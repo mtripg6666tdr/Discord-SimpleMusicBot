@@ -214,19 +214,30 @@ client.on("message", async message => {
         }
         message.channel.send({embed:{
           title: message.guild.name + "のキュー",
-          fields: fields
+          fields: fields,
+          footer: {
+            text: queue.length + "個の曲"
+          }
         }});
+      }break;
+      case "reset":{
+        data[message.guild.id] = null;
+        initData();
+        message.channel.send("✅サーバーの設定を初期化しました");
       }break;
     }
   }else if(message.content === "キャンセル" || message.content === "cancel") {
     if(data[message.guild.id].SearchPanel !== null){
-      client.channels.fetch(data[message.guild.id].SearchPanel.Msg.chId).then(ch => {
-        (ch as discord.TextChannel).messages.fetch(data[message.guild.id].SearchPanel.Msg.id).then(msg => {
-          msg.delete().catch(console.error);
-        }).catch(console.error);
-      }).catch(console.error);
-      data[message.guild.id].SearchPanel = null;
-      message.channel.send("✅キャンセルしました");
+      try{
+        const ch = await client.channels.fetch(data[message.guild.id].SearchPanel.Msg.chId);
+        const msg = await (ch as discord.TextChannel).messages.fetch(data[message.guild.id].SearchPanel.Msg.id);
+        await msg.delete();
+        data[message.guild.id].SearchPanel = null;
+        await message.channel.send("✅キャンセルしました");
+      }
+      catch(e){
+        console.error(e);
+      }
     }
   }else if(message.content.match(/^[0-9]+$/) && data[message.guild.id].SearchPanel){
     const panel = data[message.guild.id].SearchPanel;
