@@ -60,6 +60,8 @@ client.on("message", async message => {
         embed.title = "適当なみゅーじっくぼっと";
         embed.description = "ちょう適当に作ったみゅーじっくぼっと";
         embed.addField("作者", "mtripg6666tdr");
+        embed.addField("れぽじとり","https://github.com/mtripg6666tdr/Discord-SimpleMusicBot");
+        embed.addField("一言","開発中のためバグ等あるのでお気になさらず");
         message.channel.send(embed);
       }; break;
       case "join":{
