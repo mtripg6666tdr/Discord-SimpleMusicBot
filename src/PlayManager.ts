@@ -41,6 +41,9 @@ export class PlayManager {
           this.info.Connection.disconnect();
           this.info.Manager.Dispatcher = null;
           this.info.Connection = null;
+        // なくなってないなら再生開始！
+        }else{
+          this.Play();
         }
       });
       if(this.info.boundTextChannel){
