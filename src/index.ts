@@ -203,6 +203,7 @@ client.on("message", async message => {
       }break;
       case "q":
       case "queue":{
+        const msg = await message.channel.send(":eyes: キューを確認しています。お待ちください...");
         const fields:{name:string, value:string}[] = [];
         const queue = data[message.guild.id].Queue;
         for(var i = 0; i < queue.length; i++){
@@ -212,7 +213,7 @@ client.on("message", async message => {
             value: "[" + info.title + "](" + queue[i] + ")"
           });
         }
-        message.channel.send({embed:{
+        msg.edit({embed:{
           title: message.guild.name + "のキュー",
           fields: fields,
           footer: {
