@@ -1,0 +1,3 @@
+# Discord-SimpleMusicBot
+Discord向けシンプル音楽ボット 
+開発中のためバグが多々あります
