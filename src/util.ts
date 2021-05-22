@@ -2,7 +2,7 @@ import { Client, MessageEmbed, TextChannel } from "discord.js";
 import { GuildVoiceInfo, VideoInfo } from "./definition";
 
 export async function AddQueue(client:Client, data:GuildVoiceInfo, video:VideoInfo){
-  data.Queue.push(video.url);
+  data.Queue.AddQueue(video.url);
   const embed = new MessageEmbed();
   embed.title = "✅曲が追加されました";
   embed.description = "[" + video.title + "](" + video.url + ") `" + video.duration + "`";

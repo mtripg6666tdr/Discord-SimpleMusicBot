@@ -1,12 +1,14 @@
-import { StreamDispatcher, VoiceConnection } from "discord.js";
-import { PlayManager } from "./PlayManager";
+import { Client, Message, StreamDispatcher, VoiceConnection } from "discord.js";
+import * as fs from "fs";
+import { PlayManager } from "./Component/PlayManager";
+import { QueueManager } from "./Component/QueueManager";
 
 // サーバーごとデータ
-export type GuildVoiceInfo = {
-  // プレフィックス
-  Prefix: string,
+export class GuildVoiceInfo{
+  // 永続的設定
+  PersistentPref:PersistentPref;
   // ボイスチャンネルの接続
-  Connection:VoiceConnection,
+  Connection:VoiceConnection;
   // 検索窓の格納
   SearchPanel: {
     // 検索窓のメッセージを表す
@@ -18,17 +20,49 @@ export type GuildVoiceInfo = {
     },
     // 検索窓の内容
     Opts: {[num:number]: VideoInfo}
-  },
-  // キュー
-  Queue:string[],
-  // ループが有効かどうか
-  Loop:Boolean,
-  // キュー内ループが有効かどうか
-  LoopQueue:Boolean,
+  };
+  // キューマネジャ
+  Queue:QueueManager;
   // 再生マネジャ
-  Manager:PlayManager,
+  Manager:PlayManager;
   // 紐づけテキストチャンネル
-  boundTextChannel:string
+  boundTextChannel:string;
+  // サーバーID
+  GuildID:string;
+  // データパス
+  DataPath:string;
+
+  constructor(client:Client, message:Message){
+    const guildid = message.guild.id;
+
+    this.Connection = null;
+    this.SearchPanel =null;
+    this.Queue = new QueueManager();
+    this.Manager = new PlayManager(client);
+    this.boundTextChannel = message.channel.id;
+    this.GuildID = guildid;
+    this.DataPath = ".data/" + guildid + ".preferences.json";
+
+    if(fs.existsSync(".data") && fs.existsSync(this.DataPath)){
+      this.PersistentPref = JSON.parse(fs.readFileSync(this.DataPath, { encoding: "utf-8"}));
+    }else{
+      this.PersistentPref = {
+        Prefix: ">"
+      }
+    }
+  }
+
+  SavePersistentPrefs(){
+    fs.writeFileSync(this.DataPath, JSON.stringify(this.PersistentPref));
+  }
+
+  ResetPersistentPrefs(){
+    fs.unlinkSync(this.DataPath);
+  }
+}
+
+type PersistentPref = {
+  Prefix:string;
 }
 
 export type VideoInfo = {
@@ -44,4 +78,5 @@ export type ytdlVideoInfo = {
   description: string;
   title: string;
   video_url: string;
+  lengthSeconds: string;
 }
