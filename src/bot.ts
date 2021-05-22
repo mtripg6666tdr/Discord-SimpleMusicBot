@@ -243,7 +243,7 @@ export class MusicBot {
               title: message.guild.name + "のキュー",
               fields: fields,
               footer: {
-                text: queue.length + "曲 | トラックループ:" + (queue.LoopEnabled ? ":o:" : ":x:") + " | キューループ:" + (queue.QueueLoopEnabled ? ":o:" : ":x:")
+                text: queue.length + "曲 | トラックループ:" + (queue.LoopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.QueueLoopEnabled ? "⭕" : "❌")
               }
             });
             msg.edit("", embed);
@@ -289,7 +289,8 @@ export class MusicBot {
               message.channel.send(":repeat:キューリピートを有効にしました:o:");
             }
           }break;
-          case "rm":{
+          case "rm":
+          case "remove":{
             if(options.length == 0){
               message.channel.send("引数に消去する曲のオフセット(番号)を入力してください。");
               return;
@@ -305,7 +306,7 @@ export class MusicBot {
             message.channel.send("🚮" + dels.join(",") + "番目の曲を削除しました");
           }break;
         }
-      // searchコマンドのキャンセルを補足
+      // searchコマンドのキャンセルを捕捉
       }else if(message.content === "キャンセル" || message.content === "cancel") {
         if(this.data[message.guild.id].SearchPanel !== null){
           const msgId = this.data[message.guild.id].SearchPanel.Msg;
@@ -320,7 +321,7 @@ export class MusicBot {
             console.error(e);
           }
         }
-      // searchコマンドの選択を補足
+      // searchコマンドの選択を捕捉
       }else if(message.content.match(/^[0-9]+$/) && this.data[message.guild.id].SearchPanel){
         const panel = this.data[message.guild.id].SearchPanel;
         const num = Number(message.content);
