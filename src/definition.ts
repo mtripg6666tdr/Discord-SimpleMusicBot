@@ -1,5 +1,6 @@
 import { Client, Message, StreamDispatcher, VoiceConnection } from "discord.js";
 import * as fs from "fs";
+import { videoFormat } from "ytdl-core";
 import { PlayManager } from "./Component/PlayManager";
 import { QueueManager } from "./Component/QueueManager";
 
@@ -16,7 +17,11 @@ export class GuildVoiceInfo{
       // 検索窓のメッセージID
       id: string,
       // 検索窓のチャンネルID
-      chId: string
+      chId: string,
+      // 検索者
+      userId: string
+      // 検索者名
+      userName: string
     },
     // 検索窓の内容
     Opts: {[num:number]: VideoInfo}
@@ -66,9 +71,9 @@ type PersistentPref = {
 }
 
 export type VideoInfo = {
-  url:string,
-  title:string,
-  duration:string
+  url:string;
+  title:string;
+  duration:string;
 };
 
 // This type definition was distributed in https://github.com/fent/node-ytdl-core under MIT License
@@ -79,4 +84,19 @@ export type ytdlVideoInfo = {
   title: string;
   video_url: string;
   lengthSeconds: string;
+  thumbnails:Thumbnails[];
+  isLiveContent: boolean;
+}
+
+type Thumbnails = {
+  url: string;
+  width: number;
+  height: number;
+}
+
+export type QueueContent =
+{
+  info: ytdlVideoInfo;
+  formats: videoFormat[];
+  addedBy: string;
 }
