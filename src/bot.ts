@@ -293,6 +293,7 @@ export class MusicBot {
               }
             }
             embed.description = "[" + info.title + "](" + info.video_url + ")\r\n" + progressBar + " `" + min + ":" + sec + "/" + tmin + ":" + tsec + "`";
+            embed.setThumbnail(info.thumbnails[0].url);
             embed.addField(":asterisk:概要", info.description.length > 350 ? info.description.substring(0, 300) + "..." : info.description);
             embed.addField("⭐評価", ":+1:" + info.likes + "/:-1:" + info.dislikes);
             message.channel.send(embed);
@@ -311,8 +312,8 @@ export class MusicBot {
               const [min,sec] = CalcMinSec(_t);
               totalLength += _t;
               fields.push({
-                name: i === 0 ? "現在再生中" : i.toString(),
-                value: "[" + queue.default[i].info.title + "](" + queue.default[i].info.video_url + ") \r\n長さ:`" + min + ":" + sec + "`\r\nリクエスト:`" + queue.default[i].addedBy + "`"
+                name: i !== 0 ? i.toString() : this.data[message.guild.id].Manager.IsPlaying ? "現在再生中" : "再生待ち",
+                value: "[" + queue.default[i].info.title + "](" + queue.default[i].info.video_url + ") \r\n長さ: `" + min + ":" + sec + " ` \r\nリクエスト: `" + queue.default[i].addedBy + "` "
               });
             }
             const [tmin, tsec] = CalcMinSec(totalLength);
@@ -320,7 +321,7 @@ export class MusicBot {
               title: message.guild.name + "のキュー",
               fields: fields,
               author: {
-                url: client.user.avatarURL(),
+                icon_url: client.user.avatarURL(),
                 name: client.user.username
               },
               footer: {
@@ -440,6 +441,7 @@ export class MusicBot {
             embed.addField("Botが起動してからの経過時間", ready[0] + "時間" + ready[1] + "分" + ready[2] + "秒");
             embed.addField("レイテンシ", (new Date().getTime() - message.createdAt.getTime()) + "ミリ秒");
             embed.addField("データベースに登録されたサーバー数", Object.keys(this.data).length + "サーバー");
+            message.channel.send(embed);
           }break;
         }
       // searchコマンドのキャンセルを捕捉
