@@ -154,7 +154,7 @@ export class MusicBot {
           case "search":{
             if(!join()) return;
             if(ytdl.validateURL(optiont)){
-              await playFromURL(this.data[message.guild.id].Manager.IsPlaying);
+              await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
               return;
             }
             if(this.data[message.guild.id].SearchPanel !== null){
@@ -227,7 +227,7 @@ export class MusicBot {
             }
             // 引数ついてたらそれ優先
             if(optiont !== ""){
-              await playFromURL(this.data[message.guild.id].Manager.IsPlaying);
+              await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
             // ついてないからキューから再生
             }else if(this.data[message.guild.id].Queue.length >= 1){
               this.data[message.guild.id].Manager.Play();
