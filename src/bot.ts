@@ -49,33 +49,37 @@ export class MusicBot {
         };
         // VC参加関数
         const join = async():Promise<boolean>=>{
-          // すでにVC入ってるよ～
-          if(message.member.voice.channel.members.has(client.user.id)){
-            return true;
-          }
           if(message.member.voice.channelID != null){
+            // すでにVC入ってるよ～
+            if(message.member.voice.channel.members.has(client.user.id)){
+              return true;
+            }
+            // 入ってないね～参加しよう
             const msg = await message.channel.send(":electric_plug:接続中...");
             try{
               const connection = await message.member.voice.channel.join()
               this.data[message.guild.id].Connection = connection;
               console.log("[Main/" + message.guild.id + "]VC Connected to " + connection.channel.id);
               await msg.edit(":+1:ボイスチャンネル:speaker:`" + message.member.voice.channel.name + "`に接続しました!");
-              return true
+              return true;
             }
             catch(e){
               console.error(e);
             }
           }else{
+            // あらメッセージの送信者さんはボイチャ入ってないん…
             await message.channel.send("✘ボイスチャンネルに参加してからコマンドを送信してください。");
             return false;
           }
         };
         // URLから再生関数
         const playFromURL = async ()=>{
+          // 引数は動画の直リンクかなぁ
           if(ytdl.validateURL(optiont)){
             await AddQueue(client, this.data[message.guild.id], optiont, message.member.displayName, true, message.channel as discord.TextChannel);
             this.data[message.guild.id].Manager.Play();
           }else{
+            //違うならプレイリストの直リンクか？
             try{
               const id = await ytpl.getPlaylistID(optiont);
               const msg = await message.channel.send(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
@@ -90,6 +94,7 @@ export class MusicBot {
               msg.edit("✅" + result.items.length + "曲が追加されました。");
             }
             catch{
+              // なに指定したし…
               message.channel.send("有効なURLを指定してください。キーワードで再生する場合はsearchコマンドを使用してください。");
               return;
             }
@@ -99,6 +104,8 @@ export class MusicBot {
         initData();
         // テキストチャンネルバインド
         this.data[message.guild.id].boundTextChannel = message.channel.id;
+        
+        // コマンドの処理に徹します
         switch(command){
           case "commands":
           case "command":{
@@ -218,11 +225,6 @@ export class MusicBot {
               message.channel.send("ボイスチャンネルに参加してからコマンドを送信してください:relieved:");
               return;
             }
-            // すでに再生中じゃん
-            if(this.data[message.guild.id].Manager.IsPlaying && !this.data[message.guild.id].Manager.IsPaused) {
-              message.channel.send("すでに再生中です:round_pushpin:");
-              return;
-            }
             // 引数ついてたらそれ優先
             if(optiont !== ""){
               await playFromURL();
@@ -291,6 +293,7 @@ export class MusicBot {
               }
             }
             embed.description = "[" + info.title + "](" + info.video_url + ")\r\n" + progressBar + " `" + min + ":" + sec + "/" + tmin + ":" + tsec + "`";
+            embed.setThumbnail(info.thumbnails[0].url);
             embed.addField(":asterisk:概要", info.description.length > 350 ? info.description.substring(0, 300) + "..." : info.description);
             embed.addField("⭐評価", ":+1:" + info.likes + "/:-1:" + info.dislikes);
             message.channel.send(embed);
@@ -309,8 +312,8 @@ export class MusicBot {
               const [min,sec] = CalcMinSec(_t);
               totalLength += _t;
               fields.push({
-                name: i === 0 ? "現在再生中" : i.toString(),
-                value: "[" + queue.default[i].info.title + "](" + queue.default[i].info.video_url + ") \r\n長さ:`" + min + ":" + sec + "`\r\nリクエスト:`" + queue.default[i].addedBy + "`"
+                name: i !== 0 ? i.toString() : this.data[message.guild.id].Manager.IsPlaying ? "現在再生中" : "再生待ち",
+                value: "[" + queue.default[i].info.title + "](" + queue.default[i].info.video_url + ") \r\n長さ: `" + min + ":" + sec + " ` \r\nリクエスト: `" + queue.default[i].addedBy + "` "
               });
             }
             const [tmin, tsec] = CalcMinSec(totalLength);
@@ -318,7 +321,7 @@ export class MusicBot {
               title: message.guild.name + "のキュー",
               fields: fields,
               author: {
-                url: client.user.avatarURL(),
+                icon_url: client.user.avatarURL(),
                 name: client.user.username
               },
               footer: {
@@ -347,6 +350,7 @@ export class MusicBot {
           case "スキップ":
           case "s":
           case "skip":{
+            // そもそも再生状態じゃないよ...
             if(!this.data[message.guild.id].Manager.IsPlaying){
               message.channel.send("再生中ではありません");
               return;
@@ -384,7 +388,7 @@ export class MusicBot {
           case "rm":
           case "remove":{
             if(options.length == 0){
-              message.channel.send("引数に消去する曲のオフセット(番号)を入力してください。");
+              message.channel.send("引数に消去する曲のオフセット(番号)を入力してください。例えば、2番目と5番目の曲を削除したい場合、`" + this.data[message.guild.id].PersistentPref.Prefix + command + " 2 5`と入力します。");
               return;
             }
             if(options.indexOf("0") >= 0 && this.data[message.guild.id].Manager.IsPlaying) {
@@ -437,6 +441,7 @@ export class MusicBot {
             embed.addField("Botが起動してからの経過時間", ready[0] + "時間" + ready[1] + "分" + ready[2] + "秒");
             embed.addField("レイテンシ", (new Date().getTime() - message.createdAt.getTime()) + "ミリ秒");
             embed.addField("データベースに登録されたサーバー数", Object.keys(this.data).length + "サーバー");
+            message.channel.send(embed);
           }break;
         }
       // searchコマンドのキャンセルを捕捉

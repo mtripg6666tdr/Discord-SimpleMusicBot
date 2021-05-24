@@ -118,6 +118,7 @@ export class PlayManager {
       }
     }
     catch(e){
+    console.log(e);
       if(this.info.boundTextChannel && ch && mes){
         mes.edit(":tired_face:曲の再生に失敗しました...。スキップします。");
         cantPlay();
