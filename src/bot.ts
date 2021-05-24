@@ -227,7 +227,7 @@ export class MusicBot {
             if(optiont !== ""){
               await playFromURL();
             // ついてないからキューから再生
-            }else if(this.data[message.guild.id].Queue.length > 1){
+            }else if(this.data[message.guild.id].Queue.length >= 1){
               this.data[message.guild.id].Manager.Play();
             }else{
               message.channel.send("✘キューが空です");
@@ -387,7 +387,7 @@ export class MusicBot {
               message.channel.send("引数に消去する曲のオフセット(番号)を入力してください。");
               return;
             }
-            if(options.indexOf("0") >= 0) {
+            if(options.indexOf("0") >= 0 && this.data[message.guild.id].Manager.IsPlaying) {
               message.channel.send("現在再生中の楽曲を削除することはできません。");
               return;
             }
