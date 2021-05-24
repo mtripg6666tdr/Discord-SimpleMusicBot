@@ -446,6 +446,10 @@ export class MusicBot {
           
           case "ログ":
           case "log":{
+            if(message.author.id !== "593758391395155978") {
+              message.channel.send("このコマンドを十個する権限がありません。").catch(e => log(e, "error"));
+              return;
+            }
             this.Log();
             message.channel.send("```"  + logStore.data.concat("\r\n") + "```", {embed: {
               title: "CPU Usage",
