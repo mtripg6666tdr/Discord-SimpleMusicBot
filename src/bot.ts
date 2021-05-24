@@ -1,9 +1,10 @@
 import * as discord from "discord.js";
+import * as os from "os";
 import * as ytdl from "ytdl-core";
 import * as ytsr from "ytsr";
 import * as ytpl from "ytpl";
 import { GuildVoiceInfo } from "./definition";
-import { AddQueue, CalcMinSec, CalcTime } from "./util";
+import { AddQueue, CalcMinSec, CalcTime, log, logStore } from "./util";
 
 export class MusicBot {
   private client = new discord.Client();
@@ -15,16 +16,13 @@ export class MusicBot {
     const client = this.client;
     
     client.on("ready", ()=> {
-      console.log("[Main]Main bot is ready and active now");
+      log("[Main]Main bot is ready and active now");
       client.user.setActivity({
         type: "LISTENING",
         name: "音楽"
       });
       const tick = ()=>{
-        const _d = Object.values(this.data);
-        console.log("[Main]Participating Server(s) count: " + this.client.guilds.cache.size);
-        console.log("[Main]Registered Server(s) count: " + Object.keys(this.data).length);
-        console.log("[Main]Connecting Server(s) count: " + _d.filter(info => info.Connection !== null).length);
+        this.Log();
         setTimeout(tick, 10 * 60 * 1000);
       };
       tick();
@@ -39,7 +37,7 @@ export class MusicBot {
         const optiont = msg_spl.length > 1 ? message.content.substring(command.length + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">").length + 1, message.content.length) : "";
         const options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
         
-        console.log("[Main/" + message.guild.id + "]Command Prefix detected: " + message.content);
+        log("[Main/" + message.guild.id + "]Command Prefix detected: " + message.content);
         // サーバーデータ初期化関数
         const initData = ()=> {
           if(!this.data[message.guild.id]) {
@@ -59,12 +57,14 @@ export class MusicBot {
             try{
               const connection = await message.member.voice.channel.join()
               this.data[message.guild.id].Connection = connection;
-              console.log("[Main/" + message.guild.id + "]VC Connected to " + connection.channel.id);
+              log("[Main/" + message.guild.id + "]VC Connected to " + connection.channel.id);
               await msg.edit(":+1:ボイスチャンネル:speaker:`" + message.member.voice.channel.name + "`に接続しました!");
               return true;
             }
             catch(e){
-              console.error(e);
+              log(e, "error");
+              msg.edit(":sob:接続試行しましたが失敗しました...もう一度お試しください。\r\nエラー詳細\r\n```" + e + "\r\n```").catch(e => log(e, "error"));
+              return false;
             }
           }else{
             // あらメッセージの送信者さんはボイチャ入ってないん…
@@ -73,10 +73,10 @@ export class MusicBot {
           }
         };
         // URLから再生関数
-        const playFromURL = async ()=>{
+        const playFromURL = async (first:boolean = true)=>{
           // 引数は動画の直リンクかなぁ
           if(ytdl.validateURL(optiont)){
-            await AddQueue(client, this.data[message.guild.id], optiont, message.member.displayName, true, message.channel as discord.TextChannel);
+            await AddQueue(client, this.data[message.guild.id], optiont, message.member.displayName, first, message.channel as discord.TextChannel);
             this.data[message.guild.id].Manager.Play();
           }else{
             //違うならプレイリストの直リンクか？
@@ -154,7 +154,7 @@ export class MusicBot {
           case "search":{
             if(!join()) return;
             if(ytdl.validateURL(optiont)){
-              playFromURL();
+              await playFromURL(this.data[message.guild.id].Manager.IsPlaying);
               return;
             }
             if(this.data[message.guild.id].SearchPanel !== null){
@@ -200,7 +200,7 @@ export class MusicBot {
                 msg.edit("", embed);
               }
               catch(e){
-                console.error(e);
+                log(e, "error");
                 message.channel.send("✘内部エラーが発生しました");
               }
             }
@@ -227,7 +227,7 @@ export class MusicBot {
             }
             // 引数ついてたらそれ優先
             if(optiont !== ""){
-              await playFromURL();
+              await playFromURL(this.data[message.guild.id].Manager.IsPlaying);
             // ついてないからキューから再生
             }else if(this.data[message.guild.id].Queue.length >= 1){
               this.data[message.guild.id].Manager.Play();
@@ -443,6 +443,15 @@ export class MusicBot {
             embed.addField("データベースに登録されたサーバー数", Object.keys(this.data).length + "サーバー");
             message.channel.send(embed);
           }break;
+          
+          case "ログ":
+          case "log":{
+            this.Log();
+            message.channel.send("```"  + logStore.data.concat("\r\n") + "```", {embed: {
+              title: "CPU Usage",
+              description: os.cpus().toString()
+            }}).catch(e => log(e, "error"));
+          }break;
         }
       // searchコマンドのキャンセルを捕捉
       }else if(message.content === "キャンセル" || message.content === "cancel") {
@@ -456,7 +465,7 @@ export class MusicBot {
             await msg.delete();
           }
           catch(e){
-            console.error(e);
+            log(e, "error");
           }
         }
       // searchコマンドの選択を捕捉
@@ -474,6 +483,19 @@ export class MusicBot {
         }
       }
     });
+  }
+
+  Log(){
+    const _d = Object.values(this.data);
+    var memory = {} as {free:number,total:number,usage:number};
+    memory.free = os.freemem() / 1024/*KB*/ / 1024/*MB*/;
+    memory.total = os.totalmem() / 1024/*KB*/ / 1024/*MB*/;
+    memory.usage = Math.floor((memory.total -  memory.free) / memory.total * 1000) / 10;
+    log("[Main]Participating Server(s) count: " + this.client.guilds.cache.size);
+    log("[Main]Registered Server(s) count: " + Object.keys(this.data).length);
+    log("[Main]Connecting Server(s) count: " + _d.filter(info => info.Manager.IsPlaying).length);
+    log("[Main]Paused Server(s) count: " + _d.filter(_d => _d.Manager.IsPaused).length);
+    log("[System]Free:" + memory.free + "MB; Total:" + memory.total + "MB; Usage:" + memory.usage + "%");
   }
 
   Run(token:string){

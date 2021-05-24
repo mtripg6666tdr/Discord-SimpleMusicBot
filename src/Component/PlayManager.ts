@@ -2,6 +2,7 @@ import { Client, Message, MessageEmbed, StreamDispatcher, TextChannel } from "di
 import { GuildVoiceInfo, ytdlVideoInfo } from "../definition";
 import * as ytdl from "ytdl-core";
 import { Readable } from "stream";
+import { log } from "../util";
 
 export class PlayManager {
   private Dispatcher:StreamDispatcher = null;
@@ -30,12 +31,12 @@ export class PlayManager {
   }
   // コンストラクタ
   constructor(private client:Client){
-    console.log("[PlayManager]Play Manager instantiated");
+    log("[PlayManager]Play Manager instantiated");
   }
 
   // 親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
   SetData(data:GuildVoiceInfo){
-    console.log("[PlayManager]Set data of guild id " + data.GuildID)
+    log("[PlayManager]Set data of guild id " + data.GuildID)
     if(this.info) throw "すでに設定されています";
     this.info = data;
   }
@@ -43,10 +44,10 @@ export class PlayManager {
   // 再生します
   async Play():Promise<PlayManager>{
     if(!this.info.Connection || this.Dispatcher || this.info.Queue.length == 0) {
-      console.warn("[PlayManager/" + this.info.GuildID + "]Play() called but operated nothing");
+      log("[PlayManager/" + this.info.GuildID + "]Play() called but operated nothing", "warn");
       return this;
     }
-    console.log("[PlayManager/" + this.info.GuildID + "]Play() called");
+    log("[PlayManager/" + this.info.GuildID + "]Play() called");
     var mes:Message = null;
     var ch:TextChannel = null;
     if(this.info.boundTextChannel){
@@ -54,7 +55,7 @@ export class PlayManager {
       mes = await ch.send(":hourglass_flowing_sand:再生準備中...");
     }
     const cantPlay = ()=>{
-      console.warn("[PlayManager:" + this.info.GuildID + "]Play() failed");
+      log("[PlayManager:" + this.info.GuildID + "]Play() failed", "warn");
       if(this.info.Queue.LoopEnabled) this.info.Queue.LoopEnabled = false;
       if(this.info.Queue.length === 1 && this.info.Queue.QueueLoopEnabled) this.info.Queue.QueueLoopEnabled = false;
       this.Stop();
@@ -77,7 +78,7 @@ export class PlayManager {
         format: format
       });
       this.Dispatcher = this.info.Connection.play(this.Stream).on("finish", ()=> {
-        console.log("[PlayManager/" + this.info.GuildID + "]Stream finished");
+        log("[PlayManager/" + this.info.GuildID + "]Stream finished");
         // 再生が終わったら
         this.Dispatcher.destroy();
         this.Dispatcher = null;
@@ -91,16 +92,16 @@ export class PlayManager {
         // キューがなくなったら接続終了
         if(this.info.Queue.length === 0){
           this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
-            console.log("[PlayManager/" + this.info.GuildID + "]Queue empty");
-            (ch as TextChannel).send(":wave:キューが空になったため終了します").catch(console.error);
-          }).catch(console.error);
+            log("[PlayManager/" + this.info.GuildID + "]Queue empty");
+            (ch as TextChannel).send(":wave:キューが空になったため終了します").catch(e => log(e, "error"));
+          }).catch(e => log(e, "error"));
           this.Disconnect();
         // なくなってないなら再生開始！
         }else{
           this.Play();
         }
       });
-      console.log("[PlayManager/" + this.info.GuildID + "]Play() started successfully");
+      log("[PlayManager/" + this.info.GuildID + "]Play() started successfully");
       if(this.info.boundTextChannel && ch && mes){
         var _t = Number(this.CurrentVideoInfo.lengthSeconds);
         const sec = _t % 60;
@@ -118,7 +119,7 @@ export class PlayManager {
       }
     }
     catch(e){
-    console.log(e);
+    log(e);
       if(this.info.boundTextChannel && ch && mes){
         mes.edit(":tired_face:曲の再生に失敗しました...。スキップします。");
         cantPlay();
@@ -130,7 +131,7 @@ export class PlayManager {
 
   // 停止します。切断するにはDisconnectを使用してください。
   Stop():PlayManager{
-    console.log("[PlayManager/" + this.info.GuildID + "]Stop() called");
+    log("[PlayManager/" + this.info.GuildID + "]Stop() called");
     if(this.Stream && !this.Stream.destroyed){
       this.Stream.destroy();
     }
@@ -145,32 +146,32 @@ export class PlayManager {
   Disconnect():PlayManager{
     this.Stop();
     if(this.info.Connection){
-      console.log("[PlayManager/" + this.info.GuildID + "]VC disconnected from " + this.info.Connection.channel.id);
+      log("[PlayManager/" + this.info.GuildID + "]VC disconnected from " + this.info.Connection.channel.id);
       this.info.Connection.disconnect();
       this.info.Connection = null;
     }else{
-      console.warn("[PlayManager/" + this.info.GuildID + "]Disconnect() called but no connection");
+      log("[PlayManager/" + this.info.GuildID + "]Disconnect() called but no connection", "warn");
     }
     return this;
   }
 
   // 一時停止します。
   Pause():PlayManager{
-    console.log("[PlayManager/" + this.info.GuildID + "]Pause() called");
+    log("[PlayManager/" + this.info.GuildID + "]Pause() called");
     this.Dispatcher?.pause();
     return this;
   }
 
   // 一時停止再生します。
   Resume():PlayManager{
-    console.log("[PlayManager/" + this.info.GuildID + "]Resume() called");
+    log("[PlayManager/" + this.info.GuildID + "]Resume() called");
     this.Dispatcher?.resume();
     return this;
   }
 
   // 頭出しをします。
   Rewind(){
-    console.log("[PlayManager/" + this.info.GuildID + "]Rewind() called");
+    log("[PlayManager/" + this.info.GuildID + "]Rewind() called");
     this.Stop();
     this.Play();
   }

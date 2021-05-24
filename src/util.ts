@@ -29,7 +29,7 @@ export async function AddQueue(client:Client, data:GuildVoiceInfo, url:string, a
     }
   }
   catch(e){
-    console.error(e);
+    log(e, "error");
   }
 }
 
@@ -55,4 +55,21 @@ export function CalcTime(date:number){
   const min = ato % 60;
   const hour = (ato - min) / 60;
   return [hour, min, sec, millisec];
+}
+
+class LogStore{
+  data:string[] = [];
+  addLog(log:string){
+    this.data.push(log +"\r\n");
+    if(this.data.length >= 21){
+      this.data = this.data.slice(1 , this.data.length);
+    }
+  }
+}
+
+export var logStore = new LogStore();
+
+export function log(content:string, level:"log"|"warn"|"error" = "log"){
+  console[level](content);
+  logStore.addLog(level + ":" + content);
 }
