@@ -447,7 +447,7 @@ export class MusicBot {
           case "ログ":
           case "log":{
             if(message.author.id !== "593758391395155978") {
-              message.channel.send("このコマンドを十個する権限がありません。").catch(e => log(e, "error"));
+              message.channel.send("このコマンドを実行する権限がありません。").catch(e => log(e, "error"));
               return;
             }
             this.Log();
