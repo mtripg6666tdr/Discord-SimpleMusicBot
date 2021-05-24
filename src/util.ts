@@ -21,7 +21,7 @@ export async function AddQueue(client:Client, data:GuildVoiceInfo, url:string, a
       const [min,sec] = CalcMinSec(Number(info.lengthSeconds));
       embed.addField("長さ", min + ":" + sec, true);
       embed.addField("リクエスト", addedBy, true);
-      embed.addField("キュー内の位置", first ? "0" : data.Queue.length, true);
+      embed.addField("キュー内の位置", first ? "0" : data.Queue.length - 1, true);
       embed.thumbnail = {
         url: info.thumbnails[0].url
       };
