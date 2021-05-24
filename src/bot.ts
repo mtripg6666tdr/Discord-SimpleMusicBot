@@ -15,7 +15,7 @@ export class MusicBot {
     const client = this.client;
     
     client.on("ready", ()=> {
-      console.log("Ready");
+      console.log("[Main]Main bot is ready and active now");
       client.user.setActivity({
         type: "LISTENING",
         name: "音楽"
