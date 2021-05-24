@@ -449,7 +449,7 @@ export class MusicBot {
             this.Log();
             message.channel.send("```"  + logStore.data.concat("\r\n") + "```", {embed: {
               title: "CPU Usage",
-              description: os.cpus().toString()
+              description: JSON.stringify(os.cpus())
             }}).catch(e => log(e, "error"));
           }break;
         }
