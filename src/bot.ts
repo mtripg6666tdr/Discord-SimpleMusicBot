@@ -10,6 +10,7 @@ export class MusicBot {
   private client = new discord.Client();
   private data:{[key:string]:GuildVoiceInfo} = {};
   private instantiatedTime = null as Date;
+  get Client(){return this.client};
 
   constructor(){
     this.instantiatedTime = new Date();
@@ -23,7 +24,7 @@ export class MusicBot {
       });
       const tick = ()=>{
         this.Log();
-        setTimeout(tick, 10 * 60 * 1000);
+        setTimeout(tick, 5 * 60 * 1000);
       };
       tick();
     });

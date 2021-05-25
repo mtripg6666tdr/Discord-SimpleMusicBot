@@ -40,11 +40,11 @@ export class QueueManager {
     if(this.QueueLoopEnabled){
       this.default.push(this.default[0]);
     }
-    this._default = this.default.slice(1, this.default.length);
+    this._default.shift();
   }
 
   RemoveAt(offset:number){
-    this._default = this.default.slice(0,offset).concat(this.default.slice(offset + 1, this.default.length));
+    this._default.splice(offset, 1);
   }
 
   RemoveAll(){

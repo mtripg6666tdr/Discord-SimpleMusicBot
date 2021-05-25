@@ -1,6 +1,6 @@
 import { Client, Message, MessageEmbed, TextChannel } from "discord.js";
 import * as os from "os";
-import { GuildVoiceInfo, VideoInfo } from "./definition";
+import { GuildVoiceInfo } from "./definition";
 
 export async function AddQueue(client:Client, data:GuildVoiceInfo, url:string, addedBy:string, first:boolean=false, channel:TextChannel = null){
   try{
@@ -94,4 +94,8 @@ export function GetMBytes(bytes:number) {
 
 export function GetPercentage(part:number, total:number){
   return Math.round(part / total * 100 * 100) / 100;
+}
+
+export function btoa(txt:string){
+  return Buffer.from(txt).toString("base64");
 }

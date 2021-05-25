@@ -4,10 +4,20 @@
 require("dotenv").config();
 import * as http from "http";
 import { MusicBot } from "./bot";
+import { btoa, log } from "./util";
 
+const bot = new MusicBot();
 http.createServer((req, res) => {
-  res.writeHead(200, { "Content-Type": "text/plain" });
-  res.end("Discord Bot is active now");
+  res.writeHead(200, { "Content-Type": "application/json" });
+  const data = {
+    status: 200,
+    message: "Discord bot is active now",
+    client: bot.Client ? btoa(bot.Client.user.id) : null,
+    readyAt: bot.Client ? btoa(bot.Client.readyAt.getTime().toString()) : null,
+    guilds: bot.Client ? bot.Client.guilds.cache.size : null
+  };
+  log("[Server]Received a http request");
+  res.end(JSON.stringify(data));
 }).listen(8080);
 
-new MusicBot().Run(process.env.TOKEN);
+bot.Run(process.env.TOKEN);
