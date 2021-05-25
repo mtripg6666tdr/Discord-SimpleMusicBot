@@ -1,4 +1,5 @@
 import { Client, Message, MessageEmbed, TextChannel } from "discord.js";
+import * as os from "os";
 import { GuildVoiceInfo, VideoInfo } from "./definition";
 
 export async function AddQueue(client:Client, data:GuildVoiceInfo, url:string, addedBy:string, first:boolean=false, channel:TextChannel = null){
@@ -33,6 +34,7 @@ export async function AddQueue(client:Client, data:GuildVoiceInfo, url:string, a
   }
 }
 
+// Returns min and sec from total sec
 export function CalcMinSec(_t:number){
   const sec = _t % 60;
   const min = (_t - sec) / 60;
@@ -47,6 +49,7 @@ export function AddZero(str:string, length:number){
   return str;
 }
 
+// Returns hour, min, sec and millisec from total millisec
 export function CalcTime(date:number){
   const millisec = date % 1000;
   var ato = (date - millisec) / 1000;
@@ -61,7 +64,7 @@ class LogStore{
   data:string[] = [];
   addLog(log:string){
     this.data.push(log +"\r\n");
-    if(this.data.length >= 21){
+    if(this.data.length > 30){
       this.data = this.data.slice(1 , this.data.length);
     }
   }
@@ -72,4 +75,23 @@ export var logStore = new LogStore();
 export function log(content:string, level:"log"|"warn"|"error" = "log"){
   console[level](content);
   logStore.addLog(level + ":" + content);
+}
+
+type MemoryUsageInfo = {free:number,total:number,used:number,usage:number};
+
+export function GetMemInfo():MemoryUsageInfo{
+  var memory = {} as MemoryUsageInfo;
+  memory.free = GetMBytes(os.freemem());
+  memory.total = GetMBytes(os.totalmem());
+  memory.used = memory.total - memory.free;
+  memory.usage = GetPercentage(memory.used, memory.total);
+  return memory;
+}
+
+export function GetMBytes(bytes:number) {
+  return Math.round(bytes / 1024/*KB*/ / 1024/*MB*/ * 100) / 100;
+}
+
+export function GetPercentage(part:number, total:number){
+  return Math.round(part / total * 100 * 100) / 100;
 }

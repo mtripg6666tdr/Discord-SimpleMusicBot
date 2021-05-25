@@ -4,7 +4,7 @@ import * as ytdl from "ytdl-core";
 import * as ytsr from "ytsr";
 import * as ytpl from "ytpl";
 import { GuildVoiceInfo } from "./definition";
-import { AddQueue, CalcMinSec, CalcTime, log, logStore } from "./util";
+import { AddQueue, CalcMinSec, CalcTime, GetMBytes, GetMemInfo, GetPercentage, log, logStore } from "./util";
 
 export class MusicBot {
   private client = new discord.Client();
@@ -30,7 +30,7 @@ export class MusicBot {
 
     client.on("message", async message => {
       if(message.author.bot || message.channel.type == "dm") return;
-      if(message.mentions.has(client.user)) message.channel.send("使い方は、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`で確認できます");
+      if(message.mentions.has(client.user)) message.channel.send("コマンド、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`で確認できます");
       if(message.content.startsWith(this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">")){
         const msg_spl = message.content.substr(1, message.content.length - 1).split(" ");
         const command = msg_spl[0];
@@ -127,7 +127,8 @@ export class MusicBot {
             embed.addField("削除, rm, remove", "キュー内の指定された位置の曲を削除します。", true);
             embed.addField("全て削除, すべて削除, rmall, allrm, removeall", "キュー内の曲をすべて削除します。", true);
             embed.addField("頭出し, rewind, gotop, top", "再生中の曲の頭出しを行います。", true);
-            embed.addField("アップタイム, uptime", "ボットのアップタイムを表示します。", true);
+            embed.addField("アップタイム, ping, uptime", "ボットのアップタイムおよびping時間(レイテンシ)を表示します。", true);
+            embed.addField("ログ, log, システム情報, systeminfo, sysinfo", "ホストされているサーバーやプロセスに関する技術的な情報を表示します。", true);
             message.channel.send(embed);
           }break;
           
@@ -135,7 +136,7 @@ export class MusicBot {
           case "help":{
             const embed = new discord.MessageEmbed();
             embed.title = client.user.username + ":notes:";
-            embed.description = "高音質な音楽を再生して、Discordでのエクスペリエンスを最高にするため作られました:robot:";
+            embed.description = "高音質な音楽を再生して、Discordでのエクスペリエンスを最高にするため作られました:robot:\r\n利用可能なコマンドを確認するには、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`を使用してください。";
             embed.addField("作者", "[" + client.users.resolve("593758391395155978").username + "](https://github.com/mtripg6666tdr)");
             embed.addField("レポジトリ/ソースコード","https://github.com/mtripg6666tdr/Discord-SimpleMusicBot");
             message.channel.send(embed);
@@ -431,6 +432,7 @@ export class MusicBot {
           }break;
           
           case "アップタイム":
+          case "ping":
           case "uptime":{
             const now = new Date();
             const insta = CalcTime(now.getTime() - this.instantiatedTime.getTime());
@@ -445,16 +447,96 @@ export class MusicBot {
           }break;
           
           case "ログ":
+          case "systeminfo":
+          case "sysinfo":
+          case "システム情報":
           case "log":{
-            if(message.author.id !== "593758391395155978") {
-              message.channel.send("このコマンドを実行する権限がありません。").catch(e => log(e, "error"));
+            // Run default logger
+            this.Log();
+
+            if(message.author.id === "593758391395155978"){
+              // Process Logs
+              const logEmbed = new discord.MessageEmbed();
+              logEmbed.title = "Log";
+              logEmbed.description = "Last 30 bot logs\r\n```\r\n" + logStore.data.join("\r\n") + "\r\n```";
+              message.channel.send(logEmbed).catch(e => log(e, "error"));
+            }
+
+            // Process CPU Info
+            const cpuInfoEmbed = new discord.MessageEmbed();
+            const cpus = os.cpus();
+            cpuInfoEmbed.title = "CPU Info";
+            for(var i = 0; i < cpus.length; i++){
+              const all = cpus[i].times.user + cpus[i].times.sys + cpus[i].times.nice + cpus[i].times.irq + cpus[i].times.idle;
+              cpuInfoEmbed.addField(
+                "CPU" + (i + 1), "Model: `" + cpus[i].model + "`\r\n" 
+              + "Speed: `" + cpus[i].speed + "MHz`\r\n"
+              + "Times(user): `" + Math.round(cpus[i].times.user / 1000) + "s(" + GetPercentage(cpus[i].times.user, all) + "%)`\r\n"
+              + "Times(sys): `" + Math.round(cpus[i].times.sys / 1000) + "s(" + GetPercentage(cpus[i].times.sys, all) + "%)`\r\n"
+              + "Times(nice): `" + Math.round(cpus[i].times.nice / 1000) + "s(" + GetPercentage(cpus[i].times.nice, all) + "%)`\r\n"
+              + "Times(irq): `" + Math.round(cpus[i].times.irq / 1000) + "s(" + GetPercentage(cpus[i].times.irq, all) + "%)`\r\n"
+              + "Times(idle): `" + Math.round(cpus[i].times.idle / 1000) + "s(" + GetPercentage(cpus[i].times.idle, all) + "%)`"
+              , true);
+            }
+            message.channel.send(cpuInfoEmbed).catch(e => log(e, "error"));
+
+            // Process Mem Info
+            const memInfoEmbed = new discord.MessageEmbed();
+            const memory = GetMemInfo();
+            const nMem = process.memoryUsage();
+            memInfoEmbed.title = "Memory Info";
+            memInfoEmbed.addField("Total Memory", 
+                "Total: `" + memory.total + "MB`\r\n"
+              + "Used: `" + memory.used + "MB`\r\n"
+              + "Free: `" + memory.free + "MB`\r\n"
+              + "Usage: `" + memory.usage + "%`"
+            , true);
+            var rss = GetMBytes(nMem.rss);
+            var ext = GetMBytes(nMem.external);
+            memInfoEmbed.addField("Main Process Memory", 
+                "RSS: `" + rss + "MB`\r\n"
+              + "Heap total: `" + GetMBytes(nMem.heapTotal) + "MB`\r\n"
+              + "Heap used: `" + GetMBytes(nMem.heapUsed) + "MB`\r\n"
+              + "Array buffers: `" + GetMBytes(nMem.arrayBuffers) + "MB`\r\n"
+              + "External: `" + ext + "MB`\r\n"
+              + "Total: `" + GetPercentage(rss + ext, memory.total) + "%`"
+            , true);
+            message.channel.send(memInfoEmbed).catch(e => log(e, "error"));
+          }break;
+          case "移動":
+          case "mv":
+          case "move":{
+            if(options.length !== 2){
+              message.channel.send("✘引数は`移動したい曲の元のオフセット(番号) 移動先のオフセット(番号)`のように指定します。\r\n例えば、5番目の曲を2番目に移動したい場合は`" + this.data[message.guild.id].PersistentPref.Prefix + command + " 5 2`と入力します。").catch(e => log(e, "error"));
+              return;
+            }else if(options.indexOf("0") >= 0 && this.data[message.guild.id].Manager.IsPlaying){
+              message.channel.send("✘音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。").catch(e => log(e, "error"));
               return;
             }
-            this.Log();
-            message.channel.send("```"  + logStore.data.concat("\r\n") + "```", {embed: {
-              title: "CPU Usage",
-              description: JSON.stringify(os.cpus())
-            }}).catch(e => log(e, "error"));
+            const from = Number(options[0]);
+            const to = Number(options[1]);
+            if(
+              0 <= from && from <= this.data[message.guild.id].Queue.default.length &&
+              0 <= to && to <= this.data[message.guild.id].Queue.default.length
+              ){
+                if(from < to){
+                  //要素追加
+                  this.data[message.guild.id].Queue.default.splice(to + 1, 0, this.data[message.guild.id].Queue.default[from]);
+                  //要素削除
+                  this.data[message.guild.id].Queue.default.splice(from, 1);
+                  message.channel.send("✅移動しました");
+                }else if(from > to){
+                  //要素追加
+                  this.data[message.guild.id].Queue.default.splice(to, 0, this.data[message.guild.id].Queue.default[from]);
+                  //要素削除
+                  this.data[message.guild.id].Queue.default.splice(from + 1, 1);
+                  message.channel.send("✅移動しました");
+                }else{
+                  message.channel.send("✘移動元と移動先の要素が同じでした。");
+                }
+              }else{
+                message.channel.send("✘失敗しました。引数がキューの範囲外です");
+              }
           }break;
         }
       // searchコマンドのキャンセルを捕捉
@@ -489,19 +571,18 @@ export class MusicBot {
     });
   }
 
+  // 定期ログ
   Log(){
     const _d = Object.values(this.data);
-    var memory = {} as {free:number,total:number,usage:number};
-    memory.free = os.freemem() / 1024/*KB*/ / 1024/*MB*/;
-    memory.total = os.totalmem() / 1024/*KB*/ / 1024/*MB*/;
-    memory.usage = Math.floor((memory.total -  memory.free) / memory.total * 1000) / 10;
+    const memory = GetMemInfo();
     log("[Main]Participating Server(s) count: " + this.client.guilds.cache.size);
     log("[Main]Registered Server(s) count: " + Object.keys(this.data).length);
     log("[Main]Connecting Server(s) count: " + _d.filter(info => info.Manager.IsPlaying).length);
     log("[Main]Paused Server(s) count: " + _d.filter(_d => _d.Manager.IsPaused).length);
-    log("[System]Free:" + memory.free + "MB; Total:" + memory.total + "MB; Usage:" + memory.usage + "%");
+    log("[System]Free:" + Math.floor(memory.free) + "MB; Total:" + Math.floor(memory.total) + "MB; Usage:" + memory.usage + "%");
   }
 
+  // Bot実行
   Run(token:string){
     this.client.login(token);
   }

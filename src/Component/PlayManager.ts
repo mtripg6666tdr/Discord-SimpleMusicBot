@@ -2,7 +2,7 @@ import { Client, Message, MessageEmbed, StreamDispatcher, TextChannel } from "di
 import { GuildVoiceInfo, ytdlVideoInfo } from "../definition";
 import * as ytdl from "ytdl-core";
 import { Readable } from "stream";
-import { log } from "../util";
+import { CalcMinSec, log } from "../util";
 
 export class PlayManager {
   private Dispatcher:StreamDispatcher = null;
@@ -104,14 +104,23 @@ export class PlayManager {
       log("[PlayManager/" + this.info.GuildID + "]Play() started successfully");
       if(this.info.boundTextChannel && ch && mes){
         var _t = Number(this.CurrentVideoInfo.lengthSeconds);
-        const sec = _t % 60;
-        const min = (_t - sec) / 60;
+        const [min, sec] = CalcMinSec(_t);
         const embed = new MessageEmbed({
           title: ":cd:現在再生中:musical_note:",
           description: "[" + this.CurrentVideoInfo.title + "](" + this.CurrentVideoUrl + ") `" + min + ":" + sec + "`"
         });
         embed.addField("リクエスト", this.info.Queue.default[0].addedBy, true);
-        embed.addField("次の曲", this.info.Queue.default.length === 1 ? "次の曲はまだ登録されていません" : this.info.Queue.default[1].info.title, true);
+        embed.addField("次の曲", 
+        // トラックループオンなら現在の曲
+        this.info.Queue.LoopEnabled ? this.info.Queue.default[0].info.title :
+        // (トラックループはオフ)長さが2以上ならオフセット1の曲
+        this.info.Queue.length >= 2 ? this.info.Queue.default[1].info.title :
+        // (トラックループオフ,長さ1)キューループがオンなら現在の曲
+        this.info.Queue.QueueLoopEnabled ? this.info.Queue.default[0].info.title :
+        // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
+        "次の曲がまだ登録されていません"
+        , true);
+        embed.addField("再生待ちの曲数", this.info.Queue.LoopEnabled ? "ループします" : (this.info.Queue.length - 1) + "曲");
         embed.thumbnail = {
           url: this.CurrentVideoInfo.thumbnails[0].url
         };
