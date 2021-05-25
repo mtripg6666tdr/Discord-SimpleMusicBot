@@ -69,15 +69,21 @@ export class PlayManager {
         cantPlay();
         return;
       }
-      const format = ytdl.chooseFormat(this.info.Queue.default[0].formats, {
-        filter: this.CurrentVideoInfo.isLiveContent ? null : "audioonly",
-        quality: this.CurrentVideoInfo.isLiveContent ? null : "highestaudio",
-        isHLS: this.CurrentVideoInfo.isLiveContent
-      } as any);
-      this.Stream = ytdl.default(this.info.Queue.default[0].info.video_url, {
-        format: format
-      });
-      this.Dispatcher = this.info.Connection.play(this.Stream).on("finish", ()=> {
+      if(this.CurrentVideoInfo.description !== "指定されたオーディオファイル"){
+        const format = ytdl.chooseFormat(this.info.Queue.default[0].formats, {
+          filter: this.CurrentVideoInfo.isLiveContent ? null : "audioonly",
+          quality: this.CurrentVideoInfo.isLiveContent ? null : "highestaudio",
+          isHLS: this.CurrentVideoInfo.isLiveContent
+        } as any);
+        this.Stream = ytdl.default(this.info.Queue.default[0].info.video_url, {
+          format: format
+        });
+        this.Dispatcher = this.info.Connection.play(this.Stream);
+      }else{
+        this.Stream = null;
+        this.Dispatcher = this.info.Connection.play(this.CurrentVideoInfo.video_url);
+      }
+      this.Dispatcher.on("finish", ()=> {
         log("[PlayManager/" + this.info.GuildID + "]Stream finished");
         // 再生が終わったら
         this.Dispatcher.destroy();

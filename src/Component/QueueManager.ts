@@ -16,24 +16,42 @@ export class QueueManager {
 
   }
 
-  async AddQueue(url:string, addedBy:string):Promise<ytdlVideoInfo>{
-    const info = (await ytdl.getInfo(url, {lang: "ja"}));
-    this.default.push({
-      addedBy: addedBy,
-      info: info.videoDetails,
-      formats: info.formats
-    });
-    return info.videoDetails;
+  async AddQueue(url:string, addedBy:string, method:"push"|"unshift" = "push"):Promise<ytdlVideoInfo>{
+    var info;
+    if(url.indexOf("youtube") >= 0){
+      info = (await ytdl.getInfo(url, {lang: "ja"}));
+      this.default[method]({
+        addedBy: addedBy,
+        info: info.videoDetails,
+        formats: info.formats
+      });
+      return info.videoDetails;
+    }else{
+      const info = {
+        likes: 0,
+        dislikes: 0,
+        description: "指定されたオーディオファイル",
+        title: url,
+        video_url: url,
+        lengthSeconds: "0",
+        thumbnails:[{
+          url: "https://cdn.discordapp.com/attachments/757824315294220329/846737267951271946/Audio_icon-icons.com_71845.png",
+          width: 256,
+          height: 256
+        }],
+        isLiveContent: false
+      };
+      this.default[method]({
+        addedBy: addedBy,
+        info: info,
+        formats: null
+      });
+      return info;
+    }
   }
 
   async AddQueueFirst(url:string, addedBy:string):Promise<ytdlVideoInfo>{
-    const info = (await ytdl.getInfo(url, {lang: "ja"}));
-    this._default = [{
-      addedBy: addedBy,
-      info: info.videoDetails as ytdlVideoInfo,
-      formats: info.formats
-    }].concat(this.default);
-    return info.videoDetails;
+    return this.AddQueue(url, addedBy, "unshift");
   }
 
   Next(){

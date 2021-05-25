@@ -9,7 +9,7 @@ export async function AddQueue(client:Client, data:GuildVoiceInfo, url:string, a
     if(data.SearchPanel){
       ch = await client.channels.fetch(data.SearchPanel.Msg.chId) as TextChannel;
       msg= await (ch as TextChannel).messages.fetch(data.SearchPanel.Msg.id);
-      msg.edit("お待ちください...");
+      msg.edit("お待ちください...", {embed:{description: "お待ちください..."}});
     }else if(channel){
       ch = channel;
       msg = await channel.send("お待ちください...");

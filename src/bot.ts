@@ -73,8 +73,13 @@ export class MusicBot {
             return false;
           }
         };
+        const isAvailableRawAudioURL = (str:string)=>{
+          const exts = [".mp3",".wav",".wma",".mov",".mp4"];
+          return exts.filter(ext => str.endsWith(ext)).length > 0;
+        }
         // URLから再生関数
         const playFromURL = async (first:boolean = true)=>{
+          message.suppressEmbeds(true).catch(e => log(e, "warn"));
           // 引数は動画の直リンクかなぁ
           if(ytdl.validateURL(optiont)){
             await AddQueue(client, this.data[message.guild.id], optiont, message.member.displayName, first, message.channel as discord.TextChannel);
@@ -92,12 +97,38 @@ export class MusicBot {
                 await AddQueue(client, this.data[message.guild.id], result.items[i].url, message.member.displayName);
                 await msg.edit(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。" + result.items.length + "曲中" + (i + 1) + "曲処理済み。");
               }
-              msg.edit("✅" + result.items.length + "曲が追加されました。");
+              await msg.edit("✅" + result.items.length + "曲が追加されました。");
             }
             catch{
+              // Discordメッセへのリンク？
+              if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
+                const smsg = await message.channel.send("🔍メッセージを取得しています...");
+                const ids = optiont.split("/");
+                const msgId = Number(ids[ids.length - 1]);
+                const chId = Number(ids[ids.length - 2]);
+                if(msgId.toString() !== "NaN" && chId.toString() !== "NaN"){
+                  const ch = await client.channels.fetch(ids[ids.length - 2]);
+                  if(ch.type === "text"){
+                    const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
+                    if(msg.attachments.size > 0 && isAvailableRawAudioURL(msg.attachments.first().url)){
+                      await AddQueue(client, this.data[message.guild.id], msg.attachments.first().url, message.member.displayName, first, message.channel as discord.TextChannel);
+                      await smsg.delete();
+                      this.data[message.guild.id].Manager.Play();
+                      return;
+                    }
+                  }
+                }
+                await smsg.edit("✘メッセージは有効でない、もしくは指定されたメッセージには添付ファイルがありません。");
+              // オーディオファイルへの直リンク？
+              }else if(isAvailableRawAudioURL(optiont)){
+                await AddQueue(client, this.data[message.guild.id], optiont, message.member.displayName, first, message.channel as discord.TextChannel);
+                this.data[message.guild.id].Manager.Play();
+                return;
+              }
               // なに指定したし…
               message.channel.send("有効なURLを指定してください。キーワードで再生する場合はsearchコマンドを使用してください。");
               return;
+              
             }
           }
         }
@@ -130,6 +161,7 @@ export class MusicBot {
             embed.addField("頭出し, rewind, gotop, top", "再生中の曲の頭出しを行います。", true);
             embed.addField("アップタイム, ping, uptime", "ボットのアップタイムおよびping時間(レイテンシ)を表示します。", true);
             embed.addField("ログ, log, システム情報, systeminfo, sysinfo", "ホストされているサーバーやプロセスに関する技術的な情報を表示します。", true);
+            embed.addField("移動, mv, move", "曲を指定された位置から指定された位置までキュー内で移動します。", true);
             message.channel.send(embed);
           }break;
           
@@ -504,6 +536,7 @@ export class MusicBot {
             , true);
             message.channel.send(memInfoEmbed).catch(e => log(e, "error"));
           }break;
+          
           case "移動":
           case "mv":
           case "move":{
