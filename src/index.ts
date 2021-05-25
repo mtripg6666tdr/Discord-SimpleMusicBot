@@ -12,9 +12,9 @@ http.createServer((req, res) => {
   const data = {
     status: 200,
     message: "Discord bot is active now",
-    client: bot.Client ? btoa(bot.Client.user.id) : null,
-    readyAt: bot.Client ? btoa(bot.Client.readyAt.getTime().toString()) : null,
-    guilds: bot.Client ? bot.Client.guilds.cache.size : null
+    client: bot.Client && bot.Client.user ? btoa(bot.Client.user.id) : null,
+    readyAt: bot.Client && bot.Client.readyAt ? btoa(bot.Client.readyAt.getTime().toString()) : null,
+    guilds: bot.Client && bot.Client.guilds && bot.Client.guilds.cache ? bot.Client.guilds.cache.size : null
   };
   log("[Server]Received a http request");
   res.end(JSON.stringify(data));
