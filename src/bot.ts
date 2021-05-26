@@ -146,8 +146,8 @@ export class MusicBot {
             embed.description = "コマンドの一覧です(実装順)。コマンドプレフィックスは、`" + this.data[message.guild.id].PersistentPref.Prefix + "`です。";
             embed.addField("ヘルプ, help", "ヘルプを表示します。", true);
             embed.addField("参加, join", "ボイスチャンネルに参加します。", true);
-            embed.addField("検索, search", "曲をYouTubeで検索します。", true);
-            embed.addField("再生, play, p", "キュー内の楽曲を再生します。引数としてYouTubeのURLが指定された場合、それをキューの先頭に追加して再生します。", true);
+            embed.addField("検索, search", "曲をYouTubeで検索します。YouTubeの動画のURLを直接指定することもできます。", true);
+            embed.addField("再生, play, p", "キュー内の楽曲を再生します。引数としてYouTubeの動画のURLを指定することもできます。", true);
             embed.addField("一時停止, 一旦停止, 停止, pause, stop", "再生を一時停止します。", true);
             embed.addField("切断, 終了, leave, disconnect, dc", "ボイスチャンネルから切断します。", true);
             embed.addField("現在再生中, 今の曲, nowplaying, np", "現在再生中の曲の情報を表示します。", true);
@@ -160,7 +160,7 @@ export class MusicBot {
             embed.addField("全て削除, すべて削除, rmall, allrm, removeall", "キュー内の曲をすべて削除します。", true);
             embed.addField("頭出し, rewind, gotop, top", "再生中の曲の頭出しを行います。", true);
             embed.addField("アップタイム, ping, uptime", "ボットのアップタイムおよびping時間(レイテンシ)を表示します。", true);
-            embed.addField("ログ, log, システム情報, systeminfo, sysinfo", "ホストされているサーバーやプロセスに関する技術的な情報を表示します。", true);
+            embed.addField("ログ, log, システム情報, systeminfo, sysinfo", "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数を指定して特定の内容のみ取得することもできます。", true);
             embed.addField("移動, mv, move", "曲を指定された位置から指定された位置までキュー内で移動します。", true);
             message.channel.send(embed);
           }break;
@@ -487,7 +487,7 @@ export class MusicBot {
             // Run default logger
             this.Log();
 
-            if(message.author.id === "593758391395155978"){
+            if(message.author.id === "593758391395155978" && (options.indexOf("log") >= 0 || options.length == 0)){
               // Process Logs
               const logEmbed = new discord.MessageEmbed();
               logEmbed.title = "Log";
@@ -495,46 +495,50 @@ export class MusicBot {
               message.channel.send(logEmbed).catch(e => log(e, "error"));
             }
 
-            // Process CPU Info
-            const cpuInfoEmbed = new discord.MessageEmbed();
-            const cpus = os.cpus();
-            cpuInfoEmbed.title = "CPU Info";
-            for(var i = 0; i < cpus.length; i++){
-              const all = cpus[i].times.user + cpus[i].times.sys + cpus[i].times.nice + cpus[i].times.irq + cpus[i].times.idle;
-              cpuInfoEmbed.addField(
-                "CPU" + (i + 1), "Model: `" + cpus[i].model + "`\r\n" 
-              + "Speed: `" + cpus[i].speed + "MHz`\r\n"
-              + "Times(user): `" + Math.round(cpus[i].times.user / 1000) + "s(" + GetPercentage(cpus[i].times.user, all) + "%)`\r\n"
-              + "Times(sys): `" + Math.round(cpus[i].times.sys / 1000) + "s(" + GetPercentage(cpus[i].times.sys, all) + "%)`\r\n"
-              + "Times(nice): `" + Math.round(cpus[i].times.nice / 1000) + "s(" + GetPercentage(cpus[i].times.nice, all) + "%)`\r\n"
-              + "Times(irq): `" + Math.round(cpus[i].times.irq / 1000) + "s(" + GetPercentage(cpus[i].times.irq, all) + "%)`\r\n"
-              + "Times(idle): `" + Math.round(cpus[i].times.idle / 1000) + "s(" + GetPercentage(cpus[i].times.idle, all) + "%)`"
-              , true);
+            if(options.indexOf("cpu") >= 0 || options.length == 0){
+              // Process CPU Info
+              const cpuInfoEmbed = new discord.MessageEmbed();
+              const cpus = os.cpus();
+              cpuInfoEmbed.title = "CPU Info";
+              for(var i = 0; i < cpus.length; i++){
+                const all = cpus[i].times.user + cpus[i].times.sys + cpus[i].times.nice + cpus[i].times.irq + cpus[i].times.idle;
+                cpuInfoEmbed.addField(
+                  "CPU" + (i + 1), "Model: `" + cpus[i].model + "`\r\n" 
+                + "Speed: `" + cpus[i].speed + "MHz`\r\n"
+                + "Times(user): `" + Math.round(cpus[i].times.user / 1000) + "s(" + GetPercentage(cpus[i].times.user, all) + "%)`\r\n"
+                + "Times(sys): `" + Math.round(cpus[i].times.sys / 1000) + "s(" + GetPercentage(cpus[i].times.sys, all) + "%)`\r\n"
+                + "Times(nice): `" + Math.round(cpus[i].times.nice / 1000) + "s(" + GetPercentage(cpus[i].times.nice, all) + "%)`\r\n"
+                + "Times(irq): `" + Math.round(cpus[i].times.irq / 1000) + "s(" + GetPercentage(cpus[i].times.irq, all) + "%)`\r\n"
+                + "Times(idle): `" + Math.round(cpus[i].times.idle / 1000) + "s(" + GetPercentage(cpus[i].times.idle, all) + "%)`"
+                , true);
+              }
+              message.channel.send(cpuInfoEmbed).catch(e => log(e, "error"));
             }
-            message.channel.send(cpuInfoEmbed).catch(e => log(e, "error"));
 
-            // Process Mem Info
-            const memInfoEmbed = new discord.MessageEmbed();
-            const memory = GetMemInfo();
-            const nMem = process.memoryUsage();
-            memInfoEmbed.title = "Memory Info";
-            memInfoEmbed.addField("Total Memory", 
-                "Total: `" + memory.total + "MB`\r\n"
-              + "Used: `" + memory.used + "MB`\r\n"
-              + "Free: `" + memory.free + "MB`\r\n"
-              + "Usage: `" + memory.usage + "%`"
-            , true);
-            var rss = GetMBytes(nMem.rss);
-            var ext = GetMBytes(nMem.external);
-            memInfoEmbed.addField("Main Process Memory", 
-                "RSS: `" + rss + "MB`\r\n"
-              + "Heap total: `" + GetMBytes(nMem.heapTotal) + "MB`\r\n"
-              + "Heap used: `" + GetMBytes(nMem.heapUsed) + "MB`\r\n"
-              + "Array buffers: `" + GetMBytes(nMem.arrayBuffers) + "MB`\r\n"
-              + "External: `" + ext + "MB`\r\n"
-              + "Total: `" + GetPercentage(rss + ext, memory.total) + "%`"
-            , true);
-            message.channel.send(memInfoEmbed).catch(e => log(e, "error"));
+            if(options.indexOf("mem") >= 0 || options.length == 0){
+              // Process Mem Info
+              const memInfoEmbed = new discord.MessageEmbed();
+              const memory = GetMemInfo();
+              const nMem = process.memoryUsage();
+              memInfoEmbed.title = "Memory Info";
+              memInfoEmbed.addField("Total Memory", 
+                  "Total: `" + memory.total + "MB`\r\n"
+                + "Used: `" + memory.used + "MB`\r\n"
+                + "Free: `" + memory.free + "MB`\r\n"
+                + "Usage: `" + memory.usage + "%`"
+              , true);
+              var rss = GetMBytes(nMem.rss);
+              var ext = GetMBytes(nMem.external);
+              memInfoEmbed.addField("Main Process Memory", 
+                  "RSS: `" + rss + "MB`\r\n"
+                + "Heap total: `" + GetMBytes(nMem.heapTotal) + "MB`\r\n"
+                + "Heap used: `" + GetMBytes(nMem.heapUsed) + "MB`\r\n"
+                + "Array buffers: `" + GetMBytes(nMem.arrayBuffers) + "MB`\r\n"
+                + "External: `" + ext + "MB`\r\n"
+                + "Total: `" + GetPercentage(rss + ext, memory.total) + "%`"
+              , true);
+              message.channel.send(memInfoEmbed).catch(e => log(e, "error"));
+            }
           }break;
           
           case "移動":
@@ -573,9 +577,9 @@ export class MusicBot {
               }
           }break;
         }
-      // searchコマンドのキャンセルを捕捉
-      }else if(message.content === "キャンセル" || message.content === "cancel") {
-        if(this.data[message.guild.id].SearchPanel !== null){
+      }else if(this.data[message.guild.id].SearchPanel){
+        // searchコマンドのキャンセルを捕捉
+        if(message.content === "キャンセル" || message.content === "cancel") {
           const msgId = this.data[message.guild.id].SearchPanel.Msg;
           this.data[message.guild.id].SearchPanel = null;
           await message.channel.send("✅キャンセルしました");
@@ -588,17 +592,18 @@ export class MusicBot {
             log(e, "error");
           }
         }
-      // searchコマンドの選択を捕捉
-      }else if(message.content.match(/^[0-9]+$/) && this.data[message.guild.id].SearchPanel){
-        const panel = this.data[message.guild.id].SearchPanel;
-        // メッセージ送信者が検索者と一致するかを確認
-        if(message.author.id !== panel.Msg.userId) return;
-        const num = Number(message.content);
-        if(panel && Object.keys(panel.Opts).indexOf(message.content) >= 0){
-          await AddQueue(client, this.data[message.guild.id], panel.Opts[num].url, message.member.displayName);
-          this.data[message.guild.id].SearchPanel = null;
-          if(this.data[message.guild.id].Manager.IsConnecting && !this.data[message.guild.id].Manager.IsPlaying){
-            this.data[message.guild.id].Manager.Play();
+        // searchコマンドの選択を捕捉
+        else if(message.content.match(/^[0-9]+$/)){
+          const panel = this.data[message.guild.id].SearchPanel;
+          // メッセージ送信者が検索者と一致するかを確認
+          if(message.author.id !== panel.Msg.userId) return;
+          const num = Number(message.content);
+          if(panel && Object.keys(panel.Opts).indexOf(message.content) >= 0){
+            await AddQueue(client, this.data[message.guild.id], panel.Opts[num].url, message.member.displayName);
+            this.data[message.guild.id].SearchPanel = null;
+            if(this.data[message.guild.id].Manager.IsConnecting && !this.data[message.guild.id].Manager.IsPlaying){
+              this.data[message.guild.id].Manager.Play();
+            }
           }
         }
       }
