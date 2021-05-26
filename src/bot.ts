@@ -84,6 +84,37 @@ export class MusicBot {
           if(ytdl.validateURL(optiont)){
             await AddQueue(client, this.data[message.guild.id], optiont, message.member.displayName, first, message.channel as discord.TextChannel);
             this.data[message.guild.id].Manager.Play();
+          }else 
+          // Discordメッセへのリンク？
+          if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
+            const smsg = await message.channel.send("🔍メッセージを取得しています...");
+            const ids = optiont.split("/");
+            const msgId = Number(ids[ids.length - 1]);
+            const chId = Number(ids[ids.length - 2]);
+            if(msgId.toString() !== "NaN" && chId.toString() !== "NaN"){
+              const ch = await client.channels.fetch(ids[ids.length - 2]);
+              if(ch.type === "text"){
+                const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
+                if(msg.attachments.size > 0 && isAvailableRawAudioURL(msg.attachments.first().url)){
+                  await AddQueue(client, this.data[message.guild.id], msg.attachments.first().url, message.member.displayName, first, message.channel as discord.TextChannel);
+                  await smsg.delete();
+                  this.data[message.guild.id].Manager.Play();
+                  return;
+                }
+              }
+            }
+            await smsg.edit("✘メッセージは有効でない、もしくは指定されたメッセージには添付ファイルがありません。");
+          }else 
+          // オーディオファイルへの直リンク？
+          if(isAvailableRawAudioURL(optiont)){
+            await AddQueue(client, this.data[message.guild.id], optiont, message.member.displayName, first, message.channel as discord.TextChannel);
+            this.data[message.guild.id].Manager.Play();
+            return;
+          }else 
+          // SoundCloudの直リンク？
+          if(optiont.match(/https?:\/\/soundcloud.com\/.+\/.+/)){
+            await AddQueue(client, this.data[message.guild.id], optiont, message.member.displayName, first, message.channel as discord.TextChannel)
+            this.data[message.guild.id].Manager.Play();
           }else{
             //違うならプレイリストの直リンクか？
             try{
@@ -100,31 +131,6 @@ export class MusicBot {
               await msg.edit("✅" + result.items.length + "曲が追加されました。");
             }
             catch{
-              // Discordメッセへのリンク？
-              if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
-                const smsg = await message.channel.send("🔍メッセージを取得しています...");
-                const ids = optiont.split("/");
-                const msgId = Number(ids[ids.length - 1]);
-                const chId = Number(ids[ids.length - 2]);
-                if(msgId.toString() !== "NaN" && chId.toString() !== "NaN"){
-                  const ch = await client.channels.fetch(ids[ids.length - 2]);
-                  if(ch.type === "text"){
-                    const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
-                    if(msg.attachments.size > 0 && isAvailableRawAudioURL(msg.attachments.first().url)){
-                      await AddQueue(client, this.data[message.guild.id], msg.attachments.first().url, message.member.displayName, first, message.channel as discord.TextChannel);
-                      await smsg.delete();
-                      this.data[message.guild.id].Manager.Play();
-                      return;
-                    }
-                  }
-                }
-                await smsg.edit("✘メッセージは有効でない、もしくは指定されたメッセージには添付ファイルがありません。");
-              // オーディオファイルへの直リンク？
-              }else if(isAvailableRawAudioURL(optiont)){
-                await AddQueue(client, this.data[message.guild.id], optiont, message.member.displayName, first, message.channel as discord.TextChannel);
-                this.data[message.guild.id].Manager.Play();
-                return;
-              }
               // なに指定したし…
               message.channel.send("有効なURLを指定してください。キーワードで再生する場合はsearchコマンドを使用してください。");
               return;
@@ -577,7 +583,7 @@ export class MusicBot {
               }
           }break;
         }
-      }else if(this.data[message.guild.id].SearchPanel){
+      }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
         // searchコマンドのキャンセルを捕捉
         if(message.content === "キャンセル" || message.content === "cancel") {
           const msgId = this.data[message.guild.id].SearchPanel.Msg;

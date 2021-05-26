@@ -3,6 +3,8 @@ import { GuildVoiceInfo, ytdlVideoInfo } from "../definition";
 import * as ytdl from "ytdl-core";
 import { Readable } from "stream";
 import { CalcMinSec, log } from "../util";
+import Soundcloud from "soundcloud.ts";
+import { IncomingMessage } from "http";
 
 export class PlayManager {
   private Dispatcher:StreamDispatcher = null;
@@ -69,7 +71,14 @@ export class PlayManager {
         cantPlay();
         return;
       }
-      if(this.CurrentVideoInfo.description !== "指定されたオーディオファイル"){
+      if(this.CurrentVideoInfo.description === "指定されたオーディオファイル"){
+        this.Stream = null;
+        this.Dispatcher = this.info.Connection.play(this.CurrentVideoInfo.video_url);
+      }else if(this.CurrentVideoInfo.description === "指定されたSoundCloud URL"){
+        const soundCloud = new Soundcloud();
+        const imes = (await soundCloud.util.streamTrack(this.CurrentVideoInfo.video_url)) as any;
+        this.Dispatcher = this.info.Connection.play(imes.responseUrl);
+      }else{
         const format = ytdl.chooseFormat(this.info.Queue.default[0].formats, {
           filter: this.CurrentVideoInfo.isLiveContent ? null : "audioonly",
           quality: this.CurrentVideoInfo.isLiveContent ? null : "highestaudio",
@@ -79,9 +88,6 @@ export class PlayManager {
           format: format
         });
         this.Dispatcher = this.info.Connection.play(this.Stream);
-      }else{
-        this.Stream = null;
-        this.Dispatcher = this.info.Connection.play(this.CurrentVideoInfo.video_url);
       }
       this.Dispatcher.on("finish", ()=> {
         log("[PlayManager/" + this.info.GuildID + "]Stream finished");
