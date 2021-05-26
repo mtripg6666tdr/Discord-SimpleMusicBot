@@ -64,7 +64,8 @@ export class MusicBot {
             }
             catch(e){
               log(e, "error");
-              msg.edit(":sob:接続試行しましたが失敗しました...もう一度お試しください。\r\nエラー詳細\r\n```" + e + "\r\n```").catch(e => log(e, "error"));
+              //msg.edit(":sob:接続試行しましたが失敗しました...もう一度お試しください。\r\nエラー詳細\r\n```" + e + "\r\n```").catch(e => log(e, "error"));
+              msg.delete().catch(e => log(e, "error"));
               return false;
             }
           }else{
@@ -80,6 +81,7 @@ export class MusicBot {
         // URLから再生関数
         const playFromURL = async (first:boolean = true)=>{
           message.suppressEmbeds(true).catch(e => log(e, "warn"));
+          var match:RegExpMatchArray;
           // 引数は動画の直リンクかなぁ
           if(ytdl.validateURL(optiont)){
             await AddQueue(client, this.data[message.guild.id], optiont, message.member.displayName, first, message.channel as discord.TextChannel);
@@ -105,6 +107,13 @@ export class MusicBot {
             }
             await smsg.edit("✘メッセージは有効でない、もしくは指定されたメッセージには添付ファイルがありません。");
           }else 
+          // Googleドライブ?
+          if((match = optiont.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/)) && match.length >= 2){
+            const id = match[1];
+            await AddQueue(client, this.data[message.guild.id], "https://drive.google.com/uc?id=" + id, message.member.displayName, first, message.channel as discord.TextChannel);
+            this.data[message.guild.id].Manager.Play();
+            return;
+          }else
           // オーディオファイルへの直リンク？
           if(isAvailableRawAudioURL(optiont)){
             await AddQueue(client, this.data[message.guild.id], optiont, message.member.displayName, first, message.channel as discord.TextChannel);
@@ -145,6 +154,7 @@ export class MusicBot {
         
         // コマンドの処理に徹します
         switch(command){
+          case "コマンド":
           case "commands":
           case "command":{
             const embed = new discord.MessageEmbed();
@@ -175,9 +185,19 @@ export class MusicBot {
           case "help":{
             const embed = new discord.MessageEmbed();
             embed.title = client.user.username + ":notes:";
-            embed.description = "高音質な音楽を再生して、Discordでのエクスペリエンスを最高にするため作られました:robot:\r\n利用可能なコマンドを確認するには、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`を使用してください。";
+            embed.description = "高音質な音楽を再生して、Discordでのエクスペリエンスを最高にするため作られました:robot:\r\n"
+            + "利用可能なコマンドを確認するには、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`を使用してください。";
             embed.addField("作者", "[" + client.users.resolve("593758391395155978").username + "](https://github.com/mtripg6666tdr)");
             embed.addField("レポジトリ/ソースコード","https://github.com/mtripg6666tdr/Discord-SimpleMusicBot");
+            embed.addField("現在対応している再生ソース", 
+              "・YouTube(キーワード検索)\r\n"
+            + "・YouTube(動画URL指定)\r\n"
+            + "・YouTube(プレイリストURL指定)\r\n"
+            + "・SoundCloud(楽曲ページURL指定)\r\n"
+            + "・Discord(音声ファイルの添付付きメッセージのURL指定)\r\n"
+            + "・Googleドライブ(音声ファイルの限定公開リンクのURL指定)\r\n"
+            + "・オーディオファイルへの直URL"
+            );
             message.channel.send(embed);
           }; break;
           
