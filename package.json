@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "private": "true",
-  "main": "dist/index.js",
+  "main": "dist/lib.js",
   "dependencies": {
     "@types/node": "^15.3.1",
     "@types/ws": "^7.4.4",
@@ -24,7 +24,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run build && npm run onlystart",
     "onlystart": "node dist/index.js",
-    "build": "rimraf dist && tsc"
+    "build": "rimraf dist && tsc",
+    "postinstall": "npm run build"
   },
   "keywords": [],
   "author": "mtripg6666tdr",
