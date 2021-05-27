@@ -9,7 +9,6 @@
     "@types/ws": "^7.4.4",
     "discord.js": "^12.5.3",
     "dotenv": "^9.0.2",
-    "ffmpeg-static": "^4.3.0",
     "node-opus": "^0.3.3",
     "opusscript": "0.0.8",
     "rimraf": "^3.0.2",
@@ -20,6 +19,9 @@
     "ytsr": "^3.5.0"
   },
   "devDependencies": {},
+  "optionalDependencies": {
+    "ffmpeg-static": "^4.3.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run build && npm run onlystart",
