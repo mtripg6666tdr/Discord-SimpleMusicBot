@@ -45,5 +45,5 @@ Discordにて、インストール等のサポートを行っています。
 [サポートサーバーへの参加はこちら](https://discord.gg/7DrAEXBMHe)
 
 ## ライセンス
-MIT  
+GPLv3  
 詳細はリポジトリ直下の[LICENSE.md](LICENSE.md)を参照。
