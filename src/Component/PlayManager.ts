@@ -103,16 +103,28 @@ export class PlayManager {
         this.info.Queue.Next();
         // キューがなくなったら接続終了
         if(this.info.Queue.length === 0){
-          this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
-            log("[PlayManager/" + this.info.GuildID + "]Queue empty");
-            (ch as TextChannel).send(":wave:キューが空になったため終了します").catch(e => log(e, "error"));
-          }).catch(e => log(e, "error"));
+          log("[PlayManager/" + this.info.GuildID + "]Queue empty");
+          if(this.info.boundTextChannel){
+            this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
+              (ch as TextChannel).send(":wave:キューが空になったため終了します").catch(e => log(e, "error"));
+            }).catch(e => log(e, "error"));
+          }
           this.Disconnect();
         // なくなってないなら再生開始！
         }else{
           this.Play();
         }
       });
+      this.Dispatcher.on("error", (e)=>{
+        log(JSON.stringify(e), "error");
+        if(this.info.boundTextChannel){
+          this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
+            log("[PlayManager/" + this.info.GuildID + "]Some error occurred in StreamDispatcher", "error");
+            (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。スキップします。").catch(e => log(e, "error"));
+          }).catch(e => log(e, "error"));
+        }
+        cantPlay();
+      })
       log("[PlayManager/" + this.info.GuildID + "]Play() started successfully");
       if(this.info.boundTextChannel && ch && mes){
         var _t = Number(this.CurrentVideoInfo.lengthSeconds);
