@@ -31,7 +31,7 @@ export class MusicBot {
 
     client.on("message", async message => {
       if(message.author.bot || message.channel.type == "dm") return;
-      if(message.mentions.has(client.user)) message.channel.send("コマンドは、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`で確認できます");
+      if(message.mentions.has(client.user)) message.channel.send("コマンドは、`" + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">") + "command`で確認できます");
       if(message.content.startsWith(this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">")){
         const msg_spl = message.content.substr(1, message.content.length - 1).split(" ");
         const command = msg_spl[0];
@@ -148,7 +148,6 @@ export class MusicBot {
               // なに指定したし…
               message.channel.send("有効なURLを指定してください。キーワードで再生する場合はsearchコマンドを使用してください。");
               return;
-              
             }
           }
         }
@@ -160,7 +159,10 @@ export class MusicBot {
         // プレフィックス
         const pmatch = message.guild.members.resolve(client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
         if(pmatch){
-          this.data[message.guild.id].PersistentPref.Prefix = pmatch.groups.prefix;
+          if(this.data[message.guild.id].PersistentPref.Prefix !== pmatch.groups.prefix){
+            this.data[message.guild.id].PersistentPref.Prefix = pmatch.groups.prefix;
+            message.channel.send("🍵プレフィックスを`" + pmatch.groups.prefix + "`に変更しました").catch(e => log(e, "error"));
+          }
         }else{
           this.data[message.guild.id].PersistentPref.Prefix = ">";
         }  
@@ -212,13 +214,13 @@ export class MusicBot {
             + "・Googleドライブ(音声ファイルの限定公開リンクのURL指定)\r\n"
             + "・オーディオファイルへの直URL"
             );
-            message.channel.send(embed);
+            message.channel.send(embed).catch(e => log(e, "error"));
           }; break;
           
           case "参加":
           case "join":{
             if(message.member.voice.channel.members.has(client.user.id)){
-              message.channel.send("✘すでにボイスチャンネルに接続中です。");
+              message.channel.send("✘すでにボイスチャンネルに接続中です。").catch(e => log(e, "error"));
             }else{
               join();
             }
@@ -232,7 +234,7 @@ export class MusicBot {
               return;
             }
             if(this.data[message.guild.id].SearchPanel !== null){
-              message.channel.send("✘既に開かれている検索窓があります");
+              message.channel.send("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
               break;
             }
             if(optiont){
@@ -526,6 +528,7 @@ export class MusicBot {
           case "ログ":
           case "systeminfo":
           case "sysinfo":
+          case "info":
           case "システム情報":
           case "log":{
             // Run default logger
@@ -625,28 +628,32 @@ export class MusicBot {
           case "インポート":
           case "import":{
             if(optiont === ""){
-              message.channel.send("インポートもとのキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(e => log(e, "error"));
+              message.channel.send("❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(e => log(e, "error"));
               return;
             }
             if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
-              const smsg = await message.channel.send("🔍メッセージを取得しています...");
-              const ids = optiont.split("/");
-              const msgId = ids[ids.length - 1];
-              const chId = ids[ids.length - 2];
+              var smsg;
               try{
+                smsg = await message.channel.send("🔍メッセージを取得しています...");
+                const ids = optiont.split("/");
+                if(ids.length < 2){
+                  await smsg.edit("🔗指定されたURLは無効です");
+                }
+                const msgId = ids[ids.length - 1];
+                const chId = ids[ids.length - 2];
                 const ch = await client.channels.fetch(chId);
                 const msg = await (ch as discord.TextChannel).messages.fetch(msgId);
                 if(msg.author.id !== client.user.id){
-                  await smsg.edit("ボットのメッセージではありません");
+                  await smsg.edit("❌ボットのメッセージではありません");
                   return;
                 }
                 if(msg.embeds.length == 0){
-                  await smsg.edit("埋め込みが見つかりません");
+                  await smsg.edit("❌埋め込みが見つかりません");
                   return;
                 }
                 const embed = msg.embeds[0];
                 if(!embed.title.endsWith("のキュー")){
-                  await smsg.edit("キューの埋め込みが見つかりませんでした");
+                  await smsg.edit("❌キューの埋め込みが見つかりませんでした");
                   return;
                 }
                 const fields = embed.fields;
@@ -658,11 +665,14 @@ export class MusicBot {
                 }
                 await smsg.edit("✅" + fields.length + "曲を追加しました")
               }
-              catch{
-                smsg.edit("失敗しました...");
+              catch(e){
+                log(e, "error");
+                smsg?.edit("😭失敗しました...");
               }
+            }else{
+              message.channel.send("❌Discordのメッセージへのリンクを指定してください").catch(e => log(e, "error"));
             }
-            }break;
+          }break;
         }
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
         // searchコマンドのキャンセルを捕捉
