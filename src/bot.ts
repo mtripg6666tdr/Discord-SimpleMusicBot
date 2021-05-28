@@ -80,7 +80,7 @@ export class MusicBot {
         }
         // URLから再生関数
         const playFromURL = async (first:boolean = true)=>{
-          message.suppressEmbeds(true).catch(e => log(e, "warn"));
+          setTimeout(()=>message.suppressEmbeds(true).catch(e => log(e, "warn")),2000);
           var match:RegExpMatchArray;
           // 引数は動画の直リンクかなぁ
           if(ytdl.validateURL(optiont)){
