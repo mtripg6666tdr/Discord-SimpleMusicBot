@@ -4,7 +4,7 @@ import * as ytdl from "ytdl-core";
 import * as ytsr from "ytsr";
 import * as ytpl from "ytpl";
 import { GuildVoiceInfo } from "./definition";
-import { AddQueue, CalcMinSec, CalcTime, GetMBytes, GetMemInfo, GetPercentage, log, logStore } from "./util";
+import { AddQueue, CalcMinSec, CalcTime, CustomDescription, GetMBytes, GetMemInfo, GetPercentage, log, logStore, SoundCloudDescription } from "./util";
 
 export class MusicBot {
   private client = new discord.Client();
@@ -193,6 +193,7 @@ export class MusicBot {
             + "利用可能なコマンドを確認するには、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`を使用してください。";
             embed.addField("作者", "[" + client.users.resolve("593758391395155978").username + "](https://github.com/mtripg6666tdr)");
             embed.addField("レポジトリ/ソースコード","https://github.com/mtripg6666tdr/Discord-SimpleMusicBot");
+            embed.addField("サポートサーバー", "https://discord.gg/7DrAEXBMHe")
             embed.addField("現在対応している再生ソース", 
               "・YouTube(キーワード検索)\r\n"
             + "・YouTube(動画URL指定)\r\n"
@@ -459,11 +460,13 @@ export class MusicBot {
               message.channel.send("現在再生中の楽曲を削除することはできません。");
               return;
             }
-            const dels = Array.from(new Set(options.sort().reverse()));
+            const dels = Array.from(new Set(
+                options.map(str => Number(str)).filter(n => !isNaN(n)).sort((a,b)=>b-a)
+            ));
             for(var i = 0; i < dels.length; i++){
               this.data[message.guild.id].Queue.RemoveAt(Number(dels[i]));
             }
-            message.channel.send("🚮" + dels.join(",") + "番目の曲を削除しました");
+            message.channel.send("🚮" + dels.sort((a,b)=>a-b).join(",") + "番目の曲を削除しました");
           }break;
           
           case "すべて削除":

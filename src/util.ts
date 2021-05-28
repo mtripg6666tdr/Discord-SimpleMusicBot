@@ -99,3 +99,6 @@ export function GetPercentage(part:number, total:number){
 export function btoa(txt:string){
   return Buffer.from(txt).toString("base64");
 }
+
+export const SoundCloudDescription = "指定されたSoundCloud URL";
+export const CustomDescription = "指定されたオーディオファイル";

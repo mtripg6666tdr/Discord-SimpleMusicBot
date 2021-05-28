@@ -2,9 +2,8 @@ import { Client, Message, MessageEmbed, StreamDispatcher, TextChannel } from "di
 import { GuildVoiceInfo, ytdlVideoInfo } from "../definition";
 import * as ytdl from "ytdl-core";
 import { Readable } from "stream";
-import { CalcMinSec, log } from "../util";
+import { CalcMinSec, CustomDescription, log, SoundCloudDescription } from "../util";
 import Soundcloud from "soundcloud.ts";
-import { IncomingMessage } from "http";
 
 export class PlayManager {
   private Dispatcher:StreamDispatcher = null;
@@ -71,10 +70,10 @@ export class PlayManager {
         cantPlay();
         return;
       }
-      if(this.CurrentVideoInfo.description === "指定されたオーディオファイル"){
+      if(this.CurrentVideoInfo.description === CustomDescription){
         this.Stream = null;
         this.Dispatcher = this.info.Connection.play(this.CurrentVideoInfo.video_url);
-      }else if(this.CurrentVideoInfo.description === "指定されたSoundCloud URL"){
+      }else if(this.CurrentVideoInfo.description === SoundCloudDescription){
         const soundCloud = new Soundcloud();
         const imes = (await soundCloud.util.streamTrack(this.CurrentVideoInfo.video_url)) as any;
         this.Dispatcher = this.info.Connection.play(imes.responseUrl);
@@ -120,7 +119,7 @@ export class PlayManager {
         if(this.info.boundTextChannel){
           this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
             log("[PlayManager/" + this.info.GuildID + "]Some error occurred in StreamDispatcher", "error");
-            (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。スキップします。").catch(e => log(e, "error"));
+            (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + e.message + ")スキップします。").catch(e => log(e, "error"));
           }).catch(e => log(e, "error"));
         }
         cantPlay();
