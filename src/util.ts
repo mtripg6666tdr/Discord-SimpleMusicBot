@@ -3,9 +3,9 @@ import * as os from "os";
 import { GuildVoiceInfo } from "./definition";
 
 export async function AddQueue(client:Client, data:GuildVoiceInfo, url:string, addedBy:string, first:boolean=false, channel:TextChannel = null){
+  var ch:TextChannel = null;
+  var msg:Message = null;
   try{
-    var ch:TextChannel = null;
-    var msg:Message = null;
     if(data.SearchPanel){
       ch = await client.channels.fetch(data.SearchPanel.Msg.chId) as TextChannel;
       msg= await (ch as TextChannel).messages.fetch(data.SearchPanel.Msg.id);
@@ -31,6 +31,9 @@ export async function AddQueue(client:Client, data:GuildVoiceInfo, url:string, a
   }
   catch(e){
     log(e, "error");
+    if(msg){
+      msg.edit(":weary: キューの追加に失敗しました。追加できませんでした。").catch(e => log(e, "error"));
+    }
   }
 }
 

@@ -31,11 +31,7 @@ export class MusicBot {
 
     client.on("message", async message => {
       if(message.author.bot || message.channel.type == "dm") return;
-      const pmatch = message.guild.members.resolve(client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
-      if(pmatch){
-        this.data[message.guild.id].PersistentPref.Prefix = pmatch.groups.prefix;
-      }
-      if(message.mentions.has(client.user)) message.channel.send("コマンド、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`で確認できます");
+      if(message.mentions.has(client.user)) message.channel.send("コマンドは、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`で確認できます");
       if(message.content.startsWith(this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">")){
         const msg_spl = message.content.substr(1, message.content.length - 1).split(" ");
         const command = msg_spl[0];
@@ -94,20 +90,25 @@ export class MusicBot {
           // Discordメッセへのリンク？
           if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
             const smsg = await message.channel.send("🔍メッセージを取得しています...");
-            const ids = optiont.split("/");
-            const msgId = Number(ids[ids.length - 1]);
-            const chId = Number(ids[ids.length - 2]);
-            if(msgId.toString() !== "NaN" && chId.toString() !== "NaN"){
-              const ch = await client.channels.fetch(ids[ids.length - 2]);
-              if(ch.type === "text"){
-                const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
-                if(msg.attachments.size > 0 && isAvailableRawAudioURL(msg.attachments.first().url)){
-                  await AddQueue(client, this.data[message.guild.id], msg.attachments.first().url, message.member.displayName, first, message.channel as discord.TextChannel);
-                  await smsg.delete();
-                  this.data[message.guild.id].Manager.Play();
-                  return;
+            try{
+              const ids = optiont.split("/");
+              const msgId = Number(ids[ids.length - 1]);
+              const chId = Number(ids[ids.length - 2]);
+              if(msgId.toString() !== "NaN" && chId.toString() !== "NaN"){
+                const ch = await client.channels.fetch(ids[ids.length - 2]);
+                if(ch.type === "text"){
+                  const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
+                  if(msg.attachments.size > 0 && isAvailableRawAudioURL(msg.attachments.first().url)){
+                    await AddQueue(client, this.data[message.guild.id], msg.attachments.first().url, message.member.displayName, first, message.channel as discord.TextChannel);
+                    await smsg.delete();
+                    this.data[message.guild.id].Manager.Play();
+                    return;
+                  }
                 }
               }
+            }
+            catch(e){
+
             }
             await smsg.edit("✘メッセージは有効でない、もしくは指定されたメッセージには添付ファイルがありません。");
           }else 
@@ -156,6 +157,14 @@ export class MusicBot {
         // テキストチャンネルバインド
         this.data[message.guild.id].boundTextChannel = message.channel.id;
         
+        // プレフィックス
+        const pmatch = message.guild.members.resolve(client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
+        if(pmatch){
+          this.data[message.guild.id].PersistentPref.Prefix = pmatch.groups.prefix;
+        }else{
+          this.data[message.guild.id].PersistentPref.Prefix = ">";
+        }  
+
         // コマンドの処理に徹します
         switch(command){
           case "コマンド":
@@ -378,7 +387,9 @@ export class MusicBot {
               totalLength += _t;
               fields.push({
                 name: i !== 0 ? i.toString() : this.data[message.guild.id].Manager.IsPlaying ? "現在再生中" : "再生待ち",
-                value: "[" + queue.default[i].info.title + "](" + queue.default[i].info.video_url + ") \r\n長さ: `" + min + ":" + sec + " ` \r\nリクエスト: `" + queue.default[i].addedBy + "` "
+                value: "[" + queue.default[i].info.title + "](" + queue.default[i].info.video_url + ") \r\n"
+                +"長さ: `" + min + ":" + sec + " ` \r\n"
+                +"リクエスト: `" + queue.default[i].addedBy + "` "
               });
             }
             const [tmin, tsec] = CalcMinSec(totalLength);
@@ -609,6 +620,8 @@ export class MusicBot {
                 message.channel.send("✘失敗しました。引数がキューの範囲外です");
               }
           }break;
+
+          
         }
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
         // searchコマンドのキャンセルを捕捉
