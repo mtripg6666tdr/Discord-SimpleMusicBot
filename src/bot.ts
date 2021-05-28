@@ -31,6 +31,10 @@ export class MusicBot {
 
     client.on("message", async message => {
       if(message.author.bot || message.channel.type == "dm") return;
+      const pmatch = message.guild.members.resolve(client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
+      if(pmatch){
+        this.data[message.guild.id].PersistentPref.Prefix = pmatch.groups.prefix;
+      }
       if(message.mentions.has(client.user)) message.channel.send("コマンド、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`で確認できます");
       if(message.content.startsWith(this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">")){
         const msg_spl = message.content.substr(1, message.content.length - 1).split(" ");
