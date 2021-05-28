@@ -622,6 +622,47 @@ export class MusicBot {
           }break;
 
           
+          case "インポート":
+          case "import":{
+            if(optiont === ""){
+              message.channel.send("インポートもとのキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(e => log(e, "error"));
+              return;
+            }
+            if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
+              const smsg = await message.channel.send("🔍メッセージを取得しています...");
+              const ids = optiont.split("/");
+              const msgId = ids[ids.length - 1];
+              const chId = ids[ids.length - 2];
+              try{
+                const ch = await client.channels.fetch(chId);
+                const msg = await (ch as discord.TextChannel).messages.fetch(msgId);
+                if(msg.author.id !== client.user.id){
+                  await smsg.edit("ボットのメッセージではありません");
+                  return;
+                }
+                if(msg.embeds.length == 0){
+                  await smsg.edit("埋め込みが見つかりません");
+                  return;
+                }
+                const embed = msg.embeds[0];
+                if(!embed.title.endsWith("のキュー")){
+                  await smsg.edit("キューの埋め込みが見つかりませんでした");
+                  return;
+                }
+                const fields = embed.fields;
+                for(var i = 0; i < fields.length; i++){
+                  const lines = fields[i].value.split("\r\n");
+                  const tMatch = lines[0].match(/\[(?<title>.+)\]\((?<url>.+)\)/);
+                  await AddQueue(client, this.data[message.guild.id], tMatch.groups.url, message.member.displayName);
+                  await smsg.edit(fields.length + "曲中" + (i+1) + "曲処理しました。");
+                }
+                await smsg.edit("✅" + fields.length + "曲を追加しました")
+              }
+              catch{
+                smsg.edit("失敗しました...");
+              }
+            }
+            }break;
         }
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
         // searchコマンドのキャンセルを捕捉
