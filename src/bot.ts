@@ -30,7 +30,30 @@ export class MusicBot {
     });
 
     client.on("message", async message => {
+      // botのメッセやdmは無視
       if(message.author.bot || message.channel.type == "dm") return;
+      
+      // サーバーデータ初期化関数
+      const initData = ()=> {
+        if(!this.data[message.guild.id]) {
+          this.data[message.guild.id] = new GuildVoiceInfo(client, message);
+          this.data[message.guild.id].Manager.SetData(this.data[message.guild.id]);
+        }
+      };
+      // データ初期化
+      initData();
+      
+      // プレフィックス
+      const pmatch = message.guild.members.resolve(client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
+      if(pmatch){
+        if(this.data[message.guild.id].PersistentPref.Prefix !== pmatch.groups.prefix){
+          this.data[message.guild.id].PersistentPref.Prefix = pmatch.groups.prefix;
+          message.channel.send("🍵プレフィックスを`" + pmatch.groups.prefix + "`に変更しました").catch(e => log(e, "error"));
+        }
+      }else{
+        this.data[message.guild.id].PersistentPref.Prefix = ">";
+      }
+      
       if(message.mentions.has(client.user)) message.channel.send("コマンドは、`" + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">") + "command`で確認できます");
       if(message.content.startsWith(this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">")){
         const msg_spl = message.content.substr(1, message.content.length - 1).split(" ");
@@ -39,18 +62,12 @@ export class MusicBot {
         const options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
         
         log("[Main/" + message.guild.id + "]Command Prefix detected: " + message.content);
-        // サーバーデータ初期化関数
-        const initData = ()=> {
-          if(!this.data[message.guild.id]) {
-            this.data[message.guild.id] = new GuildVoiceInfo(client, message);
-            this.data[message.guild.id].Manager.SetData(this.data[message.guild.id]);
-          }
-        };
+        
         // VC参加関数
         const join = async():Promise<boolean>=>{
           if(message.member.voice.channelID != null){
             // すでにVC入ってるよ～
-            if(message.member.voice.channel.members.has(client.user.id)){
+            if(message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)){
               return true;
             }
             // 入ってないね～参加しよう
@@ -151,21 +168,8 @@ export class MusicBot {
             }
           }
         }
-        // 初期化
-        initData();
         // テキストチャンネルバインド
         this.data[message.guild.id].boundTextChannel = message.channel.id;
-        
-        // プレフィックス
-        const pmatch = message.guild.members.resolve(client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
-        if(pmatch){
-          if(this.data[message.guild.id].PersistentPref.Prefix !== pmatch.groups.prefix){
-            this.data[message.guild.id].PersistentPref.Prefix = pmatch.groups.prefix;
-            message.channel.send("🍵プレフィックスを`" + pmatch.groups.prefix + "`に変更しました").catch(e => log(e, "error"));
-          }
-        }else{
-          this.data[message.guild.id].PersistentPref.Prefix = ">";
-        }  
 
         // コマンドの処理に徹します
         switch(command){
