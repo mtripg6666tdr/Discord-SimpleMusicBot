@@ -1,9 +1,9 @@
 import { Client, Message, MessageEmbed, StreamDispatcher, TextChannel } from "discord.js";
-import { GuildVoiceInfo, ytdlVideoInfo } from "../definition";
 import * as ytdl from "ytdl-core";
+import Soundcloud from "soundcloud.ts";
 import { Readable } from "stream";
 import { CalcMinSec, CustomDescription, log, SoundCloudDescription } from "../util";
-import Soundcloud from "soundcloud.ts";
+import { GuildVoiceInfo, ytdlVideoInfo } from "../definition";
 
 export class PlayManager {
   private Dispatcher:StreamDispatcher = null;

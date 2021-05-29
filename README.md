@@ -1,15 +1,25 @@
 # Discord-SimpleMusicBot
-Discord向けシンプル音楽ボット。
-YouTubeからの再生に対応。
+Discord向け日本製シンプル音楽ボット。  
+YouTubeなどからの再生に対応。
 選曲はキーワードで指定可能なのでURLを控える必要はありません。
 
 ## 機能
 - 取得できる限り高音質で再生
 - URLから再生
+  - YouTubeの動画のリンク
+  - YouTubeのプレイリストのリンク
+  - SoundCloudの楽曲ページのリンク
+  - Discordの音声の添付ファイル付メッセージへのリンク
+  - Googleドライブの音声ファイルへの限定公開URL
+  - 音声ファイルへの直URL
 - キーワードから検索して再生
 - トラックごと及びキュー全体でループ
+- プレフィックス変更
+- Botに関するサポート（下記）
 
 ## インストール＆実行
+Node.js v12以上で動作確認しています。ffmpegへのパスを通しておいてください。通せない場合にはnpmパッケージの`ffmpeg-stable`(optionalDependencies)を利用できます。  
+本リポジトリではより多くの環境で利用可能な`node-opus`および`opusscript`を使用していますが、ご利用の環境で`@discordjs/opus`が利用できる場合には安定性などの点からこちらを利用することをおすすめします。
 1. リポジトリをクローン
 ```bash
 $ git clone https://github.com/mtripg6666tdr/Discord-SimpleMusicBot.git
