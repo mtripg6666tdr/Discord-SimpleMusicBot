@@ -48,9 +48,8 @@ export class MusicBot {
       if(pmatch){
         if(this.data[message.guild.id].PersistentPref.Prefix !== pmatch.groups.prefix){
           this.data[message.guild.id].PersistentPref.Prefix = pmatch.groups.prefix;
-          message.channel.send("🍵プレフィックスを`" + pmatch.groups.prefix + "`に変更しました").catch(e => log(e, "error"));
         }
-      }else{
+      }else if(message.content === ">"){
         this.data[message.guild.id].PersistentPref.Prefix = ">";
       }
       
@@ -81,7 +80,6 @@ export class MusicBot {
             }
             catch(e){
               log(e, "error");
-              //msg.edit(":sob:接続試行しましたが失敗しました...もう一度お試しください。\r\nエラー詳細\r\n```" + e + "\r\n```").catch(e => log(e, "error"));
               msg.delete().catch(e => log(e, "error"));
               return false;
             }
@@ -222,6 +220,8 @@ export class MusicBot {
           }; break;
           
           case "参加":
+          case "接続":
+          case "connect":
           case "join":{
             if(message.member.voice.channel.members.has(client.user.id)){
               message.channel.send("✘すでにボイスチャンネルに接続中です。").catch(e => log(e, "error"));
@@ -627,7 +627,6 @@ export class MusicBot {
                 message.channel.send("✘失敗しました。引数がキューの範囲外です");
               }
           }break;
-
           
           case "インポート":
           case "import":{
