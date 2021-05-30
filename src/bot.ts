@@ -63,6 +63,7 @@ export class MusicBot {
         log("[Main/" + message.guild.id + "]Command Prefix detected: " + message.content);
         
         // VC参加関数
+        // 成功した場合はtrue、それ以外の場合にはfalseを返します
         const join = async():Promise<boolean>=>{
           if(message.member.voice.channelID != null){
             // すでにVC入ってるよ～
@@ -80,7 +81,8 @@ export class MusicBot {
             }
             catch(e){
               log(e, "error");
-              msg.delete().catch(e => log(e, "error"));
+              msg.edit("😑接続に失敗しました…もう一度お試しください。").catch(e => log(e, "error"));
+              this.data[message.guild.id].Manager.Disconnect();
               return false;
             }
           }else{
@@ -89,11 +91,18 @@ export class MusicBot {
             return false;
           }
         };
+        // ローオーディオファイルのURLであるかどうかをURLの末尾の拡張子から判断します
+        // 引数：
+        //  str:string : 検査対象のURL
+        // 返り値
+        //  ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
         const isAvailableRawAudioURL = (str:string)=>{
           const exts = [".mp3",".wav",".wma",".mov",".mp4"];
           return exts.filter(ext => str.endsWith(ext)).length > 0;
         }
-        // URLから再生関数
+        // メッセージからストリームを判定してキューに追加し、状況に応じて再生を開始する関数
+        // 引数
+        //   first:boolean : キューの先頭に追加するかどうか
         const playFromURL = async (first:boolean = true)=>{
           setTimeout(()=>message.suppressEmbeds(true).catch(e => log(e, "warn")),2000);
           var match:RegExpMatchArray;
@@ -161,7 +170,7 @@ export class MusicBot {
             }
             catch{
               // なに指定したし…
-              message.channel.send("有効なURLを指定してください。キーワードで再生する場合はsearchコマンドを使用してください。");
+              message.channel.send("🔭有効なURLを指定してください。キーワードで再生する場合はsearchコマンドを使用してください。");
               return;
             }
           }
@@ -223,7 +232,7 @@ export class MusicBot {
           case "接続":
           case "connect":
           case "join":{
-            if(message.member.voice.channel.members.has(client.user.id)){
+            if(message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)){
               message.channel.send("✘すでにボイスチャンネルに接続中です。").catch(e => log(e, "error"));
             }else{
               join();
