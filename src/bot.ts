@@ -195,6 +195,8 @@ export class MusicBot {
             embed.addField("アップタイム, ping, uptime", "ボットのアップタイムおよびping時間(レイテンシ)を表示します。", true);
             embed.addField("ログ, log, システム情報, systeminfo, sysinfo", "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数を指定して特定の内容のみ取得することもできます。", true);
             embed.addField("移動, mv, move", "曲を指定された位置から指定された位置までキュー内で移動します。", true);
+            embed.addField("インポート, import", "指定されたメッセージに添付されたキューからインポートします。", true);
+            embed.addField("シャッフル, shuffle", "キューの内容をシャッフルします。", true);
             message.channel.send(embed);
           }break;
           
@@ -387,7 +389,16 @@ export class MusicBot {
             const fields:{name:string, value:string}[] = [];
             const queue = this.data[message.guild.id].Queue;
             var totalLength = 0;
-            for(var i = 0; i < queue.length; i++){
+            var page = optiont === "" ? 1 : Number(optiont);
+            if(isNaN(page)) page = 1;
+            if(queue.length > 0 && page > Math.ceil(queue.length / 10)){
+              message.channel.send("指定されたページは範囲外です").catch(e => log(e, "error"));
+              return;
+            }
+            for(var i = 10 * (page - 1); i < 10 * page; i++){
+              if(queue.default.length <= i){
+                break;
+              }
               const _t = Number(queue.default[i].info.lengthSeconds);
               const [min,sec] = CalcMinSec(_t);
               totalLength += _t;
@@ -401,6 +412,7 @@ export class MusicBot {
             const [tmin, tsec] = CalcMinSec(totalLength);
             const embed = new discord.MessageEmbed({
               title: message.guild.name + "のキュー",
+              description: "`" + page + "ページ目(" + Math.ceil(queue.length / 10) + "ページ中)`",
               fields: fields,
               author: {
                 icon_url: client.user.avatarURL(),
@@ -413,7 +425,12 @@ export class MusicBot {
                 url: message.guild.iconURL()
               }
             });
-            msg.edit("", embed);
+            msg.edit("", embed)
+            // .then(msg => {
+            //   msg.react("⬅️").catch(e => log(e, "error"));
+            //   msg.react("➡️").catch(e => log(e, "error"));
+            // })
+            .catch(e => log(e, "error"));
           }break;
           
           case "リセット":
@@ -437,10 +454,11 @@ export class MusicBot {
               message.channel.send("再生中ではありません");
               return;
             }
+            const title = this.data[message.guild.id].Queue.default[0].info.title;
             this.data[message.guild.id].Manager.Stop();
             this.data[message.guild.id].Queue.Next();
             this.data[message.guild.id].Manager.Play();
-            message.channel.send(":track_next:スキップしました:white_check_mark:")
+            message.channel.send(":track_next: `" + title + "`をスキップしました:white_check_mark:")
           }break;
           
           case "ループ":
@@ -480,10 +498,11 @@ export class MusicBot {
             const dels = Array.from(new Set(
                 options.map(str => Number(str)).filter(n => !isNaN(n)).sort((a,b)=>b-a)
             ));
+            const title = dels.length === 1 ? this.data[message.guild.id].Queue.default[dels[0]].info.title : null;
             for(var i = 0; i < dels.length; i++){
               this.data[message.guild.id].Queue.RemoveAt(Number(dels[i]));
             }
-            message.channel.send("🚮" + dels.sort((a,b)=>a-b).join(",") + "番目の曲を削除しました");
+            message.channel.send("🚮" + dels.sort((a,b)=>a-b).join(",") + "番目の曲" + (("(`" + title + "`)") ?? "") + "を削除しました");
           }break;
           
           case "すべて削除":
@@ -675,6 +694,12 @@ export class MusicBot {
             }else{
               message.channel.send("❌Discordのメッセージへのリンクを指定してください").catch(e => log(e, "error"));
             }
+          }break;
+
+          case "シャッフル":
+          case "shuffle":{
+            this.data[message.guild.id].Queue.Shuffle();
+            message.channel.send(":twisted_rightwards_arrows:シャッフルしました✅").catch(e => log(e, "error"));
           }break;
         }
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){

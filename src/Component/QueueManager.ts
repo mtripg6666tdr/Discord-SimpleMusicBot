@@ -89,4 +89,12 @@ export class QueueManager {
   RemoveAll(){
     this._default = [];
   }
+
+  Shuffle(){
+    if(this._default.length === 0) return;
+    const first = this._default[0];
+    this._default.shift();
+    this._default.sort(() => Math.random() - 0.5);
+    this._default.unshift(first);
+  }
 }
