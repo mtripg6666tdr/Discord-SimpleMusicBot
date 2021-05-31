@@ -27,7 +27,7 @@
     "start": "npm run build && npm run onlystart",
     "onlystart": "node dist/index.js",
     "build": "rimraf dist && tsc",
-    "postinstall": "npm run build"
+    "postinstall": "rimraf dist/ typings/ && tsc -p tsconfig.lib.json"
   },
   "keywords": [],
   "author": "mtripg6666tdr",

@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "CommonJS",
+    "noImplicitAny": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "outDir": "dist/",
+    "declaration": true,
+    "declarationDir": "./typings/"
+  },
+  "include": [
+    "./src/**/*.ts"
+  ]
+}
