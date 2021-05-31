@@ -452,7 +452,7 @@ export class MusicBot {
             this.data[message.guild.id] = null;
             // データ初期化
             initData();
-            message.channel.send("✅サーバーの設定を初期化しました");.catch(e => log(e, "error"))
+            message.channel.send("✅サーバーの設定を初期化しました").catch(e => log(e, "error"));
           }break;
           
           case "スキップ":
