@@ -71,7 +71,7 @@ export class MusicBot {
               return true;
             }
             // 入ってないね～参加しよう
-            const msg = await message.channel.send(":electric_plug:接続中...").catch(e => log(e, "error"));
+            const msg = await message.channel.send(":electric_plug:接続中...");
             try{
               const connection = await message.member.voice.channel.join()
               this.data[message.guild.id].Connection = connection;
