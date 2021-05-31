@@ -527,7 +527,7 @@ export class MusicBot {
             }
             this.data[message.guild.id].Manager.Disconnect();
             this.data[message.guild.id].Queue.RemoveAll();
-            message.channel.send("✅すべて削除しました");.catch(e => log(e, "error"))
+            message.channel.send("✅すべて削除しました").catch(e => log(e, "error"))
           }break;
           
           case "頭出し":
@@ -647,7 +647,7 @@ export class MusicBot {
                   this.data[message.guild.id].Queue.default.splice(to, 0, this.data[message.guild.id].Queue.default[from]);
                   //要素削除
                   this.data[message.guild.id].Queue.default.splice(from + 1, 1);
-                  message.channel.send("✅移動しました");.catch(e => log(e, "error"))
+                  message.channel.send("✅移動しました").catch(e => log(e, "error"))
                 }else{
                   message.channel.send("✘移動元と移動先の要素が同じでした。").catch(e => log(e, "error"));
                 }

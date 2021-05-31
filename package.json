@@ -26,8 +26,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run build && npm run onlystart",
     "onlystart": "node dist/index.js",
-    "build": "rimraf dist && tsc",
-    "postinstall": "rimraf dist/ typings/ && tsc -p tsconfig.lib.json"
+    "build": "npm run cleanup && tsc",
+    "postinstall": "npm run cleanup && tsc -p tsconfig.lib.json",
+    "cleanup": "rimraf dist/ typings/"
   },
   "keywords": [],
   "author": "mtripg6666tdr",
