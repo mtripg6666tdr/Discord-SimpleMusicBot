@@ -4,6 +4,7 @@
   "description": "",
   "private": "true",
   "main": "dist/lib.js",
+  "types": "typings/lib.d.ts",
   "dependencies": {
     "@types/node": "^15.3.1",
     "@types/ws": "^7.4.4",
