@@ -18,12 +18,13 @@ export class QueueManager {
 
   async AddQueue(url:string, addedBy:string, method:"push"|"unshift" = "push"):Promise<ytdlVideoInfo>{
     var info;
-    if(url.indexOf("youtube.com") >= 0){
+    if(url.indexOf("youtube.com") >= 0 || url.indexOf("youtu.be") >= 0){
       info = (await ytdl.getInfo(url, {lang: "ja"}));
       this.default[method]({
         addedBy: addedBy,
         info: info.videoDetails,
-        formats: info.formats
+        formats: info.formats,
+        channel: info.videoDetails.ownerChannelName
       });
       return info.videoDetails;
     }else if(url.indexOf("soundcloud") >= 0){
@@ -44,7 +45,8 @@ export class QueueManager {
       this.default[method]({
         addedBy: addedBy,
         info: info,
-        formats: null
+        formats: null,
+        channel: null
       });
       return info;
     }else{
@@ -65,7 +67,8 @@ export class QueueManager {
       this.default[method]({
         addedBy: addedBy,
         info: info,
-        formats: null
+        formats: null,
+        channel: null
       });
       return info;
     }

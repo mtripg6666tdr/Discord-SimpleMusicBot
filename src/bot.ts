@@ -385,8 +385,13 @@ export class MusicBot {
             }
             embed.description = "[" + info.title + "](" + info.video_url + ")\r\n" + progressBar + " `" + min + ":" + sec + "/" + tmin + ":" + tsec + "`";
             embed.setThumbnail(info.thumbnails[0].url);
-            embed.addField(":asterisk:概要", info.description.length > 350 ? info.description.substring(0, 300) + "..." : info.description);
-            embed.addField("⭐評価", ":+1:" + info.likes + "/:-1:" + info.dislikes);
+            embed.addField(":asterisk:概要", info.description.length > 350 ? info.description.substring(0, 300) + "..." : info.description, true);
+            if(info.likes !== 0 || info.dislikes !== 0){
+              embed.addField("⭐評価", ":+1:" + info.likes + "/:-1:" + info.dislikes, true);
+            }
+            if(this.data[message.guild.id].Queue.default[0].channel){
+              embed.addField(":cinema:チャンネル名", this.data[message.guild.id].Queue.default[0].channel, true);
+            }
             message.channel.send(embed).catch(e => log(e, "error"));
           }break;
           
@@ -416,6 +421,7 @@ export class MusicBot {
                 value: "[" + queue.default[i].info.title + "](" + queue.default[i].info.video_url + ") \r\n"
                 +"長さ: `" + min + ":" + sec + " ` \r\n"
                 +"リクエスト: `" + queue.default[i].addedBy + "` "
+                +(queue.default[i].channel ? ("\r\nチャンネル名: `" + queue.default[i].channel + "`") : "")
               });
             }
             const [tmin, tsec] = CalcMinSec(totalLength);

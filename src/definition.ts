@@ -98,5 +98,6 @@ export type QueueContent =
 {
   info: ytdlVideoInfo;
   formats: videoFormat[];
+  channel: string;
   addedBy: string;
 }
