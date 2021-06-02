@@ -49,7 +49,7 @@ export class MusicBot {
         if(this.data[message.guild.id].PersistentPref.Prefix !== pmatch.groups.prefix){
           this.data[message.guild.id].PersistentPref.Prefix = pmatch.groups.prefix;
         }
-      }else if(message.content === ">"){
+      }else if(this.data[message.guild.id].PersistentPref.Prefix !== ">"){
         this.data[message.guild.id].PersistentPref.Prefix = ">";
       }
       
@@ -178,7 +178,7 @@ export class MusicBot {
         
         // テキストチャンネルバインド
         // コマンドが送信されたチャンネルを後で利用します。
-        if(message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)){
+        if((message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)) || message.content.indexOf("join") >= 0){
           this.data[message.guild.id].boundTextChannel = message.channel.id;
         }
 
