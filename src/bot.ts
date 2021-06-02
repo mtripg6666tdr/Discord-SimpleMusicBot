@@ -65,7 +65,7 @@ export class MusicBot {
         // VC参加関数
         // 成功した場合はtrue、それ以外の場合にはfalseを返します
         const join = async():Promise<boolean>=>{
-          if(message.member.voice.channelID != null){
+          if(message.member.voice.channelID){
             // すでにVC入ってるよ～
             if(message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)){
               return true;
@@ -175,8 +175,12 @@ export class MusicBot {
             }
           }
         }
+        
         // テキストチャンネルバインド
-        this.data[message.guild.id].boundTextChannel = message.channel.id;
+        // コマンドが送信されたチャンネルを後で利用します。
+        if(message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)){
+          this.data[message.guild.id].boundTextChannel = message.channel.id;
+        }
 
         // コマンドの処理に徹します
         switch(command){
@@ -539,6 +543,7 @@ export class MusicBot {
           case "頭出し":
           case "rewind":
           case "top":
+          case "replay":
           case "gotop":{
             if(!this.data[message.guild.id].Manager.IsPlaying){
               message.channel.send("再生中ではありません").catch(e => log(e, "error"));
