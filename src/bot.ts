@@ -276,15 +276,17 @@ export class MusicBot {
                 const embed = new discord.MessageEmbed();
                 embed.title = "\"" + optiont + "\"の検索結果✨"
                 var desc = "";
+                var index = 1;
                 for(var i = 0; i < result.items.length; i++){
                   if(result.items[i].type == "video"){
                     const video = (result.items[i] as ytsr.Video);
-                    desc += "`" + (i+1) + ".` [" + video.title + "](" + video.url + ") `" + video.duration + "` \r\n\r\n";
-                    this.data[message.guild.id].SearchPanel.Opts[i + 1] = {
+                    desc += "`" + index + ".` [" + video.title + "](" + video.url + ") `" + video.duration + "` \r\n\r\n";
+                    this.data[message.guild.id].SearchPanel.Opts[index] = {
                       url: video.url,
                       title: video.title,
                       duration: video.duration
-                    }
+                    };
+                    index++;
                   }
                 }
                 embed.description = desc;
@@ -389,13 +391,14 @@ export class MusicBot {
             }
             embed.description = "[" + info.title + "](" + info.video_url + ")\r\n" + progressBar + " `" + min + ":" + sec + "/" + tmin + ":" + tsec + "`";
             embed.setThumbnail(info.thumbnails[0].url);
+            if(this.data[message.guild.id].Queue.default[0].channel){
+              embed.addField(":cinema:チャンネル名", this.data[message.guild.id].Queue.default[0].channel, true);
+            }
             embed.addField(":asterisk:概要", info.description.length > 350 ? info.description.substring(0, 300) + "..." : info.description, true);
             if(info.likes !== 0 || info.dislikes !== 0){
               embed.addField("⭐評価", ":+1:" + info.likes + "/:-1:" + info.dislikes, true);
             }
-            if(this.data[message.guild.id].Queue.default[0].channel){
-              embed.addField(":cinema:チャンネル名", this.data[message.guild.id].Queue.default[0].channel, true);
-            }
+  
             message.channel.send(embed).catch(e => log(e, "error"));
           }break;
           
