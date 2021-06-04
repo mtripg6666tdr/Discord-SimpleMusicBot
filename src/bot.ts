@@ -118,7 +118,7 @@ export class MusicBot {
               const ids = optiont.split("/");
               const msgId = Number(ids[ids.length - 1]);
               const chId = Number(ids[ids.length - 2]);
-              if(msgId.toString() !== "NaN" && chId.toString() !== "NaN"){
+              if(!isNaN(msgId) && !isNaN(chId)){
                 const ch = await client.channels.fetch(ids[ids.length - 2]);
                 if(ch.type === "text"){
                   const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
@@ -249,6 +249,10 @@ export class MusicBot {
           case "search":{
             if(!join()) return;
             if(ytdl.validateURL(optiont)){
+              if(this.data[message.guild.id].SearchPanel){
+                message.channel.send("検索中には実行できません").catch(e => log(e, "error"));
+                return;
+              }
               await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
               return;
             }
@@ -324,6 +328,10 @@ export class MusicBot {
             }
             // 引数ついてたらそれ優先
             if(optiont !== ""){
+              if(this.data[message.guild.id].SearchPanel) {
+                message.channel.send("検索中には実行できません").catch(e => log(e, "error"));
+                return;
+              }
               await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
             // ついてないからキューから再生
             }else if(this.data[message.guild.id].Queue.length >= 1){
@@ -410,6 +418,7 @@ export class MusicBot {
             const fields:{name:string, value:string}[] = [];
             const queue = this.data[message.guild.id].Queue;
             var totalLength = 0;
+            queue.default.forEach(q => totalLength += Number(q.info.lengthSeconds));
             var page = optiont === "" ? 1 : Number(optiont);
             if(isNaN(page)) page = 1;
             if(queue.length > 0 && page > Math.ceil(queue.length / 10)){
@@ -422,7 +431,6 @@ export class MusicBot {
               }
               const _t = Number(queue.default[i].info.lengthSeconds);
               const [min,sec] = CalcMinSec(_t);
-              totalLength += _t;
               fields.push({
                 name: i !== 0 ? i.toString() : this.data[message.guild.id].Manager.IsPlaying ? "現在再生中" : "再生待ち",
                 value: "[" + queue.default[i].info.title + "](" + queue.default[i].info.video_url + ") \r\n"
@@ -524,7 +532,7 @@ export class MusicBot {
             for(var i = 0; i < dels.length; i++){
               this.data[message.guild.id].Queue.RemoveAt(Number(dels[i]));
             }
-            message.channel.send("🚮" + dels.sort((a,b)=>a-b).join(",") + "番目の曲" + (("(`" + title + "`)") ?? "") + "を削除しました").catch(e => log(e, "error"));
+            message.channel.send("🚮" + dels.sort((a,b)=>a-b).join(",") + "番目の曲" + (title ? ("(`" + title + "`)") : "") + "を削除しました").catch(e => log(e, "error"));
           }break;
           
           case "すべて削除":
