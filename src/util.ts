@@ -1,5 +1,6 @@
 import { Client, Message, MessageEmbed, TextChannel } from "discord.js";
 import * as os from "os";
+import * as https from "https";
 import { GuildVoiceInfo } from "./definition";
 
 export async function AddQueue(client:Client, data:GuildVoiceInfo, url:string, addedBy:string, first:boolean=false, channel:TextChannel = null){
@@ -105,3 +106,18 @@ export function btoa(txt:string){
 
 export const SoundCloudDescription = "指定されたSoundCloud URL";
 export const CustomDescription = "指定されたオーディオファイル";
+
+export function DownloadText(url:string):Promise<string>{
+  return new Promise((resolve,reject)=>{
+    https.get(url, res => {
+      var data = "";
+      res.on("data", chunk =>{
+        data += chunk;
+      });
+      res.on("end", ()=>{
+        resolve(data);
+      });
+      res.on("error", reject);
+    }).on("error", reject);
+  })
+}

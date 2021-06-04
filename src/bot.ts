@@ -4,7 +4,7 @@ import * as ytdl from "ytdl-core";
 import * as ytsr from "ytsr";
 import * as ytpl from "ytpl";
 import { GuildVoiceInfo } from "./definition";
-import { AddQueue, CalcMinSec, CalcTime, CustomDescription, GetMBytes, GetMemInfo, GetPercentage, log, logStore, SoundCloudDescription } from "./util";
+import { AddQueue, CalcMinSec, CalcTime, CustomDescription, DownloadText, GetMBytes, GetMemInfo, GetPercentage, log, logStore, SoundCloudDescription } from "./util";
 
 export class MusicBot {
   private client = new discord.Client();
@@ -178,7 +178,7 @@ export class MusicBot {
         
         // テキストチャンネルバインド
         // コマンドが送信されたチャンネルを後で利用します。
-        if((message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)) || message.content.indexOf("join") >= 0){
+        if(!this.data[message.guild.id].Manager.IsConnecting || (message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)) || message.content.indexOf("join") >= 0){
           this.data[message.guild.id].boundTextChannel = message.channel.id;
         }
 
@@ -692,23 +692,28 @@ export class MusicBot {
                   await smsg.edit("❌ボットのメッセージではありません");
                   return;
                 }
-                if(msg.embeds.length == 0){
-                  await smsg.edit("❌埋め込みが見つかりません");
+                const embed = msg.embeds.length > 0 ? msg.embeds[0] : null;
+                const attac = msg.attachments.size > 0 ? msg.attachments.first() : null;
+                if(embed && embed.title.endsWith("のキュー")){
+                  const fields = embed.fields;
+                  for(var i = 0; i < fields.length; i++){
+                    const lines = fields[i].value.split("\r\n");
+                    const tMatch = lines[0].match(/\[(?<title>.+)\]\((?<url>.+)\)/);
+                    await AddQueue(client, this.data[message.guild.id], tMatch.groups.url, message.member.displayName);
+                    await smsg.edit(fields.length + "曲中" + (i+1) + "曲処理しました。");
+                  }
+                  await smsg.edit("✅" + fields.length + "曲を追加しました");
+                }else if(attac && attac.name.endsWith(".ytq")){
+                  const urls = (await DownloadText(attac.url)).split(",");
+                  for(var i = 0; i < urls.length; i++){
+                    await AddQueue(client, this.data[message.guild.id], urls[i], message.member.displayName);
+                    await smsg.edit(urls.length + "曲中" + (i+1) + "曲処理しました。");
+                  }
+                  await smsg.edit("✅" + urls.length + "曲を追加しました");
+                }else{
+                  await smsg.edit("❌キューの埋め込みもしくは添付ファイルが見つかりませんでした");
                   return;
                 }
-                const embed = msg.embeds[0];
-                if(!embed.title.endsWith("のキュー")){
-                  await smsg.edit("❌キューの埋め込みが見つかりませんでした");
-                  return;
-                }
-                const fields = embed.fields;
-                for(var i = 0; i < fields.length; i++){
-                  const lines = fields[i].value.split("\r\n");
-                  const tMatch = lines[0].match(/\[(?<title>.+)\]\((?<url>.+)\)/);
-                  await AddQueue(client, this.data[message.guild.id], tMatch.groups.url, message.member.displayName);
-                  await smsg.edit(fields.length + "曲中" + (i+1) + "曲処理しました。");
-                }
-                await smsg.edit("✅" + fields.length + "曲を追加しました")
               }
               catch(e){
                 log(e, "error");
@@ -723,6 +728,12 @@ export class MusicBot {
           case "shuffle":{
             this.data[message.guild.id].Queue.Shuffle();
             message.channel.send(":twisted_rightwards_arrows:シャッフルしました✅").catch(e => log(e, "error"));
+          }break;
+
+          case "エクスポート":
+          case "export":{
+            const qd = this.data[message.guild.id].Queue.default.map(q => q.info.video_url).join(",");
+            message.channel.send("✅エクスポートしました", new discord.MessageAttachment(Buffer.from(qd), "exported_queue.ytq")).catch(e => log(e, "error"));
           }break;
         }
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
