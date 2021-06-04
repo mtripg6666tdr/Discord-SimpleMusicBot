@@ -49,7 +49,7 @@ export class MusicBot {
         if(this.data[message.guild.id].PersistentPref.Prefix !== pmatch.groups.prefix){
           this.data[message.guild.id].PersistentPref.Prefix = pmatch.groups.prefix;
         }
-      }else if(message.content === ">"){
+      }else if(this.data[message.guild.id].PersistentPref.Prefix !== ">"){
         this.data[message.guild.id].PersistentPref.Prefix = ">";
       }
       
@@ -65,7 +65,7 @@ export class MusicBot {
         // VC参加関数
         // 成功した場合はtrue、それ以外の場合にはfalseを返します
         const join = async():Promise<boolean>=>{
-          if(message.member.voice.channelID != null){
+          if(message.member.voice.channelID){
             // すでにVC入ってるよ～
             if(message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)){
               return true;
@@ -175,8 +175,12 @@ export class MusicBot {
             }
           }
         }
+        
         // テキストチャンネルバインド
-        this.data[message.guild.id].boundTextChannel = message.channel.id;
+        // コマンドが送信されたチャンネルを後で利用します。
+        if((message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)) || message.content.indexOf("join") >= 0){
+          this.data[message.guild.id].boundTextChannel = message.channel.id;
+        }
 
         // コマンドの処理に徹します
         switch(command){
@@ -272,15 +276,17 @@ export class MusicBot {
                 const embed = new discord.MessageEmbed();
                 embed.title = "\"" + optiont + "\"の検索結果✨"
                 var desc = "";
+                var index = 1;
                 for(var i = 0; i < result.items.length; i++){
                   if(result.items[i].type == "video"){
                     const video = (result.items[i] as ytsr.Video);
-                    desc += "`" + (i+1) + ".` [" + video.title + "](" + video.url + ") `" + video.duration + "` \r\n\r\n";
-                    this.data[message.guild.id].SearchPanel.Opts[i + 1] = {
+                    desc += "`" + index + ".` [" + video.title + "](" + video.url + ") `" + video.duration + "` \r\n\r\n";
+                    this.data[message.guild.id].SearchPanel.Opts[index] = {
                       url: video.url,
                       title: video.title,
                       duration: video.duration
-                    }
+                    };
+                    index++;
                   }
                 }
                 embed.description = desc;
@@ -385,13 +391,14 @@ export class MusicBot {
             }
             embed.description = "[" + info.title + "](" + info.video_url + ")\r\n" + progressBar + " `" + min + ":" + sec + "/" + tmin + ":" + tsec + "`";
             embed.setThumbnail(info.thumbnails[0].url);
+            if(this.data[message.guild.id].Queue.default[0].channel){
+              embed.addField(":cinema:チャンネル名", this.data[message.guild.id].Queue.default[0].channel, true);
+            }
             embed.addField(":asterisk:概要", info.description.length > 350 ? info.description.substring(0, 300) + "..." : info.description, true);
             if(info.likes !== 0 || info.dislikes !== 0){
               embed.addField("⭐評価", ":+1:" + info.likes + "/:-1:" + info.dislikes, true);
             }
-            if(this.data[message.guild.id].Queue.default[0].channel){
-              embed.addField(":cinema:チャンネル名", this.data[message.guild.id].Queue.default[0].channel, true);
-            }
+  
             message.channel.send(embed).catch(e => log(e, "error"));
           }break;
           
@@ -539,6 +546,7 @@ export class MusicBot {
           case "頭出し":
           case "rewind":
           case "top":
+          case "replay":
           case "gotop":{
             if(!this.data[message.guild.id].Manager.IsPlaying){
               message.channel.send("再生中ではありません").catch(e => log(e, "error"));

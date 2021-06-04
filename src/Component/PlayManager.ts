@@ -123,7 +123,7 @@ export class PlayManager {
           }).catch(e => log(e, "error"));
         }
         cantPlay();
-      })
+      });
       log("[PlayManager/" + this.info.GuildID + "]Play() started successfully");
       if(this.info.boundTextChannel && ch && mes){
         var _t = Number(this.CurrentVideoInfo.lengthSeconds);
@@ -157,7 +157,6 @@ export class PlayManager {
         cantPlay();
       }
     }
-
     return this;
   }
 
@@ -202,9 +201,10 @@ export class PlayManager {
   }
 
   // 頭出しをします。
-  Rewind(){
+  Rewind():PlayManager{
     log("[PlayManager/" + this.info.GuildID + "]Rewind() called");
     this.Stop();
     this.Play();
+    return this;
   }
 }
