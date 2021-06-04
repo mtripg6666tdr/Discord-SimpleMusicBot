@@ -1,19 +1,16 @@
 import { Client, Message, MessageEmbed, StreamDispatcher, TextChannel } from "discord.js";
-import * as ytdl from "ytdl-core";
-import Soundcloud from "soundcloud.ts";
-import { Readable } from "stream";
-import { CalcMinSec, CustomDescription, log, SoundCloudDescription } from "../util";
+import { CalcMinSec, log } from "../util";
 import { GuildVoiceInfo, ytdlVideoInfo } from "../definition";
+import { AudioSource } from "../AudioSource/audiosource";
 
 export class PlayManager {
   private Dispatcher:StreamDispatcher = null;
-  private Stream:Readable = null;
   private info:GuildVoiceInfo = null;
   get CurrentVideoUrl():string{
-    if(this.CurrentVideoInfo) return this.CurrentVideoInfo.video_url;
+    if(this.CurrentVideoInfo) return this.CurrentVideoInfo.Url;
     return "";
   }
-  CurrentVideoInfo:ytdlVideoInfo;
+  CurrentVideoInfo:AudioSource;
   // 接続され、再生途中にあるか（たとえ一時停止されていても）
   get IsPlaying():boolean {
     return this.info.Connection !== null && this.Dispatcher !== null;
@@ -64,30 +61,8 @@ export class PlayManager {
       this.Play();
     };
     try{
-      this.CurrentVideoInfo = this.info.Queue.default[0].info;
-      if(this.CurrentVideoInfo.isLiveContent) {
-        mes.edit("✘ライブ配信の動画は未対応です。スキップします。");
-        cantPlay();
-        return;
-      }
-      if(this.CurrentVideoInfo.description === CustomDescription){
-        this.Stream = null;
-        this.Dispatcher = this.info.Connection.play(this.CurrentVideoInfo.video_url);
-      }else if(this.CurrentVideoInfo.description === SoundCloudDescription){
-        const soundCloud = new Soundcloud();
-        const imes = (await soundCloud.util.streamTrack(this.CurrentVideoInfo.video_url)) as any;
-        this.Dispatcher = this.info.Connection.play(imes.responseUrl);
-      }else{
-        const format = ytdl.chooseFormat(this.info.Queue.default[0].formats, {
-          filter: this.CurrentVideoInfo.isLiveContent ? null : "audioonly",
-          quality: this.CurrentVideoInfo.isLiveContent ? null : "highestaudio",
-          isHLS: this.CurrentVideoInfo.isLiveContent
-        } as any);
-        this.Stream = ytdl.default(this.info.Queue.default[0].info.video_url, {
-          format: format
-        });
-        this.Dispatcher = this.info.Connection.play(this.Stream);
-      }
+      this.CurrentVideoInfo = this.info.Queue.default[0].BasicInfo;
+      this.Dispatcher = this.info.Connection.play(await this.CurrentVideoInfo.fetch());
       this.Dispatcher.on("finish", ()=> {
         log("[PlayManager/" + this.info.GuildID + "]Stream finished");
         // 再生が終わったら
@@ -126,26 +101,26 @@ export class PlayManager {
       });
       log("[PlayManager/" + this.info.GuildID + "]Play() started successfully");
       if(this.info.boundTextChannel && ch && mes){
-        var _t = Number(this.CurrentVideoInfo.lengthSeconds);
+        var _t = Number(this.CurrentVideoInfo.LengthSeconds);
         const [min, sec] = CalcMinSec(_t);
         const embed = new MessageEmbed({
           title: ":cd:現在再生中:musical_note:",
-          description: "[" + this.CurrentVideoInfo.title + "](" + this.CurrentVideoUrl + ") `" + min + ":" + sec + "`"
+          description: "[" + this.CurrentVideoInfo.Title + "](" + this.CurrentVideoUrl + ") `" + min + ":" + sec + "`"
         });
-        embed.addField("リクエスト", this.info.Queue.default[0].addedBy, true);
+        embed.addField("リクエスト", this.info.Queue.default[0].AdditionalInfo.AddedBy, true);
         embed.addField("次の曲", 
         // トラックループオンなら現在の曲
-        this.info.Queue.LoopEnabled ? this.info.Queue.default[0].info.title :
+        this.info.Queue.LoopEnabled ? this.info.Queue.default[0].BasicInfo.Title :
         // (トラックループはオフ)長さが2以上ならオフセット1の曲
-        this.info.Queue.length >= 2 ? this.info.Queue.default[1].info.title :
+        this.info.Queue.length >= 2 ? this.info.Queue.default[1].BasicInfo.Title :
         // (トラックループオフ,長さ1)キューループがオンなら現在の曲
-        this.info.Queue.QueueLoopEnabled ? this.info.Queue.default[0].info.title :
+        this.info.Queue.QueueLoopEnabled ? this.info.Queue.default[0].BasicInfo.Title :
         // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
         "次の曲がまだ登録されていません"
         , true);
         embed.addField("再生待ちの曲数", this.info.Queue.LoopEnabled ? "ループします" : (this.info.Queue.length - 1) + "曲");
         embed.thumbnail = {
-          url: this.CurrentVideoInfo.thumbnails[0].url
+          url: this.CurrentVideoInfo.Thumnail
         };
         mes.edit("", embed);
       }
@@ -163,9 +138,6 @@ export class PlayManager {
   // 停止します。切断するにはDisconnectを使用してください。
   Stop():PlayManager{
     log("[PlayManager/" + this.info.GuildID + "]Stop() called");
-    if(this.Stream && !this.Stream.destroyed){
-      this.Stream.destroy();
-    }
     if(this.Dispatcher){
       this.Dispatcher.destroy();
       this.Dispatcher = null;

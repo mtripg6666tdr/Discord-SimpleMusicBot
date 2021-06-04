@@ -94,10 +94,4 @@ type Thumbnails = {
   height: number;
 }
 
-export type QueueContent =
-{
-  info: ytdlVideoInfo;
-  formats: videoFormat[];
-  channel: string;
-  addedBy: string;
-}
+export const DefaultAudioThumbnailURL = "https://cdn.discordapp.com/attachments/757824315294220329/846737267951271946/Audio_icon-icons.com_71845.png";

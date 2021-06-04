@@ -2,41 +2,6 @@ import { Client, Message, MessageEmbed, TextChannel } from "discord.js";
 import * as os from "os";
 import { GuildVoiceInfo } from "./definition";
 
-export async function AddQueue(client:Client, data:GuildVoiceInfo, url:string, addedBy:string, first:boolean=false, channel:TextChannel = null){
-  var ch:TextChannel = null;
-  var msg:Message = null;
-  try{
-    if(data.SearchPanel){
-      ch = await client.channels.fetch(data.SearchPanel.Msg.chId) as TextChannel;
-      msg= await (ch as TextChannel).messages.fetch(data.SearchPanel.Msg.id);
-      msg.edit("お待ちください...", {embed:{description: "お待ちください..."}});
-    }else if(channel){
-      ch = channel;
-      msg = await channel.send("お待ちください...");
-    }
-    const info = first ? await data.Queue.AddQueueFirst(url, addedBy) : await data.Queue.AddQueue(url, addedBy);
-    if(msg){
-      const embed = new MessageEmbed();
-      embed.title = "✅曲が追加されました";
-      embed.description = "[" + info.title + "](" + info.video_url + ")";
-      const [min,sec] = CalcMinSec(Number(info.lengthSeconds));
-      embed.addField("長さ", min + ":" + sec, true);
-      embed.addField("リクエスト", addedBy, true);
-      embed.addField("キュー内の位置", first ? "0" : data.Queue.length - 1, true);
-      embed.thumbnail = {
-        url: info.thumbnails[0].url
-      };
-      await msg.edit("", embed);
-    }
-  }
-  catch(e){
-    log(e, "error");
-    if(msg){
-      msg.edit(":weary: キューの追加に失敗しました。追加できませんでした。").catch(e => log(e, "error"));
-    }
-  }
-}
-
 // Returns min and sec from total sec
 export function CalcMinSec(_t:number){
   const sec = _t % 60;
