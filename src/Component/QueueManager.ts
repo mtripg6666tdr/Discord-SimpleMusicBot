@@ -21,6 +21,8 @@ export class QueueManager {
   LoopEnabled:boolean = false;
   // キューループが有効か?
   QueueLoopEnabled:boolean = false;
+  // ワンスループが有効か?
+  OnceLoopEnabled:boolean = false;
   // キューの長さ
   get length():number {
     return this.default.length;
@@ -132,6 +134,7 @@ export class QueueManager {
   }
 
   Next(){
+    this.OnceLoopEnabled = false;
     if(this.QueueLoopEnabled){
       this.default.push(this.default[0]);
     }

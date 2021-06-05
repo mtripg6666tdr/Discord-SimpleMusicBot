@@ -196,6 +196,7 @@ export class MusicBot {
             embed.addField("インポート, import", "指定されたメッセージに添付されたキューからインポートします。", true);
             embed.addField("シャッフル, shuffle", "キューの内容をシャッフルします。", true);
             embed.addField("エクスポート, export", "キューの内容をインポートできるようエクスポートします。", true);
+            embed.addField("この曲で終了, end", "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します", true);
             message.channel.send(embed);
           }break;
           
@@ -724,9 +725,22 @@ export class MusicBot {
             message.channel.send("✅エクスポートしました", new discord.MessageAttachment(Buffer.from(qd), "exported_queue.ytx")).catch(e => log(e, "error"));
           }break;
 
+          case "この曲で終了":
           case "end":{
             this.data[message.guild.id].Queue.RemoveFrom2();
             message.channel.send("✅キューに残された曲を削除しました").catch(e => log(e, "error"));
+          }break;
+
+          case "ワンスループ":
+          case "onceloop":
+          case "looponce":{
+            if(this.data[message.guild.id].Queue.OnceLoopEnabled){
+              this.data[message.guild.id].Queue.OnceLoopEnabled = false;
+              message.channel.send(":repeat_one:ワンスリピートを無効にしました:x:").catch(e => log(e, "error"));
+            }else{
+              this.data[message.guild.id].Queue.OnceLoopEnabled = true;
+              message.channel.send(":repeat_one:ワンスリピートを有効にしました:o:").catch(e => log(e, "error"));
+            }
           }break;
         }
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){

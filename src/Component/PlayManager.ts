@@ -74,8 +74,15 @@ export class PlayManager {
           this.Play();
           return;
         }else 
+        // ワンスループが有効か？
+        if(this.info.Queue.OnceLoopEnabled){
+          this.info.Queue.OnceLoopEnabled = false;
+          this.Play();
+          return;
+        }else{
         // キュー整理
         this.info.Queue.Next();
+        }
         // キューがなくなったら接続終了
         if(this.info.Queue.length === 0){
           log("[PlayManager/" + this.info.GuildID + "]Queue empty");
