@@ -6,6 +6,7 @@ import * as http from "http";
 import { MusicBot } from "./bot";
 import { btoa, log } from "./util";
 
+log("[Entry]Discord-SimpleMusicBot by mtripg6666tdr");
 const bot = new MusicBot();
 http.createServer((req, res) => {
   res.writeHead(200, { "Content-Type": "application/json" });

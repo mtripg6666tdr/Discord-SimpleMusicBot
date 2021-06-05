@@ -16,6 +16,7 @@ export class MusicBot {
   constructor(){
     this.instantiatedTime = new Date();
     const client = this.client;
+    log("[Main]Main bot is instantiated");
     
     client.on("ready", ()=> {
       log("[Main]Main bot is ready and active now");
@@ -236,10 +237,6 @@ export class MusicBot {
           case "search":{
             if(!join()) return;
             if(ytdl.validateURL(optiont)){
-              if(this.data[message.guild.id].SearchPanel){
-                message.channel.send("検索中には実行できません").catch(e => log(e, "error"));
-                return;
-              }
               await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
               return;
             }
@@ -255,6 +252,10 @@ export class MusicBot {
                   gl: "JP",
                   hl: "ja"
                 });
+                if(result.items.length <= 0){
+                  await msg.edit(":pensive:見つかりませんでした");
+                  return;
+                }
                 this.data[message.guild.id].SearchPanel = {
                   Msg: {
                     id: msg.id,
@@ -315,10 +316,6 @@ export class MusicBot {
             }
             // 引数ついてたらそれ優先
             if(optiont !== ""){
-              if(this.data[message.guild.id].SearchPanel) {
-                message.channel.send("検索中には実行できません").catch(e => log(e, "error"));
-                return;
-              }
               await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
             // ついてないからキューから再生
             }else if(this.data[message.guild.id].Queue.length >= 1){
