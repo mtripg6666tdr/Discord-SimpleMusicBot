@@ -730,7 +730,7 @@ export class MusicBot {
           case "エクスポート":
           case "export":{
             const qd = JSON.stringify(this.data[message.guild.id].Queue.default.map(q => q.BasicInfo.Url));
-            message.channel.send("✅エクスポートしました", new discord.MessageAttachment(Buffer.from(qd), "exported_queue.ytq")).catch(e => log(e, "error"));
+            message.channel.send("✅エクスポートしました", new discord.MessageAttachment(Buffer.from(qd), "exported_queue.ytx")).catch(e => log(e, "error"));
           }break;
 
           case "end":{
