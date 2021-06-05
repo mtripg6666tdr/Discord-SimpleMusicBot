@@ -57,7 +57,7 @@ export class MusicBot {
       
       if(message.mentions.has(client.user)) message.channel.send("コマンドは、`" + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">") + "command`で確認できます").catch(e => log(e, "error"));
       if(message.content.startsWith(this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">")){
-        const msg_spl = message.content.substr(1, message.content.length - 1).split(" ");
+        const msg_spl = message.content.replace(/　/g, " ").substr(1, message.content.length - 1).split(" ");
         const command = msg_spl[0];
         const optiont = msg_spl.length > 1 ? message.content.substring(command.length + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">").length + 1, message.content.length) : "";
         const options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
