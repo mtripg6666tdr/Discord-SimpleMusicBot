@@ -25,4 +25,6 @@ export class CustomStream extends AudioSource {
       value: "カスタムストリーム"
     }] as EmbedField[];
   }
+
+  npAdditional(){return ""}
 }

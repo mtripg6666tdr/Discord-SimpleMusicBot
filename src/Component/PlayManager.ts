@@ -2,6 +2,7 @@ import { Client, Message, MessageEmbed, StreamDispatcher, TextChannel } from "di
 import { CalcMinSec, log } from "../util";
 import { GuildVoiceInfo, ytdlVideoInfo } from "../definition";
 import { AudioSource } from "../AudioSource/audiosource";
+import { YouTube } from "../AudioSource/youtube";
 
 export class PlayManager {
   private Dispatcher:StreamDispatcher = null;
@@ -105,9 +106,9 @@ export class PlayManager {
         const [min, sec] = CalcMinSec(_t);
         const embed = new MessageEmbed({
           title: ":cd:現在再生中:musical_note:",
-          description: "[" + this.CurrentVideoInfo.Title + "](" + this.CurrentVideoUrl + ") `" + min + ":" + sec + "`"
+          description: "[" + this.CurrentVideoInfo.Title + "](" + this.CurrentVideoUrl + ") `" + ((this.CurrentVideoInfo.ServiceIdentifer === "youtube" && (this.CurrentVideoInfo as YouTube).LiveStream) ? "(ライブストリーム)" : min + ":" + sec) + "`"
         });
-        embed.addField("リクエスト", this.info.Queue.default[0].AdditionalInfo.AddedBy, true);
+        embed.addField("リクエスト", this.info.Queue.default[0].AdditionalInfo.AddedBy.displayName, true);
         embed.addField("次の曲", 
         // トラックループオンなら現在の曲
         this.info.Queue.LoopEnabled ? this.info.Queue.default[0].BasicInfo.Title :

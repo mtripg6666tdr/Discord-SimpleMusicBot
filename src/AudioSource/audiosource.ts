@@ -26,4 +26,6 @@ export abstract class AudioSource {
   abstract fetch():Promise<Readable|string>;
   // クラスを初期化する非同期メソッド
   abstract init(url:string):Promise<AudioSource>;
+  // 現在再生中の曲に関する追加データ
+  abstract npAdditional():string;
 }

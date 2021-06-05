@@ -1,6 +1,11 @@
-import { Client, Message, MessageEmbed, TextChannel } from "discord.js";
+import { Client, Guild, GuildMember, Message, MessageEmbed, TextChannel} from "discord.js";
+import * as ytdl from "ytdl-core";
 import { AudioSource } from "../AudioSource/audiosource";
-import { GuildVoiceInfo, ytdlVideoInfo } from "../definition";
+import { CustomStream } from "../AudioSource/custom";
+import { GoogleDrive } from "../AudioSource/googledrive";
+import { SoundCloudS } from "../AudioSource/soundcloud";
+import { YouTube } from "../AudioSource/youtube";
+import { GuildVoiceInfo } from "../definition";
 import { CalcMinSec, log } from "../util";
 
 export class QueueManager {
@@ -31,19 +36,71 @@ export class QueueManager {
     this.info = data;
   }
 
-  async AddQueue(url:string, addedBy:string, method:"push"|"unshift" = "push", type:"youtube"|"custom"|"unknown" = "unknown"):Promise<AudioSource>{
-    
+  async AddQueue(url:string, addedBy:GuildMember, method:"push"|"unshift" = "push", type:"youtube"|"custom"|"unknown" = "unknown"):Promise<QueueContent>{
+    const additionalInfo = {
+      AddedBy: {
+        userId: addedBy.id,
+        displayName: addedBy.displayName
+      }
+    } as AdditionalInfo;
+    if(type === "youtube" || (type === "unknown" && ytdl.validateURL(url))){
+      // youtube
+      const result = {
+        BasicInfo: await new YouTube().init(url),
+        AdditionalInfo: additionalInfo
+      };
+      this._default[method](result);
+      return result;
+    }else if(type === "unknown"){
+      // google drive
+      if(url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/)){
+        const result = {
+          BasicInfo: await new GoogleDrive().init(url),
+          AdditionalInfo: additionalInfo
+        };
+        this._default[method](result);
+        return result;
+      }else if(url.match(/https?:\/\/soundcloud.com\/.+\/.+/)){
+        // soundcloud
+        const result = {
+          BasicInfo: await new SoundCloudS().init(url),
+          AdditionalInfo: additionalInfo
+        };
+        this._default[method](result);
+        return result;
+      }
+    }
+    // カスタムストリーム
+    const result = {
+      BasicInfo: await new CustomStream().init(url),
+      AdditionalInfo: additionalInfo
+    };
+    this._default[method](result);
+    return result;
   }
 
-  async AddQueueFirst(url:string, addedBy:string):Promise<AudioSource>{
-    return this.AddQueue(url, addedBy, "unshift");
-  }
-
-  async AutoAddQueue(client:Client, url:string, addedBy:string, first:boolean=false, channel:TextChannel = null){
+  /**
+   * ユーザーへのインタラクションやキュー追加までを一括して行います
+   * @param client Botのクライアント
+   * @param url 追加するソースのURL
+   * @param addedBy 追加したユーザー
+   * @param type 追加するURLのソースが判明している場合にはyoutubeまたはcustom、不明な場合はunknownを指定
+   * @param first 最初に追加する場合はtrue、末尾に追加する場合はfalse
+   * @param fromSearch 検索パネルの破棄を行うかどうか。検索パネルからのキュー追加の場合にはtrue、それ以外はfalse
+   * @param channel 検索パネルからのキュー追加でない場合に、ユーザーへのインタラクションメッセージを送信するチャンネル。送信しない場合はnull
+   */
+  async AutoAddQueue(
+      client:Client, 
+      url:string, 
+      addedBy:GuildMember, 
+      type:"youtube"|"custom"|"unknown",
+      first:boolean=false, 
+      fromSearch:boolean = false, 
+      channel:TextChannel = null){
     var ch:TextChannel = null;
     var msg:Message = null;
     try{
-      if(this.info.SearchPanel){
+      if(fromSearch && this.info.SearchPanel){
         ch = await client.channels.fetch(this.info.SearchPanel.Msg.chId) as TextChannel;
         msg= await (ch as TextChannel).messages.fetch(this.info.SearchPanel.Msg.id);
         msg.edit("お待ちください...", {embed:{description: "お待ちください..."}});
@@ -51,19 +108,17 @@ export class QueueManager {
         ch = channel;
         msg = await channel.send("お待ちください...");
       }
-      const info = first ? 
-      await this.info.Queue.AddQueueFirst(url, addedBy) : 
-      await this.info.Queue.AddQueue(url, addedBy);
+      const info = await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type);
       if(msg){
         const embed = new MessageEmbed();
         embed.title = "✅曲が追加されました";
-        embed.description = "[" + info.Title + "](" + info.Url + ")";
-        const [min,sec] = CalcMinSec(Number(info.LengthSeconds));
-        embed.addField("長さ", min + ":" + sec, true);
-        embed.addField("リクエスト", addedBy, true);
+        embed.description = "[" + info.BasicInfo.Title + "](" + info.BasicInfo.Url + ")";
+        const [min,sec] = CalcMinSec(Number(info.BasicInfo.LengthSeconds));
+        embed.addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).LiveStream) ? "(ライブストリーム)" : min + ":" + sec), true);
+        embed.addField("リクエスト", addedBy.displayName, true);
         embed.addField("キュー内の位置", first ? "0" : this.info.Queue.length - 1, true);
         embed.thumbnail = {
-          url: info.Thumnail
+          url: info.BasicInfo.Thumnail
         };
         await msg.edit("", embed);
       }
@@ -89,6 +144,10 @@ export class QueueManager {
 
   RemoveAll(){
     this._default = [];
+  }
+
+  RemoveFrom2(){
+    this._default = [this.default[0]];
   }
 
   Shuffle(){

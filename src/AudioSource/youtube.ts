@@ -9,6 +9,7 @@ export class YouTube extends AudioSource {
   Like:number;
   Dislike:number;
   Thumnail:string;
+  LiveStream:boolean;
 
   toField(verbose:boolean = false){
     const fields = [] as EmbedField[];
@@ -29,9 +30,15 @@ export class YouTube extends AudioSource {
   }
 
   async fetch(){
-    return ytdl.default(this.Url, {
-      quality: "highestaudio",
-      filter: "audioonly"
+    const info = await ytdl.getInfo(this.Url)
+    const format = ytdl.chooseFormat(info.formats, {
+      filter: this.LiveStream ? null : "audioonly",
+      quality: this.LiveStream ? null : "highestaudio",
+      isHLS: this.LiveStream
+    } as any);
+    console.log(format);
+    return ytdl.downloadFromInfo(info, {
+      format: format
     });
   }
 
@@ -45,9 +52,11 @@ export class YouTube extends AudioSource {
     this.Like = info.videoDetails.likes;
     this.Dislike = info.videoDetails.dislikes;
     this.Thumnail = info.thumbnail_url;
-    if(info.videoDetails.isLiveContent){
-      throw "Currently live stream is not supported";
-    }
+    this.LiveStream = info.videoDetails.isLiveContent;
     return this;
+  }
+
+  npAdditional(){
+    return "\r\nチャンネル名:`" + this.ChannelName + "`";
   }
 }

@@ -26,4 +26,6 @@ export class GoogleDrive extends AudioSource {
       value: "Googleドライブにて共有されたファイル"
     }] as EmbedField[];
   }
+
+  npAdditional(){return ""};
 }

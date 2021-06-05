@@ -38,6 +38,10 @@ export class SoundCloudS extends AudioSource {
     });
     return fields;
   }
+
+  npAdditional(){
+    return "\r\nアーティスト:`" + this.Author + "`"
+  }
 }
 
 type SoundCloudStream = {
