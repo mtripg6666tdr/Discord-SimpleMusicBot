@@ -8,6 +8,7 @@ export class GoogleDrive extends AudioSource {
   Thumnail:string = DefaultAudioThumbnailURL;
 
   async init(url:string){
+    this.Title = "Googleドライブストリーム";
     this.Url = url;
     return this;
   }

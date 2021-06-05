@@ -4,7 +4,7 @@ import * as ytdl from "ytdl-core";
 import * as ytsr from "ytsr";
 import * as ytpl from "ytpl";
 import { GuildVoiceInfo } from "./definition";
-import { CalcMinSec, CalcTime, DownloadText, GetMBytes, GetMemInfo, GetPercentage, log, logStore } from "./util";
+import { CalcMinSec, CalcTime, DownloadText, GetMBytes, GetMemInfo, GetPercentage, isAvailableRawAudioURL, log, logStore } from "./util";
 import { YouTube } from "./AudioSource/youtube";
 
 export class MusicBot {
@@ -93,15 +93,6 @@ export class MusicBot {
             return false;
           }
         };
-        /**
-         * ローオーディオファイルのURLであるかどうかをURLの末尾の拡張子から判断します
-         * @param str 検査対象のURL
-         * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
-         */
-        const isAvailableRawAudioURL = (str:string)=>{
-          const exts = [".mp3",".wav",".wma",".mov",".mp4"];
-          return exts.filter(ext => str.endsWith(ext)).length > 0;
-        }
         /**
          * メッセージからストリームを判定してキューに追加し、状況に応じて再生を開始する関数
          * @param first キューの先頭に追加するかどうか

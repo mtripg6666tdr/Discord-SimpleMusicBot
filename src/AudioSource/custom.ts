@@ -1,5 +1,6 @@
 import { EmbedField } from "discord.js";
 import { DefaultAudioThumbnailURL } from "../definition";
+import { isAvailableRawAudioURL } from "../util";
 import { AudioSource } from "./audiosource";
 
 export class CustomStream extends AudioSource {
@@ -8,7 +9,9 @@ export class CustomStream extends AudioSource {
   Thumnail:string = DefaultAudioThumbnailURL;
 
   async init(url:string){
+    if(!isAvailableRawAudioURL(url)) throw "正しいストリームではありません"
     this.Url = url;
+    this.Title = "カスタムストリーム";
     return this;
   }
 

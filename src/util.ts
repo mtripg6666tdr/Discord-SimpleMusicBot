@@ -83,3 +83,13 @@ export function DownloadText(url:string):Promise<string>{
     }).on("error", reject);
   })
 }
+
+/**
+ * ローオーディオファイルのURLであるかどうかをURLの末尾の拡張子から判断します
+ * @param str 検査対象のURL
+ * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
+ */
+export function isAvailableRawAudioURL(str:string){
+const exts = [".mp3",".wav",".wma",".mov",".mp4"];
+return exts.filter(ext => str.endsWith(ext)).length > 0;
+}
