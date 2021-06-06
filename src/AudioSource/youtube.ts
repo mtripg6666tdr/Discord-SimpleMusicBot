@@ -51,7 +51,7 @@ export class YouTube extends AudioSource {
     this.ChannelName = info.videoDetails.ownerChannelName;
     this.Like = info.videoDetails.likes;
     this.Dislike = info.videoDetails.dislikes;
-    this.Thumnail = info.thumbnail_url;
+    this.Thumnail = info.videoDetails.thumbnails[0].url;
     this.LiveStream = info.videoDetails.isLiveContent;
     return this;
   }
