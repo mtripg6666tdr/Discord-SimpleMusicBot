@@ -213,7 +213,7 @@ export class MusicBot {
             embed.addField("エクスポート, export", "キューの内容をインポートできるようエクスポートします。", true);
             embed.addField("この曲で終了, end", "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します", true);
             embed.addField("ワンスループ, onceloop, looponce", "現在再生中の曲を1度だけループします。", true);
-            embed.addField("study, bgm", "開発者が勝手に作った勉強用BGMをキューに追加します", true);
+            embed.addField("study, bgm", "開発者が勝手に作った勉強用・作業用BGMのプレイリストをキューに追加します", true);
             message.channel.send(embed);
           }break;
           
