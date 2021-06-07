@@ -1,11 +1,13 @@
 import { Client, Guild, GuildMember, Message, MessageEmbed, TextChannel} from "discord.js";
 import * as ytdl from "ytdl-core";
 import { AudioSource } from "../AudioSource/audiosource";
+import { BestdoriApi, BestdoriS } from "../AudioSource/bestdori";
 import { CustomStream } from "../AudioSource/custom";
 import { GoogleDrive } from "../AudioSource/googledrive";
 import { SoundCloudS } from "../AudioSource/soundcloud";
-import { YouTube } from "../AudioSource/youtube";
-import { GuildVoiceInfo } from "../definition";
+import { Streamable, StreamableApi } from "../AudioSource/streamable";
+import { YouTube, ytdata } from "../AudioSource/youtube";
+import { bestdori, GuildVoiceInfo } from "../definition";
 import { CalcMinSec, log } from "../util";
 
 export class QueueManager {
@@ -33,50 +35,53 @@ export class QueueManager {
   }
 
   SetData(data:GuildVoiceInfo){
-    log("[PlayManager]Set data of guild id " + data.GuildID)
+    log("[QueueManager]Set data of guild id " + data.GuildID)
     if(this.info) throw "すでに設定されています";
     this.info = data;
   }
 
-  async AddQueue(url:string, addedBy:GuildMember, method:"push"|"unshift" = "push", type:"youtube"|"custom"|"unknown" = "unknown"):Promise<QueueContent>{
-    const additionalInfo = {
-      AddedBy: {
-        userId: addedBy.id,
-        displayName: addedBy.displayName
+  async AddQueue(url:string, addedBy:GuildMember, method:"push"|"unshift" = "push", type:"youtube"|"custom"|"unknown" = "unknown", gotData:ytdata = null):Promise<QueueContent>{
+    const result = {
+      BasicInfo:null,
+      AdditionalInfo:{
+        AddedBy: {
+          userId: addedBy.id,
+          displayName: addedBy.displayName
+        }
       }
-    } as AdditionalInfo;
+    } as QueueContent;
     if(type === "youtube" || (type === "unknown" && ytdl.validateURL(url))){
       // youtube
-      const result = {
-        BasicInfo: await new YouTube().init(url),
-        AdditionalInfo: additionalInfo
-      };
+      if(gotData){
+        result.BasicInfo = await new YouTube().initFromData(gotData.url, gotData.title, gotData.description, gotData.length, gotData.channel, gotData.thumbnail, gotData.isLive);
+      }else{
+        result.BasicInfo = await new YouTube().init(url)
+      }
       this._default[method](result);
       return result;
     }else if(type === "unknown"){
       // google drive
       if(url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/)){
-        const result = {
-          BasicInfo: await new GoogleDrive().init(url),
-          AdditionalInfo: additionalInfo
-        };
+        result.BasicInfo = await new GoogleDrive().init(url);
         this._default[method](result);
         return result;
       }else if(url.match(/https?:\/\/soundcloud.com\/.+\/.+/)){
         // soundcloud
-        const result = {
-          BasicInfo: await new SoundCloudS().init(url),
-          AdditionalInfo: additionalInfo
-        };
+        result.BasicInfo = await new SoundCloudS().init(url);
+        this._default[method](result);
+        return result;
+      }else if(StreamableApi.getVideoId(url)){
+        result.BasicInfo = await new Streamable().init(url);
+        this._default[method](result);
+        return result;
+      }else if(BestdoriApi.getAudioId(url)){
+        result.BasicInfo = await new BestdoriS().init(url);
         this._default[method](result);
         return result;
       }
     }
     // カスタムストリーム
-    const result = {
-      BasicInfo: await new CustomStream().init(url),
-      AdditionalInfo: additionalInfo
-    };
+    result.BasicInfo = await new CustomStream().init(url);
     this._default[method](result);
     return result;
   }
@@ -89,7 +94,8 @@ export class QueueManager {
    * @param type 追加するURLのソースが判明している場合にはyoutubeまたはcustom、不明な場合はunknownを指定
    * @param first 最初に追加する場合はtrue、末尾に追加する場合はfalse
    * @param fromSearch 検索パネルの破棄を行うかどうか。検索パネルからのキュー追加の場合にはtrue、それ以外はfalse
-   * @param channel 検索パネルからのキュー追加でない場合に、ユーザーへのインタラクションメッセージを送信するチャンネル。送信しない場合はnull
+   * @param channel 検索パネルからのキュー追加でない場合に、ユーザーへのインタラクションメッセージを送信するチャンネル。送信しない場合はnull,
+   * @param gotData YouTubeの場合にすでにデータを取得している場合はここにデータを指定します
    */
   async AutoAddQueue(
       client:Client, 
@@ -98,7 +104,9 @@ export class QueueManager {
       type:"youtube"|"custom"|"unknown",
       first:boolean=false, 
       fromSearch:boolean = false, 
-      channel:TextChannel = null){
+      channel:TextChannel = null,
+      gotData:ytdata = null
+      ){
     var ch:TextChannel = null;
     var msg:Message = null;
     try{
@@ -110,7 +118,9 @@ export class QueueManager {
         ch = channel;
         msg = await channel.send("お待ちください...");
       }
-      const info = await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type);
+      const info = 
+      gotData ? await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type, gotData)
+        : await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type);
       if(msg){
         const embed = new MessageEmbed();
         embed.title = "✅曲が追加されました";
@@ -118,7 +128,8 @@ export class QueueManager {
         const [min,sec] = CalcMinSec(Number(info.BasicInfo.LengthSeconds));
         embed.addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).LiveStream) ? "(ライブストリーム)" : min + ":" + sec), true);
         embed.addField("リクエスト", addedBy.displayName, true);
-        embed.addField("キュー内の位置", first ? "0" : this.info.Queue.length - 1, true);
+        const index = first ? "0" : (this.info.Queue.length - 1).toString();
+        embed.addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true);
         embed.thumbnail = {
           url: info.BasicInfo.Thumnail
         };

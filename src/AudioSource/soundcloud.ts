@@ -40,7 +40,7 @@ export class SoundCloudS extends AudioSource {
   }
 
   npAdditional(){
-    return "\r\nアーティスト:`" + this.Author + "`"
+    return "\r\nアーティスト:`" + this.Author + "`";
   }
 }
 

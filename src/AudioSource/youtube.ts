@@ -21,11 +21,14 @@ export class YouTube extends AudioSource {
       name: ":asterisk:概要",
       value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, (verbose ? 1000 : 300)) + "..." : this.Description,
       inline: false
-    }, {
-      name: "⭐評価",
-      value: ":+1:" + this.Like + "/:-1:" + this.Dislike,
-      inline: false
     });
+    if(this.Like !== -1){
+      fields.push({
+        name: "⭐評価",
+        value: ":+1:" + this.Like + "/:-1:" + this.Dislike,
+        inline: false
+      });
+    }
     return fields;
   }
 
@@ -56,7 +59,24 @@ export class YouTube extends AudioSource {
     return this;
   }
 
+  async initFromData(url:string, title:string, description:string, length:number, channel:string, thumbnail:string, isLive:boolean){
+    this.Url = url;
+    this.Title = title;
+    this.Description = description;
+    this._lengthSeconds = length;
+    this.ChannelName = channel;
+    this.Thumnail = thumbnail;
+    this.LiveStream = isLive;
+    this.Like = -1;
+    this.Dislike = -1;
+    return this;
+  }
+
   npAdditional(){
     return "\r\nチャンネル名:`" + this.ChannelName + "`";
   }
+}
+
+export type ytdata = {
+  url:string, title:string, description:string, length:number, channel:string, thumbnail:string, isLive:boolean
 }

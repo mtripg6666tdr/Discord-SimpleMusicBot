@@ -94,4 +94,30 @@ type Thumbnails = {
   height: number;
 }
 
+export const BestdoriAllSongInfoEndPoint = "https://bestdori.com/api/songs/all.5.json";
+export const BestdoriAllBandInfoEndPoint = "https://bestdori.com/api/bands/all.1.json";
+class BestdoriData {
+  allsonginfo:BestdoriAllSongInfo = null;
+  allbandinfo:BestdoriAllBandInfo = null;
+}
+export var bestdori = new BestdoriData();
+export type BandID = number;
+export type SongID = number;
+export type BestdoriAllSongInfo = {
+  [key:number]:{
+      tag:string,
+      bandId:BandID,
+      jacketImage:[string],
+      musicTitle:[string,string,string,string,string],
+      publishedAt:[string,string,string,string,string],
+      closedAt:[string,string,string,string,string],
+      difficulty:{[key in "0"|"1"|"2"|"3"|"4"]:{playLevel:number}}
+  }
+}
+export type BestdoriAllBandInfo = {
+  [key:number]:{
+      bandName:[string,string,string,string,string]
+  }
+}
+
 export const DefaultAudioThumbnailURL = "https://cdn.discordapp.com/attachments/757824315294220329/846737267951271946/Audio_icon-icons.com_71845.png";

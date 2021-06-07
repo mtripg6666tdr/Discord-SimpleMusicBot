@@ -3,9 +3,10 @@ import * as os from "os";
 import * as ytdl from "ytdl-core";
 import * as ytsr from "ytsr";
 import * as ytpl from "ytpl";
-import { GuildVoiceInfo } from "./definition";
+import { bestdori, GuildVoiceInfo } from "./definition";
 import { CalcMinSec, CalcTime, DownloadText, GetMBytes, GetMemInfo, GetPercentage, isAvailableRawAudioURL, log, logStore } from "./util";
 import { YouTube } from "./AudioSource/youtube";
+import { BestdoriApi } from "./AudioSource/bestdori";
 
 export class MusicBot {
   private client = new discord.Client();
@@ -60,7 +61,7 @@ export class MusicBot {
       if(message.content.startsWith(this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">")){
         const msg_spl = message.content.replace(/　/g, " ").substr(1, message.content.length - 1).split(" ");
         const command = msg_spl[0];
-        const optiont = msg_spl.length > 1 ? message.content.substring(command.length + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">").length + 1, message.content.length) : "";
+        var optiont = msg_spl.length > 1 ? message.content.substring(command.length + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">").length + 1, message.content.length) : "";
         const options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
         
         log("[Main/" + message.guild.id + "]Command Prefix detected: " + message.content);
@@ -90,7 +91,7 @@ export class MusicBot {
             }
           }else{
             // あらメッセージの送信者さんはボイチャ入ってないん…
-            await message.channel.send("✘ボイスチャンネルに参加してからコマンドを送信してください。").catch(e => log(e, "error"));
+            await message.channel.send("ボイスチャンネルに参加してからコマンドを送信してください:relieved:").catch(e => log(e, "error"));
             return false;
           }
         };
@@ -133,30 +134,43 @@ export class MusicBot {
             return;
           }else{
             //違うならプレイリストの直リンクか？
-            try{
+            if(optiont.indexOf("v=") < 0 && ytpl.validateID(optiont)){
               const id = await ytpl.getPlaylistID(optiont);
               const msg = await message.channel.send(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
               const result = await ytpl.default(id, {
                 gl: "JP",
-                hl: "ja"
+                hl: "ja",
+                limit: Infinity
               });
+              var index = 1;
               for(var i = 0; i <result.items.length; i++){
-                await this.data[message.guild.id].Queue.AutoAddQueue(client, result.items[i].url, message.member, "youtube", false, false);
-                await msg.edit(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。" + result.items.length + "曲中" + (i + 1) + "曲処理済み。");
+                const c = result.items[i];
+                await this.data[message.guild.id].Queue.AutoAddQueue(client, c.url, message.member, "youtube", false, false, null, {
+                  url: c.url,
+                  channel: c.author.name,
+                  description: "プレイリストから指定のため詳細は表示されません",
+                  isLive: c.isLive,
+                  length: c.durationSec,
+                  thumbnail: c.thumbnails[0].url,
+                  title: c.title
+                });
+                index++;
+                if(index % 10 === 0 || result.estimatedItemCount <= 10){
+                  await msg.edit(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。" + result.estimatedItemCount + "曲中" + index + "曲処理済み。");
+                }
               }
               await msg.edit("✅" + result.items.length + "曲が追加されました。");
+              return;
+            }
+            try{
+              await this.data[message.guild.id].Queue.AutoAddQueue(client, optiont, message.member, "unknown", first, false, message.channel as discord.TextChannel);
+              this.data[message.guild.id].Manager.Play();
+              return;
             }
             catch{
-              try{
-                await this.data[message.guild.id].Queue.AutoAddQueue(client, optiont, message.member, "unknown", first, false, message.channel as discord.TextChannel);
-                this.data[message.guild.id].Manager.Play();
-                return;
-              }
-              catch{
-                // なに指定したし…
-                message.channel.send("🔭有効なURLを指定してください。キーワードで再生する場合はsearchコマンドを使用してください。").catch(e => log(e, "error"));
-                return;
-              }
+              // なに指定したし…
+              message.channel.send("🔭有効なURLを指定してください。キーワードで再生する場合はsearchコマンドを使用してください。").catch(e => log(e, "error"));
+              return;
             }
           }
         }
@@ -199,6 +213,7 @@ export class MusicBot {
             embed.addField("エクスポート, export", "キューの内容をインポートできるようエクスポートします。", true);
             embed.addField("この曲で終了, end", "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します", true);
             embed.addField("ワンスループ, onceloop, looponce", "現在再生中の曲を1度だけループします。", true);
+            embed.addField("study, bgm", "開発者が勝手に作った勉強用BGMをキューに追加します", true);
             message.channel.send(embed);
           }break;
           
@@ -216,6 +231,7 @@ export class MusicBot {
             + "・YouTube(動画URL指定)\r\n"
             + "・YouTube(プレイリストURL指定)\r\n"
             + "・SoundCloud(楽曲ページURL指定)\r\n"
+            + "・Streamable(動画ページURL指定)\r\n"
             + "・Discord(音声ファイルの添付付きメッセージのURL指定)\r\n"
             + "・Googleドライブ(音声ファイルの限定公開リンクのURL指定)\r\n"
             + "・オーディオファイルへの直URL"
@@ -237,7 +253,7 @@ export class MusicBot {
           case "検索":
           case "search":{
             if(!join()) return;
-            if(ytdl.validateURL(optiont)){
+            if(ytdl.validateURL(optiont) || ytpl.validateID(optiont)){
               await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
               return;
             }
@@ -245,7 +261,7 @@ export class MusicBot {
               message.channel.send("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
               break;
             }
-            if(optiont){
+            if(optiont !== ""){
               const msg = await message.channel.send("🔍検索中...");
               try{
                 const result = await ytsr.default(optiont, {
@@ -253,10 +269,6 @@ export class MusicBot {
                   gl: "JP",
                   hl: "ja"
                 });
-                if(result.items.length <= 0){
-                  await msg.edit(":pensive:見つかりませんでした");
-                  return;
-                }
                 this.data[message.guild.id].SearchPanel = {
                   Msg: {
                     id: msg.id,
@@ -282,6 +294,11 @@ export class MusicBot {
                     index++;
                   }
                 }
+                if(index == 1){
+                  this.data[message.guild.id].SearchPanel = null;
+                  await msg.edit(":pensive:見つかりませんでした。");
+                  return;
+                }
                 embed.description = desc;
                 embed.footer = {
                   iconURL: message.author.avatarURL(),
@@ -293,6 +310,8 @@ export class MusicBot {
                 log(e, "error");
                 message.channel.send("✘内部エラーが発生しました").catch(e => log(e, "error"));
               }
+            }else{
+              message.channel.send("引数を指定してください").catch(e => log(e, "error"));
             }
           } break;
           
@@ -305,19 +324,34 @@ export class MusicBot {
               message.channel.send(":arrow_forward: 再生を再開します。").catch(e => log(e, "error"))
               return;
             }
-            // キューにないし引数もない
+            // キューが空だし引数もない
             if(this.data[message.guild.id].Queue.length == 0 && optiont == "") {
               message.channel.send("再生するコンテンツがありません").catch(e => log(e, "error"));
               return;
             }
             // VCに入れない
             if(!(await join())) {
-              message.channel.send("ボイスチャンネルに参加してからコマンドを送信してください:relieved:").catch(e => log(e, "error"));
               return;
             }
             // 引数ついてたらそれ優先
             if(optiont !== ""){
-              await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
+              if(optiont.startsWith("http://") || optiont.startsWith("https://")){
+                await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
+              }else{
+                const msg = await message.channel.send("🔍検索中...");
+                const result = (await ytsr.default(optiont, {
+                  limit: 10,
+                  gl: "JP",
+                  hl: "ja"
+                })).items.filter(it => it.type === "video");
+                if(result.length === 0){
+                  await msg.edit(":face_with_monocle:該当する動画が見つかりませんでした");
+                  return;
+                }
+                optiont = (result[0] as ytsr.Video).url;
+                await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
+                await msg.delete();
+              }
             // ついてないからキューから再生
             }else if(this.data[message.guild.id].Queue.length >= 1){
               this.data[message.guild.id].Manager.Play();
@@ -740,6 +774,66 @@ export class MusicBot {
               message.channel.send(":repeat_one:ワンスリピートを有効にしました:o:").catch(e => log(e, "error"));
             }
           }break;
+
+          case "searchb":{
+            if(!join()) return;
+            if(this.data[message.guild.id].SearchPanel !== null){
+              message.channel.send("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
+              break;
+            }
+            if(optiont !== ""){
+              var msg =null;
+              var desc = "";
+              try{
+                await BestdoriApi.setupData();
+                const keys = Object.keys(bestdori.allsonginfo);
+                console.log(bestdori.allsonginfo);
+                const result = keys.filter(k => bestdori.allsonginfo[Number(k)].musicTitle[0]?.toLowerCase().indexOf(optiont.toLowerCase()) >= 0);
+                const msg = await message.channel.send("🔍検索中...");
+                this.data[message.guild.id].SearchPanel = {
+                  Msg: {
+                    id: msg.id,
+                    chId: msg.channel.id,
+                    userId: message.author.id,
+                    userName: message.member.displayName
+                  },
+                  Opts: {}
+                };
+                const embed = new discord.MessageEmbed();
+                embed.title = "\"" + optiont + "\"の検索結果✨"
+                var index = 1;
+                for(var i = 0; i < result.length; i++){
+                  desc += "`" + index + ".` [" + bestdori.allsonginfo[Number(result[i])].musicTitle[0] + "](" + BestdoriApi.getAudioPage(Number(result[i])) + ") \r\n\r\n";
+                  this.data[message.guild.id].SearchPanel.Opts[index] = {
+                    url: BestdoriApi.getAudioPage(Number(result[i])),
+                    title: bestdori.allsonginfo[Number(result[i])].musicTitle[0],
+                    duration: "0"
+                  };
+                  index++;
+                }
+                if(index == 1){
+                  this.data[message.guild.id].SearchPanel = null;
+                  await msg.edit(":pensive:見つかりませんでした。");
+                  return;
+                }
+                embed.description = desc;
+                await msg.edit("", embed);
+              }
+              catch(e){
+                console.log(e)
+                if(msg) msg.edit("失敗しました").catch(e => log(e, "error"));
+                else message.channel.send("失敗しました").catch(e => log(e, "error"));
+              }
+            }else{
+              message.channel.send("引数を指定してください").catch(e => log(e, "error"));
+            }
+          }break;
+
+          case "study":
+          case "bgm":{
+            optiont = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
+            playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
+          }break; 
         }
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
         // searchコマンドのキャンセルを捕捉
@@ -763,7 +857,7 @@ export class MusicBot {
           if(message.author.id !== panel.Msg.userId) return;
           const num = Number(message.content);
           if(panel && Object.keys(panel.Opts).indexOf(message.content) >= 0){
-            await this.data[message.guild.id].Queue.AutoAddQueue(client, panel.Opts[num].url, message.member, "youtube", false, true);
+            await this.data[message.guild.id].Queue.AutoAddQueue(client, panel.Opts[num].url, message.member, "unknown", false, true);
             this.data[message.guild.id].SearchPanel = null;
             if(this.data[message.guild.id].Manager.IsConnecting && !this.data[message.guild.id].Manager.IsPlaying){
               this.data[message.guild.id].Manager.Play();
