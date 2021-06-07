@@ -787,7 +787,6 @@ export class MusicBot {
               try{
                 await BestdoriApi.setupData();
                 const keys = Object.keys(bestdori.allsonginfo);
-                console.log(bestdori.allsonginfo);
                 const result = keys.filter(k => bestdori.allsonginfo[Number(k)].musicTitle[0]?.toLowerCase().indexOf(optiont.toLowerCase()) >= 0);
                 const msg = await message.channel.send("🔍検索中...");
                 this.data[message.guild.id].SearchPanel = {

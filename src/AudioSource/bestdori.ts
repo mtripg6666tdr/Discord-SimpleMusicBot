@@ -27,7 +27,13 @@ export class BestdoriS extends AudioSource {
   }
 
   toField(){
-    return [] as EmbedField[];
+    return [
+      {
+        name: "バンド名",
+        value: this.Artist,
+        inline: false
+      }
+    ] as EmbedField[];
   }
 
   npAdditional(){return "\r\nアーティスト:`" + this.Artist + "`"}
