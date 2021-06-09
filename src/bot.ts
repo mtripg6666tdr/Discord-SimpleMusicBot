@@ -36,8 +36,8 @@ export class MusicBot {
     });
 
     client.on("message", async message => {
-      // botのメッセやdmは無視
-      if(message.author.bot || message.channel.type == "dm") return;
+      // botのメッセやdm、およびnewsは無視
+      if(message.author.bot || message.channel.type == "dm" || message.channel.type == "news") return;
       
       // サーバーデータ初期化関数
       const initData = ()=> {
