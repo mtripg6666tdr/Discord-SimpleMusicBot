@@ -63,7 +63,7 @@ export class MusicBot {
       if(message.mentions.has(client.user)) message.channel.send("コマンドは、`" + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">") + "command`で確認できます").catch(e => log(e, "error"));
       if(message.content.startsWith(this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">")){
         const msg_spl = message.content.replace(/　/g, " ").substr(1, message.content.length - 1).split(" ");
-        const command = msg_spl[0];
+        const command = msg_spl[0].toLowerCase();
         var optiont = msg_spl.length > 1 ? message.content.substring(command.length + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">").length + 1, message.content.length) : "";
         const options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
         
@@ -216,6 +216,8 @@ export class MusicBot {
             embed.addField("この曲で終了, end", "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します", true);
             embed.addField("ワンスループ, onceloop, looponce", "現在再生中の曲を1度だけループします。", true);
             embed.addField("study, bgm", "開発者が勝手に作った勉強用・作業用BGMのプレイリストをキューに追加します", true);
+            embed.addField("サウンドクラウドを検索, soundcloudを検索, searchs", "曲をSoundCloudで検索します", true);
+            embed.addField("leaveclean, lc", "ボイスチャンネルから離脱した人のリクエストした曲を削除して整理します", true);
             embed.setColor(getColor("COMMAND"));
             message.channel.send(embed);
           }break;
@@ -769,12 +771,20 @@ export class MusicBot {
 
           case "シャッフル":
           case "shuffle":{
+            if(this.data[message.guild.id].Queue.length === 0){
+              message.channel.send("キューが空です。").catch(e => log(e, "error"));
+              return;
+            }
             this.data[message.guild.id].Queue.Shuffle();
             message.channel.send(":twisted_rightwards_arrows:シャッフルしました✅").catch(e => log(e, "error"));
           }break;
 
           case "エクスポート":
           case "export":{
+            if(this.data[message.guild.id].Queue.length === 0){
+              message.channel.send("キューが空です。").catch(e => log(e, "error"));
+              return;
+            }
             const qd = JSON.stringify({
               version: YmxVersion,
               data: this.data[message.guild.id].Queue.default.map(q => q.BasicInfo.exportData())
@@ -786,6 +796,10 @@ export class MusicBot {
 
           case "この曲で終了":
           case "end":{
+            if(this.data[message.guild.id].Queue.length <= 1){
+              message.channel.send("キューが空、もしくは一曲しかないため削除されませんでした。").catch(e => log(e, "error"));
+              return;
+            }
             this.data[message.guild.id].Queue.RemoveFrom2();
             message.channel.send("✅キューに残された曲を削除しました").catch(e => log(e, "error"));
           }break;
@@ -812,10 +826,11 @@ export class MusicBot {
               var msg =null;
               var desc = "";
               try{
+                const msg = await message.channel.send("準備中...");
                 await BestdoriApi.setupData();
                 const keys = Object.keys(bestdori.allsonginfo);
                 const result = keys.filter(k => bestdori.allsonginfo[Number(k)].musicTitle[0]?.toLowerCase().indexOf(optiont.toLowerCase()) >= 0);
-                const msg = await message.channel.send("🔍検索中...");
+                await msg.edit("🔍検索中...");
                 this.data[message.guild.id].SearchPanel = {
                   Msg: {
                     id: msg.id,
@@ -862,6 +877,8 @@ export class MusicBot {
             playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
           }break; 
 
+          case "サウンドクラウドを検索":
+          case "soundcloudを検索":
           case "searchs":{
             if(!join()) return;
             if(this.data[message.guild.id].SearchPanel !== null){
@@ -914,6 +931,21 @@ export class MusicBot {
             }else{
               message.channel.send("引数を指定してください").catch(e => log(e, "error"));
             }
+          }break;
+
+          case "leaveclean":
+          case "lc":{
+            if(!this.data[message.guild.id].Manager.IsConnecting){
+              this.data[message.guild.id].Queue.RemoveAll();
+              message.channel.send("✅すべて削除しました").catch(e => log(e, "error"));
+              return;
+            }else if(this.data[message.guild.id].Queue.length === 0){
+              message.channel.send("キューが空です").catch(e => log(e, "error"));
+              return;
+            }
+            const members = ((await this.data[message.guild.id].Connection.channel.fetch()) as discord.VoiceChannel).members.array().map(m => m.id);
+            const number = this.data[message.guild.id].Queue.RemoveIf(q => members.indexOf(q.AdditionalInfo.AddedBy.userId) < 0).length;
+            message.channel.send(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => log(e, "error"));;
           }break;
         }
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){

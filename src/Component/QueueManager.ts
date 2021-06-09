@@ -178,6 +178,19 @@ export class QueueManager {
       this._default.some(() => Math.random() - 0.5);
     }
   }
+
+  RemoveIf(validator:(q:QueueContent)=>Boolean){
+    if(this._default.length === 0) return;
+    const first = this.info.Manager.IsPlaying ? 1 : 0
+    const rmIndex = [] as number[];
+    for(var i = first; i < this._default.length; i++){
+      if(validator(this._default[i])){
+        rmIndex.push(i);
+      }
+    }
+    rmIndex.forEach(n => this.RemoveAt(n));
+    return rmIndex;
+  }
 }
 
 type QueueContent = {
