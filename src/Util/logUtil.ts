@@ -1,7 +1,7 @@
 class LogStore{
   data:string[] = [];
   addLog(log:string){
-    this.data.push(log +"\r\n");
+    this.data.push(log);
     if(this.data.length > 30){
       this.data = this.data.slice(1 , this.data.length);
     }
