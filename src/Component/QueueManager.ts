@@ -95,7 +95,8 @@ export class QueueManager {
    * @param type 追加するURLのソースが判明している場合にはyoutubeまたはcustom、不明な場合はunknownを指定
    * @param first 最初に追加する場合はtrue、末尾に追加する場合はfalse
    * @param fromSearch 検索パネルの破棄を行うかどうか。検索パネルからのキュー追加の場合にはtrue、それ以外はfalse
-   * @param channel 検索パネルからのキュー追加でない場合に、ユーザーへのインタラクションメッセージを送信するチャンネル。送信しない場合はnull,
+   * @param channel 検索パネルからのキュー追加でない場合に、ユーザーへのインタラクションメッセージを送信するチャンネル。送信しない場合はnull
+   * @param message 各インタラクションを上書きするメッセージが既にある場合はここにメッセージを指定します。それ以外の場合はnull
    * @param gotData すでにデータを取得していて新たにフェッチする必要がなくローカルでキューコンテンツをインスタンス化する場合はここにデータを指定します
    */
   async AutoAddQueue(
@@ -106,6 +107,7 @@ export class QueueManager {
       first:boolean=false, 
       fromSearch:boolean = false, 
       channel:TextChannel = null,
+      message:Message = null,
       gotData:exportableCustom = null
       ){
     var ch:TextChannel = null;
@@ -115,6 +117,9 @@ export class QueueManager {
         ch = await client.channels.fetch(this.info.SearchPanel.Msg.chId) as TextChannel;
         msg= await (ch as TextChannel).messages.fetch(this.info.SearchPanel.Msg.id);
         msg.edit("お待ちください...", {embed:{description: "お待ちください..."}});
+      }else if(message){
+        ch = message.channel as TextChannel;
+        msg = message;
       }else if(channel){
         ch = channel;
         msg = await channel.send("お待ちください...");

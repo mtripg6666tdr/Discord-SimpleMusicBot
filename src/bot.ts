@@ -117,7 +117,7 @@ export class MusicBot {
                 if(ch.type === "text"){
                   const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
                   if(msg.attachments.size > 0 && isAvailableRawAudioURL(msg.attachments.first().url)){
-                    await this.data[message.guild.id].Queue.AutoAddQueue(client, msg.attachments.first().url, message.member, "custom", first, false, message.channel as discord.TextChannel);
+                    await this.data[message.guild.id].Queue.AutoAddQueue(client, msg.attachments.first().url, message.member, "custom", first, false, message.channel as discord.TextChannel, smsg);
                     this.data[message.guild.id].Manager.Play();
                     return;
                   }else throw "添付ファイルが見つかりません";
@@ -147,7 +147,7 @@ export class MusicBot {
               var index = 1;
               for(var i = 0; i <result.items.length; i++){
                 const c = result.items[i];
-                await this.data[message.guild.id].Queue.AutoAddQueue(client, c.url, message.member, "youtube", false, false, null, {
+                await this.data[message.guild.id].Queue.AutoAddQueue(client, c.url, message.member, "youtube", false, false, null, null, {
                   url: c.url,
                   channel: c.author.name,
                   description: "プレイリストから指定のため詳細は表示されません",
@@ -749,7 +749,7 @@ export class MusicBot {
                   }
                   const qs = raw.data;
                   for(var i = 0; i < qs.length; i++){
-                    await this.data[message.guild.id].Queue.AutoAddQueue(client, qs[i].url, message.member, "unknown", false, false, null, qs[i]);
+                    await this.data[message.guild.id].Queue.AutoAddQueue(client, qs[i].url, message.member, "unknown", false, false, null, null, qs[i]);
                     if(qs.length <= 10 || i % 10 == 9){
                       await smsg.edit(qs.length + "曲中" + (i+1) + "曲処理しました。");
                     }
