@@ -1,14 +1,15 @@
-import { Client, Guild, GuildMember, Message, MessageEmbed, TextChannel} from "discord.js";
+import { Client, GuildMember, Message, MessageEmbed, TextChannel} from "discord.js";
 import * as ytdl from "ytdl-core";
 import { AudioSource } from "../AudioSource/audiosource";
-import { BestdoriApi, BestdoriS } from "../AudioSource/bestdori";
-import { CustomStream } from "../AudioSource/custom";
+import { BestdoriApi, BestdoriS, exportableBestdori } from "../AudioSource/bestdori";
+import { CustomStream, exportableCustom } from "../AudioSource/custom";
 import { GoogleDrive } from "../AudioSource/googledrive";
-import { SoundCloudS } from "../AudioSource/soundcloud";
-import { Streamable, StreamableApi } from "../AudioSource/streamable";
-import { YouTube, ytdata } from "../AudioSource/youtube";
-import { bestdori, GuildVoiceInfo } from "../definition";
-import { CalcMinSec, log } from "../util";
+import { exportableSoundCloud, SoundCloudS } from "../AudioSource/soundcloud";
+import { exportableStreamable, Streamable, StreamableApi } from "../AudioSource/streamable";
+import { exportableYouTube, YouTube } from "../AudioSource/youtube";
+import { GuildVoiceInfo } from "../definition";
+import { getColor } from "../Util/colorUtil";
+import { CalcMinSec, isAvailableRawAudioURL, log } from "../Util/util";
 
 export class QueueManager {
   // キューの本体
@@ -40,7 +41,7 @@ export class QueueManager {
     this.info = data;
   }
 
-  async AddQueue(url:string, addedBy:GuildMember, method:"push"|"unshift" = "push", type:"youtube"|"custom"|"unknown" = "unknown", gotData:ytdata = null):Promise<QueueContent>{
+  async AddQueue(url:string, addedBy:GuildMember, method:"push"|"unshift" = "push", type:"youtube"|"custom"|"unknown" = "unknown", gotData:exportableCustom = null):Promise<QueueContent>{
     const result = {
       BasicInfo:null,
       AdditionalInfo:{
@@ -52,11 +53,12 @@ export class QueueManager {
     } as QueueContent;
     if(type === "youtube" || (type === "unknown" && ytdl.validateURL(url))){
       // youtube
-      if(gotData){
-        result.BasicInfo = await new YouTube().initFromData(gotData.url, gotData.title, gotData.description, gotData.length, gotData.channel, gotData.thumbnail, gotData.isLive);
-      }else{
-        result.BasicInfo = await new YouTube().init(url)
-      }
+      result.BasicInfo = await new YouTube().init(url, gotData as exportableYouTube)
+      this._default[method](result);
+      return result;
+    }else if(type === "custom" || (type === "unknown" && isAvailableRawAudioURL(url))){
+      // カスタムストリーム
+      result.BasicInfo = await new CustomStream().init(url);
       this._default[method](result);
       return result;
     }else if(type === "unknown"){
@@ -67,23 +69,22 @@ export class QueueManager {
         return result;
       }else if(url.match(/https?:\/\/soundcloud.com\/.+\/.+/)){
         // soundcloud
-        result.BasicInfo = await new SoundCloudS().init(url);
+        result.BasicInfo = await new SoundCloudS().init(url, gotData as exportableSoundCloud);
         this._default[method](result);
         return result;
       }else if(StreamableApi.getVideoId(url)){
-        result.BasicInfo = await new Streamable().init(url);
+        // Streamable
+        result.BasicInfo = await new Streamable().init(url, gotData as exportableStreamable);
         this._default[method](result);
         return result;
       }else if(BestdoriApi.getAudioId(url)){
-        result.BasicInfo = await new BestdoriS().init(url);
+        // Bestdori
+        result.BasicInfo = await new BestdoriS().init(url, gotData as exportableBestdori);
         this._default[method](result);
         return result;
       }
     }
-    // カスタムストリーム
-    result.BasicInfo = await new CustomStream().init(url);
-    this._default[method](result);
-    return result;
+    throw "Provided URL was not resolved as available service";
   }
 
   /**
@@ -95,7 +96,7 @@ export class QueueManager {
    * @param first 最初に追加する場合はtrue、末尾に追加する場合はfalse
    * @param fromSearch 検索パネルの破棄を行うかどうか。検索パネルからのキュー追加の場合にはtrue、それ以外はfalse
    * @param channel 検索パネルからのキュー追加でない場合に、ユーザーへのインタラクションメッセージを送信するチャンネル。送信しない場合はnull,
-   * @param gotData YouTubeの場合にすでにデータを取得している場合はここにデータを指定します
+   * @param gotData すでにデータを取得していて新たにフェッチする必要がなくローカルでキューコンテンツをインスタンス化する場合はここにデータを指定します
    */
   async AutoAddQueue(
       client:Client, 
@@ -105,7 +106,7 @@ export class QueueManager {
       first:boolean=false, 
       fromSearch:boolean = false, 
       channel:TextChannel = null,
-      gotData:ytdata = null
+      gotData:exportableCustom = null
       ){
     var ch:TextChannel = null;
     var msg:Message = null;
@@ -118,11 +119,13 @@ export class QueueManager {
         ch = channel;
         msg = await channel.send("お待ちください...");
       }
-      const info = 
-      gotData ? await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type, gotData)
-        : await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type);
+      if(this.info.Queue.length >= 999){
+        throw "キューの上限を超えています";
+      }
+      const info = await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type, gotData ?? null);
       if(msg){
         const embed = new MessageEmbed();
+        embed.setColor(getColor("SONG_ADDED"));
         embed.title = "✅曲が追加されました";
         embed.description = "[" + info.BasicInfo.Title + "](" + info.BasicInfo.Url + ")";
         const [min,sec] = CalcMinSec(Number(info.BasicInfo.LengthSeconds));
@@ -139,7 +142,7 @@ export class QueueManager {
     catch(e){
       log(e, "error");
       if(msg){
-        msg.edit(":weary: キューの追加に失敗しました。追加できませんでした。").catch(e => log(e, "error"));
+        msg.edit(":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")").catch(e => log(e, "error"));
       }
     }
   }
@@ -166,10 +169,14 @@ export class QueueManager {
 
   Shuffle(){
     if(this._default.length === 0) return;
-    const first = this._default[0];
-    this._default.shift();
-    this._default.sort(() => Math.random() - 0.5);
-    this._default.unshift(first);
+    if(this.info.Manager.IsPlaying){
+      const first = this._default[0];
+      this._default.shift();
+      this._default.sort(() => Math.random() - 0.5);
+      this._default.unshift(first);
+    }else{
+      this._default.some(() => Math.random() - 0.5);
+    }
   }
 }
 

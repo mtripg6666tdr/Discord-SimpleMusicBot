@@ -45,38 +45,54 @@ export class YouTube extends AudioSource {
     });
   }
 
-  async init(url:string){
-    const info = await ytdl.getInfo(url, {lang: "ja"});
+  async init(url:string, prefetched:exportableYouTube){
     this.Url = url;
-    this.Title = info.videoDetails.title;
-    this.Description = info.videoDetails.description;
-    this._lengthSeconds = Number(info.videoDetails.lengthSeconds);
-    this.ChannelName = info.videoDetails.ownerChannelName;
-    this.Like = info.videoDetails.likes;
-    this.Dislike = info.videoDetails.dislikes;
-    this.Thumnail = info.videoDetails.thumbnails[0].url;
-    this.LiveStream = info.videoDetails.isLiveContent;
-    return this;
-  }
-
-  async initFromData(url:string, title:string, description:string, length:number, channel:string, thumbnail:string, isLive:boolean){
-    this.Url = url;
-    this.Title = title;
-    this.Description = description;
-    this._lengthSeconds = length;
-    this.ChannelName = channel;
-    this.Thumnail = thumbnail;
-    this.LiveStream = isLive;
-    this.Like = -1;
-    this.Dislike = -1;
+    if(prefetched){
+      this.Title = prefetched.title;
+      this.Description = prefetched.description;
+      this._lengthSeconds = prefetched.length;
+      this.ChannelName = prefetched.channel;
+      this.Thumnail = prefetched.thumbnail;
+      this.LiveStream = prefetched.isLive;
+      this.Like = -1;
+      this.Dislike = -1;
+    }else{
+      const info = await ytdl.getInfo(url, {lang: "ja"});
+      this.Title = info.videoDetails.title;
+      this.Description = info.videoDetails.description;
+      this._lengthSeconds = Number(info.videoDetails.lengthSeconds);
+      this.ChannelName = info.videoDetails.ownerChannelName;
+      this.Like = info.videoDetails.likes;
+      this.Dislike = info.videoDetails.dislikes;
+      this.Thumnail = info.videoDetails.thumbnails[0].url;
+      this.LiveStream = info.videoDetails.isLiveContent;
+    }
     return this;
   }
 
   npAdditional(){
     return "\r\nチャンネル名:`" + this.ChannelName + "`";
   }
+
+  exportData():exportableYouTube{
+    return {
+      url: this.Url,
+      title: this.Title,
+      description: this.Description,
+      length: this.LengthSeconds,
+      channel: this.ChannelName,
+      thumbnail: this.Thumnail,
+      isLive: this.LiveStream
+    };
+  };
 }
 
-export type ytdata = {
-  url:string, title:string, description:string, length:number, channel:string, thumbnail:string, isLive:boolean
+export type exportableYouTube = {
+  url:string;
+  title:string;
+  description:string;
+  length:number;
+  channel:string;
+  thumbnail:string;
+  isLive:boolean
 }

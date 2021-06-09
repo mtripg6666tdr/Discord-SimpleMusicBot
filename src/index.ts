@@ -4,7 +4,7 @@
 require("dotenv").config();
 import * as http from "http";
 import { MusicBot } from "./bot";
-import { btoa, log } from "./util";
+import { btoa, log } from "./Util/util";
 
 log("[Entry]Discord-SimpleMusicBot by mtripg6666tdr");
 const bot = new MusicBot();

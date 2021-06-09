@@ -8,15 +8,23 @@ export class SoundCloudS extends AudioSource {
   Author:string;
   Thumnail:string;
   
-  async init(url:string){
+  async init(url:string, prefetched?:exportableSoundCloud){
     this.Url = url;
-    const sc = new SoundCloud();
-    const info = await sc.tracks.getV2(url);
-    this.Title = info.title;
-    this.Description = info.description;
-    this._lengthSeconds = Math.floor(info.duration / 1000);
-    this.Author = info.user.username;
-    this.Thumnail = info.artwork_url;
+    if(prefetched){
+      this.Title = prefetched.title;
+      this.Description = prefetched.description;
+      this._lengthSeconds = prefetched.length;
+      this.Author = prefetched.author;
+      this.Thumnail = prefetched.thumbnail;
+    }else{
+      const sc = new SoundCloud();
+      const info = await sc.tracks.getV2(url);
+      this.Title = info.title;
+      this.Description = info.description;
+      this._lengthSeconds = Math.floor(info.duration / 1000);
+      this.Author = info.user.username;
+      this.Thumnail = info.artwork_url;
+    }
     return this;
   }
 
@@ -42,6 +50,26 @@ export class SoundCloudS extends AudioSource {
   npAdditional(){
     return "\r\nアーティスト:`" + this.Author + "`";
   }
+
+  exportData():exportableSoundCloud{
+    return {
+      url: this.Url,
+      title: this.Title,
+      description: this.Description,
+      length: this._lengthSeconds,
+      author: this.Author,
+      thumbnail: this.Thumnail
+    };
+  }
+}
+
+export type exportableSoundCloud = {
+  url:string;
+  title:string;
+  description:string;
+  length:number;
+  author:string;
+  thumbnail:string;
 }
 
 type SoundCloudStream = {

@@ -3,10 +3,13 @@ import * as os from "os";
 import * as ytdl from "ytdl-core";
 import * as ytsr from "ytsr";
 import * as ytpl from "ytpl";
-import { bestdori, GuildVoiceInfo } from "./definition";
-import { CalcMinSec, CalcTime, DownloadText, GetMBytes, GetMemInfo, GetPercentage, isAvailableRawAudioURL, log, logStore } from "./util";
+import { GuildVoiceInfo, YmxFormat, YmxVersion } from "./definition";
+import { CalcMinSec, CalcTime, DownloadText, GetMBytes, GetMemInfo, GetPercentage, isAvailableRawAudioURL, log, logStore } from "./Util/util";
 import { YouTube } from "./AudioSource/youtube";
-import { BestdoriApi } from "./AudioSource/bestdori";
+import { bestdori, BestdoriApi } from "./AudioSource/bestdori";
+import { exportableCustom } from "./AudioSource/custom";
+import { getColor } from "./Util/colorUtil";
+import Soundcloud from "soundcloud.ts";
 
 export class MusicBot {
   private client = new discord.Client();
@@ -114,8 +117,7 @@ export class MusicBot {
                 if(ch.type === "text"){
                   const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
                   if(msg.attachments.size > 0 && isAvailableRawAudioURL(msg.attachments.first().url)){
-                    await this.data[message.guild.id].Queue.AutoAddQueue(client, msg.attachments.first().url, message.member, "custom", first, false, )
-                    await smsg.delete();
+                    await this.data[message.guild.id].Queue.AutoAddQueue(client, msg.attachments.first().url, message.member, "custom", first, false, message.channel as discord.TextChannel);
                     this.data[message.guild.id].Manager.Play();
                     return;
                   }else throw "添付ファイルが見つかりません";
@@ -153,7 +155,7 @@ export class MusicBot {
                   length: c.durationSec,
                   thumbnail: c.thumbnails[0].url,
                   title: c.title
-                });
+                } as exportableCustom);
                 index++;
                 if(index % 10 === 0 || result.estimatedItemCount <= 10){
                   await msg.edit(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。" + result.estimatedItemCount + "曲中" + index + "曲処理済み。");
@@ -214,6 +216,7 @@ export class MusicBot {
             embed.addField("この曲で終了, end", "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します", true);
             embed.addField("ワンスループ, onceloop, looponce", "現在再生中の曲を1度だけループします。", true);
             embed.addField("study, bgm", "開発者が勝手に作った勉強用・作業用BGMのプレイリストをキューに追加します", true);
+            embed.setColor(getColor("COMMAND"));
             message.channel.send(embed);
           }break;
           
@@ -236,6 +239,7 @@ export class MusicBot {
             + "・Googleドライブ(音声ファイルの限定公開リンクのURL指定)\r\n"
             + "・オーディオファイルへの直URL"
             );
+            embed.setColor(getColor("HELP"));
             message.channel.send(embed).catch(e => log(e, "error"));
           }; break;
           
@@ -279,13 +283,14 @@ export class MusicBot {
                   Opts: {}
                 };
                 const embed = new discord.MessageEmbed();
-                embed.title = "\"" + optiont + "\"の検索結果✨"
+                embed.title = "\"" + optiont + "\"の検索結果✨";
+                embed.setColor(getColor("SEARCH"));
                 var desc = "";
                 var index = 1;
                 for(var i = 0; i < result.items.length; i++){
                   if(result.items[i].type == "video"){
                     const video = (result.items[i] as ytsr.Video);
-                    desc += "`" + index + ".` [" + video.title + "](" + video.url + ") `" + video.duration + "` \r\n\r\n";
+                    desc += "`" + index + ".` [" + video.title + "](" + video.url + ") `" + video.duration + "` - `" + video.author.name + "` \r\n\r\n";
                     this.data[message.guild.id].SearchPanel.Opts[index] = {
                       url: video.url,
                       title: video.title,
@@ -324,8 +329,8 @@ export class MusicBot {
               message.channel.send(":arrow_forward: 再生を再開します。").catch(e => log(e, "error"))
               return;
             }
-            // キューが空だし引数もない
-            if(this.data[message.guild.id].Queue.length == 0 && optiont == "") {
+            // キューが空だし引数もないし添付ファイルもない
+            if(this.data[message.guild.id].Queue.length == 0 && optiont == "" && message.attachments.size === 0) {
               message.channel.send("再生するコンテンツがありません").catch(e => log(e, "error"));
               return;
             }
@@ -352,7 +357,11 @@ export class MusicBot {
                 await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
                 await msg.delete();
               }
-            // ついてないからキューから再生
+            // 添付ファイルを確認
+            }else if(message.attachments.size >= 1){
+              optiont = message.attachments.first().url;
+              await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
+            // なにもないからキューから再生
             }else if(this.data[message.guild.id].Queue.length >= 1){
               this.data[message.guild.id].Manager.Play();
             }else{
@@ -404,9 +413,10 @@ export class MusicBot {
             const [tmin,tsec] = CalcMinSec(_t);
             const info = this.data[message.guild.id].Manager.CurrentVideoInfo;
             const embed = new discord.MessageEmbed();
+            embed.setColor(getColor("NP"));
             var progressBar = "";
+            embed.title = "現在再生中の曲:musical_note:";
             if(_t > 0){
-              embed.title = "現在再生中の曲:musical_note:";
               const progress = Math.floor(_s / _t * 20);
               for(var i = 1 ; i < progress; i++){
                 progressBar += "=";
@@ -416,7 +426,7 @@ export class MusicBot {
                 progressBar += "=";
               }
             }
-            embed.description = "[" + info.Title + "](" + info.Url + ")\r\n" + progressBar + ((info.ServiceIdentifer === "youtube" && (info as YouTube).LiveStream) ? "(ライブストリーム)" : " `" + min + ":" + sec + "/" + tmin + ":" + tsec + "`");
+            embed.description = "[" + info.Title + "](" + info.Url + ")\r\n" + progressBar + ((info.ServiceIdentifer === "youtube" && (info as YouTube).LiveStream) ? "(ライブストリーム)" : " `" + min + ":" + sec + "/" + (_t === 0 ? "(不明)" : tmin + ":" + tsec + "`"));
             embed.setThumbnail(info.Thumnail);
             embed.fields = info.toField(
               (options[0] === "long" || options[0] === "l" || options[0] === "verbose") ? true : false
@@ -437,7 +447,7 @@ export class MusicBot {
             var page = optiont === "" ? 1 : Number(optiont);
             if(isNaN(page)) page = 1;
             if(queue.length > 0 && page > Math.ceil(queue.length / 10)){
-              message.channel.send("指定されたページは範囲外です").catch(e => log(e, "error"));
+              msg.edit(":warning:指定されたページは範囲外です").catch(e => log(e, "error"));
               return;
             }
             for(var i = 10 * (page - 1); i < 10 * page; i++){
@@ -469,7 +479,8 @@ export class MusicBot {
               },
               thumbnail: {
                 url: message.guild.iconURL()
-              }
+              },
+              color: getColor("QUEUE")
             });
             msg.edit("", embed).catch(e => log(e, "error"));
           }break;
@@ -582,6 +593,7 @@ export class MusicBot {
             const insta = CalcTime(now.getTime() - this.instantiatedTime.getTime());
             const ready = CalcTime(now.getTime() - this.client.readyAt.getTime());
             const embed = new discord.MessageEmbed();
+            embed.setColor(getColor("UPTIME"));
             embed.title = client.user.username + "のアップタイム";
             embed.addField("サーバー起動からの経過した時間", insta[0] + "時間" + insta[1] + "分" + insta[2] + "秒");
             embed.addField("Botが起動してからの経過時間", ready[0] + "時間" + ready[1] + "分" + ready[2] + "秒");
@@ -602,6 +614,7 @@ export class MusicBot {
             if(message.author.id === "593758391395155978" && (options.indexOf("log") >= 0 || options.length == 0)){
               // Process Logs
               const logEmbed = new discord.MessageEmbed();
+              logEmbed.setColor(getColor("UPTIME"));
               logEmbed.title = "Log";
               logEmbed.description = "Last 30 bot logs\r\n```\r\n" + logStore.data.join("\r\n") + "\r\n```";
               message.channel.send(logEmbed).catch(e => log(e, "error"));
@@ -610,6 +623,7 @@ export class MusicBot {
             if(options.indexOf("cpu") >= 0 || options.length == 0){
               // Process CPU Info
               const cpuInfoEmbed = new discord.MessageEmbed();
+              cpuInfoEmbed.setColor(getColor("UPTIME"));
               const cpus = os.cpus();
               cpuInfoEmbed.title = "CPU Info";
               for(var i = 0; i < cpus.length; i++){
@@ -630,6 +644,7 @@ export class MusicBot {
             if(options.indexOf("mem") >= 0 || options.length == 0){
               // Process Mem Info
               const memInfoEmbed = new discord.MessageEmbed();
+              memInfoEmbed.setColor(getColor("UPTIME"));
               const memory = GetMemInfo();
               const nMem = process.memoryUsage();
               memInfoEmbed.title = "Memory Info";
@@ -724,13 +739,20 @@ export class MusicBot {
                     await smsg.edit(fields.length + "曲中" + (i+1) + "曲処理しました。");
                   }
                   await smsg.edit("✅" + fields.length + "曲を追加しました");
-                }else if(attac && attac.name.endsWith(".ytx")){
-                  const urls = JSON.parse(await DownloadText(attac.url));
-                  for(var i = 0; i < urls.length; i++){
-                    await this.data[message.guild.id].Queue.AutoAddQueue(client, urls[i], message.member, "unknown");
-                    await smsg.edit(urls.length + "曲中" + (i+1) + "曲処理しました。");
+                }else if(attac && attac.name.endsWith(".ymx")){
+                  const raw = JSON.parse(await DownloadText(attac.url)) as YmxFormat;
+                  if(raw.version !== YmxVersion){
+                    await smsg.edit("✘指定されたファイルはバージョンに互換性がないためインポートできません(現行:v" + YmxVersion + "; ファイル:v" + raw.version + ")");
+                    return;
                   }
-                  await smsg.edit("✅" + urls.length + "曲を追加しました");
+                  const qs = raw.data;
+                  for(var i = 0; i < qs.length; i++){
+                    await this.data[message.guild.id].Queue.AutoAddQueue(client, qs[i].url, message.member, "unknown", false, false, null, qs[i]);
+                    if(qs.length <= 10 || i % 10 == 9){
+                      await smsg.edit(qs.length + "曲中" + (i+1) + "曲処理しました。");
+                    }
+                  }
+                  await smsg.edit("✅" + qs.length + "曲を追加しました");
                 }else{
                   await smsg.edit("❌キューの埋め込みもしくは添付ファイルが見つかりませんでした");
                   return;
@@ -753,8 +775,13 @@ export class MusicBot {
 
           case "エクスポート":
           case "export":{
-            const qd = JSON.stringify(this.data[message.guild.id].Queue.default.map(q => q.BasicInfo.Url));
-            message.channel.send("✅エクスポートしました", new discord.MessageAttachment(Buffer.from(qd), "exported_queue.ytx")).catch(e => log(e, "error"));
+            const qd = JSON.stringify({
+              version: YmxVersion,
+              data: this.data[message.guild.id].Queue.default.map(q => q.BasicInfo.exportData())
+            } as YmxFormat);
+            message.channel.send("✅エクスポートしました", new discord.MessageAttachment(Buffer.from(qd), "exported_queue.ymx")).then(msg => {
+              msg.edit("✅エクスポートしました (バージョン: v" + YmxVersion + "互換)\r\nインポート時は、「" + msg.url + " 」をimportコマンドの引数に指定してください").catch(e => log(e, "error"))
+            }).catch(e => log(e, "error"));
           }break;
 
           case "この曲で終了":
@@ -799,10 +826,11 @@ export class MusicBot {
                   Opts: {}
                 };
                 const embed = new discord.MessageEmbed();
+                embed.setColor(getColor("SEARCH"));
                 embed.title = "\"" + optiont + "\"の検索結果✨"
                 var index = 1;
                 for(var i = 0; i < result.length; i++){
-                  desc += "`" + index + ".` [" + bestdori.allsonginfo[Number(result[i])].musicTitle[0] + "](" + BestdoriApi.getAudioPage(Number(result[i])) + ") \r\n\r\n";
+                  desc += "`" + index + ".` [" + bestdori.allsonginfo[Number(result[i])].musicTitle[0] + "](" + BestdoriApi.getAudioPage(Number(result[i])) + ") - `" + bestdori.allbandinfo[bestdori.allsonginfo[Number(result[i])].bandId].bandName[0] + "` \r\n\r\n";
                   this.data[message.guild.id].SearchPanel.Opts[index] = {
                     url: BestdoriApi.getAudioPage(Number(result[i])),
                     title: bestdori.allsonginfo[Number(result[i])].musicTitle[0],
@@ -833,6 +861,60 @@ export class MusicBot {
             optiont = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
             playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
           }break; 
+
+          case "searchs":{
+            if(!join()) return;
+            if(this.data[message.guild.id].SearchPanel !== null){
+              message.channel.send("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
+              break;
+            }
+            if(optiont !== ""){
+              var msg =null;
+              var desc = "";
+              try{
+                const soundcloud = new Soundcloud();
+                var result = (await soundcloud.tracks.searchV2({q: optiont})).collection;
+                if(result.length > 12) result = result.splice(0, 11);
+                const msg = await message.channel.send("🔍検索中...");
+                this.data[message.guild.id].SearchPanel = {
+                  Msg: {
+                    id: msg.id,
+                    chId: msg.channel.id,
+                    userId: message.author.id,
+                    userName: message.member.displayName
+                  },
+                  Opts: {}
+                };
+                const embed = new discord.MessageEmbed();
+                embed.setColor(getColor("SEARCH"));
+                embed.title = "\"" + optiont + "\"の検索結果✨"
+                var index = 1;
+                for(var i = 0; i < result.length; i++){
+                  desc += "`" + index + ".` [" + result[i].title + "](" + result[i].permalink_url + ") - `" + result[i].user.username + "` \r\n\r\n";
+                  this.data[message.guild.id].SearchPanel.Opts[index] = {
+                    url: result[i].permalink_url,
+                    title: result[i].title,
+                    duration: result[i].full_duration.toString()
+                  };
+                  index++;
+                }
+                if(index == 1){
+                  this.data[message.guild.id].SearchPanel = null;
+                  await msg.edit(":pensive:見つかりませんでした。");
+                  return;
+                }
+                embed.description = desc;
+                await msg.edit("", embed);
+              }
+              catch(e){
+                console.log(e)
+                if(msg) msg.edit("失敗しました").catch(e => log(e, "error"));
+                else message.channel.send("失敗しました").catch(e => log(e, "error"));
+              }
+            }else{
+              message.channel.send("引数を指定してください").catch(e => log(e, "error"));
+            }
+          }break;
         }
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
         // searchコマンドのキャンセルを捕捉

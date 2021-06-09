@@ -1,29 +1,35 @@
 import { EmbedField } from "discord.js";
 import { DefaultAudioThumbnailURL } from "../definition";
-import { DownloadText } from "../util";
+import { DownloadText } from "../Util/util";
 import { AudioSource } from "./audiosource";
 
 export class Streamable extends AudioSource {
   protected _lengthSeconds = 0;
   protected _serviceIdentifer = "streamable";
   Thumnail = DefaultAudioThumbnailURL;
-  private streamInfo:StreamableAPIResult = null;
+  private streamUrl = "";
 
-  async init(url:string){
+  async init(url:string, prefetched?:exportableStreamable){
     this.Url = url;
-    this.Title = "Streamableストリーム";
     const id = StreamableApi.getVideoId(url);
     if(!id) throw "Invalid streamable url";
-    this.streamInfo = await StreamableApi.getVideoDetails(id);
-    this._lengthSeconds = Math.floor(this.streamInfo.files["mp4-mobile"].duration);
-    this.Thumnail = "https:" + this.streamInfo.thumbnail_url;
-    this.Title = this.streamInfo.title;
+    if(prefetched){
+      this._lengthSeconds = prefetched.length;
+      this.Thumnail = prefetched.thumbnail;
+      this.Title = prefetched.title;
+      this.streamUrl = prefetched.streamUrl;
+    }else{
+      const streamInfo = await StreamableApi.getVideoDetails(id);
+      this._lengthSeconds = Math.floor(streamInfo.files["mp4-mobile"].duration);
+      this.Thumnail = "https:" + streamInfo.thumbnail_url;
+      this.Title = streamInfo.title;
+      this.streamUrl = streamInfo.files["mp4-mobile"].url;
+    }
     return this;
   }
 
   async fetch(){
-    const data = DownloadText(this.Url);
-    return this.streamInfo.files["mp4-mobile"].url;
+    return this.streamUrl;
   }
 
   toField(){
@@ -37,6 +43,24 @@ export class Streamable extends AudioSource {
   }
 
   npAdditional(){return ""};
+
+  exportData():exportableStreamable{
+    return {
+      url: this.Url,
+      length: this.LengthSeconds,
+      thumbnail: this.Thumnail,
+      title: this.Title,
+      streamUrl: this.streamUrl
+    };
+  }
+}
+
+export type exportableStreamable = {
+  url:string;
+  length:number;
+  thumbnail:string;
+  title:string;
+  streamUrl:string;
 }
 
 /**
@@ -66,7 +90,7 @@ export abstract class StreamableApi {
 /**
  * APIから返却されるデータの型定義
  * Remarks: https://support.streamable.com/api-documentation
- * VSCode拡張 'Paste JSON as Code' (quicktype.quicktype)により生成
+ * VSCode拡張 'Paste JSON as Code' (quicktype.quicktype)により生成 (https://quicktype.io)
  */
 export interface StreamableAPIResult {
   status:        number;
@@ -95,4 +119,75 @@ interface Mp4 {
   bitrate:   number;
   size:      number;
   duration:  number;
+}
+
+export interface Untitled1 {
+    bgmId:        string;
+    bgmFile:      string;
+    tag:          Tag;
+    bandId:       number;
+    achievements: Achievement[];
+    jacketImage:  string[];
+    seq:          number;
+    musicTitle:   Array<null | string>;
+    lyricist:     Array<null | string>;
+    composer:     Array<null | string>;
+    arranger:     Array<null | string>;
+    howToGet:     Array<null | string>;
+    publishedAt:  Array<null | string>;
+    closedAt:     Array<null | string>;
+    difficulty:   { [key: string]: Difficulty };
+    length:       number;
+    notes:        { [key: string]: number };
+    bpm:          { [key: string]: BPM[] };
+}
+
+export interface Achievement {
+    musicId:         number;
+    achievementType: string;
+    rewardType:      RewardType;
+    quantity:        number;
+    rewardId?:       number;
+}
+
+export enum RewardType {
+    Coin = "coin",
+    PracticeTicket = "practice_ticket",
+    Star = "star",
+}
+
+export interface BPM {
+    bpm:   number;
+    start: number;
+    end:   number;
+}
+
+export interface Difficulty {
+    playLevel:         number;
+    multiLiveScoreMap: { [key: string]: MultiLiveScoreMap };
+    notesQuantity:     number;
+    scoreC:            number;
+    scoreB:            number;
+    scoreA:            number;
+    scoreS:            number;
+    scoreSS:           number;
+}
+
+export interface MultiLiveScoreMap {
+    musicId:                 number;
+    musicDifficulty:         Tag;
+    multiLiveDifficultyId:   number;
+    scoreS:                  number;
+    scoreA:                  number;
+    scoreB:                  number;
+    scoreC:                  number;
+    multiLiveDifficultyType: string;
+    scoreSS:                 number;
+}
+
+export enum Tag {
+    Easy = "easy",
+    Expert = "expert",
+    Hard = "hard",
+    Normal = "normal",
 }

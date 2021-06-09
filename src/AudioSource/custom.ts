@@ -1,6 +1,6 @@
 import { EmbedField } from "discord.js";
 import { DefaultAudioThumbnailURL } from "../definition";
-import { isAvailableRawAudioURL } from "../util";
+import { isAvailableRawAudioURL } from "../Util/util";
 import { AudioSource } from "./audiosource";
 
 export class CustomStream extends AudioSource {
@@ -29,5 +29,15 @@ export class CustomStream extends AudioSource {
     }] as EmbedField[];
   }
 
-  npAdditional(){return ""}
+  npAdditional(){return ""};
+
+  exportData():exportableCustom{
+    return {
+      url:this.Url
+    };
+  }
+}
+
+export type exportableCustom = {
+  url: string;
 }

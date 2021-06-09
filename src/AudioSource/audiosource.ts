@@ -1,5 +1,6 @@
 import { EmbedField } from "discord.js";
 import { Readable } from "stream";
+import { exportableCustom } from "./custom";
 
 export abstract class AudioSource {
   // ソースのURL
@@ -25,7 +26,9 @@ export abstract class AudioSource {
   // 再生するためのストリームをフェッチ
   abstract fetch():Promise<Readable|string>;
   // クラスを初期化する非同期メソッド
-  abstract init(url:string):Promise<AudioSource>;
+  abstract init(url:string, prefetched:exportableCustom):Promise<AudioSource>;
   // 現在再生中の曲に関する追加データ
   abstract npAdditional():string;
+  // データをエクスポート
+  abstract exportData():exportableCustom;
 }

@@ -1,8 +1,9 @@
 import { Client, Message, MessageEmbed, StreamDispatcher, TextChannel } from "discord.js";
-import { CalcMinSec, log } from "../util";
-import { GuildVoiceInfo, ytdlVideoInfo } from "../definition";
+import { CalcMinSec, log } from "../Util/util";
+import { GuildVoiceInfo } from "../definition";
 import { AudioSource } from "../AudioSource/audiosource";
 import { YouTube } from "../AudioSource/youtube";
+import { getColor } from "../Util/colorUtil";
 
 export class PlayManager {
   private Dispatcher:StreamDispatcher = null;
@@ -66,36 +67,38 @@ export class PlayManager {
       this.Dispatcher = this.info.Connection.play(await this.CurrentVideoInfo.fetch());
       this.Dispatcher.on("finish", ()=> {
         log("[PlayManager/" + this.info.GuildID + "]Stream finished");
-        // 再生が終わったら
-        this.Dispatcher.destroy();
-        this.Dispatcher = null;
-        // 曲ループオン？
-        if(this.info.Queue.LoopEnabled){
-          this.Play();
-          return;
-        }else 
-        // ワンスループが有効か？
-        if(this.info.Queue.OnceLoopEnabled){
-          this.info.Queue.OnceLoopEnabled = false;
-          this.Play();
-          return;
-        }else{
-        // キュー整理
-        this.info.Queue.Next();
-        }
-        // キューがなくなったら接続終了
-        if(this.info.Queue.length === 0){
-          log("[PlayManager/" + this.info.GuildID + "]Queue empty");
-          if(this.info.boundTextChannel){
-            this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
-              (ch as TextChannel).send(":wave:キューが空になったため終了します").catch(e => log(e, "error"));
-            }).catch(e => log(e, "error"));
+        setTimeout(()=>{
+          // 再生が終わったら
+          this.Dispatcher.destroy();
+          this.Dispatcher = null;
+          // 曲ループオン？
+          if(this.info.Queue.LoopEnabled){
+            this.Play();
+            return;
+          }else 
+          // ワンスループが有効か？
+          if(this.info.Queue.OnceLoopEnabled){
+            this.info.Queue.OnceLoopEnabled = false;
+            this.Play();
+            return;
+          }else{
+          // キュー整理
+          this.info.Queue.Next();
           }
-          this.Disconnect();
-        // なくなってないなら再生開始！
-        }else{
-          this.Play();
-        }
+          // キューがなくなったら接続終了
+          if(this.info.Queue.length === 0){
+            log("[PlayManager/" + this.info.GuildID + "]Queue empty");
+            if(this.info.boundTextChannel){
+              this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
+                (ch as TextChannel).send(":wave:キューが空になったため終了します").catch(e => log(e, "error"));
+              }).catch(e => log(e, "error"));
+            }
+            this.Disconnect();
+          // なくなってないなら再生開始！
+          }else{
+            this.Play();
+          }
+        }, this.CurrentVideoInfo.ServiceIdentifer === "bestdori" ? 3000 : 0);
       });
       this.Dispatcher.on("error", (e)=>{
         log(JSON.stringify(e), "error");
@@ -113,8 +116,9 @@ export class PlayManager {
         const [min, sec] = CalcMinSec(_t);
         const embed = new MessageEmbed({
           title: ":cd:現在再生中:musical_note:",
-          description: "[" + this.CurrentVideoInfo.Title + "](" + this.CurrentVideoUrl + ") `" + ((this.CurrentVideoInfo.ServiceIdentifer === "youtube" && (this.CurrentVideoInfo as YouTube).LiveStream) ? "(ライブストリーム)" : min + ":" + sec) + "`"
+          description: "[" + this.CurrentVideoInfo.Title + "](" + this.CurrentVideoUrl + ") `" + ((this.CurrentVideoInfo.ServiceIdentifer === "youtube" && (this.CurrentVideoInfo as YouTube).LiveStream) ? "(ライブストリーム)" : _t === 0 ? "(不明)" : (min + ":" + sec)) + "`"
         });
+        embed.setColor(getColor("NP"));
         embed.addField("リクエスト", this.info.Queue.default[0].AdditionalInfo.AddedBy.displayName, true);
         embed.addField("次の曲", 
         // トラックループオンなら現在の曲

@@ -1,7 +1,6 @@
-import { Client, Message, MessageEmbed, TextChannel } from "discord.js";
 import * as os from "os";
 import * as https from "https";
-import { GuildVoiceInfo } from "./definition";
+export { log, logStore } from "./logUtil";
 
 // Returns min and sec from total sec
 export function CalcMinSec(_t:number){
@@ -27,23 +26,6 @@ export function CalcTime(date:number){
   const min = ato % 60;
   const hour = (ato - min) / 60;
   return [hour, min, sec, millisec];
-}
-
-class LogStore{
-  data:string[] = [];
-  addLog(log:string){
-    this.data.push(log +"\r\n");
-    if(this.data.length > 30){
-      this.data = this.data.slice(1 , this.data.length);
-    }
-  }
-}
-
-export var logStore = new LogStore();
-
-export function log(content:string, level:"log"|"warn"|"error" = "log"){
-  console[level](content);
-  logStore.addLog(level + ":" + content);
 }
 
 type MemoryUsageInfo = {free:number,total:number,used:number,usage:number};
