@@ -32,16 +32,23 @@ export class QueueManager {
   }
 
   constructor(){
-
+    log("[QueueManager]Queue Manager instantiated");
   }
 
   SetData(data:GuildVoiceInfo){
-    log("[QueueManager]Set data of guild id " + data.GuildID)
+    log("[QueueManager]Set data of guild id " + data.GuildID);
     if(this.info) throw "すでに設定されています";
     this.info = data;
   }
 
-  async AddQueue(url:string, addedBy:GuildMember, method:"push"|"unshift" = "push", type:"youtube"|"custom"|"unknown" = "unknown", gotData:exportableCustom = null):Promise<QueueContent>{
+  async AddQueue(
+      url:string, 
+      addedBy:GuildMember, 
+      method:"push"|"unshift" = "push", 
+      type:"youtube"|"custom"|"unknown" = "unknown", 
+      gotData:exportableCustom = null
+      ):Promise<QueueContent>{
+    log("[QueueManager/" + this.info.GuildID + "]AddQueue() called");
     const result = {
       BasicInfo:null,
       AdditionalInfo:{
@@ -110,24 +117,30 @@ export class QueueManager {
       message:Message = null,
       gotData:exportableCustom = null
       ){
+    log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Called");
     var ch:TextChannel = null;
     var msg:Message = null;
     try{
       if(fromSearch && this.info.SearchPanel){
+        log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() From search panel");
         ch = await client.channels.fetch(this.info.SearchPanel.Msg.chId) as TextChannel;
         msg= await (ch as TextChannel).messages.fetch(this.info.SearchPanel.Msg.id);
         msg.edit("お待ちください...", {embed:{description: "お待ちください..."}});
       }else if(message){
+        log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Interaction message specified");
         ch = message.channel as TextChannel;
         msg = message;
       }else if(channel){
+        log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Interaction channel specified");
         ch = channel;
         msg = await channel.send("お待ちください...");
       }
       if(this.info.Queue.length >= 999){
+        log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Failed since too long queue", "warn");
         throw "キューの上限を超えています";
       }
       const info = await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type, gotData ?? null);
+      log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Added successfully");
       if(msg){
         const embed = new MessageEmbed();
         embed.setColor(getColor("SONG_ADDED"));
@@ -145,6 +158,7 @@ export class QueueManager {
       }
     }
     catch(e){
+      log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Failed");
       log(e, "error");
       if(msg){
         msg.edit(":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")").catch(e => log(e, "error"));
@@ -153,6 +167,7 @@ export class QueueManager {
   }
 
   Next(){
+    log("[QueueManager/" + this.info.GuildID + "]Next() Called");
     this.OnceLoopEnabled = false;
     if(this.QueueLoopEnabled){
       this.default.push(this.default[0]);
@@ -161,18 +176,22 @@ export class QueueManager {
   }
 
   RemoveAt(offset:number){
+    log("[QueueManager/" + this.info.GuildID + "]RemoveAt() Called (offset:" + offset + ")");
     this._default.splice(offset, 1);
   }
 
   RemoveAll(){
+    log("[QueueManager/" + this.info.GuildID + "]RemoveAll() Called");
     this._default = [];
   }
 
   RemoveFrom2(){
+    log("[QueueManager/" + this.info.GuildID + "]RemoveFrom2() Called");
     this._default = [this.default[0]];
   }
 
   Shuffle(){
+    log("[QueueManager/" + this.info.GuildID + "]Shuffle() Called");
     if(this._default.length === 0) return;
     if(this.info.Manager.IsPlaying){
       const first = this._default[0];
@@ -185,6 +204,7 @@ export class QueueManager {
   }
 
   RemoveIf(validator:(q:QueueContent)=>Boolean){
+    log("[QueueManager/" + this.info.GuildID + "]RemoveIf() Called");
     if(this._default.length === 0) return;
     const first = this.info.Manager.IsPlaying ? 1 : 0
     const rmIndex = [] as number[];

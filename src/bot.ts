@@ -3,13 +3,13 @@ import * as os from "os";
 import * as ytdl from "ytdl-core";
 import * as ytsr from "ytsr";
 import * as ytpl from "ytpl";
+import Soundcloud from "soundcloud.ts";
 import { GuildVoiceInfo, YmxFormat, YmxVersion } from "./definition";
 import { CalcMinSec, CalcTime, DownloadText, GetMBytes, GetMemInfo, GetPercentage, isAvailableRawAudioURL, log, logStore } from "./Util/util";
 import { YouTube } from "./AudioSource/youtube";
 import { bestdori, BestdoriApi } from "./AudioSource/bestdori";
 import { exportableCustom } from "./AudioSource/custom";
 import { getColor } from "./Util/colorUtil";
-import Soundcloud from "soundcloud.ts";
 
 export class MusicBot {
   private client = new discord.Client();
@@ -35,7 +35,8 @@ export class MusicBot {
       tick();
     });
 
-    client.on("message", async message => {
+    client.on("message", 
+    async message => {
       // botのメッセやdm、およびnewsは無視
       if(message.author.bot || message.channel.type == "dm" || message.channel.type == "news") return;
       
@@ -209,12 +210,12 @@ export class MusicBot {
             embed.addField("頭出し, rewind, gotop, top", "再生中の曲の頭出しを行います。", true);
             embed.addField("アップタイム, ping, uptime", "ボットのアップタイムおよびping時間(レイテンシ)を表示します。", true);
             embed.addField("ログ, log, システム情報, systeminfo, sysinfo", "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数を指定して特定の内容のみ取得することもできます。", true);
-            embed.addField("移動, mv, move", "曲を指定された位置から指定された位置までキュー内で移動します。", true);
-            embed.addField("インポート, import", "指定されたメッセージに添付されたキューからインポートします。", true);
+            embed.addField("移動, mv, move", "曲を指定された位置から指定された位置までキュー内で移動します。2番目の曲を5番目に移動したい場合は`mv 2 5`のようにします。", true);
+            embed.addField("インポート, import", "指定されたメッセージに添付されたキューからインポートします。exportコマンドで出力されたファイルが添付されたメッセージのURL、あるいはキューの埋め込みのあるメッセージのURLを引数として添付してください。", true);
             embed.addField("シャッフル, shuffle", "キューの内容をシャッフルします。", true);
             embed.addField("エクスポート, export", "キューの内容をインポートできるようエクスポートします。", true);
             embed.addField("この曲で終了, end", "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します", true);
-            embed.addField("ワンスループ, onceloop, looponce", "現在再生中の曲を1度だけループします。", true);
+            embed.addField("ワンスループ, onceloop, looponce", "現在再生中の曲を1度だけループ再生します。", true);
             embed.addField("study, bgm", "開発者が勝手に作った勉強用・作業用BGMのプレイリストをキューに追加します", true);
             embed.addField("サウンドクラウドを検索, soundcloudを検索, searchs", "曲をSoundCloudで検索します", true);
             embed.addField("leaveclean, lc", "ボイスチャンネルから離脱した人のリクエストした曲を削除して整理します", true);
@@ -235,6 +236,7 @@ export class MusicBot {
               "・YouTube(キーワード検索)\r\n"
             + "・YouTube(動画URL指定)\r\n"
             + "・YouTube(プレイリストURL指定)\r\n"
+            + "・SoundCloud(キーワード検索)\r\n"
             + "・SoundCloud(楽曲ページURL指定)\r\n"
             + "・Streamable(動画ページURL指定)\r\n"
             + "・Discord(音声ファイルの添付付きメッセージのURL指定)\r\n"
@@ -268,22 +270,23 @@ export class MusicBot {
               break;
             }
             if(optiont !== ""){
+              this.data[message.guild.id].SearchPanel = {} as any;
               const msg = await message.channel.send("🔍検索中...");
+              this.data[message.guild.id].SearchPanel = {
+                Msg: {
+                  id: msg.id,
+                  chId: msg.channel.id,
+                  userId: message.author.id,
+                  userName: message.member.displayName
+                },
+                Opts: {}
+              };
               try{
                 const result = await ytsr.default(optiont, {
                   limit:12,
                   gl: "JP",
                   hl: "ja"
                 });
-                this.data[message.guild.id].SearchPanel = {
-                  Msg: {
-                    id: msg.id,
-                    chId: msg.channel.id,
-                    userId: message.author.id,
-                    userName: message.member.displayName
-                  },
-                  Opts: {}
-                };
                 const embed = new discord.MessageEmbed();
                 embed.title = "\"" + optiont + "\"の検索結果✨";
                 embed.setColor(getColor("SEARCH"));
@@ -301,7 +304,7 @@ export class MusicBot {
                     index++;
                   }
                 }
-                if(index == 1){
+                if(index === 1){
                   this.data[message.guild.id].SearchPanel = null;
                   await msg.edit(":pensive:見つかりませんでした。");
                   return;
@@ -806,13 +809,15 @@ export class MusicBot {
 
           case "ワンスループ":
           case "onceloop":
-          case "looponce":{
+          case "looponce":
+          case "oncerepeat":
+          case "repeatonce":{
             if(this.data[message.guild.id].Queue.OnceLoopEnabled){
               this.data[message.guild.id].Queue.OnceLoopEnabled = false;
-              message.channel.send(":repeat_one:ワンスリピートを無効にしました:x:").catch(e => log(e, "error"));
+              message.channel.send(":repeat_one:ワンスループを無効にしました:x:").catch(e => log(e, "error"));
             }else{
               this.data[message.guild.id].Queue.OnceLoopEnabled = true;
-              message.channel.send(":repeat_one:ワンスリピートを有効にしました:o:").catch(e => log(e, "error"));
+              message.channel.send(":repeat_one:ワンスループを有効にしました:o:").catch(e => log(e, "error"));
             }
           }break;
 
@@ -823,14 +828,11 @@ export class MusicBot {
               break;
             }
             if(optiont !== ""){
-              var msg =null;
+              var msg = null;
               var desc = "";
               try{
+                this.data[message.guild.id].SearchPanel = {} as any;
                 const msg = await message.channel.send("準備中...");
-                await BestdoriApi.setupData();
-                const keys = Object.keys(bestdori.allsonginfo);
-                const result = keys.filter(k => bestdori.allsonginfo[Number(k)].musicTitle[0]?.toLowerCase().indexOf(optiont.toLowerCase()) >= 0);
-                await msg.edit("🔍検索中...");
                 this.data[message.guild.id].SearchPanel = {
                   Msg: {
                     id: msg.id,
@@ -840,6 +842,10 @@ export class MusicBot {
                   },
                   Opts: {}
                 };
+                await BestdoriApi.setupData();
+                await msg.edit("🔍検索中...");
+                const keys = Object.keys(bestdori.allsonginfo);
+                const result = keys.filter(k => bestdori.allsonginfo[Number(k)].musicTitle[0]?.toLowerCase().indexOf(optiont.toLowerCase()) >= 0);
                 const embed = new discord.MessageEmbed();
                 embed.setColor(getColor("SEARCH"));
                 embed.title = "\"" + optiont + "\"の検索結果✨"
@@ -853,12 +859,16 @@ export class MusicBot {
                   };
                   index++;
                 }
-                if(index == 1){
+                if(index === 1){
                   this.data[message.guild.id].SearchPanel = null;
                   await msg.edit(":pensive:見つかりませんでした。");
                   return;
                 }
                 embed.description = desc;
+                embed.footer = {
+                  iconURL: message.author.avatarURL(),
+                  text:"楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
+                };
                 await msg.edit("", embed);
               }
               catch(e){
@@ -886,12 +896,10 @@ export class MusicBot {
               break;
             }
             if(optiont !== ""){
-              var msg =null;
+              var msg = null;
               var desc = "";
               try{
-                const soundcloud = new Soundcloud();
-                var result = (await soundcloud.tracks.searchV2({q: optiont})).collection;
-                if(result.length > 12) result = result.splice(0, 11);
+                this.data[message.guild.id].SearchPanel = {} as any;
                 const msg = await message.channel.send("🔍検索中...");
                 this.data[message.guild.id].SearchPanel = {
                   Msg: {
@@ -902,6 +910,9 @@ export class MusicBot {
                   },
                   Opts: {}
                 };
+                const soundcloud = new Soundcloud();
+                var result = (await soundcloud.tracks.searchV2({q: optiont})).collection;
+                if(result.length > 12) result = result.splice(0, 11);
                 const embed = new discord.MessageEmbed();
                 embed.setColor(getColor("SEARCH"));
                 embed.title = "\"" + optiont + "\"の検索結果✨"
@@ -915,12 +926,16 @@ export class MusicBot {
                   };
                   index++;
                 }
-                if(index == 1){
+                if(index === 1){
                   this.data[message.guild.id].SearchPanel = null;
                   await msg.edit(":pensive:見つかりませんでした。");
                   return;
                 }
                 embed.description = desc;
+                embed.footer = {
+                  iconURL: message.author.avatarURL(),
+                  text:"楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
+                };
                 await msg.edit("", embed);
               }
               catch(e){
@@ -993,7 +1008,8 @@ export class MusicBot {
   }
 
   // Bot実行
-  Run(token:string){
+  Run(token:string, debugLog:boolean = false){
     this.client.login(token).catch(e => log(e, "error"));
+    logStore.log = debugLog;
   }
 }
