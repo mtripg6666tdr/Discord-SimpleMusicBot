@@ -180,7 +180,7 @@ export class QueueManager {
       this._default.sort(() => Math.random() - 0.5);
       this._default.unshift(first);
     }else{
-      this._default.some(() => Math.random() - 0.5);
+      this._default.sort(() => Math.random() - 0.5);
     }
   }
 
