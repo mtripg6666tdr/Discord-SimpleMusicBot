@@ -5,7 +5,7 @@ import * as ytsr from "ytsr";
 import * as ytpl from "ytpl";
 import Soundcloud from "soundcloud.ts";
 import { GuildVoiceInfo, YmxFormat, YmxVersion } from "./definition";
-import { CalcMinSec, CalcTime, DownloadText, GetMBytes, GetMemInfo, GetPercentage, isAvailableRawAudioURL, log, logStore } from "./Util/util";
+import { CalcMinSec, CalcTime, DownloadText, GetMBytes, GetMemInfo, GetPercentage, isAvailableRawAudioURL, log, logStore, suppressMessageEmbeds } from "./Util/util";
 import { YouTube } from "./AudioSource/youtube";
 import { bestdori, BestdoriApi } from "./AudioSource/bestdori";
 import { exportableCustom } from "./AudioSource/custom";
@@ -15,6 +15,7 @@ export class MusicBot {
   private client = new discord.Client();
   private data:{[key:string]:GuildVoiceInfo} = {};
   private instantiatedTime = null as Date;
+  private token = "";
   get Client(){return this.client};
 
   constructor(){
@@ -104,8 +105,9 @@ export class MusicBot {
          * @param first キューの先頭に追加するかどうか
          */
         const playFromURL = async (first:boolean = true)=>{
-          setTimeout(()=>message.suppressEmbeds(true).catch(e => log(e, "warn")),2000);
-          var match:RegExpMatchArray;
+          setTimeout(()=>{
+            suppressMessageEmbeds(message, this.client, this.token).catch(e => log(e, "warn"));
+          },2000);
           // Discordメッセへのリンク？
           if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
             const smsg = await message.channel.send("🔍メッセージを取得しています...");
@@ -828,7 +830,7 @@ export class MusicBot {
               break;
             }
             if(optiont !== ""){
-              var msg = null;
+              var msg = null as discord.Message;
               var desc = "";
               try{
                 this.data[message.guild.id].SearchPanel = {} as any;
@@ -896,7 +898,7 @@ export class MusicBot {
               break;
             }
             if(optiont !== ""){
-              var msg = null;
+              var msg = null as discord.Message;
               var desc = "";
               try{
                 this.data[message.guild.id].SearchPanel = {} as any;
@@ -1010,6 +1012,7 @@ export class MusicBot {
   // Bot実行
   Run(token:string, debugLog:boolean = false){
     this.client.login(token).catch(e => log(e, "error"));
+    this.token = token;
     logStore.log = debugLog;
   }
 }

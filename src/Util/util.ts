@@ -1,5 +1,6 @@
 import * as os from "os";
 import * as https from "https";
+import { Client, Message } from "discord.js";
 export { log, logStore } from "./logUtil";
 
 // Returns min and sec from total sec
@@ -74,4 +75,42 @@ export function DownloadText(url:string):Promise<string>{
 export function isAvailableRawAudioURL(str:string){
 const exts = [".mp3",".wav",".wma",".mov",".mp4"];
 return exts.filter(ext => str.endsWith(ext)).length > 0;
+}
+
+/**
+ * おそらくDiscord側のAPIの仕様変更により、discord.jsのMessage.suppressEmbeds()が動作しなくなったため代替としてREST APIを叩きます
+ * @param msg suppressEmbedsしたいメッセージ
+ * @param client supressEmbedsするクライアント
+ * @param token ボットのトークン
+ * @returns supressEmbedsされたメッセージ
+ */
+export function suppressMessageEmbeds(msg:Message, client:Client, token:string):Promise<Message>{
+  return new Promise((resolve, reject)=>{
+    const req = https.request({
+      protocol: "https:",
+      host: "discord.com",
+      path: "/api/channels/" + msg.channel.id + "/messages/" + msg.id,
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": "Discord Bot",
+        "Authorization": "Bot " + token
+      }
+    }, (res) => {
+      var data = "";
+      res.on("data", (chunk)=> data += chunk);
+      res.on("end", ()=>{
+        if(res.statusCode === 200){
+          resolve(new Message(client, JSON.parse(data), msg.channel));
+        }else{
+          reject();
+        }
+      });
+      res.on("error", reject);
+    });
+    req.end(JSON.stringify({
+      // SUPPRESS_EMBEDS
+      flags: 1<<2
+    }));
+  });
 }
