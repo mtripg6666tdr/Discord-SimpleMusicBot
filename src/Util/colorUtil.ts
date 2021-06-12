@@ -6,9 +6,10 @@ export function getColor(key:colorkey):number{
     "NP": 0xBC42F7,
     "QUEUE": 0xF4BCFC,
     "UPTIME": 0xD3FEFE,
-    "SONG_ADDED": 0x77EAC8
+    "SONG_ADDED": 0x77EAC8,
+    "LYRIC": 0xE4F004,
   };
   return cmap[key];
 }
 
-type colorkey = "COMMAND"|"HELP"|"SEARCH"|"NP"|"QUEUE"|"UPTIME"|"SONG_ADDED";
+type colorkey = "COMMAND"|"HELP"|"SEARCH"|"NP"|"QUEUE"|"UPTIME"|"SONG_ADDED"|"LYRIC";

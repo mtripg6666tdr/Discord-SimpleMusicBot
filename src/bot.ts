@@ -9,6 +9,7 @@ import { exportableCustom } from "./AudioSource/custom";
 import { YouTube } from "./AudioSource/youtube";
 import { GuildVoiceInfo, YmxFormat, YmxVersion } from "./definition";
 import { getColor } from "./Util/colorUtil";
+import { GetLyrics } from "./Util/lyricsUtil";
 import { 
   CalcMinSec, 
   CalcTime, 
@@ -974,6 +975,29 @@ export class MusicBot {
             const members = ((await this.data[message.guild.id].Connection.channel.fetch()) as discord.VoiceChannel).members.array().map(m => m.id);
             const number = this.data[message.guild.id].Queue.RemoveIf(q => members.indexOf(q.AdditionalInfo.AddedBy.userId) < 0).length;
             message.channel.send(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => log(e, "error"));;
+          }break;
+
+          case "l":
+          case "lyric":
+          case "lyrics":{
+            const msg = await message.channel.send("🔍検索中...");
+            try{
+              const song = await GetLyrics(optiont);
+              const embed = new discord.MessageEmbed();
+              embed.title = "\"" + song.title + "\"(" + song.artist + ")の歌詞";
+              embed.footer = {
+                text: message.member.displayName,
+                iconURL: message.author.avatarURL()
+              };
+              embed.setColor(getColor("LYRIC"));
+              embed.description = song.lyric;
+              msg.edit("", embed);
+            }
+            catch(e){
+              log(e, "error");
+              msg.edit(":confounded:失敗しました。曲名を確認してもう一度試してみてください。").catch(e => log(e, "error"));
+              return;
+            }
           }break;
         }
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
