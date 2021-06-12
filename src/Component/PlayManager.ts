@@ -1,9 +1,9 @@
 import { Client, Message, MessageEmbed, StreamDispatcher, TextChannel } from "discord.js";
-import { CalcMinSec, log } from "../Util/util";
-import { GuildVoiceInfo } from "../definition";
 import { AudioSource } from "../AudioSource/audiosource";
 import { YouTube } from "../AudioSource/youtube";
+import { GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
+import { CalcMinSec, log } from "../Util/util";
 
 export class PlayManager {
   private Dispatcher:StreamDispatcher = null;

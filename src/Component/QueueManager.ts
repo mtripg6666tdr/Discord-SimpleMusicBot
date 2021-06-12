@@ -1,4 +1,4 @@
-import { Client, GuildMember, Message, MessageEmbed, TextChannel} from "discord.js";
+import { Client, GuildMember, Message, MessageEmbed, TextChannel } from "discord.js";
 import * as ytdl from "ytdl-core";
 import { AudioSource } from "../AudioSource/audiosource";
 import { BestdoriApi, BestdoriS, exportableBestdori } from "../AudioSource/bestdori";

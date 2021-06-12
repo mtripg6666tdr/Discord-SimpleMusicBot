@@ -3,13 +3,23 @@ import * as https from "https";
 import { Client, Message } from "discord.js";
 export { log, logStore } from "./logUtil";
 
-// Returns min and sec from total sec
+/**
+ * 合計時間(秒)からゼロ補完された分および秒を計算します。
+ * @param _t 合計時間(秒)
+ * @returns [ゼロ補完された分,ゼロ補完された秒]
+ */
 export function CalcMinSec(_t:number){
   const sec = _t % 60;
   const min = (_t - sec) / 60;
   return [AddZero(min.toString(), 2), AddZero(sec.toString(), 2)];
 }
 
+/**
+ * 指定された文字列を指定された桁数になるまでゼロ補完します。
+ * @param str 補完する文字列
+ * @param length 補完後の長さ
+ * @returns 保管された文字列
+ */
 export function AddZero(str:string, length:number){
   if(str.length >= length) return str;
   while(str.length < length){
@@ -19,7 +29,12 @@ export function AddZero(str:string, length:number){
 }
 
 // Returns hour, min, sec and millisec from total millisec
-export function CalcTime(date:number){
+/**
+ * 合計時間(ミリ秒)から時間,分,秒,ミリ秒を計算します。
+ * @param date 合計時間(ミリ秒)
+ * @returns [時間,分,秒,ミリ秒]
+ */
+export function CalcTime(date:number):number[]{
   const millisec = date % 1000;
   var ato = (date - millisec) / 1000;
   const sec = ato % 60;
@@ -29,8 +44,15 @@ export function CalcTime(date:number){
   return [hour, min, sec, millisec];
 }
 
+/**
+ * メモリ使用情報
+ */
 type MemoryUsageInfo = {free:number,total:number,used:number,usage:number};
 
+/**
+ * メモリ使用情報を取得します
+ * @returns メモリ使用情報
+ */
 export function GetMemInfo():MemoryUsageInfo{
   var memory = {} as MemoryUsageInfo;
   memory.free = GetMBytes(os.freemem());
@@ -40,18 +62,39 @@ export function GetMemInfo():MemoryUsageInfo{
   return memory;
 }
 
+/**
+ * 指定されたバイト数をメガバイトに変換します
+ * @param bytes 指定されたバイト
+ * @returns 返還後のメガバイト数
+ */
 export function GetMBytes(bytes:number) {
   return Math.round(bytes / 1024/*KB*/ / 1024/*MB*/ * 100) / 100;
 }
 
+/**
+ * パーセンテージを計算します
+ * @param part 計算対象の量
+ * @param total 合計量
+ * @returns 計算後のパーセンテージ
+ */
 export function GetPercentage(part:number, total:number){
   return Math.round(part / total * 100 * 100) / 100;
 }
 
+/**
+ * 文字列をBase64エンコードします
+ * @param txt エンコードする文字列
+ * @returns Base64エンコードされた文字列
+ */
 export function btoa(txt:string){
   return Buffer.from(txt).toString("base64");
 }
 
+/**
+ * 指定されたURLからテキストデータをダウンロードします
+ * @param url URL
+ * @returns ダウンロードされたテキストデータ
+ */
 export function DownloadText(url:string):Promise<string>{
   return new Promise((resolve,reject)=>{
     https.get(url, res => {
