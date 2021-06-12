@@ -623,7 +623,7 @@ export class MusicBot {
               const logEmbed = new discord.MessageEmbed();
               logEmbed.setColor(getColor("UPTIME"));
               logEmbed.title = "Log";
-              logEmbed.description = "Last 30 bot logs\r\n```\r\n" + logStore.data.join("\r\n") + "\r\n```";
+              logEmbed.description = "Last " + logStore.data.length + " bot logs\r\n```\r\n" + logStore.data.join("\r\n") + "\r\n```";
               message.channel.send(logEmbed).catch(e => log(e, "error"));
             }
 
@@ -1009,10 +1009,16 @@ export class MusicBot {
     log("[System]Free:" + Math.floor(memory.free) + "MB; Total:" + Math.floor(memory.total) + "MB; Usage:" + memory.usage + "%");
   }
 
-  // Bot実行
-  Run(token:string, debugLog:boolean = false){
+  /**
+   * Botを開始します。
+   * @param token Botのトークン
+   * @param debugLog デバッグログを出力するかどうか
+   * @param debugLogStoreLength デバッグログの保存する数
+   */
+  Run(token:string, debugLog:boolean = false, debugLogStoreLength?:number){
     this.client.login(token).catch(e => log(e, "error"));
     this.token = token;
     logStore.log = debugLog;
+    if(debugLogStoreLength) logStore.maxLength = debugLogStoreLength;
   }
 }
