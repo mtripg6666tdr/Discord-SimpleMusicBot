@@ -233,6 +233,8 @@ export class MusicBot {
             embed.addField("study, bgm", "開発者が勝手に作った勉強用・作業用BGMのプレイリストをキューに追加します", true);
             embed.addField("サウンドクラウドを検索, soundcloudを検索, searchs", "曲をSoundCloudで検索します", true);
             embed.addField("leaveclean, lc", "ボイスチャンネルから離脱した人のリクエストした曲を削除して整理します", true);
+            embed.addField("歌詞, l, lyric, lyrics", "指定された曲の歌詞を検索します。", true);
+            embed.addField("音量, volume", "音量を調節します。1から200の間で指定します(デフォルト100)。何も引数を付けないと現在の音量を表示します。", true);
             embed.setColor(getColor("COMMAND"));
             message.channel.send(embed);
           }break;
