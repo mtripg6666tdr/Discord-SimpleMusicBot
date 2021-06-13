@@ -1,7 +1,6 @@
 import * as discord from "discord.js";
 import * as os from "os";
 import Soundcloud from "soundcloud.ts";
-import * as ytdl from "ytdl-core";
 import * as ytpl from "ytpl";
 import * as ytsr from "ytsr";
 import { bestdori, BestdoriApi } from "./AudioSource/bestdori";
@@ -900,7 +899,8 @@ export class MusicBot {
           case "study":
           case "bgm":{
             optiont = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
-            playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
+            await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
+            this.data[message.guild.id].Manager.Play();
           }break; 
 
           case "サウンドクラウドを検索":
