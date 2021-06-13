@@ -991,6 +991,10 @@ export class MusicBot {
               };
               embed.setColor(getColor("LYRIC"));
               embed.description = song.lyric;
+              embed.url = song.url;
+              embed.thumbnail = {
+                url: song.artwork
+              }
               msg.edit("", embed);
             }
             catch(e){

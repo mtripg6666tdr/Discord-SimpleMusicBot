@@ -157,28 +157,3 @@ export function suppressMessageEmbeds(msg:Message, client:Client, token:string):
     }));
   });
 }
-
-/**
- * HTMLエンティティをエンコードまたはデコードします。
- * Ref: https://qiita.com/ka215/items/ace36f55c3ad1297de81
- * @param text 処理対象の文字列
- * @param proc 処理内容
- * @returns 処理された文字列
- */
-export function htmlEntities( text:string, proc:"encode"|"decode" ) {
-  var entities = [
-    ['amp', '&'],
-    ['apos', '\''],
-    ['lt', '<'],
-    ['gt', '>'],
-  ];
-
-  for ( var i=0, max=entities.length; i<max; i++ ) {
-    if ( 'encode' === proc ) {
-      text = text.replace(new RegExp( entities[i][1], 'g' ), "&"+entities[i][0]+';' ).replace( '"', '&quot;' );
-    } else {
-      text = text.replace( '&quot;', '"' ).replace(new RegExp( '&'+entities[i][0]+';', 'g' ), entities[i][1] );
-    }
-  }
-  return text;
-}
