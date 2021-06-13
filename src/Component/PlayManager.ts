@@ -8,6 +8,7 @@ import { CalcMinSec, log } from "../Util/util";
 export class PlayManager {
   private Dispatcher:StreamDispatcher = null;
   private info:GuildVoiceInfo = null;
+  private vol:number = 100;
   get CurrentVideoUrl():string{
     if(this.CurrentVideoInfo) return this.CurrentVideoInfo.Url;
     return "";
@@ -27,7 +28,15 @@ export class PlayManager {
   }
   // 現在ストリーミングした時間
   get CurrentTime():number{
-    return this.Dispatcher.streamTime;
+    return this.Dispatcher?.streamTime;
+  }
+  // 音量取得
+  get volume():number{
+    return this.Dispatcher?.volume * 100;
+  }
+  set volume(newval:number){
+    this.vol = newval;
+    if(this.Dispatcher) this.Dispatcher.setVolume(newval / 100);
   }
   // コンストラクタ
   constructor(private client:Client){
@@ -65,6 +74,7 @@ export class PlayManager {
     try{
       this.CurrentVideoInfo = this.info.Queue.default[0].BasicInfo;
       this.Dispatcher = this.info.Connection.play(await this.CurrentVideoInfo.fetch());
+      this.Dispatcher.setVolume(this.vol / 100);
       this.Dispatcher.on("finish", ()=> {
         log("[PlayManager/" + this.info.GuildID + "]Stream finished");
         setTimeout(()=>{

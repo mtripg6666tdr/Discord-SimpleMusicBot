@@ -275,7 +275,7 @@ export class MusicBot {
           case "検索":
           case "search":{
             if(!join()) return;
-            if(ytdl.validateURL(optiont) || ytpl.validateID(optiont)){
+            if(optiont.startsWith("http://") || optiont.startsWith("https://")){
               await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
               return;
             }
@@ -977,6 +977,7 @@ export class MusicBot {
             message.channel.send(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => log(e, "error"));;
           }break;
 
+          case "歌詞":
           case "l":
           case "lyric":
           case "lyrics":{
@@ -1002,6 +1003,25 @@ export class MusicBot {
               msg.edit(":confounded:失敗しました。曲名を確認してもう一度試してみてください。").catch(e => log(e, "error"));
               return;
             }
+          }break;
+
+          case "音量":
+          case "volume":{
+            if(!this.data[message.guild.id].Manager.IsPlaying){
+              message.channel.send("なにも再生していません").catch(e => log(e, "error"));
+              return;
+            }
+            if(optiont===""){
+              message.channel.send(":loud_sound:現在の音量は**" + this.data[message.guild.id].Manager.volume + "**です(デフォルト:100)").catch(e => log(e, "error"));
+              return;
+            }
+            const newval = Number(optiont);
+            if(isNaN(newval) || newval < 1 || newval > 200){
+              message.channel.send(":bangbang:音量を変更する際は1から200の数字で指定してください。").catch(e =>log(e, "error"));
+              return;
+            }
+            this.data[message.guild.id].Manager.volume = newval;
+            message.channel.send(":loud_sound:音量を**" + newval + "**に変更しました").catch(e => log(e, "error"));
           }break;
         }
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
