@@ -981,6 +981,7 @@ export class MusicBot {
           case "l":
           case "lyric":
           case "lyrics":{
+            if(!process.env.CSE_KEY) return;
             const msg = await message.channel.send("🔍検索中...");
             try{
               const song = await GetLyrics(optiont);
