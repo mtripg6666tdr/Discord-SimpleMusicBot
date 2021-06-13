@@ -38,7 +38,9 @@ function DownloadWithoutRuby(url:string):Promise<string>{
       path: durl.pathname,
       method: "GET",
       headers: {
-        "Cookie": "lyric_ruby=off;"
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+        "Cookie": "lyric_ruby=off;",
+        "User-Agent": "Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1A543 Safari/419.3"
       }
     }, res => {
       var data = "";
