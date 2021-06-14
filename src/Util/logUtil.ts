@@ -1,9 +1,8 @@
 class LogStore{
-  log:boolean = false;
+  log:boolean = true;
   maxLength = 30;
   data:string[] = [];
   addLog(log:string){
-    if(!this.log) return;
     this.data.push(log);
     if(this.data.length > this.maxLength){
       this.data.shift();
