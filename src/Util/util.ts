@@ -95,9 +95,16 @@ export function btoa(txt:string){
  * @param url URL
  * @returns ダウンロードされたテキストデータ
  */
-export function DownloadText(url:string):Promise<string>{
+export function DownloadText(url:string, headers?:{[key:string]:string}):Promise<string>{
   return new Promise((resolve,reject)=>{
-    https.get(url, res => {
+    const durl = new URL(url);
+    const req = https.request({
+      protocol: durl.protocol,
+      host: durl.host,
+      path: durl.pathname + durl.search,
+      method: "GET",
+      headers: headers ?? undefined
+    }, res => {
       var data = "";
       res.on("data", chunk =>{
         data += chunk;
@@ -107,7 +114,8 @@ export function DownloadText(url:string):Promise<string>{
       });
       res.on("error", reject);
     }).on("error", reject);
-  })
+    req.end();
+  });
 }
 
 /**

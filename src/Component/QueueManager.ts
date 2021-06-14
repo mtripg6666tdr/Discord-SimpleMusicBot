@@ -4,6 +4,7 @@ import { AudioSource } from "../AudioSource/audiosource";
 import { BestdoriApi, BestdoriS, exportableBestdori } from "../AudioSource/bestdori";
 import { CustomStream, exportableCustom } from "../AudioSource/custom";
 import { GoogleDrive } from "../AudioSource/googledrive";
+import { Hibiki, HibikiApi } from "../AudioSource/hibiki";
 import { exportableSoundCloud, SoundCloudS } from "../AudioSource/soundcloud";
 import { exportableStreamable, Streamable, StreamableApi } from "../AudioSource/streamable";
 import { exportableYouTube, YouTube } from "../AudioSource/youtube";
@@ -58,38 +59,35 @@ export class QueueManager {
         }
       }
     } as QueueContent;
+    
     if(type === "youtube" || (type === "unknown" && ytdl.validateURL(url))){
       // youtube
       result.BasicInfo = await new YouTube().init(url, gotData as exportableYouTube)
-      this._default[method](result);
-      return result;
     }else if(type === "custom" || (type === "unknown" && isAvailableRawAudioURL(url))){
       // カスタムストリーム
       result.BasicInfo = await new CustomStream().init(url);
-      this._default[method](result);
-      return result;
     }else if(type === "unknown"){
       // google drive
       if(url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/)){
         result.BasicInfo = await new GoogleDrive().init(url);
-        this._default[method](result);
-        return result;
       }else if(url.match(/https?:\/\/soundcloud.com\/.+\/.+/)){
         // soundcloud
         result.BasicInfo = await new SoundCloudS().init(url, gotData as exportableSoundCloud);
-        this._default[method](result);
-        return result;
       }else if(StreamableApi.getVideoId(url)){
         // Streamable
         result.BasicInfo = await new Streamable().init(url, gotData as exportableStreamable);
-        this._default[method](result);
-        return result;
       }else if(BestdoriApi.getAudioId(url)){
         // Bestdori
         result.BasicInfo = await new BestdoriS().init(url, gotData as exportableBestdori);
-        this._default[method](result);
-        return result;
+      }else if(HibikiApi.validateURL(url)){
+        // Hibiki
+        if(gotData) throw "このタイプのコンテンツは復元できません";
+        result.BasicInfo = await new Hibiki().init(url);
       }
+    }
+    if(result.BasicInfo){
+      this._default[method](result);
+      return result;
     }
     throw "Provided URL was not resolved as available service";
   }
