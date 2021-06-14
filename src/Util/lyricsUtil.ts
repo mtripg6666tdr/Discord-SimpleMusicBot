@@ -5,8 +5,8 @@ import { DownloadText } from "./util";
 
 export async function GetLyrics(keyword:string):Promise<songInfo>{
   const data = JSON.parse(await DownloadText("https://customsearch.googleapis.com/customsearch/v1?cx=89ebccacdc32461f2&key=" + process.env.CSE_KEY + "&q=" + encodeURIComponent(keyword))) as CSE_Result;
-  const items = data.items.filter(i => new URL(i.link).pathname.startsWith("/lyric/"));
-  if(items.length === 0) throw "No results found";
+  const items = data.items?.filter(i => new URL(i.link).pathname.startsWith("/lyric/"));
+  if(items.length === 0 || !items) throw "No results found";
   const url = items[0].link;
   var lyric = await DownloadWithoutRuby(url);
   var doc = "";
