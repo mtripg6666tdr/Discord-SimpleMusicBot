@@ -10,7 +10,6 @@ export async function GetLyrics(keyword:string):Promise<songInfo>{
   const url = items[0].link;
   var lyric = await DownloadWithoutRuby(url);
   var doc = "";
-  lyric = decode(lyric);
   [doc, lyric] = lyric.split("<div class=\"hiragana\" >");
   [lyric, ] = lyric.split("</div>");
   lyric = lyric.replace(/<span class="rt rt_hidden">.+?<\/span>/g, "");
@@ -21,9 +20,9 @@ export async function GetLyrics(keyword:string):Promise<songInfo>{
   const match = doc.match(/<meta name="description" content="(?<artist>.+?)が歌う(?<title>.+)の歌詞ページ.+です。.+">/);
   const artwork = doc.match(/<img src="(?<url>.+?)" alt=".+? 歌詞" \/>/).groups?.url;
   return {
-    lyric: lyric,
-    artist: decodeURIComponent(match.groups.artist),
-    title: decodeURIComponent(match.groups.title),
+    lyric: decode(lyric),
+    artist: decode(match.groups.artist),
+    title: decode(match.groups.title),
     artwork: artwork.startsWith("http") ? artwork : DefaultAudioThumbnailURL,
     url: url
   };
@@ -40,7 +39,7 @@ function DownloadWithoutRuby(url:string):Promise<string>{
       headers: {
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
         "Cookie": "lyric_ruby=off;",
-        "User-Agent": "Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1A543 Safari/419.3"
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"
       }
     }, res => {
       var data = "";
