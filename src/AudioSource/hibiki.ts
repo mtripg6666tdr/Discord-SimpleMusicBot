@@ -14,7 +14,7 @@ export class Hibiki extends AudioSource {
   
   async init(url:string){
     this.Url = url;
-    const match = this.Url.match(/^https?:\/\/hibiki-radio.jp\/description\/(?<id>.+)\/detail(\/.+)?$/);
+    const match = this.Url.match(/^https?:\/\/hibiki-radio.jp\/description\/(?<id>.+)\/detail([\/#].+)?$/);
     this.programId = match.groups.id;
     this.radioInfo = await HibikiApi.getBasicData(this.programId);
     this.Thumnail = this.radioInfo.sp_image_url;
