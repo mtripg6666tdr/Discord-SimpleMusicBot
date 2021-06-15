@@ -11,12 +11,11 @@ import { exportableYouTube, YouTube } from "../AudioSource/youtube";
 import { GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcMinSec, isAvailableRawAudioURL, log } from "../Util/util";
+import { ManagerBase } from "./ManagerBase";
 
-export class QueueManager {
+export class QueueManager extends ManagerBase {
   // キューの本体
   private _default:QueueContent[] = [];
-  // 親ノード
-  private info:GuildVoiceInfo = null;
   // キューの本体のゲッタープロパティ
   get default():QueueContent[] {
     return this._default;
@@ -33,13 +32,13 @@ export class QueueManager {
   }
 
   constructor(){
+    super();
     log("[QueueManager]Queue Manager instantiated");
   }
 
   SetData(data:GuildVoiceInfo){
     log("[QueueManager]Set data of guild id " + data.GuildID);
-    if(this.info) throw "すでに設定されています";
-    this.info = data;
+    super.SetData(data);
   }
 
   async AddQueue(

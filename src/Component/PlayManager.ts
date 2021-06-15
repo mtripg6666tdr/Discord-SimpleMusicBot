@@ -4,10 +4,10 @@ import { YouTube } from "../AudioSource/youtube";
 import { GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcMinSec, log } from "../Util/util";
+import { ManagerBase } from "./ManagerBase";
 
-export class PlayManager {
+export class PlayManager extends ManagerBase {
   private Dispatcher:StreamDispatcher = null;
-  private info:GuildVoiceInfo = null;
   private vol:number = 100;
   get CurrentVideoUrl():string{
     if(this.CurrentVideoInfo) return this.CurrentVideoInfo.Url;
@@ -40,14 +40,14 @@ export class PlayManager {
   }
   // コンストラクタ
   constructor(private client:Client){
+    super();
     log("[PlayManager]Play Manager instantiated");
   }
 
   // 親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
   SetData(data:GuildVoiceInfo){
     log("[PlayManager]Set data of guild id " + data.GuildID)
-    if(this.info) throw "すでに設定されています";
-    this.info = data;
+    super.SetData(data);
   }
 
   // 再生します

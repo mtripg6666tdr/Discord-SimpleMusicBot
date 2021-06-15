@@ -6,7 +6,7 @@ import * as ytsr from "ytsr";
 import { bestdori, BestdoriApi } from "./AudioSource/bestdori";
 import { exportableCustom } from "./AudioSource/custom";
 import { YouTube } from "./AudioSource/youtube";
-import { GuildVoiceInfo, YmxFormat, YmxVersion } from "./definition";
+import { CancellationPending, GuildVoiceInfo, YmxFormat, YmxVersion } from "./definition";
 import { getColor } from "./Util/colorUtil";
 import { GetLyrics } from "./Util/lyricsUtil";
 import { 
@@ -27,6 +27,7 @@ export class MusicBot {
   private data:{[key:string]:GuildVoiceInfo} = {};
   private instantiatedTime = null as Date;
   private token = "";
+  private cancellations = [] as CancellationPending[];
   get Client(){return this.client};
 
   constructor(){
@@ -159,6 +160,8 @@ export class MusicBot {
                 limit: Infinity
               });
               var index = 1;
+              const cancellation = new CancellationPending();
+              this.cancellations.push(cancellation);
               for(var i = 0; i <result.items.length; i++){
                 const c = result.items[i];
                 await this.data[message.guild.id].Queue.AutoAddQueue(client, c.url, message.member, "youtube", false, false, null, null, {
@@ -174,8 +177,16 @@ export class MusicBot {
                 if(index % 10 === 0 || result.estimatedItemCount <= 10){
                   await msg.edit(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。" + result.estimatedItemCount + "曲中" + index + "曲処理済み。");
                 }
+                if(cancellation.Cancelled){
+                  break;
+                }
               }
-              await msg.edit("✅" + result.items.length + "曲が追加されました。");
+              if(cancellation.Cancelled){
+                await msg.edit("✅キャンセルされました。");
+              }else{
+                await msg.edit("✅" + result.items.length + "曲が追加されました。");
+              }
+              this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
               return;
             }
             try{
@@ -734,6 +745,8 @@ export class MusicBot {
             }
             if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
               var smsg;
+              const cancellation = new CancellationPending();
+              this.cancellations.push(cancellation);
               try{
                 smsg = await message.channel.send("🔍メッセージを取得しています...");
                 const ids = optiont.split("/");
@@ -757,8 +770,13 @@ export class MusicBot {
                     const tMatch = lines[0].match(/\[(?<title>.+)\]\((?<url>.+)\)/);
                     await this.data[message.guild.id].Queue.AutoAddQueue(client, tMatch.groups.url, message.member, "unknown");
                     await smsg.edit(fields.length + "曲中" + (i+1) + "曲処理しました。");
+                    if(cancellation.Cancelled) break;
                   }
-                  await smsg.edit("✅" + fields.length + "曲を追加しました");
+                  if(!cancellation.Cancelled){
+                    await smsg.edit("✅" + fields.length + "曲を処理しました");
+                  }else {
+                    await smsg.edit("✅キャンセルされました");
+                  }
                 }else if(attac && attac.name.endsWith(".ymx")){
                   const raw = JSON.parse(await DownloadText(attac.url)) as YmxFormat;
                   if(raw.version !== YmxVersion){
@@ -771,8 +789,13 @@ export class MusicBot {
                     if(qs.length <= 10 || i % 10 == 9){
                       await smsg.edit(qs.length + "曲中" + (i+1) + "曲処理しました。");
                     }
+                    if(cancellation.Cancelled) break;
                   }
-                  await smsg.edit("✅" + qs.length + "曲を追加しました");
+                  if(!cancellation.Cancelled){
+                    await smsg.edit("✅" + qs.length + "曲を処理しました");
+                  }else {
+                    await smsg.edit("✅キャンセルされました");
+                  }
                 }else{
                   await smsg.edit("❌キューの埋め込みもしくは添付ファイルが見つかりませんでした");
                   return;
@@ -781,6 +804,9 @@ export class MusicBot {
               catch(e){
                 log(e, "error");
                 smsg?.edit("😭失敗しました...");
+              }
+              finally{
+                this.cancellations.slice(this.cancellations.findIndex(c => c === cancellation), 1);
               }
             }else{
               message.channel.send("❌Discordのメッセージへのリンクを指定してください").catch(e => log(e, "error"));
@@ -1056,6 +1082,9 @@ export class MusicBot {
             }
           }
         }
+      }else if(this.cancellations.filter(c => !c.Cancelled).length > 0 && message.content === "キャンセル" || message.content === "cancel"){
+        this.cancellations.forEach(c => c.Cancel());
+        message.channel.send("処理中の処理をすべてキャンセルしています....").catch(e => log(e, "error"));
       }
     });
   }
