@@ -94,7 +94,7 @@ export class MusicBot {
             // 入ってないね～参加しよう
             const msg = await message.channel.send(":electric_plug:接続中...");
             try{
-              const connection = await message.member.voice.channel.join()
+              const connection = await message.member.voice.channel.join();
               this.data[message.guild.id].Connection = connection;
               log("[Main/" + message.guild.id + "]VC Connected to " + connection.channel.id);
               await msg.edit(":+1:ボイスチャンネル:speaker:`" + message.member.voice.channel.name + "`に接続しました!");
@@ -286,7 +286,7 @@ export class MusicBot {
           
           case "検索":
           case "search":{
-            if(!join()) return;
+            join();
             if(optiont.startsWith("http://") || optiont.startsWith("https://")){
               await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
               return;
@@ -593,7 +593,7 @@ export class MusicBot {
           case "rmall":
           case "allrm":
           case "removeall":{
-            if(!message.member.voice.channel || !message.member.voice.channel.members.has(client.user.id)){
+            if(!message.member.voice.channel || (message.member.voice.channel && !message.member.voice.channel.members.has(client.user.id))){
               if(!message.member.hasPermission("MANAGE_GUILD") && !message.member.hasPermission("MANAGE_CHANNELS")){
                 message.channel.send("この操作を実行する権限がありません。").catch(e => log(e, "error"));
                 return;
@@ -840,6 +840,10 @@ export class MusicBot {
 
           case "この曲で終了":
           case "end":{
+            if(!this.data[message.guild.id].Manager.IsPlaying){
+              message.channel.send("再生中ではありません").catch(e => log(e, "error"));
+              return;
+            }
             if(this.data[message.guild.id].Queue.length <= 1){
               message.channel.send("キューが空、もしくは一曲しかないため削除されませんでした。").catch(e => log(e, "error"));
               return;
@@ -863,7 +867,7 @@ export class MusicBot {
           }break;
 
           case "searchb":{
-            if(!join()) return;
+            join()
             if(this.data[message.guild.id].SearchPanel !== null){
               message.channel.send("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
               break;
@@ -924,6 +928,7 @@ export class MusicBot {
 
           case "study":
           case "bgm":{
+            if(!(await join())) return;
             optiont = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
             await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
             this.data[message.guild.id].Manager.Play();
@@ -932,7 +937,7 @@ export class MusicBot {
           case "サウンドクラウドを検索":
           case "soundcloudを検索":
           case "searchs":{
-            if(!join()) return;
+            join()
             if(this.data[message.guild.id].SearchPanel !== null){
               message.channel.send("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
               break;
