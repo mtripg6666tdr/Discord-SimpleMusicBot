@@ -63,7 +63,7 @@ type songInfo = {
   url:string;
 }
 
-export interface CSE_Result {
+interface CSE_Result {
   kind:              string;
   url:               URL;
   queries:           Queries;
@@ -72,16 +72,16 @@ export interface CSE_Result {
   items:             Item[];
 }
 
-export interface Context {
+interface Context {
   title: string;
 }
 
-export interface Item {
-  kind:             Kind;
+interface Item {
+  kind:             any;
   title:            string;
   htmlTitle:        string;
   link:             string;
-  displayLink:      DisplayLink;
+  displayLink:      any;
   snippet:          string;
   htmlSnippet:      string;
   cacheId:          string;
@@ -90,15 +90,7 @@ export interface Item {
   pagemap:          Pagemap;
 }
 
-export enum DisplayLink {
-  UtatenCOM = "utaten.com",
-}
-
-export enum Kind {
-  CustomsearchResult = "customsearch#result",
-}
-
-export interface Pagemap {
+interface Pagemap {
   cse_thumbnail?: CSEThumbnail[];
   metatags:       { [key: string]: string }[];
   cse_image:      CSEImage[];
@@ -106,7 +98,7 @@ export interface Pagemap {
   Article?:       Article[];
 }
 
-export interface Article {
+interface Article {
   datePublished: string;
   image:         string;
   itemtype:      string;
@@ -115,27 +107,27 @@ export interface Article {
   headline:      string;
 }
 
-export interface CSEImage {
+interface CSEImage {
   src: string;
 }
 
-export interface CSEThumbnail {
+interface CSEThumbnail {
   src:    string;
   width:  string;
   height: string;
 }
 
-export interface Listitem {
+interface Listitem {
   item:     string;
   name:     string;
   position: string;
 }
 
-export interface Queries {
+interface Queries {
   request: Request[];
 }
 
-export interface Request {
+interface Request {
   title:          string;
   totalResults:   string;
   searchTerms:    string;
@@ -147,14 +139,14 @@ export interface Request {
   cx:             string;
 }
 
-export interface SearchInformation {
+interface SearchInformation {
   searchTime:            number;
   formattedSearchTime:   string;
   totalResults:          string;
   formattedTotalResults: string;
 }
 
-export interface URL {
+interface URL {
   type:     string;
   template: string;
 }
