@@ -73,6 +73,8 @@ export class PlayManager extends ManagerBase {
     };
     try{
       this.CurrentVideoInfo = this.info.Queue.default[0].BasicInfo;
+      // fetchしている間にPlayingを読み取られた時用に適当なオブジェクトを代入してnullでなくしておく
+      this.Dispatcher = {} as any;
       this.Dispatcher = this.info.Connection.play(await this.CurrentVideoInfo.fetch());
       this.Dispatcher.setVolume(this.vol / 100);
       this.Dispatcher.on("finish", ()=> {
