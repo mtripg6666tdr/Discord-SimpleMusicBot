@@ -10,6 +10,8 @@ export class PlayManager extends ManagerBase {
   private Dispatcher:StreamDispatcher = null;
   private vol:number = 100;
   private fallback = false;
+  private startTime = 0;
+  private pausedSince = 0;
   get CurrentVideoUrl():string{
     if(this.CurrentVideoInfo) return this.CurrentVideoInfo.Url;
     return "";
@@ -74,16 +76,25 @@ export class PlayManager extends ManagerBase {
     };
     try{
       this.fallback = false;
+      this.pausedSince = 0;
       this.CurrentVideoInfo = this.info.Queue.default[0].BasicInfo;
       // fetchしている間にPlayingを読み取られた時用に適当なオブジェクトを代入してnullでなくしておく
-      this.Dispatcher = {} as any;
+      this.Dispatcher = "" as any;
       this.Dispatcher = this.info.Connection.play(await this.CurrentVideoInfo.fetch());
       if(logStore.data[logStore.data.length - 1].indexOf("youtube-dl") >= 0){
         this.fallback = true;
       }
       this.Dispatcher.setVolume(this.vol / 100);
+      this.Dispatcher.on("start", ()=>{
+        this.startTime = new Date().getTime();
+      });
       this.Dispatcher.on("finish", ()=> {
         log("[PlayManager/" + this.info.GuildID + "]Stream finished");
+        const now = new Date().getTime();
+        const timeout =
+          this.CurrentVideoInfo.ServiceIdentifer === "bestdori" ? 5000 : 
+          (this.CurrentVideoInfo.LengthSeconds * 1000 + this.startTime) > now ? this.CurrentVideoInfo.LengthSeconds * 1000 - (now - this.startTime) + 5000: 
+          0;
         setTimeout(()=>{
           // 再生が終わったら
           this.Dispatcher.destroy();
@@ -115,7 +126,7 @@ export class PlayManager extends ManagerBase {
           }else{
             this.Play();
           }
-        }, this.CurrentVideoInfo.ServiceIdentifer === "bestdori" || this.fallback ? 5000 : 0);
+        }, timeout);
       });
       this.Dispatcher.on("error", (e)=>{
         log(JSON.stringify(e), "error");
@@ -170,7 +181,7 @@ export class PlayManager extends ManagerBase {
   // 停止します。切断するにはDisconnectを使用してください。
   Stop():PlayManager{
     log("[PlayManager/" + this.info.GuildID + "]Stop() called");
-    if(this.Dispatcher){
+    if(this.Dispatcher && this.Dispatcher !== "" as any){
       this.Dispatcher.destroy();
       this.Dispatcher = null;
     }
@@ -194,6 +205,7 @@ export class PlayManager extends ManagerBase {
   Pause():PlayManager{
     log("[PlayManager/" + this.info.GuildID + "]Pause() called");
     this.Dispatcher?.pause();
+    this.pausedSince = new Date().getTime();
     return this;
   }
 
@@ -201,6 +213,8 @@ export class PlayManager extends ManagerBase {
   Resume():PlayManager{
     log("[PlayManager/" + this.info.GuildID + "]Resume() called");
     this.Dispatcher?.resume();
+    if(this.pausedSince !== 0)
+    this.startTime += (new Date().getTime() - this.pausedSince);
     return this;
   }
 

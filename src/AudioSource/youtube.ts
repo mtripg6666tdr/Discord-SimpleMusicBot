@@ -49,7 +49,7 @@ export class YouTube extends AudioSource {
       });
     }else{
       log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
-      const info = JSON.parse(await execAsync("youtube-dl --skip-download --print-json " + this.Url)) as YoutubeDlInfo;
+      const info = JSON.parse(await execAsync("youtube-dl --skip-download --print-json \"" + this.Url + "\"")) as YoutubeDlInfo;
       var format = info.formats.filter(f => f.format_note==="tiny");
       format.sort((fa, fb) => fb.abr - fa.tbr);
       return format[0].url;
@@ -57,7 +57,7 @@ export class YouTube extends AudioSource {
   }
 
   async init(url:string, prefetched:exportableYouTube){
-    this.Url = url;
+    this.Url = "https://www.youtube.com/watch?v=" + ytdl.getVideoID(url);
     if(prefetched){
       this.Title = prefetched.title;
       this.Description = prefetched.description;
@@ -82,7 +82,7 @@ export class YouTube extends AudioSource {
       catch{
         this.fallback = true;
         log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
-        const info = JSON.parse(await execAsync("youtube-dl --skip-download --print-json " + url)) as YoutubeDlInfo;
+        const info = JSON.parse(await execAsync("youtube-dl --skip-download --print-json \"" + this.Url + "\"")) as YoutubeDlInfo;
         if(info.is_live) throw "YouTube-DL fallback currently doesn't support live stream";
         this.Title = info.title;
         this.Description = info.description;
