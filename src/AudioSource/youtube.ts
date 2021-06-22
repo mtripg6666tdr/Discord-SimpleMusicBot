@@ -48,6 +48,7 @@ export class YouTube extends AudioSource {
         format: format
       });
     }else{
+      log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
       const info = JSON.parse(await execAsync("youtube-dl --skip-download --print-json " + this.Url)) as YoutubeDlInfo;
       var format = info.formats.filter(f => f.format_note==="tiny");
       format.sort((fa, fb) => fb.abr - fa.tbr);

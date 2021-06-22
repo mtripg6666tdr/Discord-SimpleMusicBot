@@ -3,7 +3,7 @@ import { AudioSource } from "../AudioSource/audiosource";
 import { YouTube } from "../AudioSource/youtube";
 import { GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcMinSec, log } from "../Util/util";
+import { CalcMinSec, log, logStore } from "../Util/util";
 import { ManagerBase } from "./ManagerBase";
 
 export class PlayManager extends ManagerBase {
@@ -72,10 +72,14 @@ export class PlayManager extends ManagerBase {
       this.Play();
     };
     try{
+      var fallback = false;
       this.CurrentVideoInfo = this.info.Queue.default[0].BasicInfo;
       // fetchしている間にPlayingを読み取られた時用に適当なオブジェクトを代入してnullでなくしておく
       this.Dispatcher = {} as any;
       this.Dispatcher = this.info.Connection.play(await this.CurrentVideoInfo.fetch());
+      if(logStore.data[logStore.data.length - 1].indexOf("youtube-dl") >= 0){
+        fallback = true;
+      }
       this.Dispatcher.setVolume(this.vol / 100);
       this.Dispatcher.on("finish", ()=> {
         log("[PlayManager/" + this.info.GuildID + "]Stream finished");
@@ -146,6 +150,9 @@ export class PlayManager extends ManagerBase {
         embed.thumbnail = {
           url: this.CurrentVideoInfo.Thumnail
         };
+        if(fallback){
+          embed.addField(":warning:注意","現在通常方法が使用できなかったため、Node.jsからフォールバックのPythonライブラリを使用しています。正常なオペレーションができない場合があります。");
+        }
         mes.edit("", embed);
       }
     }
