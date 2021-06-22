@@ -3,6 +3,7 @@ import * as os from "os";
 import Soundcloud from "soundcloud.ts";
 import * as ytpl from "ytpl";
 import * as ytsr from "ytsr";
+import { exec, execSync } from "child_process";
 import { bestdori, BestdoriApi } from "./AudioSource/bestdori";
 import { exportableCustom } from "./AudioSource/custom";
 import { YouTube } from "./AudioSource/youtube";
@@ -1056,6 +1057,27 @@ export class MusicBot {
             }
             this.data[message.guild.id].Manager.volume = newval;
             message.channel.send(":loud_sound:音量を**" + newval + "**に変更しました").catch(e => log(e, "error"));
+          }break;
+
+          case "reboot":{
+            if(message.author.id === "593758391395155978"){
+              if(optiont === ""){
+                message.channel.send("再起動を実行します...お待ちください...");
+                exec("npm run onlystart");
+                setTimeout(()=> process.exit(0),500);
+              }else if(optiont === "update"){
+                await message.channel.send("アップデートして再起動を実行します。完了まで10分程度要することがあります。");
+                await message.channel.send("アップデート中...");
+                var buf = execSync("git pull");
+                await message.channel.send("実行結果:\r\n```" + buf.toString() + "\r\n```");
+                await message.channel.send("コンパイル中...");
+                buf = execSync("npm run build");
+                await message.channel.send("実行結果:\r\n```" + buf.toString() + "\r\n```");
+                await message.channel.send("再起動しています...");
+                exec("npm run onlystart");
+                setTimeout(()=> process.exit(0),500);
+              }
+            }
           }break;
         }
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
