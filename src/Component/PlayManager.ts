@@ -9,6 +9,7 @@ import { ManagerBase } from "./ManagerBase";
 export class PlayManager extends ManagerBase {
   private Dispatcher:StreamDispatcher = null;
   private vol:number = 100;
+  private fallback = false;
   get CurrentVideoUrl():string{
     if(this.CurrentVideoInfo) return this.CurrentVideoInfo.Url;
     return "";
@@ -72,13 +73,13 @@ export class PlayManager extends ManagerBase {
       this.Play();
     };
     try{
-      var fallback = false;
+      this.fallback = false;
       this.CurrentVideoInfo = this.info.Queue.default[0].BasicInfo;
       // fetchしている間にPlayingを読み取られた時用に適当なオブジェクトを代入してnullでなくしておく
       this.Dispatcher = {} as any;
       this.Dispatcher = this.info.Connection.play(await this.CurrentVideoInfo.fetch());
       if(logStore.data[logStore.data.length - 1].indexOf("youtube-dl") >= 0){
-        fallback = true;
+        this.fallback = true;
       }
       this.Dispatcher.setVolume(this.vol / 100);
       this.Dispatcher.on("finish", ()=> {
@@ -114,7 +115,7 @@ export class PlayManager extends ManagerBase {
           }else{
             this.Play();
           }
-        }, this.CurrentVideoInfo.ServiceIdentifer === "bestdori" ? 3000 : 0);
+        }, this.CurrentVideoInfo.ServiceIdentifer === "bestdori" || this.fallback ? 5000 : 0);
       });
       this.Dispatcher.on("error", (e)=>{
         log(JSON.stringify(e), "error");
@@ -150,7 +151,7 @@ export class PlayManager extends ManagerBase {
         embed.thumbnail = {
           url: this.CurrentVideoInfo.Thumnail
         };
-        if(fallback){
+        if(this.fallback){
           embed.addField(":warning:注意","現在通常方法が使用できなかったため、Node.jsからフォールバックのPythonライブラリを使用しています。正常なオペレーションができない場合があります。");
         }
         mes.edit("", embed);
