@@ -10,7 +10,7 @@ import { exportableStreamable, Streamable, StreamableApi } from "../AudioSource/
 import { exportableYouTube, YouTube } from "../AudioSource/youtube";
 import { GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcMinSec, isAvailableRawAudioURL, log } from "../Util/util";
+import { CalcMinSec, isAvailableRawAudioURL, log, logStore } from "../Util/util";
 import { ManagerBase } from "./ManagerBase";
 
 export class QueueManager extends ManagerBase {
@@ -61,7 +61,7 @@ export class QueueManager extends ManagerBase {
     
     if(type === "youtube" || (type === "unknown" && ytdl.validateURL(url))){
       // youtube
-      result.BasicInfo = await new YouTube().init(url, gotData as exportableYouTube)
+      result.BasicInfo = await new YouTube().init(url, gotData as exportableYouTube);
     }else if(type === "custom" || (type === "unknown" && isAvailableRawAudioURL(url))){
       // カスタムストリーム
       result.BasicInfo = await new CustomStream().init(url);
@@ -117,6 +117,7 @@ export class QueueManager extends ManagerBase {
     log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Called");
     var ch:TextChannel = null;
     var msg:Message = null;
+    var fallback = false;
     try{
       if(fromSearch && this.info.SearchPanel){
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() From search panel");
@@ -137,6 +138,9 @@ export class QueueManager extends ManagerBase {
         throw "キューの上限を超えています";
       }
       const info = await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type, gotData ?? null);
+      if(logStore.data[logStore.data.length - 1].indexOf("youtube-dl") >= 0){
+        fallback = true;
+      }
       log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Added successfully");
       if(msg){
         const embed = new MessageEmbed();
@@ -151,6 +155,9 @@ export class QueueManager extends ManagerBase {
         embed.thumbnail = {
           url: info.BasicInfo.Thumnail
         };
+        if(fallback){
+          embed.addField(":warning:注意","現在通常方法が使用できなかったため、Node.jsからフォールバックのPythonライブラリを使用しています。正常なオペレーションができない場合があります。");
+        }
         await msg.edit("", embed);
       }
     }

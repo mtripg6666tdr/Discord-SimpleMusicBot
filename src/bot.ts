@@ -37,6 +37,7 @@ export class MusicBot {
     log("[Main]Main bot is instantiated");
     
     client.on("ready", ()=> {
+      client.voice.connections.forEach(c => c.disconnect());
       log("[Main]Main bot is ready and active now");
       client.user.setActivity({
         type: "LISTENING",
