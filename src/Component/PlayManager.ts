@@ -1,9 +1,10 @@
 import { Client, Message, MessageEmbed, StreamDispatcher, TextChannel } from "discord.js";
+import { Readable } from "stream";
 import { AudioSource } from "../AudioSource/audiosource";
 import { YouTube } from "../AudioSource/youtube";
 import { GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcMinSec, log, logStore } from "../Util/util";
+import { CalcMinSec, DownloadAsReadable, log, logStore } from "../Util/util";
 import { ManagerBase } from "./ManagerBase";
 
 export class PlayManager extends ManagerBase {
@@ -80,7 +81,14 @@ export class PlayManager extends ManagerBase {
       this.CurrentVideoInfo = this.info.Queue.default[0].BasicInfo;
       // fetchしている間にPlayingを読み取られた時用に適当なオブジェクトを代入してnullでなくしておく
       this.Dispatcher = "" as any;
-      this.Dispatcher = this.info.Connection.play(await this.CurrentVideoInfo.fetch());
+      const rawStream = await this.CurrentVideoInfo.fetch();
+      var stream = null as Readable;
+      if(typeof rawStream === "string"){
+        stream = DownloadAsReadable(rawStream);
+      }else{
+        stream = rawStream;
+      }
+      this.Dispatcher = this.info.Connection.play(stream);
       if(logStore.data[logStore.data.length - 1].indexOf("youtube-dl") >= 0){
         this.fallback = true;
       }

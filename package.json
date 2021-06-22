@@ -11,6 +11,7 @@
     "discord.js": "^12.5.3",
     "dotenv": "^9.0.2",
     "html-entities": "^2.3.2",
+    "miniget": "^4.2.1",
     "node-opus": "^0.3.3",
     "opusscript": "0.0.8",
     "rimraf": "^3.0.2",

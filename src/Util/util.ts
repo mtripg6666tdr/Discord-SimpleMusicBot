@@ -1,6 +1,8 @@
 import * as os from "os";
 import * as https from "https";
+import * as miniget from "miniget";
 import { Client, Message } from "discord.js";
+import { PassThrough, Readable } from "stream";
 export { log, logStore } from "./logUtil";
 
 /**
@@ -164,4 +166,18 @@ export function suppressMessageEmbeds(msg:Message, client:Client, token:string):
       flags: 1<<2
     }));
   });
+}
+
+export function DownloadAsReadable(url:string):Readable{
+  const stream = new PassThrough({
+    highWaterMark: 1024 * 512
+  });
+  stream._destroy = () => { stream.destroyed = true };
+  const req = miniget.default(url, {
+    maxReconnects: 6,
+    maxRetries: 3,
+    backoff: { inc: 500, max: 10000 },
+  });
+  req.pipe(stream);
+  return stream;
 }
