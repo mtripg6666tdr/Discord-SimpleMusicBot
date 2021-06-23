@@ -136,8 +136,14 @@ function execAsync(command:string):Promise<string>{
   });
 }
 
-function getYouTubeDlInfo(url:string){
-  return execAsync("youtube-dl --skip-download --print-json \"" + this.Url + "\"");
+async function getYouTubeDlInfo(url:string):Promise<Promise<string>>{
+  try{
+    await execAsync("youtube-dl --version");
+    return execAsync("youtube-dl --skip-download --print-json \"" + this.Url + "\"");
+  }
+  catch{
+    throw "Main library threw an error and fallback library was not found or occurred an error";
+  }
 }
 
 interface YoutubeDlInfo {
