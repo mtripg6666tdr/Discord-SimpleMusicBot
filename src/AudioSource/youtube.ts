@@ -3,7 +3,7 @@ import { EmbedField } from "discord.js";
 import * as ytdl from "ytdl-core";
 import { log } from "../Util/logUtil";
 import { DownloadText } from "../Util/util";
-import { AudioSource } from "./audiosource";
+import { AudioSource, HLSstream } from "./audiosource";
 
 export class YouTube extends AudioSource {
   protected _serviceIdentifer = "youtube";
@@ -52,9 +52,17 @@ export class YouTube extends AudioSource {
     catch{
       log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
       const info = JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
-      var format = info.formats.filter(f => f.format_note==="tiny");
-      format.sort((fa, fb) => fb.abr - fa.tbr);
-      return format[0].url;
+      if(info.is_live){
+        var format = info.formats.filter(f => f.format_id === info.format_id);
+        return {
+          type:"HLS",
+          url:format[0].url
+        } as HLSstream;
+      }else{
+        var format = info.formats.filter(f => f.format_note==="tiny");
+        format.sort((fa, fb) => fb.abr - fa.tbr);
+        return format[0].url;
+      }
     }
   }
 
@@ -85,7 +93,8 @@ export class YouTube extends AudioSource {
         this.fallback = true;
         log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
         const info = JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
-        if(info.is_live) throw "YouTube-DL fallback currently doesn't support live stream";
+        //if(info.is_live) throw "YouTube-DL fallback currently doesn't support live stream";
+        this.LiveStream = info.is_live;
         this.Title = info.title;
         this.Description = info.description;
         this._lengthSeconds = Number(info.duration);
@@ -93,7 +102,6 @@ export class YouTube extends AudioSource {
         this.Like = info.like_count;
         this.Dislike = info.dislike_count;
         this.Thumnail = info.thumbnail;
-        this.LiveStream = false;
       }
     }
     return this;

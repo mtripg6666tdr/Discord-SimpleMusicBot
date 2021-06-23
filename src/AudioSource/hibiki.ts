@@ -1,6 +1,6 @@
 import { EmbedField } from "discord.js";
 import { DownloadText } from "../Util/util";
-import { AudioSource } from "./audiosource"
+import { AudioSource, HLSstream } from "./audiosource"
 import { exportableCustom } from "./custom";
 
 export class Hibiki extends AudioSource {
@@ -28,7 +28,10 @@ export class Hibiki extends AudioSource {
 
   async fetch(){
     const playcheck = await HibikiApi.playCheck(this.radioInfo.episode.video.id.toString());
-    return playcheck.playlist_url;
+    return {
+      type:"HLS",
+      url:playcheck.playlist_url
+    } as HLSstream;
   }
 
   toField():EmbedField[]{

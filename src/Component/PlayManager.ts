@@ -1,6 +1,6 @@
 import { Client, Message, MessageEmbed, StreamDispatcher, TextChannel } from "discord.js";
 import { Readable } from "stream";
-import { AudioSource } from "../AudioSource/audiosource";
+import { AudioSource, HLSstream } from "../AudioSource/audiosource";
 import { YouTube } from "../AudioSource/youtube";
 import { GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
@@ -82,11 +82,13 @@ export class PlayManager extends ManagerBase {
       // fetchしている間にPlayingを読み取られた時用に適当なオブジェクトを代入してnullでなくしておく
       this.Dispatcher = "" as any;
       const rawStream = await this.CurrentVideoInfo.fetch();
-      var stream = null as Readable;
+      var stream:Readable|string = null;
       if(typeof rawStream === "string"){
         stream = DownloadAsReadable(rawStream);
+      }else if((rawStream as HLSstream).type){
+        stream = (rawStream as HLSstream).url;
       }else{
-        stream = rawStream;
+        stream = rawStream as Readable;
       }
       this.Dispatcher = this.info.Connection.play(stream);
       if(logStore.data[logStore.data.length - 1].indexOf("youtube-dl") >= 0){

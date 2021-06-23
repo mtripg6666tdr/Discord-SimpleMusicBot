@@ -24,7 +24,7 @@ export abstract class AudioSource {
   // 現在再生中の曲を示すEmbedField
   abstract toField(verbose:boolean):EmbedField[];
   // 再生するためのストリームをフェッチ
-  abstract fetch():Promise<Readable|string>;
+  abstract fetch():Promise<Readable|string|HLSstream>;
   // クラスを初期化する非同期メソッド
   abstract init(url:string, prefetched:exportableCustom):Promise<AudioSource>;
   // 現在再生中の曲に関する追加データ
@@ -32,3 +32,5 @@ export abstract class AudioSource {
   // データをエクスポート
   abstract exportData():exportableCustom;
 }
+
+export type HLSstream = {type:"HLS",url:string}
