@@ -36,7 +36,7 @@ export class YouTube extends AudioSource {
   }
 
   async fetch(){
-    if(!this.fallback){
+    try{
       const info = await ytdl.getInfo(this.Url)
       const format = ytdl.chooseFormat(info.formats, {
         filter: this.LiveStream ? null : "audioonly",
@@ -47,9 +47,10 @@ export class YouTube extends AudioSource {
       return ytdl.downloadFromInfo(info, {
         format: format
       });
-    }else{
+    }
+    catch{
       log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
-      const info = JSON.parse(await execAsync("youtube-dl --skip-download --print-json \"" + this.Url + "\"")) as YoutubeDlInfo;
+      const info = JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
       var format = info.formats.filter(f => f.format_note==="tiny");
       format.sort((fa, fb) => fb.abr - fa.tbr);
       return format[0].url;
@@ -82,7 +83,7 @@ export class YouTube extends AudioSource {
       catch{
         this.fallback = true;
         log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
-        const info = JSON.parse(await execAsync("youtube-dl --skip-download --print-json \"" + this.Url + "\"")) as YoutubeDlInfo;
+        const info = JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
         if(info.is_live) throw "YouTube-DL fallback currently doesn't support live stream";
         this.Title = info.title;
         this.Description = info.description;
@@ -126,8 +127,17 @@ export type exportableYouTube = {
 
 function execAsync(command:string):Promise<string>{
   return new Promise((resolve, reject) => {
-    resolve(execSync(command).toString());
+    try{
+      resolve(execSync(command).toString());
+    }
+    catch(e){
+      reject(e);
+    }
   });
+}
+
+function getYouTubeDlInfo(url:string){
+  return execAsync("youtube-dl --skip-download --print-json \"" + this.Url + "\"");
 }
 
 interface YoutubeDlInfo {
