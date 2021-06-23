@@ -64,7 +64,7 @@ export class YouTube extends AudioSource {
           begin: Date.now(),
           parser: "m3u8"
         });
-        req.pipe(stream);
+        req.pipe(stream).on('error', ()=> stream.emit("error"));
         return stream;
       }else{
         var format = info.formats.filter(f => f.format_note==="tiny");

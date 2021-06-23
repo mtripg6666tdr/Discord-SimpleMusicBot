@@ -85,10 +85,12 @@ export class PlayManager extends ManagerBase {
       var stream:Readable|string = null;
       if(typeof rawStream === "string"){
         stream = DownloadAsReadable(rawStream);
+        stream.on('error', ()=> this.Dispatcher.emit("error"));
       }else if((rawStream as defaultM3u8stream).type){
         stream = (rawStream as defaultM3u8stream).url;
       }else{
         stream = rawStream as Readable;
+        stream.on('error', ()=> this.Dispatcher.emit("error"));
       }
       this.Dispatcher = this.info.Connection.play(stream);
       if(logStore.data[logStore.data.length - 1].indexOf("youtube-dl") >= 0){

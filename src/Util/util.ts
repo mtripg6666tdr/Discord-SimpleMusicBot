@@ -178,6 +178,6 @@ export function DownloadAsReadable(url:string):Readable{
     maxRetries: 3,
     backoff: { inc: 500, max: 10000 },
   });
-  req.pipe(stream);
+  req.pipe(stream).on('error', ()=> stream.emit("error"));
   return stream;
 }
