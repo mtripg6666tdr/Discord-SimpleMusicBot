@@ -2,6 +2,7 @@ import { execSync } from "child_process";
 import { EmbedField } from "discord.js";
 import * as ytdl from "ytdl-core";
 import { log } from "../Util/logUtil";
+import { DownloadText } from "../Util/util";
 import { AudioSource } from "./audiosource";
 
 export class YouTube extends AudioSource {
@@ -138,14 +139,40 @@ function execAsync(command:string):Promise<string>{
 
 async function getYouTubeDlInfo(url:string):Promise<Promise<string>>{
   try{
-    await execAsync("youtube-dl --version");
-    return execAsync("youtube-dl --skip-download --print-json \"" + url + "\"");
+    const dlbinary = async (ver:string)=>{
+      const releases = JSON.parse(await DownloadText("https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest", {
+        "Accept":"application/vnd.github.v3+json",
+        "User-Agent": "Discord-SimpleMusicBot"
+      })) as GitHubRelease;
+      if(ver !== releases.tag_name){
+        await execAsync("curl -L -o \"youtube-dl" + (process.platform === "win32" ? ".exe" : "") + "\" " + releases.assets.filter(a => a.name === (process.platform === "win32" ? "youtube-dl.exe" : "youtube-dl"))[0].browser_download_url);
+      }
+      ytdlUpdateCheck.last = new Date();
+    }
+    var version = "";
+    try{
+      const buf = await execAsync("." + (process.platform === "win32" ? "\\" : "/") + "youtube-dl --version");
+      version = buf.trim();
+    }
+    catch(e){
+      await dlbinary("");
+    }
+    if(new Date().getTime() - ytdlUpdateCheck.last.getTime() >= 1000 * 60 /*1sec*/ * 60 /*1min*/ * 60 /*1hour*/ * 3){
+      await dlbinary(version);
+    }
+    return execAsync("." + (process.platform === "win32" ? "\\" : "/") + "youtube-dl --skip-download --print-json \"" + url + "\"");
   }
-  catch{
+  catch(e){
     throw "Main library threw an error and fallback library was not found or occurred an error";
   }
 }
 
+class ytdlUpdateCheckData {
+  last:Date = new Date(0);
+}
+var ytdlUpdateCheck = new ytdlUpdateCheckData();
+
+// QuickType of youtube-dl json
 interface YoutubeDlInfo {
   id:                   string;
   title:                string;
@@ -296,4 +323,96 @@ interface Thumbnail {
   width:      number;
   resolution: string;
   id:         string;
+}
+
+
+// QuickType of GitHub Releases API
+interface GitHubRelease {
+  url:              string;
+  assets_url:       string;
+  upload_url:       string;
+  html_url:         string;
+  id:               number;
+  author:           Author;
+  node_id:          string;
+  tag_name:         string;
+  target_commitish: TargetCommitish;
+  name:             string;
+  draft:            boolean;
+  prerelease:       boolean;
+  created_at:       string;
+  published_at:     string;
+  assets:           Asset[];
+  tarball_url:      string;
+  zipball_url:      string;
+  body:             string;
+  reactions?:       Reactions;
+}
+
+export interface Asset {
+  url:                  string;
+  id:                   number;
+  node_id:              string;
+  name:                 string;
+  label:                string;
+  uploader:             Author;
+  content_type:         ContentType;
+  state:                State;
+  size:                 number;
+  download_count:       number;
+  created_at:           string;
+  updated_at:           string;
+  browser_download_url: string;
+}
+
+export enum ContentType {
+  ApplicationOctetStream = "application/octet-stream",
+  ApplicationPGPSignature = "application/pgp-signature",
+  ApplicationXTar = "application/x-tar",
+}
+
+export enum State {
+  Uploaded = "uploaded",
+}
+
+export interface Author {
+  login:               any;
+  id:                  number;
+  node_id:             any;
+  avatar_url:          string;
+  gravatar_id:         string;
+  url:                 string;
+  html_url:            string;
+  followers_url:       string;
+  following_url:       any;
+  gists_url:           any;
+  starred_url:         any;
+  subscriptions_url:   string;
+  organizations_url:   string;
+  repos_url:           string;
+  events_url:          any;
+  received_events_url: string;
+  type:                Type;
+  site_admin:          boolean;
+}
+
+enum Type {
+  User = "User",
+}
+
+interface Reactions {
+  url:         string;
+  total_count: number;
+  "+1":        number;
+  "-1":        number;
+  laugh:       number;
+  hooray:      number;
+  confused:    number;
+  heart:       number;
+  rocket:      number;
+  eyes:        number;
+}
+
+enum TargetCommitish {
+  Master = "master",
 }

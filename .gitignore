@@ -2,3 +2,5 @@ node_modules
 dist
 typings
 *.env
+*.exe
+youtube-dl
