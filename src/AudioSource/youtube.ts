@@ -139,7 +139,7 @@ function execAsync(command:string):Promise<string>{
 async function getYouTubeDlInfo(url:string):Promise<Promise<string>>{
   try{
     await execAsync("youtube-dl --version");
-    return execAsync("youtube-dl --skip-download --print-json \"" + this.Url + "\"");
+    return execAsync("youtube-dl --skip-download --print-json \"" + url + "\"");
   }
   catch{
     throw "Main library threw an error and fallback library was not found or occurred an error";
