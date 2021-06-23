@@ -1,4 +1,4 @@
-import { execSync } from "child_process";
+import { exec } from "child_process";
 import { EmbedField } from "discord.js";
 import * as ytdl from "ytdl-core";
 import { log } from "../Util/logUtil";
@@ -129,7 +129,12 @@ export type exportableYouTube = {
 function execAsync(command:string):Promise<string>{
   return new Promise((resolve, reject) => {
     try{
-      resolve(execSync(command).toString());
+      exec(command, (error, stdout, stderr) => {
+        if(error){
+          reject(error);
+        }
+        resolve(stdout);
+      });
     }
     catch(e){
       reject(e);
