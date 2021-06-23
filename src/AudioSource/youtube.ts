@@ -141,11 +141,14 @@ async function getYouTubeDlInfo(url:string):Promise<Promise<string>>{
   try{
     const dlbinary = async (ver:string)=>{
       const releases = JSON.parse(await DownloadText("https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest", {
-        "Accept":"application/vnd.github.v3+json",
+        "Accept": "application/vnd.github.v3+json",
         "User-Agent": "Discord-SimpleMusicBot"
       })) as GitHubRelease;
       if(ver !== releases.tag_name){
         await execAsync("curl -L -o \"youtube-dl" + (process.platform === "win32" ? ".exe" : "") + "\" " + releases.assets.filter(a => a.name === (process.platform === "win32" ? "youtube-dl.exe" : "youtube-dl"))[0].browser_download_url);
+        if(process.platform !== "win32"){
+          await execAsync("chmod 777 youtube-dl");
+        }
       }
       ytdlUpdateCheck.last = new Date();
     }
