@@ -1,9 +1,11 @@
 import { exec } from "child_process";
 import { EmbedField } from "discord.js";
 import * as ytdl from "ytdl-core";
+import m3u8stream from "m3u8stream";
 import { log } from "../Util/logUtil";
 import { DownloadText } from "../Util/util";
-import { AudioSource, HLSstream } from "./audiosource";
+import { AudioSource, defaultM3u8stream } from "./audiosource";
+import { PassThrough } from "stream";
 
 export class YouTube extends AudioSource {
   protected _serviceIdentifer = "youtube";
@@ -54,10 +56,16 @@ export class YouTube extends AudioSource {
       const info = JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
       if(info.is_live){
         var format = info.formats.filter(f => f.format_id === info.format_id);
-        return {
-          type:"HLS",
-          url:format[0].url
-        } as HLSstream;
+        const stream = new PassThrough({
+          highWaterMark: 1024 * 512
+        });
+        stream._destroy = () => { stream.destroyed = true };
+              const req = m3u8stream(format[0].url, {
+          begin: Date.now(),
+          parser: "m3u8"
+        });
+        req.pipe(stream);
+        return stream;
       }else{
         var format = info.formats.filter(f => f.format_note==="tiny");
         format.sort((fa, fb) => fb.abr - fa.tbr);
@@ -93,7 +101,6 @@ export class YouTube extends AudioSource {
         this.fallback = true;
         log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
         const info = JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
-        //if(info.is_live) throw "YouTube-DL fallback currently doesn't support live stream";
         this.LiveStream = info.is_live;
         this.Title = info.title;
         this.Description = info.description;

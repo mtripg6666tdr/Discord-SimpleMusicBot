@@ -464,6 +464,7 @@ export class MusicBot {
             embed.fields = info.toField(
               (options[0] === "long" || options[0] === "l" || options[0] === "verbose") ? true : false
             );
+            embed.addField(":link:URL", info.Url);
   
             message.channel.send(embed).catch(e => log(e, "error"));
           }break;

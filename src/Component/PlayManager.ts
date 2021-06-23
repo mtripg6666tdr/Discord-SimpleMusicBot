@@ -1,6 +1,6 @@
 import { Client, Message, MessageEmbed, StreamDispatcher, TextChannel } from "discord.js";
 import { Readable } from "stream";
-import { AudioSource, HLSstream } from "../AudioSource/audiosource";
+import { AudioSource, defaultM3u8stream } from "../AudioSource/audiosource";
 import { YouTube } from "../AudioSource/youtube";
 import { GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
@@ -85,8 +85,8 @@ export class PlayManager extends ManagerBase {
       var stream:Readable|string = null;
       if(typeof rawStream === "string"){
         stream = DownloadAsReadable(rawStream);
-      }else if((rawStream as HLSstream).type){
-        stream = (rawStream as HLSstream).url;
+      }else if((rawStream as defaultM3u8stream).type){
+        stream = (rawStream as defaultM3u8stream).url;
       }else{
         stream = rawStream as Readable;
       }

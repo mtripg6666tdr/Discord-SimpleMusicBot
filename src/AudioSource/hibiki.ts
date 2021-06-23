@@ -1,6 +1,6 @@
 import { EmbedField } from "discord.js";
 import { DownloadText } from "../Util/util";
-import { AudioSource, HLSstream } from "./audiosource"
+import { AudioSource, defaultM3u8stream } from "./audiosource"
 import { exportableCustom } from "./custom";
 
 export class Hibiki extends AudioSource {
@@ -31,7 +31,7 @@ export class Hibiki extends AudioSource {
     return {
       type:"HLS",
       url:playcheck.playlist_url
-    } as HLSstream;
+    } as defaultM3u8stream;
   }
 
   toField():EmbedField[]{
