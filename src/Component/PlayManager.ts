@@ -80,7 +80,7 @@ export class PlayManager extends ManagerBase {
       this.pausedSince = 0;
       this.CurrentVideoInfo = this.info.Queue.default[0].BasicInfo;
       // fetchしている間にPlayingを読み取られた時用に適当なオブジェクトを代入してnullでなくしておく
-      this.Dispatcher = "" as any;
+      this.Dispatcher = {emit:()=>{}} as any;
       const rawStream = await this.CurrentVideoInfo.fetch();
       var stream:Readable|string = null;
       if(typeof rawStream === "string"){
