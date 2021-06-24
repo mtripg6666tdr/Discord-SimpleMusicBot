@@ -41,7 +41,7 @@ export class MusicBot {
     log("[Main]Main bot is instantiated");
     try{
       this.versionInfo = 
-        execSync("git branch --show-current").toString().trim();
+        execSync("git log -n 1 --pretty=format:%h").toString().trim();
     }
     catch{};
 
