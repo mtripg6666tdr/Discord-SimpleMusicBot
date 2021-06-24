@@ -21,4 +21,4 @@ http.createServer((req, res) => {
   res.end(JSON.stringify(data));
 }).listen(8080);
 
-bot.Run(process.env.TOKEN, true);
+bot.Run(process.env.TOKEN, true, 40);

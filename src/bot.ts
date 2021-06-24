@@ -330,7 +330,7 @@ export class MusicBot {
           case "se":{
             join();
             if(optiont.startsWith("http://") || optiont.startsWith("https://")){
-              await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
+              await playFromURL(!this.data[message.guild.id].Manager.IsConnecting);
               return;
             }
             if(this.data[message.guild.id].SearchPanel !== null){
@@ -414,7 +414,7 @@ export class MusicBot {
             // 引数ついてたらそれ優先
             if(optiont !== ""){
               if(optiont.startsWith("http://") || optiont.startsWith("https://")){
-                await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
+                await playFromURL(!this.data[message.guild.id].Manager.IsConnecting);
               }else{
                 const msg = await message.channel.send("🔍検索中...");
                 const result = (await ytsr.default(optiont, {
@@ -427,13 +427,13 @@ export class MusicBot {
                   return;
                 }
                 optiont = (result[0] as ytsr.Video).url;
-                await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
+                await playFromURL(!this.data[message.guild.id].Manager.IsConnecting);
                 await msg.delete();
               }
             // 添付ファイルを確認
             }else if(message.attachments.size >= 1){
               optiont = message.attachments.first().url;
-              await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
+              await playFromURL(!this.data[message.guild.id].Manager.IsConnecting);
             // なにもないからキューから再生
             }else if(this.data[message.guild.id].Queue.length >= 1){
               this.data[message.guild.id].Manager.Play();
@@ -1013,7 +1013,7 @@ export class MusicBot {
           case "bgm":{
             if(!(await join())) return;
             optiont = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
-            await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
+            await playFromURL(!this.data[message.guild.id].Manager.IsConnecting);
             this.data[message.guild.id].Manager.Play();
           }break; 
 
