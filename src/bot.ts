@@ -40,8 +40,7 @@ export class MusicBot {
     const client = this.client;
     log("[Main]Main bot is instantiated");
     try{
-      this.versionInfo = 
-        execSync("git log -n 1 --pretty=format:%h").toString().trim();
+      this.versionInfo = execSync("git log -n 1 --pretty=format:%h").toString().trim();
     }
     catch{};
 
@@ -86,15 +85,21 @@ export class MusicBot {
         this.data[message.guild.id].PersistentPref.Prefix = ">";
       }
       
-      if(message.mentions.has(client.user)) message.channel.send("コマンドは、`" + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">") + "command`で確認できます").catch(e => log(e, "error"));
+      if(message.content === "<@" + client.user.id + ">") message.channel.send("コマンドは、`" + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">") + "command`で確認できます").catch(e => log(e, "error"));
       if(message.content.startsWith(this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">")){
         const msg_spl = message.content.replace(/　/g, " ").substr(1, message.content.length - 1).split(" ");
-        const command = msg_spl[0].toLowerCase();
+        var command = msg_spl[0].toLowerCase();
         var optiont = msg_spl.length > 1 ? message.content.substring(command.length + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">").length + 1, message.content.length) : "";
         var options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
         
         log("[Main/" + message.guild.id + "]Command Prefix detected: " + message.content);
         
+        // 超省略形を捕捉
+        if(command.startsWith("http")){
+          optiont = command;
+          command = "p";
+        }
+
         // VC参加関数
         // 成功した場合はtrue、それ以外の場合にはfalseを返します
         const join = async():Promise<boolean>=>{
@@ -826,7 +831,7 @@ export class MusicBot {
               return;
             }
             var force = false;
-            if(options.length >= 2 && options[0] === "force"){
+            if(options.length >= 2 && options[0] === "force" && message.author.id === "593758391395155978"){
               force = true;
               optiont = options[1];
             }
@@ -963,7 +968,7 @@ export class MusicBot {
             }
             if(optiont !== ""){
               var msg = null as discord.Message;
-              var desc = "";
+              var desc = "※最大20件まで表示されます\r\n\r\n";
               try{
                 this.data[message.guild.id].SearchPanel = {} as any;
                 const msg = await message.channel.send("準備中...");
@@ -979,7 +984,10 @@ export class MusicBot {
                 await BestdoriApi.setupData();
                 await msg.edit("🔍検索中...");
                 const keys = Object.keys(bestdori.allsonginfo);
-                const result = keys.filter(k => bestdori.allsonginfo[Number(k)].musicTitle[0]?.toLowerCase().indexOf(optiont.toLowerCase()) >= 0);
+                const result = keys.filter(k => {
+                  const info = bestdori.allsonginfo[Number(k)];
+                  return (info.musicTitle[0] + bestdori.allbandinfo[info.bandId].bandName[0]).toLowerCase().indexOf(optiont.toLowerCase()) >= 0
+                });
                 const embed = new discord.MessageEmbed();
                 embed.setColor(getColor("SEARCH"));
                 embed.title = "\"" + optiont + "\"の検索結果✨"
@@ -992,6 +1000,9 @@ export class MusicBot {
                     duration: "0"
                   };
                   index++;
+                  if(index>=21){
+                    break;
+                  }
                 }
                 if(index === 1){
                   this.data[message.guild.id].SearchPanel = null;
@@ -1200,7 +1211,7 @@ export class MusicBot {
               message.channel.send(":confused:見つかりませんでした").catch(e => log(e, "error"));
               return;
             }
-            if(qsresult.length > 10) result = result.slice(0,10);
+            if(qsresult.length > 20) qsresult = qsresult.slice(0,20);
             const fields = qsresult.map(c => {
               const index = this.data[message.guild.id].Queue.default.findIndex(d => d.BasicInfo.Title === c.BasicInfo.Title).toString()
               const _t = c.BasicInfo.LengthSeconds;
@@ -1213,7 +1224,7 @@ export class MusicBot {
             });
             const embed = new discord.MessageEmbed();
             embed.title = "\"" + optiont + "\"の検索結果✨";
-            embed.description = "キュー内での検索結果です";
+            embed.description = "キュー内での検索結果です。最大20件表示されます。";
             embed.fields = fields;
             embed.setColor(getColor("SEARCH"));
             message.channel.send(embed);
