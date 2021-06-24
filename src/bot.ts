@@ -253,10 +253,11 @@ export class MusicBot {
               .addField("音量, volume", "音量を調節します。1から200の間で指定します(デフォルト100)。何も引数を付けないと現在の音量を表示します。", true),
               // プレイリスト操作系
               new discord.MessageEmbed()
-              .setTitle("プレイリスト制御系")
+              .setTitle("プレイリスト操作系")
               .addField("キュー, 再生待ち, queue, q", "キューを表示します。", true)
               .addField("検索, search, se", "曲をYouTubeで検索します。YouTubeの動画のURLを直接指定することもできます。", true)
               .addField("サウンドクラウドを検索, soundcloudを検索, searchs, ses, ss", "曲をSoundCloudで検索します", true)
+              .addField("キューを検索, searchq, seq, sq", "キュー内を検索します", true)
               .addField("移動, mv, move", "曲を指定された位置から指定された位置までキュー内で移動します。2番目の曲を5番目に移動したい場合は`mv 2 5`のようにします。", true)
               .addField("最後の曲を先頭へ, movelastsongtofirst, mlstf, ml, mltf, mlf, m1", "キューの最後の曲を先頭に移動します", true)
               .addField("削除, rm, remove", "キュー内の指定された位置の曲を削除します。", true)
@@ -824,6 +825,11 @@ export class MusicBot {
               message.channel.send("❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(e => log(e, "error"));
               return;
             }
+            var force = false;
+            if(options.length >= 2 && options[0] === "force"){
+              force = true;
+              optiont = options[1];
+            }
             if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
               var smsg;
               const cancellation = new CancellationPending();
@@ -838,7 +844,7 @@ export class MusicBot {
                 const chId = ids[ids.length - 2];
                 const ch = await client.channels.fetch(chId);
                 const msg = await (ch as discord.TextChannel).messages.fetch(msgId);
-                if(msg.author.id !== client.user.id){
+                if(msg.author.id !== client.user.id && !force){
                   await smsg.edit("❌ボットのメッセージではありません");
                   return;
                 }
@@ -1180,6 +1186,38 @@ export class MusicBot {
             const info = q.default[1];
             message.channel.send("✅`" + info.BasicInfo.Title + "`を一番最後からキューの先頭に移動しました").catch(e => log(e, "error"));
           }
+
+          case "キューを検索":
+          case "searchq":
+          case "seq":
+          case "sq":{
+            if(this.data[message.guild.id].Queue.length === 0){
+              message.channel.send("✘キューが空です").catch(e => log(e, "error"));
+              return;
+            }
+            var qsresult = this.data[message.guild.id].Queue.default.filter(c => c.BasicInfo.Title.toLowerCase().indexOf(optiont.toLowerCase()) >= 0);
+            if(qsresult.length === 0){
+              message.channel.send(":confused:見つかりませんでした").catch(e => log(e, "error"));
+              return;
+            }
+            if(qsresult.length > 10) result = result.slice(0,10);
+            const fields = qsresult.map(c => {
+              const index = this.data[message.guild.id].Queue.default.findIndex(d => d.BasicInfo.Title === c.BasicInfo.Title).toString()
+              const _t = c.BasicInfo.LengthSeconds;
+              const [min,sec] = CalcMinSec(_t);
+              return {
+                name: index === "0" ? "現在再生中/再生待ち" : index,
+                value: "[" + c.BasicInfo.Title + "](" + c.BasicInfo.Url + ")\r\nリクエスト: `" + c.AdditionalInfo.AddedBy.displayName + "` \r\n長さ: " + ((c.BasicInfo.ServiceIdentifer === "youtube" && (c.BasicInfo as YouTube).LiveStream) ? "(ライブストリーム)" : " `" + (_t === 0 ? "(不明)" : min + ":" + sec + "`")),
+                inline: false
+              } as discord.EmbedField
+            });
+            const embed = new discord.MessageEmbed();
+            embed.title = "\"" + optiont + "\"の検索結果✨";
+            embed.description = "キュー内での検索結果です";
+            embed.fields = fields;
+            embed.setColor(getColor("SEARCH"));
+            message.channel.send(embed);
+          }break;
         }
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
         // searchコマンドのキャンセルを捕捉
