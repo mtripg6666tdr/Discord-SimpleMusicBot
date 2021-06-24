@@ -22,20 +22,31 @@ import {
   logStore, 
   suppressMessageEmbeds 
 } from "./Util/util";
+import { PageToggle } from "./Component/PageToggle";
 
 export class MusicBot {
   private client = new discord.Client();
   private data:{[key:string]:GuildVoiceInfo} = {};
   private instantiatedTime = null as Date;
   private token = "";
+  private versionInfo = "Could not get info";
   private cancellations = [] as CancellationPending[];
+  private EmbedPageToggle:PageToggle[] = [] as PageToggle[];
+  get Toggles(){return this.EmbedPageToggle};
   get Client(){return this.client};
 
   constructor(){
     this.instantiatedTime = new Date();
     const client = this.client;
     log("[Main]Main bot is instantiated");
-    
+    try{
+      this.versionInfo = 
+        execSync("git log -n 1 --pretty=format:%h").toString().trim()
+      + "@"
+      + execSync("git branch --show-current").toString().trim();
+    }
+    catch{};
+
     client.on("ready", ()=> {
       client.voice.connections.forEach(c => c.disconnect());
       log("[Main]Main bot is ready and active now");
@@ -46,6 +57,7 @@ export class MusicBot {
       const tick = ()=>{
         this.Log();
         setTimeout(tick, 5 * 60 * 1000);
+        PageToggle.Organize(this.EmbedPageToggle, 5);
       };
       tick();
     });
@@ -58,7 +70,7 @@ export class MusicBot {
       // サーバーデータ初期化関数
       const initData = ()=> {
         if(!this.data[message.guild.id]) {
-          this.data[message.guild.id] = new GuildVoiceInfo(client, message);
+          this.data[message.guild.id] = new GuildVoiceInfo(client, message, this);
           this.data[message.guild.id].Manager.SetData(this.data[message.guild.id]);
           this.data[message.guild.id].Queue.SetData(this.data[message.guild.id]);
         }
@@ -81,7 +93,7 @@ export class MusicBot {
         const msg_spl = message.content.replace(/　/g, " ").substr(1, message.content.length - 1).split(" ");
         const command = msg_spl[0].toLowerCase();
         var optiont = msg_spl.length > 1 ? message.content.substring(command.length + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">").length + 1, message.content.length) : "";
-        const options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
+        var options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
         
         log("[Main/" + message.guild.id + "]Command Prefix detected: " + message.content);
         
@@ -91,8 +103,13 @@ export class MusicBot {
           if(message.member.voice.channelID){
             // すでにVC入ってるよ～
             if(message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)){
-              return true;
+              if(this.data[message.guild.id].Connection){
+                return true;
+              }else{
+                message.member.voice.channel.leave();
+              }
             }
+
             // 入ってないね～参加しよう
             const msg = await message.channel.send(":electric_plug:接続中...");
             try{
@@ -216,39 +233,62 @@ export class MusicBot {
           case "commands":
           case "command":
           case "cmd":{
-            const embed = new discord.MessageEmbed();
-            embed.title = "コマンド一覧";
-            embed.description = "コマンドの一覧です(実装順)。コマンドプレフィックスは、`" + this.data[message.guild.id].PersistentPref.Prefix + "`です。";
-            embed.addField("ヘルプ, help", "ヘルプを表示します。", true);
-            embed.addField("参加, join", "ボイスチャンネルに参加します。", true);
-            embed.addField("検索, search", "曲をYouTubeで検索します。YouTubeの動画のURLを直接指定することもできます。", true);
-            embed.addField("再生, play, p", "キュー内の楽曲を再生します。引数としてYouTubeの動画のURLを指定することもできます。", true);
-            embed.addField("一時停止, 一旦停止, 停止, pause, stop", "再生を一時停止します。", true);
-            embed.addField("切断, 終了, leave, disconnect, dc", "ボイスチャンネルから切断します。", true);
-            embed.addField("現在再生中, 今の曲, nowplaying, np", "現在再生中の曲の情報を表示します。", true);
-            embed.addField("キュー, 再生待ち, queue, q", "キューを表示します。", true);
-            embed.addField("リセット, reset", "サーバーの設定やデータを削除して初期化します。", true);
-            embed.addField("スキップ, skip, s", "現在再生中の曲をスキップします", true);
-            embed.addField("ループ, loop", "トラックごとのループを設定します。",true);
-            embed.addField("キューループ, loopqueue, queueloop", "キュー内のループを設定します。", true);
-            embed.addField("削除, rm, remove", "キュー内の指定された位置の曲を削除します。", true);
-            embed.addField("全て削除, すべて削除, rmall, allrm, removeall", "キュー内の曲をすべて削除します。", true);
-            embed.addField("頭出し, rewind, gotop, top", "再生中の曲の頭出しを行います。", true);
-            embed.addField("アップタイム, ping, uptime", "ボットのアップタイムおよびping時間(レイテンシ)を表示します。", true);
-            embed.addField("ログ, log, システム情報, systeminfo, sysinfo", "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数を指定して特定の内容のみ取得することもできます。", true);
-            embed.addField("移動, mv, move", "曲を指定された位置から指定された位置までキュー内で移動します。2番目の曲を5番目に移動したい場合は`mv 2 5`のようにします。", true);
-            embed.addField("インポート, import", "指定されたメッセージに添付されたキューからインポートします。exportコマンドで出力されたファイルが添付されたメッセージのURL、あるいはキューの埋め込みのあるメッセージのURLを引数として添付してください。", true);
-            embed.addField("シャッフル, shuffle", "キューの内容をシャッフルします。", true);
-            embed.addField("エクスポート, export", "キューの内容をインポートできるようエクスポートします。", true);
-            embed.addField("この曲で終了, end", "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します", true);
-            embed.addField("ワンスループ, onceloop, looponce", "現在再生中の曲を1度だけループ再生します。", true);
-            embed.addField("study, bgm", "開発者が勝手に作った勉強用・作業用BGMのプレイリストをキューに追加します", true);
-            embed.addField("サウンドクラウドを検索, soundcloudを検索, searchs", "曲をSoundCloudで検索します", true);
-            embed.addField("leaveclean, lc", "ボイスチャンネルから離脱した人のリクエストした曲を削除して整理します", true);
-            embed.addField("歌詞, l, lyric, lyrics", "指定された曲の歌詞を検索します。", true);
-            embed.addField("音量, volume", "音量を調節します。1から200の間で指定します(デフォルト100)。何も引数を付けないと現在の音量を表示します。", true);
-            embed.setColor(getColor("COMMAND"));
-            message.channel.send(embed);
+            const embed = [] as discord.MessageEmbed[];
+            embed.push(
+              new discord.MessageEmbed()
+              // ボイスチャンネル操作
+              .setTitle("ボイスチャンネル操作系")
+              .addField("参加, join", "ボイスチャンネルに参加します。", true)
+              .addField("切断, 終了, leave, disconnect, dc", "ボイスチャンネルから切断します。", true),
+              // プレイヤー制御
+              new discord.MessageEmbed()
+              .setTitle("音楽プレイヤー制御系")
+              .addField("現在再生中, 今の曲, nowplaying, np", "現在再生中の曲の情報を表示します。", true)
+              .addField("再生, play, p", "キュー内の楽曲を再生します。引数としてYouTubeの動画のURLを指定することもできます。", true)
+              .addField("一時停止, 一旦停止, 停止, pause, stop", "再生を一時停止します。", true)
+              .addField("スキップ, skip, s", "現在再生中の曲をスキップします", true)
+              .addField("頭出し, rewind, gotop, top", "再生中の曲の頭出しを行います。", true)
+              .addField("ループ, loop", "トラックごとのループを設定します。",true)
+              .addField("キューループ, loopqueue, queueloop", "キュー内のループを設定します。", true)
+              .addField("ワンスループ, onceloop, looponce", "現在再生中の曲を1度だけループ再生します。", true)
+              .addField("シャッフル, shuffle", "キューの内容をシャッフルします。", true)
+              .addField("音量, volume", "音量を調節します。1から200の間で指定します(デフォルト100)。何も引数を付けないと現在の音量を表示します。", true),
+              // プレイリスト操作系
+              new discord.MessageEmbed()
+              .setTitle("プレイリスト制御系")
+              .addField("キュー, 再生待ち, queue, q", "キューを表示します。", true)
+              .addField("検索, search, se", "曲をYouTubeで検索します。YouTubeの動画のURLを直接指定することもできます。", true)
+              .addField("サウンドクラウドを検索, soundcloudを検索, searchs, ses, ss", "曲をSoundCloudで検索します", true)
+              .addField("移動, mv, move", "曲を指定された位置から指定された位置までキュー内で移動します。2番目の曲を5番目に移動したい場合は`mv 2 5`のようにします。", true)
+              .addField("最後の曲を先頭へ, movelastsongtofirst, mlstf, ml, mltf, mlf, m1", "キューの最後の曲を先頭に移動します", true)
+              .addField("削除, rm, remove", "キュー内の指定された位置の曲を削除します。", true)
+              .addField("全て削除, すべて削除, rmall, allrm, removeall", "キュー内の曲をすべて削除します。", true)
+              .addField("leaveclean, lc", "ボイスチャンネルから離脱した人のリクエストした曲を削除して整理します", true)
+              .addField("インポート, import", "指定されたメッセージに添付されたキューからインポートします。exportコマンドで出力されたファイルが添付されたメッセージのURL、あるいはキューの埋め込みのあるメッセージのURLを引数として添付してください。", true)
+              .addField("エクスポート, export", "キューの内容をインポートできるようエクスポートします。", true)
+              .addField("この曲で終了, end", "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します", true)
+              .addField("study, bgm", "開発者が勝手に作った勉強用・作業用BGMのプレイリストをキューに追加します", true),
+              // ユーティリティ系
+              new discord.MessageEmbed()
+              .setTitle("ユーティリティ系")
+              .addField("リセット, reset", "サーバーの設定やデータを削除して初期化します。", true)
+              .addField("アップタイム, ping, uptime", "ボットのアップタイムおよびping時間(レイテンシ)を表示します。", true)
+              .addField("ログ, log, システム情報, systeminfo, sysinfo", "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数を指定して特定の内容のみ取得することもできます。", true)
+              .addField("歌詞, l, lyric, lyrics", "指定された曲の歌詞を検索します。", true),
+              // 一般ボット操作
+              new discord.MessageEmbed()
+              .setTitle("ボット操作全般")
+              .addField("ヘルプ, help", "ヘルプを表示します。", true)
+              .addField("command, commands, cmd", "コマンド一覧を表示します", true),
+            );
+            for(var i = 0; i < embed.length; i++){
+              embed[i].setTitle("コマンド一覧(" + embed[i].title + ")");
+              embed[i].setDescription("コマンドの一覧です。\r\n`" + (i+1) + "ページ目(" + embed.length + "ページ中)`\r\nコマンドプレフィックスは、`" + this.data[message.guild.id].PersistentPref.Prefix + "`です。");
+              embed[i].setColor(getColor("COMMAND"));
+            }
+            const msg = await message.channel.send(embed[0]);
+            const toggle = await PageToggle.init(msg, embed);
+            this.EmbedPageToggle.push(toggle);
           }break;
           
           case "ヘルプ":
@@ -257,7 +297,8 @@ export class MusicBot {
             embed.title = client.user.username + ":notes:";
             embed.description = "高音質な音楽を再生して、Discordでのエクスペリエンスを最高にするため作られました:robot:\r\n"
             + "利用可能なコマンドを確認するには、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`を使用してください。";
-            embed.addField("作者", "[" + client.users.resolve("593758391395155978").username + "](https://github.com/mtripg6666tdr)");
+            embed.addField("開発者", "[" + client.users.resolve("593758391395155978").username + "](https://github.com/mtripg6666tdr)");
+            embed.addField("バージョン", "`" + this.versionInfo + "`");
             embed.addField("レポジトリ/ソースコード","https://github.com/mtripg6666tdr/Discord-SimpleMusicBot");
             embed.addField("サポートサーバー", "https://discord.gg/7DrAEXBMHe")
             embed.addField("現在対応している再生ソース", 
@@ -279,7 +320,7 @@ export class MusicBot {
           case "接続":
           case "connect":
           case "join":{
-            if(message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)){
+            if(message.member.voice.channel && message.member.voice.channel.members.has(client.user.id) && this.data[message.guild.id].Connection){
               message.channel.send("✘すでにボイスチャンネルに接続中です。").catch(e => log(e, "error"));
             }else{
               join();
@@ -287,7 +328,8 @@ export class MusicBot {
           }; break;
           
           case "検索":
-          case "search":{
+          case "search":
+          case "se":{
             join();
             if(optiont.startsWith("http://") || optiont.startsWith("https://")){
               await playFromURL(!this.data[message.guild.id].Manager.IsPlaying);
@@ -474,49 +516,60 @@ export class MusicBot {
           case "q":
           case "queue":{
             const msg = await message.channel.send(":eyes: キューを確認しています。お待ちください...");
-            const fields:{name:string, value:string}[] = [];
             const queue = this.data[message.guild.id].Queue;
+            // 合計所要時間の計算
             var totalLength = 0;
             queue.default.forEach(q => totalLength += Number(q.BasicInfo.LengthSeconds));
-            var page = optiont === "" ? 1 : Number(optiont);
-            if(isNaN(page)) page = 1;
-            if(queue.length > 0 && page > Math.ceil(queue.length / 10)){
+            var _page = optiont === "" ? 1 : Number(optiont);
+            if(isNaN(_page)) _page = 1;
+            if(queue.length > 0 && _page > Math.ceil(queue.length / 10)){
               msg.edit(":warning:指定されたページは範囲外です").catch(e => log(e, "error"));
               return;
             }
-            for(var i = 10 * (page - 1); i < 10 * page; i++){
-              if(queue.default.length <= i){
-                break;
+            // 合計ページ数割り出し
+            const totalpage = Math.ceil(queue.length / 10);
+            // ページのキューを割り出す
+            const getQueueEmbed = (page:number)=>{
+              const fields:{name:string, value:string}[] = [];
+              for(var i = 10 * (page - 1); i < 10 * page; i++){
+                if(queue.default.length <= i){
+                  break;
+                }
+                const q = queue.default[i];
+                const _t = Number(q.BasicInfo.LengthSeconds);
+                const [min,sec] = CalcMinSec(_t);
+                fields.push({
+                  name: i !== 0 ? i.toString() : this.data[message.guild.id].Manager.IsPlaying ? "現在再生中" : "再生待ち",
+                  value: "[" + q.BasicInfo.Title + "](" + q.BasicInfo.Url + ") \r\n"
+                  +"長さ: `" + ((q.BasicInfo.ServiceIdentifer === "youtube" && (q.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : min + ":" + sec) + " ` \r\n"
+                  +"リクエスト: `" + q.AdditionalInfo.AddedBy.displayName + "` "
+                  + q.BasicInfo.npAdditional()
+                });
               }
-              const q = queue.default[i];
-              const _t = Number(q.BasicInfo.LengthSeconds);
-              const [min,sec] = CalcMinSec(_t);
-              fields.push({
-                name: i !== 0 ? i.toString() : this.data[message.guild.id].Manager.IsPlaying ? "現在再生中" : "再生待ち",
-                value: "[" + q.BasicInfo.Title + "](" + q.BasicInfo.Url + ") \r\n"
-                +"長さ: `" + ((q.BasicInfo.ServiceIdentifer === "youtube" && (q.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : min + ":" + sec) + " ` \r\n"
-                +"リクエスト: `" + q.AdditionalInfo.AddedBy.displayName + "` "
-                + q.BasicInfo.npAdditional()
+              const [tmin, tsec] = CalcMinSec(totalLength);
+              return new discord.MessageEmbed({
+                title: message.guild.name + "のキュー",
+                description: "`" + page + "ページ目(" + totalpage + "ページ中)`",
+                fields: fields,
+                author: {
+                  icon_url: client.user.avatarURL(),
+                  name: client.user.username
+                },
+                footer: {
+                  text: queue.length + "曲 | 合計:" + tmin + ":" + tsec + " | トラックループ:" + (queue.LoopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.QueueLoopEnabled ? "⭕" : "❌")
+                },
+                thumbnail: {
+                  url: message.guild.iconURL()
+                },
+                color: getColor("QUEUE")
               });
             }
-            const [tmin, tsec] = CalcMinSec(totalLength);
-            const embed = new discord.MessageEmbed({
-              title: message.guild.name + "のキュー",
-              description: "`" + page + "ページ目(" + Math.ceil(queue.length / 10) + "ページ中)`",
-              fields: fields,
-              author: {
-                icon_url: client.user.avatarURL(),
-                name: client.user.username
-              },
-              footer: {
-                text: queue.length + "曲 | 合計:" + tmin + ":" + tsec + " | トラックループ:" + (queue.LoopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.QueueLoopEnabled ? "⭕" : "❌")
-              },
-              thumbnail: {
-                url: message.guild.iconURL()
-              },
-              color: getColor("QUEUE")
-            });
-            msg.edit("", embed).catch(e => log(e, "error"));
+
+            // 送信
+            await msg.edit("", getQueueEmbed(_page)).catch(e => log(e, "error"));
+            if(totalpage > 1){
+              this.EmbedPageToggle.push((await PageToggle.init(msg, getQueueEmbed, totalpage, _page)).SetFresh(true));
+            }
           }break;
           
           case "リセット":
@@ -581,14 +634,50 @@ export class MusicBot {
               message.channel.send("現在再生中の楽曲を削除することはできません。");
               return;
             }
+            const q = this.data[message.guild.id].Queue;
+            const addition = [] as number[];
+            options.forEach(o => {
+              var match = o.match(/^(?<from>[0-9]+)-(?<to>[0-9]+)$/);
+              if(match){
+                const from = Number(match.groups.from);
+                const to = Number(match.groups.to);
+                if(!isNaN(from) && !isNaN(to) && from<=to){
+                  for(var i = from; i <= to; i++){
+                    addition.push(i);
+                  }
+                }
+              }else{
+                match = o.match(/^(?<from>[0-9]+)-$/);
+                if(match){
+                  const from = Number(match.groups.from);
+                  if(!isNaN(from)){
+                    for(var i = from; i < q.length; i++){
+                      addition.push(i);
+                    }
+                  }
+                }else{
+                  match = o.match(/^-(?<to>[0-9]+)$/);
+                  if(match){
+                    const to = Number(match.groups.to);
+                    if(!isNaN(to)){
+                      for(var i = (this.data[message.guild.id].Manager.IsPlaying ? 1 : 0); i <= to; i++){
+                        addition.push(i);
+                      }
+                    }
+                  }
+                }
+              }
+            });
+            options = options.concat(addition.map(n => n.toString()));
             const dels = Array.from(new Set(
                 options.map(str => Number(str)).filter(n => !isNaN(n)).sort((a,b)=>b-a)
             ));
-            const title = dels.length === 1 ? this.data[message.guild.id].Queue.default[dels[0]].BasicInfo.Title : null;
+            const title = dels.length === 1 ? q.default[dels[0]].BasicInfo.Title : null;
             for(var i = 0; i < dels.length; i++){
-              this.data[message.guild.id].Queue.RemoveAt(Number(dels[i]));
+              q.RemoveAt(Number(dels[i]));
             }
-            message.channel.send("🚮" + dels.sort((a,b)=>a-b).join(",") + "番目の曲" + (title ? ("(`" + title + "`)") : "") + "を削除しました").catch(e => log(e, "error"));
+            const resultStr = dels.sort((a,b)=>a-b).join(",");
+            message.channel.send("🚮" + (resultStr.length > 100 ? "指定された" : resultStr + "番目の") + "曲" + (title ? ("(`" + title + "`)") : "") + "を削除しました").catch(e => log(e, "error"));
           }break;
           
           case "すべて削除":
@@ -720,18 +809,9 @@ export class MusicBot {
               0 <= to && to <= q.default.length
               ){
                 const title = q.default[from].BasicInfo.Title
-                if(from < to){
-                  //要素追加
-                  q.default.splice(to + 1, 0, q.default[from]);
-                  //要素削除
-                  q.default.splice(from, 1);
-                  message.channel.send("✅ `" + title +  "`を移動しました").catch(e => log(e, "error"));
-                }else if(from > to){
-                  //要素追加
-                  q.default.splice(to, 0, q.default[from]);
-                  //要素削除
-                  q.default.splice(from + 1, 1);
-                  message.channel.send("✅ `" + title +  "`を移動しました").catch(e => log(e, "error"));
+                if(from !== to){
+                  q.Move(from, to);
+                  message.channel.send("✅ `" + title +  "`を`" + from + "`番目から`"+ to + "`番目に移動しました").catch(e => log(e, "error"));
                 }else{
                   message.channel.send("✘移動元と移動先の要素が同じでした。").catch(e => log(e, "error"));
                 }
@@ -869,7 +949,9 @@ export class MusicBot {
             }
           }break;
 
-          case "searchb":{
+          case "searchb":
+          case "sb":
+          case "seb":{
             join()
             if(this.data[message.guild.id].SearchPanel !== null){
               message.channel.send("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
@@ -939,7 +1021,9 @@ export class MusicBot {
 
           case "サウンドクラウドを検索":
           case "soundcloudを検索":
-          case "searchs":{
+          case "searchs":
+          case "ss":
+          case "ses":{
             join()
             if(this.data[message.guild.id].SearchPanel !== null){
               message.channel.send("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
@@ -1081,6 +1165,23 @@ export class MusicBot {
               }
             }
           }break;
+
+          case "最後の曲を先頭へ":
+          case "movelastsongtofirst":
+          case "mlstf":
+          case "ml":
+          case "mltf":
+          case "mlf":
+          case "m1":{
+            if(this.data[message.guild.id].Queue.length <= 2){
+              message.channel.send("キューに3曲以上追加されているときに使用できます。").catch(e=>log(e, "error"));
+              return;
+            }
+            const q = this.data[message.guild.id].Queue;
+            q.Move(q.length - 1, 1);
+            const info = q.default[1];
+            message.channel.send("✅`" + info.BasicInfo.Title + "`を一番最後からキューの先頭に移動しました").catch(e => log(e, "error"));
+          }
         }
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
         // searchコマンドのキャンセルを捕捉
@@ -1116,6 +1217,20 @@ export class MusicBot {
         message.channel.send("処理中の処理をすべてキャンセルしています....").catch(e => log(e, "error"));
       }
     });
+
+    client.on("messageReactionAdd", async(reaction, user) => {
+      if(user.bot) return;
+      if(reaction.message.author.id === this.client.user.id){
+        const l = this.EmbedPageToggle.filter(t => t.Message.channel.id === reaction.message.channel.id && t.Message.id === reaction.message.id);
+        if(l.length >= 1 && (reaction.emoji.name === PageToggle.arrowLeft || reaction.emoji.name === PageToggle.arrowRight)){
+          await l[0].FlipPage(
+            reaction.emoji.name === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
+            reaction.emoji.name === PageToggle.arrowRight ? (l[0].Current < l[0].Length ? l[0].Current + 1 : l[0].Current ) : 0
+          );
+          await reaction.users.remove(user.id);
+        }
+      }
+    })
   }
 
   // 定期ログ

@@ -1,6 +1,7 @@
-import { Client, Message, VoiceConnection } from "discord.js";
+import { Client, Message, MessageEmbed, VoiceConnection } from "discord.js";
 import * as fs from "fs";
 import { exportableCustom } from "./AudioSource/custom";
+import { MusicBot } from "./bot";
 import { PlayManager } from "./Component/PlayManager";
 import { QueueManager } from "./Component/QueueManager";
 
@@ -36,8 +37,10 @@ export class GuildVoiceInfo{
   GuildID:string;
   // データパス
   DataPath:string;
+  // メインモジュール
+  Bot:MusicBot;
 
-  constructor(client:Client, message:Message){
+  constructor(client:Client, message:Message, bot:MusicBot){
     const guildid = message.guild.id;
 
     this.Connection = null;
@@ -47,6 +50,7 @@ export class GuildVoiceInfo{
     this.boundTextChannel = message.channel.id;
     this.GuildID = guildid;
     this.DataPath = ".data/" + guildid + ".preferences.json";
+    this.Bot = bot;
 
     if(fs.existsSync(".data") && fs.existsSync(this.DataPath)){
       this.PersistentPref = JSON.parse(fs.readFileSync(this.DataPath, { encoding: "utf-8"}));

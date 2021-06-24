@@ -45,6 +45,7 @@ export class PlayManager extends ManagerBase {
     this.vol = newval;
     if(this.Dispatcher) this.Dispatcher.setVolume(newval / 100);
   }
+  get Client(){return this.client};
   // コンストラクタ
   constructor(private client:Client){
     super();
@@ -70,7 +71,8 @@ export class PlayManager extends ManagerBase {
     this.CurrentVideoInfo = this.info.Queue.default[0].BasicInfo;
     if(this.info.boundTextChannel){
       ch = await this.client.channels.fetch(this.info.boundTextChannel) as TextChannel;
-      mes = await ch.send(":hourglass_flowing_sand: `" + this.CurrentVideoInfo.Title + "`の再生準備中...");
+      const [min,sec] = CalcMinSec(this.CurrentVideoInfo.LengthSeconds);
+      mes = await ch.send(":hourglass_flowing_sand: `" + this.CurrentVideoInfo.Title + "` `(" + min + ":" + sec + ")`の再生準備中...");
     }
     // 再生できない時の関数
     const cantPlay = ()=>{
@@ -100,6 +102,10 @@ export class PlayManager extends ManagerBase {
         // ストリームなら変換せずにそのままplay
         stream = rawStream as Readable;
         stream.on('error', ()=> this.Dispatcher.emit("error"));
+      }
+      if(!this.info.Connection) {
+        if(mes) await mes.delete();
+        return;
       }
       // 再生
       this.Dispatcher = this.info.Connection.play(stream);

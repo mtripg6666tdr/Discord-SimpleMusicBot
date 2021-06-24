@@ -12,6 +12,7 @@ import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcMinSec, isAvailableRawAudioURL, log } from "../Util/util";
 import { ManagerBase } from "./ManagerBase";
+import { PageToggle } from "./PageToggle";
 
 /**
  * サーバーごとのキューを管理するマネージャー。
@@ -53,6 +54,7 @@ export class QueueManager extends ManagerBase {
       gotData:exportableCustom = null
       ):Promise<QueueContent>{
     log("[QueueManager/" + this.info.GuildID + "]AddQueue() called");
+    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     const result = {
       BasicInfo:null,
       AdditionalInfo:{
@@ -137,7 +139,7 @@ export class QueueManager extends ManagerBase {
       }else if(channel){
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Interaction channel specified");
         ch = channel;
-        msg = await channel.send("お待ちください...");
+        msg = await channel.send("情報を取得しています。お待ちください...");
       }
       if(this.info.Queue.length >= 999){
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Failed since too long queue", "warn");
@@ -175,6 +177,7 @@ export class QueueManager extends ManagerBase {
 
   Next(){
     log("[QueueManager/" + this.info.GuildID + "]Next() Called");
+    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this.OnceLoopEnabled = false;
     if(this.QueueLoopEnabled){
       this.default.push(this.default[0]);
@@ -184,21 +187,25 @@ export class QueueManager extends ManagerBase {
 
   RemoveAt(offset:number){
     log("[QueueManager/" + this.info.GuildID + "]RemoveAt() Called (offset:" + offset + ")");
+    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default.splice(offset, 1);
   }
 
   RemoveAll(){
     log("[QueueManager/" + this.info.GuildID + "]RemoveAll() Called");
+    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default = [];
   }
 
   RemoveFrom2(){
     log("[QueueManager/" + this.info.GuildID + "]RemoveFrom2() Called");
+    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default = [this.default[0]];
   }
 
   Shuffle(){
     log("[QueueManager/" + this.info.GuildID + "]Shuffle() Called");
+    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(this._default.length === 0) return;
     if(this.info.Manager.IsPlaying){
       const first = this._default[0];
@@ -212,6 +219,7 @@ export class QueueManager extends ManagerBase {
 
   RemoveIf(validator:(q:QueueContent)=>Boolean){
     log("[QueueManager/" + this.info.GuildID + "]RemoveIf() Called");
+    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(this._default.length === 0) return;
     const first = this.info.Manager.IsPlaying ? 1 : 0
     const rmIndex = [] as number[];
@@ -222,6 +230,22 @@ export class QueueManager extends ManagerBase {
     }
     rmIndex.forEach(n => this.RemoveAt(n));
     return rmIndex;
+  }
+
+  Move(from:number, to:number){
+    log("[QueueManager/" + this.info.GuildID + "]Move() Called");
+    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
+    if(from < to){
+      //要素追加
+      this.default.splice(to + 1, 0, this.default[from]);
+      //要素削除
+      this.default.splice(from, 1);
+    }else if(from > to){
+      //要素追加
+      this.default.splice(to, 0, this.default[from]);
+      //要素削除
+      this.default.splice(from + 1, 1);
+    }
   }
 }
 
