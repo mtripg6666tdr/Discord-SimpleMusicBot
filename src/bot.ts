@@ -88,7 +88,7 @@ export class MusicBot {
       if(message.content === "<@" + client.user.id + ">") message.channel.send("コマンドは、`" + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">") + "command`で確認できます").catch(e => log(e, "error"));
       if(message.content.startsWith(this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">")){
         const msg_spl = message.content.replace(/　/g, " ").substr(1, message.content.length - 1).split(" ");
-        var command = msg_spl[0].toLowerCase();
+        var command = msg_spl[0];
         var optiont = msg_spl.length > 1 ? message.content.substring(command.length + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">").length + 1, message.content.length) : "";
         var options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
         
@@ -99,6 +99,7 @@ export class MusicBot {
           optiont = command;
           command = "p";
         }
+        command = command.toLowerCase();
 
         // VC参加関数
         // 成功した場合はtrue、それ以外の場合にはfalseを返します
