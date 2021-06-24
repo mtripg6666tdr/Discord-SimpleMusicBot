@@ -1223,7 +1223,7 @@ export class MusicBot {
         if(l.length >= 1 && (reaction.emoji.name === PageToggle.arrowLeft || reaction.emoji.name === PageToggle.arrowRight)){
           await l[0].FlipPage(
             reaction.emoji.name === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
-            reaction.emoji.name === PageToggle.arrowRight ? (l[0].Current < l[0].Length ? l[0].Current + 1 : l[0].Current ) : 0
+            reaction.emoji.name === PageToggle.arrowRight ? (l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current ) : 0
           );
           await reaction.users.remove(user.id);
         }
