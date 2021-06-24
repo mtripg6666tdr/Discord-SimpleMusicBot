@@ -94,14 +94,18 @@ export class PlayManager extends ManagerBase {
       if(typeof rawStream === "string"){
         // URLならストリーム化
         stream = DownloadAsReadable(rawStream);
-        stream.on('error', ()=> this.Dispatcher.emit("error"));
+        stream.on('error', (e)=> {
+          this.Dispatcher.emit("error", e);
+        });
       }else if((rawStream as defaultM3u8stream).type){
         // M3U8プレイリストならURLを直接play
         stream = (rawStream as defaultM3u8stream).url;
       }else{
         // ストリームなら変換せずにそのままplay
         stream = rawStream as Readable;
-        stream.on('error', ()=> this.Dispatcher.emit("error"));
+        stream.on('error', (e)=> {
+          this.Dispatcher.emit("error", e)
+        });
       }
       if(!this.info.Connection) {
         if(mes) await mes.delete();
@@ -163,7 +167,7 @@ export class PlayManager extends ManagerBase {
         if(this.info.boundTextChannel){
           this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
             log("[PlayManager/" + this.info.GuildID + "]Some error occurred in StreamDispatcher", "error");
-            (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + e.message + ")スキップします。").catch(e => log(e, "error"));
+            (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? (e.message ?? e) : "undefined") + ")スキップします。").catch(e => log(e, "error"));
           }).catch(e => log(e, "error"));
         }
         cantPlay();

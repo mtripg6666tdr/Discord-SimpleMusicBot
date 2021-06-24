@@ -66,11 +66,15 @@ export class YouTube extends AudioSource {
           highWaterMark: 1024 * 512
         });
         stream._destroy = () => { stream.destroyed = true };
-              const req = m3u8stream(format[0].url, {
+          const req = m3u8stream(format[0].url, {
           begin: Date.now(),
           parser: "m3u8"
         });
-        req.pipe(stream).on('error', ()=> stream.emit("error"));
+        req.on("error", (e)=>{
+          stream.emit("error",e);
+        }).pipe(stream).on('error', (e)=> {
+          stream.emit("error",e);
+        });
         return stream;
       }else{
         var format = info.formats.filter(f => f.format_note==="tiny");

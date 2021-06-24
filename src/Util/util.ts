@@ -126,8 +126,8 @@ export function DownloadText(url:string, headers?:{[key:string]:string}):Promise
  * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
  */
 export function isAvailableRawAudioURL(str:string){
-const exts = [".mp3",".wav",".wma",".mov",".mp4"];
-return exts.filter(ext => str.endsWith(ext)).length > 0;
+  const exts = [".mp3",".wav",".wma",".mov",".mp4"];
+  return exts.filter(ext => str.endsWith(ext)).length > 0;
 }
 
 /**
@@ -178,6 +178,8 @@ export function DownloadAsReadable(url:string):Readable{
     maxRetries: 3,
     backoff: { inc: 500, max: 10000 },
   });
-  req.pipe(stream).on('error', ()=> stream.emit("error"));
+  req.on("error", (e)=>{
+    stream.emit("error",e);
+  }).pipe(stream);
   return stream;
 }

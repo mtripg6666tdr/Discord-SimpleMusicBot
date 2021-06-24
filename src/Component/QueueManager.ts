@@ -152,8 +152,9 @@ export class QueueManager extends ManagerBase {
         embed.setColor(getColor("SONG_ADDED"));
         embed.title = "✅曲が追加されました";
         embed.description = "[" + info.BasicInfo.Title + "](" + info.BasicInfo.Url + ")";
-        const [min,sec] = CalcMinSec(Number(info.BasicInfo.LengthSeconds));
-        embed.addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).LiveStream) ? "(ライブストリーム)" : min + ":" + sec), true);
+        const _t = Number(info.BasicInfo.LengthSeconds);
+        const [min,sec] = CalcMinSec(_t);
+        embed.addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true);
         embed.addField("リクエスト", addedBy.displayName, true);
         const index = first ? "0" : (this.info.Queue.length - 1).toString();
         embed.addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true);
