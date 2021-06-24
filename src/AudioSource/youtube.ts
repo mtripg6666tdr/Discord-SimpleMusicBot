@@ -16,6 +16,9 @@ export class YouTube extends AudioSource {
   Dislike:number;
   Thumnail:string;
   LiveStream:boolean;
+  get IsFallbacked(){
+    return this.fallback;
+  }
 
   toField(verbose:boolean = false){
     const fields = [] as EmbedField[];
@@ -47,11 +50,14 @@ export class YouTube extends AudioSource {
         isHLS: this.LiveStream
       } as any);
       console.log(format);
-      return ytdl.downloadFromInfo(info, {
+      const readable = ytdl.downloadFromInfo(info, {
         format: format
       });
+      this.fallback = false;
+      return readable;
     }
     catch{
+      this.fallback = true;
       log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
       const info = JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
       if(info.is_live){
@@ -96,6 +102,7 @@ export class YouTube extends AudioSource {
         this.Dislike = info.videoDetails.dislikes;
         this.Thumnail = info.videoDetails.thumbnails[0].url;
         this.LiveStream = info.videoDetails.isLiveContent;
+        this.fallback = false;
       }
       catch{
         this.fallback = true;

@@ -2,15 +2,18 @@ import { Client, Message, MessageEmbed, StreamDispatcher, TextChannel } from "di
 import { Readable } from "stream";
 import { AudioSource, defaultM3u8stream } from "../AudioSource/audiosource";
 import { YouTube } from "../AudioSource/youtube";
-import { GuildVoiceInfo } from "../definition";
+import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcMinSec, DownloadAsReadable, log, logStore } from "../Util/util";
 import { ManagerBase } from "./ManagerBase";
 
+/**
+ * サーバーごとの再生を管理するマネージャー。
+ * 再生や一時停止などの処理を行います。
+ */
 export class PlayManager extends ManagerBase {
   private Dispatcher:StreamDispatcher = null;
   private vol:number = 100;
-  private fallback = false;
   private startTime = 0;
   private pausedSince = 0;
   get CurrentVideoUrl():string{
@@ -56,6 +59,7 @@ export class PlayManager extends ManagerBase {
 
   // 再生します
   async Play():Promise<PlayManager>{
+    // 再生できる状態か確認
     if(!this.info.Connection || this.Dispatcher || this.info.Queue.length == 0) {
       log("[PlayManager/" + this.info.GuildID + "]Play() called but operated nothing", "warn");
       return this;
@@ -63,10 +67,12 @@ export class PlayManager extends ManagerBase {
     log("[PlayManager/" + this.info.GuildID + "]Play() called");
     var mes:Message = null;
     var ch:TextChannel = null;
+    this.CurrentVideoInfo = this.info.Queue.default[0].BasicInfo;
     if(this.info.boundTextChannel){
       ch = await this.client.channels.fetch(this.info.boundTextChannel) as TextChannel;
-      mes = await ch.send(":hourglass_flowing_sand:再生準備中...");
+      mes = await ch.send(":hourglass_flowing_sand: `" + this.CurrentVideoInfo.Title + "`の再生準備中...");
     }
+    // 再生できない時の関数
     const cantPlay = ()=>{
       log("[PlayManager:" + this.info.GuildID + "]Play() failed", "warn");
       if(this.info.Queue.LoopEnabled) this.info.Queue.LoopEnabled = false;
@@ -76,36 +82,41 @@ export class PlayManager extends ManagerBase {
       this.Play();
     };
     try{
-      this.fallback = false;
+      // 変数の初期化
       this.pausedSince = 0;
-      this.CurrentVideoInfo = this.info.Queue.default[0].BasicInfo;
       // fetchしている間にPlayingを読み取られた時用に適当なオブジェクトを代入してnullでなくしておく
       this.Dispatcher = {emit:()=>{}} as any;
+      // QueueContentからストリーム、M3U8プレイリスト(非HLS)または直URLを取得
       const rawStream = await this.CurrentVideoInfo.fetch();
       var stream:Readable|string = null;
       if(typeof rawStream === "string"){
+        // URLならストリーム化
         stream = DownloadAsReadable(rawStream);
         stream.on('error', ()=> this.Dispatcher.emit("error"));
       }else if((rawStream as defaultM3u8stream).type){
+        // M3U8プレイリストならURLを直接play
         stream = (rawStream as defaultM3u8stream).url;
       }else{
+        // ストリームなら変換せずにそのままplay
         stream = rawStream as Readable;
         stream.on('error', ()=> this.Dispatcher.emit("error"));
       }
+      // 再生
       this.Dispatcher = this.info.Connection.play(stream);
-      if(logStore.data[logStore.data.length - 1].indexOf("youtube-dl") >= 0){
-        this.fallback = true;
-      }
+      // 音量設定
       this.Dispatcher.setVolume(this.vol / 100);
+      // 各種イベント設定
       this.Dispatcher.on("start", ()=>{
+        // 再生開始されたら開始された時刻を保存
         this.startTime = new Date().getTime();
       });
       this.Dispatcher.on("finish", ()=> {
+        // ストリームが終了したら時間を確認しつつ次の曲へ移行
         log("[PlayManager/" + this.info.GuildID + "]Stream finished");
         const now = new Date().getTime();
         const timeout =
           this.CurrentVideoInfo.ServiceIdentifer === "bestdori" ? 5000 : 
-          (this.CurrentVideoInfo.LengthSeconds * 1000 + this.startTime) > now ? this.CurrentVideoInfo.LengthSeconds * 1000 - (now - this.startTime) + 5000: 
+          (this.CurrentVideoInfo.LengthSeconds * 1000 + this.startTime) > now ? this.CurrentVideoInfo.LengthSeconds * 1000 - (now - this.startTime) + 1500: 
           0;
         setTimeout(()=>{
           // 再生が終わったら
@@ -141,6 +152,7 @@ export class PlayManager extends ManagerBase {
         }, timeout);
       });
       this.Dispatcher.on("error", (e)=>{
+        // エラーが発生したら再生できないときの関数を呼んで逃げる
         log(JSON.stringify(e), "error");
         if(this.info.boundTextChannel){
           this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
@@ -152,6 +164,7 @@ export class PlayManager extends ManagerBase {
       });
       log("[PlayManager/" + this.info.GuildID + "]Play() started successfully");
       if(this.info.boundTextChannel && ch && mes){
+        // 再生開始メッセージ
         var _t = Number(this.CurrentVideoInfo.LengthSeconds);
         const [min, sec] = CalcMinSec(_t);
         const embed = new MessageEmbed({
@@ -174,8 +187,8 @@ export class PlayManager extends ManagerBase {
         embed.thumbnail = {
           url: this.CurrentVideoInfo.Thumnail
         };
-        if(this.fallback){
-          embed.addField(":warning:注意","現在通常方法が使用できなかったため、Node.jsからフォールバックのPythonライブラリを使用しています。正常なオペレーションができない場合があります。");
+        if(this.CurrentVideoInfo.ServiceIdentifer === "youtube" && (this.CurrentVideoInfo as YouTube).IsFallbacked){
+          embed.addField(":warning:注意", FallBackNotice);
         }
         mes.edit("", embed);
       }
@@ -190,7 +203,10 @@ export class PlayManager extends ManagerBase {
     return this;
   }
 
-  // 停止します。切断するにはDisconnectを使用してください。
+  /** 
+   * 停止します。切断するにはDisconnectを使用してください。
+   * @returns this
+  */
   Stop():PlayManager{
     log("[PlayManager/" + this.info.GuildID + "]Stop() called");
     if(this.Dispatcher && this.Dispatcher !== "" as any){
@@ -200,7 +216,10 @@ export class PlayManager extends ManagerBase {
     return this;
   }
 
-  // 切断します。内部的にはStopも呼ばれています。これを呼ぶ前にStopを呼ぶ必要はありません。
+  /**
+   * 切断します。内部的にはStopも呼ばれています。これを呼ぶ前にStopを呼ぶ必要はありません。
+   * @returns this
+   */
   Disconnect():PlayManager{
     this.Stop();
     if(this.info.Connection){
@@ -213,7 +232,10 @@ export class PlayManager extends ManagerBase {
     return this;
   }
 
-  // 一時停止します。
+  /**
+   * 一時停止します。
+   * @returns this
+   */
   Pause():PlayManager{
     log("[PlayManager/" + this.info.GuildID + "]Pause() called");
     this.Dispatcher?.pause();
@@ -221,7 +243,10 @@ export class PlayManager extends ManagerBase {
     return this;
   }
 
-  // 一時停止再生します。
+  /**
+   * 一時停止再生します。
+   * @returns this
+   */
   Resume():PlayManager{
     log("[PlayManager/" + this.info.GuildID + "]Resume() called");
     this.Dispatcher?.resume();
@@ -230,7 +255,10 @@ export class PlayManager extends ManagerBase {
     return this;
   }
 
-  // 頭出しをします。
+  /**
+   * 頭出しをします。
+   * @returns this
+   */
   Rewind():PlayManager{
     log("[PlayManager/" + this.info.GuildID + "]Rewind() called");
     this.Stop();

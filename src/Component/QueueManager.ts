@@ -8,11 +8,15 @@ import { Hibiki, HibikiApi } from "../AudioSource/hibiki";
 import { exportableSoundCloud, SoundCloudS } from "../AudioSource/soundcloud";
 import { exportableStreamable, Streamable, StreamableApi } from "../AudioSource/streamable";
 import { exportableYouTube, YouTube } from "../AudioSource/youtube";
-import { GuildVoiceInfo } from "../definition";
+import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcMinSec, isAvailableRawAudioURL, log, logStore } from "../Util/util";
+import { CalcMinSec, isAvailableRawAudioURL, log } from "../Util/util";
 import { ManagerBase } from "./ManagerBase";
 
+/**
+ * サーバーごとのキューを管理するマネージャー。
+ * キューの追加および削除などの機能を提供します。
+ */
 export class QueueManager extends ManagerBase {
   // キューの本体
   private _default:QueueContent[] = [];
@@ -117,13 +121,15 @@ export class QueueManager extends ManagerBase {
     log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Called");
     var ch:TextChannel = null;
     var msg:Message = null;
-    var fallback = false;
     try{
       if(fromSearch && this.info.SearchPanel){
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() From search panel");
         ch = await client.channels.fetch(this.info.SearchPanel.Msg.chId) as TextChannel;
-        msg= await (ch as TextChannel).messages.fetch(this.info.SearchPanel.Msg.id);
-        msg.edit("お待ちください...", {embed:{description: "お待ちください..."}});
+        msg = await (ch as TextChannel).messages.fetch(this.info.SearchPanel.Msg.id);
+        const tembed = new MessageEmbed();
+        tembed.title = "お待ちください";
+        tembed.description = "情報を取得しています...";
+        msg.edit("", tembed);
       }else if(message){
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Interaction message specified");
         ch = message.channel as TextChannel;
@@ -138,9 +144,6 @@ export class QueueManager extends ManagerBase {
         throw "キューの上限を超えています";
       }
       const info = await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type, gotData ?? null);
-      if(logStore.data[logStore.data.length - 1].indexOf("youtube-dl") >= 0){
-        fallback = true;
-      }
       log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Added successfully");
       if(msg){
         const embed = new MessageEmbed();
@@ -155,8 +158,8 @@ export class QueueManager extends ManagerBase {
         embed.thumbnail = {
           url: info.BasicInfo.Thumnail
         };
-        if(fallback){
-          embed.addField(":warning:注意","現在通常方法が使用できなかったため、Node.jsからフォールバックのPythonライブラリを使用しています。正常なオペレーションができない場合があります。");
+        if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).IsFallbacked){
+          embed.addField(":warning:注意", FallBackNotice);
         }
         await msg.edit("", embed);
       }

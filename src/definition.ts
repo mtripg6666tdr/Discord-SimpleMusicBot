@@ -121,3 +121,5 @@ export class CancellationPending {
     if(message) this._message = message;
   }
 }
+
+export const FallBackNotice = "現在、通常の方法で情報を取得できなかったため、代替としてPythonライブラリにフォールバックして取得しました。処理に時間がかかるなど、正常なオペレーションができない場合があります。";

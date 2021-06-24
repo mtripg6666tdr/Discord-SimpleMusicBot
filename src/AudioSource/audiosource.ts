@@ -7,7 +7,7 @@ export abstract class AudioSource {
   Url:string;
   // サービス識別子
   protected abstract _serviceIdentifer:string;
-  get ServiceIdentifer():string{
+  get ServiceIdentifer():"youtube"|string{
     return this._serviceIdentifer;
   }
   // タイトル(曲名)
