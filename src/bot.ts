@@ -1197,7 +1197,7 @@ export class MusicBot {
             q.Move(q.length - 1, 1);
             const info = q.default[1];
             message.channel.send("✅`" + info.BasicInfo.Title + "`を一番最後からキューの先頭に移動しました").catch(e => log(e, "error"));
-          }
+          }break;
 
           case "キューを検索":
           case "searchq":
