@@ -35,6 +35,11 @@ export class QueueManager extends ManagerBase {
   get length():number {
     return this.default.length;
   }
+  get LengthSeconds():number{
+    var totalLength = 0;
+    this.default.forEach(q => totalLength += Number(q.BasicInfo.LengthSeconds));
+    return totalLength;
+  }
 
   constructor(){
     super();
@@ -67,7 +72,7 @@ export class QueueManager extends ManagerBase {
     
     if(type === "youtube" || (type === "unknown" && ytdl.validateURL(url))){
       // youtube
-      result.BasicInfo = await new YouTube().init(url, gotData as exportableYouTube);
+      result.BasicInfo = await new YouTube().init(url, gotData as exportableYouTube, this.length === 0 || method === "unshift" || this.LengthSeconds < 30 * 60 * 1000);
     }else if(type === "custom" || (type === "unknown" && isAvailableRawAudioURL(url))){
       // カスタムストリーム
       result.BasicInfo = await new CustomStream().init(url);
@@ -86,8 +91,7 @@ export class QueueManager extends ManagerBase {
         result.BasicInfo = await new BestdoriS().init(url, gotData as exportableBestdori);
       }else if(HibikiApi.validateURL(url)){
         // Hibiki
-        if(gotData) throw "このタイプのコンテンツは復元できません";
-        result.BasicInfo = await new Hibiki().init(url);
+        result.BasicInfo = await new Hibiki().init(gotData.url);
       }
     }
     if(result.BasicInfo){

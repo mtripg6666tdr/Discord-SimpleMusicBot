@@ -523,8 +523,7 @@ export class MusicBot {
             const msg = await message.channel.send(":eyes: キューを確認しています。お待ちください...");
             const queue = this.data[message.guild.id].Queue;
             // 合計所要時間の計算
-            var totalLength = 0;
-            queue.default.forEach(q => totalLength += Number(q.BasicInfo.LengthSeconds));
+            var totalLength = queue.LengthSeconds;
             var _page = optiont === "" ? 1 : Number(optiont);
             if(isNaN(_page)) _page = 1;
             if(queue.length > 0 && _page > Math.ceil(queue.length / 10)){

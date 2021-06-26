@@ -11,6 +11,8 @@ export class YouTube extends AudioSource {
   protected _serviceIdentifer = "youtube";
   protected _lengthSeconds = 0;
   private fallback = false;
+  private ytdlInfo = null as ytdl.videoInfo;
+  private youtubeDlInfo = null as YoutubeDlInfo;
   ChannelName:string;
   Like:number;
   Dislike:number;
@@ -18,6 +20,9 @@ export class YouTube extends AudioSource {
   LiveStream:boolean;
   get IsFallbacked(){
     return this.fallback;
+  }
+  get IsCached(){
+    return Boolean(this.ytdlInfo || this.youtubeDlInfo);
   }
 
   toField(verbose:boolean = false){
@@ -43,7 +48,7 @@ export class YouTube extends AudioSource {
 
   async fetch(){
     try{
-      const info = await ytdl.getInfo(this.Url)
+      const info = this.ytdlInfo ?? await ytdl.getInfo(this.Url)
       const format = ytdl.chooseFormat(info.formats, {
         filter: this.LiveStream ? null : "audioonly",
         quality: this.LiveStream ? null : "highestaudio",
@@ -59,7 +64,7 @@ export class YouTube extends AudioSource {
     catch{
       this.fallback = true;
       log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
-      const info = JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
+      const info = this.youtubeDlInfo ?? JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
       if(info.is_live){
         var format = info.formats.filter(f => f.format_id === info.format_id);
         const stream = new PassThrough({
@@ -84,7 +89,7 @@ export class YouTube extends AudioSource {
     }
   }
 
-  async init(url:string, prefetched:exportableYouTube){
+  async init(url:string, prefetched:exportableYouTube, forceCache?:boolean){
     this.Url = "https://www.youtube.com/watch?v=" + ytdl.getVideoID(url);
     if(prefetched){
       this.Title = prefetched.title;
@@ -98,12 +103,15 @@ export class YouTube extends AudioSource {
     }else{
       try{
         const info = await ytdl.getInfo(url, {lang: "ja"});
+        if(forceCache){
+          this.ytdlInfo = info;
+        }
         this.Title = info.videoDetails.title;
         this.Description = info.videoDetails.description;
-        this._lengthSeconds = Number(info.videoDetails.lengthSeconds);
+        this._lengthSeconds = Number(info.videoDetails.lengthSeconds ?? 0);
         this.ChannelName = info.videoDetails.ownerChannelName;
-        this.Like = info.videoDetails.likes;
-        this.Dislike = info.videoDetails.dislikes;
+        this.Like = info.videoDetails.likes ?? -1;
+        this.Dislike = info.videoDetails.dislikes ?? -1;
         this.Thumnail = info.videoDetails.thumbnails[0].url;
         this.LiveStream = info.videoDetails.isLiveContent;
         this.fallback = false;
@@ -112,6 +120,9 @@ export class YouTube extends AudioSource {
         this.fallback = true;
         log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
         const info = JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
+        if(forceCache){
+          this.youtubeDlInfo = info;
+        }
         this.LiveStream = info.is_live;
         this.Title = info.title;
         this.Description = info.description;

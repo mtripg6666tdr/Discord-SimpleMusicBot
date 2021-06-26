@@ -1,5 +1,6 @@
 import { EmbedField } from "discord.js";
 import SoundCloud from "soundcloud.ts";
+import { InitPassThrough } from "../Util/util";
 import { AudioSource } from "./audiosource";
 
 export class SoundCloudS extends AudioSource {
@@ -30,7 +31,11 @@ export class SoundCloudS extends AudioSource {
 
   async fetch(){
     const sc = new SoundCloud();
-    return ((await sc.util.streamTrack(this.Url)) as any as SoundCloudStream).responseUrl;
+    const stream = InitPassThrough();
+    (await sc.util.streamTrack(this.Url)).on("error", (e)=>{
+      stream.emit("error", e);
+    }).pipe(stream);
+    return stream;
   }
 
   toField(verbose:boolean = false){

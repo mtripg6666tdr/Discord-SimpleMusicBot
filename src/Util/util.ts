@@ -169,10 +169,7 @@ export function suppressMessageEmbeds(msg:Message, client:Client, token:string):
 }
 
 export function DownloadAsReadable(url:string):Readable{
-  const stream = new PassThrough({
-    highWaterMark: 1024 * 512
-  });
-  stream._destroy = () => { stream.destroyed = true };
+  const stream = InitPassThrough();
   const req = miniget.default(url, {
     maxReconnects: 6,
     maxRetries: 3,
@@ -181,5 +178,13 @@ export function DownloadAsReadable(url:string):Readable{
   req.on("error", (e)=>{
     stream.emit("error",e);
   }).pipe(stream);
+  return stream;
+}
+
+export function InitPassThrough():PassThrough{
+  const stream = new PassThrough({
+    highWaterMark: 1024 * 512
+  });
+  stream._destroy = () => { stream.destroyed = true };
   return stream;
 }
