@@ -168,6 +168,11 @@ export function suppressMessageEmbeds(msg:Message, client:Client, token:string):
   });
 }
 
+/**
+ * 指定されたURLからReadable Streamを生成します
+ * @param url URL
+ * @returns Readableストリーム
+ */
 export function DownloadAsReadable(url:string):Readable{
   const stream = InitPassThrough();
   const req = miniget.default(url, {
@@ -181,10 +186,34 @@ export function DownloadAsReadable(url:string):Readable{
   return stream;
 }
 
+/**
+ * 空のPassThroughを生成します
+ * @returns PassThrough
+ */
 export function InitPassThrough():PassThrough{
   const stream = new PassThrough({
     highWaterMark: 1024 * 512
   });
   stream._destroy = () => { stream.destroyed = true };
   return stream;
+}
+
+export function NormalizeText(rawText:string){
+  var result = rawText;
+  ([
+    {key: /０/g, value: "0"},
+    {key: /１/g, value: "1"},
+    {key: /２/g, value: "2"},
+    {key: /３/g, value: "3"},
+    {key: /４/g, value: "4"},
+    {key: /５/g, value: "5"},
+    {key: /６/g, value: "6"},
+    {key: /７/g, value: "7"},
+    {key: /８/g, value: "8"},
+    {key: /９/g, value: "9"},
+    {key: /　/g, value: " "},
+  ] as {key:RegExp, value:string}[]).forEach(reg => {
+    result = result.replace(reg.key, reg.value);
+  });
+  return result;
 }

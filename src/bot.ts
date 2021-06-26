@@ -20,6 +20,7 @@ import {
   isAvailableRawAudioURL, 
   log, 
   logStore, 
+  NormalizeText, 
   suppressMessageEmbeds 
 } from "./Util/util";
 import { PageToggle } from "./Component/PageToggle";
@@ -87,7 +88,7 @@ export class MusicBot {
       
       if(message.content === "<@" + client.user.id + ">") message.channel.send("コマンドは、`" + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">") + "command`で確認できます").catch(e => log(e, "error"));
       if(message.content.startsWith(this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">")){
-        const msg_spl = message.content.replace(/　/g, " ").substr(1, message.content.length - 1).split(" ");
+        const msg_spl = NormalizeText(message.content).substr(1, message.content.length - 1).split(" ");
         var command = msg_spl[0];
         var optiont = msg_spl.length > 1 ? message.content.substring(command.length + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">").length + 1, message.content.length) : "";
         var options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
@@ -337,7 +338,10 @@ export class MusicBot {
           case "se":{
             join();
             if(optiont.startsWith("http://") || optiont.startsWith("https://")){
-              await playFromURL(!this.data[message.guild.id].Manager.IsConnecting);
+              options.forEach(async u => {
+                optiont = u;
+                await playFromURL(!this.data[message.guild.id].Manager.IsConnecting);
+              });
               return;
             }
             if(this.data[message.guild.id].SearchPanel !== null){
@@ -421,7 +425,10 @@ export class MusicBot {
             // 引数ついてたらそれ優先
             if(optiont !== ""){
               if(optiont.startsWith("http://") || optiont.startsWith("https://")){
-                await playFromURL(!this.data[message.guild.id].Manager.IsConnecting);
+                options.forEach(async u => {
+                  optiont = u;
+                  await playFromURL(!this.data[message.guild.id].Manager.IsConnecting);
+                });
               }else{
                 const msg = await message.channel.send("🔍検索中...");
                 const result = (await ytsr.default(optiont, {
@@ -1246,18 +1253,22 @@ export class MusicBot {
           }
         }
         // searchコマンドの選択を捕捉
-        else if(message.content.match(/^[0-9]+$/)){
+        else if(NormalizeText(message.content).match(/^([0-9]\s?)+$/)){
           const panel = this.data[message.guild.id].SearchPanel;
           // メッセージ送信者が検索者と一致するかを確認
           if(message.author.id !== panel.Msg.userId) return;
-          const num = Number(message.content);
-          if(panel && Object.keys(panel.Opts).indexOf(message.content) >= 0){
-            await this.data[message.guild.id].Queue.AutoAddQueue(client, panel.Opts[num].url, message.member, "unknown", false, true);
+          const nums = NormalizeText(message.content).split(" ");          
+          const num = nums.shift();
+          if(panel && Object.keys(panel.Opts).indexOf(num) >= 0){
+            await this.data[message.guild.id].Queue.AutoAddQueue(client, panel.Opts[Number(num)].url, message.member, "unknown", false, true);
             this.data[message.guild.id].SearchPanel = null;
             if(this.data[message.guild.id].Manager.IsConnecting && !this.data[message.guild.id].Manager.IsPlaying){
               this.data[message.guild.id].Manager.Play();
             }
           }
+          nums.map(n => Number(n)).forEach(async n => {
+            await this.data[message.guild.id].Queue.AutoAddQueue(client, panel.Opts[n].url, message.member, "unknown", false, false, message.channel as discord.TextChannel);
+          });
         }
       }else if(this.cancellations.filter(c => !c.Cancelled).length > 0 && message.content === "キャンセル" || message.content === "cancel"){
         this.cancellations.forEach(c => c.Cancel());

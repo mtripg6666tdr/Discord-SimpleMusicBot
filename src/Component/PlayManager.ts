@@ -271,8 +271,7 @@ export class PlayManager extends ManagerBase {
    */
   Rewind():PlayManager{
     log("[PlayManager/" + this.info.GuildID + "]Rewind() called");
-    this.Stop();
-    this.Play();
+    this.Stop().Play();
     return this;
   }
 }
