@@ -5,44 +5,44 @@ import { DefaultAudioThumbnailURL } from "../definition";
 import { DownloadText } from "./util";
 
 export async function GetLyrics(keyword:string):Promise<songInfo>{
-  const data = JSON.parse(await DownloadText("https://customsearch.googleapis.com/customsearch/v1?cx=89ebccacdc32461f2&key=" + process.env.CSE_KEY + "&q=" + encodeURIComponent(keyword))) as CSE_Result;
-  const items = data.items?.filter(i => new URL(i.link).pathname.startsWith("/lyric/"));
-  if(!items || items.length === 0) {
-    // FallBack to Genius
+  try{
     const client = new Genius.Client();
-    try{
-      const song = (await client.songs.search(keyword))[0];
-      return {
-        artist: song.artist.name,
-        artwork: song.image,
-        lyric: await song.lyrics(),
-        title: song.title,
-        url: song.url
-      }
-    }
-    catch(e){
-      throw "No lyric was found and failed to search in fallback way.";
+    const song = (await client.songs.search(keyword))[0];
+    return {
+      artist: song.artist.name,
+      artwork: song.image,
+      lyric: await song.lyrics(),
+      title: song.title,
+      url: song.url
     }
   }
-  const url = items[0].link;
-  var lyric = await DownloadWithoutRuby(url);
-  var doc = "";
-  [doc, lyric] = lyric.split("<div class=\"hiragana\" >");
-  [lyric, ] = lyric.split("</div>");
-  lyric = lyric.replace(/<span class="rt rt_hidden">.+?<\/span>/g, "");
-  lyric = lyric.replace(/\n/g, "");
-  lyric = lyric.replace(/<br \/>/g, "\n");
-  lyric = lyric.replace(/[\r\n]{2}/g, "\n");
-  lyric = lyric.replace(/<.+?>/g, "");
-  const match = doc.match(/<meta name="description" content="(?<artist>.+?)が歌う(?<title>.+)の歌詞ページ.+です。.+">/);
-  const artwork = doc.match(/<img src="(?<url>.+?)" alt=".+? 歌詞" \/>/).groups?.url;
-  return {
-    lyric: decode(lyric),
-    artist: decode(match.groups.artist),
-    title: decode(match.groups.title),
-    artwork: artwork.startsWith("http") ? artwork : DefaultAudioThumbnailURL,
-    url: url
-  };
+  catch(e){
+    // Fallback to utaten
+    const data = JSON.parse(await DownloadText("https://customsearch.googleapis.com/customsearch/v1?cx=89ebccacdc32461f2&key=" + process.env.CSE_KEY + "&q=" + encodeURIComponent(keyword))) as CSE_Result;
+    const items = data.items?.filter(i => new URL(i.link).pathname.startsWith("/lyric/"));
+    if(!items || items.length === 0) {
+      throw "No lyric was found";
+    }
+    const url = items[0].link;
+    var lyric = await DownloadWithoutRuby(url);
+    var doc = "";
+    [doc, lyric] = lyric.split("<div class=\"hiragana\" >");
+    [lyric, ] = lyric.split("</div>");
+    lyric = lyric.replace(/<span class="rt rt_hidden">.+?<\/span>/g, "");
+    lyric = lyric.replace(/\n/g, "");
+    lyric = lyric.replace(/<br \/>/g, "\n");
+    lyric = lyric.replace(/[\r\n]{2}/g, "\n");
+    lyric = lyric.replace(/<.+?>/g, "");
+    const match = doc.match(/<meta name="description" content="(?<artist>.+?)が歌う(?<title>.+)の歌詞ページ.+です。.+">/);
+    const artwork = doc.match(/<img src="(?<url>.+?)" alt=".+? 歌詞" \/>/).groups?.url;
+    return {
+      lyric: decode(lyric),
+      artist: decode(match.groups.artist),
+      title: decode(match.groups.title),
+      artwork: artwork.startsWith("http") ? artwork : DefaultAudioThumbnailURL,
+      url: url
+    };
+  }
 }
 
 function DownloadWithoutRuby(url:string):Promise<string>{
