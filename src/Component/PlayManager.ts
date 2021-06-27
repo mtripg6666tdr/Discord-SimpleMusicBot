@@ -219,7 +219,7 @@ export class PlayManager extends ManagerBase {
   */
   Stop():PlayManager{
     log("[PlayManager/" + this.info.GuildID + "]Stop() called");
-    if(this.Dispatcher && this.Dispatcher !== "" as any){
+    if(this.Dispatcher && this.Dispatcher instanceof StreamDispatcher){
       this.Dispatcher.destroy();
       this.Dispatcher = null;
     }
