@@ -253,6 +253,7 @@ export class PlayManager extends ManagerBase {
    * @returns this
    */
   Pause():PlayManager{
+    this.info.Bot.BackupStatus();
     log("[PlayManager/" + this.info.GuildID + "]Pause() called");
     this.Dispatcher?.pause();
     this.pausedSince = new Date().getTime();
@@ -264,6 +265,7 @@ export class PlayManager extends ManagerBase {
    * @returns this
    */
   Resume():PlayManager{
+    this.info.Bot.BackupStatus();
     log("[PlayManager/" + this.info.GuildID + "]Resume() called");
     this.Dispatcher?.resume();
     if(this.pausedSince !== 0)

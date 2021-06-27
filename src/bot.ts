@@ -1359,15 +1359,7 @@ export class MusicBot {
   BackupData(){
     if(DatabaseAPI.CanOperate){
       try{
-        // 参加ステータスの送信
-        const speaking = [] as {guildid:string, value:string}[];
-        Object.keys(this.data).forEach(id => {
-          speaking.push({
-            guildid: id,
-            value: this.data[id].Manager.IsConnecting ? this.data[id].Connection.channel.id + ":" + this.data[id].boundTextChannel : ""
-          });
-        });
-        DatabaseAPI.SetIsSpeaking(speaking);
+        this.BackupStatus();
         // キューの送信
         const queue = [] as {guildid:string, queue:string}[];
         Object.keys(this.data).forEach(id => {
@@ -1380,5 +1372,20 @@ export class MusicBot {
       }
       catch(e){};
     }
+  }
+
+  BackupStatus(){
+    try{
+      // 参加ステータスの送信
+      const speaking = [] as {guildid:string, value:string}[];
+      Object.keys(this.data).forEach(id => {
+        speaking.push({
+          guildid: id,
+          value: this.data[id].Manager.IsPlaying ? this.data[id].Connection.channel.id + ":" + this.data[id].boundTextChannel : ""
+        });
+      });
+      DatabaseAPI.SetIsSpeaking(speaking);
+    }
+    catch(e){throw e};
   }
 }
