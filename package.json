@@ -6,10 +6,12 @@
   "main": "dist/lib.js",
   "types": "typings/lib.d.ts",
   "dependencies": {
+    "@types/follow-redirects": "^1.13.0",
     "@types/node": "^15.12.4",
     "@types/ws": "^7.4.5",
     "discord.js": "^12.5.3",
     "dotenv": "^9.0.2",
+    "follow-redirects": "^1.14.1",
     "genius-lyrics": "^4.2.9",
     "html-entities": "^2.3.2",
     "m3u8stream": "^0.8.4",

@@ -64,15 +64,15 @@ export class QueueManager extends ManagerBase {
       BasicInfo:null,
       AdditionalInfo:{
         AddedBy: {
-          userId: addedBy.id,
-          displayName: addedBy.displayName
+          userId: addedBy?.id ?? "0",
+          displayName: addedBy?.displayName ?? "不明"
         }
       }
     } as QueueContent;
     
     if(type === "youtube" || (type === "unknown" && ytdl.validateURL(url))){
       // youtube
-      result.BasicInfo = await new YouTube().init(url, gotData as exportableYouTube, this.length === 0 || method === "unshift" || this.LengthSeconds < 30 * 60 * 1000);
+      result.BasicInfo = await new YouTube().init(url, gotData as exportableYouTube, this.length === 0 || method === "unshift" || this.LengthSeconds < 4 * 60 * 60 * 1000);
     }else if(type === "custom" || (type === "unknown" && isAvailableRawAudioURL(url))){
       // カスタムストリーム
       result.BasicInfo = await new CustomStream().init(url);
@@ -159,7 +159,7 @@ export class QueueManager extends ManagerBase {
         const _t = Number(info.BasicInfo.LengthSeconds);
         const [min,sec] = CalcMinSec(_t);
         embed.addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true);
-        embed.addField("リクエスト", addedBy.displayName, true);
+        embed.addField("リクエスト", addedBy?.displayName ?? "不明", true);
         const index = first ? "0" : (this.info.Queue.length - 1).toString();
         embed.addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true);
         embed.thumbnail = {

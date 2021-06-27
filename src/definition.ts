@@ -40,14 +40,12 @@ export class GuildVoiceInfo{
   // メインモジュール
   Bot:MusicBot;
 
-  constructor(client:Client, message:Message, bot:MusicBot){
-    const guildid = message.guild.id;
-
+  constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBot){
     this.Connection = null;
     this.SearchPanel =null;
     this.Queue = new QueueManager();
     this.Manager = new PlayManager(client);
-    this.boundTextChannel = message.channel.id;
+    this.boundTextChannel = boundchannelid;
     this.GuildID = guildid;
     this.DataPath = ".data/" + guildid + ".preferences.json";
     this.Bot = bot;

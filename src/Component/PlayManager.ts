@@ -4,6 +4,7 @@ import { AudioSource, defaultM3u8stream } from "../AudioSource/audiosource";
 import { YouTube } from "../AudioSource/youtube";
 import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
+import { DatabaseAPI } from "../Util/databaseUtil";
 import { CalcMinSec, DownloadAsReadable, log, logStore } from "../Util/util";
 import { ManagerBase } from "./ManagerBase";
 
@@ -218,6 +219,7 @@ export class PlayManager extends ManagerBase {
    * @returns this
   */
   Stop():PlayManager{
+    this.info.Bot.BackupData();
     log("[PlayManager/" + this.info.GuildID + "]Stop() called");
     if(this.Dispatcher && this.Dispatcher.destroy){
       this.Dispatcher.destroy();

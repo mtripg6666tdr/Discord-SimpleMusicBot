@@ -97,7 +97,7 @@ export function btoa(txt:string){
  * @param url URL
  * @returns ダウンロードされたテキストデータ
  */
-export function DownloadText(url:string, headers?:{[key:string]:string}):Promise<string>{
+export function DownloadText(url:string, headers?:{[key:string]:string}, requestBody?:any):Promise<string>{
   return new Promise((resolve,reject)=>{
     const durl = new URL(url);
     const req = https.request({
@@ -116,7 +116,7 @@ export function DownloadText(url:string, headers?:{[key:string]:string}):Promise
       });
       res.on("error", reject);
     }).on("error", reject);
-    req.end();
+    req.end(requestBody ?? undefined);
   });
 }
 

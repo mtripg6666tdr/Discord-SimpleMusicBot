@@ -24,6 +24,7 @@ import {
   suppressMessageEmbeds 
 } from "./Util/util";
 import { PageToggle } from "./Component/PageToggle";
+import { DatabaseAPI } from "./Util/databaseUtil";
 
 export class MusicBot {
   private client = new discord.Client();
@@ -45,19 +46,49 @@ export class MusicBot {
     }
     catch{};
 
-    client.on("ready", ()=> {
+    client.on("ready", async()=> {
       client.voice.connections.forEach(c => c.disconnect());
       log("[Main]Main bot is ready and active now");
+
+      client.user.setActivity({
+        type: "PLAYING",
+        name: "起動中..."
+      }).catch(e => log(e, "error"));
+
+      if(DatabaseAPI.CanOperate){
+        const queues = await DatabaseAPI.GetQueueData(client.guilds.cache.keyArray());
+        const speakingIds = await DatabaseAPI.GetIsSpeaking(client.guilds.cache.keyArray());
+        const queueGuildids = Object.keys(queues);
+        const speakingGuildids = Object.keys(speakingIds);
+        queueGuildids.forEach(async id => {
+          const queue = JSON.parse(queues[id]) as YmxFormat;
+          if(speakingGuildids.indexOf(id) >= 0 && queue.version === YmxVersion && speakingIds[id].indexOf(":") >= 0){
+            const [vid, cid] = speakingIds[id].split(":");
+            this.initData(id, cid);
+            try{
+              queue.data.forEach(async q => {
+                await this.data[id].Queue.AutoAddQueue(client, q.url, null, "unknown", false, false, null, null, q);
+              });
+              this.data[id].Connection = await (await client.channels.fetch(vid) as discord.VoiceChannel).join();
+              await this.data[id].Manager.Play();
+            }
+            catch(e){}
+          }
+        });
+      }
+
       client.user.setActivity({
         type: "LISTENING",
         name: "音楽"
       }).catch(e => log(e, "error"));
+
       const tick = ()=>{
         this.Log();
         setTimeout(tick, 5 * 60 * 1000);
         PageToggle.Organize(this.EmbedPageToggle, 5);
+        this.BackupData();
       };
-      tick();
+      setTimeout(tick, 1 * 60 * 1000);
     });
 
     client.on("message", 
@@ -65,16 +96,8 @@ export class MusicBot {
       // botのメッセやdm、およびnewsは無視
       if(message.author.bot || message.channel.type == "dm" || message.channel.type == "news") return;
       
-      // サーバーデータ初期化関数
-      const initData = ()=> {
-        if(!this.data[message.guild.id]) {
-          this.data[message.guild.id] = new GuildVoiceInfo(client, message, this);
-          this.data[message.guild.id].Manager.SetData(this.data[message.guild.id]);
-          this.data[message.guild.id].Queue.SetData(this.data[message.guild.id]);
-        }
-      };
       // データ初期化
-      initData();
+      this.initData(message.guild.id, message.channel.id);
       
       // プレフィックス
       const pmatch = message.guild.members.resolve(client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
@@ -229,6 +252,7 @@ export class MusicBot {
         // テキストチャンネルバインド
         // コマンドが送信されたチャンネルを後で利用します。
         if(!this.data[message.guild.id].Manager.IsConnecting || (message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)) || message.content.indexOf("join") >= 0){
+          if(message.content !== (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">"))
           this.data[message.guild.id].boundTextChannel = message.channel.id;
         }
 
@@ -592,7 +616,7 @@ export class MusicBot {
             // サーバープリファレンスをnullに
             this.data[message.guild.id] = null;
             // データ初期化
-            initData();
+            this.initData(message.guild.id, message.channel.id);
             message.channel.send("✅サーバーの設定を初期化しました").catch(e => log(e, "error"));
           }break;
           
@@ -928,10 +952,7 @@ export class MusicBot {
               message.channel.send("キューが空です。").catch(e => log(e, "error"));
               return;
             }
-            const qd = JSON.stringify({
-              version: YmxVersion,
-              data: this.data[message.guild.id].Queue.default.map(q => q.BasicInfo.exportData())
-            } as YmxFormat);
+            const qd = this.exportQueue(message.guild.id);
             message.channel.send("✅エクスポートしました", new discord.MessageAttachment(Buffer.from(qd), "exported_queue.ymx")).then(msg => {
               msg.edit("✅エクスポートしました (バージョン: v" + YmxVersion + "互換)\r\nインポート時は、「" + msg.url + " 」をimportコマンドの引数に指定してください").catch(e => log(e, "error"))
             }).catch(e => log(e, "error"));
@@ -1313,5 +1334,47 @@ export class MusicBot {
     this.token = token;
     logStore.log = debugLog;
     if(debugLogStoreLength) logStore.maxLength = debugLogStoreLength;
+  }
+
+  private exportQueue(guildId:string){
+    return JSON.stringify({
+      version: YmxVersion,
+      data: this.data[guildId].Queue.default.map(q => q.BasicInfo.exportData())
+    } as YmxFormat);
+  }
+
+  // サーバーデータ初期化関数
+  private initData(guildid:string, channelid:string){
+    if(!this.data[guildid]) {
+      this.data[guildid] = new GuildVoiceInfo(this.Client, guildid, channelid, this);
+      this.data[guildid].Manager.SetData(this.data[guildid]);
+      this.data[guildid].Queue.SetData(this.data[guildid]);
+    }
+  };
+
+  BackupData(){
+    if(DatabaseAPI.CanOperate){
+      try{
+        // 参加ステータスの送信
+        const speaking = [] as {guildid:string, value:string}[];
+        Object.keys(this.data).forEach(id => {
+          speaking.push({
+            guildid: id,
+            value: this.data[id].Manager.IsConnecting ? this.data[id].Connection.channel.id + ":" + this.data[id].boundTextChannel : ""
+          });
+        });
+        DatabaseAPI.SetIsSpeaking(speaking);
+        // キューの送信
+        const queue = [] as {guildid:string, queue:string}[];
+        Object.keys(this.data).forEach(id => {
+          queue.push({
+            guildid: id,
+            queue: this.exportQueue(id)
+          });
+        })
+        DatabaseAPI.SetQueueData(queue);
+      }
+      catch(e){};
+    }
   }
 }
