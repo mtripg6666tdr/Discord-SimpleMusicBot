@@ -91,7 +91,7 @@ export class QueueManager extends ManagerBase {
         result.BasicInfo = await new BestdoriS().init(url, gotData as exportableBestdori);
       }else if(HibikiApi.validateURL(url)){
         // Hibiki
-        result.BasicInfo = await new Hibiki().init(gotData.url);
+        result.BasicInfo = await new Hibiki().init(url);
       }
     }
     if(result.BasicInfo){
