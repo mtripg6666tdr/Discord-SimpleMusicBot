@@ -10,6 +10,7 @@
     "@types/ws": "^7.4.5",
     "discord.js": "^12.5.3",
     "dotenv": "^9.0.2",
+    "genius-lyrics": "^4.2.9",
     "html-entities": "^2.3.2",
     "m3u8stream": "^0.8.4",
     "miniget": "^4.2.1",

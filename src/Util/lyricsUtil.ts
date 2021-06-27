@@ -1,3 +1,4 @@
+import Genius from "genius-lyrics";
 import * as https from "https";
 import { decode } from "html-entities";
 import { DefaultAudioThumbnailURL } from "../definition";
@@ -6,7 +7,23 @@ import { DownloadText } from "./util";
 export async function GetLyrics(keyword:string):Promise<songInfo>{
   const data = JSON.parse(await DownloadText("https://customsearch.googleapis.com/customsearch/v1?cx=89ebccacdc32461f2&key=" + process.env.CSE_KEY + "&q=" + encodeURIComponent(keyword))) as CSE_Result;
   const items = data.items?.filter(i => new URL(i.link).pathname.startsWith("/lyric/"));
-  if(items.length === 0 || !items) throw "No results found";
+  if(!items || items.length === 0) {
+    // FallBack to Genius
+    const client = new Genius.Client();
+    try{
+      const song = (await client.songs.search(keyword))[0];
+      return {
+        artist: song.artist.name,
+        artwork: song.image,
+        lyric: await song.lyrics(),
+        title: song.title,
+        url: song.url
+      }
+    }
+    catch(e){
+      throw "No lyric was found and failed to search in fallback way.";
+    }
+  }
   const url = items[0].link;
   var lyric = await DownloadWithoutRuby(url);
   var doc = "";
