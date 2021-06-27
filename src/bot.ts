@@ -34,6 +34,7 @@ export class MusicBot {
   private versionInfo = "Could not get info";
   private cancellations = [] as CancellationPending[];
   private EmbedPageToggle:PageToggle[] = [] as PageToggle[];
+  private isReadyFinished = false;
   get Toggles(){return this.EmbedPageToggle};
   get Client(){return this.client};
 
@@ -50,37 +51,38 @@ export class MusicBot {
       client.voice.connections.forEach(c => c.disconnect());
       log("[Main]Main bot is ready and active now");
 
-      client.user.setActivity({
+      await client.user.setActivity({
         type: "PLAYING",
         name: "起動中..."
-      }).catch(e => log(e, "error"));
+      });
 
       if(DatabaseAPI.CanOperate){
         const queues = await DatabaseAPI.GetQueueData(client.guilds.cache.keyArray());
         const speakingIds = await DatabaseAPI.GetIsSpeaking(client.guilds.cache.keyArray());
         const queueGuildids = Object.keys(queues);
         const speakingGuildids = Object.keys(speakingIds);
-        queueGuildids.forEach(async id => {
+        for(var i=0;i<queueGuildids.length;i++){
+          var id = queueGuildids[i];
           const queue = JSON.parse(queues[id]) as YmxFormat;
           if(speakingGuildids.indexOf(id) >= 0 && queue.version === YmxVersion && speakingIds[id].indexOf(":") >= 0){
             const [vid, cid] = speakingIds[id].split(":");
             this.initData(id, cid);
             try{
-              queue.data.forEach(async q => {
-                await this.data[id].Queue.AutoAddQueue(client, q.url, null, "unknown", false, false, null, null, q);
-              });
+              for(var j=0;j<queue.data.length;j++){
+                await this.data[id].Queue.AutoAddQueue(client, queue.data[j].url, null, "unknown", false, false, null, null, queue.data[j]);
+              }
               this.data[id].Connection = await (await client.channels.fetch(vid) as discord.VoiceChannel).join();
               await this.data[id].Manager.Play();
             }
             catch(e){}
           }
-        });
+        }
       }
 
-      client.user.setActivity({
+      await client.user.setActivity({
         type: "LISTENING",
         name: "音楽"
-      }).catch(e => log(e, "error"));
+      });
 
       const tick = ()=>{
         this.Log();
@@ -89,15 +91,13 @@ export class MusicBot {
         this.BackupData();
       };
       setTimeout(tick, 1 * 60 * 1000);
+      this.isReadyFinished = true;
     });
 
     client.on("message", 
     async message => {
       // botのメッセやdm、およびnewsは無視
-      if(message.author.bot || message.channel.type == "dm" || message.channel.type == "news") return;
-      
-      // データ初期化
-      this.initData(message.guild.id, message.channel.id);
+      if(!this.isReadyFinished || message.author.bot || message.channel.type == "dm" || message.channel.type == "news") return;
       
       // プレフィックス
       const pmatch = message.guild.members.resolve(client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
@@ -116,6 +116,9 @@ export class MusicBot {
         var optiont = msg_spl.length > 1 ? message.content.substring(command.length + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">").length + 1, message.content.length) : "";
         var options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
         
+        // データ初期化
+        this.initData(message.guild.id, message.channel.id);
+
         log("[Main/" + message.guild.id + "]Command Prefix detected: " + message.content);
         
         // 超省略形を捕捉
