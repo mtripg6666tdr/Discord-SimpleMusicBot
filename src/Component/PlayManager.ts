@@ -4,8 +4,7 @@ import { AudioSource, defaultM3u8stream } from "../AudioSource/audiosource";
 import { YouTube } from "../AudioSource/youtube";
 import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { DatabaseAPI } from "../Util/databaseUtil";
-import { CalcMinSec, DownloadAsReadable, log, logStore } from "../Util/util";
+import { CalcMinSec, DownloadAsReadable, isAvailableRawVideoURL, log } from "../Util/util";
 import { ManagerBase } from "./ManagerBase";
 
 /**
@@ -93,11 +92,16 @@ export class PlayManager extends ManagerBase {
       const rawStream = await this.CurrentVideoInfo.fetch();
       var stream:Readable|string = null;
       if(typeof rawStream === "string"){
-        // URLならストリーム化
-        stream = DownloadAsReadable(rawStream);
-        stream.on('error', (e)=> {
-          this.Dispatcher.emit("error", e);
-        });
+        if(isAvailableRawVideoURL(rawStream)){
+          // URLでも動画なら直接渡す
+          stream = rawStream;
+        }else{
+          // ほかならストリーム化
+          stream = DownloadAsReadable(rawStream);
+          stream.on('error', (e)=> {
+            this.Dispatcher.emit("error", e);
+          });
+        }
       }else if((rawStream as defaultM3u8stream).type){
         // M3U8プレイリストならURLを直接play
         stream = (rawStream as defaultM3u8stream).url;

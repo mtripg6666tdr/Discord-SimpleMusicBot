@@ -130,6 +130,11 @@ export function isAvailableRawAudioURL(str:string){
   return exts.filter(ext => str.endsWith(ext)).length > 0;
 }
 
+export function isAvailableRawVideoURL(str:string){
+  const exts = [".mov",".mp4"];
+  return exts.filter(ext => str.endsWith(ext)).length > 0;
+}
+
 /**
  * おそらくDiscord側のAPIの仕様変更により、discord.jsのMessage.suppressEmbeds()が動作しなくなったため代替としてREST APIを叩きます
  * @param msg suppressEmbedsしたいメッセージ
