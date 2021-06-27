@@ -67,6 +67,7 @@ export class MusicBot {
           if(speakingGuildids.indexOf(id) >= 0 && queue.version === YmxVersion && speakingIds[id].indexOf(":") >= 0){
             const [vid, cid] = speakingIds[id].split(":");
             this.initData(id, cid);
+            this.data[id].boundTextChannel = cid;
             try{
               for(var j=0;j<queue.data.length;j++){
                 await this.data[id].Queue.AutoAddQueue(client, queue.data[j].url, null, "unknown", false, false, null, null, queue.data[j]);
@@ -99,6 +100,9 @@ export class MusicBot {
       // botのメッセやdm、およびnewsは無視
       if(!this.isReadyFinished || message.author.bot || message.channel.type == "dm" || message.channel.type == "news") return;
       
+      // データ初期化
+      this.initData(message.guild.id, message.channel.id);
+
       // プレフィックス
       const pmatch = message.guild.members.resolve(client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
       if(pmatch){
@@ -116,9 +120,6 @@ export class MusicBot {
         var optiont = msg_spl.length > 1 ? message.content.substring(command.length + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">").length + 1, message.content.length) : "";
         var options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
         
-        // データ初期化
-        this.initData(message.guild.id, message.channel.id);
-
         log("[Main/" + message.guild.id + "]Command Prefix detected: " + message.content);
         
         // 超省略形を捕捉
