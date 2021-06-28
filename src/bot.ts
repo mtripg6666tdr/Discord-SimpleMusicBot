@@ -75,7 +75,9 @@ export class MusicBot {
               this.data[id].Connection = await (await client.channels.fetch(vid) as discord.VoiceChannel).join();
               await this.data[id].Manager.Play();
             }
-            catch(e){}
+            catch(e){
+              log(e, "warn");
+            }
           }
         }
       }
@@ -1375,7 +1377,9 @@ export class MusicBot {
         })
         DatabaseAPI.SetQueueData(queue);
       }
-      catch(e){};
+      catch(e){
+        log(e, "warn");
+      };
     }
   }
 
