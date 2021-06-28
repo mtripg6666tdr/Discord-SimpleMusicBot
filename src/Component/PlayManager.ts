@@ -209,7 +209,7 @@ export class PlayManager extends ManagerBase {
       }
     }
     catch(e){
-    log(e);
+      log(e);
       if(this.info.boundTextChannel && ch && mes){
         mes.edit(":tired_face:曲の再生に失敗しました...。スキップします。");
         cantPlay();
@@ -227,8 +227,8 @@ export class PlayManager extends ManagerBase {
     log("[PlayManager/" + this.info.GuildID + "]Stop() called");
     if(this.Dispatcher && this.Dispatcher.destroy){
       this.Dispatcher.destroy();
-      this.Dispatcher = null;
     }
+    this.Dispatcher = null;
     return this;
   }
 
