@@ -252,13 +252,6 @@ export class MusicBot {
             }
           }
         }
-        
-        // テキストチャンネルバインド
-        // コマンドが送信されたチャンネルを後で利用します。
-        if(!this.data[message.guild.id].Manager.IsConnecting || (message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)) || message.content.indexOf("join") >= 0){
-          if(message.content !== (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">"))
-          this.data[message.guild.id].boundTextChannel = message.channel.id;
-        }
 
         // コマンドの処理に徹します
         switch(command){
@@ -1261,7 +1254,19 @@ export class MusicBot {
             embed.setColor(getColor("SEARCH"));
             message.channel.send(embed);
           }break;
+
+          default: {
+            return;
+          }break;
         }
+
+        // テキストチャンネルバインド
+        // コマンドが送信されたチャンネルを後で利用します。
+        if(!this.data[message.guild.id].Manager.IsConnecting || (message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)) || message.content.indexOf("join") >= 0){
+          if(message.content !== (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">"))
+          this.data[message.guild.id].boundTextChannel = message.channel.id;
+        }
+
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
         // searchコマンドのキャンセルを捕捉
         if(message.content === "キャンセル" || message.content === "cancel") {
