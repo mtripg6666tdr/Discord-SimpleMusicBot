@@ -76,6 +76,7 @@ export type VideoInfo = {
   url:string;
   title:string;
   duration:string;
+  thumbnail:string;
 };
 
 // This type definition was distributed in https://github.com/fent/node-ytdl-core under MIT License

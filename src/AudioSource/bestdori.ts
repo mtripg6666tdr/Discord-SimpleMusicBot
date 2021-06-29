@@ -21,7 +21,7 @@ export class BestdoriS extends AudioSource {
     const data = bestdori.allsonginfo[this.id];
     this.Title = data.musicTitle[0];
     this.Type = data.tag;
-    this.Thumnail = "https://bestdori.com/assets/jp/musicjacket/musicjacket" + (Math.ceil(this.id / 10) * 10) + "_rip/assets-star-forassetbundle-startapp-musicjacket-musicjacket" + Math.ceil(this.id / 10) * 10 + "-" + data.jacketImage[0] + "-jacket.png";
+    this.Thumnail = BestdoriApi.getThumbnail(this.id, data.jacketImage[0]);
     this.Artist = bestdori.allbandinfo[data.bandId].bandName[0];
     if(prefetched){
       this._lengthSeconds = prefetched.length;
@@ -122,6 +122,10 @@ export abstract class BestdoriApi {
   static async getDetailedInfo(id:number){
     const apiUrl = "https://bestdori.com/api/songs/" + id.toString() + ".json";
     return JSON.parse(await DownloadText(apiUrl)) as BestdoriDetailedSongInfo;
+  }
+
+  static getThumbnail(id:number, jacketimage:string){
+    return "https://bestdori.com/assets/jp/musicjacket/musicjacket" + (Math.ceil(id / 10) * 10) + "_rip/assets-star-forassetbundle-startapp-musicjacket-musicjacket" + Math.ceil(id / 10) * 10 + "-" + jacketimage + "-jacket.png"
   }
 }
 

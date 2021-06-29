@@ -1,30 +1,30 @@
 import * as discord from "discord.js";
 import * as os from "os";
-import Soundcloud from "soundcloud.ts";
 import * as ytpl from "ytpl";
 import * as ytsr from "ytsr";
-import { exec, execSync } from "child_process";
+import Soundcloud from "soundcloud.ts";
 import { bestdori, BestdoriApi } from "./AudioSource/bestdori";
+import { exec, execSync } from "child_process";
 import { exportableCustom } from "./AudioSource/custom";
 import { YouTube } from "./AudioSource/youtube";
+import { PageToggle } from "./Component/PageToggle";
 import { CancellationPending, GuildVoiceInfo, YmxFormat, YmxVersion } from "./definition";
 import { getColor } from "./Util/colorUtil";
-import { GetLyrics } from "./Util/lyricsUtil";
-import { 
-  CalcMinSec, 
-  CalcTime, 
-  DownloadText, 
-  GetMBytes, 
-  GetMemInfo, 
-  GetPercentage, 
-  isAvailableRawAudioURL, 
-  log, 
-  logStore, 
-  NormalizeText, 
-  suppressMessageEmbeds 
-} from "./Util/util";
-import { PageToggle } from "./Component/PageToggle";
 import { DatabaseAPI } from "./Util/databaseUtil";
+import { GetLyrics } from "./Util/lyricsUtil";
+import {
+  CalcMinSec,
+  CalcTime,
+  DownloadText,
+  GetMBytes,
+  GetMemInfo,
+  GetPercentage,
+  isAvailableRawAudioURL,
+  log,
+  logStore,
+  NormalizeText,
+  suppressMessageEmbeds
+} from "./Util/util";
 
 export class MusicBot {
   private client = new discord.Client();
@@ -171,8 +171,8 @@ export class MusicBot {
          */
         const playFromURL = async (first:boolean = true)=>{
           setTimeout(()=>{
-            suppressMessageEmbeds(message, this.client, this.token).catch(e => log(e, "warn"));
-          },2000);
+            suppressMessageEmbeds(message, this.client).catch(e => log(e, "warn"));
+          },4000);
           // Discordメッセへのリンク？
           if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
             const smsg = await message.channel.send("🔍メッセージを取得しています...");
@@ -210,7 +210,7 @@ export class MusicBot {
               const result = await ytpl.default(id, {
                 gl: "JP",
                 hl: "ja",
-                limit: Infinity
+                limit: 999
               });
               var index = 1;
               const cancellation = new CancellationPending();
@@ -227,8 +227,8 @@ export class MusicBot {
                   title: c.title
                 } as exportableCustom);
                 index++;
-                if(index % 10 === 0 || result.estimatedItemCount <= 10){
-                  await msg.edit(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。" + result.estimatedItemCount + "曲中" + index + "曲処理済み。");
+                if(index % 50 === 0 || (result.estimatedItemCount <= 50 && index % 10 === 0) || result.estimatedItemCount <= 10){
+                  await msg.edit(":hourglass_flowing_sand:プレイリスト`" + result.title + "`を処理しています。お待ちください。" + result.estimatedItemCount + "曲中" + index + "曲処理済み。");
                 }
                 if(cancellation.Cancelled){
                   break;
@@ -237,7 +237,12 @@ export class MusicBot {
               if(cancellation.Cancelled){
                 await msg.edit("✅キャンセルされました。");
               }else{
-                await msg.edit("✅" + result.items.length + "曲が追加されました。");
+                const embed = new discord.MessageEmbed();
+                embed.title = "✅プレイリストが処理されました";
+                embed.description = "[" + result.title + "](" + result.url + ") `(" + result.author.name + ")` \r\n" + index + "曲が追加されました";
+                embed.setThumbnail(result.bestThumbnail.url);
+                embed.setColor(getColor("PLAYLIST_COMPLETED"));
+                await msg.edit("", embed);
               }
               this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
               return;
@@ -267,7 +272,8 @@ export class MusicBot {
               // ボイスチャンネル操作
               .setTitle("ボイスチャンネル操作系")
               .addField("参加, join", "ボイスチャンネルに参加します。", true)
-              .addField("切断, 終了, leave, disconnect, dc", "ボイスチャンネルから切断します。", true),
+              .addField("切断, 終了, leave, disconnect, dc", "ボイスチャンネルから切断します。", true)
+              ,
               // プレイヤー制御
               new discord.MessageEmbed()
               .setTitle("音楽プレイヤー制御系")
@@ -280,7 +286,8 @@ export class MusicBot {
               .addField("キューループ, loopqueue, queueloop", "キュー内のループを設定します。", true)
               .addField("ワンスループ, onceloop, looponce", "現在再生中の曲を1度だけループ再生します。", true)
               .addField("シャッフル, shuffle", "キューの内容をシャッフルします。", true)
-              .addField("音量, volume", "音量を調節します。1から200の間で指定します(デフォルト100)。何も引数を付けないと現在の音量を表示します。", true),
+              .addField("音量, volume", "音量を調節します。1から200の間で指定します(デフォルト100)。何も引数を付けないと現在の音量を表示します。", true)
+              ,
               // プレイリスト操作系
               new discord.MessageEmbed()
               .setTitle("プレイリスト操作系")
@@ -296,19 +303,23 @@ export class MusicBot {
               .addField("インポート, import", "指定されたメッセージに添付されたキューからインポートします。exportコマンドで出力されたファイルが添付されたメッセージのURL、あるいはキューの埋め込みのあるメッセージのURLを引数として添付してください。", true)
               .addField("エクスポート, export", "キューの内容をインポートできるようエクスポートします。", true)
               .addField("この曲で終了, end", "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します", true)
-              .addField("study, bgm", "開発者が勝手に作った勉強用・作業用BGMのプレイリストをキューに追加します", true),
+              .addField("study, bgm", "開発者が勝手に作った勉強用・作業用BGMのプレイリストをキューに追加します", true)
+              ,
               // ユーティリティ系
               new discord.MessageEmbed()
               .setTitle("ユーティリティ系")
               .addField("リセット, reset", "サーバーの設定やデータを削除して初期化します。", true)
               .addField("アップタイム, ping, uptime", "ボットのアップタイムおよびping時間(レイテンシ)を表示します。", true)
               .addField("ログ, log, システム情報, systeminfo, sysinfo", "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数を指定して特定の内容のみ取得することもできます。", true)
-              .addField("歌詞, l, lyric, lyrics", "指定された曲の歌詞を検索します。", true),
+              .addField("歌詞, l, lyric, lyrics", "指定された曲の歌詞を検索します。", true)
+              .addField("サムネイル, thumb, thumbnail, t", "サムネイルを表示します。検索結果のオフセットを指定して検索結果のサムネイルを表示することもできます", true)
+              ,
               // 一般ボット操作
               new discord.MessageEmbed()
               .setTitle("ボット操作全般")
               .addField("ヘルプ, help", "ヘルプを表示します。", true)
-              .addField("command, commands, cmd", "コマンド一覧を表示します", true),
+              .addField("command, commands, cmd", "コマンド一覧を表示します", true)
+              ,
             );
             for(var i = 0; i < embed.length; i++){
               embed[i].setTitle("コマンド一覧(" + embed[i].title + ")");
@@ -401,7 +412,8 @@ export class MusicBot {
                     this.data[message.guild.id].SearchPanel.Opts[index] = {
                       url: video.url,
                       title: video.title,
-                      duration: video.duration
+                      duration: video.duration,
+                      thumbnail: video.bestThumbnail.url
                     };
                     index++;
                   }
@@ -552,6 +564,10 @@ export class MusicBot {
           case "queue":{
             const msg = await message.channel.send(":eyes: キューを確認しています。お待ちください...");
             const queue = this.data[message.guild.id].Queue;
+            if(queue.length === 0){
+              msg.edit(":face_with_raised_eyebrow:キューは空です。").catch(e => log(e, "error"));
+              return;
+            }
             // 合計所要時間の計算
             var totalLength = queue.LengthSeconds;
             var _page = optiont === "" ? 1 : Number(optiont);
@@ -1024,7 +1040,8 @@ export class MusicBot {
                   this.data[message.guild.id].SearchPanel.Opts[index] = {
                     url: BestdoriApi.getAudioPage(Number(result[i])),
                     title: bestdori.allsonginfo[Number(result[i])].musicTitle[0],
-                    duration: "0"
+                    duration: "0",
+                    thumbnail: BestdoriApi.getThumbnail(Number(result[i]), bestdori.allsonginfo[Number(result[i])].jacketImage[0])
                   };
                   index++;
                   if(index>=21){
@@ -1098,7 +1115,8 @@ export class MusicBot {
                   this.data[message.guild.id].SearchPanel.Opts[index] = {
                     url: result[i].permalink_url,
                     title: result[i].title,
-                    duration: result[i].full_duration.toString()
+                    duration: result[i].full_duration.toString(),
+                    thumbnail: result[i].artwork_url
                   };
                   index++;
                 }
@@ -1257,6 +1275,29 @@ export class MusicBot {
             message.channel.send(embed);
           }break;
 
+          case "サムネイル":
+          case "thumb":
+          case "thumbnail":
+          case "t":{
+            const embed = new discord.MessageEmbed();
+            embed.setColor(getColor("THUMB"));
+            if(optiont && this.data[message.guild.id].SearchPanel && Object.keys(this.data[message.guild.id].SearchPanel.Opts).indexOf(optiont) >= 0){
+              const opt = this.data[message.guild.id].SearchPanel.Opts[Number(NormalizeText(optiont))];
+              embed.setImage(opt.thumbnail);
+              embed.title = opt.title;
+              embed.description = "URL: " + opt.url;
+            }else if(!optiont && this.data[message.guild.id].Manager.IsPlaying && this.data[message.guild.id].Queue.default.length >= 1){
+              const info = this.data[message.guild.id].Queue.default[0].BasicInfo;
+              embed.setImage(info.Thumnail);
+              embed.title = info.Title;
+              embed.description = "URL: " + info.Url;
+            }else{
+              message.channel.send("✘検索結果が見つかりません").catch(e => log(e, "error"));
+              return;
+            }
+            message.channel.send(embed).catch(e => log(e, "error"));
+          }break;
+
           default: {
             return;
           }break;
@@ -1273,6 +1314,7 @@ export class MusicBot {
         // searchコマンドのキャンセルを捕捉
         if(message.content === "キャンセル" || message.content === "cancel") {
           const msgId = this.data[message.guild.id].SearchPanel.Msg;
+          if(msgId.userId !== message.author.id) return;
           this.data[message.guild.id].SearchPanel = null;
           await message.channel.send("✅キャンセルしました");
           try{

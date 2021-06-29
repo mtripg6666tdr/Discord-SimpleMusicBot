@@ -1,7 +1,7 @@
 import * as os from "os";
 import * as https from "https";
 import * as miniget from "miniget";
-import { Client, Message } from "discord.js";
+import { APIMessage, Client, Message, MessageFlags } from "discord.js";
 import { PassThrough, Readable } from "stream";
 export { log, logStore } from "./logUtil";
 
@@ -142,35 +142,18 @@ export function isAvailableRawVideoURL(str:string){
  * @param token ボットのトークン
  * @returns supressEmbedsされたメッセージ
  */
-export function suppressMessageEmbeds(msg:Message, client:Client, token:string):Promise<Message>{
-  return new Promise((resolve, reject)=>{
-    const req = https.request({
-      protocol: "https:",
-      host: "discord.com",
-      path: "/api/channels/" + msg.channel.id + "/messages/" + msg.id,
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": "Discord Bot",
-        "Authorization": "Bot " + token
-      }
-    }, (res) => {
-      var data = "";
-      res.on("data", (chunk)=> data += chunk);
-      res.on("end", ()=>{
-        if(res.statusCode === 200){
-          resolve(new Message(client, JSON.parse(data), msg.channel));
-        }else{
-          reject();
-        }
-      });
-      res.on("error", reject);
+export function suppressMessageEmbeds(msg:Message, client:Client):Promise<Message>{
+    const flags = new MessageFlags(msg.flags);
+    flags.add(MessageFlags.FLAGS.SUPPRESS_EMBEDS);
+    const {data}:any = APIMessage.create(msg as any, {flags} as any).resolveData();
+    data.embed = undefined;
+    data.embeds = undefined;
+    // @ts-ignore
+    return client.api.channels[msg.channel.id].messages[msg.id].patch({data}).then(d => {
+      const clone = (msg as any)._clone();
+      clone._patch(d);
+      return clone as Message;
     });
-    req.end(JSON.stringify({
-      // SUPPRESS_EMBEDS
-      flags: 1<<2
-    }));
-  });
 }
 
 /**

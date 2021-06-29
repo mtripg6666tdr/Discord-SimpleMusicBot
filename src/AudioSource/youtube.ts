@@ -174,7 +174,8 @@ function execAsync(command:string):Promise<string>{
       });
     }
     catch(e){
-      reject(e);
+      log(e, "error");
+      reject("Main library threw an error and fallback library also threw an error");
     }
   });
 }

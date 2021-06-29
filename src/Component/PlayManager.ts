@@ -16,6 +16,8 @@ export class PlayManager extends ManagerBase {
   private vol:number = 100;
   private startTime = 0;
   private pausedSince = 0;
+  errorCount = 0;
+  errorUrl = "";
   get CurrentVideoUrl():string{
     if(this.CurrentVideoInfo) return this.CurrentVideoInfo.Url;
     return "";
@@ -35,17 +37,19 @@ export class PlayManager extends ManagerBase {
   }
   // 現在ストリーミングした時間
   get CurrentTime():number{
-    return this.Dispatcher?.streamTime;
+    return (this.Dispatcher && this.Dispatcher.streamTime) ? this.Dispatcher.streamTime : 0;
   }
   // 音量取得
   get volume():number{
-    return this.Dispatcher?.volume * 100;
+    return ((this.Dispatcher && this.Dispatcher.volume) ? this.Dispatcher.volume : 1) * 100;
   }
   set volume(newval:number){
     this.vol = newval;
-    if(this.Dispatcher) this.Dispatcher.setVolume(newval / 100);
+    if(this.Dispatcher && this.Dispatcher.setVolume) this.Dispatcher.setVolume(newval / 100);
   }
-  get Client(){return this.client};
+  get Client(){
+    return this.client
+  };
   // コンストラクタ
   constructor(private client:Client){
     super();
@@ -79,8 +83,16 @@ export class PlayManager extends ManagerBase {
       log("[PlayManager:" + this.info.GuildID + "]Play() failed", "warn");
       if(this.info.Queue.LoopEnabled) this.info.Queue.LoopEnabled = false;
       if(this.info.Queue.length === 1 && this.info.Queue.QueueLoopEnabled) this.info.Queue.QueueLoopEnabled = false;
+      if(this.errorUrl == this.CurrentVideoInfo.Url){
+        this.errorCount++;
+        this.errorUrl = this.CurrentVideoInfo.Url;
+      }else{
+        this.errorCount = 1;
+      }
       this.Stop();
-      this.info.Queue.Next();
+      if(this.errorCount > 3){
+        this.info.Queue.Next();
+      }
       this.Play();
     };
     try{
@@ -137,6 +149,8 @@ export class PlayManager extends ManagerBase {
           // 再生が終わったら
           this.Dispatcher.destroy();
           this.Dispatcher = null;
+          this.errorCount = 0;
+          this.errorUrl = "";
           // 曲ループオン？
           if(this.info.Queue.LoopEnabled){
             this.Play();
@@ -172,7 +186,7 @@ export class PlayManager extends ManagerBase {
         if(this.info.boundTextChannel){
           this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
             log("[PlayManager/" + this.info.GuildID + "]Some error occurred in StreamDispatcher", "error");
-            (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? (e.message ?? e) : "undefined") + ")スキップします。").catch(e => log(e, "error"));
+            (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? (e.message ?? e) : "undefined") + ")" + (this.errorCount >= 3 ? "スキップします。" : "再試行します。")).catch(e => log(e, "error"));
           }).catch(e => log(e, "error"));
         }
         cantPlay();
@@ -186,7 +200,7 @@ export class PlayManager extends ManagerBase {
           title: ":cd:現在再生中:musical_note:",
           description: "[" + this.CurrentVideoInfo.Title + "](" + this.CurrentVideoUrl + ") `" + ((this.CurrentVideoInfo.ServiceIdentifer === "youtube" && (this.CurrentVideoInfo as YouTube).LiveStream) ? "(ライブストリーム)" : _t === 0 ? "(不明)" : (min + ":" + sec)) + "`"
         });
-        embed.setColor(getColor("NP"));
+        embed.setColor(getColor("AUTO_NP"));
         embed.addField("リクエスト", this.info.Queue.default[0].AdditionalInfo.AddedBy.displayName, true);
         embed.addField("次の曲", 
         // トラックループオンなら現在の曲
@@ -211,7 +225,7 @@ export class PlayManager extends ManagerBase {
     catch(e){
       log(e);
       if(this.info.boundTextChannel && ch && mes){
-        mes.edit(":tired_face:曲の再生に失敗しました...。スキップします。");
+        mes.edit(":tired_face:曲の再生に失敗しました...。" + (this.errorCount >= 3 ? "スキップします。" : "再試行します。"));
         cantPlay();
       }
     }

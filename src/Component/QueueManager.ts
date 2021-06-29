@@ -162,9 +162,9 @@ export class QueueManager extends ManagerBase {
         embed.addField("リクエスト", addedBy?.displayName ?? "不明", true);
         const index = first ? "0" : (this.info.Queue.length - 1).toString();
         embed.addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true);
-        embed.thumbnail = {
-          url: info.BasicInfo.Thumnail
-        };
+        const [emin, esec] = CalcMinSec(this.LengthSeconds - _t - this.info.Manager.CurrentTime);
+        embed.addField("再生されるまでの予想時間", index === "0" ? "-" : (emin + ":" + esec));
+        embed.setThumbnail(info.BasicInfo.Thumnail);
         if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
@@ -184,6 +184,8 @@ export class QueueManager extends ManagerBase {
     log("[QueueManager/" + this.info.GuildID + "]Next() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this.OnceLoopEnabled = false;
+    this.info.Manager.errorCount = 0;
+    this.info.Manager.errorUrl = "";
     if(this.QueueLoopEnabled){
       this.default.push(this.default[0]);
     }
