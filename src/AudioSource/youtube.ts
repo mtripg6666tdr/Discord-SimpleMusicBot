@@ -122,7 +122,7 @@ export class YouTube extends AudioSource {
       this.Dislike = -1;
     }else{
       try{
-        const agent = HttpsProxyAgent.default(process.env.PROXY);
+        const agent = process.env.PROXY && HttpsProxyAgent.default(process.env.PROXY);
         let info = null as ytdl.videoInfo;
         if(process.env.PROXY){
           info = await ytdl.getInfo(url, {
