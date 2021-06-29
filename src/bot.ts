@@ -260,12 +260,22 @@ export class MusicBot {
           }
         }
 
+        const updateBoundChannel = ()=>{
+          // テキストチャンネルバインド
+          // コマンドが送信されたチャンネルを後で利用します。
+          if(!this.data[message.guild.id].Manager.IsConnecting || (message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)) || message.content.indexOf("join") >= 0){
+            if(message.content !== (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">"))
+            this.data[message.guild.id].boundTextChannel = message.channel.id;
+          }
+        }
+
         // コマンドの処理に徹します
         switch(command){
           case "コマンド":
           case "commands":
           case "command":
           case "cmd":{
+            updateBoundChannel();
             const embed = [] as discord.MessageEmbed[];
             embed.push(
               new discord.MessageEmbed()
@@ -333,6 +343,7 @@ export class MusicBot {
           
           case "ヘルプ":
           case "help":{
+            updateBoundChannel();
             const embed = new discord.MessageEmbed();
             embed.title = client.user.username + ":notes:";
             embed.description = "高音質な音楽を再生して、Discordでのエクスペリエンスを最高にするため作られました:robot:\r\n"
@@ -360,6 +371,7 @@ export class MusicBot {
           case "接続":
           case "connect":
           case "join":{
+            updateBoundChannel();
             if(message.member.voice.channel && message.member.voice.channel.members.has(client.user.id) && this.data[message.guild.id].Connection){
               message.channel.send("✘すでにボイスチャンネルに接続中です。").catch(e => log(e, "error"));
             }else{
@@ -370,6 +382,7 @@ export class MusicBot {
           case "検索":
           case "search":
           case "se":{
+            updateBoundChannel();
             join();
             if(optiont.startsWith("http://") || optiont.startsWith("https://")){
               options.forEach(async u => {
@@ -442,6 +455,7 @@ export class MusicBot {
           case "再生":
           case "p":
           case "play":{
+            updateBoundChannel();
             // 一時停止されてるね
             if(this.data[message.guild.id].Manager.IsPaused){
               this.data[message.guild.id].Manager.Resume();
@@ -496,6 +510,7 @@ export class MusicBot {
           case "停止":
           case "stop":
           case "pause":{
+            updateBoundChannel();
             // そもそも再生状態じゃないよ...
             if(!this.data[message.guild.id].Manager.IsPlaying || this.data[message.guild.id].Manager.IsPaused){
               message.channel.send("再生中ではありません").catch(e => log(e, "error"));
@@ -510,6 +525,7 @@ export class MusicBot {
           case "leave":
           case "disconnect":
           case "dc":{
+            updateBoundChannel();
             // そもそも再生状態じゃないよ...
             if(!this.data[message.guild.id].Manager.IsConnecting){
               message.channel.send("再生中ではありません").catch(e => log(e, "error"));
@@ -524,6 +540,7 @@ export class MusicBot {
           case "今の曲":
           case "np":
           case "nowplaying":{
+            updateBoundChannel();
             // そもそも再生状態じゃないよ...
             if(!this.data[message.guild.id].Manager.IsPlaying){
               message.channel.send("再生中ではありません").catch(e => log(e, "error"));
@@ -562,6 +579,7 @@ export class MusicBot {
           case "再生待ち":
           case "q":
           case "queue":{
+            updateBoundChannel();
             const msg = await message.channel.send(":eyes: キューを確認しています。お待ちください...");
             const queue = this.data[message.guild.id].Queue;
             if(queue.length === 0){
@@ -624,6 +642,7 @@ export class MusicBot {
           
           case "リセット":
           case "reset":{
+            updateBoundChannel();
             // VC接続中なら切断
             if(this.data[message.guild.id].Manager.IsConnecting){
               this.data[message.guild.id].Manager.Disconnect();
@@ -638,6 +657,7 @@ export class MusicBot {
           case "スキップ":
           case "s":
           case "skip":{
+            updateBoundChannel();
             // そもそも再生状態じゃないよ...
             if(!this.data[message.guild.id].Manager.IsPlaying){
               message.channel.send("再生中ではありません").catch(e => log(e, "error"));
@@ -652,6 +672,7 @@ export class MusicBot {
           
           case "ループ":
           case "loop":{
+            updateBoundChannel();
             if(this.data[message.guild.id].Queue.LoopEnabled){
               this.data[message.guild.id].Queue.LoopEnabled = false;
               message.channel.send(":repeat_one:トラックリピートを無効にしました:x:").catch(e => log(e, "error"));
@@ -664,6 +685,7 @@ export class MusicBot {
           case "キューループ":
           case "queueloop":
           case "loopqueue":{
+            updateBoundChannel();
             if(this.data[message.guild.id].Queue.QueueLoopEnabled){
               this.data[message.guild.id].Queue.QueueLoopEnabled = false;
               message.channel.send(":repeat:キューリピートを無効にしました:x:").catch(e => log(e, "error"));
@@ -676,6 +698,7 @@ export class MusicBot {
           case "削除":
           case "rm":
           case "remove":{
+            updateBoundChannel();
             if(options.length == 0){
               message.channel.send("引数に消去する曲のオフセット(番号)を入力してください。例えば、2番目と5番目の曲を削除したい場合、`" + this.data[message.guild.id].PersistentPref.Prefix + command + " 2 5`と入力します。").catch(e => log(e, "error"));
               return;
@@ -735,6 +758,7 @@ export class MusicBot {
           case "rmall":
           case "allrm":
           case "removeall":{
+            updateBoundChannel();
             if(!message.member.voice.channel || (message.member.voice.channel && !message.member.voice.channel.members.has(client.user.id))){
               if(!message.member.hasPermission("MANAGE_GUILD") && !message.member.hasPermission("MANAGE_CHANNELS")){
                 message.channel.send("この操作を実行する権限がありません。").catch(e => log(e, "error"));
@@ -751,6 +775,7 @@ export class MusicBot {
           case "top":
           case "replay":
           case "gotop":{
+            updateBoundChannel();
             if(!this.data[message.guild.id].Manager.IsPlaying){
               message.channel.send("再生中ではありません").catch(e => log(e, "error"));
               return;
@@ -762,6 +787,7 @@ export class MusicBot {
           case "アップタイム":
           case "ping":
           case "uptime":{
+            updateBoundChannel();
             const now = new Date();
             const insta = CalcTime(now.getTime() - this.instantiatedTime.getTime());
             const ready = CalcTime(now.getTime() - this.client.readyAt.getTime());
@@ -781,6 +807,7 @@ export class MusicBot {
           case "info":
           case "システム情報":
           case "log":{
+            updateBoundChannel();
             // Run default logger
             this.Log();
 
@@ -844,6 +871,7 @@ export class MusicBot {
           case "移動":
           case "mv":
           case "move":{
+            updateBoundChannel();
             if(options.length !== 2){
               message.channel.send("✘引数は`移動したい曲の元のオフセット(番号) 移動先のオフセット(番号)`のように指定します。\r\n例えば、5番目の曲を2番目に移動したい場合は`" + this.data[message.guild.id].PersistentPref.Prefix + command + " 5 2`と入力します。").catch(e => log(e, "error"));
               return;
@@ -872,6 +900,7 @@ export class MusicBot {
           
           case "インポート":
           case "import":{
+            updateBoundChannel();
             if(optiont === ""){
               message.channel.send("❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(e => log(e, "error"));
               return;
@@ -953,6 +982,7 @@ export class MusicBot {
 
           case "シャッフル":
           case "shuffle":{
+            updateBoundChannel();
             if(this.data[message.guild.id].Queue.length === 0){
               message.channel.send("キューが空です。").catch(e => log(e, "error"));
               return;
@@ -963,6 +993,7 @@ export class MusicBot {
 
           case "エクスポート":
           case "export":{
+            updateBoundChannel();
             if(this.data[message.guild.id].Queue.length === 0){
               message.channel.send("キューが空です。").catch(e => log(e, "error"));
               return;
@@ -975,6 +1006,7 @@ export class MusicBot {
 
           case "この曲で終了":
           case "end":{
+            updateBoundChannel();
             if(!this.data[message.guild.id].Manager.IsPlaying){
               message.channel.send("再生中ではありません").catch(e => log(e, "error"));
               return;
@@ -992,6 +1024,7 @@ export class MusicBot {
           case "looponce":
           case "oncerepeat":
           case "repeatonce":{
+            updateBoundChannel();
             if(this.data[message.guild.id].Queue.OnceLoopEnabled){
               this.data[message.guild.id].Queue.OnceLoopEnabled = false;
               message.channel.send(":repeat_one:ワンスループを無効にしました:x:").catch(e => log(e, "error"));
@@ -1004,6 +1037,7 @@ export class MusicBot {
           case "searchb":
           case "sb":
           case "seb":{
+            updateBoundChannel();
             join()
             if(this.data[message.guild.id].SearchPanel !== null){
               message.channel.send("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
@@ -1072,6 +1106,7 @@ export class MusicBot {
 
           case "study":
           case "bgm":{
+            updateBoundChannel();
             if(!(await join())) return;
             optiont = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
             await playFromURL(!this.data[message.guild.id].Manager.IsConnecting);
@@ -1083,6 +1118,7 @@ export class MusicBot {
           case "searchs":
           case "ss":
           case "ses":{
+            updateBoundChannel();
             join()
             if(this.data[message.guild.id].SearchPanel !== null){
               message.channel.send("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
@@ -1144,6 +1180,7 @@ export class MusicBot {
 
           case "leaveclean":
           case "lc":{
+            updateBoundChannel();
             if(!this.data[message.guild.id].Manager.IsConnecting){
               this.data[message.guild.id].Queue.RemoveAll();
               message.channel.send("✅すべて削除しました").catch(e => log(e, "error"));
@@ -1161,6 +1198,7 @@ export class MusicBot {
           case "l":
           case "lyric":
           case "lyrics":{
+            updateBoundChannel();
             if(!process.env.CSE_KEY) return;
             const msg = await message.channel.send("🔍検索中...");
             try{
@@ -1188,6 +1226,7 @@ export class MusicBot {
 
           case "音量":
           case "volume":{
+            updateBoundChannel();
             if(!this.data[message.guild.id].Manager.IsPlaying){
               message.channel.send("なにも再生していません").catch(e => log(e, "error"));
               return;
@@ -1206,6 +1245,7 @@ export class MusicBot {
           }break;
 
           case "reboot":{
+            updateBoundChannel();
             if(message.author.id === "593758391395155978"){
               if(optiont === ""){
                 message.channel.send("再起動を実行します...お待ちください...");
@@ -1233,6 +1273,7 @@ export class MusicBot {
           case "mltf":
           case "mlf":
           case "m1":{
+            updateBoundChannel();
             if(this.data[message.guild.id].Queue.length <= 2){
               message.channel.send("キューに3曲以上追加されているときに使用できます。").catch(e=>log(e, "error"));
               return;
@@ -1247,6 +1288,7 @@ export class MusicBot {
           case "searchq":
           case "seq":
           case "sq":{
+            updateBoundChannel();
             if(this.data[message.guild.id].Queue.length === 0){
               message.channel.send("✘キューが空です").catch(e => log(e, "error"));
               return;
@@ -1279,6 +1321,7 @@ export class MusicBot {
           case "thumb":
           case "thumbnail":
           case "t":{
+            updateBoundChannel();
             const embed = new discord.MessageEmbed();
             embed.setColor(getColor("THUMB"));
             if(optiont && this.data[message.guild.id].SearchPanel && Object.keys(this.data[message.guild.id].SearchPanel.Opts).indexOf(optiont) >= 0){
@@ -1297,17 +1340,6 @@ export class MusicBot {
             }
             message.channel.send(embed).catch(e => log(e, "error"));
           }break;
-
-          default: {
-            return;
-          }break;
-        }
-
-        // テキストチャンネルバインド
-        // コマンドが送信されたチャンネルを後で利用します。
-        if(!this.data[message.guild.id].Manager.IsConnecting || (message.member.voice.channel && message.member.voice.channel.members.has(client.user.id)) || message.content.indexOf("join") >= 0){
-          if(message.content !== (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">"))
-          this.data[message.guild.id].boundTextChannel = message.channel.id;
         }
 
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
