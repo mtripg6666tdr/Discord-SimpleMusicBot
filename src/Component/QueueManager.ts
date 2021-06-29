@@ -162,7 +162,7 @@ export class QueueManager extends ManagerBase {
         embed.addField("リクエスト", addedBy?.displayName ?? "不明", true);
         const index = first ? "0" : (this.info.Queue.length - 1).toString();
         embed.addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true);
-        const [emin, esec] = CalcMinSec(this.LengthSeconds - _t - this.info.Manager.CurrentTime);
+        const [emin, esec] = CalcMinSec(this.LengthSeconds - _t - this.info.Manager.CurrentTime / 1000);
         embed.addField("再生されるまでの予想時間", index === "0" ? "-" : (emin + ":" + esec));
         embed.setThumbnail(info.BasicInfo.Thumnail);
         if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).IsFallbacked){
