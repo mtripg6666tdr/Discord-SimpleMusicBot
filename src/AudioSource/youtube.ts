@@ -127,7 +127,7 @@ export class YouTube extends AudioSource {
         if(process.env.PROXY){
           info = await ytdl.getInfo(url, {
             lang: "ja",
-            requestOptions: agent
+            requestOptions: {agent}
           });
         }else{
           info = await ytdl.getInfo(url, {
