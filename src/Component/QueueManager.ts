@@ -199,7 +199,9 @@ export class QueueManager extends ManagerBase {
       if(this.info.AddRelative && this.info.Manager.CurrentVideoInfo.ServiceIdentifer === "youtube"){
         const relatedVideos = (this.info.Manager.CurrentVideoInfo as YouTube).relatedVideos;
         if(relatedVideos.length >= 1){
-          await this.info.Queue.AddQueue(relatedVideos[0].url, null, "push", "youtube", relatedVideos[0]);
+          const random = Math.random();
+          const video = relatedVideos[(relatedVideos.length < 2 ? 0 : relatedVideos.length < 3 ? (random >= 0.5 ? 0 : 1) : (random >= 0.33 ? 0 : random >= 0.66 ? 1 : 2))];
+          await this.info.Queue.AddQueue(video.url, null, "push", "youtube", video);
         }
       }
     }
