@@ -9,6 +9,7 @@ import { AudioSource, defaultM3u8stream } from "./audiosource";
 import { PassThrough, Readable } from "stream";
 
 export class YouTube extends AudioSource {
+  // サービス識別子（固定）
   protected _serviceIdentifer = "youtube";
   protected _lengthSeconds = 0;
   private fallback = false;
@@ -19,94 +20,12 @@ export class YouTube extends AudioSource {
   Dislike:number;
   Thumnail:string;
   LiveStream:boolean;
+  relatedVideos:exportableYouTube[] = [];
   get IsFallbacked(){
     return this.fallback;
   }
   get IsCached(){
     return Boolean(this.ytdlInfo || this.youtubeDlInfo);
-  }
-
-  toField(verbose:boolean = false){
-    const fields = [] as EmbedField[];
-    fields.push({
-      name: ":cinema:チャンネル名",
-      value: this.ChannelName,
-      inline: false
-    }, {
-      name: ":asterisk:概要",
-      value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, (verbose ? 1000 : 300)) + "..." : this.Description,
-      inline: false
-    });
-    if(this.Like !== -1){
-      fields.push({
-        name: "⭐評価",
-        value: ":+1:" + this.Like + "/:-1:" + this.Dislike,
-        inline: false
-      });
-    }
-    return fields;
-  }
-
-  async fetch(){
-    try{
-      let info = this.ytdlInfo;
-      let agent = process.env.PROXY && HttpsProxyAgent.default(process.env.PROXY);
-      if(!info){
-        if(process.env.PROXY){
-          info = await ytdl.getInfo(this.Url, {
-            requestOptions: {agent},
-            lang: "ja"
-          });
-        }else{
-          info = await ytdl.getInfo(this.Url);
-        }
-      }
-      const format = ytdl.chooseFormat(info.formats, {
-        filter: this.LiveStream ? null : "audioonly",
-        quality: this.LiveStream ? null : "highestaudio",
-        isHLS: this.LiveStream
-      } as any);
-      let readable = null as Readable;
-      if(process.env.PROXY){
-        readable = ytdl.downloadFromInfo(info, {
-          format: format,
-          requestOptions: {agent},
-          lang: "ja"
-        });
-      }else{
-        readable = ytdl.downloadFromInfo(info, {
-          format: format
-        });
-      }
-      this.fallback = false;
-      return readable;
-    }
-    catch{
-      this.fallback = true;
-      log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
-      const info = this.youtubeDlInfo ?? JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
-      if(info.is_live){
-        var format = info.formats.filter(f => f.format_id === info.format_id);
-        const stream = new PassThrough({
-          highWaterMark: 1024 * 512
-        });
-        stream._destroy = () => { stream.destroyed = true };
-          const req = m3u8stream(format[0].url, {
-          begin: Date.now(),
-          parser: "m3u8"
-        });
-        req.on("error", (e)=>{
-          stream.emit("error",e);
-        }).pipe(stream).on('error', (e)=> {
-          stream.emit("error",e);
-        });
-        return stream;
-      }else{
-        var format = info.formats.filter(f => f.format_note==="tiny");
-        format.sort((fa, fb) => fb.abr - fa.tbr);
-        return format[0].url;
-      }
-    }
   }
 
   async init(url:string, prefetched:exportableYouTube, forceCache?:boolean){
@@ -165,6 +84,102 @@ export class YouTube extends AudioSource {
       }
     }
     return this;
+  }
+
+  async fetch(){
+    try{
+      let info = this.ytdlInfo;
+      let agent = process.env.PROXY && HttpsProxyAgent.default(process.env.PROXY);
+      if(!info){
+        if(process.env.PROXY){
+          info = await ytdl.getInfo(this.Url, {
+            requestOptions: {agent},
+            lang: "ja"
+          });
+        }else{
+          info = await ytdl.getInfo(this.Url);
+        }
+      }
+      this.relatedVideos = info.related_videos.map(video => {
+        return {
+          url: "https://www.youtube.com/watch?v=" + video.id,
+          title: video.title,
+          description: "関連動画として取得したため詳細は表示されません",
+          length: video.length_seconds,
+          channel: (video.author as ytdl.Author).name,
+          thumbnail: video.thumbnails[0].url,
+          isLive: video.isLive
+        }
+      }).filter(v => !v.isLive);
+      this.Description = info.videoDetails.description;
+      const format = ytdl.chooseFormat(info.formats, {
+        filter: this.LiveStream ? null : "audioonly",
+        quality: this.LiveStream ? null : "highestaudio",
+        isHLS: this.LiveStream
+      } as any);
+      let readable = null as Readable;
+      if(process.env.PROXY){
+        readable = ytdl.downloadFromInfo(info, {
+          format: format,
+          requestOptions: {agent},
+          lang: "ja"
+        });
+      }else{
+        readable = ytdl.downloadFromInfo(info, {
+          format: format
+        });
+      }
+      this.fallback = false;
+      return readable;
+    }
+    catch{
+      this.fallback = true;
+      log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
+      const info = this.youtubeDlInfo ?? JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
+      this.Description = info.description;
+      if(info.is_live){
+        var format = info.formats.filter(f => f.format_id === info.format_id);
+        const stream = new PassThrough({
+          highWaterMark: 1024 * 512
+        });
+        stream._destroy = () => { stream.destroyed = true };
+          const req = m3u8stream(format[0].url, {
+          begin: Date.now(),
+          parser: "m3u8"
+        });
+        req.on("error", (e)=>{
+          stream.emit("error",e);
+        }).pipe(stream).on('error', (e)=> {
+          stream.emit("error",e);
+        });
+        return stream;
+      }else{
+        var format = info.formats.filter(f => f.format_note==="tiny");
+        format.sort((fa, fb) => fb.abr - fa.tbr);
+        return format[0].url;
+      }
+    }
+  }
+
+  toField(verbose:boolean = false){
+    const fields = [] as EmbedField[];
+    fields.push({
+      name: ":cinema:チャンネル名",
+      value: this.ChannelName,
+      inline: false
+    }, {
+      name: ":asterisk:概要",
+      value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, (verbose ? 1000 : 300)) + "..." : this.Description,
+      inline: false
+    });
+    if(this.Like !== -1){
+      fields.push({
+        name: "⭐評価",
+        value: ":+1:" + this.Like + "/:-1:" + this.Dislike,
+        inline: false
+      });
+    }
+    return fields;
   }
 
   npAdditional(){

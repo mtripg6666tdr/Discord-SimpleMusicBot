@@ -30,7 +30,6 @@ export class MusicBot {
   private client = new discord.Client();
   private data:{[key:string]:GuildVoiceInfo} = {};
   private instantiatedTime = null as Date;
-  private token = "";
   private versionInfo = "Could not get info";
   private cancellations = [] as CancellationPending[];
   private EmbedPageToggle:PageToggle[] = [] as PageToggle[];
@@ -65,9 +64,14 @@ export class MusicBot {
           var id = queueGuildids[i];
           const queue = JSON.parse(queues[id]) as YmxFormat;
           if(speakingGuildids.indexOf(id) >= 0 && queue.version === YmxVersion && speakingIds[id].indexOf(":") >= 0){
-            const [vid, cid] = speakingIds[id].split(":");
+            //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
+            const [vid, cid, ..._bs] = speakingIds[id].split(":");
+            const [loop, qloop, related] = _bs.map(b => b === "1");
             this.initData(id, cid);
             this.data[id].boundTextChannel = cid;
+            this.data[id].Queue.LoopEnabled = loop;
+            this.data[id].Queue.QueueLoopEnabled = qloop;
+            this.data[id].AddRelative = related;
             try{
               for(var j=0;j<queue.data.length;j++){
                 await this.data[id].Queue.AutoAddQueue(client, queue.data[j].url, null, "unknown", false, false, null, null, queue.data[j]);
@@ -297,6 +301,7 @@ export class MusicBot {
               .addField("ワンスループ, onceloop, looponce", "現在再生中の曲を1度だけループ再生します。", true)
               .addField("シャッフル, shuffle", "キューの内容をシャッフルします。", true)
               .addField("音量, volume", "音量を調節します。1から200の間で指定します(デフォルト100)。何も引数を付けないと現在の音量を表示します。", true)
+              .addField("関連動画, 関連曲, おすすめ, オススメ, related, relatedsong, r, recommend", "YouTubeから楽曲を再生終了時に、関連曲をキューに自動で追加する機能です", true)
               ,
               // プレイリスト操作系
               new discord.MessageEmbed()
@@ -665,7 +670,7 @@ export class MusicBot {
             }
             const title = this.data[message.guild.id].Queue.default[0].BasicInfo.Title;
             this.data[message.guild.id].Manager.Stop();
-            this.data[message.guild.id].Queue.Next();
+            await this.data[message.guild.id].Queue.Next();
             this.data[message.guild.id].Manager.Play();
             message.channel.send(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => log(e, "error"));
           }break;
@@ -1340,6 +1345,28 @@ export class MusicBot {
             }
             message.channel.send(embed).catch(e => log(e, "error"));
           }break;
+
+          case "関連動画":
+          case "関連曲":
+          case "おすすめ":
+          case "オススメ":
+          case "related":
+          case "relatedsong":
+          case "r":
+          case "recommend":{
+            updateBoundChannel();
+            if(this.data[message.guild.id].AddRelative){
+              this.data[message.guild.id].AddRelative = false;
+              message.channel.send("❌関連曲自動再生をオフにしました").catch(e => log(e, "error"));
+            }else{
+              this.data[message.guild.id].AddRelative = true;
+              const embed = new discord.MessageEmbed()
+                .setTitle("⭕関連曲自動再生をオンにしました")
+                .setDescription("YouTubeからの楽曲再生終了時に、関連曲をキューの末尾に自動追加する機能です。\r\n※YouTube以外のソースからの再生時、ループ有効時には追加されません")
+                .setColor(getColor("RELATIVE_SETUP"))
+              message.channel.send("", embed);
+            }
+          }break;
         }
 
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
@@ -1416,7 +1443,6 @@ export class MusicBot {
    */
   Run(token:string, debugLog:boolean = false, debugLogStoreLength?:number){
     this.client.login(token).catch(e => log(e, "error"));
-    this.token = token;
     logStore.log = debugLog;
     if(debugLogStoreLength) logStore.maxLength = debugLogStoreLength;
   }
@@ -1464,7 +1490,9 @@ export class MusicBot {
       Object.keys(this.data).forEach(id => {
         speaking.push({
           guildid: id,
-          value: this.data[id].Manager.IsPlaying ? this.data[id].Connection.channel.id + ":" + this.data[id].boundTextChannel : ""
+          // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
+          value: this.data[id].Manager.IsPlaying ? 
+            this.data[id].Connection.channel.id + ":" + this.data[id].boundTextChannel + ":" + (this.data[id].Queue.LoopEnabled ? "1" : "0") + ":" + (this.data[id].Queue.QueueLoopEnabled ? "1" : "0") + ":" + (this.data[id].AddRelative ? "1" : "0") : ""
         });
       });
       DatabaseAPI.SetIsSpeaking(speaking);

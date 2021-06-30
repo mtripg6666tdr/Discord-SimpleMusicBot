@@ -39,6 +39,8 @@ export class GuildVoiceInfo{
   DataPath:string;
   // メインモジュール
   Bot:MusicBot;
+  // 関連動画自動追加
+  AddRelative:boolean
 
   constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBot){
     this.Connection = null;
@@ -49,6 +51,7 @@ export class GuildVoiceInfo{
     this.GuildID = guildid;
     this.DataPath = ".data/" + guildid + ".preferences.json";
     this.Bot = bot;
+    this.AddRelative = false;
 
     if(fs.existsSync(".data") && fs.existsSync(this.DataPath)){
       this.PersistentPref = JSON.parse(fs.readFileSync(this.DataPath, { encoding: "utf-8"}));

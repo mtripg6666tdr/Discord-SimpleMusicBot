@@ -79,7 +79,7 @@ export class PlayManager extends ManagerBase {
       mes = await ch.send(":hourglass_flowing_sand: `" + this.CurrentVideoInfo.Title + "` `(" + min + ":" + sec + ")`の再生準備中...");
     }
     // 再生できない時の関数
-    const cantPlay = ()=>{
+    const cantPlay = async()=>{
       log("[PlayManager:" + this.info.GuildID + "]Play() failed", "warn");
       if(this.info.Queue.LoopEnabled) this.info.Queue.LoopEnabled = false;
       if(this.info.Queue.length === 1 && this.info.Queue.QueueLoopEnabled) this.info.Queue.QueueLoopEnabled = false;
@@ -91,7 +91,7 @@ export class PlayManager extends ManagerBase {
       }
       this.Stop();
       if(this.errorCount > 3){
-        this.info.Queue.Next();
+        await this.info.Queue.Next();
       }
       this.Play();
     };
@@ -145,25 +145,24 @@ export class PlayManager extends ManagerBase {
           this.CurrentVideoInfo.ServiceIdentifer === "bestdori" ? 5000 : 
           (this.CurrentVideoInfo.LengthSeconds * 1000 + this.startTime) > now ? this.CurrentVideoInfo.LengthSeconds * 1000 - (now - this.startTime) + 1500: 
           0;
-        setTimeout(()=>{
+        setTimeout(async()=>{
           // 再生が終わったら
           this.Dispatcher.destroy();
           this.Dispatcher = null;
           this.errorCount = 0;
           this.errorUrl = "";
-          // 曲ループオン？
           if(this.info.Queue.LoopEnabled){
+            // 曲ループオンならばもう一度再生
             this.Play();
             return;
-          }else 
-          // ワンスループが有効か？
-          if(this.info.Queue.OnceLoopEnabled){
+          }else if(this.info.Queue.OnceLoopEnabled){
+            // ワンスループが有効ならもう一度同じものを再生
             this.info.Queue.OnceLoopEnabled = false;
             this.Play();
             return;
           }else{
-          // キュー整理
-          this.info.Queue.Next();
+            // キュー整理
+            await this.info.Queue.Next();
           }
           // キューがなくなったら接続終了
           if(this.info.Queue.length === 0){

@@ -118,7 +118,7 @@ export class QueueManager extends ManagerBase {
       url:string, 
       addedBy:GuildMember, 
       type:"youtube"|"custom"|"unknown",
-      first:boolean=false, 
+      first:boolean = false, 
       fromSearch:boolean = false, 
       channel:TextChannel = null,
       message:Message = null,
@@ -129,6 +129,7 @@ export class QueueManager extends ManagerBase {
     var msg:Message = null;
     try{
       if(fromSearch && this.info.SearchPanel){
+        // 検索パネルから
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() From search panel");
         ch = await client.channels.fetch(this.info.SearchPanel.Msg.chId) as TextChannel;
         msg = await (ch as TextChannel).messages.fetch(this.info.SearchPanel.Msg.id);
@@ -137,34 +138,40 @@ export class QueueManager extends ManagerBase {
         tembed.description = "情報を取得しています...";
         msg.edit("", tembed);
       }else if(message){
+        // すでに処理中メッセージがある
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Interaction message specified");
         ch = message.channel as TextChannel;
         msg = message;
       }else if(channel){
+        // まだないので生成
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Interaction channel specified");
         ch = channel;
         msg = await channel.send("情報を取得しています。お待ちください...");
       }
-      if(this.info.Queue.length >= 999){
+      if(this.info.Queue.length > 999){
+        // キュー上限
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Failed since too long queue", "warn");
         throw "キューの上限を超えています";
       }
       const info = await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type, gotData ?? null);
       log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Added successfully");
       if(msg){
-        const embed = new MessageEmbed();
-        embed.setColor(getColor("SONG_ADDED"));
-        embed.title = "✅曲が追加されました";
-        embed.description = "[" + info.BasicInfo.Title + "](" + info.BasicInfo.Url + ")";
+        // 曲の時間取得＆計算
         const _t = Number(info.BasicInfo.LengthSeconds);
         const [min,sec] = CalcMinSec(_t);
-        embed.addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true);
-        embed.addField("リクエスト", addedBy?.displayName ?? "不明", true);
+        // キュー内のオフセット取得
         const index = first ? "0" : (this.info.Queue.length - 1).toString();
-        embed.addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true);
+        // ETAの計算
         const [emin, esec] = CalcMinSec(this.LengthSeconds - _t - Math.floor(this.info.Manager.CurrentTime / 1000));
-        embed.addField("再生されるまでの予想時間", index === "0" ? "-" : (emin + ":" + esec));
-        embed.setThumbnail(info.BasicInfo.Thumnail);
+        const embed = new MessageEmbed()
+          .setColor(getColor("SONG_ADDED"))
+          .setTitle("✅曲が追加されました")
+          .setDescription("[" + info.BasicInfo.Title + "](" + info.BasicInfo.Url + ")")
+          .addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true)
+          .addField("リクエスト", addedBy?.displayName ?? "不明", true)
+          .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
+          .addField("再生されるまでの予想時間", index === "0" ? "-" : (emin + ":" + esec))
+          .setThumbnail(info.BasicInfo.Thumnail);
         if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
@@ -180,7 +187,7 @@ export class QueueManager extends ManagerBase {
     }
   }
 
-  Next(){
+  async Next(){
     log("[QueueManager/" + this.info.GuildID + "]Next() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this.OnceLoopEnabled = false;
@@ -188,6 +195,13 @@ export class QueueManager extends ManagerBase {
     this.info.Manager.errorUrl = "";
     if(this.QueueLoopEnabled){
       this.default.push(this.default[0]);
+    }else{
+      if(this.info.AddRelative && this.info.Manager.CurrentVideoInfo.ServiceIdentifer === "youtube"){
+        const relatedVideos = (this.info.Manager.CurrentVideoInfo as YouTube).relatedVideos;
+        if(relatedVideos.length >= 1){
+          await this.info.Queue.AddQueue(relatedVideos[0].url, null, "push", "youtube", relatedVideos[0]);
+        }
+      }
     }
     this._default.shift();
   }
@@ -256,14 +270,35 @@ export class QueueManager extends ManagerBase {
   }
 }
 
+/**
+ * キューの内容を示します
+ */
 type QueueContent = {
+  /**
+   * 曲自体のメタ情報
+   */
   BasicInfo:AudioSource;
+  /**
+   * 曲の情報とは別の追加情報
+   */
   AdditionalInfo:AdditionalInfo;
 }
 
+/**
+ * 曲の情報とは別の追加情報を示します。
+ */
 type AdditionalInfo = {
+  /**
+   * 曲の追加者を示します
+   */
   AddedBy:{
+    /**
+     * 曲の追加者の表示名。表示名は追加された時点での名前になります。
+     */
     displayName:string,
+    /**
+     * 曲の追加者のユーザーID
+     */
     userId:string
   }
 }
