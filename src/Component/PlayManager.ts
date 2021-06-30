@@ -80,15 +80,15 @@ export class PlayManager extends ManagerBase {
     }
     // 再生できない時の関数
     const cantPlay = async()=>{
-      log("[PlayManager:" + this.info.GuildID + "]Play() failed", "warn");
       if(this.info.Queue.LoopEnabled) this.info.Queue.LoopEnabled = false;
       if(this.info.Queue.length === 1 && this.info.Queue.QueueLoopEnabled) this.info.Queue.QueueLoopEnabled = false;
       if(this.errorUrl == this.CurrentVideoInfo.Url){
         this.errorCount++;
-        this.errorUrl = this.CurrentVideoInfo.Url;
       }else{
         this.errorCount = 1;
+        this.errorUrl = this.CurrentVideoInfo.Url;
       }
+      log("[PlayManager:" + this.info.GuildID + "]Play() failed, (" + this.errorCount + "times)", "warn");
       this.Stop();
       if(this.errorCount > 3){
         await this.info.Queue.Next();
@@ -223,6 +223,14 @@ export class PlayManager extends ManagerBase {
     }
     catch(e){
       log(e);
+      try{
+        const t = JSON.stringify(e);
+        if(t.indexOf("429")>=0){
+          mes.edit("レート制限か検出されました").catch(e => log(e, "error"));
+          this.Disconnect();
+          return;
+        }
+      }catch{};
       if(this.info.boundTextChannel && ch && mes){
         mes.edit(":tired_face:曲の再生に失敗しました...。" + (this.errorCount >= 3 ? "スキップします。" : "再試行します。"));
         cantPlay();
