@@ -76,8 +76,10 @@ export class MusicBot {
               for(var j=0;j<queue.data.length;j++){
                 await this.data[id].Queue.AutoAddQueue(client, queue.data[j].url, null, "unknown", false, false, null, null, queue.data[j]);
               }
-              this.data[id].Connection = await (await client.channels.fetch(vid) as discord.VoiceChannel).join();
-              await this.data[id].Manager.Play();
+              if(vid != "0"){
+                this.data[id].Connection = await (await client.channels.fetch(vid) as discord.VoiceChannel).join();
+                await this.data[id].Manager.Play();
+              }
             }
             catch(e){
               log(e, "warn");
@@ -1491,8 +1493,9 @@ export class MusicBot {
         speaking.push({
           guildid: id,
           // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
-          value: this.data[id].Manager.IsPlaying ? 
-            this.data[id].Connection.channel.id + ":" + this.data[id].boundTextChannel + ":" + (this.data[id].Queue.LoopEnabled ? "1" : "0") + ":" + (this.data[id].Queue.QueueLoopEnabled ? "1" : "0") + ":" + (this.data[id].AddRelative ? "1" : "0") : ""
+          value: (this.data[id].Manager.IsPlaying ? 
+            this.data[id].Connection.channel.id : "0") 
+            + ":" + this.data[id].boundTextChannel + ":" + (this.data[id].Queue.LoopEnabled ? "1" : "0") + ":" + (this.data[id].Queue.QueueLoopEnabled ? "1" : "0") + ":" + (this.data[id].AddRelative ? "1" : "0")
         });
       });
       DatabaseAPI.SetIsSpeaking(speaking);
