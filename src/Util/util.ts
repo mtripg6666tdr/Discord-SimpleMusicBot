@@ -104,7 +104,7 @@ export function DownloadText(url:string, headers?:{[key:string]:string}, request
       protocol: durl.protocol,
       host: durl.host,
       path: durl.pathname + durl.search,
-      method: "GET",
+      method: requestBody ? "POST" : "GET",
       headers: headers ?? undefined
     }, res => {
       var data = "";

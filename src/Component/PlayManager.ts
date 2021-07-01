@@ -224,9 +224,9 @@ export class PlayManager extends ManagerBase {
     catch(e){
       log(e);
       try{
-        const t = JSON.stringify(e);
+        const t = typeof e == "string" ? e : JSON.stringify(e);
         if(t.indexOf("429")>=0){
-          mes.edit("レート制限か検出されました").catch(e => log(e, "error"));
+          mes.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(e => log(e, "error"));
           this.Disconnect();
           return;
         }

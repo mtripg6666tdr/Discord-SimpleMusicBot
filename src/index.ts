@@ -19,6 +19,6 @@ http.createServer((req, res) => {
   };
   log("[Server]Received a http request");
   res.end(JSON.stringify(data));
-}).listen(8080);
+}).listen(8081);
 
 bot.Run(process.env.TOKEN, true, 40);

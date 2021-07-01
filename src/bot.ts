@@ -2,13 +2,13 @@ import * as discord from "discord.js";
 import * as os from "os";
 import * as ytpl from "ytpl";
 import * as ytsr from "ytsr";
-import Soundcloud from "soundcloud.ts";
+import Soundcloud, { SoundcloudTrackV2 } from "soundcloud.ts";
 import { bestdori, BestdoriApi } from "./AudioSource/bestdori";
 import { exec, execSync } from "child_process";
 import { exportableCustom } from "./AudioSource/custom";
 import { YouTube } from "./AudioSource/youtube";
 import { PageToggle } from "./Component/PageToggle";
-import { CancellationPending, GuildVoiceInfo, YmxFormat, YmxVersion } from "./definition";
+import { CancellationPending, DefaultUserAgent, GuildVoiceInfo, YmxFormat, YmxVersion } from "./definition";
 import { getColor } from "./Util/colorUtil";
 import { DatabaseAPI } from "./Util/databaseUtil";
 import { GetLyrics } from "./Util/lyricsUtil";
@@ -25,6 +25,7 @@ import {
   NormalizeText,
   suppressMessageEmbeds
 } from "./Util/util";
+import { SoundCloudTrackCollection } from "./AudioSource/soundcloud";
 
 export class MusicBot {
   private client = new discord.Client();
@@ -980,7 +981,7 @@ export class MusicBot {
                 smsg?.edit("😭失敗しました...");
               }
               finally{
-                this.cancellations.slice(this.cancellations.findIndex(c => c === cancellation), 1);
+                this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
               }
             }else{
               message.channel.send("❌Discordのメッセージへのリンクを指定してください").catch(e => log(e, "error"));
@@ -1147,14 +1148,34 @@ export class MusicBot {
                   Opts: {}
                 };
                 const soundcloud = new Soundcloud();
-                var result = (await soundcloud.tracks.searchV2({q: optiont})).collection;
+                let result:SoundcloudTrackV2[] = [];
+                if(optiont.match(/^https:\/\/soundcloud.com\/[^\/]+$/)){
+                  // ユーザーの楽曲検索
+                  const user = (await soundcloud.users.getV2(optiont));
+                  optiont = user.username
+                  let nextUrl = "";
+                  let rawResult = (await soundcloud.api.getV2("users/" + user.id+ "/tracks") as SoundCloudTrackCollection);
+                  result.push(...rawResult.collection);
+                  nextUrl = rawResult.next_href + "&client_id=" + await soundcloud.api.getClientID();
+                  while(nextUrl && result.length < 10){
+                    const data = await DownloadText(nextUrl, {
+                      "User-Agent": DefaultUserAgent
+                    });
+                    rawResult = JSON.parse(data) as SoundCloudTrackCollection
+                    result.push(...rawResult.collection);
+                    nextUrl = rawResult.next_href ? rawResult.next_href + "&client_id=" + await soundcloud.api.getClientID() : rawResult.next_href;
+                  }
+                }else{
+                  // 楽曲検索
+                  result = (await soundcloud.tracks.searchV2({q: optiont})).collection;
+                }
                 if(result.length > 12) result = result.splice(0, 11);
                 const embed = new discord.MessageEmbed();
                 embed.setColor(getColor("SEARCH"));
                 embed.title = "\"" + optiont + "\"の検索結果✨"
                 var index = 1;
                 for(var i = 0; i < result.length; i++){
-                  desc += "`" + index + ".` [" + result[i].title + "](" + result[i].permalink_url + ") - `" + result[i].user.username + "` \r\n\r\n";
+                  desc += "`" + index + ".` [" + result[i].title + "](" + result[i].permalink_url + ") - [" + result[i].user.username + "](" + result[i].user.permalink_url + ") \r\n\r\n";
                   this.data[message.guild.id].SearchPanel.Opts[index] = {
                     url: result[i].permalink_url,
                     title: result[i].title,

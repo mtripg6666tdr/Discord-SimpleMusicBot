@@ -1,5 +1,5 @@
 import { EmbedField } from "discord.js";
-import SoundCloud from "soundcloud.ts";
+import SoundCloud, { SoundcloudTrackV2 } from "soundcloud.ts";
 import { InitPassThrough } from "../Util/util";
 import { AudioSource } from "./audiosource";
 
@@ -77,6 +77,11 @@ export type exportableSoundCloud = {
   thumbnail:string;
 }
 
-type SoundCloudStream = {
-  responseUrl:string;
+/**
+ * SoundCloud API Track Collection
+ */
+export interface SoundCloudTrackCollection {
+  collection: SoundcloudTrackV2[];
+  next_href:  string;
+  query_urn:  null;
 }
