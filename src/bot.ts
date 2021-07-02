@@ -134,6 +134,7 @@ export class MusicBot {
         // 超省略形を捕捉
         if(command.startsWith("http")){
           optiont = command;
+          options.push(optiont);
           command = "p";
         }
         command = command.toLowerCase();
