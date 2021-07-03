@@ -112,6 +112,7 @@ export class YouTube extends AudioSource {
         }
       }).filter(v => !v.isLive);
       this.Description = info.videoDetails.description ?? "不明";
+      if(info.videoDetails.title) this.Title = info.videoDetails.title;
       const format = ytdl.chooseFormat(info.formats, {
         filter: this.LiveStream ? null : "audioonly",
         quality: this.LiveStream ? null : "highestaudio",
@@ -137,6 +138,7 @@ export class YouTube extends AudioSource {
       log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
       const info = this.youtubeDlInfo ?? JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
       this.Description = info.description ?? "不明";
+      if(info.title) this.Title = info.title;
       if(info.is_live){
         var format = info.formats.filter(f => f.format_id === info.format_id);
         const stream = new PassThrough({
