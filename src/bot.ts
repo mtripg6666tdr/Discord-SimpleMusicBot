@@ -61,8 +61,8 @@ export class MusicBot {
         const speakingIds = await DatabaseAPI.GetIsSpeaking(client.guilds.cache.keyArray());
         const queueGuildids = Object.keys(queues);
         const speakingGuildids = Object.keys(speakingIds);
-        for(var i=0;i<queueGuildids.length;i++){
-          var id = queueGuildids[i];
+        for(let i=0;i<queueGuildids.length;i++){
+          let id = queueGuildids[i];
           const queue = JSON.parse(queues[id]) as YmxFormat;
           if(speakingGuildids.indexOf(id) >= 0 && queue.version === YmxVersion && speakingIds[id].indexOf(":") >= 0){
             //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
@@ -74,7 +74,7 @@ export class MusicBot {
             this.data[id].Queue.QueueLoopEnabled = qloop;
             this.data[id].AddRelative = related;
             try{
-              for(var j=0;j<queue.data.length;j++){
+              for(let j=0;j<queue.data.length;j++){
                 await this.data[id].Queue.AutoAddQueue(client, queue.data[j].url, null, "unknown", false, false, null, null, queue.data[j]);
               }
               if(vid != "0"){
@@ -125,9 +125,9 @@ export class MusicBot {
       if(message.content === "<@" + client.user.id + ">") message.channel.send("コマンドは、`" + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">") + "command`で確認できます").catch(e => log(e, "error"));
       if(message.content.startsWith(this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">")){
         const msg_spl = NormalizeText(message.content).substr(1, message.content.length - 1).split(" ");
-        var command = msg_spl[0];
-        var optiont = msg_spl.length > 1 ? message.content.substring(command.length + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">").length + 1, message.content.length) : "";
-        var options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
+        let command = msg_spl[0];
+        let optiont = msg_spl.length > 1 ? message.content.substring(command.length + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">").length + 1, message.content.length) : "";
+        let options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
         
         log("[Main/" + message.guild.id + "]Command Prefix detected: " + message.content);
         
@@ -220,10 +220,10 @@ export class MusicBot {
                 hl: "ja",
                 limit: 999
               });
-              var index = 1;
+              let index = 1;
               const cancellation = new CancellationPending();
               this.cancellations.push(cancellation);
-              for(var i = 0; i <result.items.length; i++){
+              for(let i = 0; i <result.items.length; i++){
                 const c = result.items[i];
                 await this.data[message.guild.id].Queue.AutoAddQueue(client, c.url, message.member, "youtube", false, false, null, null, {
                   url: c.url,
@@ -340,7 +340,7 @@ export class MusicBot {
               .addField("command, commands, cmd", "コマンド一覧を表示します", true)
               ,
             );
-            for(var i = 0; i < embed.length; i++){
+            for(let i = 0; i < embed.length; i++){
               embed[i].setTitle("コマンド一覧(" + embed[i].title + ")");
               embed[i].setDescription("コマンドの一覧です。\r\n`" + (i+1) + "ページ目(" + embed.length + "ページ中)`\r\nコマンドプレフィックスは、`" + this.data[message.guild.id].PersistentPref.Prefix + "`です。");
               embed[i].setColor(getColor("COMMAND"));
@@ -425,9 +425,9 @@ export class MusicBot {
                 const embed = new discord.MessageEmbed();
                 embed.title = "\"" + optiont + "\"の検索結果✨";
                 embed.setColor(getColor("SEARCH"));
-                var desc = "";
-                var index = 1;
-                for(var i = 0; i < result.items.length; i++){
+                let desc = "";
+                let index = 1;
+                for(let i = 0; i < result.items.length; i++){
                   if(result.items[i].type == "video"){
                     const video = (result.items[i] as ytsr.Video);
                     desc += "`" + index + ".` [" + video.title + "](" + video.url + ") `" + video.duration + "` - `" + video.author.name + "` \r\n\r\n";
@@ -562,15 +562,15 @@ export class MusicBot {
             const info = this.data[message.guild.id].Manager.CurrentVideoInfo;
             const embed = new discord.MessageEmbed();
             embed.setColor(getColor("NP"));
-            var progressBar = "";
+            let progressBar = "";
             embed.title = "現在再生中の曲:musical_note:";
             if(_t > 0){
               const progress = Math.floor(_s / _t * 20);
-              for(var i = 1 ; i < progress; i++){
+              for(let i = 1 ; i < progress; i++){
                 progressBar += "=";
               }
               progressBar += "●";
-              for(var i = progress + 1; i <= 20; i++){
+              for(let i = progress + 1; i <= 20; i++){
                 progressBar += "=";
               }
             }
@@ -596,8 +596,8 @@ export class MusicBot {
               return;
             }
             // 合計所要時間の計算
-            var totalLength = queue.LengthSeconds;
-            var _page = optiont === "" ? 1 : Number(optiont);
+            let totalLength = queue.LengthSeconds;
+            let _page = optiont === "" ? 1 : Number(optiont);
             if(isNaN(_page)) _page = 1;
             if(queue.length > 0 && _page > Math.ceil(queue.length / 10)){
               msg.edit(":warning:指定されたページは範囲外です").catch(e => log(e, "error"));
@@ -608,7 +608,7 @@ export class MusicBot {
             // ページのキューを割り出す
             const getQueueEmbed = (page:number)=>{
               const fields:{name:string, value:string}[] = [];
-              for(var i = 10 * (page - 1); i < 10 * page; i++){
+              for(let i = 10 * (page - 1); i < 10 * page; i++){
                 if(queue.default.length <= i){
                   break;
                 }
@@ -719,12 +719,12 @@ export class MusicBot {
             const q = this.data[message.guild.id].Queue;
             const addition = [] as number[];
             options.forEach(o => {
-              var match = o.match(/^(?<from>[0-9]+)-(?<to>[0-9]+)$/);
+              let match = o.match(/^(?<from>[0-9]+)-(?<to>[0-9]+)$/);
               if(match){
                 const from = Number(match.groups.from);
                 const to = Number(match.groups.to);
                 if(!isNaN(from) && !isNaN(to) && from<=to){
-                  for(var i = from; i <= to; i++){
+                  for(let i = from; i <= to; i++){
                     addition.push(i);
                   }
                 }
@@ -733,7 +733,7 @@ export class MusicBot {
                 if(match){
                   const from = Number(match.groups.from);
                   if(!isNaN(from)){
-                    for(var i = from; i < q.length; i++){
+                    for(let i = from; i < q.length; i++){
                       addition.push(i);
                     }
                   }
@@ -742,7 +742,7 @@ export class MusicBot {
                   if(match){
                     const to = Number(match.groups.to);
                     if(!isNaN(to)){
-                      for(var i = (this.data[message.guild.id].Manager.IsPlaying ? 1 : 0); i <= to; i++){
+                      for(let i = (this.data[message.guild.id].Manager.IsPlaying ? 1 : 0); i <= to; i++){
                         addition.push(i);
                       }
                     }
@@ -755,7 +755,7 @@ export class MusicBot {
                 options.map(str => Number(str)).filter(n => !isNaN(n)).sort((a,b)=>b-a)
             ));
             const title = dels.length === 1 ? q.default[dels[0]].BasicInfo.Title : null;
-            for(var i = 0; i < dels.length; i++){
+            for(let i = 0; i < dels.length; i++){
               q.RemoveAt(Number(dels[i]));
             }
             const resultStr = dels.sort((a,b)=>a-b).join(",");
@@ -835,7 +835,7 @@ export class MusicBot {
               cpuInfoEmbed.setColor(getColor("UPTIME"));
               const cpus = os.cpus();
               cpuInfoEmbed.title = "CPU Info";
-              for(var i = 0; i < cpus.length; i++){
+              for(let i = 0; i < cpus.length; i++){
                 const all = cpus[i].times.user + cpus[i].times.sys + cpus[i].times.nice + cpus[i].times.irq + cpus[i].times.idle;
                 cpuInfoEmbed.addField(
                   "CPU" + (i + 1), "Model: `" + cpus[i].model + "`\r\n" 
@@ -863,8 +863,8 @@ export class MusicBot {
                 + "Free: `" + memory.free + "MB`\r\n"
                 + "Usage: `" + memory.usage + "%`"
               , true);
-              var rss = GetMBytes(nMem.rss);
-              var ext = GetMBytes(nMem.external);
+              let rss = GetMBytes(nMem.rss);
+              let ext = GetMBytes(nMem.external);
               memInfoEmbed.addField("Main Process Memory", 
                   "RSS: `" + rss + "MB`\r\n"
                 + "Heap total: `" + GetMBytes(nMem.heapTotal) + "MB`\r\n"
@@ -914,13 +914,13 @@ export class MusicBot {
               message.channel.send("❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(e => log(e, "error"));
               return;
             }
-            var force = false;
+            let force = false;
             if(options.length >= 2 && options[0] === "force" && message.author.id === "593758391395155978"){
               force = true;
               optiont = options[1];
             }
             if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
-              var smsg;
+              let smsg;
               const cancellation = new CancellationPending();
               this.cancellations.push(cancellation);
               try{
@@ -941,7 +941,7 @@ export class MusicBot {
                 const attac = msg.attachments.size > 0 ? msg.attachments.first() : null;
                 if(embed && embed.title.endsWith("のキュー")){
                   const fields = embed.fields;
-                  for(var i = 0; i < fields.length; i++){
+                  for(let i = 0; i < fields.length; i++){
                     const lines = fields[i].value.split("\r\n");
                     const tMatch = lines[0].match(/\[(?<title>.+)\]\((?<url>.+)\)/);
                     await this.data[message.guild.id].Queue.AutoAddQueue(client, tMatch.groups.url, message.member, "unknown");
@@ -960,7 +960,7 @@ export class MusicBot {
                     return;
                   }
                   const qs = raw.data;
-                  for(var i = 0; i < qs.length; i++){
+                  for(let i = 0; i < qs.length; i++){
                     await this.data[message.guild.id].Queue.AutoAddQueue(client, qs[i].url, message.member, "unknown", false, false, null, null, qs[i]);
                     if(qs.length <= 10 || i % 10 == 9){
                       await smsg.edit(qs.length + "曲中" + (i+1) + "曲処理しました。");
@@ -1053,8 +1053,8 @@ export class MusicBot {
               break;
             }
             if(optiont !== ""){
-              var msg = null as discord.Message;
-              var desc = "※最大20件まで表示されます\r\n\r\n";
+              let msg = null as discord.Message;
+              let desc = "※最大20件まで表示されます\r\n\r\n";
               try{
                 this.data[message.guild.id].SearchPanel = {} as any;
                 const msg = await message.channel.send("準備中...");
@@ -1077,8 +1077,8 @@ export class MusicBot {
                 const embed = new discord.MessageEmbed();
                 embed.setColor(getColor("SEARCH"));
                 embed.title = "\"" + optiont + "\"の検索結果✨"
-                var index = 1;
-                for(var i = 0; i < result.length; i++){
+                let index = 1;
+                for(let i = 0; i < result.length; i++){
                   desc += "`" + index + ".` [" + bestdori.allsonginfo[Number(result[i])].musicTitle[0] + "](" + BestdoriApi.getAudioPage(Number(result[i])) + ") - `" + bestdori.allbandinfo[bestdori.allsonginfo[Number(result[i])].bandId].bandName[0] + "` \r\n\r\n";
                   this.data[message.guild.id].SearchPanel.Opts[index] = {
                     url: BestdoriApi.getAudioPage(Number(result[i])),
@@ -1134,8 +1134,8 @@ export class MusicBot {
               break;
             }
             if(optiont !== ""){
-              var msg = null as discord.Message;
-              var desc = "";
+              let msg = null as discord.Message;
+              let desc = "";
               try{
                 this.data[message.guild.id].SearchPanel = {} as any;
                 const msg = await message.channel.send("🔍検索中...");
@@ -1174,8 +1174,8 @@ export class MusicBot {
                 const embed = new discord.MessageEmbed();
                 embed.setColor(getColor("SEARCH"));
                 embed.title = "\"" + optiont + "\"の検索結果✨"
-                var index = 1;
-                for(var i = 0; i < result.length; i++){
+                let index = 1;
+                for(let i = 0; i < result.length; i++){
                   desc += "`" + index + ".` [" + result[i].title + "](" + result[i].permalink_url + ") - [" + result[i].user.username + "](" + result[i].user.permalink_url + ") \r\n\r\n";
                   this.data[message.guild.id].SearchPanel.Opts[index] = {
                     url: result[i].permalink_url,
@@ -1283,7 +1283,7 @@ export class MusicBot {
               }else if(optiont === "update"){
                 await message.channel.send("アップデートして再起動を実行します。完了まで10分程度要することがあります。");
                 await message.channel.send("アップデート中...");
-                var buf = execSync("git pull");
+                let buf = execSync("git pull");
                 await message.channel.send("実行結果:\r\n```" + buf.toString() + "\r\n```");
                 await message.channel.send("コンパイル中...");
                 buf = execSync("npm run build");
@@ -1322,7 +1322,7 @@ export class MusicBot {
               message.channel.send("✘キューが空です").catch(e => log(e, "error"));
               return;
             }
-            var qsresult = this.data[message.guild.id].Queue.default.filter(c => c.BasicInfo.Title.toLowerCase().indexOf(optiont.toLowerCase()) >= 0);
+            let qsresult = this.data[message.guild.id].Queue.default.filter(c => c.BasicInfo.Title.toLowerCase().indexOf(optiont.toLowerCase()) >= 0);
             if(qsresult.length === 0){
               message.channel.send(":confused:見つかりませんでした").catch(e => log(e, "error"));
               return;

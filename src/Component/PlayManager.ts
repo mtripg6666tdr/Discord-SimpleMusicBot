@@ -70,8 +70,8 @@ export class PlayManager extends ManagerBase {
       return this;
     }
     log("[PlayManager/" + this.info.GuildID + "]Play() called");
-    var mes:Message = null;
-    var ch:TextChannel = null;
+    let mes:Message = null;
+    let ch:TextChannel = null;
     this.CurrentVideoInfo = this.info.Queue.default[0].BasicInfo;
     if(this.info.boundTextChannel){
       ch = await this.client.channels.fetch(this.info.boundTextChannel) as TextChannel;
@@ -102,7 +102,7 @@ export class PlayManager extends ManagerBase {
       this.Dispatcher = {emit:()=>{}} as any;
       // QueueContentからストリーム、M3U8プレイリスト(非HLS)または直URLを取得
       const rawStream = await this.CurrentVideoInfo.fetch();
-      var stream:Readable|string = null;
+      let stream:Readable|string = null;
       if(typeof rawStream === "string"){
         if(isAvailableRawVideoURL(rawStream)){
           // URLでも動画なら直接渡す
@@ -124,6 +124,7 @@ export class PlayManager extends ManagerBase {
           this.Dispatcher.emit("error", e)
         });
       }
+      // fetchおよび処理中に切断された場合処理を終了
       if(!this.info.Connection) {
         if(mes) await mes.delete();
         return;
@@ -193,7 +194,7 @@ export class PlayManager extends ManagerBase {
       log("[PlayManager/" + this.info.GuildID + "]Play() started successfully");
       if(this.info.boundTextChannel && ch && mes){
         // 再生開始メッセージ
-        var _t = Number(this.CurrentVideoInfo.LengthSeconds);
+        const _t = Number(this.CurrentVideoInfo.LengthSeconds);
         const [min, sec] = CalcMinSec(_t);
         const embed = new MessageEmbed({
           title: ":cd:現在再生中:musical_note:",
@@ -202,32 +203,32 @@ export class PlayManager extends ManagerBase {
         embed.setColor(getColor("AUTO_NP"));
         embed.addField("リクエスト", this.info.Queue.default[0].AdditionalInfo.AddedBy.displayName, true);
         embed.addField("次の曲", 
-        // トラックループオンなら現在の曲
-        this.info.Queue.LoopEnabled ? this.info.Queue.default[0].BasicInfo.Title :
-        // (トラックループはオフ)長さが2以上ならオフセット1の曲
-        this.info.Queue.length >= 2 ? this.info.Queue.default[1].BasicInfo.Title :
-        // (トラックループオフ,長さ1)キューループがオンなら現在の曲
-        this.info.Queue.QueueLoopEnabled ? this.info.Queue.default[0].BasicInfo.Title :
-        // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
-        "次の曲がまだ登録されていません"
-        , true);
-        embed.addField("再生待ちの曲数", this.info.Queue.LoopEnabled ? "ループします" : (this.info.Queue.length - 1) + "曲");
-        embed.thumbnail = {
-          url: this.CurrentVideoInfo.Thumnail
-        };
+          // トラックループオンなら現在の曲
+          this.info.Queue.LoopEnabled ? this.info.Queue.default[0].BasicInfo.Title :
+          // (トラックループはオフ)長さが2以上ならオフセット1の曲
+          this.info.Queue.length >= 2 ? this.info.Queue.default[1].BasicInfo.Title :
+          // (トラックループオフ,長さ1)キューループがオンなら現在の曲
+          this.info.Queue.QueueLoopEnabled ? this.info.Queue.default[0].BasicInfo.Title :
+          // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
+          "次の曲がまだ登録されていません"
+          , true);
+        const [qmin, qsec] = CalcMinSec(this.info.Queue.LengthSeconds);
+        embed.addField("再生待ちの曲", this.info.Queue.LoopEnabled ? "ループします" : ((this.info.Queue.length - 1) + "曲(" + qmin + ":" + qsec + ")"));
+        embed.setThumbnail(this.CurrentVideoInfo.Thumnail);
         if(this.CurrentVideoInfo.ServiceIdentifer === "youtube" && (this.CurrentVideoInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
-        mes.edit("", embed);
+        mes.edit("", embed).catch(e => log(e, "error"));
       }
     }
     catch(e){
-      log(e);
+      log(e, "error");
       try{
         const t = typeof e == "string" ? e : JSON.stringify(e);
         if(t.indexOf("429")>=0){
           mes.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(e => log(e, "error"));
-          this.Disconnect();
+          log("Rate limit detected", "error");
+          this.Stop();
           return;
         }
       }catch{};
