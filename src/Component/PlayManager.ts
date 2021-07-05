@@ -102,28 +102,7 @@ export class PlayManager extends ManagerBase {
       this.Dispatcher = {emit:()=>{}} as any;
       // QueueContentからストリーム、M3U8プレイリスト(非HLS)または直URLを取得
       const rawStream = await this.CurrentVideoInfo.fetch();
-      let stream:Readable|string = null;
-      if(typeof rawStream === "string"){
-        if(isAvailableRawVideoURL(rawStream)){
-          // URLでも動画なら直接渡す
-          stream = rawStream;
-        }else{
-          // ほかならストリーム化
-          stream = DownloadAsReadable(rawStream);
-          stream.on('error', (e)=> {
-            this.Dispatcher.emit("error", e);
-          });
-        }
-      }else if((rawStream as defaultM3u8stream).type){
-        // M3U8プレイリストならURLを直接play
-        stream = (rawStream as defaultM3u8stream).url;
-      }else{
-        // ストリームなら変換せずにそのままplay
-        stream = rawStream as Readable;
-        stream.on('error', (e)=> {
-          this.Dispatcher.emit("error", e)
-        });
-      }
+      let stream:Readable|string = this.ResolveStream(rawStream);
       // fetchおよび処理中に切断された場合処理を終了
       if(!this.info.Connection) {
         if(mes) await mes.delete();
@@ -138,48 +117,7 @@ export class PlayManager extends ManagerBase {
         // 再生開始されたら開始された時刻を保存
         this.startTime = new Date().getTime();
       });
-      this.Dispatcher.on("finish", ()=> {
-        // ストリームが終了したら時間を確認しつつ次の曲へ移行
-        log("[PlayManager/" + this.info.GuildID + "]Stream finished");
-        const now = new Date().getTime();
-        const timeout =
-          this.CurrentVideoInfo.ServiceIdentifer === "bestdori" ? 5000 : 
-          (this.CurrentVideoInfo.LengthSeconds * 1000 + this.startTime) > now ? this.CurrentVideoInfo.LengthSeconds * 1000 - (now - this.startTime) + 1500: 
-          0;
-        setTimeout(async()=>{
-          // 再生が終わったら
-          this.Dispatcher.destroy();
-          this.Dispatcher = null;
-          this.errorCount = 0;
-          this.errorUrl = "";
-          if(this.info.Queue.LoopEnabled){
-            // 曲ループオンならばもう一度再生
-            this.Play();
-            return;
-          }else if(this.info.Queue.OnceLoopEnabled){
-            // ワンスループが有効ならもう一度同じものを再生
-            this.info.Queue.OnceLoopEnabled = false;
-            this.Play();
-            return;
-          }else{
-            // キュー整理
-            await this.info.Queue.Next();
-          }
-          // キューがなくなったら接続終了
-          if(this.info.Queue.length === 0){
-            log("[PlayManager/" + this.info.GuildID + "]Queue empty");
-            if(this.info.boundTextChannel){
-              this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
-                (ch as TextChannel).send(":wave:キューが空になったため終了します").catch(e => log(e, "error"));
-              }).catch(e => log(e, "error"));
-            }
-            this.Disconnect();
-          // なくなってないなら再生開始！
-          }else{
-            this.Play();
-          }
-        }, timeout);
-      });
+      this.Dispatcher.on("finish", ()=> this.onDispatcherFinished());
       this.Dispatcher.on("error", (e)=>{
         // エラーが発生したら再生できないときの関数を呼んで逃げる
         log(JSON.stringify(e), "error");
@@ -303,5 +241,74 @@ export class PlayManager extends ManagerBase {
     log("[PlayManager/" + this.info.GuildID + "]Rewind() called");
     this.Stop().Play();
     return this;
+  }
+
+  private ResolveStream(rawStream:string|Readable|defaultM3u8stream){
+    let stream = null as string|Readable;
+    if(typeof rawStream === "string"){
+      if(isAvailableRawVideoURL(rawStream)){
+        // URLでも動画なら直接渡す
+        stream = rawStream;
+      }else{
+        // ほかならストリーム化
+        stream = DownloadAsReadable(rawStream);
+        stream.on('error', (e)=> {
+          this.Dispatcher.emit("error", e);
+        });
+      }
+    }else if((rawStream as defaultM3u8stream).type){
+      // M3U8プレイリストならURLを直接play
+      stream = (rawStream as defaultM3u8stream).url;
+    }else{
+      // ストリームなら変換せずにそのままplay
+      stream = rawStream as Readable;
+      stream.on('error', (e)=> {
+        this.Dispatcher.emit("error", e)
+      });
+    }
+    return stream;
+  }
+
+  private onDispatcherFinished(){
+    // ストリームが終了したら時間を確認しつつ次の曲へ移行
+    log("[PlayManager/" + this.info.GuildID + "]Stream finished");
+    const now = new Date().getTime();
+    const timeout =
+      this.CurrentVideoInfo.ServiceIdentifer === "bestdori" ? 5000 : 
+      (this.CurrentVideoInfo.LengthSeconds * 1000 + this.startTime) > now ? this.CurrentVideoInfo.LengthSeconds * 1000 - (now - this.startTime) + 1500: 
+      0;
+    setTimeout(async()=>{
+      // 再生が終わったら
+      this.Dispatcher.destroy();
+      this.Dispatcher = null;
+      this.errorCount = 0;
+      this.errorUrl = "";
+      if(this.info.Queue.LoopEnabled){
+        // 曲ループオンならばもう一度再生
+        this.Play();
+        return;
+      }else if(this.info.Queue.OnceLoopEnabled){
+        // ワンスループが有効ならもう一度同じものを再生
+        this.info.Queue.OnceLoopEnabled = false;
+        this.Play();
+        return;
+      }else{
+        // キュー整理
+        await this.info.Queue.Next();
+      }
+      // キューがなくなったら接続終了
+      if(this.info.Queue.length === 0){
+        log("[PlayManager/" + this.info.GuildID + "]Queue empty");
+        if(this.info.boundTextChannel){
+          this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
+            (ch as TextChannel).send(":wave:キューが空になったため終了します").catch(e => log(e, "error"));
+          }).catch(e => log(e, "error"));
+        }
+        this.Disconnect();
+      // なくなってないなら再生開始！
+      }else{
+        this.Play();
+      }
+    }, timeout);
   }
 }

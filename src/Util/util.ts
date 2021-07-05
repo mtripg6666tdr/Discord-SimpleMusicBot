@@ -186,6 +186,9 @@ export function InitPassThrough():PassThrough{
   return stream;
 }
 
+/**
+ * 文字列を正規化します
+ */
 export function NormalizeText(rawText:string){
   var result = rawText;
   ([

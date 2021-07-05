@@ -104,11 +104,9 @@ export class MusicBot {
       this.isReadyFinished = true;
     });
 
-    client.on("message", 
-    async message => {
+    client.on("message", async message => {
       // botのメッセやdm、およびnewsは無視
       if(!this.isReadyFinished || message.author.bot || message.channel.type == "dm" || message.channel.type == "news") return;
-      
       // データ初期化
       this.initData(message.guild.id, message.channel.id);
 
@@ -122,7 +120,11 @@ export class MusicBot {
         this.data[message.guild.id].PersistentPref.Prefix = ">";
       }
       
-      if(message.content === "<@" + client.user.id + ">") message.channel.send("コマンドは、`" + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">") + "command`で確認できます").catch(e => log(e, "error"));
+      if(message.content === "<@" + client.user.id + ">") {
+        // メンションならば
+        message.channel.send("コマンドは、`" + (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">") + "command`で確認できます").catch(e => log(e, "error"));
+        return;
+      }
       if(message.content.startsWith(this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">")){
         const msg_spl = NormalizeText(message.content).substr(1, message.content.length - 1).split(" ");
         let command = msg_spl[0];
@@ -178,11 +180,9 @@ export class MusicBot {
          * @param first キューの先頭に追加するかどうか
          */
         const playFromURL = async (first:boolean = true)=>{
-          setTimeout(()=>{
-            suppressMessageEmbeds(message, this.client).catch(e => log(e, "warn"));
-          },4000);
-          // Discordメッセへのリンク？
+          setTimeout(()=> suppressMessageEmbeds(message, this.client).catch(e => log(e, "warn")), 4000);
           if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
+            // Discordメッセへのリンクならば
             const smsg = await message.channel.send("🔍メッセージを取得しています...");
             try{
               const ids = optiont.split("/");
@@ -204,57 +204,54 @@ export class MusicBot {
               message.channel.send("✘追加できませんでした(" + e + ")").catch(e => log(e ,"error"));
             }
             await smsg.edit("✘メッセージは有効でない、もしくは指定されたメッセージには添付ファイルがありません。");
-          }else
-          // オーディオファイルへの直リンク？
-          if(isAvailableRawAudioURL(optiont)){
+          }else if(isAvailableRawAudioURL(optiont)){
+            // オーディオファイルへの直リンク？
             await this.data[message.guild.id].Queue.AutoAddQueue(client, optiont, message.member, "custom", first, false, message.channel as discord.TextChannel);
             this.data[message.guild.id].Manager.Play();
             return;
-          }else{
+          }else if(optiont.indexOf("v=") < 0 && ytpl.validateID(optiont)){
             //違うならプレイリストの直リンクか？
-            if(optiont.indexOf("v=") < 0 && ytpl.validateID(optiont)){
-              const id = await ytpl.getPlaylistID(optiont);
-              const msg = await message.channel.send(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
-              const result = await ytpl.default(id, {
-                gl: "JP",
-                hl: "ja",
-                limit: 999
-              });
-              let index = 1;
-              const cancellation = new CancellationPending();
-              this.cancellations.push(cancellation);
-              for(let i = 0; i <result.items.length; i++){
-                const c = result.items[i];
-                await this.data[message.guild.id].Queue.AutoAddQueue(client, c.url, message.member, "youtube", false, false, null, null, {
-                  url: c.url,
-                  channel: c.author.name,
-                  description: "プレイリストから指定のため詳細は表示されません",
-                  isLive: c.isLive,
-                  length: c.durationSec,
-                  thumbnail: c.thumbnails[0].url,
-                  title: c.title
-                } as exportableCustom);
-                index++;
-                if(index % 50 === 0 || (result.estimatedItemCount <= 50 && index % 10 === 0) || result.estimatedItemCount <= 10){
-                  await msg.edit(":hourglass_flowing_sand:プレイリスト`" + result.title + "`を処理しています。お待ちください。" + result.estimatedItemCount + "曲中" + index + "曲処理済み。");
-                }
-                if(cancellation.Cancelled){
-                  break;
-                }
+            const id = await ytpl.getPlaylistID(optiont);
+            const msg = await message.channel.send(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
+            const result = await ytpl.default(id, {
+              gl: "JP",
+              hl: "ja",
+              limit: 999
+            });
+            let index = 1;
+            const cancellation = new CancellationPending();
+            this.cancellations.push(cancellation);
+            for(let i = 0; i <result.items.length; i++){
+              const c = result.items[i];
+              await this.data[message.guild.id].Queue.AutoAddQueue(client, c.url, message.member, "youtube", false, false, null, null, {
+                url: c.url,
+                channel: c.author.name,
+                description: "プレイリストから指定のため詳細は表示されません",
+                isLive: c.isLive,
+                length: c.durationSec,
+                thumbnail: c.thumbnails[0].url,
+                title: c.title
+              } as exportableCustom);
+              index++;
+              if(index % 50 === 0 || (result.estimatedItemCount <= 50 && index % 10 === 0) || result.estimatedItemCount <= 10){
+                await msg.edit(":hourglass_flowing_sand:プレイリスト`" + result.title + "`を処理しています。お待ちください。" + result.estimatedItemCount + "曲中" + index + "曲処理済み。");
               }
               if(cancellation.Cancelled){
-                await msg.edit("✅キャンセルされました。");
-              }else{
-                const embed = new discord.MessageEmbed();
-                embed.title = "✅プレイリストが処理されました";
-                embed.description = "[" + result.title + "](" + result.url + ") `(" + result.author.name + ")` \r\n" + index + "曲が追加されました";
-                embed.setThumbnail(result.bestThumbnail.url);
-                embed.setColor(getColor("PLAYLIST_COMPLETED"));
-                await msg.edit("", embed);
+                break;
               }
-              this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
-              return;
             }
+            if(cancellation.Cancelled){
+              await msg.edit("✅キャンセルされました。");
+            }else{
+              const embed = new discord.MessageEmbed();
+              embed.title = "✅プレイリストが処理されました";
+              embed.description = "[" + result.title + "](" + result.url + ") `(" + result.author.name + ")` \r\n" + index + "曲が追加されました";
+              embed.setThumbnail(result.bestThumbnail.url);
+              embed.setColor(getColor("PLAYLIST_COMPLETED"));
+              await msg.edit("", embed);
+            }
+            this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
+          }else{
             try{
               await this.data[message.guild.id].Queue.AutoAddQueue(client, optiont, message.member, "unknown", first, false, message.channel as discord.TextChannel);
               this.data[message.guild.id].Manager.Play();
