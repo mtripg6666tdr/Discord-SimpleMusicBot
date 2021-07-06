@@ -4,7 +4,7 @@ import { AudioSource, defaultM3u8stream } from "../AudioSource/audiosource";
 import { YouTube } from "../AudioSource/youtube";
 import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcMinSec, DownloadAsReadable, isAvailableRawVideoURL, log } from "../Util/util";
+import { CalcHourMinSec, CalcMinSec, DownloadAsReadable, isAvailableRawVideoURL, log } from "../Util/util";
 import { ManagerBase } from "./ManagerBase";
 
 /**
@@ -150,8 +150,8 @@ export class PlayManager extends ManagerBase {
           // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
           "次の曲がまだ登録されていません"
           , true);
-        const [qmin, qsec] = CalcMinSec(this.info.Queue.LengthSeconds);
-        embed.addField("再生待ちの曲", this.info.Queue.LoopEnabled ? "ループします" : ((this.info.Queue.length - 1) + "曲(" + qmin + ":" + qsec + ")"));
+        const [qhour, qmin, qsec] = CalcHourMinSec(this.info.Queue.LengthSeconds);
+        embed.addField("再生待ちの曲", this.info.Queue.LoopEnabled ? "ループします" : ((this.info.Queue.length - 1) + "曲(" + qhour + "時間" + qmin + "分" + qsec + "秒)"), true);
         embed.setThumbnail(this.CurrentVideoInfo.Thumnail);
         if(this.CurrentVideoInfo.ServiceIdentifer === "youtube" && (this.CurrentVideoInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);

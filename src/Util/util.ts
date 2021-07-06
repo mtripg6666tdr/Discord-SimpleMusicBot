@@ -17,6 +17,18 @@ export function CalcMinSec(_t:number){
 }
 
 /**
+ * 合計時間(秒)から時間、ゼロ補完された分および秒を計算します。
+ * @param seconds 合計時間(秒)
+ * @returns [時間, ゼロ補完された分, ゼロ補完された秒]
+ */
+export function CalcHourMinSec(seconds:number){
+  const sec = seconds % 60;
+  const min = (seconds - sec) / 60 % 60;
+  const hor = ((seconds - sec) / 60 - min) / 60;
+  return [hor.toString(), AddZero(min.toString(), 2), AddZero(sec.toString(), 2)];
+}
+
+/**
  * 指定された文字列を指定された桁数になるまでゼロ補完します。
  * @param str 補完する文字列
  * @param length 補完後の長さ

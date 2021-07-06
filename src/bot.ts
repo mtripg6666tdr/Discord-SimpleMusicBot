@@ -13,6 +13,7 @@ import { getColor } from "./Util/colorUtil";
 import { DatabaseAPI } from "./Util/databaseUtil";
 import { GetLyrics } from "./Util/lyricsUtil";
 import {
+  CalcHourMinSec,
   CalcMinSec,
   CalcTime,
   DownloadText,
@@ -620,7 +621,7 @@ export class MusicBot {
                   + q.BasicInfo.npAdditional()
                 });
               }
-              const [tmin, tsec] = CalcMinSec(totalLength);
+              const [thour, tmin, tsec] = CalcHourMinSec(totalLength);
               return new discord.MessageEmbed({
                 title: message.guild.name + "のキュー",
                 description: "`" + page + "ページ目(" + totalpage + "ページ中)`",
@@ -630,7 +631,7 @@ export class MusicBot {
                   name: client.user.username
                 },
                 footer: {
-                  text: queue.length + "曲 | 合計:" + tmin + ":" + tsec + " | トラックループ:" + (queue.LoopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.QueueLoopEnabled ? "⭕" : "❌")
+                  text: queue.length + "曲 | 合計:" + thour + ":" + tmin + ":" + tsec + " | トラックループ:" + (queue.LoopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.QueueLoopEnabled ? "⭕" : "❌")
                 },
                 thumbnail: {
                   url: message.guild.iconURL()

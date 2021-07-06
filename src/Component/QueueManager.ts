@@ -10,7 +10,7 @@ import { exportableStreamable, Streamable, StreamableApi } from "../AudioSource/
 import { exportableYouTube, YouTube } from "../AudioSource/youtube";
 import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcMinSec, isAvailableRawAudioURL, log } from "../Util/util";
+import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log } from "../Util/util";
 import { ManagerBase } from "./ManagerBase";
 import { PageToggle } from "./PageToggle";
 
@@ -162,7 +162,7 @@ export class QueueManager extends ManagerBase {
         // キュー内のオフセット取得
         const index = first ? "0" : (this.info.Queue.length - 1).toString();
         // ETAの計算
-        const [emin, esec] = CalcMinSec(this.LengthSeconds - _t - Math.floor(this.info.Manager.CurrentTime / 1000));
+        const [ehour, emin, esec] = CalcHourMinSec(this.LengthSeconds - _t - Math.floor(this.info.Manager.CurrentTime / 1000));
         const embed = new MessageEmbed()
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
@@ -170,7 +170,7 @@ export class QueueManager extends ManagerBase {
           .addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true)
           .addField("リクエスト", addedBy?.displayName ?? "不明", true)
           .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
-          .addField("再生されるまでの予想時間", index === "0" ? "-" : (emin + ":" + esec))
+          .addField("再生されるまでの予想時間", index === "0" ? "-" : (ehour + "時間" + emin + "分" + esec + "秒後"), true)
           .setThumbnail(info.BasicInfo.Thumnail);
         if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
