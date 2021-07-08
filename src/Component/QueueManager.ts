@@ -170,7 +170,7 @@ export class QueueManager extends ManagerBase {
           .addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true)
           .addField("リクエスト", addedBy?.displayName ?? "不明", true)
           .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
-          .addField("再生されるまでの予想時間", index === "0" ? "-" : (ehour + "時間" + emin + "分" + esec + "秒後"), true)
+          .addField("再生されるまでの予想時間", index === "0" ? "-" : ((ehour === "0" ? "" : ehour + ":") + emin + ":" + esec), true)
           .setThumbnail(info.BasicInfo.Thumnail);
         if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);

@@ -151,7 +151,7 @@ export class PlayManager extends ManagerBase {
           "次の曲がまだ登録されていません"
           , true);
         const [qhour, qmin, qsec] = CalcHourMinSec(this.info.Queue.LengthSeconds - this.CurrentVideoInfo.LengthSeconds);
-        embed.addField("再生待ちの曲", this.info.Queue.LoopEnabled ? "ループします" : ((this.info.Queue.length - 1) + "曲(" + qhour + "時間" + qmin + "分" + qsec + "秒)"), true);
+        embed.addField("再生待ちの曲", this.info.Queue.LoopEnabled ? "ループします" : ((this.info.Queue.length - 1) + "曲(" + (qhour === "0" ? "" : qhour + ":") + qmin + ":" + qsec + ")"), true);
         embed.setThumbnail(this.CurrentVideoInfo.Thumnail);
         if(this.CurrentVideoInfo.ServiceIdentifer === "youtube" && (this.CurrentVideoInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
