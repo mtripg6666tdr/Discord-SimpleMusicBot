@@ -474,6 +474,7 @@ export class MusicBot {
               message.channel.send("再生するコンテンツがありません").catch(e => log(e, "error"));
               return;
             }
+            const wasConnected = this.data[message.guild.id].Manager.IsConnecting;
             // VCに入れない
             if(!(await join())) {
               return;
@@ -481,10 +482,10 @@ export class MusicBot {
             // 引数ついてたらそれ優先
             if(optiont !== ""){
               if(optiont.startsWith("http://") || optiont.startsWith("https://")){
-                options.forEach(async u => {
-                  optiont = u;
-                  await playFromURL(!this.data[message.guild.id].Manager.IsConnecting);
-                });
+                for(let i = 0; i < options.length; i++){
+                  optiont = options[i];
+                  await playFromURL(i === 0 ? !wasConnected : false);
+                }
               }else{
                 const msg = await message.channel.send("🔍検索中...");
                 const result = (await ytsr.default(optiont, {
