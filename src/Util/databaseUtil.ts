@@ -9,15 +9,20 @@ export abstract class DatabaseAPI {
       const ids = data.map(d => d.guildid).join(",");
       var rawData = {} as {[key:string]:string};
       data.forEach(d => rawData[d.guildid] = d.value);
-      const result = await this.HttpRequest("POST", process.env.GAS_URL, {
-        token: process.env.GAS_TOKEN,
-        guildid: ids,
-        data: JSON.stringify(rawData),
-        type: "j"
-      } as requestBody, MIME_JSON);
-      if(result.status === 200){
-        return true;
-      }else{
+      try{
+        const result = await this.HttpRequest("POST", process.env.GAS_URL, {
+          token: process.env.GAS_TOKEN,
+          guildid: ids,
+          data: JSON.stringify(rawData),
+          type: "j"
+        } as requestBody, MIME_JSON);
+        if(result.status === 200){
+          return true;
+        }else{
+          return false;
+        }
+      }
+      catch{
         return false;
       }
     }else{
@@ -27,14 +32,19 @@ export abstract class DatabaseAPI {
 
   static async GetIsSpeaking(guildids:string[]){
     if(this.CanOperate){
-      const result = await this.HttpRequest("GET", process.env.GAS_URL, {
-        token: process.env.GAS_TOKEN,
-        guildid: guildids.join(","),
-        type: "j"
-      } as requestBody, MIME_JSON);
-      if(result.status === 200){
-        return result.data as {[guildid:string]:string}
-      }else{
+      try{
+        const result = await this.HttpRequest("GET", process.env.GAS_URL, {
+          token: process.env.GAS_TOKEN,
+          guildid: guildids.join(","),
+          type: "j"
+        } as requestBody, MIME_JSON);
+        if(result.status === 200){
+          return result.data as {[guildid:string]:string}
+        }else{
+          return null;
+        }
+      }
+      catch{
         return null;
       }
     }else{
@@ -47,13 +57,18 @@ export abstract class DatabaseAPI {
       const ids = data.map(d => d.guildid).join(",");
       var rawData = {} as {[guildis:string]:string};
       data.forEach(d => rawData[d.guildid] = d.queue);
-      const result = await this.HttpRequest("POST", process.env.GAS_URL, {
-        token: process.env.GAS_TOKEN,
-        guildid: ids,
-        data: JSON.stringify(rawData),
-        type: "queue"
-      } as requestBody, MIME_JSON);
-      return result.status === 200;
+      try{
+        const result = await this.HttpRequest("POST", process.env.GAS_URL, {
+          token: process.env.GAS_TOKEN,
+          guildid: ids,
+          data: JSON.stringify(rawData),
+          type: "queue"
+        } as requestBody, MIME_JSON);
+        return result.status === 200;
+      }
+      catch{
+        return false;
+      }
     }else{
       return false;
     }
@@ -61,14 +76,19 @@ export abstract class DatabaseAPI {
 
   static async GetQueueData(guildids:string[]){
     if(this.CanOperate){
-      const result = await this.HttpRequest("GET", process.env.GAS_URL, {
-        token: process.env.GAS_TOKEN,
-        guildid: guildids.join(","),
-        type: "queue"
-      } as requestBody, MIME_JSON);
-      if(result.status === 200){
-        return result.data as {[guildid:string]:string};
-      }else return null;
+      try{
+        const result = await this.HttpRequest("GET", process.env.GAS_URL, {
+          token: process.env.GAS_TOKEN,
+          guildid: guildids.join(","),
+          type: "queue"
+        } as requestBody, MIME_JSON);
+        if(result.status === 200){
+          return result.data as {[guildid:string]:string};
+        }else return null;
+      }
+      catch{
+        return null;
+      }
     }else{
       return null;
     }
@@ -99,7 +119,12 @@ export abstract class DatabaseAPI {
         var data = "";
         res.on("data", (chunk) => data+=chunk);
         res.on("end", ()=> {
-          resolve(JSON.parse(data) as postResult)
+          try{
+            resolve(JSON.parse(data) as postResult)
+          }
+          catch{
+            reject();
+          }
         });
         res.on("error", ()=>reject());
       });

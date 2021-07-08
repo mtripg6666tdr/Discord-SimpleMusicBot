@@ -1520,6 +1520,6 @@ export class MusicBot {
       });
       DatabaseAPI.SetIsSpeaking(speaking);
     }
-    catch(e){throw e};
+    catch{}
   }
 }
