@@ -1,45 +1,79 @@
-import { Client, Message, MessageEmbed, VoiceConnection } from "discord.js";
+import { Client, VoiceConnection } from "discord.js";
 import * as fs from "fs";
 import { exportableCustom } from "./AudioSource/custom";
 import { MusicBot } from "./bot";
 import { PlayManager } from "./Component/PlayManager";
 import { QueueManager } from "./Component/QueueManager";
 
-// サーバーごとデータ
+/**
+ * サーバーごとデータを保存するコンテナ
+ */
 export class GuildVoiceInfo{
-  // 永続的設定
+  /**
+   * 永続的設定を保存するコンテナ
+   */
   PersistentPref:PersistentPref;
-  // ボイスチャンネルの接続
+  /**
+   * ボイスチャンネルの接続
+   */
   Connection:VoiceConnection;
-  // 検索窓の格納
+  /**
+   * 検索窓の格納します
+   */
   SearchPanel: {
-    // 検索窓のメッセージを表す
+    /**
+     * 検索窓のメッセージを保存します
+     */
     Msg: {
-      // 検索窓のメッセージID
+      /**
+       * 検索窓のメッセージID
+       */
       id: string,
-      // 検索窓のチャンネルID
+      /**
+       * 検索窓のチャンネルID
+       */
       chId: string,
-      // 検索者
+      /**
+       * 検索したユーザーのID
+       */
       userId: string
-      // 検索者名
+      /**
+       * 検索者のユーザー名
+       */
       userName: string
     },
-    // 検索窓の内容
+    /**
+     * 検索窓の内容を保存します
+     */
     Opts: {[num:number]: VideoInfo}
   };
-  // キューマネジャ
+  /**
+   * キューマネジャ
+   */
   Queue:QueueManager;
-  // 再生マネジャ
+  /**
+   * 再生マネジャ
+   */
   Manager:PlayManager;
-  // 紐づけテキストチャンネル
+  /**
+   * 紐づけテキストチャンネル
+   */
   boundTextChannel:string;
-  // サーバーID
+  /**
+   * サーバーID
+   */
   GuildID:string;
-  // データパス
+  /**
+   * データパス
+   */
   DataPath:string;
-  // メインモジュール
+  /**
+   * メインボット
+   */
   Bot:MusicBot;
-  // 関連動画自動追加
+  /**
+   * 関連動画自動追加が有効
+   */
   AddRelative:boolean
 
   constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBot){
@@ -130,3 +164,4 @@ export class CancellationPending {
 
 export const FallBackNotice = "現在、通常の方法で情報を取得できなかったため、代替としてPythonライブラリにフォールバックして取得しました。処理に時間がかかるなど、正常なオペレーションができない場合があります。";
 export const DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36";
+export const EventEmitterLike = {emit: ()=>{}};

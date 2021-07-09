@@ -10,7 +10,7 @@ class LogStore{
   }
 }
 
-export var logStore = new LogStore();
+export const logStore = new LogStore();
 
 export function log(content:string, level:"log"|"warn"|"error" = "log"){
   if(!logStore.log && level === "log") return;

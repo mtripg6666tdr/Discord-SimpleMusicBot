@@ -98,7 +98,7 @@ export abstract class BestdoriApi {
    * @returns BestdoriのID
    */
   static getAudioId(url:string):number{
-    var match = url.match(/^https?:\/\/bestdori\.com\/info\/songs\/(?<Id>\d+)(\/.*)?$/);
+    const match = url.match(/^https?:\/\/bestdori\.com\/info\/songs\/(?<Id>\d+)(\/.*)?$/);
     if(match){
       return Number(match.groups.Id);
     }else{
@@ -135,7 +135,7 @@ class BestdoriData {
   allsonginfo:BestdoriAllSongInfo = null;
   allbandinfo:BestdoriAllBandInfo = null;
 }
-export var bestdori = new BestdoriData();
+export const bestdori = new BestdoriData();
 export type BandID = number;
 export type SongID = number;
 

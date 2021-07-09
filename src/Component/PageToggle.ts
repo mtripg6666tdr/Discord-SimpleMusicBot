@@ -41,7 +41,7 @@ export class PageToggle {
 
   static Organize(toggles:PageToggle[], min:number, forceRemovingUnfresh:string = null){
     const delIndex = [] as number[];
-    for(var i = 0; i < toggles.length; i++){
+    for(let i = 0; i < toggles.length; i++){
       if(new Date().getTime() - toggles[i].Message.createdTimestamp >= min * 60 * 1000 || (forceRemovingUnfresh && toggles[i].IsFreshNecessary && toggles[i].Message.guild.id === forceRemovingUnfresh)){
         delIndex.push(i);
       }
@@ -54,7 +54,7 @@ export class PageToggle {
   }
 
   async FlipPage(page:number){
-    var embed = null as MessageEmbed;
+    let embed = null as MessageEmbed;
     this._current = page;
     if(this._embeds instanceof Array){
       embed = (this._embeds as MessageEmbed[])[page]

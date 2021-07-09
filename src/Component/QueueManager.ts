@@ -22,7 +22,7 @@ export class QueueManager extends ManagerBase {
   // キューの本体
   private _default:QueueContent[] = [];
   // キューの本体のゲッタープロパティ
-  get default():QueueContent[] {
+  private get default():QueueContent[] {
     return this._default;
   }
   // トラックループが有効か?
@@ -36,7 +36,7 @@ export class QueueManager extends ManagerBase {
     return this.default.length;
   }
   get LengthSeconds():number{
-    var totalLength = 0;
+    let totalLength = 0;
     this.default.forEach(q => totalLength += Number(q.BasicInfo.LengthSeconds));
     return totalLength;
   }
@@ -49,6 +49,40 @@ export class QueueManager extends ManagerBase {
   SetData(data:GuildVoiceInfo){
     log("[QueueManager]Set data of guild id " + data.GuildID);
     super.SetData(data);
+  }
+
+  /**
+   * キュー内の指定されたインデックスの内容を返します
+   * @param index インデックス
+   * @returns 指定された位置にあるキューコンテンツ
+   */
+  get(index:number){
+    return this.default[index];
+  }
+
+  /**
+   * キュー内で与えられた条件に適合するものを配列として返却します
+   * @param predicate 条件を表す関数
+   * @returns 条件に適合した要素の配列
+   */
+  filter(predicate: (value: QueueContent, index: number, array: QueueContent[]) => unknown, thisArg?: any):QueueContent[]{
+    return this.default.filter(predicate, thisArg);
+  }
+  /**
+   * キュー内のコンテンツから与えられた条件に一致する最初の要素のインデックスを返却します
+   * @param predicate 条件
+   * @returns インデックス
+   */
+  findIndex(predicate: (value: QueueContent, index: number, obj: QueueContent[]) => unknown, thisArg?: any):number{
+    return this.default.findIndex(predicate, thisArg);
+  }
+  /**
+   * キュー内のコンテンツのすべてで与えられた関数を実行し結果を配列として返却します
+   * @param callbackfn 変換する関数
+   * @returns 変換後の配列
+   */
+  map<T>(callbackfn: (value: QueueContent, index: number, array: QueueContent[]) => T, thisArg?: any):T[]{
+    return this.default.map(callbackfn, thisArg);
   }
 
   async AddQueue(
@@ -96,6 +130,9 @@ export class QueueManager extends ManagerBase {
     }
     if(result.BasicInfo){
       this._default[method](result);
+      if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+        this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+      }
       return result;
     }
     throw "Provided URL was not resolved as available service";
@@ -125,8 +162,8 @@ export class QueueManager extends ManagerBase {
       gotData:exportableCustom = null
       ){
     log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Called");
-    var ch:TextChannel = null;
-    var msg:Message = null;
+    let ch:TextChannel = null;
+    let msg:Message = null;
     try{
       if(fromSearch && this.info.SearchPanel){
         // 検索パネルから
@@ -187,6 +224,9 @@ export class QueueManager extends ManagerBase {
     }
   }
 
+  /**
+   * 次の曲に移動します
+   */
   async Next(){
     log("[QueueManager/" + this.info.GuildID + "]Next() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
@@ -205,26 +245,51 @@ export class QueueManager extends ManagerBase {
       }
     }
     this._default.shift();
+    if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+      this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+    }
   }
 
+  /**
+   * 指定された位置のキューコンテンツを削除します
+   * @param offset 位置
+   */
   RemoveAt(offset:number){
     log("[QueueManager/" + this.info.GuildID + "]RemoveAt() Called (offset:" + offset + ")");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default.splice(offset, 1);
+    if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+      this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+    }
   }
 
+  /**
+   * すべてのキューコンテンツを消去します
+   */
   RemoveAll(){
     log("[QueueManager/" + this.info.GuildID + "]RemoveAll() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default = [];
+    if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+      this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+    }
   }
 
+  /**
+   * 最初のキューコンテンツだけ残し、残りのキューコンテンツを消去します
+   */
   RemoveFrom2(){
     log("[QueueManager/" + this.info.GuildID + "]RemoveFrom2() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default = [this.default[0]];
+    if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+      this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+    }
   }
 
+  /**
+   * キューをシャッフルします
+   */
   Shuffle(){
     log("[QueueManager/" + this.info.GuildID + "]Shuffle() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
@@ -237,23 +302,40 @@ export class QueueManager extends ManagerBase {
     }else{
       this._default.sort(() => Math.random() - 0.5);
     }
+    if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+      this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+    }
   }
 
+  /**
+   * 条件に一致するキューコンテンツをキューから削除します
+   * @param validator 条件を表す関数
+   * @returns 削除されたオフセットの一覧
+   */
   RemoveIf(validator:(q:QueueContent)=>Boolean){
     log("[QueueManager/" + this.info.GuildID + "]RemoveIf() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(this._default.length === 0) return;
     const first = this.info.Manager.IsPlaying ? 1 : 0
     const rmIndex = [] as number[];
-    for(var i = first; i < this._default.length; i++){
+    for(let i = first; i < this._default.length; i++){
       if(validator(this._default[i])){
         rmIndex.push(i);
       }
     }
+    rmIndex.sort((a,b)=>b-a);
     rmIndex.forEach(n => this.RemoveAt(n));
+    if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+      this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+    }
     return rmIndex;
   }
 
+  /**
+   * キュー内で移動します
+   * @param from 移動元のインデックス
+   * @param to 移動先のインデックス
+   */
   Move(from:number, to:number){
     log("[QueueManager/" + this.info.GuildID + "]Move() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
@@ -267,6 +349,9 @@ export class QueueManager extends ManagerBase {
       this.default.splice(to, 0, this.default[from]);
       //要素削除
       this.default.splice(from + 1, 1);
+    }
+    if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+      this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
     }
   }
 }

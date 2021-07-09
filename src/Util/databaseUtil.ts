@@ -7,7 +7,7 @@ export abstract class DatabaseAPI {
   static async SetIsSpeaking(data:{guildid:string, value:string}[]){
     if(this.CanOperate){
       const ids = data.map(d => d.guildid).join(",");
-      var rawData = {} as {[key:string]:string};
+      let rawData = {} as {[key:string]:string};
       data.forEach(d => rawData[d.guildid] = d.value);
       try{
         const result = await this.HttpRequest("POST", process.env.GAS_URL, {
@@ -55,7 +55,7 @@ export abstract class DatabaseAPI {
   static async SetQueueData(data:{guildid:string, queue:string}[]){
     if(this.CanOperate){
       const ids = data.map(d => d.guildid).join(",");
-      var rawData = {} as {[guildis:string]:string};
+      let rawData = {} as {[guildis:string]:string};
       data.forEach(d => rawData[d.guildid] = d.queue);
       try{
         const result = await this.HttpRequest("POST", process.env.GAS_URL, {
@@ -116,7 +116,7 @@ export abstract class DatabaseAPI {
         }
       }
       const req = https.request(opt, (res) => {
-        var data = "";
+        let data = "";
         res.on("data", (chunk) => data+=chunk);
         res.on("end", ()=> {
           try{

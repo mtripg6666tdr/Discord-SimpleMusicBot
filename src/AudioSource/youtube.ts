@@ -140,12 +140,12 @@ export class YouTube extends AudioSource {
       this.Description = info.description ?? "不明";
       if(info.title) this.Title = info.title;
       if(info.is_live){
-        var format = info.formats.filter(f => f.format_id === info.format_id);
+        const format = info.formats.filter(f => f.format_id === info.format_id);
         const stream = new PassThrough({
           highWaterMark: 1024 * 512
         });
         stream._destroy = () => { stream.destroyed = true };
-          const req = m3u8stream(format[0].url, {
+        const req = m3u8stream(format[0].url, {
           begin: Date.now(),
           parser: "m3u8"
         });
@@ -156,7 +156,7 @@ export class YouTube extends AudioSource {
         });
         return stream;
       }else{
-        var format = info.formats.filter(f => f.format_note==="tiny");
+        const format = info.formats.filter(f => f.format_note==="tiny");
         format.sort((fa, fb) => fb.abr - fa.tbr);
         return format[0].url;
       }
@@ -243,7 +243,7 @@ async function getYouTubeDlInfo(url:string):Promise<Promise<string>>{
       }
       ytdlUpdateCheck.last = new Date();
     }
-    var version = "";
+    let version = "";
     try{
       const buf = await execAsync("." + (process.platform === "win32" ? "\\" : "/") + "youtube-dl --version");
       version = buf.trim();
@@ -264,7 +264,7 @@ async function getYouTubeDlInfo(url:string):Promise<Promise<string>>{
 class ytdlUpdateCheckData {
   last:Date = new Date(0);
 }
-var ytdlUpdateCheck = new ytdlUpdateCheckData();
+const ytdlUpdateCheck = new ytdlUpdateCheckData();
 
 // QuickType of youtube-dl json
 interface YoutubeDlInfo {

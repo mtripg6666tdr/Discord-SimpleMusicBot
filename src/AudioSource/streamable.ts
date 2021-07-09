@@ -73,7 +73,7 @@ export abstract class StreamableApi {
    * @returns 動画のID
    */
   static getVideoId(url:string):string{
-    var match = url.match(/^https?:\/\/streamable.com\/(?<Id>.+)$/);
+    const match = url.match(/^https?:\/\/streamable.com\/(?<Id>.+)$/);
     if(match){
       return match.groups.Id
     }else{

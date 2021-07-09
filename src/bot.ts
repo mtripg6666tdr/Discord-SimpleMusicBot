@@ -36,8 +36,10 @@ export class MusicBot {
   private cancellations = [] as CancellationPending[];
   private EmbedPageToggle:PageToggle[] = [] as PageToggle[];
   private isReadyFinished = false;
+  private queueModifiedGuilds = [] as string[];
   get Toggles(){return this.EmbedPageToggle};
   get Client(){return this.client};
+  get QueueModifiedGuilds(){return this.queueModifiedGuilds};
 
   constructor(){
     this.instantiatedTime = new Date();
@@ -97,7 +99,7 @@ export class MusicBot {
 
       const tick = ()=>{
         this.Log();
-        setTimeout(tick, 5 * 60 * 1000);
+        setTimeout(tick, 4 * 60 * 1000);
         PageToggle.Organize(this.EmbedPageToggle, 5);
         this.BackupData();
       };
@@ -608,10 +610,10 @@ export class MusicBot {
             const getQueueEmbed = (page:number)=>{
               const fields:{name:string, value:string}[] = [];
               for(let i = 10 * (page - 1); i < 10 * page; i++){
-                if(queue.default.length <= i){
+                if(queue.length <= i){
                   break;
                 }
-                const q = queue.default[i];
+                const q = queue.get(i);
                 const _t = Number(q.BasicInfo.LengthSeconds);
                 const [min,sec] = CalcMinSec(_t);
                 fields.push({
@@ -671,7 +673,7 @@ export class MusicBot {
               message.channel.send("再生中ではありません").catch(e => log(e, "error"));
               return;
             }
-            const title = this.data[message.guild.id].Queue.default[0].BasicInfo.Title;
+            const title = this.data[message.guild.id].Queue.get(0).BasicInfo.Title;
             this.data[message.guild.id].Manager.Stop();
             await this.data[message.guild.id].Queue.Next();
             this.data[message.guild.id].Manager.Play();
@@ -753,7 +755,7 @@ export class MusicBot {
             const dels = Array.from(new Set(
                 options.map(str => Number(str)).filter(n => !isNaN(n)).sort((a,b)=>b-a)
             ));
-            const title = dels.length === 1 ? q.default[dels[0]].BasicInfo.Title : null;
+            const title = dels.length === 1 ? q.get(dels[0]).BasicInfo.Title : null;
             for(let i = 0; i < dels.length; i++){
               q.RemoveAt(Number(dels[i]));
             }
@@ -891,10 +893,10 @@ export class MusicBot {
             const to = Number(options[1]);
             const q = this.data[message.guild.id].Queue;
             if(
-              0 <= from && from <= q.default.length &&
-              0 <= to && to <= q.default.length
+              0 <= from && from <= q.length &&
+              0 <= to && to <= q.length
               ){
-                const title = q.default[from].BasicInfo.Title
+                const title = q.get(from).BasicInfo.Title;
                 if(from !== to){
                   q.Move(from, to);
                   message.channel.send("✅ `" + title +  "`を`" + from + "`番目から`"+ to + "`番目に移動しました").catch(e => log(e, "error"));
@@ -1308,7 +1310,7 @@ export class MusicBot {
             }
             const q = this.data[message.guild.id].Queue;
             q.Move(q.length - 1, 1);
-            const info = q.default[1];
+            const info = q.get(1);
             message.channel.send("✅`" + info.BasicInfo.Title + "`を一番最後からキューの先頭に移動しました").catch(e => log(e, "error"));
           }break;
 
@@ -1321,14 +1323,14 @@ export class MusicBot {
               message.channel.send("✘キューが空です").catch(e => log(e, "error"));
               return;
             }
-            let qsresult = this.data[message.guild.id].Queue.default.filter(c => c.BasicInfo.Title.toLowerCase().indexOf(optiont.toLowerCase()) >= 0);
+            let qsresult = this.data[message.guild.id].Queue.filter(c => c.BasicInfo.Title.toLowerCase().indexOf(optiont.toLowerCase()) >= 0);
             if(qsresult.length === 0){
               message.channel.send(":confused:見つかりませんでした").catch(e => log(e, "error"));
               return;
             }
             if(qsresult.length > 20) qsresult = qsresult.slice(0,20);
             const fields = qsresult.map(c => {
-              const index = this.data[message.guild.id].Queue.default.findIndex(d => d.BasicInfo.Title === c.BasicInfo.Title).toString()
+              const index = this.data[message.guild.id].Queue.findIndex(d => d.BasicInfo.Title === c.BasicInfo.Title).toString()
               const _t = c.BasicInfo.LengthSeconds;
               const [min,sec] = CalcMinSec(_t);
               return {
@@ -1357,8 +1359,8 @@ export class MusicBot {
               embed.setImage(opt.thumbnail);
               embed.title = opt.title;
               embed.description = "URL: " + opt.url;
-            }else if(!optiont && this.data[message.guild.id].Manager.IsPlaying && this.data[message.guild.id].Queue.default.length >= 1){
-              const info = this.data[message.guild.id].Queue.default[0].BasicInfo;
+            }else if(!optiont && this.data[message.guild.id].Manager.IsPlaying && this.data[message.guild.id].Queue.length >= 1){
+              const info = this.data[message.guild.id].Queue.get(0).BasicInfo;
               embed.setImage(info.Thumnail);
               embed.title = info.Title;
               embed.description = "URL: " + info.Url;
@@ -1473,7 +1475,7 @@ export class MusicBot {
   private exportQueue(guildId:string){
     return JSON.stringify({
       version: YmxVersion,
-      data: this.data[guildId].Queue.default.map(q => q.BasicInfo.exportData())
+      data: this.data[guildId].Queue.map(q => q.BasicInfo.exportData())
     } as YmxFormat);
   }
 
@@ -1492,13 +1494,18 @@ export class MusicBot {
         this.BackupStatus();
         // キューの送信
         const queue = [] as {guildid:string, queue:string}[];
-        Object.keys(this.data).forEach(id => {
+        const guilds = this.queueModifiedGuilds;
+        this.queueModifiedGuilds = [];
+        guilds.forEach(id => {
+          if(this.data[id].Queue.length)
           queue.push({
             guildid: id,
             queue: this.exportQueue(id)
           });
-        })
-        DatabaseAPI.SetQueueData(queue);
+        });
+        if(queue.length > 0){
+          DatabaseAPI.SetQueueData(queue);
+        }
       }
       catch(e){
         log(e, "warn");
@@ -1521,6 +1528,8 @@ export class MusicBot {
       });
       DatabaseAPI.SetIsSpeaking(speaking);
     }
-    catch{}
+    catch(e){
+      log(e, "warn");
+    }
   }
 }

@@ -50,7 +50,7 @@ export function AddZero(str:string, length:number){
  */
 export function CalcTime(date:number):number[]{
   const millisec = date % 1000;
-  var ato = (date - millisec) / 1000;
+  let ato = (date - millisec) / 1000;
   const sec = ato % 60;
   ato = (ato - sec) / 60;
   const min = ato % 60;
@@ -68,7 +68,7 @@ type MemoryUsageInfo = {free:number,total:number,used:number,usage:number};
  * @returns メモリ使用情報
  */
 export function GetMemInfo():MemoryUsageInfo{
-  var memory = {} as MemoryUsageInfo;
+  let memory = {} as MemoryUsageInfo;
   memory.free = GetMBytes(os.freemem());
   memory.total = GetMBytes(os.totalmem());
   memory.used = memory.total - memory.free;
@@ -119,7 +119,7 @@ export function DownloadText(url:string, headers?:{[key:string]:string}, request
       method: requestBody ? "POST" : "GET",
       headers: headers ?? undefined
     }, res => {
-      var data = "";
+      let data = "";
       res.on("data", chunk =>{
         data += chunk;
       });
@@ -202,7 +202,7 @@ export function InitPassThrough():PassThrough{
  * 文字列を正規化します
  */
 export function NormalizeText(rawText:string){
-  var result = rawText;
+  let result = rawText;
   ([
     {key: /０/g, value: "0"},
     {key: /１/g, value: "1"},

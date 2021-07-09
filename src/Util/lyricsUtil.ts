@@ -24,8 +24,8 @@ export async function GetLyrics(keyword:string):Promise<songInfo>{
       throw "No lyric was found";
     }
     const url = items[0].link;
-    var lyric = await DownloadWithoutRuby(url);
-    var doc = "";
+    let lyric = await DownloadWithoutRuby(url);
+    let doc = "";
     [doc, lyric] = lyric.split("<div class=\"hiragana\" >");
     [lyric, ] = lyric.split("</div>");
     lyric = lyric.replace(/<span class="rt rt_hidden">.+?<\/span>/g, "");
@@ -59,7 +59,7 @@ function DownloadWithoutRuby(url:string):Promise<string>{
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"
       }
     }, res => {
-      var data = "";
+      let data = "";
       res.on("data", (chunk)=>{
         data += chunk;
       });

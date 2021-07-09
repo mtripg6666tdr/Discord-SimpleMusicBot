@@ -2,7 +2,7 @@ import { Client, Message, MessageEmbed, StreamDispatcher, TextChannel } from "di
 import { Readable } from "stream";
 import { AudioSource, defaultM3u8stream } from "../AudioSource/audiosource";
 import { YouTube } from "../AudioSource/youtube";
-import { FallBackNotice, GuildVoiceInfo } from "../definition";
+import { EventEmitterLike, FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, DownloadAsReadable, isAvailableRawVideoURL, log } from "../Util/util";
 import { ManagerBase } from "./ManagerBase";
@@ -72,7 +72,7 @@ export class PlayManager extends ManagerBase {
     log("[PlayManager/" + this.info.GuildID + "]Play() called");
     let mes:Message = null;
     let ch:TextChannel = null;
-    this.CurrentVideoInfo = this.info.Queue.default[0].BasicInfo;
+    this.CurrentVideoInfo = this.info.Queue.get(0).BasicInfo;
     if(this.info.boundTextChannel){
       ch = await this.client.channels.fetch(this.info.boundTextChannel) as TextChannel;
       const [min,sec] = CalcMinSec(this.CurrentVideoInfo.LengthSeconds);
@@ -90,7 +90,7 @@ export class PlayManager extends ManagerBase {
       }
       log("[PlayManager:" + this.info.GuildID + "]Play() failed, (" + this.errorCount + "times)", "warn");
       this.Stop();
-      if(this.errorCount > 3){
+      if(this.errorCount >= 3){
         await this.info.Queue.Next();
       }
       this.Play();
@@ -99,7 +99,7 @@ export class PlayManager extends ManagerBase {
       // 変数の初期化
       this.pausedSince = 0;
       // fetchしている間にPlayingを読み取られた時用に適当なオブジェクトを代入してnullでなくしておく
-      this.Dispatcher = {emit:()=>{}} as any;
+      this.Dispatcher = EventEmitterLike as any;
       // QueueContentからストリーム、M3U8プレイリスト(非HLS)または直URLを取得
       const rawStream = await this.CurrentVideoInfo.fetch();
       let stream:Readable|string = this.ResolveStream(rawStream);
@@ -139,14 +139,14 @@ export class PlayManager extends ManagerBase {
           description: "[" + this.CurrentVideoInfo.Title + "](" + this.CurrentVideoUrl + ") `" + ((this.CurrentVideoInfo.ServiceIdentifer === "youtube" && (this.CurrentVideoInfo as YouTube).LiveStream) ? "(ライブストリーム)" : _t === 0 ? "(不明)" : (min + ":" + sec)) + "`"
         });
         embed.setColor(getColor("AUTO_NP"));
-        embed.addField("リクエスト", this.info.Queue.default[0].AdditionalInfo.AddedBy.displayName, true);
+        embed.addField("リクエスト", this.info.Queue.get(0).AdditionalInfo.AddedBy.displayName, true);
         embed.addField("次の曲", 
           // トラックループオンなら現在の曲
-          this.info.Queue.LoopEnabled ? this.info.Queue.default[0].BasicInfo.Title :
+          this.info.Queue.LoopEnabled ? this.info.Queue.get(0).BasicInfo.Title :
           // (トラックループはオフ)長さが2以上ならオフセット1の曲
-          this.info.Queue.length >= 2 ? this.info.Queue.default[1].BasicInfo.Title :
+          this.info.Queue.length >= 2 ? this.info.Queue.get(1).BasicInfo.Title :
           // (トラックループオフ,長さ1)キューループがオンなら現在の曲
-          this.info.Queue.QueueLoopEnabled ? this.info.Queue.default[0].BasicInfo.Title :
+          this.info.Queue.QueueLoopEnabled ? this.info.Queue.get(0).BasicInfo.Title :
           // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
           "次の曲がまだ登録されていません"
           , true);
