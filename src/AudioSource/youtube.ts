@@ -199,6 +199,11 @@ export class YouTube extends AudioSource {
       isLive: this.LiveStream
     };
   };
+
+  disableCache(){
+    this.ytdlInfo = null;
+    this.youtubeDlInfo = null;
+  }
 }
 
 export type exportableYouTube = {

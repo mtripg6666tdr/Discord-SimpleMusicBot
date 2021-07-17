@@ -88,6 +88,9 @@ export class PlayManager extends ManagerBase {
       }else{
         this.errorCount = 1;
         this.errorUrl = this.CurrentVideoInfo.Url;
+        if((this.CurrentVideoInfo as YouTube).disableCache){
+          (this.CurrentVideoInfo as YouTube).disableCache();
+        }
       }
       log("[PlayManager:" + this.info.GuildID + "]Play() failed, (" + this.errorCount + "times)", "warn");
       this.Stop();
