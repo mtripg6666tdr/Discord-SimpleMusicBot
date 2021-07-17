@@ -4,3 +4,4 @@ typings
 *.env
 *.exe
 youtube-dl
+*.template.*
