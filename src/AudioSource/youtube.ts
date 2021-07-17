@@ -216,9 +216,10 @@ function execAsync(command:string):Promise<string>{
     try{
       exec(command, (error, stdout, stderr) => {
         if(error){
-          reject(error);
+          reject(stderr);
+        }else{
+          resolve(stdout);
         }
-        resolve(stdout);
       });
     }
     catch(e){

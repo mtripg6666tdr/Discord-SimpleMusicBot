@@ -16,6 +16,7 @@ export class PlayManager extends ManagerBase {
   private vol:number = 100;
   private startTime = 0;
   private pausedSince = 0;
+  private readonly retryLimit = 3;
   errorCount = 0;
   errorUrl = "";
   get CurrentVideoUrl():string{
@@ -90,7 +91,7 @@ export class PlayManager extends ManagerBase {
       }
       log("[PlayManager:" + this.info.GuildID + "]Play() failed, (" + this.errorCount + "times)", "warn");
       this.Stop();
-      if(this.errorCount >= 3){
+      if(this.errorCount >= this.retryLimit){
         await this.info.Queue.Next();
       }
       this.Play();
@@ -124,7 +125,7 @@ export class PlayManager extends ManagerBase {
         if(this.info.boundTextChannel){
           this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
             log("[PlayManager/" + this.info.GuildID + "]Some error occurred in StreamDispatcher", "error");
-            (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? (e.message ?? e) : "undefined") + ")" + (this.errorCount >= 3 ? "スキップします。" : "再試行します。")).catch(e => log(e, "error"));
+            (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? (e.message ?? e) : "undefined") + ")" + (this.errorCount >= this.retryLimit ? "スキップします。" : "再試行します。")).catch(e => log(e, "error"));
           }).catch(e => log(e, "error"));
         }
         cantPlay();
@@ -163,7 +164,7 @@ export class PlayManager extends ManagerBase {
       log(e, "error");
       try{
         const t = typeof e == "string" ? e : JSON.stringify(e);
-        if(t.indexOf("429")>=0){
+        if(t.indexOf("429") >= 0){
           mes.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(e => log(e, "error"));
           log("Rate limit detected", "error");
           this.Stop();
@@ -171,7 +172,7 @@ export class PlayManager extends ManagerBase {
         }
       }catch{};
       if(this.info.boundTextChannel && ch && mes){
-        mes.edit(":tired_face:曲の再生に失敗しました...。" + (this.errorCount >= 3 ? "スキップします。" : "再試行します。"));
+        mes.edit(":tired_face:曲の再生に失敗しました...。" + (this.errorCount >= this.retryLimit ? "スキップします。" : "再試行します。"));
         cantPlay();
       }
     }
