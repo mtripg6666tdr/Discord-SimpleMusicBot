@@ -27,8 +27,13 @@ http.createServer((req, res) => {
 // ハンドルされなかったエラーのハンドル
 process.on("uncaughtException", (error)=>{
   if(bot.Client){
-    const errorText = typeof error === "string" ? error : JSON.stringify(error);
-    (bot.Client.channels.resolve("846411633458806804") as TextChannel).send(errorText);
+    try{
+      const errorText = typeof error === "string" ? error : JSON.stringify(error);
+      (bot.Client.channels.resolve("846411633458806804") as TextChannel).send(errorText);
+    }
+    catch{
+      throw error;
+    }
   }
 }).on("SIGINT", ()=>{
   if(bot.Client){
