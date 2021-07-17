@@ -1,33 +1,19 @@
+import { execSync } from "child_process";
 import * as discord from "discord.js";
-import * as os from "os";
 import * as ytpl from "ytpl";
-import * as ytsr from "ytsr";
-import Soundcloud, { SoundcloudTrackV2 } from "soundcloud.ts";
-import { bestdori, BestdoriApi } from "./AudioSource/bestdori";
-import { exec, execSync } from "child_process";
 import { exportableCustom } from "./AudioSource/custom";
-import { YouTube } from "./AudioSource/youtube";
+import { Command, CommandArgs } from "./Commands";
 import { PageToggle } from "./Component/PageToggle";
-import { CancellationPending, DefaultUserAgent, GuildVoiceInfo, YmxFormat, YmxVersion } from "./definition";
+import { CancellationPending, GuildVoiceInfo, YmxFormat, YmxVersion } from "./definition";
 import { getColor } from "./Util/colorUtil";
 import { DatabaseAPI } from "./Util/databaseUtil";
-import { GetLyrics } from "./Util/lyricsUtil";
 import {
-  CalcHourMinSec,
-  CalcMinSec,
-  CalcTime,
-  DownloadText,
-  GetMBytes,
-  GetMemInfo,
-  GetPercentage,
-  isAvailableRawAudioURL,
+  GetMemInfo, isAvailableRawAudioURL,
   log,
   logStore,
   NormalizeText,
   suppressMessageEmbeds
 } from "./Util/util";
-import { SoundCloudTrackCollection } from "./AudioSource/soundcloud";
-import { Command, CommandArgs } from "./Commands";
 
 export class MusicBot {
   private client = new discord.Client();
