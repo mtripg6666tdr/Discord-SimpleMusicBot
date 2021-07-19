@@ -15,7 +15,7 @@ export default class Thumbnail implements CommandInterface {
     options.updateBoundChannel(message);
     const embed = new discord.MessageEmbed();
     embed.setColor(getColor("THUMB"));
-    if(options.rawArgs && options.data[message.guild.id].SearchPanel && Object.keys(options.data[message.guild.id].SearchPanel.Opts).indexOf(options.rawArgs == "" ? options.rawArgs : "n") >= 0){
+    if(options.rawArgs && options.data[message.guild.id].SearchPanel && Object.keys(options.data[message.guild.id].SearchPanel.Opts).indexOf(options.rawArgs === "" ? "n" : options.rawArgs) >= 0){
       const opt = options.data[message.guild.id].SearchPanel.Opts[Number(NormalizeText(options.rawArgs))];
       embed.setImage(opt.thumbnail);
       embed.title = opt.title;
