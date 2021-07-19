@@ -4,7 +4,7 @@ import { log } from "../Util/util";
 
 export default class Loop implements CommandInterface {
   name = "ループ";
-  alias = ["トラックループ", "loop", "l"];
+  alias = ["トラックループ", "loop", "repeat", "trackloop", "trackrepeat"];
   description = "トラックごとのループを設定します。";
   unlist = false;
   category = "player";
