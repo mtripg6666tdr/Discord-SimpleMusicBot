@@ -187,12 +187,12 @@ export class PlayManager extends ManagerBase {
    * @returns this
   */
   Stop():PlayManager{
-    this.info.Bot.BackupData();
     log("[PlayManager/" + this.info.GuildID + "]Stop() called");
     if(this.Dispatcher && this.Dispatcher.destroy){
       this.Dispatcher.destroy();
     }
     this.Dispatcher = null;
+    this.info.Bot.BackupData();
     return this;
   }
 

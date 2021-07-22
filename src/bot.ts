@@ -256,7 +256,6 @@ export class MusicBot {
         const guilds = this.queueModifiedGuilds;
         this.queueModifiedGuilds = [];
         guilds.forEach(id => {
-          if(this.data[id].Queue.length)
           queue.push({
             guildid: id,
             queue: this.exportQueue(id)
@@ -280,7 +279,7 @@ export class MusicBot {
         speaking.push({
           guildid: id,
           // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
-          value: (this.data[id].Manager.IsPlaying ? 
+          value: (this.data[id].Manager.IsPlaying && !this.data[id].Manager.IsPaused ? 
             this.data[id].Connection.channel.id : "0") 
             + ":" + this.data[id].boundTextChannel + ":" + (this.data[id].Queue.LoopEnabled ? "1" : "0") + ":" + (this.data[id].Queue.QueueLoopEnabled ? "1" : "0") + ":" + (this.data[id].AddRelative ? "1" : "0")
         });
