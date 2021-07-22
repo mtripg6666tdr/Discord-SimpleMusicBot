@@ -40,23 +40,20 @@ export class Command {
   private commands = null as CommandInterface[];
 
   private constructor(){
-    //
-  }
-
-  resolve(command:string){
-    if(!this.commands){
-      this.commands = [];
+    this.commands = [];
       fs.readdirSync(__dirname, {withFileTypes: true})
       .filter(d => d.isFile())
-      .map(d => d.name.slice(0, -3))
-      .filter(n => n !== "index" && !n.endsWith(".js."))
+      .map(d => d.name)
+      .filter(n => n.endsWith(".js") && n !== "index.js")
+      .map(n => n.slice(0, -3))
       .forEach(n => {
         const cp = new (require(path.join(__dirname, n)).default)() as CommandInterface;
         this.commands.push(cp);
         return cp;
       });
-    }
+  }
 
+  resolve(command:string){
     for(let i = 0; i < this.commands.length; i++){
       if(this.commands[i].name === command || this.commands[i].alias.indexOf(command) >= 0){
         return this.commands[i];
