@@ -10,7 +10,7 @@
     "@types/node": "^15.12.4",
     "@types/ws": "^7.4.5",
     "discord.js": "^12.5.3",
-    "dotenv": "^9.0.2",
+    "dotenv": "^10.0.0",
     "follow-redirects": "^1.14.1",
     "genius-lyrics": "^4.2.9",
     "html-entities": "^2.3.2",
