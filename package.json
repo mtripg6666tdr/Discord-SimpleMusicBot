@@ -8,7 +8,7 @@
   "dependencies": {
     "@types/follow-redirects": "^1.13.1",
     "@types/node": "^15.12.4",
-    "@types/ws": "^7.4.5",
+    "@types/ws": "^7.4.7",
     "discord.js": "^12.5.3",
     "dotenv": "^10.0.0",
     "follow-redirects": "^1.14.1",
