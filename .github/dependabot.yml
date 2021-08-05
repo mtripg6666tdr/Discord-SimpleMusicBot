@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    commit-message:
+      prefix: "Update:"
+    target-branch: "master"
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-name: "discord.js"
+      - dependency-name: "soundcloud.ts"
