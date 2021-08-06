@@ -27,7 +27,7 @@
   },
   "devDependencies": {},
   "optionalDependencies": {
-    "ffmpeg-static": "^4.3.0"
+    "ffmpeg-static": "^4.4.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
