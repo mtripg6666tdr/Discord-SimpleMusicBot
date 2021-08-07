@@ -4,6 +4,7 @@ import * as path from "path";
 import { MusicBot } from "../bot";
 import { PageToggle } from "../Component/PageToggle";
 import { CancellationPending, GuildVoiceInfo } from "../definition";
+import Commands from "./commands";
 
 export interface CommandInterface {
   run(message:Message, options:CommandArgs):Promise<void>;
@@ -49,6 +50,9 @@ export class Command {
       .forEach(n => {
         const cp = new (require(path.join(__dirname, n)).default)() as CommandInterface;
         this.commands.push(cp);
+        if(cp.name === "コマンド"){
+          (cp as Commands).commands = this.commands;
+        }
         return cp;
       });
   }
