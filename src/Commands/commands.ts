@@ -7,7 +7,7 @@ export default class Commands implements CommandInterface{
   name = "コマンド";
   alias = ["command", "commands", "cmd"];
   description = "コマンド一覧を表示します。コマンド名を渡すとそのコマンドの詳細を表示します。";
-  unlist = true;
+  unlist = false;
   category = "bot";
   commands = null as CommandInterface[];
   usage = "command [コマンド名]";
