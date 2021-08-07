@@ -5,7 +5,7 @@ import { log } from "../Util/util";
 export default class LeaveClean implements CommandInterface {
   name = "leaveclean";
   alias = ["lc"];
-  description = "ボイスチャンネルから離脱した人のリクエストした曲を削除して整理します";
+  description = "ボイスチャンネルから離脱した人がリクエストした曲をキューから削除して整理します";
   unlist = false;
   category = "playlist";
   async run(message:discord.Message, options:CommandArgs){
