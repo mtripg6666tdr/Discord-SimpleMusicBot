@@ -128,7 +128,7 @@ export class PlayManager extends ManagerBase {
         if(this.info.boundTextChannel){
           this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
             log("[PlayManager/" + this.info.GuildID + "]Some error occurred in StreamDispatcher", "error");
-            (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? (e.message ?? e) : "undefined") + ")" + (this.errorCount >= this.retryLimit ? "スキップします。" : "再試行します。")).catch(e => log(e, "error"));
+            (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? (e.message ?? e) : "undefined") + ")" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。")).catch(e => log(e, "error"));
           }).catch(e => log(e, "error"));
         }
         cantPlay();
@@ -175,7 +175,7 @@ export class PlayManager extends ManagerBase {
         }
       }catch{};
       if(this.info.boundTextChannel && ch && mes){
-        mes.edit(":tired_face:曲の再生に失敗しました...。" + (this.errorCount >= this.retryLimit ? "スキップします。" : "再試行します。"));
+        mes.edit(":tired_face:曲の再生に失敗しました...。" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。"));
         cantPlay();
       }
     }
