@@ -5,11 +5,11 @@ import { log } from "../Util/util";
 export default class Rm implements CommandInterface {
   name = "削除";
   alias = ["消去", "rm", "remove"];
-  description = "キュー内の指定されたインデックス(位置)の曲を削除します。インデックスはキューの一覧に付与されているものです。";
+  description = "キュー内の指定された位置の曲を削除します。";
   unlist = false;
   category = "playlist";
   examples = "rm 5";
-  usage = "削除 <削除するインデックス>"
+  usage = "削除 <削除する位置>"
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.args.length == 0){

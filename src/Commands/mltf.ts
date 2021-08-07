@@ -5,7 +5,7 @@ import { log } from "../Util/util";
 export default class Some implements CommandInterface {
   name = "最後の曲を先頭へ";
   alias = ["movelastsongtofirst", "mlstf", "ml", "mltf", "mlf", "m1"];
-  description = "キューの最後の曲をキューの先頭に移動します";
+  description = "キューの最後の曲をキューの先頭に移動します。";
   unlist = false;
   category = "playlist";
   async run(message:discord.Message, options:CommandArgs){

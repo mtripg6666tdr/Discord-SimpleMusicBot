@@ -8,7 +8,6 @@ export default class Reboot implements CommandInterface {
   alias = [] as string[];
   unlist = true;
   async run(message:discord.Message, options:CommandArgs){
-    options.updateBoundChannel(message);
     if(message.author.id === "593758391395155978"){
       if(options.rawArgs === ""){
         message.channel.send("再起動を実行します...お待ちください...");

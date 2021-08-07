@@ -5,7 +5,7 @@ import { log } from "../Util/util";
 export default class Reset implements CommandInterface {
   name = "リセット";
   alias = ["reset"];
-  description = "サーバーの設定やデータを削除して初期化します。";
+  description = "サーバーのキュー、設定やデータを削除して初期化します。\r\n※接続中の場合ボイスチャンネルから離脱します。";
   unlist = false;
   category = "utility";
   async run(message:discord.Message, options:CommandArgs){

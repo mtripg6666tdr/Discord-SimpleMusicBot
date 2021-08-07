@@ -6,7 +6,7 @@ import { log } from "../Util/util";
 export default class Play implements CommandInterface {
   name = "再生";
   alias = ["play", "p"];
-  description = "キュー内の楽曲を再生します。引数としてYouTubeの動画のURLを指定することもできます。";
+  description = "キュー内の楽曲を再生します。引数として対応しているサイトの楽曲のURLを指定することもできます。";
   unlist = false;
   category = "player";
   async run(message:discord.Message, options:CommandArgs){

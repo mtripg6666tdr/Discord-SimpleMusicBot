@@ -5,7 +5,7 @@ import { log } from "../Util/util";
 export default class Skip implements CommandInterface {
   name = "スキップ";
   alias = ["skip", "s"];
-  description = "現在再生中の曲をスキップします";
+  description = "現在再生中の曲をスキップします。";
   unlist = false;
   category = "player";
   async run(message:discord.Message, options:CommandArgs){

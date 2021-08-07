@@ -5,7 +5,7 @@ import { log } from "../Util/util";
 export default class Bgm implements CommandInterface {
   name = "bgm";
   alias = ["study"];
-  description = "開発者が勝手に作った勉強用・作業用BGMのプレイリストをキューに追加して、再生されてない場合再生が開始されます。";
+  description = "開発者が勝手に作った勉強用・作業用BGMのプレイリストをキューに追加します。再生されてない場合再生が開始されます(可能な場合)。";
   unlist = false;
   category = "playlist";
   async run(message:discord.Message, options:CommandArgs){

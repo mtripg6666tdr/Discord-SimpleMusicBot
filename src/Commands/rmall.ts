@@ -5,7 +5,7 @@ import { log } from "../Util/util";
 export default class Rmall implements CommandInterface {
   name = "すべて削除";
   alias = ["すべて削除", "rmall", "allrm", "removeall"];
-  description = "キュー内の曲をすべて削除します。";
+  description = "キュー内の曲をすべて削除します。\r\n※接続中の場合ボイスチャンネルから離脱します。";
   unlist = false;
   category = "playlist";
   async run(message:discord.Message, options:CommandArgs){
