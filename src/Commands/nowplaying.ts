@@ -43,6 +43,6 @@ export default class NowPlaying implements CommandInterface {
     );
     embed.addField(":link:URL", info.Url);
 
-    message.channel.send(embed).catch(e => log(e, "error"));
+    message.channel.send({embeds:[embed]}).catch(e => log(e, "error"));
   }
 }

@@ -30,7 +30,7 @@ export default class Lyrics implements CommandInterface {
       embed.thumbnail = {
         url: song.artwork
       }
-      msg.edit("", embed);
+      msg.edit({content: "", embeds:[embed]});
     }
     catch(e){
       log(e, "error");

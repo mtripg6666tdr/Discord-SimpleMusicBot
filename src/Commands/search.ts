@@ -71,7 +71,7 @@ export default class Search implements CommandInterface {
           iconURL: message.author.avatarURL(),
           text:"動画のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
         };
-        await msg.edit("", embed);
+        await msg.edit({content:"", embeds:[embed]});
       }
       catch(e){
         log(e, "error");

@@ -16,7 +16,10 @@ export default class Export implements CommandInterface {
       return;
     }
     const qd = options.bot.exportQueue(message.guild.id);
-    message.channel.send("✅エクスポートしました", new discord.MessageAttachment(Buffer.from(qd), "exported_queue.ymx")).then(msg => {
+    message.channel.send({
+      content:"✅エクスポートしました", 
+      files: [new discord.MessageAttachment(Buffer.from(qd), "exported_queue.ymx")]
+    }).then(msg => {
       msg.edit("✅エクスポートしました (バージョン: v" + YmxVersion + "互換)\r\nインポート時は、「" + msg.url + " 」をimportコマンドの引数に指定してください").catch(e => log(e, "error"))
     }).catch(e => log(e, "error"));
   }

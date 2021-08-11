@@ -39,6 +39,6 @@ export default class Searchq implements CommandInterface {
     embed.description = "キュー内での検索結果です。最大20件表示されます。";
     embed.fields = fields;
     embed.setColor(getColor("SEARCH"));
-    message.channel.send(embed);
+    message.channel.send({embeds:[embed]});
   }
 }

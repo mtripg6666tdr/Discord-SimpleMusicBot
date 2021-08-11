@@ -173,7 +173,7 @@ export class QueueManager extends ManagerBase {
         const tembed = new MessageEmbed();
         tembed.title = "お待ちください";
         tembed.description = "情報を取得しています...";
-        msg.edit("", tembed);
+        msg.edit({content:"", embeds:[tembed]});
       }else if(message){
         // すでに処理中メッセージがある
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Interaction message specified");
@@ -212,7 +212,7 @@ export class QueueManager extends ManagerBase {
         if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
-        await msg.edit("", embed);
+        await msg.edit({content: "", embeds:[embed]});
       }
     }
     catch(e){

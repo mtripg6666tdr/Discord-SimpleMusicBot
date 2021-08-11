@@ -31,6 +31,6 @@ export default class Help implements CommandInterface {
     + "・オーディオファイルへの直URL"
     );
     embed.setColor(getColor("HELP"));
-    message.channel.send(embed).catch(e => log(e, "error"));
+    message.channel.send({embeds:[embed]}).catch(e => log(e, "error"));
   }
 }

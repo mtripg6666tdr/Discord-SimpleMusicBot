@@ -20,7 +20,7 @@ export default class Related implements CommandInterface {
         .setTitle("⭕関連曲自動再生をオンにしました")
         .setDescription("YouTubeからの楽曲再生終了時に、関連曲をキューの末尾に自動追加する機能です。\r\n※YouTube以外のソースからの再生時、ループ有効時には追加されません")
         .setColor(getColor("RELATIVE_SETUP"))
-      message.channel.send("", embed);
+      message.channel.send({embeds:[embed]});
     }
   }
 }

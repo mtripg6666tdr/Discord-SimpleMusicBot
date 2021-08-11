@@ -29,6 +29,6 @@ export default class Thumbnail implements CommandInterface {
       message.channel.send("✘検索結果が見つかりません").catch(e => log(e, "error"));
       return;
     }
-    message.channel.send(embed).catch(e => log(e, "error"));
+    message.channel.send({embeds:[embed]}).catch(e => log(e, "error"));
   }
 }

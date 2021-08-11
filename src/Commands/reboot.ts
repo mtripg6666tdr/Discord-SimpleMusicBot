@@ -1,7 +1,6 @@
 import { exec, execSync } from "child_process";
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
-import { log } from "../Util/util";
 
 export default class Reboot implements CommandInterface {
   name = "reboot";

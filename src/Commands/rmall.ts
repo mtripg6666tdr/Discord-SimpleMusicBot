@@ -11,7 +11,7 @@ export default class Rmall implements CommandInterface {
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
     if(!message.member.voice.channel || (message.member.voice.channel && !message.member.voice.channel.members.has(options.client.user.id))){
-      if(!message.member.hasPermission("MANAGE_GUILD") && !message.member.hasPermission("MANAGE_CHANNELS")){
+      if(!message.member.permissions.has("MANAGE_GUILD") && !message.member.permissions.has("MANAGE_CHANNELS")){
         message.channel.send("この操作を実行する権限がありません。").catch(e => log(e, "error"));
         return;
       }

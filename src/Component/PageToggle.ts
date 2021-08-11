@@ -61,7 +61,7 @@ export class PageToggle {
     }else if(typeof this._embeds === "function"){
       embed = await (this._embeds as any)(page);
     }
-    await this.Message.edit(this.Message.content, embed);
+    await this.Message.edit({content: this.Message.content ,embeds:[embed]});
   }
 
   SetFresh(isFreshNecessary:boolean){

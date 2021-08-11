@@ -160,7 +160,7 @@ export class PlayManager extends ManagerBase {
         if(this.CurrentVideoInfo.ServiceIdentifer === "youtube" && (this.CurrentVideoInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
-        mes.edit("", embed).catch(e => log(e, "error"));
+        mes.edit({content: "", embeds:[embed]}).catch(e => log(e, "error"));
       }
     }
     catch(e){

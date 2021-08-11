@@ -59,7 +59,7 @@ export default class Queue implements CommandInterface {
     }
 
     // 送信
-    await msg.edit("", getQueueEmbed(_page)).catch(e => log(e, "error"));
+    await msg.edit({content:"", embeds:[getQueueEmbed(_page)]}).catch(e => log(e, "error"));
     if(totalpage > 1){
       options.EmbedPageToggle.push((await PageToggle.init(msg, (n) => getQueueEmbed(n + 1), totalpage, _page - 1)).SetFresh(true));
     }

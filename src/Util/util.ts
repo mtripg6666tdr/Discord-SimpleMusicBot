@@ -1,7 +1,7 @@
 import * as os from "os";
 import * as https from "https";
 import * as miniget from "miniget";
-import { APIMessage, Client, Message, MessageFlags } from "discord.js";
+import { Client, Message } from "discord.js";
 import { PassThrough, Readable } from "stream";
 export { log, logStore } from "./logUtil";
 
@@ -153,19 +153,10 @@ export function isAvailableRawVideoURL(str:string){
  * @param client supressEmbedsするクライアント
  * @param token ボットのトークン
  * @returns supressEmbedsされたメッセージ
+ * @deprecated アップデートにより非推奨
  */
-export function suppressMessageEmbeds(msg:Message, client:Client):Promise<Message>{
-    const flags = new MessageFlags(msg.flags);
-    flags.add(MessageFlags.FLAGS.SUPPRESS_EMBEDS);
-    const {data}:any = APIMessage.create(msg as any, {flags} as any).resolveData();
-    data.embed = undefined;
-    data.embeds = undefined;
-    // @ts-ignore
-    return client.api.channels[msg.channel.id].messages[msg.id].patch({data}).then(d => {
-      const clone = (msg as any)._clone();
-      clone._patch(d);
-      return clone as Message;
-    });
+export function suppressMessageEmbeds(msg:Message, client?:Client):Promise<Message>{
+    return msg.suppressEmbeds(true);
 }
 
 /**

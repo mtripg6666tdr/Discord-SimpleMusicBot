@@ -16,7 +16,11 @@ import {
 } from "./Util/util";
 
 export class MusicBot {
-  private client = new discord.Client();
+  private client = new discord.Client({intents: [
+    discord.Intents.FLAGS.GUILDS,
+    discord.Intents.FLAGS.GUILD_MESSAGES,
+    discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+  ]});
   private data:{[key:string]:GuildVoiceInfo} = {};
   private instantiatedTime = null as Date;
   private versionInfo = "Could not get info";
@@ -56,7 +60,6 @@ export class MusicBot {
     catch{};
 
     client.on("ready", async()=> {
-      client.voice.connections.forEach(c => c.disconnect());
       log("[Main]Main bot is ready and active now");
 
       await client.user.setActivity({
@@ -65,8 +68,8 @@ export class MusicBot {
       });
 
       if(DatabaseAPI.CanOperate){
-        const queues = await DatabaseAPI.GetQueueData(client.guilds.cache.keyArray());
-        const speakingIds = await DatabaseAPI.GetIsSpeaking(client.guilds.cache.keyArray());
+        const queues = await DatabaseAPI.GetQueueData([...client.guilds.cache.keys()]);
+        const speakingIds = await DatabaseAPI.GetIsSpeaking([...client.guilds.cache.keys()]);
         const queueGuildids = Object.keys(queues);
         const speakingGuildids = Object.keys(speakingIds);
         for(let i=0;i<queueGuildids.length;i++){
@@ -97,7 +100,7 @@ export class MusicBot {
         }
       }
 
-      await client.user.setActivity({
+      client.user.setActivity({
         type: "LISTENING",
         name: "音楽"
       });
@@ -113,9 +116,9 @@ export class MusicBot {
       log("Bot is ready");
     });
 
-    client.on("message", async message => {
+    client.on("messageCreate", async message => {
       // botのメッセやdm、およびnewsは無視
-      if(!this.isReadyFinished || message.author.bot || message.channel.type == "dm" || message.channel.type == "news") return;
+      if(!this.isReadyFinished || message.author.bot || message.channel.type !== "GUILD_TEXT") return;
       // データ初期化
       this.initData(message.guild.id, message.channel.id);
 
@@ -294,7 +297,7 @@ export class MusicBot {
   // VC参加関数
   // 成功した場合はtrue、それ以外の場合にはfalseを返します
   private async Join(message:discord.Message):Promise<boolean>{
-    if(message.member.voice.channelID){
+    if(message.member.voice.channelId){
       // すでにVC入ってるよ～
       if(message.member.voice.channel && message.member.voice.channel.members.has(this.client.user.id)){
         if(this.data[message.guild.id].Connection){
@@ -341,7 +344,7 @@ export class MusicBot {
         const chId = Number(ids[ids.length - 2]) ?? undefined;
         if(!isNaN(msgId) && !isNaN(chId)){
           const ch = await this.client.channels.fetch(ids[ids.length - 2]);
-          if(ch.type === "text"){
+          if(ch.type === "GUILD_TEXT"){
             const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
             if(msg.attachments.size > 0 && isAvailableRawAudioURL(msg.attachments.first().url)){
               await this.data[message.guild.id].Queue.AutoAddQueue(this.client, msg.attachments.first().url, message.member, "custom", first, false, message.channel as discord.TextChannel, smsg);
@@ -399,7 +402,7 @@ export class MusicBot {
         embed.description = "[" + result.title + "](" + result.url + ") `(" + result.author.name + ")` \r\n" + index + "曲が追加されました";
         embed.setThumbnail(result.bestThumbnail.url);
         embed.setColor(getColor("PLAYLIST_COMPLETED"));
-        await msg.edit("", embed);
+        await msg.edit({content: "", embeds: [embed]});
       }
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
     }else{

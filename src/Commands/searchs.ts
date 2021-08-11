@@ -83,7 +83,7 @@ export default class Searchs implements CommandInterface {
           iconURL: message.author.avatarURL(),
           text:"楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
         };
-        await msg.edit("", embed);
+        await msg.edit({content: "", embeds:[embed]});
       }
       catch(e){
         console.log(e)

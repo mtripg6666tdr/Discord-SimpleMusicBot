@@ -24,6 +24,6 @@ export default class Uptime implements CommandInterface {
       + options.client.ws.ping + "ミリ秒(取得値)"
     );
     embed.addField("データベースに登録されたサーバー数", Object.keys(options.data).length + "サーバー");
-    message.channel.send(embed).catch(e => log(e, "error"));
+    message.channel.send({embeds:[embed]}).catch(e => log(e, "error"));
   }
 }
