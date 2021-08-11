@@ -6,10 +6,11 @@
   "main": "dist/lib.js",
   "types": "typings/lib.d.ts",
   "dependencies": {
+    "@discordjs/voice": "^0.6.0",
     "@types/follow-redirects": "^1.13.1",
     "@types/node": "^16.4.13",
     "@types/ws": "^7.4.7",
-    "discord.js": "^12.5.3",
+    "discord.js": "^13.0.1",
     "dotenv": "^10.0.0",
     "follow-redirects": "^1.14.1",
     "genius-lyrics": "^4.2.9",
