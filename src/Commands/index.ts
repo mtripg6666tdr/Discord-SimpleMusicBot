@@ -15,6 +15,11 @@ export interface CommandInterface {
   examples?: string;
   usage?: string;
   category?:string;
+  argument?:{
+    type:"bool"|"integer"|"string",
+    name:string,
+    description:string
+  }[]
 }
 
 export interface CommandArgs {
@@ -36,6 +41,9 @@ export class Command {
   static get Instance(){
     if(this._instance) return this._instance;
     else return this._instance = new Command();
+  }
+  get Commands(){
+    return this.commands;
   }
 
   private commands = null as CommandInterface[];
