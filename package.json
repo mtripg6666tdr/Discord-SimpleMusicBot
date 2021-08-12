@@ -39,9 +39,9 @@
     "start": "npm run build && npm run onlystart",
     "onlystart": "npx node dist/index.js",
     "build": "npm run cleanup && tsc",
-    "postinstall": "node preparelib.js",
+    "postinstall": "node util/preparelib.js",
     "cleanup": "rimraf dist/ typings/",
-    "checkvoiceenv": "node voiceenvcheck"
+    "checkvoiceenv": "node util/voiceenvcheck"
   },
   "keywords": [],
   "author": "mtripg6666tdr",
