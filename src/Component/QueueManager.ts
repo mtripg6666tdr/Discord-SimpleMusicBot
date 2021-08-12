@@ -40,6 +40,9 @@ export class QueueManager extends ManagerBase {
     this.default.forEach(q => totalLength += Number(q.BasicInfo.LengthSeconds));
     return totalLength;
   }
+  get Nothing():boolean{
+    return this.length === 0;
+  }
 
   constructor(){
     super();
@@ -173,7 +176,7 @@ export class QueueManager extends ManagerBase {
         const tembed = new MessageEmbed();
         tembed.title = "お待ちください";
         tembed.description = "情報を取得しています...";
-        msg.edit({content:"", embeds:[tembed]});
+        msg.edit({content: null, embeds:[tembed]});
       }else if(message){
         // すでに処理中メッセージがある
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Interaction message specified");
@@ -212,14 +215,14 @@ export class QueueManager extends ManagerBase {
         if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
-        await msg.edit({content: "", embeds:[embed]});
+        await msg.edit({content: null, embeds:[embed]});
       }
     }
     catch(e){
       log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Failed");
       log(e, "error");
       if(msg){
-        msg.edit(":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")").catch(e => log(e, "error"));
+        msg.edit({content: ":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")", embeds: null}).catch(e => log(e, "error"));
       }
     }
   }

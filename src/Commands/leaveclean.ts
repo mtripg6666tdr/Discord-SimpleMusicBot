@@ -1,4 +1,5 @@
 import * as discord from "discord.js";
+import * as voice from "@discordjs/voice";
 import { CommandArgs, CommandInterface } from ".";
 import { log } from "../Util/util";
 
@@ -18,7 +19,7 @@ export default class LeaveClean implements CommandInterface {
       message.channel.send("キューが空です").catch(e => log(e, "error"));
       return;
     }
-    const members = [...((await options.data[message.guild.id].Connection.channel.fetch()) as discord.VoiceChannel).members.keys()];
+    const members = [...((await options.client.channels.resolve(voice.getVoiceConnection(message.guild.id).joinConfig.channelId).fetch()) as discord.VoiceChannel).members.keys()];
     const number = options.data[message.guild.id].Queue.RemoveIf(q => members.indexOf(q.AdditionalInfo.AddedBy.userId) < 0).length;
     message.channel.send(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => log(e, "error"));;
   }

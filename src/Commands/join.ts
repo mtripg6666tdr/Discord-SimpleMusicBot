@@ -1,4 +1,5 @@
 import * as discord from "discord.js";
+import * as voice from "@discordjs/voice";
 import { CommandArgs, CommandInterface } from ".";
 import { log } from "../Util/util";
 
@@ -10,7 +11,7 @@ export default class Join implements CommandInterface {
   category = "voice";
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(message.member.voice.channel && message.member.voice.channel.members.has(options.client.user.id) && options.data[message.guild.id].Connection){
+    if(message.member.voice.channel && message.member.voice.channel.members.has(options.client.user.id) && voice.getVoiceConnection(message.guild.id)){
       message.channel.send("✘すでにボイスチャンネルに接続中です。").catch(e => log(e, "error"));
     }else{
       options.Join(message);

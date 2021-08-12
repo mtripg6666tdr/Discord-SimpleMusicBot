@@ -19,7 +19,9 @@ YouTubeなどからの再生に対応。
 - Botに関するサポート（下記）
 
 ## インストール＆実行
-Node.js v12以上で動作確認しています。ffmpegへのパスを通しておいてください。通せない場合にはnpmパッケージの`ffmpeg-stable`(optionalDependencies)を利用できます。  
+Node.js v12以上で動作確認しています。  
+実際には`discord.js`がNode.js v16.1.0以上が必須のためnpmパッケージのnodeを利用しています。
+npmパッケージの`ffmpeg-stable`(optionalDependencies)を利用できない場合、手動で`ffmpeg`へのパスを通す必要があります。  
 
 1. リポジトリをクローン
 ```bash

@@ -1,5 +1,6 @@
 import { execSync } from "child_process";
 import * as discord from "discord.js";
+import * as voice from "@discordjs/voice";
 import * as ytpl from "ytpl";
 import { exportableCustom } from "./AudioSource/custom";
 import { Command, CommandArgs } from "./Commands";
@@ -11,8 +12,7 @@ import {
   GetMemInfo, isAvailableRawAudioURL,
   log,
   logStore,
-  NormalizeText,
-  suppressMessageEmbeds
+  NormalizeText
 } from "./Util/util";
 
 export class MusicBot {
@@ -20,6 +20,7 @@ export class MusicBot {
     discord.Intents.FLAGS.GUILDS,
     discord.Intents.FLAGS.GUILD_MESSAGES,
     discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    discord.Intents.FLAGS.GUILD_VOICE_STATES,
   ]});
   private data:{[key:string]:GuildVoiceInfo} = {};
   private instantiatedTime = null as Date;
@@ -60,13 +61,16 @@ export class MusicBot {
     catch{};
 
     client.on("ready", async()=> {
-      log("[Main]Main bot is ready and active now");
+      log("[Main]Socket connection is ready.");
+      log("[Main]Starting environment checking and preparation.");
 
-      await client.user.setActivity({
+      // Set activity as booting
+      client.user.setActivity({
         type: "PLAYING",
         name: "起動中..."
       });
 
+      // Recover queues
       if(DatabaseAPI.CanOperate){
         const queues = await DatabaseAPI.GetQueueData([...client.guilds.cache.keys()]);
         const speakingIds = await DatabaseAPI.GetIsSpeaking([...client.guilds.cache.keys()]);
@@ -89,7 +93,12 @@ export class MusicBot {
                 await this.data[id].Queue.AutoAddQueue(client, queue.data[j].url, null, "unknown", false, false, null, null, queue.data[j]);
               }
               if(vid != "0"){
-                this.data[id].Connection = await (await client.channels.fetch(vid) as discord.VoiceChannel).join();
+                const vc = await client.channels.fetch(vid) as discord.VoiceChannel;
+                voice.joinVoiceChannel({
+                  channelId: vc.id,
+                  guildId: vc.guild.id,
+                  adapterCreator: vc.guild.voiceAdapterCreator
+                });
                 await this.data[id].Manager.Play();
               }
             }
@@ -98,13 +107,18 @@ export class MusicBot {
             }
           }
         }
+        log("[Main]Finish queues and states recovery.");
+      }else{
+        log("[Main]Cannot perform queues and states recovery. Check .env file to perform.", "warn");
       }
 
+      // Set activity
       client.user.setActivity({
         type: "LISTENING",
         name: "音楽"
       });
 
+      // Set main tick
       const tick = ()=>{
         this.Log();
         setTimeout(tick, 4 * 60 * 1000);
@@ -112,8 +126,15 @@ export class MusicBot {
         this.BackupData();
       };
       setTimeout(tick, 1 * 60 * 1000);
+      log("[Main]Main tick has been set successfully");
+
+      // Command instance preparing
+      Command.Instance.Check();
+      log("[Main]Finish preparing commands");
+
+      // Finish initializing
       this.isReadyFinished = true;
-      log("Bot is ready");
+      log("[Main]Bot is ready");
     });
 
     client.on("messageCreate", async message => {
@@ -283,7 +304,7 @@ export class MusicBot {
           guildid: id,
           // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
           value: (this.data[id].Manager.IsPlaying && !this.data[id].Manager.IsPaused ? 
-            this.data[id].Connection.channel.id : "0") 
+            voice.getVoiceConnection(id).joinConfig.channelId : "0") 
             + ":" + this.data[id].boundTextChannel + ":" + (this.data[id].Queue.LoopEnabled ? "1" : "0") + ":" + (this.data[id].Queue.QueueLoopEnabled ? "1" : "0") + ":" + (this.data[id].AddRelative ? "1" : "0")
         });
       });
@@ -297,22 +318,27 @@ export class MusicBot {
   // VC参加関数
   // 成功した場合はtrue、それ以外の場合にはfalseを返します
   private async Join(message:discord.Message):Promise<boolean>{
-    if(message.member.voice.channelId){
+    if(message.member.voice.channel){
+      //const msg = await message.channel.send(":face_with_monocle: 接続を確認中...");
       // すでにVC入ってるよ～
-      if(message.member.voice.channel && message.member.voice.channel.members.has(this.client.user.id)){
-        if(this.data[message.guild.id].Connection){
+      if(message.member.voice.channel.members.has(this.client.user.id)){
+        const connection = voice.getVoiceConnection(message.guild.id);
+        if(connection){
+          //await msg.delete();
           return true;
-        }else{
-          message.member.voice.channel.leave();
         }
       }
 
       // 入ってないね～参加しよう
+      //await msg.edit(":electric_plug:接続中...");
       const msg = await message.channel.send(":electric_plug:接続中...");
       try{
-        const connection = await message.member.voice.channel.join();
-        this.data[message.guild.id].Connection = connection;
-        log("[Main/" + message.guild.id + "]VC Connected to " + connection.channel.id);
+        voice.joinVoiceChannel({
+          channelId: message.member.voice.channel.id,
+          guildId: message.member.guild.id,
+          adapterCreator: message.member.guild.voiceAdapterCreator
+        });
+        log("[Main/" + message.guild.id + "]VC Connected to " + message.member.voice.channel.id);
         await msg.edit(":+1:ボイスチャンネル:speaker:`" + message.member.voice.channel.name + "`に接続しました!");
         return true;
       }
@@ -334,7 +360,7 @@ export class MusicBot {
    * @param first キューの先頭に追加するかどうか
    */
   private async PlayFromURL(message:discord.Message, optiont:string, first:boolean = true){
-    setTimeout(()=> suppressMessageEmbeds(message, this.client).catch(e => log(e, "warn")), 4000);
+    setTimeout(()=> message.suppressEmbeds(true).catch(e => log(e, "warn")), 4000);
     if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
       // Discordメッセへのリンクならば
       const smsg = await message.channel.send("🔍メッセージを取得しています...");
@@ -402,7 +428,7 @@ export class MusicBot {
         embed.description = "[" + result.title + "](" + result.url + ") `(" + result.author.name + ")` \r\n" + index + "曲が追加されました";
         embed.setThumbnail(result.bestThumbnail.url);
         embed.setColor(getColor("PLAYLIST_COMPLETED"));
-        await msg.edit({content: "", embeds: [embed]});
+        await msg.edit({content: null, embeds: [embed]});
       }
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
     }else{

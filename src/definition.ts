@@ -1,4 +1,4 @@
-import { Client, VoiceConnection } from "discord.js";
+import { Client } from "discord.js";
 import * as fs from "fs";
 import { exportableCustom } from "./AudioSource/custom";
 import { MusicBot } from "./bot";
@@ -13,10 +13,6 @@ export class GuildVoiceInfo{
    * 永続的設定を保存するコンテナ
    */
   PersistentPref:PersistentPref;
-  /**
-   * ボイスチャンネルの接続
-   */
-  Connection:VoiceConnection;
   /**
    * 検索窓の格納します
    */
@@ -77,7 +73,6 @@ export class GuildVoiceInfo{
   AddRelative:boolean
 
   constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBot){
-    this.Connection = null;
     this.SearchPanel =null;
     this.Queue = new QueueManager();
     this.Manager = new PlayManager(client);

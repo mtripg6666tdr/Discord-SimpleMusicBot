@@ -65,4 +65,8 @@ export class Command {
     }
     return null;
   }
+
+  Check(){
+    return true;
+  }
 }
