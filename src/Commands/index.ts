@@ -18,7 +18,8 @@ export interface CommandInterface {
   argument?:{
     type:"bool"|"integer"|"string",
     name:string,
-    description:string
+    description:string,
+    required:boolean
   }[]
 }
 

@@ -1,6 +1,5 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
-import { log } from "../Util/util";
 
 export default class Bgm implements CommandInterface {
   name = "bgm";
