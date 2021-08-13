@@ -1,4 +1,5 @@
 import * as discord from "discord.js";
+import * as voice from "@discordjs/voice";
 import { CommandArgs, CommandInterface } from ".";
 import { getColor } from "../Util/colorUtil";
 import { CalcTime, log } from "../Util/util";
@@ -22,6 +23,7 @@ export default class Uptime implements CommandInterface {
     embed.addField("レイテンシ", 
         (new Date().getTime() - message.createdAt.getTime()) + "ミリ秒(実測値)\r\n"
       + options.client.ws.ping + "ミリ秒(取得値)"
+      + (voice.getVoiceConnection(message.guild.id)?.ping ?? "-") + "ミリ秒(ボイスチャンネル接続取得値)"
     );
     embed.addField("データベースに登録されたサーバー数", Object.keys(options.data).length + "サーバー");
     message.channel.send({embeds:[embed]}).catch(e => log(e, "error"));

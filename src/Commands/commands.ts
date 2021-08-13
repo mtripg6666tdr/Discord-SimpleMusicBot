@@ -1,5 +1,5 @@
 import * as discord from "discord.js";
-import { Command, CommandArgs, CommandInterface } from ".";
+import { Command, CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/colorUtil";
 
@@ -12,6 +12,12 @@ export default class Commands implements CommandInterface{
   commands = null as CommandInterface[];
   usage = "command [コマンド名]";
   examples = "command search";
+  argument = [{
+    type: "string",
+    description: "詳細表示するするコマンド名",
+    name: "コマンド",
+    required: false
+  }] as SlashCommandArgument[]
   async run(message:discord.Message, options:CommandArgs){
     if(options.rawArgs == ""){
       // 引数がない場合は全コマンドの一覧を表示

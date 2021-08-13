@@ -1,5 +1,5 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { YouTube } from "../AudioSource/youtube";
 import { getColor } from "../Util/colorUtil";
 import { CalcMinSec, log } from "../Util/util";
@@ -10,6 +10,12 @@ export default class NowPlaying implements CommandInterface {
   description = "現在再生中の曲の情報を表示します。 `l`を引数にするとより長く概要を表示します(可能な場合)。";
   unlist = false;
   category = "player";
+  argument = [{
+    type: "bool",
+    name: "詳細表示",
+    description: "可能な場合より長く詳細を表示します",
+    required: false
+  }] as SlashCommandArgument[];
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...

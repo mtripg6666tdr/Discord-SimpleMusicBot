@@ -1,5 +1,5 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { YouTube } from "../AudioSource/youtube";
 import { getColor } from "../Util/colorUtil";
 import { CalcMinSec, log } from "../Util/util";
@@ -12,13 +12,24 @@ export default class Searchq implements CommandInterface {
   category = "playlist";
   examples = "seq milk boy";
   usage = "seq <キーワード>";
+  argument = [{
+    type: "string",
+    name: "キーワード",
+    description: "検索したい楽曲のキーワード",
+    required: true
+  }] as SlashCommandArgument[];
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.length === 0){
       message.channel.send("✘キューが空です").catch(e => log(e, "error"));
       return;
     }
-    let qsresult = options.data[message.guild.id].Queue.filter(c => c.BasicInfo.Title.toLowerCase().indexOf(options.rawArgs.toLowerCase()) >= 0);
+    let qsresult = options.data[message.guild.id].Queue
+                    .filter(c => c.BasicInfo.Title.toLowerCase().indexOf(options.rawArgs.toLowerCase()) >= 0)
+                    .concat(
+                      options.data[message.guild.id].Queue
+                      .filter(c => c.BasicInfo.Url.toLowerCase().indexOf(options.rawArgs.toLowerCase()) >= 0)
+                    );
     if(qsresult.length === 0){
       message.channel.send(":confused:見つかりませんでした").catch(e => log(e, "error"));
       return;

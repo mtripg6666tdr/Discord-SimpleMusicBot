@@ -1,5 +1,5 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { log } from "../Util/util";
 
 export default class Rm implements CommandInterface {
@@ -10,6 +10,12 @@ export default class Rm implements CommandInterface {
   category = "playlist";
   examples = "rm 5";
   usage = "削除 <削除する位置>"
+  argument = [{
+    type: "string",
+    name: "削除するインデックス",
+    description: "削除するインデックスはキューに併記されているものです。ハイフンを使って2-5のように範囲指定したり、スペースを使って1 4 8のように複数指定することも可能です。",
+    required: true
+  }] as SlashCommandArgument[]
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.args.length == 0){

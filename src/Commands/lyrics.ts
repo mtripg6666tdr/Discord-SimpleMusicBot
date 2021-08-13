@@ -1,5 +1,5 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { getColor } from "../Util/colorUtil";
 import { GetLyrics } from "../Util/lyricsUtil";
 import { log } from "../Util/util";
@@ -12,6 +12,12 @@ export default class Lyrics implements CommandInterface {
   category = "utility";
   examples = "l 夜に駆ける";
   usage = "l <タイトル、アーティスト等>";
+  argument = [{
+    type: "string",
+    name: "検索キーワード",
+    description: "楽曲を検索するキーワード",
+    required: true
+  }] as SlashCommandArgument[];
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
     if(!process.env.CSE_KEY) return;

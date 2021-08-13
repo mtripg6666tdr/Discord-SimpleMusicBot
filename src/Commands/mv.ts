@@ -1,5 +1,5 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { log } from "../Util/util";
 
 export default class Mv implements CommandInterface {
@@ -10,6 +10,17 @@ export default class Mv implements CommandInterface {
   category = "playlist";
   examples = "移動 2 5";
   usage = "移動 <from> <to>";
+  argument = [{
+    type: "integer",
+    name: "移動元",
+    description: "移動元のインデックス。キューに併記されているものです",
+    required: true
+  }, {
+    type: "integer",
+    name: "移動先",
+    description: "移動先のインデックス。キューに併記されているものです",
+    required: true
+  }] as SlashCommandArgument[];
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.rawArgs.length !== 2){

@@ -1,6 +1,6 @@
 import * as discord from "discord.js";
 import Soundcloud, { SoundcloudTrackV2 } from "soundcloud.ts";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { SoundCloudTrackCollection } from "../AudioSource/soundcloud";
 import { DefaultUserAgent } from "../definition";
 import { getColor } from "../Util/colorUtil";
@@ -14,6 +14,12 @@ export default class Searchs implements CommandInterface {
   category = "playlist";
   examples = "ses sakura trip";
   usage = "ses <キーワード>";
+  argument = [{
+    type: "string",
+    name: "キーワードまたはURL",
+    description: "検索したい楽曲のキーワードまたはURL。",
+    required: true
+  }] as SlashCommandArgument[];
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
     options.Join(message);

@@ -1,5 +1,5 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { getColor } from "../Util/colorUtil";
 import { log, NormalizeText } from "../Util/util";
 
@@ -11,6 +11,12 @@ export default class Thumbnail implements CommandInterface {
   category = "player";
   examples = "サムネイル 5";
   usage = "サムネイル [検索パネル中のインデックス]";
+  argument = [{
+    type: "integer",
+    name: "インデックス",
+    description: "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します",
+    required: false
+  }] as SlashCommandArgument[];
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
     const embed = new discord.MessageEmbed();

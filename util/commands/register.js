@@ -14,31 +14,40 @@ module.exports = function(route){
   /**
    * @type { import("../../src/Commands").CommandInterface[] }
    */
-  const commands = new Command().commands;
+  const commands = new Command().commands.filter(
+    /**
+     * 
+     * @param { import("../../src/Commands").CommandInterface } c 
+     * @returns { boolean }
+     */
+    c => !c.unlist
+  );
 
   for(let i = 0; i < commands.length; i++){
     const builder = new SlashCommandBuilder();
     builder
-      .setName(commands[i].alias.filter(c => c.match(/a-zA-Z/))[0])
+      .setName(commands[i].alias.filter(c => c.match(/^[\w-]{1,32}$/))[0])
       .setDescription(commands[i].description);
-    commands[i].argument.forEach(arg => {
-      const addingOptionArgs = option =>
-        option
-          .setName(arg.name)
-          .setDescription(arg.description)
-          .setRequired(arg.required)
-      switch(arg.type){
-        case "bool":
-          builder.addBooleanOption(addingOptionArgs);
-          break;
-        case "integer":
-          builder.addIntegerOption(addingOptionArgs);
-          break;
-        case "string":
-          builder.addStringOption(addingOptionArgs);
-          break;
-      }
-    });
+    if(commands[i].argument){
+      commands[i].argument.forEach(arg => {
+        const addingOptionArgs = option =>
+          option
+            .setName(arg.name)
+            .setDescription(arg.description)
+            .setRequired(arg.required)
+        switch(arg.type){
+          case "bool":
+            builder.addBooleanOption(addingOptionArgs);
+            break;
+          case "integer":
+            builder.addIntegerOption(addingOptionArgs);
+            break;
+          case "string":
+            builder.addStringOption(addingOptionArgs);
+            break;
+        }
+      });
+    }
     commandsInfo.push(builder.toJSON());
   }
 

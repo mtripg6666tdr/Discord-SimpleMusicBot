@@ -1,5 +1,5 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { YouTube } from "../AudioSource/youtube";
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/colorUtil";
@@ -11,6 +11,12 @@ export default class Queue implements CommandInterface {
   description = "キューを表示します。";
   unlist = false;
   category = "playlist";
+  argument = [{
+    type: "integer",
+    name: "ページ",
+    description: "表示するキューのページを指定することができます",
+    required: false
+  }] as SlashCommandArgument[];
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
     const msg = await message.channel.send(":eyes: キューを確認しています。お待ちください...");

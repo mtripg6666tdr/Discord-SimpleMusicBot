@@ -1,6 +1,6 @@
 import * as discord from "discord.js";
 import * as ytsr from "ytsr";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { getColor } from "../Util/colorUtil";
 import { log } from "../Util/util";
 
@@ -12,6 +12,12 @@ export default class Search implements CommandInterface {
   category = "playlist";
   examples = "検索 夜に駆ける";
   usage = "検索 <キーワード>";
+  argument = [{
+    type: "string",
+    name: "キーワードまたはURL",
+    description: "検索したい動画のキーワードまたはURL。",
+    required: true
+  }] as SlashCommandArgument[];
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
     options.Join(message);

@@ -1,5 +1,5 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CancellationPending, YmxFormat, YmxVersion } from "../definition";
 import { DownloadText, log } from "../Util/util";
 
@@ -11,6 +11,12 @@ export default class Import implements CommandInterface {
   category = "playlist";
   examples = "import https://discord.com/channels/...";
   usage = "インポート <インポート元のURL>"
+  argument = [{
+    type: "string",
+    name: "URL",
+    description: "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURL、もしくはキューの埋め込みが添付されたURLを指定できます。",
+    required: true
+  }] as SlashCommandArgument[]
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.rawArgs === ""){

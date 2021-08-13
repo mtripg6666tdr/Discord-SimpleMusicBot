@@ -1,6 +1,6 @@
 import * as discord from "discord.js";
 import * as os from "os";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { getColor } from "../Util/colorUtil";
 import { GetMBytes, GetMemInfo, GetPercentage, log, logStore } from "../Util/util";
 
@@ -11,7 +11,13 @@ export default class SystemInfo implements CommandInterface {
   unlist = false;
   category = "utility";
   examples = "sysinfo mem";
-  usage = "sysinfo (mem|cpu)";
+  usage = "sysinfo [mem|cpu]";
+  argument = [{
+    type: "string",
+    name: "表示項目",
+    description: "memまたはcpuのどちらかを指定できます",
+    required: false
+  }] as SlashCommandArgument[];
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
     // Run default logger

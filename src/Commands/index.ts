@@ -15,12 +15,14 @@ export interface CommandInterface {
   examples?: string;
   usage?: string;
   category?:string;
-  argument?:{
-    type:"bool"|"integer"|"string",
-    name:string,
-    description:string,
-    required:boolean
-  }[]
+  argument?:SlashCommandArgument[]
+}
+
+export interface SlashCommandArgument {
+  type:"bool"|"integer"|"string",
+  name:string,
+  description:string,
+  required:boolean
 }
 
 export interface CommandArgs {
