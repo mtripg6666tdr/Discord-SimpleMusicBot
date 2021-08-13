@@ -13,11 +13,11 @@ export default class Export implements CommandInterface {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.length === 0){
-      message.channel.send("キューが空です。").catch(e => log(e, "error"));
+      message.reply("キューが空です。").catch(e => log(e, "error"));
       return;
     }
     const qd = options.bot.exportQueue(message.guild.id);
-    message.channel.send({
+    message.reply({
       content:"✅エクスポートしました", 
       files: [new discord.MessageAttachment(Buffer.from(qd), "exported_queue.ymx")]
     }).then(msg => {

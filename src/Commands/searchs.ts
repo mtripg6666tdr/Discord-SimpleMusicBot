@@ -25,7 +25,7 @@ export default class Searchs implements CommandInterface {
     options.updateBoundChannel(message);
     options.Join(message);
     if(options.data[message.guild.id].SearchPanel !== null){
-      message.channel.send("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
+      message.reply("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
       return;
     }
     if(options.rawArgs !== ""){
@@ -33,7 +33,7 @@ export default class Searchs implements CommandInterface {
       let desc = "";
       try{
         options.data[message.guild.id].SearchPanel = {} as any;
-        const msg = await message.channel.send("🔍検索中...");
+        const msg = await message.reply("🔍検索中...");
         options.data[message.guild.id].SearchPanel = {
           Msg: {
             id: msg.id,
@@ -93,12 +93,12 @@ export default class Searchs implements CommandInterface {
         await msg.edit({content: null, embeds:[embed]});
       }
       catch(e){
-        console.log(e)
-        if(msg) msg.edit("失敗しました").catch(e => log(e, "error"));
-        else message.channel.send("失敗しました").catch(e => log(e, "error"));
+        log(e, "error");
+        if(msg) msg.edit("✘内部エラーが発生しました").catch(e => log(e, "error"));
+        else message.reply("✘内部エラーが発生しました").catch(e => log(e, "error"));
       }
     }else{
-      message.channel.send("引数を指定してください").catch(e => log(e, "error"));
+      message.reply("引数を指定してください").catch(e => log(e, "error"));
     }
   }
 }

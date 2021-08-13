@@ -12,11 +12,11 @@ export default class Dc implements CommandInterface {
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.data[message.guild.id].Manager.IsConnecting){
-      message.channel.send("再生中ではありません").catch(e => log(e, "error"));
+      message.reply("再生中ではありません").catch(e => log(e, "error"));
       return;
     }
     // 停止しま～す
     options.data[message.guild.id].Manager.Disconnect();
-    message.channel.send(":postbox: 正常に切断しました").catch(e => log(e, "error"));
+    message.reply(":postbox: 正常に切断しました").catch(e => log(e, "error"));
   }
 }

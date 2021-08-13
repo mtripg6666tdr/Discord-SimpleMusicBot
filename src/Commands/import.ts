@@ -1,6 +1,7 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
+import { InteractionMessage } from "../Component/InteractionMessage";
 import { CancellationPending, YmxFormat, YmxVersion } from "../definition";
 import { DownloadText, log } from "../Util/util";
 
@@ -21,7 +22,7 @@ export default class Import implements CommandInterface {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.rawArgs === ""){
-      message.channel.send("❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(e => log(e, "error"));
+      message.reply("❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(e => log(e, "error"));
       return;
     }
     let force = false;
@@ -31,11 +32,11 @@ export default class Import implements CommandInterface {
       url = options.args[1];
     }
     if(url.startsWith("http://discord.com/channels/") || url.startsWith("https://discord.com/channels/")){
-      let smsg;
+      let smsg = null as InteractionMessage;
       const cancellation = new CancellationPending();
       options.cancellations.push(cancellation);
       try{
-        smsg = await message.channel.send("🔍メッセージを取得しています...");
+        smsg = await message.reply("🔍メッセージを取得しています...");
         const ids = url.split("/");
         if(ids.length < 2){
           await smsg.edit("🔗指定されたURLは無効です");
@@ -96,7 +97,7 @@ export default class Import implements CommandInterface {
         options.cancellations.splice(options.cancellations.findIndex(c => c === cancellation), 1);
       }
     }else{
-      message.channel.send("❌Discordのメッセージへのリンクを指定してください").catch(e => log(e, "error"));
+      message.reply("❌Discordのメッセージへのリンクを指定してください").catch(e => log(e, "error"));
     }
   }
 }

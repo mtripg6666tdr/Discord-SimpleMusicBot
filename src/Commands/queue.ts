@@ -20,7 +20,7 @@ export default class Queue implements CommandInterface {
   }] as SlashCommandArgument[];
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    const msg = await message.channel.send(":eyes: キューを確認しています。お待ちください...");
+    const msg = await message.reply(":eyes: キューを確認しています。お待ちください...");
     const queue = options.data[message.guild.id].Queue;
     if(queue.length === 0){
       msg.edit(":face_with_raised_eyebrow:キューは空です。").catch(e => log(e, "error"));

@@ -62,7 +62,7 @@ export default class Commands implements CommandInterface{
         embed[i].setDescription("コマンドの一覧です。\r\n`" + (i+1) + "ページ目(" + embed.length + "ページ中)`\r\nコマンドプレフィックスは、`" + options.data[message.guild.id].PersistentPref.Prefix + "`です。");
         embed[i].setColor(getColor("COMMAND"));
       }
-      const msg = await message.channel.send({embeds:[embed[0]]});
+      const msg = await message.reply({embeds:[embed[0]]});
       const toggle = await PageToggle.init(msg, embed);
       options.EmbedPageToggle.push(toggle);
     }else{
@@ -82,9 +82,9 @@ export default class Commands implements CommandInterface{
         if(ci.examples){
           embed.addField("使用例", "`" + prefix + ci.examples + "`");
         }
-        await message.channel.send({embeds:[embed]});
+        await message.reply({embeds:[embed]});
       }else{
-        await message.channel.send(":face_with_raised_eyebrow: コマンドが見つかりませんでした");
+        await message.reply(":face_with_raised_eyebrow: コマンドが見つかりませんでした");
       }
     }
   }

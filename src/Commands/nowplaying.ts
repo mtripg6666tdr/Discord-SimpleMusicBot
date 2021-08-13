@@ -14,14 +14,14 @@ export default class NowPlaying implements CommandInterface {
   argument = [{
     type: "bool",
     name: "detailed",
-    description: "l、longまたはverboseが指定された場合、可能な場合より長く詳細を表示します",
+    description: "Trueが指定された場合、可能な場合より長く詳細を表示します",
     required: false
   }] as SlashCommandArgument[];
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.data[message.guild.id].Manager.IsPlaying){
-      message.channel.send("再生中ではありません").catch(e => log(e, "error"));
+      message.reply("再生中ではありません").catch(e => log(e, "error"));
       return;
     }
     const _s = Math.floor(options.data[message.guild.id].Manager.CurrentTime / 1000);
@@ -46,10 +46,10 @@ export default class NowPlaying implements CommandInterface {
     embed.description = "[" + info.Title + "](" + info.Url + ")\r\n" + progressBar + ((info.ServiceIdentifer === "youtube" && (info as YouTube).LiveStream) ? "(ライブストリーム)" : " `" + min + ":" + sec + "/" + (_t === 0 ? "(不明)" : tmin + ":" + tsec + "`"));
     embed.setThumbnail(info.Thumnail);
     embed.fields = info.toField(
-      (options.args[0] === "long" || options.args[0] === "l" || options.args[0] === "verbose") ? true : false
+      (options.args[0] === "long" || options.args[0] === "l" || options.args[0] === "verbose" || options.args[0] === "true") ? true : false
     );
     embed.addField(":link:URL", info.Url);
 
-    message.channel.send({embeds:[embed]}).catch(e => log(e, "error"));
+    message.reply({embeds:[embed]}).catch(e => log(e, "error"));
   }
 }

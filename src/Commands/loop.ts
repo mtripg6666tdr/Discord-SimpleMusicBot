@@ -12,10 +12,10 @@ export default class Loop implements CommandInterface {
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.LoopEnabled){
       options.data[message.guild.id].Queue.LoopEnabled = false;
-      message.channel.send(":repeat_one:トラックリピートを無効にしました:x:").catch(e => log(e, "error"));
+      message.reply(":repeat_one:トラックリピートを無効にしました:x:").catch(e => log(e, "error"));
     }else{
       options.data[message.guild.id].Queue.LoopEnabled = true;
-      message.channel.send(":repeat_one:トラックリピートを有効にしました:o:").catch(e => log(e, "error"));
+      message.reply(":repeat_one:トラックリピートを有効にしました:o:").catch(e => log(e, "error"));
     }
   }
 }

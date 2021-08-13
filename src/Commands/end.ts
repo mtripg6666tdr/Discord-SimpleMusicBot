@@ -11,14 +11,14 @@ export default class End implements CommandInterface {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(!options.data[message.guild.id].Manager.IsPlaying){
-      message.channel.send("再生中ではありません").catch(e => log(e, "error"));
+      message.reply("再生中ではありません").catch(e => log(e, "error"));
       return;
     }
     if(options.data[message.guild.id].Queue.length <= 1){
-      message.channel.send("キューが空、もしくは一曲しかないため削除されませんでした。").catch(e => log(e, "error"));
+      message.reply("キューが空、もしくは一曲しかないため削除されませんでした。").catch(e => log(e, "error"));
       return;
     }
     options.data[message.guild.id].Queue.RemoveFrom2();
-    message.channel.send("✅キューに残された曲を削除しました").catch(e => log(e, "error"));
+    message.reply("✅キューに残された曲を削除しました").catch(e => log(e, "error"));
   }
 }

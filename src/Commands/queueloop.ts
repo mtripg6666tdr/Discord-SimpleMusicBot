@@ -12,10 +12,10 @@ export default class QueueLoop implements CommandInterface {
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.QueueLoopEnabled){
       options.data[message.guild.id].Queue.QueueLoopEnabled = false;
-      message.channel.send(":repeat:キューリピートを無効にしました:x:").catch(e => log(e, "error"));
+      message.reply(":repeat:キューリピートを無効にしました:x:").catch(e => log(e, "error"));
     }else{
       options.data[message.guild.id].Queue.QueueLoopEnabled = true;
-      message.channel.send(":repeat:キューリピートを有効にしました:o:").catch(e => log(e, "error"));
+      message.reply(":repeat:キューリピートを有効にしました:o:").catch(e => log(e, "error"));
     }
   }
 }

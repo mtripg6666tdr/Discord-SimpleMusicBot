@@ -13,7 +13,7 @@ export default class Searchb implements CommandInterface {
     options.updateBoundChannel(message);
     options.Join(message);
     if(options.data[message.guild.id].SearchPanel !== null){
-      message.channel.send("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
+      message.reply("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
       return;
     }
     if(options.rawArgs !== ""){
@@ -21,7 +21,7 @@ export default class Searchb implements CommandInterface {
       let desc = "※最大20件まで表示されます\r\n\r\n";
       try{
         options.data[message.guild.id].SearchPanel = {} as any;
-        const msg = await message.channel.send("準備中...");
+        const msg = await message.reply("準備中...");
         options.data[message.guild.id].SearchPanel = {
           Msg: {
             id: msg.id,
@@ -70,10 +70,10 @@ export default class Searchb implements CommandInterface {
       catch(e){
         console.log(e)
         if(msg) msg.edit("失敗しました").catch(e => log(e, "error"));
-        else message.channel.send("失敗しました").catch(e => log(e, "error"));
+        else message.reply("失敗しました").catch(e => log(e, "error"));
       }
     }else{
-      message.channel.send("引数を指定してください").catch(e => log(e, "error"));
+      message.reply("引数を指定してください").catch(e => log(e, "error"));
     }
   }
 }

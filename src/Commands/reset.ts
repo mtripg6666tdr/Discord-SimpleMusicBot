@@ -18,6 +18,6 @@ export default class Reset implements CommandInterface {
     options.data[message.guild.id] = null;
     // データ初期化
     options.initData(message.guild.id, message.channel.id);
-    message.channel.send("✅サーバーの設定を初期化しました").catch(e => log(e, "error"));
+    message.reply("✅サーバーの設定を初期化しました").catch(e => log(e, "error"));
   }
 }

@@ -21,8 +21,7 @@ export default class Lyrics implements CommandInterface {
   }] as SlashCommandArgument[];
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(!process.env.CSE_KEY) return;
-    const msg = await message.channel.send("🔍検索中...");
+    const msg = await message.reply("🔍検索中...");
     try{
       const song = await GetLyrics(options.rawArgs);
       const embed = new discord.MessageEmbed();

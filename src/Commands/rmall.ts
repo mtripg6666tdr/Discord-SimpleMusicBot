@@ -12,12 +12,12 @@ export default class Rmall implements CommandInterface {
     options.updateBoundChannel(message);
     if(!message.member.voice.channel || (message.member.voice.channel && !message.member.voice.channel.members.has(options.client.user.id))){
       if(!message.member.permissions.has("MANAGE_GUILD") && !message.member.permissions.has("MANAGE_CHANNELS")){
-        message.channel.send("この操作を実行する権限がありません。").catch(e => log(e, "error"));
+        message.reply("この操作を実行する権限がありません。").catch(e => log(e, "error"));
         return;
       }
     }
     options.data[message.guild.id].Manager.Disconnect();
     options.data[message.guild.id].Queue.RemoveAll();
-    message.channel.send("✅すべて削除しました").catch(e => log(e, "error"))
+    message.reply("✅すべて削除しました").catch(e => log(e, "error"))
   }
 }

@@ -23,6 +23,7 @@ export default class SystemInfo implements CommandInterface {
     options.updateBoundChannel(message);
     // Run default logger
     options.bot.Log();
+    await message.reply("実行します");
 
     if(message.author.id === (process.env.ADMIN_USER ?? "593758391395155978") && (options.args.indexOf("log") >= 0 || options.args.length == 0)){
       // Process Logs

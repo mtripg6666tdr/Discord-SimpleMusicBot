@@ -14,14 +14,14 @@ export default class LeaveClean implements CommandInterface {
     options.updateBoundChannel(message);
     if(!options.data[message.guild.id].Manager.IsConnecting){
       options.data[message.guild.id].Queue.RemoveAll();
-      message.channel.send("✅すべて削除しました").catch(e => log(e, "error"));
+      message.reply("✅すべて削除しました").catch(e => log(e, "error"));
       return;
     }else if(options.data[message.guild.id].Queue.length === 0){
-      message.channel.send("キューが空です").catch(e => log(e, "error"));
+      message.reply("キューが空です").catch(e => log(e, "error"));
       return;
     }
     const members = [...((await options.client.channels.resolve(voice.getVoiceConnection(message.guild.id).joinConfig.channelId).fetch()) as discord.VoiceChannel).members.keys()];
     const number = options.data[message.guild.id].Queue.RemoveIf(q => members.indexOf(q.AdditionalInfo.AddedBy.userId) < 0).length;
-    message.channel.send(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => log(e, "error"));;
+    message.reply(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => log(e, "error"));;
   }
 }

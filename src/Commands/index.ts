@@ -34,7 +34,7 @@ export interface CommandArgs {
   updateBoundChannel(message:CommandMessage):void;
   EmbedPageToggle:PageToggle[];
   client:Client;
-  Join(message:CommandMessage):Promise<boolean>;
+  Join(message:CommandMessage, reply?:boolean):Promise<boolean>;
   PlayFromURL(message:CommandMessage, optiont:string, first:boolean):Promise<void>;
   initData(guildid:string, channelid:string):void;
   cancellations:CancellationPending[];
