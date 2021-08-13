@@ -11,6 +11,7 @@ import { exportableYouTube, YouTube } from "../AudioSource/youtube";
 import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log } from "../Util/util";
+import { CommandLike } from "./CommandLike";
 import { ManagerBase } from "./ManagerBase";
 import { PageToggle } from "./PageToggle";
 
@@ -160,13 +161,13 @@ export class QueueManager extends ManagerBase {
       type:"youtube"|"custom"|"unknown",
       first:boolean = false, 
       fromSearch:boolean = false, 
-      channel:TextChannel = null,
-      message:Message = null,
+      channel:CommandLike = null,
+      message:CommandLike = null,
       gotData:exportableCustom = null
       ){
     log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Called");
-    let ch:TextChannel = null;
-    let msg:Message = null;
+    let ch:TextChannel|CommandLike = null;
+    let msg:Message|CommandLike = null;
     try{
       if(fromSearch && this.info.SearchPanel){
         // 検索パネルから
@@ -180,7 +181,7 @@ export class QueueManager extends ManagerBase {
       }else if(message){
         // すでに処理中メッセージがある
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Interaction message specified");
-        ch = message.channel as TextChannel;
+        ch = message.channel;
         msg = message;
       }else if(channel){
         // まだないので生成

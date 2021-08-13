@@ -1,6 +1,7 @@
 import * as discord from "discord.js";
 import * as ytsr from "ytsr";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandLike } from "../Component/CommandLike";
 import { getColor } from "../Util/colorUtil";
 import { log } from "../Util/util";
 
@@ -18,7 +19,7 @@ export default class Search implements CommandInterface {
     description: "検索したい動画のキーワードまたはURL。",
     required: true
   }] as SlashCommandArgument[];
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message:CommandLike, options:CommandArgs){
     options.updateBoundChannel(message);
     options.Join(message);
     if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){

@@ -1,6 +1,7 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { YouTube } from "../AudioSource/youtube";
+import { CommandLike } from "../Component/CommandLike";
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, log } from "../Util/util";
@@ -17,7 +18,7 @@ export default class Queue implements CommandInterface {
     description: "表示するキューのページを指定することができます",
     required: false
   }] as SlashCommandArgument[];
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message:CommandLike, options:CommandArgs){
     options.updateBoundChannel(message);
     const msg = await message.channel.send(":eyes: キューを確認しています。お待ちください...");
     const queue = options.data[message.guild.id].Queue;

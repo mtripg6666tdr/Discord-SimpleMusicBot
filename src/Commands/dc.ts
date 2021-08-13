@@ -1,5 +1,5 @@
-import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
+import { CommandLike } from "../Component/CommandLike";
 import { log } from "../Util/util";
 
 export default class Dc implements CommandInterface {
@@ -8,7 +8,7 @@ export default class Dc implements CommandInterface {
   description = "ボイスチャンネルから切断します。";
   unlist = false;
   category = "voice";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message:CommandLike, options:CommandArgs){
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.data[message.guild.id].Manager.IsConnecting){

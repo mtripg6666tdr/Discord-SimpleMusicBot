@@ -1,5 +1,5 @@
-import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
+import { CommandLike } from "../Component/CommandLike";
 import { log } from "../Util/util";
 
 export default class Loop implements CommandInterface {
@@ -8,7 +8,7 @@ export default class Loop implements CommandInterface {
   description = "トラックごとのループを設定します。";
   unlist = false;
   category = "player";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message:CommandLike, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.LoopEnabled){
       options.data[message.guild.id].Queue.LoopEnabled = false;

@@ -1,5 +1,5 @@
-import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
+import { CommandLike } from "../Component/CommandLike";
 import { log } from "../Util/util";
 
 export default class Skip implements CommandInterface {
@@ -8,7 +8,7 @@ export default class Skip implements CommandInterface {
   description = "現在再生中の曲をスキップします。";
   unlist = false;
   category = "player";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message:CommandLike, options:CommandArgs){
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.data[message.guild.id].Manager.IsPlaying){

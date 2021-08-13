@@ -1,13 +1,14 @@
-import { Client, Message } from "discord.js";
+import { Client } from "discord.js";
 import * as fs from "fs";
 import * as path from "path";
 import { MusicBot } from "../bot";
+import { CommandLike } from "../Component/CommandLike";
 import { PageToggle } from "../Component/PageToggle";
 import { CancellationPending, GuildVoiceInfo } from "../definition";
 import Commands from "./commands";
 
 export interface CommandInterface {
-  run(message:Message, options:CommandArgs):Promise<void>;
+  run(message:CommandLike, options:CommandArgs):Promise<void>;
   name: string;
   alias: string[];
   description?: string;
@@ -30,11 +31,11 @@ export interface CommandArgs {
   data:{[key:string]:GuildVoiceInfo};
   rawArgs: string;
   args: string[];
-  updateBoundChannel(message:Message):void;
+  updateBoundChannel(message:CommandLike):void;
   EmbedPageToggle:PageToggle[];
   client:Client;
-  Join(message:Message):Promise<boolean>;
-  PlayFromURL(message:Message, optiont:string, first:boolean):Promise<void>;
+  Join(message:CommandLike):Promise<boolean>;
+  PlayFromURL(message:CommandLike, optiont:string, first:boolean):Promise<void>;
   initData(guildid:string, channelid:string):void;
   cancellations:CancellationPending[];
 }

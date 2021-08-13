@@ -1,6 +1,7 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { YouTube } from "../AudioSource/youtube";
+import { CommandLike } from "../Component/CommandLike";
 import { getColor } from "../Util/colorUtil";
 import { CalcMinSec, log } from "../Util/util";
 
@@ -16,7 +17,7 @@ export default class NowPlaying implements CommandInterface {
     description: "l、longまたはverboseが指定された場合、可能な場合より長く詳細を表示します",
     required: false
   }] as SlashCommandArgument[];
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message:CommandLike, options:CommandArgs){
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.data[message.guild.id].Manager.IsPlaying){

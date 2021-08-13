@@ -1,5 +1,5 @@
-import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
+import { CommandLike } from "../Component/CommandLike";
 import { log } from "../Util/util";
 
 export default class End implements CommandInterface {
@@ -8,7 +8,7 @@ export default class End implements CommandInterface {
   description = "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します";
   unlist = false;
   category = "playlist";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message:CommandLike, options:CommandArgs){
     options.updateBoundChannel(message);
     if(!options.data[message.guild.id].Manager.IsPlaying){
       message.channel.send("再生中ではありません").catch(e => log(e, "error"));

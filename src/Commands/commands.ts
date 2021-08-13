@@ -1,5 +1,6 @@
 import * as discord from "discord.js";
 import { Command, CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandLike } from "../Component/CommandLike";
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/colorUtil";
 
@@ -18,7 +19,7 @@ export default class Commands implements CommandInterface{
     name: "command",
     required: false
   }] as SlashCommandArgument[]
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message:CommandLike, options:CommandArgs){
     if(options.rawArgs == ""){
       // 引数がない場合は全コマンドの一覧を表示
       const embed = [] as discord.MessageEmbed[];

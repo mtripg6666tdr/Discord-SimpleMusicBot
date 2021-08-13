@@ -1,5 +1,6 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandLike } from "../Component/CommandLike";
 import { log } from "../Util/util";
 
 export default class Mv implements CommandInterface {
@@ -21,7 +22,7 @@ export default class Mv implements CommandInterface {
     description: "移動先のインデックス。キューに併記されているものです",
     required: true
   }] as SlashCommandArgument[];
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message:CommandLike, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.rawArgs.length !== 2){
       message.channel.send("✘引数は`移動したい曲の元のオフセット(番号) 移動先のオフセット(番号)`のように指定します。").catch(e => log(e, "error"));

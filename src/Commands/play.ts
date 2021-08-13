@@ -1,6 +1,6 @@
-import * as discord from "discord.js";
 import * as ytsr from "ytsr";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandLike } from "../Component/CommandLike";
 import { log } from "../Util/util";
 
 export default class Play implements CommandInterface {
@@ -15,7 +15,7 @@ export default class Play implements CommandInterface {
     description: "再生する動画のキーワードまたはURL。VCに未接続の場合接続してその曲を優先して再生します。接続中の場合はキューの末尾に追加します。一時停止中の場合はオプションは無視され、再生が再開されます。",
     required: false
   }] as SlashCommandArgument[];
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message:CommandLike, options:CommandArgs){
     options.updateBoundChannel(message);
     // 一時停止されてるね
     if(options.data[message.guild.id].Manager.IsPaused){
