@@ -1,6 +1,6 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
-import { CommandLike } from "../Component/CommandLike";
+import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { log } from "../Util/util";
 
@@ -10,18 +10,18 @@ export default class Related implements CommandInterface {
   description = "YouTubeから楽曲を再生終了時に、関連曲をキューに自動で追加する機能の有効/無効を設定します";
   unlist = false;
   category = "playlist";
-  async run(message:CommandLike, options:CommandArgs){
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].AddRelative){
       options.data[message.guild.id].AddRelative = false;
-      message.channel.send("❌関連曲自動再生をオフにしました").catch(e => log(e, "error"));
+      message.reply("❌関連曲自動再生をオフにしました").catch(e => log(e, "error"));
     }else{
       options.data[message.guild.id].AddRelative = true;
       const embed = new discord.MessageEmbed()
         .setTitle("⭕関連曲自動再生をオンにしました")
         .setDescription("YouTubeからの楽曲再生終了時に、関連曲をキューの末尾に自動追加する機能です。\r\n※YouTube以外のソースからの再生時、ループ有効時には追加されません")
         .setColor(getColor("RELATIVE_SETUP"))
-      message.channel.send({embeds:[embed]});
+      message.reply({embeds:[embed]});
     }
   }
 }

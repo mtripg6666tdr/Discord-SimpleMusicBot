@@ -1,6 +1,6 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
-import { CommandLike } from "../Component/CommandLike";
+import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { log, NormalizeText } from "../Util/util";
 
@@ -18,7 +18,7 @@ export default class Thumbnail implements CommandInterface {
     description: "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します",
     required: false
   }] as SlashCommandArgument[];
-  async run(message:CommandLike, options:CommandArgs){
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const embed = new discord.MessageEmbed();
     embed.setColor(getColor("THUMB"));
@@ -33,9 +33,9 @@ export default class Thumbnail implements CommandInterface {
       embed.title = info.Title;
       embed.description = "URL: " + info.Url;
     }else{
-      message.channel.send("✘検索結果が見つかりません").catch(e => log(e, "error"));
+      message.reply("✘検索結果が見つかりません").catch(e => log(e, "error"));
       return;
     }
-    message.channel.send({embeds:[embed]}).catch(e => log(e, "error"));
+    message.reply({embeds:[embed]}).catch(e => log(e, "error"));
   }
 }
