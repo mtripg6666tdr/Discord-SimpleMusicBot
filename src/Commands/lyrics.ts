@@ -14,7 +14,7 @@ export default class Lyrics implements CommandInterface {
   usage = "l <タイトル、アーティスト等>";
   argument = [{
     type: "string",
-    name: "検索キーワード",
+    name: "keyword",
     description: "楽曲を検索するキーワード",
     required: true
   }] as SlashCommandArgument[];

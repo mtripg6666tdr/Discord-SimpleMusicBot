@@ -6,14 +6,14 @@ import { DownloadText, log } from "../Util/util";
 export default class Import implements CommandInterface {
   name = "インポート";
   alias = ["import"];
-  description = "指定されたメッセージに添付されたキューからインポートします。exportコマンドで出力されたファイルが添付されたメッセージのURL、あるいはキューの埋め込みのあるメッセージのURLを引数として指定してください。";
+  description = "指定されたメッセージからキューをインポートします。exportコマンドで出力されたファイルが添付されたURL、もしくはキューの埋め込みのあるメッセージのURLを引数として指定してください。";
   unlist = false;
   category = "playlist";
   examples = "import https://discord.com/channels/...";
   usage = "インポート <インポート元のURL>"
   argument = [{
     type: "string",
-    name: "URL",
+    name: "url",
     description: "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURL、もしくはキューの埋め込みが添付されたURLを指定できます。",
     required: true
   }] as SlashCommandArgument[]

@@ -13,7 +13,7 @@ export default class Thumbnail implements CommandInterface {
   usage = "サムネイル [検索パネル中のインデックス]";
   argument = [{
     type: "integer",
-    name: "インデックス",
+    name: "index",
     description: "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します",
     required: false
   }] as SlashCommandArgument[];

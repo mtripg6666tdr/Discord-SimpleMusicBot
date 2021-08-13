@@ -12,12 +12,12 @@ export default class Mv implements CommandInterface {
   usage = "移動 <from> <to>";
   argument = [{
     type: "integer",
-    name: "移動元",
+    name: "from",
     description: "移動元のインデックス。キューに併記されているものです",
     required: true
   }, {
     type: "integer",
-    name: "移動先",
+    name: "to",
     description: "移動先のインデックス。キューに併記されているものです",
     required: true
   }] as SlashCommandArgument[];

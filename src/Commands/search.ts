@@ -14,7 +14,7 @@ export default class Search implements CommandInterface {
   usage = "検索 <キーワード>";
   argument = [{
     type: "string",
-    name: "キーワードまたはURL",
+    name: "keyword",
     description: "検索したい動画のキーワードまたはURL。",
     required: true
   }] as SlashCommandArgument[];

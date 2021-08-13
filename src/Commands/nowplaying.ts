@@ -12,8 +12,8 @@ export default class NowPlaying implements CommandInterface {
   category = "player";
   argument = [{
     type: "bool",
-    name: "詳細表示",
-    description: "可能な場合より長く詳細を表示します",
+    name: "detailed",
+    description: "l、longまたはverboseが指定された場合、可能な場合より長く詳細を表示します",
     required: false
   }] as SlashCommandArgument[];
   async run(message:discord.Message, options:CommandArgs){

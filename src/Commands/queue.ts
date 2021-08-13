@@ -13,7 +13,7 @@ export default class Queue implements CommandInterface {
   category = "playlist";
   argument = [{
     type: "integer",
-    name: "ページ",
+    name: "page",
     description: "表示するキューのページを指定することができます",
     required: false
   }] as SlashCommandArgument[];

@@ -12,7 +12,7 @@ export default class Rm implements CommandInterface {
   usage = "削除 <削除する位置>"
   argument = [{
     type: "string",
-    name: "削除するインデックス",
+    name: "index",
     description: "削除するインデックスはキューに併記されているものです。ハイフンを使って2-5のように範囲指定したり、スペースを使って1 4 8のように複数指定することも可能です。",
     required: true
   }] as SlashCommandArgument[]

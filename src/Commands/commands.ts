@@ -15,7 +15,7 @@ export default class Commands implements CommandInterface{
   argument = [{
     type: "string",
     description: "詳細表示するするコマンド名",
-    name: "コマンド",
+    name: "command",
     required: false
   }] as SlashCommandArgument[]
   async run(message:discord.Message, options:CommandArgs){

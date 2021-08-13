@@ -14,7 +14,7 @@ export default class Searchq implements CommandInterface {
   usage = "seq <キーワード>";
   argument = [{
     type: "string",
-    name: "キーワード",
+    name: "keyword",
     description: "検索したい楽曲のキーワード",
     required: true
   }] as SlashCommandArgument[];

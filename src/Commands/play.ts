@@ -11,7 +11,7 @@ export default class Play implements CommandInterface {
   category = "player";
   argument = [{
     type: "string",
-    name: "キーワードまたはURL",
+    name: "keyword",
     description: "再生する動画のキーワードまたはURL。VCに未接続の場合接続してその曲を優先して再生します。接続中の場合はキューの末尾に追加します。一時停止中の場合はオプションは無視され、再生が再開されます。",
     required: false
   }] as SlashCommandArgument[];

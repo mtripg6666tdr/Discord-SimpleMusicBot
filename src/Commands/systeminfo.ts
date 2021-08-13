@@ -14,7 +14,7 @@ export default class SystemInfo implements CommandInterface {
   usage = "sysinfo [mem|cpu]";
   argument = [{
     type: "string",
-    name: "表示項目",
+    name: "content",
     description: "memまたはcpuのどちらかを指定できます",
     required: false
   }] as SlashCommandArgument[];
