@@ -1,6 +1,6 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
-import { CommandLike } from "../Component/CommandLike";
+import { CommandMessage } from "../Component/CommandMessage"
 import { CancellationPending, YmxFormat, YmxVersion } from "../definition";
 import { DownloadText, log } from "../Util/util";
 
@@ -18,7 +18,7 @@ export default class Import implements CommandInterface {
     description: "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURL、もしくはキューの埋め込みが添付されたURLを指定できます。",
     required: true
   }] as SlashCommandArgument[]
-  async run(message:CommandLike, options:CommandArgs){
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.rawArgs === ""){
       message.channel.send("❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(e => log(e, "error"));

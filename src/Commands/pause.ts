@@ -1,5 +1,5 @@
 import { CommandArgs, CommandInterface } from ".";
-import { CommandLike } from "../Component/CommandLike";
+import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util/util";
 
 export default class Pause implements CommandInterface {
@@ -8,7 +8,7 @@ export default class Pause implements CommandInterface {
   description = "再生を一時停止します。";
   unlist = false;
   category = "player";
-  async run(message:CommandLike, options:CommandArgs){
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.data[message.guild.id].Manager.IsPlaying || options.data[message.guild.id].Manager.IsPaused){

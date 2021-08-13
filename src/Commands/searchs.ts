@@ -2,7 +2,7 @@ import * as discord from "discord.js";
 import Soundcloud, { SoundcloudTrackV2 } from "soundcloud.ts";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { SoundCloudTrackCollection } from "../AudioSource/soundcloud";
-import { CommandLike } from "../Component/CommandLike";
+import { CommandMessage } from "../Component/CommandMessage";
 import { DefaultUserAgent } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { DownloadText, log } from "../Util/util";
@@ -21,7 +21,7 @@ export default class Searchs implements CommandInterface {
     description: "検索したい楽曲のキーワードまたはURL。",
     required: true
   }] as SlashCommandArgument[];
-  async run(message:CommandLike, options:CommandArgs){
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     options.Join(message);
     if(options.data[message.guild.id].SearchPanel !== null){

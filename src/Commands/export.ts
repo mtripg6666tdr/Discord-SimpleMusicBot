@@ -1,6 +1,6 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
-import { CommandLike } from "../Component/CommandLike";
+import { CommandMessage } from "../Component/CommandMessage"
 import { YmxVersion } from "../definition";
 import { log } from "../Util/util";
 
@@ -10,7 +10,7 @@ export default class Export implements CommandInterface {
   description = "キューの内容をインポートできるようエクスポートします。";
   unlist = false;
   category = "playlist";
-  async run(message:CommandLike, options:CommandArgs){
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.length === 0){
       message.channel.send("キューが空です。").catch(e => log(e, "error"));

@@ -7,7 +7,7 @@ import { log, NormalizeText } from "../Util/util";
  * メッセージによるコマンド実行と、スラッシュコマンドによるコマンド実行による差を吸収します
  * @remarks このクラスは、従来の様式でのコマンドの処理コードをそのまま使えるようにするものであり非常によくないコードです
  */
-export class CommandLike {
+export class CommandMessage {
   private isMessage = false;
   private _channel = null as TextChannel;
   private _message = null as Message;
@@ -19,7 +19,7 @@ export class CommandLike {
   }
 
   static fromMessage(message:Message){
-    const me = new CommandLike();
+    const me = new CommandMessage();
     me.isMessage = true;
     me._message = message;
     me._channel = message.channel as TextChannel;
@@ -27,7 +27,7 @@ export class CommandLike {
   }
 
   static fromInteraction(interaction:CommandInteraction, client:Client){
-    const me = new CommandLike();
+    const me = new CommandMessage();
     me.isMessage = false;
     me._interaction = interaction;
     if(!interaction.deferred){
@@ -42,9 +42,9 @@ export class CommandLike {
    * @param options 
    * @returns 
    */
-  async send(options:string|MessageOptions):Promise<CommandLike>{
+  async send(options:string|MessageOptions):Promise<CommandMessage>{
     if(this.isMessage){
-      const me = this._responseMes ? CommandLike.fromMessage(this._message) : this;
+      const me = this._responseMes ? CommandMessage.fromMessage(this._message) : this;
       me._responseMes = await this._channel.send(options);
       return me;
     }else{

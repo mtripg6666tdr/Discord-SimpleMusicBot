@@ -11,7 +11,7 @@ import { exportableYouTube, YouTube } from "../AudioSource/youtube";
 import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log } from "../Util/util";
-import { CommandLike } from "./CommandLike";
+import { CommandMessage } from "./CommandMessage"
 import { ManagerBase } from "./ManagerBase";
 import { PageToggle } from "./PageToggle";
 
@@ -161,13 +161,13 @@ export class QueueManager extends ManagerBase {
       type:"youtube"|"custom"|"unknown",
       first:boolean = false, 
       fromSearch:boolean = false, 
-      channel:CommandLike = null,
-      message:CommandLike = null,
+      channel:CommandMessage = null,
+      message:CommandMessage = null,
       gotData:exportableCustom = null
       ){
     log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Called");
-    let ch:TextChannel|CommandLike = null;
-    let msg:Message|CommandLike = null;
+    let ch:TextChannel|CommandMessage = null;
+    let msg:Message|CommandMessage = null;
     try{
       if(fromSearch && this.info.SearchPanel){
         // 検索パネルから

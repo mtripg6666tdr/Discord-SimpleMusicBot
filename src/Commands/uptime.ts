@@ -3,7 +3,7 @@ import * as voice from "@discordjs/voice";
 import { CommandArgs, CommandInterface } from ".";
 import { getColor } from "../Util/colorUtil";
 import { CalcTime, log } from "../Util/util";
-import { CommandLike } from "../Component/CommandLike";
+import { CommandMessage } from "../Component/CommandMessage";
 
 export default class Uptime implements CommandInterface {
   name = "アップタイム";
@@ -11,7 +11,7 @@ export default class Uptime implements CommandInterface {
   description = "ボットのアップタイムおよびping時間(レイテンシ)を表示します。";
   unlist = false;
   category = "utility";
-  async run(message:CommandLike, options:CommandArgs){
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const now = new Date();
     const insta = CalcTime(now.getTime() - options.bot.InstantiatedTime.getTime());

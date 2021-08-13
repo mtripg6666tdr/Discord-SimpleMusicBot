@@ -1,7 +1,7 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
 import { bestdori, BestdoriApi } from "../AudioSource/bestdori";
-import { CommandLike } from "../Component/CommandLike";
+import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { log } from "../Util/util";
 
@@ -9,7 +9,7 @@ export default class Searchb implements CommandInterface {
   name = "searchb";
   alias = ["seb", "sb"];
   unlist = true;
-  async run(message:CommandLike, options:CommandArgs){
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     options.Join(message);
     if(options.data[message.guild.id].SearchPanel !== null){

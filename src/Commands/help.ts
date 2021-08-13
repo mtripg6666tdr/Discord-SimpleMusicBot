@@ -1,6 +1,6 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
-import { CommandLike } from "../Component/CommandLike";
+import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { log } from "../Util/util";
 
@@ -10,7 +10,7 @@ export default class Help implements CommandInterface {
   description = "ヘルプを表示します。";
   unlist = false;
   category = "bot";
-  async run(message:CommandLike, options:CommandArgs){
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const embed = new discord.MessageEmbed();
     embed.title = options.client.user.username + ":notes:";

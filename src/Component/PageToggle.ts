@@ -1,5 +1,5 @@
 import { Message, MessageEmbed } from "discord.js";
-import { CommandLike } from "./CommandLike";
+import { CommandMessage } from "./CommandMessage";
 
 /**
  * 最終的にメッセージの埋め込みに解決されるデータ
@@ -10,7 +10,7 @@ type MessageEmbedsResolvable = MessageEmbed[]|((pagenum:number)=>MessageEmbed)|(
  * リアクションによってページめくりができるメッセージの管理を行います
  */
 export class PageToggle {
-  private _message:CommandLike;
+  private _message:CommandMessage;
   get Message(){
     return this._message;
   }
@@ -32,7 +32,7 @@ export class PageToggle {
 
   static arrowRight = "➡️";
   static arrowLeft = "⬅️";
-  static async init(msg:CommandLike, embeds:MessageEmbedsResolvable, total?:number, current?:number):Promise<PageToggle>{
+  static async init(msg:CommandMessage, embeds:MessageEmbedsResolvable, total?:number, current?:number):Promise<PageToggle>{
     const n = new PageToggle();
     n._message = msg;
     n._embeds = embeds;

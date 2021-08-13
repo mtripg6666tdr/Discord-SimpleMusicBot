@@ -1,5 +1,5 @@
 import { CommandArgs, CommandInterface } from ".";
-import { CommandLike } from "../Component/CommandLike";
+import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util/util";
 
 export default class Mltf implements CommandInterface {
@@ -8,7 +8,7 @@ export default class Mltf implements CommandInterface {
   description = "キューの最後の曲をキューの先頭に移動します。";
   unlist = false;
   category = "playlist";
-  async run(message:CommandLike, options:CommandArgs){
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.length <= 2){
       message.channel.send("キューに3曲以上追加されているときに使用できます。").catch(e=>log(e, "error"));

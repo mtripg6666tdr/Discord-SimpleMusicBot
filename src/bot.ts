@@ -14,7 +14,7 @@ import {
   logStore,
   NormalizeText
 } from "./Util/util";
-import { CommandLike } from "./Component/CommandLike";
+import { CommandMessage } from "./Component/CommandMessage"
 
 export class MusicBot {
   private client = new discord.Client({intents: [
@@ -161,9 +161,9 @@ export class MusicBot {
       }
       if(message.content.startsWith(this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">")){
         // コマンドの引数の解決
-        const {command, options,rawOptions} = CommandLike.resolveCommandMessage(message.content, message.guild.id, this.data);
+        const {command, options,rawOptions} = CommandMessage.resolveCommandMessage(message.content, message.guild.id, this.data);
         // コマンドの処理
-        await Command.Instance.resolve(command)?.run(CommandLike.fromMessage(message), this.getCommandArgs(options, rawOptions));
+        await Command.Instance.resolve(command)?.run(CommandMessage.fromMessage(message), this.getCommandArgs(options, rawOptions));
 
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
         // searchコマンドのキャンセルを捕捉
@@ -196,7 +196,7 @@ export class MusicBot {
             }
           }
           nums.map(n => Number(n)).forEach(async n => {
-            await this.data[message.guild.id].Queue.AutoAddQueue(client, panel.Opts[n].url, message.member, "unknown", false, false, CommandLike.fromMessage(message));
+            await this.data[message.guild.id].Queue.AutoAddQueue(client, panel.Opts[n].url, message.member, "unknown", false, false, CommandMessage.fromMessage(message));
           });
         }
       }else if(this.cancellations.filter(c => !c.Cancelled).length > 0 && message.content === "キャンセル" || message.content === "cancel"){
@@ -233,9 +233,9 @@ export class MusicBot {
         // 遅延リプライ
         await interaction.deferReply();
         // メッセージライクに解決
-        const messageLike = CommandLike.fromInteraction(interaction, this.client);
+        const messageLike = CommandMessage.fromInteraction(interaction, this.client);
         // 引数を解決
-        const { rawOptions, options } = CommandLike.resolveCommandMessage(messageLike.content, messageLike.guild.id, this.data);
+        const { rawOptions, options } = CommandMessage.resolveCommandMessage(messageLike.content, messageLike.guild.id, this.data);
         // コマンドを実行
         await command.run(messageLike, this.getCommandArgs(options, rawOptions));
       }else{
@@ -329,7 +329,7 @@ export class MusicBot {
 
   // VC参加関数
   // 成功した場合はtrue、それ以外の場合にはfalseを返します
-  private async Join(message:CommandLike):Promise<boolean>{
+  private async Join(message:CommandMessage):Promise<boolean>{
     if(message.member.voice.channel){
       //const msg = await message.channel.send(":face_with_monocle: 接続を確認中...");
       // すでにVC入ってるよ～
@@ -371,7 +371,7 @@ export class MusicBot {
    * メッセージからストリームを判定してキューに追加し、状況に応じて再生を開始する関数
    * @param first キューの先頭に追加するかどうか
    */
-  private async PlayFromURL(message:CommandLike, optiont:string, first:boolean = true){
+  private async PlayFromURL(message:CommandMessage, optiont:string, first:boolean = true){
     setTimeout(()=> message.suppressEmbeds(true).catch(e => log(e, "warn")), 4000);
     if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
       // Discordメッセへのリンクならば
@@ -457,7 +457,7 @@ export class MusicBot {
     }
   }
 
-  protected async updateBoundChannel(message:CommandLike){
+  protected async updateBoundChannel(message:CommandMessage){
     // テキストチャンネルバインド
     // コマンドが送信されたチャンネルを後で利用します。
     if(!this.data[message.guild.id].Manager.IsConnecting || (message.member.voice.channel && message.member.voice.channel.members.has(this.client.user.id)) || message.content.indexOf("join") >= 0){
