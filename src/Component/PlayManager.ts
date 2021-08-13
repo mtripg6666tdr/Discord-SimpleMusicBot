@@ -15,6 +15,7 @@ import { ManagerBase } from "./ManagerBase";
 export class PlayManager extends ManagerBase {
   private AudioPlayer:voice.AudioPlayer = null;
   private readonly retryLimit = 3;
+  error = false;
   errorCount = 0;
   errorUrl = "";
   get CurrentVideoUrl():string{
@@ -88,6 +89,7 @@ export class PlayManager extends ManagerBase {
         }
       }
       log("[PlayManager:" + this.info.GuildID + "]Play() failed, (" + this.errorCount + "times)", "warn");
+      this.error = true;
       this.Stop();
       if(this.errorCount >= this.retryLimit){
         await this.info.Queue.Next();
@@ -102,7 +104,7 @@ export class PlayManager extends ManagerBase {
         this.AudioPlayer.on(voice.AudioPlayerStatus.Idle, (oldstate, newstate)=> {
           if(oldstate.status === voice.AudioPlayerStatus.Playing 
             && newstate.status === voice.AudioPlayerStatus.Idle
-            && this.errorUrl !== this.CurrentVideoUrl
+            && !this.error
             ){
             this.onStreamFinished();
           }
@@ -133,6 +135,7 @@ export class PlayManager extends ManagerBase {
         if(mes) await mes.delete();
         return;
       }
+      this.error = false;
       // 再生
       this.AudioPlayer.play(voice.createAudioResource(stream));
       await voice.entersState(this.AudioPlayer, voice.AudioPlayerStatus.Playing, 10e3);
