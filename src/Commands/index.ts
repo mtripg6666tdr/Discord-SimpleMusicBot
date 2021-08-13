@@ -1,13 +1,14 @@
-import { Client, Message } from "discord.js";
+import { Client } from "discord.js";
 import * as fs from "fs";
 import * as path from "path";
 import { MusicBot } from "../bot";
+import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
 import { CancellationPending, GuildVoiceInfo } from "../definition";
 import Commands from "./commands";
 
 export interface CommandInterface {
-  run(message:Message, options:CommandArgs):Promise<void>;
+  run(message:CommandMessage, options:CommandArgs):Promise<void>;
   name: string;
   alias: string[];
   description?: string;
@@ -15,6 +16,14 @@ export interface CommandInterface {
   examples?: string;
   usage?: string;
   category?:string;
+  argument?:SlashCommandArgument[]
+}
+
+export interface SlashCommandArgument {
+  type:"bool"|"integer"|"string",
+  name:string,
+  description:string,
+  required:boolean
 }
 
 export interface CommandArgs {
@@ -22,11 +31,11 @@ export interface CommandArgs {
   data:{[key:string]:GuildVoiceInfo};
   rawArgs: string;
   args: string[];
-  updateBoundChannel(message:Message):void;
+  updateBoundChannel(message:CommandMessage):void;
   EmbedPageToggle:PageToggle[];
   client:Client;
-  Join(message:Message):Promise<boolean>;
-  PlayFromURL(message:Message, optiont:string, first:boolean):Promise<void>;
+  Join(message:CommandMessage, reply?:boolean):Promise<boolean>;
+  PlayFromURL(message:CommandMessage, optiont:string, first:boolean):Promise<void>;
   initData(guildid:string, channelid:string):void;
   cancellations:CancellationPending[];
 }
@@ -36,6 +45,9 @@ export class Command {
   static get Instance(){
     if(this._instance) return this._instance;
     else return this._instance = new Command();
+  }
+  get Commands(){
+    return this.commands;
   }
 
   private commands = null as CommandInterface[];

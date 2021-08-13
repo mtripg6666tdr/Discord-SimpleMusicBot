@@ -1,6 +1,7 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { YouTube } from "../AudioSource/youtube";
+import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, log } from "../Util/util";
@@ -11,9 +12,15 @@ export default class Queue implements CommandInterface {
   description = "キューを表示します。";
   unlist = false;
   category = "playlist";
-  async run(message:discord.Message, options:CommandArgs){
+  argument = [{
+    type: "integer",
+    name: "page",
+    description: "表示するキューのページを指定することができます",
+    required: false
+  }] as SlashCommandArgument[];
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    const msg = await message.channel.send(":eyes: キューを確認しています。お待ちください...");
+    const msg = await message.reply(":eyes: キューを確認しています。お待ちください...");
     const queue = options.data[message.guild.id].Queue;
     if(queue.length === 0){
       msg.edit(":face_with_raised_eyebrow:キューは空です。").catch(e => log(e, "error"));

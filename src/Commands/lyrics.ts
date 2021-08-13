@@ -1,5 +1,6 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { GetLyrics } from "../Util/lyricsUtil";
 import { log } from "../Util/util";
@@ -12,10 +13,15 @@ export default class Lyrics implements CommandInterface {
   category = "utility";
   examples = "l 夜に駆ける";
   usage = "l <タイトル、アーティスト等>";
-  async run(message:discord.Message, options:CommandArgs){
+  argument = [{
+    type: "string",
+    name: "keyword",
+    description: "楽曲を検索するキーワード",
+    required: true
+  }] as SlashCommandArgument[];
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(!process.env.CSE_KEY) return;
-    const msg = await message.channel.send("🔍検索中...");
+    const msg = await message.reply("🔍検索中...");
     try{
       const song = await GetLyrics(options.rawArgs);
       const embed = new discord.MessageEmbed();

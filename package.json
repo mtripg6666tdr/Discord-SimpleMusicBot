@@ -6,10 +6,13 @@
   "main": "dist/lib.js",
   "types": "typings/lib.d.ts",
   "dependencies": {
+    "@discordjs/builders": "^0.5.0",
+    "@discordjs/rest": "0.1.0-canary.0",
     "@discordjs/voice": "^0.6.0",
     "@types/follow-redirects": "^1.13.1",
-    "@types/node": "^16.4.13",
+    "@types/node": "^16.6.1",
     "@types/ws": "^7.4.7",
+    "discord-api-types": "^0.22.0",
     "discord.js": "^13.0.1",
     "dotenv": "^10.0.0",
     "follow-redirects": "^1.14.1",
@@ -38,9 +41,11 @@
     "start": "npm run build && npm run onlystart",
     "onlystart": "npx node dist/index.js",
     "build": "npm run cleanup && tsc",
-    "postinstall": "node preparelib.js",
+    "postinstall": "node util/preparelib.js",
     "cleanup": "rimraf dist/ typings/",
-    "checkvoiceenv": "node voiceenvcheck"
+    "checkvoiceenv": "node util/voiceenvcheck",
+    "applyslashcommandguild": "node util/commands/guild",
+    "applyslashcommandapplication": "node util/commands/application"
   },
   "keywords": [],
   "author": "mtripg6666tdr",

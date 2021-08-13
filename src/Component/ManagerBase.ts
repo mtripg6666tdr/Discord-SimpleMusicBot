@@ -1,5 +1,8 @@
 import { GuildVoiceInfo } from "../definition";
 
+/**
+ * すべてのマネージャークラスの基底クラスです
+ */
 export abstract class ManagerBase{
   // 親ノード
   protected info:GuildVoiceInfo = null;

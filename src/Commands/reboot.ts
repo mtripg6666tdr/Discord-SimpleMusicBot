@@ -1,12 +1,12 @@
 import { exec, execSync } from "child_process";
-import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
+import { CommandMessage } from "../Component/CommandMessage"
 
 export default class Reboot implements CommandInterface {
   name = "reboot";
   alias = [] as string[];
   unlist = true;
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message:CommandMessage, options:CommandArgs){
     if(message.author.id === "593758391395155978"){
       if(options.rawArgs === ""){
         message.channel.send("再起動を実行します...お待ちください...");

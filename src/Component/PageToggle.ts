@@ -1,8 +1,16 @@
-import { Message, MessageEmbed } from "discord.js";
+import { MessageEmbed } from "discord.js";
+import { InteractionMessage } from "./InteractionMessage";
 
+/**
+ * 最終的にメッセージの埋め込みに解決されるデータ
+ */
 type MessageEmbedsResolvable = MessageEmbed[]|((pagenum:number)=>MessageEmbed)|((pagenum:number)=>Promise<MessageEmbed>);
+
+/**
+ * リアクションによってページめくりができるメッセージの管理を行います
+ */
 export class PageToggle {
-  private _message:Message;
+  private _message:InteractionMessage;
   get Message(){
     return this._message;
   }
@@ -24,7 +32,7 @@ export class PageToggle {
 
   static arrowRight = "➡️";
   static arrowLeft = "⬅️";
-  static async init(msg:Message, embeds:MessageEmbedsResolvable, total?:number, current?:number):Promise<PageToggle>{
+  static async init(msg:InteractionMessage, embeds:MessageEmbedsResolvable, total?:number, current?:number):Promise<PageToggle>{
     const n = new PageToggle();
     n._message = msg;
     n._embeds = embeds;
@@ -61,7 +69,7 @@ export class PageToggle {
     }else if(typeof this._embeds === "function"){
       embed = await (this._embeds as any)(page);
     }
-    await this.Message.edit({content: this.Message.content ,embeds:[embed]});
+    await this.Message.edit({content: null ,embeds:[embed]});
   }
 
   SetFresh(isFreshNecessary:boolean){

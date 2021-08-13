@@ -24,22 +24,25 @@ http.createServer((req, res) => {
   res.end(JSON.stringify(data));
 }).listen(8081);
 
-// ハンドルされなかったエラーのハンドル
-process.on("uncaughtException", (error)=>{
-  if(bot.Client){
-    try{
-      const errorText = typeof error === "string" ? error : JSON.stringify(error);
-      (bot.Client.channels.resolve("846411633458806804") as TextChannel).send(errorText);
+if(!process.env.DEBUG){
+  // ハンドルされなかったエラーのハンドル
+  process.on("uncaughtException", (error)=>{
+    if(bot.Client){
+      try{
+        const errorText = typeof error === "string" ? error : JSON.stringify(error);
+        (bot.Client.channels.resolve(process.env.ERROR_REPORT) as TextChannel).send(errorText);
+      }
+      catch(e){
+        console.error(e);
+        process.exit(1);
+      }
     }
-    catch{
-      throw error;
+  }).on("SIGINT", ()=>{
+    if(bot.Client){
+      (bot.Client.channels.resolve(process.env.ERROR_REPORT) as TextChannel).send("Process terminated");
     }
-  }
-}).on("SIGINT", ()=>{
-  if(bot.Client){
-    (bot.Client.channels.resolve("846411633458806804") as TextChannel).send("Process terminated");
-  }
-});
+  });
+}
 
 // ボット開始
 bot.Run(process.env.TOKEN, true, 40);

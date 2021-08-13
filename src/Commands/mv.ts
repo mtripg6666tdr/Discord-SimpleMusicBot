@@ -1,5 +1,6 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util/util";
 
 export default class Mv implements CommandInterface {
@@ -10,17 +11,28 @@ export default class Mv implements CommandInterface {
   category = "playlist";
   examples = "移動 2 5";
   usage = "移動 <from> <to>";
-  async run(message:discord.Message, options:CommandArgs){
+  argument = [{
+    type: "integer",
+    name: "from",
+    description: "移動元のインデックス。キューに併記されているものです",
+    required: true
+  }, {
+    type: "integer",
+    name: "to",
+    description: "移動先のインデックス。キューに併記されているものです",
+    required: true
+  }] as SlashCommandArgument[];
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(options.rawArgs.length !== 2){
-      message.channel.send("✘引数は`移動したい曲の元のオフセット(番号) 移動先のオフセット(番号)`のように指定します。").catch(e => log(e, "error"));
+    if(options.args.length !== 2){
+      message.reply("✘引数は`移動したい曲の元のオフセット(番号) 移動先のオフセット(番号)`のように指定します。").catch(e => log(e, "error"));
       return;
     }else if(options.rawArgs.indexOf("0") >= 0 && options.data[message.guild.id].Manager.IsPlaying){
-      message.channel.send("✘音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。").catch(e => log(e, "error"));
+      message.reply("✘音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。").catch(e => log(e, "error"));
       return;
     }
-    const from = Number(options.rawArgs[0]);
-    const to = Number(options.rawArgs[1]);
+    const from = Number(options.args[0]);
+    const to = Number(options.args[1]);
     const q = options.data[message.guild.id].Queue;
     if(
       0 <= from && from <= q.length &&
@@ -29,12 +41,12 @@ export default class Mv implements CommandInterface {
         const title = q.get(from).BasicInfo.Title;
         if(from !== to){
           q.Move(from, to);
-          message.channel.send("✅ `" + title +  "`を`" + from + "`番目から`"+ to + "`番目に移動しました").catch(e => log(e, "error"));
+          message.reply("✅ `" + title +  "`を`" + from + "`番目から`"+ to + "`番目に移動しました").catch(e => log(e, "error"));
         }else{
-          message.channel.send("✘移動元と移動先の要素が同じでした。").catch(e => log(e, "error"));
+          message.reply("✘移動元と移動先の要素が同じでした。").catch(e => log(e, "error"));
         }
       }else{
-        message.channel.send("✘失敗しました。引数がキューの範囲外です").catch(e => log(e, "error"));
+        message.reply("✘失敗しました。引数がキューの範囲外です").catch(e => log(e, "error"));
       }
   }
 }

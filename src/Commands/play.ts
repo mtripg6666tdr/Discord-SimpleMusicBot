@@ -1,6 +1,6 @@
-import * as discord from "discord.js";
 import * as ytsr from "ytsr";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util/util";
 
 export default class Play implements CommandInterface {
@@ -9,17 +9,23 @@ export default class Play implements CommandInterface {
   description = "キュー内の楽曲を再生します。引数として対応しているサイトの楽曲のURLを指定することもできます。";
   unlist = false;
   category = "player";
-  async run(message:discord.Message, options:CommandArgs){
+  argument = [{
+    type: "string",
+    name: "keyword",
+    description: "再生する動画のキーワードまたはURL。VCに未接続の場合接続してその曲を優先して再生します。接続中の場合はキューの末尾に追加します。一時停止中の場合はオプションは無視され、再生が再開されます。",
+    required: false
+  }] as SlashCommandArgument[];
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // 一時停止されてるね
     if(options.data[message.guild.id].Manager.IsPaused){
       options.data[message.guild.id].Manager.Resume();
-      message.channel.send(":arrow_forward: 再生を再開します。").catch(e => log(e, "error"))
+      message.reply(":arrow_forward: 再生を再開します。").catch(e => log(e, "error"))
       return;
     }
     // キューが空だし引数もないし添付ファイルもない
     if(options.data[message.guild.id].Queue.length == 0 && options.rawArgs == "" && message.attachments.size === 0) {
-      message.channel.send("再生するコンテンツがありません").catch(e => log(e, "error"));
+      message.reply("再生するコンテンツがありません").catch(e => log(e, "error"));
       return;
     }
     const wasConnected = options.data[message.guild.id].Manager.IsConnecting;
@@ -35,7 +41,7 @@ export default class Play implements CommandInterface {
           await options.PlayFromURL(message, options.rawArgs, i === 0 ? !wasConnected : false);
         }
       }else{
-        const msg = await message.channel.send("🔍検索中...");
+        const msg = await message.reply("🔍検索中...");
         const result = (await ytsr.default(options.rawArgs, {
           limit: 10,
           gl: "JP",
@@ -55,9 +61,10 @@ export default class Play implements CommandInterface {
       await options.PlayFromURL(message, options.rawArgs, !options.data[message.guild.id].Manager.IsConnecting);
     // なにもないからキューから再生
     }else if(options.data[message.guild.id].Queue.length >= 1){
+      message.reply("再生します");
       options.data[message.guild.id].Manager.Play();
     }else{
-      message.channel.send("✘キューが空です").catch(e => log(e, "error"));
+      message.reply("✘キューが空です").catch(e => log(e, "error"));
     }
   }
 }

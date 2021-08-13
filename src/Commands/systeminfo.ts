@@ -1,6 +1,7 @@
 import * as discord from "discord.js";
 import * as os from "os";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandMessage } from "../Component/CommandMessage";
 import { getColor } from "../Util/colorUtil";
 import { GetMBytes, GetMemInfo, GetPercentage, log, logStore } from "../Util/util";
 
@@ -11,11 +12,18 @@ export default class SystemInfo implements CommandInterface {
   unlist = false;
   category = "utility";
   examples = "sysinfo mem";
-  usage = "sysinfo (mem|cpu)";
-  async run(message:discord.Message, options:CommandArgs){
+  usage = "sysinfo [mem|cpu]";
+  argument = [{
+    type: "string",
+    name: "content",
+    description: "memまたはcpuのどちらかを指定できます",
+    required: false
+  }] as SlashCommandArgument[];
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // Run default logger
     options.bot.Log();
+    await message.reply("実行します");
 
     if(message.author.id === (process.env.ADMIN_USER ?? "593758391395155978") && (options.args.indexOf("log") >= 0 || options.args.length == 0)){
       // Process Logs
