@@ -125,12 +125,14 @@ export class YouTube extends AudioSource {
         readable = ytdl.downloadFromInfo(info, {
           format: format,
           requestOptions: {agent},
-          lang: "ja"
+          lang: "ja",
+          highWaterMark: 1048576 * 32 
         });
       }else{
         readable = ytdl.downloadFromInfo(info, {
           format: format,
-          lang: "ja"
+          lang: "ja",
+          highWaterMark: 1048576 * 32 
         });
       }
       this.fallback = false;
