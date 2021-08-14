@@ -4,8 +4,7 @@ import { log, NormalizeText } from "../Util/util";
 import { InteractionMessage } from "./InteractionMessage";
 
 /**
- * メッセージによるコマンド実行と、スラッシュコマンドによるコマンド実行による差を吸収します
- * @remarks このクラスは、従来の様式でのコマンドの処理コードをそのまま使えるようにするものであり非常によくないコードです
+ * ユーザーが送信するコマンドを含むメッセージまたはインタラクションを表します
  */
 export class CommandMessage {
   private isMessage = false;
@@ -17,6 +16,11 @@ export class CommandMessage {
     //
   }
 
+  /**
+   * オブジェクトをメッセージオブジェクトで初期化します
+   * @param message ユーザーが送信するコマンドを含むメッセージ
+   * @returns 新しいCommandMessageのインスタンス
+   */
   static fromMessage(message:Message){
     const me = new CommandMessage();
     me.isMessage = true;
@@ -24,6 +28,12 @@ export class CommandMessage {
     return me;
   }
 
+  /**
+   * オブジェクトをインタラクションで初期化します
+   * @param client ボットのクライアント
+   * @param interaction ユーザーが送信するコマンドを含むインタラクション
+   * @returns 新しいCommandMessageのインスタンス
+   */
   static fromInteraction(client:Client, interaction:CommandInteraction){
     const me = new CommandMessage();
     me.isMessage = false;
@@ -36,9 +46,9 @@ export class CommandMessage {
   }
 
   /**
-   * メッセージに応答します
-   * @param options 
-   * @returns 
+   * コマンドに応答します
+   * @param options 応答メッセージの本体
+   * @returns 応答するメッセージのInteractionMessage
    */
   async reply(options:string|MessageOptions):Promise<InteractionMessage>{
     if(this.isMessage){
@@ -126,26 +136,45 @@ export class CommandMessage {
     return this.isMessage ? this._message.guild : this._interaction.guild;
   }
 
+  /**
+   * コマンドメッセージのリアクションを取得します
+   */
   get reactions(){
     return this.isMessage ? this._message.reactions : null;
   }
 
+  /**
+   * コマンドメッセージのURLを取得します。
+   * インタラクションによるコマンド送信の場合URLが存在しないためnullとなります。
+   */
   get url(){
     return this.isMessage ? this._message.url : null;
   }
 
+  /**
+   * コマンドメッセージの作成されたタイムスタンプを取得します
+   */
   get createdTimestamp(){
     return this.isMessage ? this._message.createdTimestamp : this._interaction.createdTimestamp;
   }
 
+  /**
+   * コマンドメッセージの作成されたデートタイムを取得します
+   */
   get createdAt(){
     return this.isMessage ? this._message.createdAt : this._interaction.createdAt;
   }
 
+  /**
+   * コマンドメッセージのIDを取得します
+   */
   get id(){
     return this.isMessage ? this._message.id : this._interaction.id;
   }
 
+  /**
+   * コマンドメッセージのチャンネルIDを取得します
+   */
   get channelId(){
     return this.isMessage ? this._message.channel.id : this._interaction.channel.id;
   }
@@ -157,6 +186,13 @@ export class CommandMessage {
     return this.isMessage ? this._message.attachments : new Collection<string, MessageAttachment>();
   }
 
+  /**
+   * メッセージの内容からコマンド名や引数を解決します
+   * @param content 内容
+   * @param guildid サーバーID
+   * @param data GuildVoiceInfoのデータ
+   * @returns 解決されたコマンド名、パース済み引数、生の引数を含むオブジェクト
+   */
   static resolveCommandMessage(content:string, guildid:string, data:{[key:string]:GuildVoiceInfo}){
     const msg_spl = NormalizeText(content).substr(1, content.length - 1).split(" ");
     let command = msg_spl[0];
