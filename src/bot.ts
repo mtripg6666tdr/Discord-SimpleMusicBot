@@ -436,7 +436,9 @@ export class MusicBot {
       }
     }else{
       // あらメッセージの送信者さんはボイチャ入ってないん…
-      await message.reply("ボイスチャンネルに参加してからコマンドを送信してください:relieved:").catch(e => log(e, "error"));
+      reply ? 
+      await message.reply("ボイスチャンネルに参加してからコマンドを送信してください:relieved:").catch(e => log(e, "error")) :
+      await message.channel.send("ボイスチャンネルに参加してからコマンドを送信してください:relieved:").catch(e => log(e, "error"));
       return false;
     }
   };
