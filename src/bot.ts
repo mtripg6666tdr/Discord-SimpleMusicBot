@@ -20,10 +20,15 @@ import { CommandMessage } from "./Component/CommandMessage"
  * 音楽ボットの本体
  */
 export class MusicBot {
+  // クライアントの初期化
   private client = new discord.Client({intents: [
+    // サーバーを認識する
     discord.Intents.FLAGS.GUILDS,
+    // サーバーのメッセージを認識する
     discord.Intents.FLAGS.GUILD_MESSAGES,
+    // サーバーのリアクションを認識する
     discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    // サーバーのボイスチャンネルのステータスを確認する
     discord.Intents.FLAGS.GUILD_VOICE_STATES,
   ]});
   private data:{[key:string]:GuildVoiceInfo} = {};
@@ -33,10 +38,26 @@ export class MusicBot {
   private EmbedPageToggle:PageToggle[] = [] as PageToggle[];
   private isReadyFinished = false;
   private queueModifiedGuilds = [] as string[];
+  /**
+   * ページトグル
+   */
   get Toggles(){return this.EmbedPageToggle};
+  /**
+   * クライアント
+   */
   get Client(){return this.client};
+  /**
+   * キューが変更されたサーバーの保存
+   */
   get QueueModifiedGuilds(){return this.queueModifiedGuilds};
+  /**
+   * バージョン情報  
+   * (リポジトリの最終コミットのハッシュ値)
+   */
   get Version(){return this.versionInfo};
+  /**
+   * 初期化された時刻
+   */
   get InstantiatedTime(){return this.instantiatedTime}; 
 
   constructor(){
@@ -67,7 +88,11 @@ export class MusicBot {
         for(let i=0;i<queueGuildids.length;i++){
           let id = queueGuildids[i];
           const queue = JSON.parse(queues[id]) as YmxFormat;
-          if(speakingGuildids.indexOf(id) >= 0 && queue.version === YmxVersion && speakingIds[id].indexOf(":") >= 0){
+          if(
+            speakingGuildids.indexOf(id) >= 0 && 
+            queue.version === YmxVersion && 
+            speakingIds[id].indexOf(":") >= 0
+            ){
             //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
             const [vid, cid, ..._bs] = speakingIds[id].split(":");
             const [loop, qloop, related] = _bs.map(b => b === "1");
@@ -130,11 +155,13 @@ export class MusicBot {
       if(!this.isReadyFinished || message.author.bot || message.channel.type !== "GUILD_TEXT") return;
       // データ初期化
       this.initData(message.guild.id, message.channel.id);
-      // プレフィックス
+      // プレフィックスの更新
       this.updatePrefix(message);
       if(message.content === "<@" + client.user.id + ">") {
         // メンションならば
-        message.channel.send("コマンドは、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`で確認できます").catch(e => log(e, "error"));
+        message.channel
+          .send("コマンドは、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`で確認できます")
+          .catch(e => log(e, "error"));
         return;
       }
       if(message.content.startsWith(this.data[message.guild.id].PersistentPref.Prefix)){
@@ -168,7 +195,10 @@ export class MusicBot {
           if(panel && Object.keys(panel.Opts).indexOf(num) >= 0){
             await this.data[message.guild.id].Queue.AutoAddQueue(client, panel.Opts[Number(num)].url, message.member, "unknown", false, true);
             this.data[message.guild.id].SearchPanel = null;
-            if(this.data[message.guild.id].Manager.IsConnecting && !this.data[message.guild.id].Manager.IsPlaying){
+            if(
+              this.data[message.guild.id].Manager.IsConnecting && 
+              !this.data[message.guild.id].Manager.IsPlaying
+              ){
               this.data[message.guild.id].Manager.Play();
             }
           }
@@ -176,7 +206,10 @@ export class MusicBot {
             await this.data[message.guild.id].Queue.AutoAddQueue(client, panel.Opts[n].url, message.member, "unknown", false, false, message.channel as discord.TextChannel);
           });
         }
-      }else if(this.cancellations.filter(c => !c.Cancelled).length > 0 && message.content === "キャンセル" || message.content === "cancel"){
+      }else if(
+        this.cancellations.filter(c => !c.Cancelled).length > 0 && 
+        (message.content === "キャンセル" || message.content === "cancel")
+        ){
         this.cancellations.forEach(c => c.Cancel());
         message.channel.send("処理中の処理をすべてキャンセルしています....").catch(e => log(e, "error"));
       }
@@ -188,8 +221,13 @@ export class MusicBot {
       // 自分のメッセージに対するリアクションのみ処理
       if(reaction.message.author.id === this.client.user.id){
         // メッセージのページトグルを取得
-        const l = this.EmbedPageToggle.filter(t => t.Message.channelId === reaction.message.channel.id && t.Message.id === reaction.message.id);
-        if(l.length >= 1 && (reaction.emoji.name === PageToggle.arrowLeft || reaction.emoji.name === PageToggle.arrowRight)){
+        const l = this.EmbedPageToggle.filter(t => 
+          t.Message.channelId === reaction.message.channel.id && 
+          t.Message.id === reaction.message.id);
+        if(
+          l.length >= 1 && 
+          (reaction.emoji.name === PageToggle.arrowLeft || reaction.emoji.name === PageToggle.arrowRight)
+          ){
           // ページめくり
           await l[0].FlipPage(
             reaction.emoji.name === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
@@ -296,7 +334,10 @@ export class MusicBot {
           // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
           value: (this.data[id].Manager.IsPlaying && !this.data[id].Manager.IsPaused ? 
             voice.getVoiceConnection(id).joinConfig.channelId : "0") 
-            + ":" + this.data[id].boundTextChannel + ":" + (this.data[id].Queue.LoopEnabled ? "1" : "0") + ":" + (this.data[id].Queue.QueueLoopEnabled ? "1" : "0") + ":" + (this.data[id].AddRelative ? "1" : "0")
+            + ":" + this.data[id].boundTextChannel 
+            + ":" + (this.data[id].Queue.LoopEnabled ? "1" : "0") 
+            + ":" + (this.data[id].Queue.QueueLoopEnabled ? "1" : "0") 
+            + ":" + (this.data[id].AddRelative ? "1" : "0")
         });
       });
       DatabaseAPI.SetIsSpeaking(speaking);
@@ -438,7 +479,11 @@ export class MusicBot {
           title: c.title
         } as exportableCustom);
         index++;
-        if(index % 50 === 0 || (result.estimatedItemCount <= 50 && index % 10 === 0) || result.estimatedItemCount <= 10){
+        if(
+          index % 50 === 0 || 
+          (result.estimatedItemCount <= 50 && index % 10 === 0) || 
+          result.estimatedItemCount <= 10
+          ){
           await msg.edit(":hourglass_flowing_sand:プレイリスト`" + result.title + "`を処理しています。お待ちください。" + result.estimatedItemCount + "曲中" + index + "曲処理済み。");
         }
         if(cancellation.Cancelled){
@@ -477,7 +522,11 @@ export class MusicBot {
   protected async updateBoundChannel(message:CommandMessage){
     // テキストチャンネルバインド
     // コマンドが送信されたチャンネルを後で利用します。
-    if(!this.data[message.guild.id].Manager.IsConnecting || (message.member.voice.channel && message.member.voice.channel.members.has(this.client.user.id)) || message.content.indexOf("join") >= 0){
+    if(
+      !this.data[message.guild.id].Manager.IsConnecting || 
+      (message.member.voice.channel && message.member.voice.channel.members.has(this.client.user.id)) || 
+      message.content.indexOf("join") >= 0
+      ){
       if(message.content !== (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">"))
       this.data[message.guild.id].boundTextChannel = message.channelId;
     }

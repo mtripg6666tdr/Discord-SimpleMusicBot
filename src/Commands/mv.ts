@@ -1,4 +1,3 @@
-import * as discord from "discord.js";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
