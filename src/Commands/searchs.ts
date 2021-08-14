@@ -5,7 +5,7 @@ import { SoundCloudTrackCollection } from "../AudioSource/soundcloud";
 import { CommandMessage } from "../Component/CommandMessage";
 import { DefaultUserAgent } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { DownloadText, log } from "../Util/util";
+import { DownloadText, log } from "../Util";
 
 export default class Searchs implements CommandInterface {
   name = "サウンドクラウドを検索";

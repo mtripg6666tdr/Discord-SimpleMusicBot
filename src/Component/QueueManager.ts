@@ -10,7 +10,7 @@ import { exportableStreamable, Streamable, StreamableApi } from "../AudioSource/
 import { exportableYouTube, YouTube } from "../AudioSource/youtube";
 import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log } from "../Util/util";
+import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log } from "../Util";
 import { CommandMessage } from "./CommandMessage"
 import { InteractionMessage } from "./InteractionMessage";
 import { ManagerBase } from "./ManagerBase";

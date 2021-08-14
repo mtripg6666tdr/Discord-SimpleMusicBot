@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, MessageOptions, Client, Collection, MessageAttachment, ReplyMessageOptions } from "discord.js";
 import { GuildVoiceInfo } from "../definition";
-import { log, NormalizeText } from "../Util/util";
+import { log, NormalizeText } from "../Util";
 import { InteractionMessage } from "./InteractionMessage";
 
 /**

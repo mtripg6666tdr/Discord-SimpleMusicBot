@@ -5,7 +5,7 @@ require("dotenv").config();
 import { TextChannel } from "discord.js";
 import * as http from "http";
 import { MusicBot } from "./bot";
-import { btoa, log } from "./Util/util";
+import { btoa, log } from "./Util";
 
 log("[Entry]Discord-SimpleMusicBot by mtripg6666tdr");
 const bot = new MusicBot();

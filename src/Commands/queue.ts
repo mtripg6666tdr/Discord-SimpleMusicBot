@@ -4,7 +4,7 @@ import { YouTube } from "../AudioSource/youtube";
 import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, log } from "../Util/util";
+import { CalcHourMinSec, CalcMinSec, log } from "../Util";
 
 export default class Queue implements CommandInterface {
   name = "キュー";

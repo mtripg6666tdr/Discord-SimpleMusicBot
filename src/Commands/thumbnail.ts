@@ -2,7 +2,7 @@ import * as discord from "discord.js";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
-import { log, NormalizeText } from "../Util/util";
+import { log, NormalizeText } from "../Util";
 
 export default class Thumbnail implements CommandInterface {
   name = "サムネイル";

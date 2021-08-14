@@ -1,7 +1,7 @@
 import * as discord from "discord.js";
 import * as voice from "@discordjs/voice";
 import { CommandArgs, CommandInterface } from ".";
-import { log } from "../Util/util";
+import { log } from "../Util";
 import { CommandMessage } from "../Component/CommandMessage"
 
 export default class LeaveClean implements CommandInterface {

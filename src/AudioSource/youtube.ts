@@ -4,8 +4,8 @@ import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 import m3u8stream from "m3u8stream";
 import { log } from "../Util/logUtil";
-import { DownloadText } from "../Util/util";
-import { AudioSource, defaultM3u8stream } from "./audiosource";
+import { DownloadText } from "../Util";
+import { AudioSource } from "./audiosource";
 import { PassThrough, Readable } from "stream";
 
 export class YouTube extends AudioSource {

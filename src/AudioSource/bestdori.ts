@@ -1,5 +1,5 @@
 import { EmbedField } from "discord.js";
-import { AddZero, DownloadText } from "../Util/util";
+import { AddZero, DownloadText } from "../Util";
 import { AudioSource } from "./audiosource";
 
 export class BestdoriS extends AudioSource {

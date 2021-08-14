@@ -2,7 +2,7 @@ import * as discord from "discord.js";
 import * as voice from "@discordjs/voice";
 import { CommandArgs, CommandInterface } from ".";
 import { getColor } from "../Util/colorUtil";
-import { CalcTime, log } from "../Util/util";
+import { CalcTime, log } from "../Util";
 import { CommandMessage } from "../Component/CommandMessage";
 
 export default class Uptime implements CommandInterface {

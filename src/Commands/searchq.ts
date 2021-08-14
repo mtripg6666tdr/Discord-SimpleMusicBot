@@ -3,7 +3,7 @@ import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { YouTube } from "../AudioSource/youtube";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
-import { CalcMinSec, log } from "../Util/util";
+import { CalcMinSec, log } from "../Util";
 
 export default class Searchq implements CommandInterface {
   name = "キュー内を検索";

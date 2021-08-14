@@ -1,7 +1,7 @@
 import * as ytsr from "ytsr";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { log } from "../Util/util";
+import { log } from "../Util";
 
 export default class Play implements CommandInterface {
   name = "再生";

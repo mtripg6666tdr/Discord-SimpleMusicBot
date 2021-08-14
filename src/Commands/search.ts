@@ -3,7 +3,7 @@ import * as ytsr from "ytsr";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
-import { log } from "../Util/util";
+import { log } from "../Util";
 
 export default class Search implements CommandInterface {
   name = "検索";

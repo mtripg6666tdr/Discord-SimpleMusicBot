@@ -2,7 +2,7 @@ import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
-import { log } from "../Util/util";
+import { log } from "../Util";
 
 export default class Help implements CommandInterface {
   name = "ヘルプ";

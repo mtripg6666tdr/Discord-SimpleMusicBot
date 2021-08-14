@@ -1,6 +1,6 @@
 import { CommandArgs, CommandInterface } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { log } from "../Util/util";
+import { log } from "../Util";
 
 export default class Mltf implements CommandInterface {
   name = "最後の曲を先頭へ";

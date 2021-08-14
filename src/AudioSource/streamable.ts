@@ -1,6 +1,6 @@
 import { EmbedField } from "discord.js";
 import { DefaultAudioThumbnailURL } from "../definition";
-import { DownloadText } from "../Util/util";
+import { DownloadText } from "../Util";
 import { AudioSource } from "./audiosource";
 
 export class Streamable extends AudioSource {

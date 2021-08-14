@@ -13,7 +13,7 @@ import {
   log,
   logStore,
   NormalizeText
-} from "./Util/util";
+} from "./Util";
 import { CommandMessage } from "./Component/CommandMessage"
 
 /**

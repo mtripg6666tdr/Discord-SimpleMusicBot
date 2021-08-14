@@ -3,7 +3,7 @@ import { CommandArgs, CommandInterface } from ".";
 import { bestdori, BestdoriApi } from "../AudioSource/bestdori";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
-import { log } from "../Util/util";
+import { log } from "../Util";
 
 export default class Searchb implements CommandInterface {
   name = "searchb";

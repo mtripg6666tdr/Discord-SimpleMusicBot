@@ -3,7 +3,7 @@ import * as os from "os";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage";
 import { getColor } from "../Util/colorUtil";
-import { GetMBytes, GetMemInfo, GetPercentage, log, logStore } from "../Util/util";
+import { GetMBytes, GetMemInfo, GetPercentage, log, logStore } from "../Util";
 
 export default class SystemInfo implements CommandInterface {
   name = "システム情報";

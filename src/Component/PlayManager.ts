@@ -5,7 +5,7 @@ import { AudioSource, defaultM3u8stream } from "../AudioSource/audiosource";
 import { YouTube } from "../AudioSource/youtube";
 import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, DownloadAsReadable, isAvailableRawVideoURL, log } from "../Util/util";
+import { CalcHourMinSec, CalcMinSec, DownloadAsReadable, isAvailableRawVideoURL, log } from "../Util";
 import { ManagerBase } from "./ManagerBase";
 
 /**

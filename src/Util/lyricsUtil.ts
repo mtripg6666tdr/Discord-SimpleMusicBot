@@ -2,7 +2,7 @@ import Genius from "genius-lyrics";
 import * as https from "https";
 import { decode } from "html-entities";
 import { DefaultAudioThumbnailURL } from "../definition";
-import { DownloadText } from "./util";
+import { DownloadText } from ".";
 
 export async function GetLyrics(keyword:string):Promise<songInfo>{
   try{

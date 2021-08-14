@@ -3,7 +3,7 @@ import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { GetLyrics } from "../Util/lyricsUtil";
-import { log } from "../Util/util";
+import { log } from "../Util";
 
 export default class Lyrics implements CommandInterface {
   name = "歌詞";

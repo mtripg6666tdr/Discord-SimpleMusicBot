@@ -3,7 +3,7 @@ import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { InteractionMessage } from "../Component/InteractionMessage";
 import { CancellationPending, YmxFormat, YmxVersion } from "../definition";
-import { DownloadText, log } from "../Util/util";
+import { DownloadText, log } from "../Util";
 
 export default class Import implements CommandInterface {
   name = "インポート";
