@@ -67,7 +67,7 @@ export default class Search implements CommandInterface {
               thumbnail: video.bestThumbnail.url
             };
             selectOpts.push({
-              label: index + ". " + video.title,
+              label: index + ". " + (video.title.length > 90 ? video.title.substring(0, 90) + "…" : video.title.length),
               description: "長さ: " + video.duration + ", チャンネル名: " + video.author.name,
               value: index.toString()
             });
@@ -105,6 +105,7 @@ export default class Search implements CommandInterface {
       }
       catch(e){
         log(e, "error");
+        options.data[message.guild.id].SearchPanel = null;
         if(msg) msg.edit("✘内部エラーが発生しました").catch(e => log(e, "error"));
         else message.reply("✘内部エラーが発生しました").catch(e => log(e, "error"));
       }

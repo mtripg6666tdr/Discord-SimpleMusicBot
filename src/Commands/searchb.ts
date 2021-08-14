@@ -44,15 +44,16 @@ export default class Searchb implements CommandInterface {
         let index = 1;
         let selectOpts = [] as discord.MessageSelectOptionData[];
         for(let i = 0; i < result.length; i++){
+          const title = bestdori.allsonginfo[Number(result[i])].musicTitle[0];
           desc += "`" + index + ".` [" + bestdori.allsonginfo[Number(result[i])].musicTitle[0] + "](" + BestdoriApi.getAudioPage(Number(result[i])) + ") - `" + bestdori.allbandinfo[bestdori.allsonginfo[Number(result[i])].bandId].bandName[0] + "` \r\n\r\n";
           options.data[message.guild.id].SearchPanel.Opts[index] = {
             url: BestdoriApi.getAudioPage(Number(result[i])),
-            title: bestdori.allsonginfo[Number(result[i])].musicTitle[0],
+            title: title,
             duration: "0",
             thumbnail: BestdoriApi.getThumbnail(Number(result[i]), bestdori.allsonginfo[Number(result[i])].jacketImage[0])
           };
           selectOpts.push({
-            label: index + ". " + bestdori.allsonginfo[Number(result[i])].musicTitle[0],
+            label: index + ". " + (title.length > 90 ? title.substr(0, 90) + "…" : title),
             description: "長さ: " + options.data[message.guild.id].SearchPanel.Opts[index].duration + ", バンド名: " + bestdori.allbandinfo[bestdori.allsonginfo[Number(result[i])].bandId].bandName[0],
             value: index.toString()
           });
@@ -90,7 +91,8 @@ export default class Searchb implements CommandInterface {
         });
       }
       catch(e){
-        console.log(e)
+        console.log(e);
+        options.data[message.guild.id].SearchPanel = null;
         if(msg) msg.edit("失敗しました").catch(e => log(e, "error"));
         else message.reply("失敗しました").catch(e => log(e, "error"));
       }

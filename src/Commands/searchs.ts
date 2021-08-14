@@ -81,7 +81,7 @@ export default class Searchs implements CommandInterface {
             thumbnail: result[i].artwork_url
           };
           selectOpts.push({
-            label: index + ". " + result[i].title,
+            label: index + ". " + (result[i].title.length > 90 ? result[i].title.substr(0, 90) + "…" : result[i].title),
             description: "長さ: " + min + ":" + sec + ", ユーザー: " + result[i].user.username,
             value: index.toString()
           });
@@ -118,6 +118,7 @@ export default class Searchs implements CommandInterface {
       }
       catch(e){
         log(e, "error");
+        options.data[message.guild.id].SearchPanel = null;
         if(msg) msg.edit("✘内部エラーが発生しました").catch(e => log(e, "error"));
         else message.reply("✘内部エラーが発生しました").catch(e => log(e, "error"));
       }
