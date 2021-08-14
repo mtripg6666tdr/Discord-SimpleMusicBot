@@ -122,11 +122,11 @@ export class PlayManager extends ManagerBase {
             }
             cantPlay();
           });
-          this.AudioPlayer.on("unsubscribe", (subscription)=>{
-            this.AudioPlayer.stop(true);
-            this.AudioPlayer = null;
-          });
         }
+        this.AudioPlayer.on("unsubscribe", (subscription)=>{
+          this.AudioPlayer.stop(true);
+          this.AudioPlayer = null;
+        });
       }
       // QueueContentからストリーム、M3U8プレイリスト(非HLS)または直URLを取得
       const rawStream = await this.CurrentVideoInfo.fetch();
