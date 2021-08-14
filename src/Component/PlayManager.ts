@@ -14,6 +14,7 @@ import { ManagerBase } from "./ManagerBase";
  */
 export class PlayManager extends ManagerBase {
   private AudioPlayer:voice.AudioPlayer = null;
+  private stream:string|Readable = null;
   private readonly retryLimit = 3;
   error = false;
   errorCount = 0;
@@ -138,6 +139,7 @@ export class PlayManager extends ManagerBase {
         return;
       }
       this.error = false;
+      this.stream = stream;
       // 再生
       this.AudioPlayer.play(voice.createAudioResource(stream));
       await voice.entersState(this.AudioPlayer, voice.AudioPlayerStatus.Playing, 10e3);
@@ -198,6 +200,7 @@ export class PlayManager extends ManagerBase {
     log("[PlayManager/" + this.info.GuildID + "]Stop() called");
     if(this.AudioPlayer){
       this.AudioPlayer.stop(true);
+      if(this.stream && typeof this.stream !== "string" && !(this.stream as Readable).destroyed) (this.stream as Readable).destroy();
     }
     this.info.Bot.BackupData();
     return this;
@@ -288,6 +291,7 @@ export class PlayManager extends ManagerBase {
   }
 
   private async onStreamFinished(){
+    if(this.stream && typeof this.stream !== "string" && !(this.stream as Readable).destroyed) (this.stream as Readable).destroy();
     // ストリームが終了したら時間を確認しつつ次の曲へ移行
     log("[PlayManager/" + this.info.GuildID + "]Stream finished");
     // 再生が終わったら
