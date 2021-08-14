@@ -1,7 +1,7 @@
 import { CommandInteraction, Message, MessageOptions, Client, Collection, MessageAttachment, ReplyMessageOptions } from "discord.js";
 import { GuildVoiceInfo } from "../definition";
 import { log, NormalizeText } from "../Util";
-import { InteractionMessage } from "./InteractionMessage";
+import { ResponseMessage } from "./ResponseMessage";
 
 /**
  * ユーザーが送信するコマンドを含むメッセージまたはインタラクションを表します
@@ -24,7 +24,7 @@ export class CommandMessage {
    * @param message ユーザーが送信するコマンドを含むメッセージ
    * @returns 新しいCommandMessageのインスタンス
    */
-  static fromMessage(message:Message, data:{[key:string]:GuildVoiceInfo}){
+  static createFromMessage(message:Message, data:{[key:string]:GuildVoiceInfo}){
     const me = new CommandMessage();
     me.isMessage = true;
     me._message = message;
@@ -35,7 +35,7 @@ export class CommandMessage {
     return me;
   }
 
-  private static fromMessageWithParsed(message:Message, command:string, options:string[], rawOptions:string){
+  private static createFromMessageWithParsed(message:Message, command:string, options:string[], rawOptions:string){
     const me = new CommandMessage();
     me.isMessage = true;
     me._message = message;
@@ -51,7 +51,7 @@ export class CommandMessage {
    * @param interaction ユーザーが送信するコマンドを含むインタラクション
    * @returns 新しいCommandMessageのインスタンス
    */
-  static fromInteraction(client:Client, interaction:CommandInteraction){
+  static createFromInteraction(client:Client, interaction:CommandInteraction){
     const me = new CommandMessage();
     me.isMessage = false;
     me._interaction = interaction;
@@ -70,7 +70,7 @@ export class CommandMessage {
    * @param options 応答メッセージの本体
    * @returns 応答するメッセージのInteractionMessage
    */
-  async reply(options:string|MessageOptions):Promise<InteractionMessage>{
+  async reply(options:string|MessageOptions):Promise<ResponseMessage>{
     if(this.isMessage){
       let _opt = null as ReplyMessageOptions;
       if(typeof options === "string"){
@@ -85,7 +85,7 @@ export class CommandMessage {
           repliedUser: false
         }
       } as ReplyMessageOptions));
-      return InteractionMessage.fromMessage(msg);
+      return ResponseMessage.createFromMessage(msg);
     }else{
       if(this._interactionReplied){
         throw new Error("すでに返信済みです");
@@ -100,9 +100,9 @@ export class CommandMessage {
       const mes  = (await this._interaction.editReply(_opt));
       this._interactionReplied = true;
       if(mes instanceof Message){
-        return InteractionMessage.fromInteractionWithMessage(this._interaction, mes);
+        return ResponseMessage.createFromInteractionWithMessage(this._interaction, mes);
       }else{
-        return InteractionMessage.fromInteraction(this._client, this._interaction, mes);
+        return ResponseMessage.createFromInteraction(this._client, this._interaction, mes);
       }
     }
   }
@@ -114,7 +114,7 @@ export class CommandMessage {
    */
   async suppressEmbeds(suppress:boolean):Promise<CommandMessage>{
     if(this.isMessage){
-      return CommandMessage.fromMessageWithParsed(await this._message.suppressEmbeds(suppress), this._command, this._options, this._rawOptions);
+      return CommandMessage.createFromMessageWithParsed(await this._message.suppressEmbeds(suppress), this._command, this._options, this._rawOptions);
     }else{
       return this;
     }

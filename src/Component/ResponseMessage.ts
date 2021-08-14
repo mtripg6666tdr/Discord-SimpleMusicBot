@@ -4,7 +4,7 @@ import { Client, CommandInteraction, EmojiIdentifierResolvable, Message, Message
 /**
  * CommandMessageに対するボットの応答メッセージを表します
  */
-export class InteractionMessage {
+export class ResponseMessage {
   private isMessage = false;
   private _interaction = null as CommandInteraction;
   private _message = null as Message;
@@ -18,8 +18,8 @@ export class InteractionMessage {
    * @param message 応答メッセージ本体
    * @returns 新しいInteractionMessageのインスタンス
    */
-  static fromMessage(message:Message){
-    const me = new InteractionMessage();
+  static createFromMessage(message:Message){
+    const me = new ResponseMessage();
     me.isMessage = true;
     me._message = message;
     return me;
@@ -32,8 +32,8 @@ export class InteractionMessage {
    * @param message 応答メッセージ
    * @returns 新しいInteractionMessageのインスタンス
    */
-  static fromInteraction(client:Client, interaction:CommandInteraction, message:APIMessage){
-    const me = new InteractionMessage();
+  static createFromInteraction(client:Client, interaction:CommandInteraction, message:APIMessage){
+    const me = new ResponseMessage();
     me.isMessage = false;
     me._interaction = interaction;
     me._message = new Message(client, message);
@@ -47,8 +47,8 @@ export class InteractionMessage {
    * @param message 応答メッセージ
    * @returns 新しいInteractionMessageのインスタンス
    */
-  static fromInteractionWithMessage(interaction:CommandInteraction, message:Message){
-    const me = new InteractionMessage();
+  static createFromInteractionWithMessage(interaction:CommandInteraction, message:Message){
+    const me = new ResponseMessage();
     me.isMessage = false;
     me._interaction = interaction;
     me._message = message;
@@ -60,7 +60,7 @@ export class InteractionMessage {
    * @param options 応答メッセージの内容
    * @returns 編集後のInteractionMessage
    */
-  async edit(options:string|MessageEditOptions):Promise<InteractionMessage>{
+  async edit(options:string|MessageEditOptions):Promise<ResponseMessage>{
     if(this.isMessage){
       let _opt = null as MessageEditOptions;
       if(typeof options === "string"){
@@ -75,7 +75,7 @@ export class InteractionMessage {
           repliedUser: false
         }
       } as MessageEditOptions));
-      return InteractionMessage.fromMessage(msg);
+      return ResponseMessage.createFromMessage(msg);
     }else{
       let _opt = null as (MessageEditOptions & { fetchReply: true});
       if(typeof options === "string"){
@@ -86,9 +86,9 @@ export class InteractionMessage {
       }
       const mes  = (await this._interaction.editReply(_opt));
       if(mes instanceof Message){
-        return InteractionMessage.fromInteractionWithMessage(this._interaction, mes);
+        return ResponseMessage.createFromInteractionWithMessage(this._interaction, mes);
       }else{
-        return InteractionMessage.fromInteraction(this._message.client, this._interaction, mes);
+        return ResponseMessage.createFromInteraction(this._message.client, this._interaction, mes);
       }
     }
   }

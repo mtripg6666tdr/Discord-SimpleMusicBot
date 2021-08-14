@@ -139,7 +139,7 @@ export class MusicBot {
       }
       if(message.content.startsWith(this.data[message.guild.id].PersistentPref.Prefix)){
         // コマンドメッセージを作成
-        const commandMessage = CommandMessage.fromMessage(message, this.data);
+        const commandMessage = CommandMessage.createFromMessage(message, this.data);
         // コマンドの処理
         await Command.Instance.resolve(commandMessage.command)?.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
@@ -212,7 +212,7 @@ export class MusicBot {
         // 遅延リプライ
         await interaction.deferReply();
         // メッセージライクに解決してコマンドメッセージに
-        const commandMessage = CommandMessage.fromInteraction(this.client, interaction);
+        const commandMessage = CommandMessage.createFromInteraction(this.client, interaction);
         // コマンドを実行
         await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
       }else{

@@ -1,7 +1,7 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { InteractionMessage } from "../Component/InteractionMessage";
+import { ResponseMessage } from "../Component/ResponseMessage";
 import { CancellationPending, YmxFormat, YmxVersion } from "../definition";
 import { DownloadText, log } from "../Util";
 
@@ -32,7 +32,7 @@ export default class Import implements CommandInterface {
       url = options.args[1];
     }
     if(url.startsWith("http://discord.com/channels/") || url.startsWith("https://discord.com/channels/")){
-      let smsg = null as InteractionMessage;
+      let smsg = null as ResponseMessage;
       const cancellation = new CancellationPending();
       options.cancellations.push(cancellation);
       try{

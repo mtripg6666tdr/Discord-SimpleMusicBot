@@ -12,7 +12,7 @@ import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log } from "../Util";
 import { CommandMessage } from "./CommandMessage"
-import { InteractionMessage } from "./InteractionMessage";
+import { ResponseMessage } from "./ResponseMessage";
 import { ManagerBase } from "./ManagerBase";
 import { PageToggle } from "./PageToggle";
 
@@ -163,12 +163,12 @@ export class QueueManager extends ManagerBase {
       first:boolean = false, 
       fromSearch:boolean = false, 
       channel:TextChannel = null,
-      message:InteractionMessage = null,
+      message:ResponseMessage = null,
       gotData:exportableCustom = null
       ){
     log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Called");
     let ch:TextChannel = null;
-    let msg:Message|InteractionMessage = null;
+    let msg:Message|ResponseMessage = null;
     try{
       if(fromSearch && this.info.SearchPanel){
         // 検索パネルから
