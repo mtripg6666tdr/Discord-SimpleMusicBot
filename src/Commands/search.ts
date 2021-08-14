@@ -67,7 +67,7 @@ export default class Search implements CommandInterface {
               thumbnail: video.bestThumbnail.url
             };
             selectOpts.push({
-              label: index + ". " + (video.title.length > 90 ? video.title.substring(0, 90) + "…" : video.title.length),
+              label: index + ". " + (video.title.length > 90 ? video.title.substring(0, 90) + "…" : video.title),
               description: "長さ: " + video.duration + ", チャンネル名: " + video.author.name,
               value: index.toString()
             });
