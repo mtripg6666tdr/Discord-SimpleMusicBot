@@ -522,7 +522,7 @@ export class MusicBot {
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
     }else{
       try{
-        await this.data[message.guild.id].Queue.AutoAddQueue(this.client, optiont, message.member, "unknown", first, false, message.channel as discord.TextChannel);
+        await this.data[message.guild.id].Queue.AutoAddQueue(this.client, optiont, message.member, "unknown", first, false, message.channel as discord.TextChannel, await message.reply("お待ちください..."));
         this.data[message.guild.id].Manager.Play();
         return;
       }
