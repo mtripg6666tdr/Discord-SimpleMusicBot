@@ -97,7 +97,9 @@ export class YouTube extends AudioSource {
             lang: "ja"
           });
         }else{
-          info = await ytdl.getInfo(this.Url);
+          info = await ytdl.getInfo(this.Url, {
+            lang: "ja"
+          });
         }
       }
       this.relatedVideos = info.related_videos.map(video => {
@@ -127,7 +129,8 @@ export class YouTube extends AudioSource {
         });
       }else{
         readable = ytdl.downloadFromInfo(info, {
-          format: format
+          format: format,
+          lang: "ja"
         });
       }
       this.fallback = false;
