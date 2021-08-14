@@ -16,6 +16,9 @@ import {
 } from "./Util/util";
 import { CommandMessage } from "./Component/CommandMessage"
 
+/**
+ * 音楽ボットの本体
+ */
 export class MusicBot {
   private client = new discord.Client({intents: [
     discord.Intents.FLAGS.GUILDS,
@@ -35,22 +38,6 @@ export class MusicBot {
   get QueueModifiedGuilds(){return this.queueModifiedGuilds};
   get Version(){return this.versionInfo};
   get InstantiatedTime(){return this.instantiatedTime}; 
-
-  private getCommandArgs(options:string[], optiont:string):CommandArgs{
-    return {
-      EmbedPageToggle: this.EmbedPageToggle,
-      args: options,
-      bot: this,
-      data: this.data,
-      rawArgs: optiont,
-      updateBoundChannel: this.updateBoundChannel,
-      client: this.client,
-      Join: this.Join,
-      PlayFromURL: this.PlayFromURL,
-      initData: this.initData,
-      cancellations: this.cancellations
-    };
-  }
 
   constructor(){
     this.instantiatedTime = new Date();
@@ -151,10 +138,10 @@ export class MusicBot {
         return;
       }
       if(message.content.startsWith(this.data[message.guild.id].PersistentPref.Prefix)){
-        // コマンドの引数の解決
-        const {command, options,rawOptions} = CommandMessage.resolveCommandMessage(message.content, message.guild.id, this.data);
+        // コマンドメッセージを作成
+        const commandMessage = CommandMessage.fromMessage(message, this.data);
         // コマンドの処理
-        await Command.Instance.resolve(command)?.run(CommandMessage.fromMessage(message), this.getCommandArgs(options, rawOptions));
+        await Command.Instance.resolve(commandMessage.command)?.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
         // searchコマンドのキャンセルを捕捉
         if(message.content === "キャンセル" || message.content === "cancel") {
@@ -224,19 +211,19 @@ export class MusicBot {
       if(command){
         // 遅延リプライ
         await interaction.deferReply();
-        // メッセージライクに解決
-        const messageLike = CommandMessage.fromInteraction(this.client, interaction);
-        // 引数を解決
-        const { rawOptions, options } = CommandMessage.resolveCommandMessage(messageLike.content, messageLike.guild.id, this.data);
+        // メッセージライクに解決してコマンドメッセージに
+        const commandMessage = CommandMessage.fromInteraction(this.client, interaction);
         // コマンドを実行
-        await command.run(messageLike, this.getCommandArgs(options, rawOptions));
+        await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
       }else{
         await interaction.reply("おっと！なにかが間違ってしまったようです。\r\nコマンドが見つかりませんでした。 :sob:");
       }
     });
   }
 
-  // 定期ログ
+  /**
+   *  定期ログを実行します
+   */
   Log(){
     const _d = Object.values(this.data);
     const memory = GetMemInfo();
@@ -259,6 +246,9 @@ export class MusicBot {
     if(debugLogStoreLength) logStore.maxLength = debugLogStoreLength;
   }
 
+  /**
+   * キューをエクスポートしてテキストにします
+   */
   exportQueue(guildId:string){
     return JSON.stringify({
       version: YmxVersion,
@@ -266,15 +256,9 @@ export class MusicBot {
     } as YmxFormat);
   }
 
-  // サーバーデータ初期化関数
-  private initData(guildid:string, channelid:string){
-    if(!this.data[guildid]) {
-      this.data[guildid] = new GuildVoiceInfo(this.Client, guildid, channelid, this);
-      this.data[guildid].Manager.SetData(this.data[guildid]);
-      this.data[guildid].Queue.SetData(this.data[guildid]);
-    }
-  };
-
+  /**
+   * 接続ステータスやキューを含む全データをサーバーにバックアップします
+   */
   BackupData(){
     if(DatabaseAPI.CanOperate){
       try{
@@ -299,6 +283,9 @@ export class MusicBot {
     }
   }
 
+  /**
+   * 接続ステータス等をサーバーにバックアップします
+   */
   BackupStatus(){
     try{
       // 参加ステータスの送信
@@ -319,8 +306,45 @@ export class MusicBot {
     }
   }
 
-  // VC参加関数
-  // 成功した場合はtrue、それ以外の場合にはfalseを返します
+  /**
+   * 必要に応じてサーバーデータを初期化します
+   */
+  private initData(guildid:string, channelid:string){
+    if(!this.data[guildid]) {
+      this.data[guildid] = new GuildVoiceInfo(this.Client, guildid, channelid, this);
+      this.data[guildid].Manager.SetData(this.data[guildid]);
+      this.data[guildid].Queue.SetData(this.data[guildid]);
+    }
+  }
+
+  /**
+   * コマンドを実行する際にランナーに渡す引数を生成します
+   * @param options コマンドのパース済み引数
+   * @param optiont コマンドの生の引数
+   * @returns コマンドを実行する際にランナーに渡す引数
+   */
+  private createCommandRunnerArgs(options:string[], optiont:string):CommandArgs{
+    return {
+      EmbedPageToggle: this.EmbedPageToggle,
+      args: options,
+      bot: this,
+      data: this.data,
+      rawArgs: optiont,
+      updateBoundChannel: this.updateBoundChannel,
+      client: this.client,
+      Join: this.Join,
+      PlayFromURL: this.PlayFromURL,
+      initData: this.initData,
+      cancellations: this.cancellations
+    };
+  }
+
+  /**
+   * ボイスチャンネルに接続します
+   * @param message コマンドを表すメッセージ
+   * @param reply 応答が必要な際に、コマンドに対して返信で応じるか新しいメッセージとして応答するか。(デフォルトではfalse)
+   * @returns 成功した場合はtrue、それ以外の場合にはfalse
+   */
   private async Join(message:CommandMessage, reply:boolean = false):Promise<boolean>{
     if(message.member.voice.channel){
       // すでにVC入ってるよ～
@@ -358,7 +382,7 @@ export class MusicBot {
   };
 
   /**
-   * メッセージからストリームを判定してキューに追加し、状況に応じて再生を開始する関数
+   * メッセージからストリームを判定してキューに追加し、状況に応じて再生を開始します
    * @param first キューの先頭に追加するかどうか
    */
   private async PlayFromURL(message:CommandMessage, optiont:string, first:boolean = true){
@@ -446,6 +470,10 @@ export class MusicBot {
     }
   }
 
+  /**
+   * 状況に応じてバインドチャンネルを更新します
+   * @param message 更新元となるメッセージ
+   */
   protected async updateBoundChannel(message:CommandMessage){
     // テキストチャンネルバインド
     // コマンドが送信されたチャンネルを後で利用します。
@@ -455,6 +483,10 @@ export class MusicBot {
     }
   }
 
+  /**
+   * プレフィックス更新します
+   * @param message 更新元となるメッセージ
+   */
   protected updatePrefix(message:discord.Message):void{
     const pmatch = message.guild.members.resolve(this.client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
     if(pmatch){

@@ -12,6 +12,9 @@ export class CommandMessage {
   private _interaction = null as CommandInteraction;
   private _interactionReplied = false;
   private _client = null as Client;
+  private _command = null as string;
+  private _options = null as string[];
+  private _rawOptions = null as string;
   private constructor(){
     //
   }
@@ -21,10 +24,24 @@ export class CommandMessage {
    * @param message ユーザーが送信するコマンドを含むメッセージ
    * @returns 新しいCommandMessageのインスタンス
    */
-  static fromMessage(message:Message){
+  static fromMessage(message:Message, data:{[key:string]:GuildVoiceInfo}){
     const me = new CommandMessage();
     me.isMessage = true;
     me._message = message;
+    const { command, options, rawOptions } = this.resolveCommandMessage(message.content, message.guild.id, data);
+    me._command = command;
+    me._options = options;
+    me._rawOptions = rawOptions;
+    return me;
+  }
+
+  private static fromMessageWithParsed(message:Message, command:string, options:string[], rawOptions:string){
+    const me = new CommandMessage();
+    me.isMessage = true;
+    me._message = message;
+    me._command = command;
+    me._options = options;
+    me._rawOptions = rawOptions;
     return me;
   }
 
@@ -42,6 +59,9 @@ export class CommandMessage {
       interaction.deferReply();
     }
     me._client = client;
+    me._command = interaction.commandName;
+    me._options = interaction.options.data.map(arg => arg.value.toString());
+    me._rawOptions = me._options.join(" ");
     return me;
   }
 
@@ -94,7 +114,7 @@ export class CommandMessage {
    */
   async suppressEmbeds(suppress:boolean):Promise<CommandMessage>{
     if(this.isMessage){
-      return CommandMessage.fromMessage(await this._message.suppressEmbeds(suppress));
+      return CommandMessage.fromMessageWithParsed(await this._message.suppressEmbeds(suppress), this._command, this._options, this._rawOptions);
     }else{
       return this;
     }
@@ -185,6 +205,27 @@ export class CommandMessage {
   get attachments(){
     return this.isMessage ? this._message.attachments : new Collection<string, MessageAttachment>();
   }
+  
+  /**
+   * コマンド名を取得します
+   */
+  get command(){
+    return this._command;
+  }
+
+  /**
+   * 引数一覧を取得します
+   */
+  get options(){
+    return this._options;
+  }
+
+  /**
+   * 生の引数を取得します
+   */
+  get rawOptions(){
+    return this._rawOptions;
+  }
 
   /**
    * メッセージの内容からコマンド名や引数を解決します
@@ -193,7 +234,7 @@ export class CommandMessage {
    * @param data GuildVoiceInfoのデータ
    * @returns 解決されたコマンド名、パース済み引数、生の引数を含むオブジェクト
    */
-  static resolveCommandMessage(content:string, guildid:string, data:{[key:string]:GuildVoiceInfo}){
+  private static resolveCommandMessage(content:string, guildid:string, data:{[key:string]:GuildVoiceInfo}){
     const msg_spl = NormalizeText(content).substr(1, content.length - 1).split(" ");
     let command = msg_spl[0];
     let rawOptions = msg_spl.length > 1 ? content.substring(command.length + (data[guildid] ? data[guildid].PersistentPref.Prefix : ">").length + 1, content.length) : "";
