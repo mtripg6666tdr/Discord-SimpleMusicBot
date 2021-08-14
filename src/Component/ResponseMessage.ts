@@ -192,4 +192,22 @@ export class ResponseMessage {
   get attachments(){
     return this._message.attachments;
   }
+
+  /**
+   * 応答メッセージの埋め込みを取得します
+   */
+  get embeds(){
+    return this._message.embeds;
+  }
+
+  /**
+   * 応答メッセージのコンポーネントを取得します
+   */
+  get components(){
+    return this._message.components;
+  }
+
+  async fetch(){
+    return this.isMessage ? ResponseMessage.createFromMessage(await this._message.fetch()) : ResponseMessage.createFromInteractionWithMessage(this._interaction, await this._message.fetch());
+  }
 }

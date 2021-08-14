@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { MessageActionRow, MessageButton, MessageComponentInteraction, MessageEmbed } from "discord.js";
 import { ResponseMessage } from "./ResponseMessage";
 
 /**
@@ -30,11 +30,13 @@ export class PageToggle {
 
   private constructor(){}
 
-  static arrowRight = "➡️";
-  static arrowLeft = "⬅️";
+  static arrowRightEmoji = "▶";
+  static arrowLeftEmoji = "◀";
+  static arrowRight = "flip_page_next";
+  static arrowLeft = "flip_page_prev";
   static async init(msg:ResponseMessage, embeds:MessageEmbedsResolvable, total?:number, current?:number):Promise<PageToggle>{
     const n = new PageToggle();
-    n._message = msg;
+    n._message = await msg.fetch();
     n._embeds = embeds;
     if(total){
       n._total = total;
@@ -42,8 +44,23 @@ export class PageToggle {
     if(current){
       n._current = current;
     }
-    await n._message.react(this.arrowLeft);
-    await n._message.react(this.arrowRight);
+    await n._message.edit({
+      content: n._message.content === "" ? null : n._message.content,
+      embeds: n._message.embeds,
+      components: [
+        new MessageActionRow()
+        .addComponents(
+          new MessageButton()
+          .setCustomId(this.arrowLeft)
+          .setLabel(this.arrowLeftEmoji)
+          .setStyle("PRIMARY"),
+          new MessageButton()
+          .setCustomId(this.arrowRight)
+          .setLabel(this.arrowRightEmoji)
+          .setStyle("PRIMARY")
+        )
+      ]
+    });
     return n;
   }
 
@@ -56,12 +73,16 @@ export class PageToggle {
     }
     delIndex.sort((a,b)=>b-a);
     delIndex.forEach(i => {
-      toggles[i].Message.reactions.removeAll();
+      toggles[i].Message.edit({
+        content: toggles[i].Message.content === "" ? null : toggles[i].Message.content,
+        embeds: toggles[i].Message.embeds,
+        components: []
+      });
       toggles.splice(i, 1);
     });
   }
 
-  async FlipPage(page:number){
+  async FlipPage(page:number, interaction?:MessageComponentInteraction){
     let embed = null as MessageEmbed;
     this._current = page;
     if(this._embeds instanceof Array){
@@ -69,7 +90,17 @@ export class PageToggle {
     }else if(typeof this._embeds === "function"){
       embed = await (this._embeds as any)(page);
     }
-    await this.Message.edit({content: null ,embeds:[embed]});
+    if(interaction){
+      await interaction.editReply({
+        content: this.Message.content === "" ? null : this.Message.content,
+        embeds:[embed]
+      });
+    }else{
+      await this.Message.edit({
+        content: this.Message.content === "" ? null : this.Message.content,
+        embeds:[embed]
+      });
+    }
   }
 
   SetFresh(isFreshNecessary:boolean){

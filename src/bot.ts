@@ -26,8 +26,6 @@ export class MusicBot {
     discord.Intents.FLAGS.GUILDS,
     // サーバーのメッセージを認識する
     discord.Intents.FLAGS.GUILD_MESSAGES,
-    // サーバーのリアクションを認識する
-    discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
     // サーバーのボイスチャンネルのステータスを確認する
     discord.Intents.FLAGS.GUILD_VOICE_STATES,
   ]});
@@ -215,46 +213,44 @@ export class MusicBot {
       }
     });
 
-    client.on("messageReactionAdd", async(reaction, user) => {
-      // ボットユーザーなら返却
-      if(user.bot) return;
-      // 自分のメッセージに対するリアクションのみ処理
-      if(reaction.message.author.id === this.client.user.id){
-        // メッセージのページトグルを取得
-        const l = this.EmbedPageToggle.filter(t => 
-          t.Message.channelId === reaction.message.channel.id && 
-          t.Message.id === reaction.message.id);
-        if(
-          l.length >= 1 && 
-          (reaction.emoji.name === PageToggle.arrowLeft || reaction.emoji.name === PageToggle.arrowRight)
-          ){
-          // ページめくり
-          await l[0].FlipPage(
-            reaction.emoji.name === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
-            reaction.emoji.name === PageToggle.arrowRight ? (l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current ) : 0
-          );
-          // リアクション削除
-          await reaction.users.remove(user.id);
-        }
-      }
-    });
-
     client.on("interactionCreate", async(interaction)=>{
-      // コマンド出ないインタラクションの場合は返却
-      if(!interaction.isCommand()) return;
+      if(interaction.user.bot) return;
       // データ初期化
       this.initData(interaction.guild.id, interaction.channel.id);
-      // コマンドを解決
-      const command = Command.Instance.resolve(interaction.commandName);
-      if(command){
-        // 遅延リプライ
-        await interaction.deferReply();
-        // メッセージライクに解決してコマンドメッセージに
-        const commandMessage = CommandMessage.createFromInteraction(this.client, interaction);
-        // コマンドを実行
-        await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
-      }else{
-        await interaction.reply("おっと！なにかが間違ってしまったようです。\r\nコマンドが見つかりませんでした。 :sob:");
+      // コマンドインタラクション
+      if(interaction.isCommand()){
+        // コマンドを解決
+        const command = Command.Instance.resolve(interaction.commandName);
+        if(command){
+          // 遅延リプライ
+          await interaction.deferReply();
+          // メッセージライクに解決してコマンドメッセージに
+          const commandMessage = CommandMessage.createFromInteraction(this.client, interaction);
+          // コマンドを実行
+          await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
+        }else{
+          await interaction.reply("おっと！なにかが間違ってしまったようです。\r\nコマンドが見つかりませんでした。 :sob:");
+        }
+      // ボタンインタラクション
+      }else if(interaction.isButton()){
+        await interaction.deferUpdate();
+        const l = this.EmbedPageToggle.filter(t => 
+          t.Message.channelId === interaction.channel.id && 
+          t.Message.id === interaction.message.id);
+        if(
+          l.length >= 1 &&
+          interaction.customId === PageToggle.arrowLeft || interaction.customId === PageToggle.arrowRight
+          ){
+            // ページめくり
+            await l[0].FlipPage(
+              interaction.customId === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
+              interaction.customId === PageToggle.arrowRight ? (l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current ) : 0
+              ,
+              interaction
+              );
+          }else{
+            await interaction.editReply("失敗しました!");
+          }
       }
     });
   }
