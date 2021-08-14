@@ -1,12 +1,12 @@
 import { APIMessage } from "discord-api-types";
-import { Client, CommandInteraction, EmojiIdentifierResolvable, Message, MessageEditOptions } from "discord.js";
+import { Client, CommandInteraction, EmojiIdentifierResolvable, Message, MessageEditOptions, SelectMenuInteraction } from "discord.js";
 
 /**
  * CommandMessageに対するボットの応答メッセージを表します
  */
 export class ResponseMessage {
   private isMessage = false;
-  private _interaction = null as CommandInteraction;
+  private _interaction = null as CommandInteraction|SelectMenuInteraction;
   private _message = null as Message;
 
   private constructor(){
@@ -19,6 +19,7 @@ export class ResponseMessage {
    * @returns 新しいInteractionMessageのインスタンス
    */
   static createFromMessage(message:Message){
+    if(message.author.id !== message.client.user.id) throw new Error("メッセージは応答メッセージではありません");
     const me = new ResponseMessage();
     me.isMessage = true;
     me._message = message;
@@ -28,14 +29,15 @@ export class ResponseMessage {
   /**
    * オブジェクトをインタラクションで初期化します
    * @param client ボットのクライアント
-   * @param interaction ユーザーが送信するコマンドを含むインタラクション
+   * @param interaction ユーザーが送信するインタラクション
    * @param message 応答メッセージ
    * @returns 新しいInteractionMessageのインスタンス
    */
-  static createFromInteraction(client:Client, interaction:CommandInteraction, message:APIMessage){
+  static createFromInteraction(client:Client, interaction:CommandInteraction|SelectMenuInteraction, message:APIMessage){
     const me = new ResponseMessage();
     me.isMessage = false;
     me._interaction = interaction;
+    if(message.author.id !== client.user.id) throw new Error("メッセージは応答メッセージではありません");
     me._message = new Message(client, message);
     return me;
   }
@@ -43,11 +45,12 @@ export class ResponseMessage {
   /**
    * オブジェクトをインタラクションで初期化します
    * @param client ボットのクライアント
-   * @param interaction ユーザーが送信するコマンドを含むインタラクション
+   * @param interaction ユーザーが送信するインタラクション
    * @param message 応答メッセージ
    * @returns 新しいInteractionMessageのインスタンス
    */
-  static createFromInteractionWithMessage(interaction:CommandInteraction, message:Message){
+  static createFromInteractionWithMessage(interaction:CommandInteraction|SelectMenuInteraction, message:Message){
+    if(message.author.id !== message.client.user.id) throw new Error("メッセージは応答メッセージではありません");
     const me = new ResponseMessage();
     me.isMessage = false;
     me._interaction = interaction;

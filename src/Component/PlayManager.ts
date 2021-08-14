@@ -110,21 +110,23 @@ export class PlayManager extends ManagerBase {
           }
         });
         voice.getVoiceConnection(this.info.GuildID).subscribe(this.AudioPlayer);
-        this.AudioPlayer.on("error", (e)=>{
-          // エラーが発生したら再生できないときの関数を呼んで逃げる
-          log(e.name + "\r\n" + e.message + "\r\n" + e.stack, "error");
-          if(this.info.boundTextChannel){
-            this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
-              log("[PlayManager/" + this.info.GuildID + "]Some error occurred in StreamDispatcher", "error");
-              (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? (e.message ?? e) : "undefined") + ")" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。")).catch(e => log(e, "error"));
-            }).catch(e => log(e, "error"));
-          }
-          cantPlay();
-        });
-        this.AudioPlayer.on("unsubscribe", (subscription)=>{
-          this.AudioPlayer.stop(true);
-          this.AudioPlayer = null;
-        });
+        if(!process.env.DEBUG){
+          this.AudioPlayer.on("error", (e)=>{
+            // エラーが発生したら再生できないときの関数を呼んで逃げる
+            log(e.name + "\r\n" + e.message + "\r\n" + e.stack, "error");
+            if(this.info.boundTextChannel){
+              this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
+                log("[PlayManager/" + this.info.GuildID + "]Some error occurred in AudioPlayer", "error");
+                (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? (e.message ?? e) : "undefined") + ")" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。")).catch(e => log(e, "error"));
+              }).catch(e => log(e, "error"));
+            }
+            cantPlay();
+          });
+          this.AudioPlayer.on("unsubscribe", (subscription)=>{
+            this.AudioPlayer.stop(true);
+            this.AudioPlayer = null;
+          });
+        }
       }
       // QueueContentからストリーム、M3U8プレイリスト(非HLS)または直URLを取得
       const rawStream = await this.CurrentVideoInfo.fetch();
@@ -258,12 +260,14 @@ export class PlayManager extends ManagerBase {
       }else{
         // ほかならストリーム化
         stream = DownloadAsReadable(rawStream);
-        stream.on('error', (e)=> {
-          this.AudioPlayer.emit("error", {
-            ...e,
-            resource: (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource ?? null
+        if(!process.env.DEBUG){
+          stream.on('error', (e)=> {
+            this.AudioPlayer.emit("error", {
+              ...e,
+              resource: (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource ?? null
+            });
           });
-        });
+        }
       }
     }else if((rawStream as defaultM3u8stream).type){
       // M3U8プレイリストならURLを直接play
@@ -271,12 +275,14 @@ export class PlayManager extends ManagerBase {
     }else{
       // ストリームなら変換せずにそのままplay
       stream = rawStream as Readable;
-      stream.on('error', (e)=> {
-        this.AudioPlayer.emit("error", {
-          ...e,
-          resource: (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource ?? null
+      if(!process.env.DEBUG){
+        stream.on('error', (e)=> {
+          this.AudioPlayer.emit("error", {
+            ...e,
+            resource: (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource ?? null
+          });
         });
-      });
+      }
     }
     return stream;
   }

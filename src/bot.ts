@@ -5,7 +5,7 @@ import * as ytpl from "ytpl";
 import { exportableCustom } from "./AudioSource/custom";
 import { Command, CommandArgs } from "./Commands";
 import { PageToggle } from "./Component/PageToggle";
-import { CancellationPending, GuildVoiceInfo, YmxFormat, YmxVersion } from "./definition";
+import { CancellationPending, GuildVoiceInfo, SearchPanel, YmxFormat, YmxVersion } from "./definition";
 import { getColor } from "./Util/colorUtil";
 import { DatabaseAPI } from "./Util/databaseUtil";
 import {
@@ -15,6 +15,7 @@ import {
   NormalizeText
 } from "./Util";
 import { CommandMessage } from "./Component/CommandMessage"
+import { ResponseMessage } from "./Component/ResponseMessage";
 
 /**
  * 音楽ボットの本体
@@ -186,23 +187,12 @@ export class MusicBot {
         // searchコマンドの選択を捕捉
         else if(NormalizeText(message.content).match(/^([0-9]\s?)+$/)){
           const panel = this.data[message.guild.id].SearchPanel;
+          if(!panel) return;
           // メッセージ送信者が検索者と一致するかを確認
           if(message.author.id !== panel.Msg.userId) return;
-          const nums = NormalizeText(message.content).split(" ");          
-          const num = nums.shift();
-          if(panel && Object.keys(panel.Opts).indexOf(num) >= 0){
-            await this.data[message.guild.id].Queue.AutoAddQueue(client, panel.Opts[Number(num)].url, message.member, "unknown", false, true);
-            this.data[message.guild.id].SearchPanel = null;
-            if(
-              this.data[message.guild.id].Manager.IsConnecting && 
-              !this.data[message.guild.id].Manager.IsPlaying
-              ){
-              this.data[message.guild.id].Manager.Play();
-            }
-          }
-          nums.map(n => Number(n)).forEach(async n => {
-            await this.data[message.guild.id].Queue.AutoAddQueue(client, panel.Opts[n].url, message.member, "unknown", false, false, message.channel as discord.TextChannel);
-          });
+          const nums = NormalizeText(message.content).split(" ");
+          const responseMessage = await(await this.client.channels.fetch(panel.Msg.chId) as discord.TextChannel).messages.fetch(panel.Msg.id);
+          await this.playFromSearchPanelOptions(nums, message.guild.id, ResponseMessage.createFromMessage(responseMessage))
         }
       }else if(
         this.cancellations.filter(c => !c.Cancelled).length > 0 && 
@@ -251,6 +241,39 @@ export class MusicBot {
           }else{
             await interaction.editReply("失敗しました!");
           }
+      }else if(interaction.isSelectMenu()){
+        // 検索パネル取得
+        const panel = this.data[interaction.guild.id].SearchPanel;
+        // なければ返却
+        if(!panel) return;
+        // インタラクションしたユーザーを確認
+        if(interaction.user.id !== panel.Msg.userId) return;
+        await interaction.deferUpdate();
+        if(interaction.customId === "search"){
+          if(interaction.values.indexOf("cancel") >= 0){
+            //const msgId = this.data[interaction.guild.id].SearchPanel.Msg;
+            this.data[interaction.guild.id].SearchPanel = null;
+            await interaction.channel.send("✅キャンセルしました");
+            // try{
+            //   const ch = await client.channels.fetch(msgId.chId);
+            //   const msg = await (ch as discord.TextChannel).messages.fetch(msgId.id);
+            //   await msg.delete();
+            // }
+            // catch(e){
+            //   log(e, "error");
+            // }
+            await interaction.deleteReply();
+          }else{
+            const message = interaction.message;
+            let responseMessage = null as ResponseMessage;
+            if(message instanceof discord.Message){
+              responseMessage = ResponseMessage.createFromInteractionWithMessage(interaction, message);
+            }else{
+              responseMessage = ResponseMessage.createFromInteraction(this.client, interaction, message);
+            }
+            await this.playFromSearchPanelOptions(interaction.values, interaction.guild.id, responseMessage)
+          }
+        }
       }
     });
   }
@@ -541,5 +564,31 @@ export class MusicBot {
     }else if(this.data[message.guild.id].PersistentPref.Prefix !== ">"){
       this.data[message.guild.id].PersistentPref.Prefix = ">";
     }
+  }
+
+  /**
+   * 検索パネルのオプション番号を表すインデックス番号から再生します
+   * @param nums インデックス番号の配列
+   * @param guildid サーバーID
+   * @param member 検索者のメンバー
+   * @param message 検索パネルが添付されたメッセージ自体を指す応答メッセージ
+   */
+  protected async playFromSearchPanelOptions(nums:string[], guildid:string, message:ResponseMessage){
+    const panel = this.data[guildid].SearchPanel;
+    const member = await (await this.client.guilds.fetch(guildid)).members.fetch(panel.Msg.userId);
+    const num = nums.shift();
+    if(Object.keys(panel.Opts).indexOf(num) >= 0){
+      await this.data[guildid].Queue.AutoAddQueue(this.client, panel.Opts[Number(num)].url, member, "unknown", false, message);
+      this.data[guildid].SearchPanel = null;
+      if(
+        this.data[guildid].Manager.IsConnecting && 
+        !this.data[guildid].Manager.IsPlaying
+        ){
+        this.data[guildid].Manager.Play();
+      }
+    }
+    nums.filter(n => Object.keys(panel.Opts).indexOf(n) >= 0).map(n => Number(n)).forEach(async n => {
+      await this.data[guildid].Queue.AutoAddQueue(this.client, panel.Opts[n].url, member, "unknown", false, false, message.channel as discord.TextChannel);
+    });
   }
 }

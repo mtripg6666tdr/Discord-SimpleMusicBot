@@ -5,7 +5,7 @@ import { SoundCloudTrackCollection } from "../AudioSource/soundcloud";
 import { CommandMessage } from "../Component/CommandMessage";
 import { DefaultUserAgent } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { DownloadText, log } from "../Util";
+import { CalcMinSec, DownloadText, log } from "../Util";
 
 export default class Searchs implements CommandInterface {
   name = "サウンドクラウドを検索";
@@ -70,14 +70,21 @@ export default class Searchs implements CommandInterface {
         embed.setColor(getColor("SEARCH"));
         embed.title = "\"" + options.rawArgs + "\"の検索結果✨"
         let index = 1;
+        let selectOpts = [] as discord.MessageSelectOptionData[];
         for(let i = 0; i < result.length; i++){
-          desc += "`" + index + ".` [" + result[i].title + "](" + result[i].permalink_url + ") - [" + result[i].user.username + "](" + result[i].user.permalink_url + ") \r\n\r\n";
+          const [min,sec] = CalcMinSec(Math.floor(result[i].duration / 1000));
+          desc += "`" + index + ".` [" + result[i].title + "](" + result[i].permalink_url + ") " + min + ":" + sec + " - [" + result[i].user.username + "](" + result[i].user.permalink_url + ") \r\n\r\n";
           options.data[message.guild.id].SearchPanel.Opts[index] = {
             url: result[i].permalink_url,
             title: result[i].title,
             duration: result[i].full_duration.toString(),
             thumbnail: result[i].artwork_url
           };
+          selectOpts.push({
+            label: index + ". " + result[i].title,
+            description: "長さ: " + min + ":" + sec + ", ユーザー: " + result[i].user.username,
+            value: index.toString()
+          });
           index++;
         }
         if(index === 1){
@@ -90,7 +97,24 @@ export default class Searchs implements CommandInterface {
           iconURL: message.author.avatarURL(),
           text:"楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
         };
-        await msg.edit({content: null, embeds:[embed]});
+        await msg.edit({
+          content: null, 
+          embeds:[embed],
+          components: [
+            new discord.MessageActionRow()
+            .addComponents(
+              new discord.MessageSelectMenu()
+              .setCustomId("search")
+              .setPlaceholder("数字を送信するか、ここから選択...")
+              .setMinValues(1)
+              .setMaxValues(index - 1)
+              .addOptions([...selectOpts, {
+                label: "キャンセル",
+                value: "cancel"
+              }])
+            )
+          ]
+        });
       }
       catch(e){
         log(e, "error");

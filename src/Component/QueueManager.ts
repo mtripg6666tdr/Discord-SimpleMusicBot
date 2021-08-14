@@ -161,7 +161,7 @@ export class QueueManager extends ManagerBase {
       addedBy:GuildMember, 
       type:"youtube"|"custom"|"unknown",
       first:boolean = false, 
-      fromSearch:boolean = false, 
+      fromSearch:boolean|ResponseMessage = false, 
       channel:TextChannel = null,
       message:ResponseMessage = null,
       gotData:exportableCustom = null
@@ -174,16 +174,21 @@ export class QueueManager extends ManagerBase {
         // 検索パネルから
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() From search panel");
         ch = await client.channels.fetch(this.info.SearchPanel.Msg.chId) as TextChannel;
-        msg = await (ch as TextChannel).messages.fetch(this.info.SearchPanel.Msg.id);
+        if(typeof fromSearch === "boolean"){
+          msg = await (ch as TextChannel).messages.fetch(this.info.SearchPanel.Msg.id);
+        }else{
+          msg = fromSearch;
+        }
         const tembed = new MessageEmbed();
         tembed.title = "お待ちください";
         tembed.description = "情報を取得しています...";
-        msg.edit({
+        await msg.edit({
           content: null, 
           embeds:[tembed],
           allowedMentions: {
             repliedUser: false
-          }
+          },
+          components: []
         });
       }else if(message){
         // すでに処理中メッセージがある

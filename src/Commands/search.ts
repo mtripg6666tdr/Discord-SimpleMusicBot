@@ -55,6 +55,7 @@ export default class Search implements CommandInterface {
         embed.setColor(getColor("SEARCH"));
         let desc = "";
         let index = 1;
+        const selectOpts = [] as discord.MessageSelectOptionData[];
         for(let i = 0; i < result.items.length; i++){
           if(result.items[i].type == "video"){
             const video = (result.items[i] as ytsr.Video);
@@ -65,6 +66,11 @@ export default class Search implements CommandInterface {
               duration: video.duration,
               thumbnail: video.bestThumbnail.url
             };
+            selectOpts.push({
+              label: index + ". " + video.title,
+              description: "長さ: " + video.duration + ", チャンネル名: " + video.author.name,
+              value: index.toString()
+            });
             index++;
           }
         }
@@ -78,7 +84,24 @@ export default class Search implements CommandInterface {
           iconURL: message.author.avatarURL(),
           text:"動画のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
         };
-        await msg.edit({content: null, embeds:[embed]});
+        await msg.edit({
+          content: null, 
+          embeds:[embed],
+          components: [
+            new discord.MessageActionRow()
+            .addComponents(
+              new discord.MessageSelectMenu()
+              .setCustomId("search")
+              .setPlaceholder("数字を送信するか、ここから選択...")
+              .setMinValues(1)
+              .setMaxValues(index - 1)
+              .addOptions([...selectOpts, {
+                label: "キャンセル",
+                value: "cancel"
+              }])
+            )
+          ]
+        });
       }
       catch(e){
         log(e, "error");
