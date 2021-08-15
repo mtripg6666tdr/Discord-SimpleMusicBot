@@ -26,7 +26,7 @@ module.exports = function(route){
   for(let i = 0; i < commands.length; i++){
     const builder = new SlashCommandBuilder();
     builder
-      .setName(commands[i].alias.filter(c => c.match(/^[\w-]{1,32}$/))[0])
+      .setName(commands[i].alias.filter(c => c.match(/^[\w-]{2,32}$/))[0])
       .setDescription(commands[i].description);
     if(commands[i].argument){
       commands[i].argument.forEach(arg => {
