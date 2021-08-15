@@ -44,8 +44,10 @@
     "postinstall": "node util/preparelib.js",
     "cleanup": "rimraf dist/ typings/",
     "checkvoiceenv": "node util/voiceenvcheck",
-    "applyslashcommandguild": "node util/commands/guild",
-    "applyslashcommandapplication": "node util/commands/application"
+    "applyslashcommandguild": "npx node util/registercommands/guild",
+    "applyslashcommandapplication": "npx node util/registercommands/application",
+    "deleteslashcommandguild": "npx node util/deletecommands/guild",
+    "deleteslashcommandapplication": "npx node util/deletecommands/application"
   },
   "keywords": [],
   "author": "mtripg6666tdr",
