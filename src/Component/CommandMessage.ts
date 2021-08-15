@@ -234,7 +234,7 @@ export class CommandMessage {
    * @param data GuildVoiceInfoのデータ
    * @returns 解決されたコマンド名、パース済み引数、生の引数を含むオブジェクト
    */
-  private static resolveCommandMessage(content:string, guildid:string, data:{[key:string]:GuildVoiceInfo}){
+  static resolveCommandMessage(content:string, guildid:string, data:{[key:string]:GuildVoiceInfo}){
     const msg_spl = NormalizeText(content).substr(1, content.length - 1).split(" ");
     let command = msg_spl[0];
     let rawOptions = msg_spl.length > 1 ? content.substring(command.length + (data[guildid] ? data[guildid].PersistentPref.Prefix : ">").length + 1, content.length) : "";
