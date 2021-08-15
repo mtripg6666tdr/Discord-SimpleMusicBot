@@ -12,15 +12,15 @@ export default class Mv implements CommandInterface {
   usage = "移動 <from> <to>";
   async run(message:discord.Message, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(options.rawArgs.length !== 2){
+    if(options.args.length !== 2){
       message.channel.send("✘引数は`移動したい曲の元のオフセット(番号) 移動先のオフセット(番号)`のように指定します。").catch(e => log(e, "error"));
       return;
-    }else if(options.rawArgs.indexOf("0") >= 0 && options.data[message.guild.id].Manager.IsPlaying){
+    }else if(options.args.indexOf("0") >= 0 && options.data[message.guild.id].Manager.IsPlaying){
       message.channel.send("✘音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。").catch(e => log(e, "error"));
       return;
     }
-    const from = Number(options.rawArgs[0]);
-    const to = Number(options.rawArgs[1]);
+    const from = Number(options.args[0]);
+    const to = Number(options.args[1]);
     const q = options.data[message.guild.id].Queue;
     if(
       0 <= from && from <= q.length &&
