@@ -215,7 +215,7 @@ export class QueueManager extends ManagerBase {
         // キュー内のオフセット取得
         const index = first ? "0" : (this.info.Queue.length - 1).toString();
         // ETAの計算
-        const [ehour, emin, esec] = CalcHourMinSec(this.LengthSeconds - _t - Math.floor(this.info.Manager.CurrentTime / 1000));
+        const [ehour, emin, esec] = CalcHourMinSec(this.LengthSeconds - _t - Math.floor(this.info.Player.CurrentTime / 1000));
         const embed = new MessageEmbed()
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
@@ -247,13 +247,13 @@ export class QueueManager extends ManagerBase {
     log("[QueueManager/" + this.info.GuildID + "]Next() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this.OnceLoopEnabled = false;
-    this.info.Manager.errorCount = 0;
-    this.info.Manager.errorUrl = "";
+    this.info.Player.errorCount = 0;
+    this.info.Player.errorUrl = "";
     if(this.QueueLoopEnabled){
       this.default.push(this.default[0]);
     }else{
-      if(this.info.AddRelative && this.info.Manager.CurrentVideoInfo.ServiceIdentifer === "youtube"){
-        const relatedVideos = (this.info.Manager.CurrentVideoInfo as YouTube).relatedVideos;
+      if(this.info.AddRelative && this.info.Player.CurrentVideoInfo.ServiceIdentifer === "youtube"){
+        const relatedVideos = (this.info.Player.CurrentVideoInfo as YouTube).relatedVideos;
         if(relatedVideos.length >= 1){
           const video = relatedVideos[0];
           await this.info.Queue.AddQueue(video.url, null, "push", "youtube", video);
@@ -310,7 +310,7 @@ export class QueueManager extends ManagerBase {
     log("[QueueManager/" + this.info.GuildID + "]Shuffle() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(this._default.length === 0) return;
-    if(this.info.Manager.IsPlaying){
+    if(this.info.Player.IsPlaying){
       const first = this._default[0];
       this._default.shift();
       this._default.sort(() => Math.random() - 0.5);
@@ -332,7 +332,7 @@ export class QueueManager extends ManagerBase {
     log("[QueueManager/" + this.info.GuildID + "]RemoveIf() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(this._default.length === 0) return;
-    const first = this.info.Manager.IsPlaying ? 1 : 0
+    const first = this.info.Player.IsPlaying ? 1 : 0
     const rmIndex = [] as number[];
     for(let i = first; i < this._default.length; i++){
       if(validator(this._default[i])){

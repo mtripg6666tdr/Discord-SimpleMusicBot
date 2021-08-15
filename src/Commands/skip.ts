@@ -11,14 +11,14 @@ export default class Skip implements CommandInterface {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
-    if(!options.data[message.guild.id].Manager.IsPlaying){
+    if(!options.data[message.guild.id].Player.IsPlaying){
       message.reply("再生中ではありません").catch(e => log(e, "error"));
       return;
     }
     const title = options.data[message.guild.id].Queue.get(0).BasicInfo.Title;
-    options.data[message.guild.id].Manager.Stop();
+    options.data[message.guild.id].Player.Stop();
     await options.data[message.guild.id].Queue.Next();
-    options.data[message.guild.id].Manager.Play();
+    options.data[message.guild.id].Player.Play();
     message.reply(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => log(e, "error"));
   }
 }

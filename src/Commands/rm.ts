@@ -22,7 +22,7 @@ export default class Rm implements CommandInterface {
       message.reply("引数に消去する曲のオフセット(番号)を入力してください。").catch(e => log(e, "error"));
       return;
     }
-    if(options.args.indexOf("0") >= 0 && options.data[message.guild.id].Manager.IsPlaying) {
+    if(options.args.indexOf("0") >= 0 && options.data[message.guild.id].Player.IsPlaying) {
       message.reply("現在再生中の楽曲を削除することはできません。");
       return;
     }
@@ -52,7 +52,7 @@ export default class Rm implements CommandInterface {
           if(match){
             const to = Number(match.groups.to);
             if(!isNaN(to)){
-              for(let i = (options.data[message.guild.id].Manager.IsPlaying ? 1 : 0); i <= to; i++){
+              for(let i = (options.data[message.guild.id].Player.IsPlaying ? 1 : 0); i <= to; i++){
                 addition.push(i);
               }
             }

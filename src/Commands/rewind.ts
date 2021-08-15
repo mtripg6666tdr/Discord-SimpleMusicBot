@@ -10,10 +10,10 @@ export default class Rewind implements CommandInterface {
   category = "player";
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(!options.data[message.guild.id].Manager.IsPlaying){
+    if(!options.data[message.guild.id].Player.IsPlaying){
       message.reply("再生中ではありません").catch(e => log(e, "error"));
     }else{
-      options.data[message.guild.id].Manager.Rewind();
+      options.data[message.guild.id].Player.Rewind();
       message.reply(":rewind:再生中の楽曲を頭出ししました:+1:").catch(e => log(e, "error"));
     }
   }

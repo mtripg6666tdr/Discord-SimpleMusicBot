@@ -12,7 +12,7 @@ export default class LeaveClean implements CommandInterface {
   category = "playlist";
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(!options.data[message.guild.id].Manager.IsConnecting){
+    if(!options.data[message.guild.id].Player.IsConnecting){
       options.data[message.guild.id].Queue.RemoveAll();
       message.reply("✅すべて削除しました").catch(e => log(e, "error"));
       return;

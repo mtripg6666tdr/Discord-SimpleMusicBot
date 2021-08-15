@@ -24,7 +24,7 @@ export class GuildVoiceInfo{
   /**
    * 再生マネジャ
    */
-  Manager:PlayManager;
+  Player:PlayManager;
   /**
    * 紐づけテキストチャンネル
    */
@@ -49,7 +49,7 @@ export class GuildVoiceInfo{
   constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBot){
     this.SearchPanel =null;
     this.Queue = new QueueManager();
-    this.Manager = new PlayManager(client);
+    this.Player = new PlayManager(client);
     this.boundTextChannel = boundchannelid;
     this.GuildID = guildid;
     this.DataPath = ".data/" + guildid + ".preferences.json";

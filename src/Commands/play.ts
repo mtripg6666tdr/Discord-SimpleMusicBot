@@ -18,8 +18,8 @@ export default class Play implements CommandInterface {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // 一時停止されてるね
-    if(options.data[message.guild.id].Manager.IsPaused){
-      options.data[message.guild.id].Manager.Resume();
+    if(options.data[message.guild.id].Player.IsPaused){
+      options.data[message.guild.id].Player.Resume();
       message.reply(":arrow_forward: 再生を再開します。").catch(e => log(e, "error"))
       return;
     }
@@ -28,7 +28,7 @@ export default class Play implements CommandInterface {
       message.reply("再生するコンテンツがありません").catch(e => log(e, "error"));
       return;
     }
-    const wasConnected = options.data[message.guild.id].Manager.IsConnecting;
+    const wasConnected = options.data[message.guild.id].Player.IsConnecting;
     // VCに入れない
     if(!(await options.Join(message))) {
       return;
@@ -52,17 +52,17 @@ export default class Play implements CommandInterface {
           return;
         }
         options.rawArgs = (result[0] as ytsr.Video).url;
-        await options.PlayFromURL(message, options.rawArgs, !options.data[message.guild.id].Manager.IsConnecting);
+        await options.PlayFromURL(message, options.rawArgs, !options.data[message.guild.id].Player.IsConnecting);
         await msg.delete();
       }
     // 添付ファイルを確認
     }else if(message.attachments.size >= 1){
       options.rawArgs = message.attachments.first().url;
-      await options.PlayFromURL(message, options.rawArgs, !options.data[message.guild.id].Manager.IsConnecting);
+      await options.PlayFromURL(message, options.rawArgs, !options.data[message.guild.id].Player.IsConnecting);
     // なにもないからキューから再生
     }else if(options.data[message.guild.id].Queue.length >= 1){
       message.reply("再生します");
-      options.data[message.guild.id].Manager.Play();
+      options.data[message.guild.id].Player.Play();
     }else{
       message.reply("✘キューが空です").catch(e => log(e, "error"));
     }

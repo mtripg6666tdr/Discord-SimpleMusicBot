@@ -11,11 +11,11 @@ export default class Pause implements CommandInterface {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
-    if(!options.data[message.guild.id].Manager.IsPlaying || options.data[message.guild.id].Manager.IsPaused){
+    if(!options.data[message.guild.id].Player.IsPlaying || options.data[message.guild.id].Player.IsPaused){
       message.reply("再生中ではありません").catch(e => log(e, "error"));
     }
     // 停止しま～す
-    options.data[message.guild.id].Manager.Pause();
+    options.data[message.guild.id].Player.Pause();
     message.reply(":pause_button: 一時停止しました").catch(e => log(e, "error"));
   }
 }

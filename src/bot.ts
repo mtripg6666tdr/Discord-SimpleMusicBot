@@ -111,7 +111,7 @@ export class MusicBot {
                   guildId: vc.guild.id,
                   adapterCreator: vc.guild.voiceAdapterCreator
                 });
-                await this.data[id].Manager.Play();
+                await this.data[id].Player.Play();
               }
             }
             catch(e){
@@ -286,8 +286,8 @@ export class MusicBot {
     const memory = GetMemInfo();
     log("[Main]Participating Server(s) count: " + this.client.guilds.cache.size);
     log("[Main]Registered Server(s) count: " + Object.keys(this.data).length);
-    log("[Main]Connecting Server(s) count: " + _d.filter(info => info.Manager.IsPlaying).length);
-    log("[Main]Paused Server(s) count: " + _d.filter(_d => _d.Manager.IsPaused).length);
+    log("[Main]Connecting Server(s) count: " + _d.filter(info => info.Player.IsPlaying).length);
+    log("[Main]Paused Server(s) count: " + _d.filter(_d => _d.Player.IsPaused).length);
     log("[System]Free:" + Math.floor(memory.free) + "MB; Total:" + Math.floor(memory.total) + "MB; Usage:" + memory.usage + "%");
   }
 
@@ -351,7 +351,7 @@ export class MusicBot {
         speaking.push({
           guildid: id,
           // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
-          value: (this.data[id].Manager.IsPlaying && !this.data[id].Manager.IsPaused ? 
+          value: (this.data[id].Player.IsPlaying && !this.data[id].Player.IsPaused ? 
             voice.getVoiceConnection(id).joinConfig.channelId : "0") 
             + ":" + this.data[id].boundTextChannel 
             + ":" + (this.data[id].Queue.LoopEnabled ? "1" : "0") 
@@ -372,7 +372,7 @@ export class MusicBot {
   private initData(guildid:string, channelid:string){
     if(!this.data[guildid]) {
       this.data[guildid] = new GuildVoiceInfo(this.Client, guildid, channelid, this);
-      this.data[guildid].Manager.SetData(this.data[guildid]);
+      this.data[guildid].Player.SetData(this.data[guildid]);
       this.data[guildid].Queue.SetData(this.data[guildid]);
     }
   }
@@ -431,7 +431,7 @@ export class MusicBot {
         log(e, "error");
         msg?.delete();
         message.reply("😑接続に失敗しました…もう一度お試しください。").catch(e => log(e, "error"));
-        this.data[message.guild.id].Manager.Disconnect();
+        this.data[message.guild.id].Player.Disconnect();
         return false;
       }
     }else{
@@ -462,7 +462,7 @@ export class MusicBot {
             const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
             if(msg.attachments.size > 0 && isAvailableRawAudioURL(msg.attachments.first().url)){
               await this.data[message.guild.id].Queue.AutoAddQueue(this.client, msg.attachments.first().url, message.member, "custom", first, false, message.channel as discord.TextChannel, smsg);
-              this.data[message.guild.id].Manager.Play();
+              this.data[message.guild.id].Player.Play();
               return;
             }else throw "添付ファイルが見つかりません";
           }else throw "メッセージの取得に失敗"
@@ -474,7 +474,7 @@ export class MusicBot {
     }else if(isAvailableRawAudioURL(optiont)){
       // オーディオファイルへの直リンク？
       await this.data[message.guild.id].Queue.AutoAddQueue(this.client, optiont, message.member, "custom", first, false, message.channel as discord.TextChannel);
-      this.data[message.guild.id].Manager.Play();
+      this.data[message.guild.id].Player.Play();
       return;
     }else if(optiont.indexOf("v=") < 0 && ytpl.validateID(optiont)){
       //違うならプレイリストの直リンクか？
@@ -525,7 +525,7 @@ export class MusicBot {
     }else{
       try{
         await this.data[message.guild.id].Queue.AutoAddQueue(this.client, optiont, message.member, "unknown", first, false, message.channel as discord.TextChannel, await message.reply("お待ちください..."));
-        this.data[message.guild.id].Manager.Play();
+        this.data[message.guild.id].Player.Play();
         return;
       }
       catch{
@@ -544,7 +544,7 @@ export class MusicBot {
     // テキストチャンネルバインド
     // コマンドが送信されたチャンネルを後で利用します。
     if(
-      !this.data[message.guild.id].Manager.IsConnecting || 
+      !this.data[message.guild.id].Player.IsConnecting || 
       (message.member.voice.channel && message.member.voice.channel.members.has(this.client.user.id)) || 
       message.content.indexOf("join") >= 0
       ){
@@ -583,10 +583,10 @@ export class MusicBot {
       await this.data[guildid].Queue.AutoAddQueue(this.client, panel.Opts[Number(num)].url, member, "unknown", false, message);
       this.data[guildid].SearchPanel = null;
       if(
-        this.data[guildid].Manager.IsConnecting && 
-        !this.data[guildid].Manager.IsPlaying
+        this.data[guildid].Player.IsConnecting && 
+        !this.data[guildid].Player.IsPlaying
         ){
-        this.data[guildid].Manager.Play();
+        this.data[guildid].Player.Play();
       }
     }
     nums.filter(n => Object.keys(panel.Opts).indexOf(n) >= 0).map(n => Number(n)).forEach(async n => {

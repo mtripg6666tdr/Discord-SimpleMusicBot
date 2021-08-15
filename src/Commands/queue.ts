@@ -47,7 +47,7 @@ export default class Queue implements CommandInterface {
         const _t = Number(q.BasicInfo.LengthSeconds);
         const [min,sec] = CalcMinSec(_t);
         fields.push({
-          name: i !== 0 ? i.toString() : options.data[message.guild.id].Manager.IsPlaying ? "現在再生中" : "再生待ち",
+          name: i !== 0 ? i.toString() : options.data[message.guild.id].Player.IsPlaying ? "現在再生中" : "再生待ち",
           value: "[" + q.BasicInfo.Title + "](" + q.BasicInfo.Url + ") \r\n"
           +"長さ: `" + ((q.BasicInfo.ServiceIdentifer === "youtube" && (q.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : min + ":" + sec) + " ` \r\n"
           +"リクエスト: `" + q.AdditionalInfo.AddedBy.displayName + "` "

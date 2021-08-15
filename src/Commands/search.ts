@@ -24,7 +24,7 @@ export default class Search implements CommandInterface {
     options.Join(message);
     if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){
       options.args.forEach(async u => {
-        await options.PlayFromURL(message, u, !options.data[message.guild.id].Manager.IsConnecting);
+        await options.PlayFromURL(message, u, !options.data[message.guild.id].Player.IsConnecting);
       });
       return;
     }

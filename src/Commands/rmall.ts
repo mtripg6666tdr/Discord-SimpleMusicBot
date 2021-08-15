@@ -16,7 +16,7 @@ export default class Rmall implements CommandInterface {
         return;
       }
     }
-    options.data[message.guild.id].Manager.Disconnect();
+    options.data[message.guild.id].Player.Disconnect();
     options.data[message.guild.id].Queue.RemoveAll();
     message.reply("✅すべて削除しました").catch(e => log(e, "error"))
   }

@@ -11,8 +11,8 @@ export default class Reset implements CommandInterface {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // VC接続中なら切断
-    if(options.data[message.guild.id].Manager.IsConnecting){
-      options.data[message.guild.id].Manager.Disconnect();
+    if(options.data[message.guild.id].Player.IsConnecting){
+      options.data[message.guild.id].Player.Disconnect();
     }
     // サーバープリファレンスをnullに
     options.data[message.guild.id] = null;

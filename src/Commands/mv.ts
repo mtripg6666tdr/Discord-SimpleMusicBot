@@ -26,7 +26,7 @@ export default class Mv implements CommandInterface {
     if(options.args.length !== 2){
       message.reply("✘引数は`移動したい曲の元のオフセット(番号) 移動先のオフセット(番号)`のように指定します。").catch(e => log(e, "error"));
       return;
-    }else if(options.rawArgs.indexOf("0") >= 0 && options.data[message.guild.id].Manager.IsPlaying){
+    }else if(options.rawArgs.indexOf("0") >= 0 && options.data[message.guild.id].Player.IsPlaying){
       message.reply("✘音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。").catch(e => log(e, "error"));
       return;
     }

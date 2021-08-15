@@ -15,7 +15,7 @@ export default class Mltf implements CommandInterface {
       return;
     }
     const q = options.data[message.guild.id].Queue;
-    q.Move(q.length - 1, options.data[message.guild.id].Manager.IsPlaying ? 1 : 0);
+    q.Move(q.length - 1, options.data[message.guild.id].Player.IsPlaying ? 1 : 0);
     const info = q.get(1);
     message.reply("✅`" + info.BasicInfo.Title + "`を一番最後からキューの先頭に移動しました").catch(e => log(e, "error"));
   }

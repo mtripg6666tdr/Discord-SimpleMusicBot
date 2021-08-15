@@ -10,7 +10,7 @@ export default class End implements CommandInterface {
   category = "playlist";
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(!options.data[message.guild.id].Manager.IsPlaying){
+    if(!options.data[message.guild.id].Player.IsPlaying){
       message.reply("再生中ではありません").catch(e => log(e, "error"));
       return;
     }
