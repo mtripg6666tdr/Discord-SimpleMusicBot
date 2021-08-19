@@ -7,7 +7,7 @@
   "types": "typings/lib.d.ts",
   "dependencies": {
     "@types/follow-redirects": "^1.13.1",
-    "@types/node": "^16.6.1",
+    "@types/node": "^16.6.2",
     "@types/ws": "^7.4.7",
     "discord.js": "^12.5.3",
     "dotenv": "^10.0.0",
