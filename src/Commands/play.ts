@@ -31,6 +31,7 @@ export default class Play implements CommandInterface {
     const wasConnected = options.data[message.guild.id].Player.IsConnecting;
     // VCに入れない
     if(!(await options.Join(message))) {
+      await(await message.reply("VCに参加してください")).delete();
       return;
     }
     // 引数ついてたらそれ優先
