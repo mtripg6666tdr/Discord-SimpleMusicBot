@@ -20,8 +20,9 @@ YouTubeなどからの再生に対応。
 
 ## インストール＆実行
 Node.js v12以上で動作確認しています。  
-実際には、パッケージ`discord.js`はNode.js v16.1.0以上が必須であるため、npmパッケージのnodeを利用しています。  
-上手くいかない場合には環境に直接Node.js v16.1.0以上をインストールして下さい。  
+~~実際には、パッケージ`discord.js`はNode.js v16.1.0以上が必須であるため、npmパッケージのnodeを利用しています。  ~~
+~~上手くいかない場合には環境に直接Node.js v16.1.0以上をインストールして下さい。~~  
+> Node.js v15以上ではAborted Exceptionが発生するバグがあるため(現在原因不明)、Node.js v14以下で使用してください。
 npmパッケージの`ffmpeg-stable`(optionalDependencies)を利用できない場合、手動で`ffmpeg`へのパスを通す必要があります。  
 
 1. リポジトリをクローン

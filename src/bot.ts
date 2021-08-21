@@ -421,8 +421,9 @@ export class MusicBot {
         voice.joinVoiceChannel({
           channelId: message.member.voice.channel.id,
           guildId: message.member.guild.id,
-          adapterCreator: message.member.guild.voiceAdapterCreator
-        });
+          adapterCreator: message.member.guild.voiceAdapterCreator,
+          debug: Boolean(process.env.DEBUG)
+        }).on("debug", (mes) => log("[Connection]" + mes));
         log("[Main/" + message.guild.id + "]VC Connected to " + message.member.voice.channel.id);
         await msg.edit(":+1:ボイスチャンネル:speaker:`" + message.member.voice.channel.name + "`に接続しました!");
         return true;

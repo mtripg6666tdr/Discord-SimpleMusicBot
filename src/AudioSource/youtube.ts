@@ -118,21 +118,19 @@ export class YouTube extends AudioSource {
       const format = ytdl.chooseFormat(info.formats, {
         filter: this.LiveStream ? null : "audioonly",
         quality: this.LiveStream ? null : "highestaudio",
-        isHLS: this.LiveStream
+        isHLS: this.LiveStream,
       } as any);
       let readable = null as Readable;
       if(process.env.PROXY){
         readable = ytdl.downloadFromInfo(info, {
           format: format,
           requestOptions: {agent},
-          lang: "ja",
-          highWaterMark: 1048576 * 32 
+          lang: "ja"
         });
       }else{
         readable = ytdl.downloadFromInfo(info, {
           format: format,
-          lang: "ja",
-          highWaterMark: 1048576 * 32 
+          lang: "ja"
         });
       }
       this.fallback = false;

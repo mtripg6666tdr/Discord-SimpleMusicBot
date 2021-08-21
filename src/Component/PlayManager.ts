@@ -5,8 +5,9 @@ import { AudioSource, defaultM3u8stream } from "../AudioSource/audiosource";
 import { YouTube } from "../AudioSource/youtube";
 import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, DownloadAsReadable, isAvailableRawVideoURL, log } from "../Util";
+import { CalcHourMinSec, CalcMinSec, DownloadAsReadable, InitPassThrough, isAvailableRawVideoURL, log } from "../Util";
 import { ManagerBase } from "./ManagerBase";
+import { FFmpeg } from "prism-media";
 
 /**
  * サーバーごとの再生を管理するマネージャー。
@@ -14,7 +15,6 @@ import { ManagerBase } from "./ManagerBase";
  */
 export class PlayManager extends ManagerBase {
   private AudioPlayer:voice.AudioPlayer = null;
-  private stream:string|Readable = null;
   private readonly retryLimit = 3;
   error = false;
   errorCount = 0;
@@ -131,7 +131,7 @@ export class PlayManager extends ManagerBase {
       }
       // QueueContentからストリーム、M3U8プレイリスト(非HLS)または直URLを取得
       const rawStream = await this.CurrentVideoInfo.fetch();
-      let stream:Readable|string = this.ResolveStream(rawStream);
+      let stream:voice.AudioResource = this.ResolveStream(rawStream);
       // fetchおよび処理中に切断された場合処理を終了
       const connection = voice.getVoiceConnection(this.info.GuildID);
       if(!connection) {
@@ -139,9 +139,8 @@ export class PlayManager extends ManagerBase {
         return;
       }
       this.error = false;
-      this.stream = stream;
       // 再生
-      this.AudioPlayer.play(voice.createAudioResource(stream));
+      this.AudioPlayer.play(stream);
       await voice.entersState(this.AudioPlayer, voice.AudioPlayerStatus.Playing, 10e3);
       log("[PlayManager/" + this.info.GuildID + "]Play() started successfully");
       if(this.info.boundTextChannel && ch && mes){
@@ -200,7 +199,6 @@ export class PlayManager extends ManagerBase {
     log("[PlayManager/" + this.info.GuildID + "]Stop() called");
     if(this.AudioPlayer){
       this.AudioPlayer.stop(true);
-      if(this.stream && typeof this.stream !== "string" && !(this.stream as Readable).destroyed) (this.stream as Readable).destroy();
     }
     this.info.Bot.BackupData();
     return this;
@@ -254,44 +252,66 @@ export class PlayManager extends ManagerBase {
     return this;
   }
 
-  private ResolveStream(rawStream:string|Readable|defaultM3u8stream){
-    let stream = null as string|Readable;
+  private ResolveStream(rawStream:string|Readable|defaultM3u8stream):voice.AudioResource{
+    let stream = null as voice.AudioResource;
     if(typeof rawStream === "string"){
       if(isAvailableRawVideoURL(rawStream)){
         // URLでも動画なら直接渡す
-        stream = rawStream;
+        stream = voice.createAudioResource(rawStream);
       }else{
         // ほかならストリーム化
-        stream = DownloadAsReadable(rawStream);
-        if(!process.env.DEBUG){
-          stream.on('error', (e)=> {
-            this.AudioPlayer.emit("error", {
-              ...e,
-              resource: (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource ?? null
-            });
-          });
-        }
+        stream = this.ResolveResourceURL(rawStream);
       }
     }else if((rawStream as defaultM3u8stream).type){
       // M3U8プレイリストならURLを直接play
-      stream = (rawStream as defaultM3u8stream).url;
+      stream = this.ResolveResourceURL((rawStream as defaultM3u8stream).url);
     }else{
       // ストリームなら変換せずにそのままplay
-      stream = rawStream as Readable;
+      const rstream = rawStream as Readable;
       if(!process.env.DEBUG){
-        stream.on('error', (e)=> {
+        rstream.on('error', (e)=> {
           this.AudioPlayer.emit("error", {
             ...e,
             resource: (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource ?? null
           });
         });
       }
+      stream = voice.createAudioResource(rstream);
     }
     return stream;
   }
 
+  private ResolveResourceURL(url:string):voice.AudioResource{
+    const FFMPEG_OPUS_ARGUMENTS = [
+      '-analyzeduration',
+      '0',
+      '-loglevel',
+      '0',
+      '-acodec',
+      'libopus',
+      '-f',
+      'opus',
+      '-ar',
+      '48000',
+      '-ac',
+      '2',
+    ];
+    const args = ['-reconnect', '1', '-reconnect_streamed', '1', '-reconnect_on_network_error', '1', '-reconnect_on_http_error', '4xx,5xx', '-reconnect_delay_max', '30', '-i', url, ...FFMPEG_OPUS_ARGUMENTS];
+    const passThrough = InitPassThrough();
+    if(!process.env.DEBUG){
+      passThrough.on("error", (e)=> {
+        this.AudioPlayer.emit("error", {
+          ...e,
+          resource: (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource ?? null
+        });
+      });
+    }
+    const stream = new FFmpeg({args})
+      .pipe(passThrough);
+    return voice.createAudioResource(stream, {inputType: voice.StreamType.OggOpus});
+  }
+
   private async onStreamFinished(){
-    if(this.stream && typeof this.stream !== "string" && !(this.stream as Readable).destroyed) (this.stream as Readable).destroy();
     // ストリームが終了したら時間を確認しつつ次の曲へ移行
     log("[PlayManager/" + this.info.GuildID + "]Stream finished");
     // 再生が終わったら

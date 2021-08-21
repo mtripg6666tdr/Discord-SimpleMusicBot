@@ -2,6 +2,7 @@
 // メインエントリ
 // =============
 require("dotenv").config();
+global.AbortController = require("abort-controller");
 import { TextChannel } from "discord.js";
 import * as http from "http";
 import { MusicBot } from "./bot";
