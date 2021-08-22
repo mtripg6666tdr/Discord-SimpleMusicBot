@@ -523,7 +523,7 @@ export class MusicBot {
         await msg.edit({content: null, embeds: [embed]});
       }
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
-      this.data[message.guild.id].Manager.Play();
+      this.data[message.guild.id].Player.Play();
     }else{
       try{
         await this.data[message.guild.id].Queue.AutoAddQueue(this.client, optiont, message.member, "unknown", first, false, message.channel as discord.TextChannel, await message.reply("お待ちください..."));
