@@ -49,7 +49,9 @@
     "applyslashcommandguild": "npx node util/registercommands/guild",
     "applyslashcommandapplication": "npx node util/registercommands/application",
     "deleteslashcommandguild": "npx node util/deletecommands/guild",
-    "deleteslashcommandapplication": "npx node util/deletecommands/application"
+    "deleteslashcommandapplication": "npx node util/deletecommands/application",
+    "startonreplit": "node util/replit",
+    "setuponreplit": "node util/replit -s"
   },
   "keywords": [],
   "author": "mtripg6666tdr",

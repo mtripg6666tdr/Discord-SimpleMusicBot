@@ -4,5 +4,6 @@ typings
 *.env
 *.exe
 youtube-dl
+node
 *.template.*
 *.log
