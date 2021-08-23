@@ -1,6 +1,6 @@
 import { EmbedField } from "discord.js";
 import { DefaultAudioThumbnailURL } from "../definition";
-import { isAvailableRawAudioURL } from "../Util/util";
+import { isAvailableRawAudioURL } from "../Util";
 import { AudioSource } from "./audiosource";
 
 export class CustomStream extends AudioSource {

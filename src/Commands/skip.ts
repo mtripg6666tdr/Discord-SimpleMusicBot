@@ -1,6 +1,6 @@
-import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
-import { log } from "../Util/util";
+import { CommandMessage } from "../Component/CommandMessage"
+import { log } from "../Util";
 
 export default class Skip implements CommandInterface {
   name = "スキップ";
@@ -8,17 +8,17 @@ export default class Skip implements CommandInterface {
   description = "現在再生中の曲をスキップします。";
   unlist = false;
   category = "player";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
-    if(!options.data[message.guild.id].Manager.IsPlaying){
-      message.channel.send("再生中ではありません").catch(e => log(e, "error"));
+    if(!options.data[message.guild.id].Player.IsPlaying){
+      message.reply("再生中ではありません").catch(e => log(e, "error"));
       return;
     }
     const title = options.data[message.guild.id].Queue.get(0).BasicInfo.Title;
-    options.data[message.guild.id].Manager.Stop();
+    options.data[message.guild.id].Player.Stop();
     await options.data[message.guild.id].Queue.Next();
-    options.data[message.guild.id].Manager.Play();
-    message.channel.send(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => log(e, "error"));
+    options.data[message.guild.id].Player.Play();
+    message.reply(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => log(e, "error"));
   }
 }

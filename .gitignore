@@ -5,3 +5,4 @@ typings
 *.exe
 youtube-dl
 *.template.*
+*.log

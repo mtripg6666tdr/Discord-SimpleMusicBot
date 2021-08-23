@@ -1,5 +1,5 @@
 import { EmbedField } from "discord.js";
-import { DownloadText } from "../Util/util";
+import { DownloadText } from "../Util";
 import { AudioSource, defaultM3u8stream } from "./audiosource"
 import { exportableCustom } from "./custom";
 

@@ -1,8 +1,9 @@
 import * as discord from "discord.js";
 import * as os from "os";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandMessage } from "../Component/CommandMessage";
 import { getColor } from "../Util/colorUtil";
-import { GetMBytes, GetMemInfo, GetPercentage, log, logStore } from "../Util/util";
+import { GetMBytes, GetMemInfo, GetPercentage, log, logStore } from "../Util";
 
 export default class SystemInfo implements CommandInterface {
   name = "システム情報";
@@ -11,11 +12,18 @@ export default class SystemInfo implements CommandInterface {
   unlist = false;
   category = "utility";
   examples = "sysinfo mem";
-  usage = "sysinfo (mem|cpu)";
-  async run(message:discord.Message, options:CommandArgs){
+  usage = "sysinfo [mem|cpu]";
+  argument = [{
+    type: "string",
+    name: "content",
+    description: "memまたはcpuのどちらかを指定できます",
+    required: false
+  }] as SlashCommandArgument[];
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // Run default logger
     options.bot.Log();
+    await message.reply("実行します");
 
     if(message.author.id === (process.env.ADMIN_USER ?? "593758391395155978") && (options.args.indexOf("log") >= 0 || options.args.length == 0)){
       // Process Logs
@@ -23,7 +31,7 @@ export default class SystemInfo implements CommandInterface {
       logEmbed.setColor(getColor("UPTIME"));
       logEmbed.title = "Log";
       logEmbed.description = "Last " + logStore.data.length + " bot logs\r\n```\r\n" + logStore.data.join("\r\n") + "\r\n```";
-      message.channel.send(logEmbed).catch(e => log(e, "error"));
+      message.channel.send({embeds:[logEmbed]}).catch(e => log(e, "error"));
     }
 
     if(options.args.indexOf("cpu") >= 0 || options.args.length == 0){
@@ -44,7 +52,7 @@ export default class SystemInfo implements CommandInterface {
         + "Times(idle): `" + Math.round(cpus[i].times.idle / 1000) + "s(" + GetPercentage(cpus[i].times.idle, all) + "%)`"
         , true);
       }
-      message.channel.send(cpuInfoEmbed).catch(e => log(e, "error"));
+      message.channel.send({embeds:[cpuInfoEmbed]}).catch(e => log(e, "error"));
     }
 
     if(options.args.indexOf("mem") >= 0 || options.args.length == 0){
@@ -70,7 +78,7 @@ export default class SystemInfo implements CommandInterface {
         + "External: `" + ext + "MB`\r\n"
         + "Total: `" + GetPercentage(rss + ext, memory.total) + "%`"
       , true);
-      message.channel.send(memInfoEmbed).catch(e => log(e, "error"));
+      message.channel.send({embeds:[memInfoEmbed]}).catch(e => log(e, "error"));
     }
   }
 }

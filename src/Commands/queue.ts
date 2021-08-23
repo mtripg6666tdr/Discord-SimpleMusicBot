@@ -1,9 +1,10 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { YouTube } from "../AudioSource/youtube";
+import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, log } from "../Util/util";
+import { CalcHourMinSec, CalcMinSec, log } from "../Util";
 
 export default class Queue implements CommandInterface {
   name = "キュー";
@@ -11,9 +12,15 @@ export default class Queue implements CommandInterface {
   description = "キューを表示します。";
   unlist = false;
   category = "playlist";
-  async run(message:discord.Message, options:CommandArgs){
+  argument = [{
+    type: "integer",
+    name: "page",
+    description: "表示するキューのページを指定することができます",
+    required: false
+  }] as SlashCommandArgument[];
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    const msg = await message.channel.send(":eyes: キューを確認しています。お待ちください...");
+    const msg = await message.reply(":eyes: キューを確認しています。お待ちください...");
     const queue = options.data[message.guild.id].Queue;
     if(queue.length === 0){
       msg.edit(":face_with_raised_eyebrow:キューは空です。").catch(e => log(e, "error"));
@@ -40,7 +47,7 @@ export default class Queue implements CommandInterface {
         const _t = Number(q.BasicInfo.LengthSeconds);
         const [min,sec] = CalcMinSec(_t);
         fields.push({
-          name: i !== 0 ? i.toString() : options.data[message.guild.id].Manager.IsPlaying ? "現在再生中" : "再生待ち",
+          name: i !== 0 ? i.toString() : options.data[message.guild.id].Player.IsPlaying ? "現在再生中" : "再生待ち",
           value: "[" + q.BasicInfo.Title + "](" + q.BasicInfo.Url + ") \r\n"
           +"長さ: `" + ((q.BasicInfo.ServiceIdentifer === "youtube" && (q.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : min + ":" + sec) + " ` \r\n"
           +"リクエスト: `" + q.AdditionalInfo.AddedBy.displayName + "` "
@@ -59,7 +66,7 @@ export default class Queue implements CommandInterface {
     }
 
     // 送信
-    await msg.edit("", getQueueEmbed(_page)).catch(e => log(e, "error"));
+    await msg.edit({content: null, embeds:[getQueueEmbed(_page)]}).catch(e => log(e, "error"));
     if(totalpage > 1){
       options.EmbedPageToggle.push((await PageToggle.init(msg, (n) => getQueueEmbed(n + 1), totalpage, _page - 1)).SetFresh(true));
     }

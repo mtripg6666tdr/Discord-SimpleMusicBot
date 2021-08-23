@@ -12,7 +12,8 @@
         "skipFiles": [
             "<node_internals>/**"
         ],
-        "program": "${workspaceFolder}\\dist\\index.js"
+        "program": "${workspaceFolder}\\dist\\index.js",
+        "runtimeExecutable": "${workspaceFolder}\\node_modules\\.bin\\node"
     }
   ]
 }

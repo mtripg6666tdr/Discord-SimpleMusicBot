@@ -19,7 +19,11 @@ YouTubeなどからの再生に対応。
 - Botに関するサポート（下記）
 
 ## インストール＆実行
-Node.js v12以上で動作確認しています。ffmpegへのパスを通しておいてください。通せない場合にはnpmパッケージの`ffmpeg-stable`(optionalDependencies)を利用できます。  
+Node.js v12以上で動作確認しています。  
+~~実際には、パッケージ`discord.js`はNode.js v16.1.0以上が必須であるため、npmパッケージのnodeを利用しています。  ~~
+~~上手くいかない場合には環境に直接Node.js v16.1.0以上をインストールして下さい。~~  
+> Node.js v15以上ではAborted Exceptionが発生するバグがあるため(現在原因不明)、Node.js v14以下で使用してください。
+npmパッケージの`ffmpeg-stable`(optionalDependencies)を利用できない場合、手動で`ffmpeg`へのパスを通す必要があります。  
 
 1. リポジトリをクローン
 ```bash
@@ -36,13 +40,24 @@ $ cd Dicord-SimpleMusicBot
 $ npm install
 ```
 
-4. Botのトークンを設定
-```bash
-$ echo TOKEN=トークン>.env
-```
-※トークンの部分をBotのトークンに置き換えてください。
+4. Botのトークンなどを設定  
+ボットのトークンを[`.env`](.env)ファイルに指定します。  
+書き方は[`.env.sample`](.env.sample)に書いてありますので、リネームしてお使いください。  
 
-5. トランスパイル＆実行
+5. スラッシュコマンドの登録  
+必要な場合はスラッシュコマンドの登録を行います。スラッシュコマンドの登録をする場合には、ボットを招待する際に`bot`スコープに加え、`commands`スコープが必要となります。
+- アプリケーションスコープ
+```bash
+$ npm run applyslashcommandapplication
+```
+アプリケーションスコープでスラッシュコマンドを登録すると反映まで約1時間かかります  
+- サーバースコープ
+```bash
+$ npm run applyslashcommandguild
+```
+サーバースコープの場合即時に反映されます
+
+6. トランスパイル＆実行
 ```bash
 $ npm start
 ```

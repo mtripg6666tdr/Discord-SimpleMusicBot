@@ -1,8 +1,9 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { YouTube } from "../AudioSource/youtube";
+import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
-import { CalcMinSec, log } from "../Util/util";
+import { CalcMinSec, log } from "../Util";
 
 export default class Searchq implements CommandInterface {
   name = "キュー内を検索";
@@ -12,15 +13,26 @@ export default class Searchq implements CommandInterface {
   category = "playlist";
   examples = "seq milk boy";
   usage = "seq <キーワード>";
-  async run(message:discord.Message, options:CommandArgs){
+  argument = [{
+    type: "string",
+    name: "keyword",
+    description: "検索したい楽曲のキーワード",
+    required: true
+  }] as SlashCommandArgument[];
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.length === 0){
-      message.channel.send("✘キューが空です").catch(e => log(e, "error"));
+      message.reply("✘キューが空です").catch(e => log(e, "error"));
       return;
     }
-    let qsresult = options.data[message.guild.id].Queue.filter(c => c.BasicInfo.Title.toLowerCase().indexOf(options.rawArgs.toLowerCase()) >= 0);
+    let qsresult = options.data[message.guild.id].Queue
+                    .filter(c => c.BasicInfo.Title.toLowerCase().indexOf(options.rawArgs.toLowerCase()) >= 0)
+                    .concat(
+                      options.data[message.guild.id].Queue
+                      .filter(c => c.BasicInfo.Url.toLowerCase().indexOf(options.rawArgs.toLowerCase()) >= 0)
+                    );
     if(qsresult.length === 0){
-      message.channel.send(":confused:見つかりませんでした").catch(e => log(e, "error"));
+      message.reply(":confused:見つかりませんでした").catch(e => log(e, "error"));
       return;
     }
     if(qsresult.length > 20) qsresult = qsresult.slice(0,20);
@@ -39,6 +51,6 @@ export default class Searchq implements CommandInterface {
     embed.description = "キュー内での検索結果です。最大20件表示されます。";
     embed.fields = fields;
     embed.setColor(getColor("SEARCH"));
-    message.channel.send(embed);
+    message.reply({embeds:[embed]});
   }
 }

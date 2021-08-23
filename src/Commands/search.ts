@@ -1,8 +1,9 @@
 import * as discord from "discord.js";
 import * as ytsr from "ytsr";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
-import { log } from "../Util/util";
+import { log } from "../Util";
 
 export default class Search implements CommandInterface {
   name = "検索";
@@ -12,22 +13,28 @@ export default class Search implements CommandInterface {
   category = "playlist";
   examples = "検索 夜に駆ける";
   usage = "検索 <キーワード>";
-  async run(message:discord.Message, options:CommandArgs){
+  argument = [{
+    type: "string",
+    name: "keyword",
+    description: "検索したい動画のキーワードまたはURL。",
+    required: true
+  }] as SlashCommandArgument[];
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     options.Join(message);
     if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){
       options.args.forEach(async u => {
-        await options.PlayFromURL(message, u, !options.data[message.guild.id].Manager.IsConnecting);
+        await options.PlayFromURL(message, u, !options.data[message.guild.id].Player.IsConnecting);
       });
       return;
     }
     if(options.data[message.guild.id].SearchPanel !== null){
-      message.channel.send("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
+      message.reply("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
       return;
     }
     if(options.rawArgs !== ""){
       options.data[message.guild.id].SearchPanel = {} as any;
-      const msg = await message.channel.send("🔍検索中...");
+      const msg = await message.reply("🔍検索中...");
       options.data[message.guild.id].SearchPanel = {
         Msg: {
           id: msg.id,
@@ -48,6 +55,7 @@ export default class Search implements CommandInterface {
         embed.setColor(getColor("SEARCH"));
         let desc = "";
         let index = 1;
+        const selectOpts = [] as discord.MessageSelectOptionData[];
         for(let i = 0; i < result.items.length; i++){
           if(result.items[i].type == "video"){
             const video = (result.items[i] as ytsr.Video);
@@ -58,6 +66,11 @@ export default class Search implements CommandInterface {
               duration: video.duration,
               thumbnail: video.bestThumbnail.url
             };
+            selectOpts.push({
+              label: index + ". " + (video.title.length > 90 ? video.title.substring(0, 90) + "…" : video.title),
+              description: "長さ: " + video.duration + ", チャンネル名: " + video.author.name,
+              value: index.toString()
+            });
             index++;
           }
         }
@@ -71,14 +84,33 @@ export default class Search implements CommandInterface {
           iconURL: message.author.avatarURL(),
           text:"動画のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
         };
-        await msg.edit("", embed);
+        await msg.edit({
+          content: null, 
+          embeds:[embed],
+          components: [
+            new discord.MessageActionRow()
+            .addComponents(
+              new discord.MessageSelectMenu()
+              .setCustomId("search")
+              .setPlaceholder("数字を送信するか、ここから選択...")
+              .setMinValues(1)
+              .setMaxValues(index - 1)
+              .addOptions([...selectOpts, {
+                label: "キャンセル",
+                value: "cancel"
+              }])
+            )
+          ]
+        });
       }
       catch(e){
         log(e, "error");
-        message.channel.send("✘内部エラーが発生しました").catch(e => log(e, "error"));
+        options.data[message.guild.id].SearchPanel = null;
+        if(msg) msg.edit("✘内部エラーが発生しました").catch(e => log(e, "error"));
+        else message.reply("✘内部エラーが発生しました").catch(e => log(e, "error"));
       }
     }else{
-      message.channel.send("引数を指定してください").catch(e => log(e, "error"));
+      message.reply("引数を指定してください").catch(e => log(e, "error"));
     }
   }
 }

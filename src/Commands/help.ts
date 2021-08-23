@@ -1,7 +1,8 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
+import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
-import { log } from "../Util/util";
+import { log } from "../Util";
 
 export default class Help implements CommandInterface {
   name = "ヘルプ";
@@ -9,7 +10,7 @@ export default class Help implements CommandInterface {
   description = "ヘルプを表示します。";
   unlist = false;
   category = "bot";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const embed = new discord.MessageEmbed();
     embed.title = options.client.user.username + ":notes:";
@@ -31,6 +32,6 @@ export default class Help implements CommandInterface {
     + "・オーディオファイルへの直URL"
     );
     embed.setColor(getColor("HELP"));
-    message.channel.send(embed).catch(e => log(e, "error"));
+    message.reply({embeds:[embed]}).catch(e => log(e, "error"));
   }
 }

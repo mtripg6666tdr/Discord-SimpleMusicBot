@@ -1,13 +1,18 @@
-// =============
-// メインエントリ
-// =============
-require("dotenv").config();
 import { TextChannel } from "discord.js";
 import * as http from "http";
 import { MusicBot } from "./bot";
-import { btoa, log } from "./Util/util";
-
+import { btoa, log } from "./Util";
+// =============
+// メインエントリ
+// =============
 log("[Entry]Discord-SimpleMusicBot by mtripg6666tdr");
+require("dotenv").config();
+global.AbortController = require("abort-controller");
+const nodeVersion = process.versions.node.split(".")[0];
+if(Number(nodeVersion) >= 15){
+  log("[Entry]Node major version " + nodeVersion + " is incompatible to this project, but I'll do the best!", "warn");
+}
+
 const bot = new MusicBot();
 
 // Webサーバーのインスタンス化
@@ -24,22 +29,25 @@ http.createServer((req, res) => {
   res.end(JSON.stringify(data));
 }).listen(8081);
 
-// ハンドルされなかったエラーのハンドル
-process.on("uncaughtException", (error)=>{
-  if(bot.Client){
-    try{
-      const errorText = typeof error === "string" ? error : JSON.stringify(error);
-      (bot.Client.channels.resolve("846411633458806804") as TextChannel).send(errorText);
+if(!process.env.DEBUG){
+  // ハンドルされなかったエラーのハンドル
+  process.on("uncaughtException", (error)=>{
+    if(bot.Client){
+      try{
+        const errorText = typeof error === "string" ? error : JSON.stringify(error);
+        (bot.Client.channels.resolve(process.env.ERROR_REPORT) as TextChannel).send(errorText);
+      }
+      catch(e){
+        console.error(e);
+        process.exit(1);
+      }
     }
-    catch{
-      throw error;
+  }).on("SIGINT", ()=>{
+    if(bot.Client){
+      (bot.Client.channels.resolve(process.env.ERROR_REPORT) as TextChannel).send("Process terminated");
     }
-  }
-}).on("SIGINT", ()=>{
-  if(bot.Client){
-    (bot.Client.channels.resolve("846411633458806804") as TextChannel).send("Process terminated");
-  }
-});
+  });
+}
 
 // ボット開始
 bot.Run(process.env.TOKEN, true, 40);

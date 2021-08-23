@@ -1,4 +1,4 @@
-import { Client, VoiceConnection } from "discord.js";
+import { Client } from "discord.js";
 import * as fs from "fs";
 import { exportableCustom } from "./AudioSource/custom";
 import { MusicBot } from "./bot";
@@ -14,39 +14,9 @@ export class GuildVoiceInfo{
    */
   PersistentPref:PersistentPref;
   /**
-   * ボイスチャンネルの接続
-   */
-  Connection:VoiceConnection;
-  /**
    * 検索窓の格納します
    */
-  SearchPanel: {
-    /**
-     * 検索窓のメッセージを保存します
-     */
-    Msg: {
-      /**
-       * 検索窓のメッセージID
-       */
-      id: string,
-      /**
-       * 検索窓のチャンネルID
-       */
-      chId: string,
-      /**
-       * 検索したユーザーのID
-       */
-      userId: string
-      /**
-       * 検索者のユーザー名
-       */
-      userName: string
-    },
-    /**
-     * 検索窓の内容を保存します
-     */
-    Opts: {[num:number]: VideoInfo}
-  };
+  SearchPanel: SearchPanel;
   /**
    * キューマネジャ
    */
@@ -54,7 +24,7 @@ export class GuildVoiceInfo{
   /**
    * 再生マネジャ
    */
-  Manager:PlayManager;
+  Player:PlayManager;
   /**
    * 紐づけテキストチャンネル
    */
@@ -77,10 +47,9 @@ export class GuildVoiceInfo{
   AddRelative:boolean
 
   constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBot){
-    this.Connection = null;
     this.SearchPanel =null;
     this.Queue = new QueueManager();
-    this.Manager = new PlayManager(client);
+    this.Player = new PlayManager(client);
     this.boundTextChannel = boundchannelid;
     this.GuildID = guildid;
     this.DataPath = ".data/" + guildid + ".preferences.json";
@@ -108,6 +77,34 @@ export class GuildVoiceInfo{
 type PersistentPref = {
   Prefix:string;
 }
+
+export type SearchPanel = {
+  /**
+   * 検索窓のメッセージを保存します
+   */
+  Msg: {
+    /**
+     * 検索窓のメッセージID
+     */
+    id: string,
+    /**
+     * 検索窓のチャンネルID
+     */
+    chId: string,
+    /**
+     * 検索したユーザーのID
+     */
+    userId: string
+    /**
+     * 検索者のユーザー名
+     */
+    userName: string
+  },
+  /**
+   * 検索窓の内容を保存します
+   */
+  Opts: {[num:number]: VideoInfo}
+};
 
 export type VideoInfo = {
   url:string;

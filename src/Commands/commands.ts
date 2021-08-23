@@ -1,5 +1,6 @@
 import * as discord from "discord.js";
-import { Command, CommandArgs, CommandInterface } from ".";
+import { Command, CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/colorUtil";
 
@@ -12,7 +13,13 @@ export default class Commands implements CommandInterface{
   commands = null as CommandInterface[];
   usage = "command [コマンド名]";
   examples = "command search";
-  async run(message:discord.Message, options:CommandArgs){
+  argument = [{
+    type: "string",
+    description: "詳細表示するするコマンド名",
+    name: "command",
+    required: false
+  }] as SlashCommandArgument[]
+  async run(message:CommandMessage, options:CommandArgs){
     if(options.rawArgs == ""){
       // 引数がない場合は全コマンドの一覧を表示
       const embed = [] as discord.MessageEmbed[];
@@ -55,7 +62,7 @@ export default class Commands implements CommandInterface{
         embed[i].setDescription("コマンドの一覧です。\r\n`" + (i+1) + "ページ目(" + embed.length + "ページ中)`\r\nコマンドプレフィックスは、`" + options.data[message.guild.id].PersistentPref.Prefix + "`です。");
         embed[i].setColor(getColor("COMMAND"));
       }
-      const msg = await message.channel.send(embed[0]);
+      const msg = await message.reply({embeds:[embed[0]]});
       const toggle = await PageToggle.init(msg, embed);
       options.EmbedPageToggle.push(toggle);
     }else{
@@ -75,9 +82,9 @@ export default class Commands implements CommandInterface{
         if(ci.examples){
           embed.addField("使用例", "`" + prefix + ci.examples + "`");
         }
-        await message.channel.send(embed);
+        await message.reply({embeds:[embed]});
       }else{
-        await message.channel.send(":face_with_raised_eyebrow: コマンドが見つかりませんでした");
+        await message.reply(":face_with_raised_eyebrow: コマンドが見つかりませんでした");
       }
     }
   }

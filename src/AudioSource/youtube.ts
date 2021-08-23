@@ -4,8 +4,8 @@ import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 import m3u8stream from "m3u8stream";
 import { log } from "../Util/logUtil";
-import { DownloadText } from "../Util/util";
-import { AudioSource, defaultM3u8stream } from "./audiosource";
+import { DownloadText } from "../Util";
+import { AudioSource } from "./audiosource";
 import { PassThrough, Readable } from "stream";
 
 export class YouTube extends AudioSource {
@@ -97,7 +97,9 @@ export class YouTube extends AudioSource {
             lang: "ja"
           });
         }else{
-          info = await ytdl.getInfo(this.Url);
+          info = await ytdl.getInfo(this.Url, {
+            lang: "ja"
+          });
         }
       }
       this.relatedVideos = info.related_videos.map(video => {
@@ -116,7 +118,7 @@ export class YouTube extends AudioSource {
       const format = ytdl.chooseFormat(info.formats, {
         filter: this.LiveStream ? null : "audioonly",
         quality: this.LiveStream ? null : "highestaudio",
-        isHLS: this.LiveStream
+        isHLS: this.LiveStream,
       } as any);
       let readable = null as Readable;
       if(process.env.PROXY){
@@ -127,7 +129,8 @@ export class YouTube extends AudioSource {
         });
       }else{
         readable = ytdl.downloadFromInfo(info, {
-          format: format
+          format: format,
+          lang: "ja"
         });
       }
       this.fallback = false;
