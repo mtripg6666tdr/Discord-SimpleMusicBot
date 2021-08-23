@@ -33,10 +33,11 @@
     "ytpl": "^2.2.3",
     "ytsr": "^3.5.3"
   },
-  "devDependencies": {},
-  "optionalDependencies": {
-    "ffmpeg-static": "^4.4.0",
+  "devDependencies": {
     "node": "^14.17.4"
+  },
+  "optionalDependencies": {
+    "ffmpeg-static": "^4.4.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -49,9 +50,7 @@
     "applyslashcommandguild": "npx node util/registercommands/guild",
     "applyslashcommandapplication": "npx node util/registercommands/application",
     "deleteslashcommandguild": "npx node util/deletecommands/guild",
-    "deleteslashcommandapplication": "npx node util/deletecommands/application",
-    "startonreplit": "node util/replit",
-    "setuponreplit": "node util/replit -s"
+    "deleteslashcommandapplication": "npx node util/deletecommands/application"
   },
   "keywords": [],
   "author": "mtripg6666tdr",

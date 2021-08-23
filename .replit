@@ -1,2 +1,2 @@
 language = "nodejs"
-run = "npm run startonreplit"
+run = "npm run onlystart"
