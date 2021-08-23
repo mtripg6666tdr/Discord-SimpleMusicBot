@@ -19,6 +19,7 @@ export class PlayManager extends ManagerBase {
   error = false;
   errorCount = 0;
   errorUrl = "";
+  private stopped = false;
   get CurrentVideoUrl():string{
     if(this.CurrentVideoInfo) return this.CurrentVideoInfo.Url;
     return "";
@@ -106,6 +107,7 @@ export class PlayManager extends ManagerBase {
           if(oldstate.status === voice.AudioPlayerStatus.Playing 
             && newstate.status === voice.AudioPlayerStatus.Idle
             && !this.error
+            && !this.stopped
             ){
             this.onStreamFinished();
           }
@@ -139,6 +141,7 @@ export class PlayManager extends ManagerBase {
         return;
       }
       this.error = false;
+      this.stopped = false;
       // 再生
       this.AudioPlayer.play(stream);
       await voice.entersState(this.AudioPlayer, voice.AudioPlayerStatus.Playing, 10e3);
@@ -198,6 +201,7 @@ export class PlayManager extends ManagerBase {
   Stop():PlayManager{
     log("[PlayManager/" + this.info.GuildID + "]Stop() called");
     if(this.AudioPlayer){
+      this.stopped = true;
       this.AudioPlayer.stop(true);
     }
     this.info.Bot.BackupData();
