@@ -19,10 +19,10 @@ YouTubeなどからの再生に対応。
 - Botに関するサポート（下記）
 
 ## インストール＆実行
-Node.js v12以上で動作確認しています。  
+Node.js v14以上で動作確認しています。  
 <s>実際には、パッケージdiscord.jsはNode.js v16.1.0以上が必須であるため、npmパッケージのnodeを利用しています。</s>  
 <s>上手くいかない場合には環境に直接Node.js v16.1.0以上をインストールして下さい。</s>  
-**Node.js v15以上ではAborted Exceptionが発生するバグがあるため(現在原因不明)、Node.js v14以下で使用してください。**  
+**Node.js v15以上ではAborted Exceptionが発生するバグがあるため(現在原因不明)、Node.js v14で使用してください。**  
 npmパッケージの`ffmpeg-stable`(optionalDependencies)を利用できない場合、手動で`ffmpeg`へのパスを通す必要があります。    
 
 1. リポジトリをクローン
