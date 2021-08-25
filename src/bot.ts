@@ -3,7 +3,7 @@ import * as discord from "discord.js";
 import * as voice from "@discordjs/voice";
 import * as ytpl from "ytpl";
 import { exportableCustom } from "./AudioSource/custom";
-import { Command, CommandArgs } from "./Commands";
+import { CommandsManager, CommandArgs } from "./Commands";
 import { PageToggle } from "./Component/PageToggle";
 import { CancellationPending, GuildVoiceInfo, NotSendableMessage, SearchPanel, YmxFormat, YmxVersion } from "./definition";
 import { getColor } from "./Util/colorUtil";
@@ -142,7 +142,7 @@ export class MusicBot {
       log("[Main]Main tick has been set successfully");
 
       // Command instance preparing
-      Command.Instance.Check();
+      CommandsManager.Instance.Check();
       log("[Main]Finish preparing commands");
 
       // Finish initializing
@@ -168,7 +168,7 @@ export class MusicBot {
         // コマンドメッセージを作成
         const commandMessage = CommandMessage.createFromMessage(message, this.data);
         // コマンドを解決
-        const command = Command.Instance.resolve(commandMessage.command);
+        const command = CommandsManager.Instance.resolve(commandMessage.command);
         if(!command) return;
         // 送信可能か確認
         if(!(await CheckSendable(message.channel as discord.TextChannel, message.guild.members.resolve(this.client.user)))){
@@ -236,7 +236,7 @@ export class MusicBot {
           return;
         }
         // コマンドを解決
-        const command = Command.Instance.resolve(interaction.commandName);
+        const command = CommandsManager.Instance.resolve(interaction.commandName);
         if(command){
           // 遅延リプライ
           await interaction.deferReply();

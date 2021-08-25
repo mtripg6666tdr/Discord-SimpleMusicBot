@@ -1,4 +1,4 @@
-import { Command, CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandsManager, CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 
 export default class Invoke implements CommandInterface {
@@ -19,7 +19,7 @@ export default class Invoke implements CommandInterface {
       await message.reply("invokeコマンドをinvokeコマンドで実行することはできません");
       return;
     }
-    const ci = Command.Instance.resolve(commandInfo.command);
+    const ci = CommandsManager.Instance.resolve(commandInfo.command);
     if(ci){
       options.args = commandInfo.options;
       options.rawArgs = commandInfo.rawOptions;

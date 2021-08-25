@@ -1,5 +1,5 @@
 import * as discord from "discord.js";
-import { Command, CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandsManager, CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/colorUtil";
@@ -66,7 +66,7 @@ export default class Commands implements CommandInterface{
       const toggle = await PageToggle.init(msg, embed);
       options.EmbedPageToggle.push(toggle);
     }else{
-      const ci = Command.Instance.resolve(options.rawArgs);
+      const ci = CommandsManager.Instance.resolve(options.rawArgs);
       if(ci && !ci.unlist){
         const prefix = options.data[message.guild.id] ? options.data[message.guild.id].PersistentPref.Prefix : ">";
         const embed = 

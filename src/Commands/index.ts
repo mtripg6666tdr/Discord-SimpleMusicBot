@@ -40,11 +40,11 @@ export interface CommandArgs {
   cancellations:CancellationPending[];
 }
 
-export class Command {
-  private static _instance = null as Command;
+export class CommandsManager {
+  private static _instance = null as CommandsManager;
   static get Instance(){
     if(this._instance) return this._instance;
-    else return this._instance = new Command();
+    else return this._instance = new CommandsManager();
   }
   get Commands(){
     return this.commands;
