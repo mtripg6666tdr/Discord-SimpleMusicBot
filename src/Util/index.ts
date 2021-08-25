@@ -1,7 +1,7 @@
 import * as os from "os";
 import * as https from "https";
 import * as miniget from "miniget";
-import { Client, Message } from "discord.js";
+import { Client, GuildMember, Message, TextChannel, User } from "discord.js";
 import { PassThrough, Readable } from "stream";
 export { log, logStore } from "./logUtil";
 
@@ -210,4 +210,25 @@ export function NormalizeText(rawText:string){
     result = result.replace(reg.key, reg.value);
   });
   return result;
+}
+
+
+/**
+ * 与えられたテキストチャンネルでメンバーが送信可能かどうかを判断します。
+ * @param channel 検査対象のテキストチャンネル
+ * @param user ユーザー
+ * @returns 可能であればtrue、それ以外であればfalse
+ */
+export async function CheckSendable(channel:TextChannel, user:GuildMember){
+  try{
+    const permissions = ((await channel.fetch()) as TextChannel).permissionsFor(user);
+    return permissions.has("SEND_MESSAGES") 
+      && permissions.has("EMBED_LINKS")
+      && permissions.has("MANAGE_MESSAGES")
+      && permissions.has("ATTACH_FILES")
+      ;
+  }
+  catch{
+    return false;
+  }
 }

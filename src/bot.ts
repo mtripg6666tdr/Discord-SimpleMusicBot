@@ -5,10 +5,11 @@ import * as ytpl from "ytpl";
 import { exportableCustom } from "./AudioSource/custom";
 import { Command, CommandArgs } from "./Commands";
 import { PageToggle } from "./Component/PageToggle";
-import { CancellationPending, GuildVoiceInfo, SearchPanel, YmxFormat, YmxVersion } from "./definition";
+import { CancellationPending, GuildVoiceInfo, NotSendableMessage, SearchPanel, YmxFormat, YmxVersion } from "./definition";
 import { getColor } from "./Util/colorUtil";
 import { DatabaseAPI } from "./Util/databaseUtil";
 import {
+  CheckSendable,
   GetMemInfo, isAvailableRawAudioURL,
   log,
   logStore,
@@ -166,8 +167,24 @@ export class MusicBot {
       if(message.content.startsWith(this.data[message.guild.id].PersistentPref.Prefix)){
         // コマンドメッセージを作成
         const commandMessage = CommandMessage.createFromMessage(message, this.data);
+        // コマンドを解決
+        const command = Command.Instance.resolve(commandMessage.command);
+        if(!command) return;
+        // 送信可能か確認
+        if(!(await CheckSendable(message.channel as discord.TextChannel, message.guild.members.resolve(this.client.user)))){
+          try{
+            await message.reply({
+              content: NotSendableMessage,
+              allowedMentions: {
+                repliedUser: false
+              }
+            });
+          }
+          catch{}
+          return;
+        }
         // コマンドの処理
-        await Command.Instance.resolve(commandMessage.command)?.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
+        await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
       }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
         // searchコマンドのキャンセルを捕捉
         if(message.content === "キャンセル" || message.content === "cancel") {
@@ -209,6 +226,15 @@ export class MusicBot {
       this.initData(interaction.guild.id, interaction.channel.id);
       // コマンドインタラクション
       if(interaction.isCommand()){
+        if(!interaction.channel.isText()){
+          await interaction.reply("テキストチャンネルで実行してください");
+          return;
+        }
+        // 送信可能か確認
+        if(!(await CheckSendable(interaction.channel as discord.TextChannel, interaction.guild.members.resolve(this.client.user)))){
+          await interaction.reply(NotSendableMessage);
+          return;
+        }
         // コマンドを解決
         const command = Command.Instance.resolve(interaction.commandName);
         if(command){
@@ -251,17 +277,8 @@ export class MusicBot {
         await interaction.deferUpdate();
         if(interaction.customId === "search"){
           if(interaction.values.indexOf("cancel") >= 0){
-            //const msgId = this.data[interaction.guild.id].SearchPanel.Msg;
             this.data[interaction.guild.id].SearchPanel = null;
             await interaction.channel.send("✅キャンセルしました");
-            // try{
-            //   const ch = await client.channels.fetch(msgId.chId);
-            //   const msg = await (ch as discord.TextChannel).messages.fetch(msgId.id);
-            //   await msg.delete();
-            // }
-            // catch(e){
-            //   log(e, "error");
-            // }
             await interaction.deleteReply();
           }else{
             const message = interaction.message;
