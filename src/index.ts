@@ -32,7 +32,7 @@ http.createServer((req, res) => {
 if(!process.env.DEBUG){
   // ハンドルされなかったエラーのハンドル
   process.on("uncaughtException", (error)=>{
-    if(bot.Client){
+    if(bot.Client && process.env.ERROR_REPORT){
       try{
         const errorText = typeof error === "string" ? error : JSON.stringify(error);
         (bot.Client.channels.resolve(process.env.ERROR_REPORT) as TextChannel).send(errorText);
@@ -43,7 +43,7 @@ if(!process.env.DEBUG){
       }
     }
   }).on("SIGINT", ()=>{
-    if(bot.Client){
+    if(bot.Client && process.env.ERROR_REPORT){
       (bot.Client.channels.resolve(process.env.ERROR_REPORT) as TextChannel).send("Process terminated");
     }
   });
