@@ -10,7 +10,7 @@
     "@discordjs/rest": "0.1.0-canary.0",
     "@discordjs/voice": "^0.6.0",
     "@types/follow-redirects": "^1.13.1",
-    "@types/node": "^16.7.1",
+    "@types/node": "^16.7.2",
     "@types/ws": "^7.4.7",
     "abort-controller": "^3.0.0",
     "discord-api-types": "^0.22.0",
