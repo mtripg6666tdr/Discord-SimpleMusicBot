@@ -1,6 +1,6 @@
 import { Client } from "discord.js";
 import * as fs from "fs";
-import { exportableCustom } from "./AudioSource/custom";
+import { exportableCustom } from "./AudioSource";
 import { MusicBot } from "./bot";
 import { PlayManager } from "./Component/PlayManager";
 import { QueueManager } from "./Component/QueueManager";

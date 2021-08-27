@@ -1,6 +1,6 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
-import { YouTube } from "../AudioSource/youtube";
+import { YouTube } from "../AudioSource";
 import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/colorUtil";

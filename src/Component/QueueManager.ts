@@ -1,17 +1,9 @@
 import { Client, GuildMember, Message, MessageEmbed, TextChannel } from "discord.js";
 import * as ytdl from "ytdl-core";
-import { AudioSource } from "../AudioSource/audiosource";
-import { BestdoriApi, BestdoriS, exportableBestdori } from "../AudioSource/bestdori";
-import { CustomStream, exportableCustom } from "../AudioSource/custom";
-import { GoogleDrive } from "../AudioSource/googledrive";
-import { Hibiki, HibikiApi } from "../AudioSource/hibiki";
-import { exportableSoundCloud, SoundCloudS } from "../AudioSource/soundcloud";
-import { exportableStreamable, Streamable, StreamableApi } from "../AudioSource/streamable";
-import { exportableYouTube, YouTube } from "../AudioSource/youtube";
+import * as AudioSource from "../AudioSource";
 import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log } from "../Util";
-import { CommandMessage } from "./CommandMessage"
 import { ResponseMessage } from "./ResponseMessage";
 import { ManagerBase } from "./ManagerBase";
 import { PageToggle } from "./PageToggle";
@@ -95,7 +87,7 @@ export class QueueManager extends ManagerBase {
       addedBy:GuildMember, 
       method:"push"|"unshift" = "push", 
       type:"youtube"|"custom"|"unknown" = "unknown", 
-      gotData:exportableCustom = null
+      gotData:AudioSource.exportableCustom = null
       ):Promise<QueueContent>{
     log("[QueueManager/" + this.info.GuildID + "]AddQueue() called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
@@ -111,26 +103,26 @@ export class QueueManager extends ManagerBase {
     
     if(type === "youtube" || (type === "unknown" && ytdl.validateURL(url))){
       // youtube
-      result.BasicInfo = await new YouTube().init(url, gotData as exportableYouTube, this.length === 0 || method === "unshift" || this.LengthSeconds < 4 * 60 * 60 * 1000);
+      result.BasicInfo = await new AudioSource.YouTube().init(url, gotData as AudioSource.exportableYouTube, this.length === 0 || method === "unshift" || this.LengthSeconds < 4 * 60 * 60 * 1000);
     }else if(type === "custom" || (type === "unknown" && isAvailableRawAudioURL(url))){
       // カスタムストリーム
-      result.BasicInfo = await new CustomStream().init(url);
+      result.BasicInfo = await new AudioSource.CustomStream().init(url);
     }else if(type === "unknown"){
       // google drive
       if(url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/)){
-        result.BasicInfo = await new GoogleDrive().init(url);
+        result.BasicInfo = await new AudioSource.GoogleDrive().init(url);
       }else if(url.match(/https?:\/\/soundcloud.com\/.+\/.+/)){
         // soundcloud
-        result.BasicInfo = await new SoundCloudS().init(url, gotData as exportableSoundCloud);
-      }else if(StreamableApi.getVideoId(url)){
+        result.BasicInfo = await new AudioSource.SoundCloudS().init(url, gotData as AudioSource.exportableSoundCloud);
+      }else if(AudioSource.StreamableApi.getVideoId(url)){
         // Streamable
-        result.BasicInfo = await new Streamable().init(url, gotData as exportableStreamable);
-      }else if(BestdoriApi.getAudioId(url)){
+        result.BasicInfo = await new AudioSource.Streamable().init(url, gotData as AudioSource.exportableStreamable);
+      }else if(AudioSource.BestdoriApi.getAudioId(url)){
         // Bestdori
-        result.BasicInfo = await new BestdoriS().init(url, gotData as exportableBestdori);
-      }else if(HibikiApi.validateURL(url)){
+        result.BasicInfo = await new AudioSource.BestdoriS().init(url, gotData as AudioSource.exportableBestdori);
+      }else if(AudioSource.HibikiApi.validateURL(url)){
         // Hibiki
-        result.BasicInfo = await new Hibiki().init(url);
+        result.BasicInfo = await new AudioSource.Hibiki().init(url);
       }
     }
     if(result.BasicInfo){
@@ -164,7 +156,7 @@ export class QueueManager extends ManagerBase {
       fromSearch:boolean|ResponseMessage = false, 
       channel:TextChannel = null,
       message:ResponseMessage = null,
-      gotData:exportableCustom = null
+      gotData:AudioSource.exportableCustom = null
       ){
     log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Called");
     let ch:TextChannel = null;
@@ -220,12 +212,12 @@ export class QueueManager extends ManagerBase {
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
           .setDescription("[" + info.BasicInfo.Title + "](" + info.BasicInfo.Url + ")")
-          .addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true)
+          .addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as AudioSource.YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true)
           .addField("リクエスト", addedBy?.displayName ?? "不明", true)
           .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
           .addField("再生されるまでの予想時間", index === "0" ? "-" : ((ehour === "0" ? "" : ehour + ":") + emin + ":" + esec), true)
           .setThumbnail(info.BasicInfo.Thumnail);
-        if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).IsFallbacked){
+        if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as AudioSource.YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
         await msg.edit({content: null, embeds:[embed]});
@@ -253,7 +245,7 @@ export class QueueManager extends ManagerBase {
       this.default.push(this.default[0]);
     }else{
       if(this.info.AddRelative && this.info.Player.CurrentVideoInfo.ServiceIdentifer === "youtube"){
-        const relatedVideos = (this.info.Player.CurrentVideoInfo as YouTube).relatedVideos;
+        const relatedVideos = (this.info.Player.CurrentVideoInfo as AudioSource.YouTube).relatedVideos;
         if(relatedVideos.length >= 1){
           const video = relatedVideos[0];
           await this.info.Queue.AddQueue(video.url, null, "push", "youtube", video);
@@ -379,7 +371,7 @@ type QueueContent = {
   /**
    * 曲自体のメタ情報
    */
-  BasicInfo:AudioSource;
+  BasicInfo:AudioSource.AudioSource;
   /**
    * 曲の情報とは別の追加情報
    */

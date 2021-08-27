@@ -1,7 +1,7 @@
 import * as discord from "discord.js";
 import Soundcloud, { SoundcloudTrackV2 } from "soundcloud.ts";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
-import { SoundCloudTrackCollection } from "../AudioSource/soundcloud";
+import { SoundCloudTrackCollection } from "../AudioSource";
 import { CommandMessage } from "../Component/CommandMessage";
 import { DefaultUserAgent } from "../definition";
 import { getColor } from "../Util/colorUtil";

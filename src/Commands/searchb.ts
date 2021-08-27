@@ -1,6 +1,6 @@
 import * as discord from "discord.js";
 import { CommandArgs, CommandInterface } from ".";
-import { bestdori, BestdoriApi } from "../AudioSource/bestdori";
+import { bestdori, BestdoriApi } from "../AudioSource";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { log } from "../Util";

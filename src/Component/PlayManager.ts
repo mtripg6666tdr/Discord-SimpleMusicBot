@@ -1,8 +1,7 @@
 import { Client, Message, MessageEmbed, TextChannel } from "discord.js";
 import * as voice from "@discordjs/voice";
 import { Readable } from "stream";
-import { AudioSource, defaultM3u8stream } from "../AudioSource/audiosource";
-import { YouTube } from "../AudioSource/youtube";
+import { AudioSource, defaultM3u8stream, YouTube } from "../AudioSource";
 import { FallBackNotice, GuildVoiceInfo } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, DownloadAsReadable, InitPassThrough, isAvailableRawVideoURL, log } from "../Util";
