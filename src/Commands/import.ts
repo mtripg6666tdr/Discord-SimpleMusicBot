@@ -2,7 +2,8 @@ import * as discord from "discord.js";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { ResponseMessage } from "../Component/ResponseMessage";
-import { TaskCancellationManager, YmxFormat, YmxVersion } from "../definition";
+import { TaskCancellationManager } from "../Component/TaskCancellationManager";
+import { YmxFormat, YmxVersion } from "../definition";
 import { DownloadText, log } from "../Util";
 
 export default class Import implements CommandInterface {

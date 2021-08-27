@@ -5,7 +5,8 @@ import * as ytpl from "ytpl";
 import { exportableCustom } from "./AudioSource/custom";
 import { CommandsManager, CommandArgs } from "./Commands";
 import { PageToggle } from "./Component/PageToggle";
-import { TaskCancellationManager, GuildVoiceInfo, NotSendableMessage, SearchPanel, YmxFormat, YmxVersion } from "./definition";
+import { TaskCancellationManager } from "./Component/TaskCancellationManager";
+import { GuildVoiceInfo, NotSendableMessage, SearchPanel, YmxFormat, YmxVersion } from "./definition";
 import { getColor } from "./Util/colorUtil";
 import { DatabaseAPI } from "./Util/databaseUtil";
 import {

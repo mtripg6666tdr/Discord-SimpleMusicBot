@@ -4,7 +4,8 @@ import * as path from "path";
 import { MusicBot } from "../bot";
 import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
-import { TaskCancellationManager, GuildVoiceInfo } from "../definition";
+import { GuildVoiceInfo } from "../definition";
+import { TaskCancellationManager } from "../Component/TaskCancellationManager";
 import Commands from "./commands";
 
 export interface CommandInterface {

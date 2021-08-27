@@ -138,27 +138,6 @@ export type YmxFormat = {
   data:exportableCustom[]
 }
 
-export class TaskCancellationManager {
-  private _cancelled = false;
-  private _message = "";
-  constructor(){
-    //
-  }
-
-  get Cancelled(){
-    return this._cancelled;
-  }
-
-  get Message(){
-    return this._message;
-  }
-
-  Cancel(message?:string){
-    this._cancelled = true;
-    if(message) this._message = message;
-  }
-}
-
 export const FallBackNotice = "現在、通常の方法で情報を取得できなかったため、代替としてPythonライブラリにフォールバックして取得しました。処理に時間がかかるなど、正常なオペレーションができない場合があります。";
 export const DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36";
 export const EventEmitterLike = {emit: ()=>{}};
