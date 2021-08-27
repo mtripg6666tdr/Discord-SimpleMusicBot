@@ -2,7 +2,7 @@ import * as discord from "discord.js";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { ResponseMessage } from "../Component/ResponseMessage";
-import { CancellationPending, YmxFormat, YmxVersion } from "../definition";
+import { TaskCancellationManager, YmxFormat, YmxVersion } from "../definition";
 import { DownloadText, log } from "../Util";
 
 export default class Import implements CommandInterface {
@@ -33,7 +33,7 @@ export default class Import implements CommandInterface {
     }
     if(url.startsWith("http://discord.com/channels/") || url.startsWith("https://discord.com/channels/")){
       let smsg = null as ResponseMessage;
-      const cancellation = new CancellationPending();
+      const cancellation = new TaskCancellationManager();
       options.cancellations.push(cancellation);
       try{
         smsg = await message.reply("🔍メッセージを取得しています...");

@@ -4,7 +4,7 @@ import * as path from "path";
 import { MusicBot } from "../bot";
 import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
-import { CancellationPending, GuildVoiceInfo } from "../definition";
+import { TaskCancellationManager, GuildVoiceInfo } from "../definition";
 import Commands from "./commands";
 
 export interface CommandInterface {
@@ -37,7 +37,7 @@ export interface CommandArgs {
   Join(message:CommandMessage, reply?:boolean):Promise<boolean>;
   PlayFromURL(message:CommandMessage, optiont:string, first:boolean):Promise<void>;
   initData(guildid:string, channelid:string):void;
-  cancellations:CancellationPending[];
+  cancellations:TaskCancellationManager[];
 }
 
 export class CommandsManager {

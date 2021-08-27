@@ -5,7 +5,7 @@ import * as ytpl from "ytpl";
 import { exportableCustom } from "./AudioSource/custom";
 import { CommandsManager, CommandArgs } from "./Commands";
 import { PageToggle } from "./Component/PageToggle";
-import { CancellationPending, GuildVoiceInfo, NotSendableMessage, SearchPanel, YmxFormat, YmxVersion } from "./definition";
+import { TaskCancellationManager, GuildVoiceInfo, NotSendableMessage, SearchPanel, YmxFormat, YmxVersion } from "./definition";
 import { getColor } from "./Util/colorUtil";
 import { DatabaseAPI } from "./Util/databaseUtil";
 import {
@@ -34,7 +34,7 @@ export class MusicBot {
   private data:{[key:string]:GuildVoiceInfo} = {};
   private instantiatedTime = null as Date;
   private versionInfo = "Could not get info";
-  private cancellations = [] as CancellationPending[];
+  private cancellations = [] as TaskCancellationManager[];
   private EmbedPageToggle:PageToggle[] = [] as PageToggle[];
   private isReadyFinished = false;
   private queueModifiedGuilds = [] as string[];
@@ -504,7 +504,7 @@ export class MusicBot {
         limit: 999
       });
       let index = 1;
-      const cancellation = new CancellationPending();
+      const cancellation = new TaskCancellationManager();
       this.cancellations.push(cancellation);
       for(let i = 0; i <result.items.length; i++){
         const c = result.items[i];

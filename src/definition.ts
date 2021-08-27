@@ -138,7 +138,7 @@ export type YmxFormat = {
   data:exportableCustom[]
 }
 
-export class CancellationPending {
+export class TaskCancellationManager {
   private _cancelled = false;
   private _message = "";
   constructor(){
