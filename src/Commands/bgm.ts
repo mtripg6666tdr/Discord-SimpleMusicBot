@@ -12,6 +12,5 @@ export default class Bgm implements CommandInterface {
     if(!(await options.Join(message))) return;
     const url = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
     await options.PlayFromURL(message, url, !options.data[message.guild.id].Player.IsConnecting);
-    options.data[message.guild.id].Player.Play();
   }
 }
