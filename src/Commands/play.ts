@@ -42,14 +42,15 @@ export default class Play implements CommandInterface {
           await options.PlayFromURL(message, options.rawArgs, i === 0 ? !wasConnected : false);
         }
       }else{
-        const msg = await message.reply("🔍検索中...");
+        const msg = await message.channel.send("🔍検索中...");
         const result = (await ytsr.default(options.rawArgs, {
           limit: 10,
           gl: "JP",
           hl: "ja"
         })).items.filter(it => it.type === "video");
         if(result.length === 0){
-          await msg.edit(":face_with_monocle:該当する動画が見つかりませんでした");
+          await message.reply(":face_with_monocle:該当する動画が見つかりませんでした");
+          await msg.delete();
           return;
         }
         options.rawArgs = (result[0] as ytsr.Video).url;
