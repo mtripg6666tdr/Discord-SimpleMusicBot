@@ -18,6 +18,7 @@ import {
 } from "./Util";
 import { CommandMessage } from "./Component/CommandMessage"
 import { ResponseMessage } from "./Component/ResponseMessage";
+import Soundcloud from "soundcloud.ts";
 
 /**
  * 音楽ボットの本体
@@ -210,7 +211,7 @@ export class MusicBot {
           if(message.author.id !== panel.Msg.userId) return;
           const nums = NormalizeText(message.content).split(" ");
           const responseMessage = await(await this.client.channels.fetch(panel.Msg.chId) as discord.TextChannel).messages.fetch(panel.Msg.id);
-          await this.playFromSearchPanelOptions(nums, message.guild.id, ResponseMessage.createFromMessage(responseMessage))
+          await this.playFromSearchPanelOptions(nums, message.guild.id, ResponseMessage.createFromMessage(responseMessage, null));
         }
       }else if(
         this.cancellations.filter(c => !c.Cancelled).length > 0 && 
@@ -285,9 +286,9 @@ export class MusicBot {
             const message = interaction.message;
             let responseMessage = null as ResponseMessage;
             if(message instanceof discord.Message){
-              responseMessage = ResponseMessage.createFromInteractionWithMessage(interaction, message);
+              responseMessage = ResponseMessage.createFromInteractionWithMessage(interaction, message, null);
             }else{
-              responseMessage = ResponseMessage.createFromInteraction(this.client, interaction, message);
+              responseMessage = ResponseMessage.createFromInteraction(this.client, interaction, message, null);
             }
             await this.playFromSearchPanelOptions(interaction.values, interaction.guild.id, responseMessage)
           }
@@ -496,7 +497,7 @@ export class MusicBot {
       this.data[message.guild.id].Player.Play();
       return;
     }else if(optiont.indexOf("v=") < 0 && ytpl.validateID(optiont)){
-      //違うならプレイリストの直リンクか？
+      //違うならYouTubeプレイリストの直リンクか？
       const id = await ytpl.getPlaylistID(optiont);
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const result = await ytpl.default(id, {
@@ -504,40 +505,54 @@ export class MusicBot {
         hl: "ja",
         limit: 999
       });
-      let index = 1;
       const cancellation = new TaskCancellationManager();
       this.cancellations.push(cancellation);
-      for(let i = 0; i <result.items.length; i++){
-        const c = result.items[i];
-        await this.data[message.guild.id].Queue.AutoAddQueue(this.client, c.url, message.member, "youtube", false, false, null, null, {
-          url: c.url,
-          channel: c.author.name,
-          description: "プレイリストから指定のため詳細は表示されません",
-          isLive: c.isLive,
-          length: c.durationSec,
-          thumbnail: c.thumbnails[0].url,
-          title: c.title
-        } as exportableCustom);
-        index++;
-        if(
-          index % 50 === 0 || 
-          (result.estimatedItemCount <= 50 && index % 10 === 0) || 
-          result.estimatedItemCount <= 10
-          ){
-          await msg.edit(":hourglass_flowing_sand:プレイリスト`" + result.title + "`を処理しています。お待ちください。" + result.estimatedItemCount + "曲中" + index + "曲処理済み。");
-        }
-        if(cancellation.Cancelled){
-          break;
-        }
-      }
+      const index = await this.data[message.guild.id].Queue.ProcessPlaylist(this.client, msg, cancellation, first, "youtube", result.items, result.title, result.estimatedItemCount, (c) => ({
+        url: c.url,
+        channel: c.author.name,
+        description: "プレイリストから指定のため詳細は表示されません",
+        isLive: c.isLive,
+        length: c.durationSec,
+        thumbnail: c.thumbnails[0].url,
+        title: c.title
+      } as exportableCustom));
       if(cancellation.Cancelled){
         await msg.edit("✅キャンセルされました。");
       }else{
-        const embed = new discord.MessageEmbed();
-        embed.title = "✅プレイリストが処理されました";
-        embed.description = "[" + result.title + "](" + result.url + ") `(" + result.author.name + ")` \r\n" + index + "曲が追加されました";
-        embed.setThumbnail(result.bestThumbnail.url);
-        embed.setColor(getColor("PLAYLIST_COMPLETED"));
+        const embed = new discord.MessageEmbed()
+          .setTitle("✅プレイリストが処理されました")
+          .setDescription("[" + result.title + "](" + result.url + ") `(" + result.author.name + ")` \r\n" + index + "曲が追加されました")
+          .setThumbnail(result.bestThumbnail.url)
+          .setColor(getColor("PLAYLIST_COMPLETED"));
+        await msg.edit({content: null, embeds: [embed]});
+      }
+      this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
+      this.data[message.guild.id].Player.Play();
+    }else if(optiont.indexOf("soundcloud.com") >= 0 && optiont.indexOf("/sets/") > 0){
+      const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
+      const sc = new Soundcloud();
+      const playlist = await sc.playlists.getV2(optiont);
+      const cancellation = new TaskCancellationManager();
+      this.cancellations.push(cancellation);
+      const index = await this.data[message.guild.id].Queue.ProcessPlaylist(this.client, msg, cancellation, first, "soundcloud", playlist.tracks, playlist.title, playlist.track_count, async (track) => {
+        const item = await sc.tracks.getV2(track.id);
+        return{
+          url: item.permalink_url,
+          title: item.title,
+          description: item.description,
+          length: item.duration,
+          author: item.user.username,
+          thumbnail: item.artwork_url
+        } as exportableCustom
+      });
+      if(cancellation.Cancelled){
+        await msg.edit("✅キャンセルされました。");
+      }else{
+        const embed = new discord.MessageEmbed()
+          .setTitle("✅プレイリストが処理されました")
+          .setDescription("[" + playlist.title + "](" + playlist.permalink_url + ") `(" + playlist.user.username + ")` \r\n" + index + "曲が追加されました")
+          .setThumbnail(playlist.artwork_url)
+          .setColor(getColor("PLAYLIST_COMPLETED"));
         await msg.edit({content: null, embeds: [embed]});
       }
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);

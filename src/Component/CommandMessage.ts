@@ -15,6 +15,7 @@ export class CommandMessage {
   private _command = null as string;
   private _options = null as string[];
   private _rawOptions = null as string;
+  private _responseMessage = null as ResponseMessage;
   private constructor(){
     //
   }
@@ -85,7 +86,7 @@ export class CommandMessage {
           repliedUser: false
         }
       } as ReplyMessageOptions));
-      return ResponseMessage.createFromMessage(msg);
+      return this._responseMessage = ResponseMessage.createFromMessage(msg, this);
     }else{
       if(this._interactionReplied){
         throw new Error("すでに返信済みです");
@@ -100,11 +101,19 @@ export class CommandMessage {
       const mes  = (await this._interaction.editReply(_opt));
       this._interactionReplied = true;
       if(mes instanceof Message){
-        return ResponseMessage.createFromInteractionWithMessage(this._interaction, mes);
+        return this._responseMessage = ResponseMessage.createFromInteractionWithMessage(this._interaction, mes, this);
       }else{
-        return ResponseMessage.createFromInteraction(this._client, this._interaction, mes);
+        return this._responseMessage = ResponseMessage.createFromInteraction(this._client, this._interaction, mes, this);
       }
     }
+  }
+
+  /**
+   * 対応する応答メッセージを返します
+   * @remarks 応答メッセージは最新のものとは限りません
+   */
+  get response():ResponseMessage{
+    return this._responseMessage;
   }
   
   /**

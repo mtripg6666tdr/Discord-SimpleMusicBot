@@ -7,7 +7,10 @@ import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log } from "../Util
 import { ResponseMessage } from "./ResponseMessage";
 import { ManagerBase } from "./ManagerBase";
 import { PageToggle } from "./PageToggle";
+import { exportableCustom } from "../AudioSource";
+import { TaskCancellationManager } from "./TaskCancellationManager";
 
+export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"unknown";
 /**
  * サーバーごとのキューを管理するマネージャー。
  * キューの追加および削除などの機能を提供します。
@@ -86,7 +89,7 @@ export class QueueManager extends ManagerBase {
       url:string, 
       addedBy:GuildMember, 
       method:"push"|"unshift" = "push", 
-      type:"youtube"|"custom"|"unknown" = "unknown", 
+      type:KnownAudioSourceIdentifer = "unknown", 
       gotData:AudioSource.exportableCustom = null
       ):Promise<QueueContent>{
     log("[QueueManager/" + this.info.GuildID + "]AddQueue() called");
@@ -107,13 +110,13 @@ export class QueueManager extends ManagerBase {
     }else if(type === "custom" || (type === "unknown" && isAvailableRawAudioURL(url))){
       // カスタムストリーム
       result.BasicInfo = await new AudioSource.CustomStream().init(url);
+    }else if(type === "soundcloud" || url.match(/https?:\/\/soundcloud.com\/.+\/.+/)){
+        // soundcloud
+        result.BasicInfo = await new AudioSource.SoundCloudS().init(url, gotData as AudioSource.exportableSoundCloud);
     }else if(type === "unknown"){
       // google drive
       if(url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/)){
         result.BasicInfo = await new AudioSource.GoogleDrive().init(url);
-      }else if(url.match(/https?:\/\/soundcloud.com\/.+\/.+/)){
-        // soundcloud
-        result.BasicInfo = await new AudioSource.SoundCloudS().init(url, gotData as AudioSource.exportableSoundCloud);
       }else if(AudioSource.StreamableApi.getVideoId(url)){
         // Streamable
         result.BasicInfo = await new AudioSource.Streamable().init(url, gotData as AudioSource.exportableStreamable);
@@ -151,7 +154,7 @@ export class QueueManager extends ManagerBase {
       client:Client, 
       url:string, 
       addedBy:GuildMember, 
-      type:"youtube"|"custom"|"unknown",
+      type:KnownAudioSourceIdentifer,
       first:boolean = false, 
       fromSearch:boolean|ResponseMessage = false, 
       channel:TextChannel = null,
@@ -230,6 +233,49 @@ export class QueueManager extends ManagerBase {
         msg.edit({content: ":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")", embeds: null}).catch(e => log(e, "error"));
       }
     }
+  }
+
+    /**
+   * プレイリストを処理します
+   * @param client botのクライアント
+   * @param msg すでに返信済みの応答メッセージ
+   * @param cancellation 処理のキャンセレーションマネージャー
+   * @param queue キューマネージャー
+   * @param first 最初に追加する場合はtrue、それ以外の場合はfalse
+   * @param identifer オーディオソースサービス識別子
+   * @param playlist プレイリスト本体。トラックの配列
+   * @param title プレイリストのタイトル
+   * @param totalCount プレイリストに含まれるトラック数
+   * @param exportableConsumer トラックをexportableCustomに処理する関数
+   */
+  async ProcessPlaylist<T>(
+    client:Client,
+    msg:ResponseMessage,
+    cancellation:TaskCancellationManager,
+    first:boolean,
+    identifer:KnownAudioSourceIdentifer, 
+    playlist:T[], 
+    title:string, 
+    totalCount:number, 
+    exportableConsumer:(track:T)=>Promise<exportableCustom>|exportableCustom
+    ){
+    let index = 0;
+    for(let i = 0; i < totalCount; i++){
+      const item = playlist[i];
+      const exportable = await exportableConsumer(item);
+      await this.AutoAddQueue(client, exportable.url, msg.command.member, identifer, first, false, null, null, exportable);
+      index++;
+      if(
+        index % 50 === 0 || 
+        (totalCount <= 50 && index % 10 === 0) || 
+        totalCount <= 10
+      ){
+        await msg.edit(":hourglass_flowing_sand:プレイリスト`" + title + "`を処理しています。お待ちください。" + totalCount + "曲中" + index + "曲処理済み。");
+      }
+      if(cancellation.Cancelled)
+        break;
+    }
+    return index;
   }
 
   /**

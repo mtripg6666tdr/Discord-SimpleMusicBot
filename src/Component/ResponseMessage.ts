@@ -1,5 +1,6 @@
 import { APIMessage } from "discord-api-types";
 import { Client, CommandInteraction, EmojiIdentifierResolvable, Message, MessageEditOptions, SelectMenuInteraction } from "discord.js";
+import { CommandMessage } from "./CommandMessage";
 
 /**
  * CommandMessageに対するボットの応答メッセージを表します
@@ -8,6 +9,7 @@ export class ResponseMessage {
   private isMessage = false;
   private _interaction = null as CommandInteraction|SelectMenuInteraction;
   private _message = null as Message;
+  private _commandMessage = null as CommandMessage;
 
   private constructor(){
     //
@@ -18,11 +20,12 @@ export class ResponseMessage {
    * @param message 応答メッセージ本体
    * @returns 新しいInteractionMessageのインスタンス
    */
-  static createFromMessage(message:Message){
+  static createFromMessage(message:Message, commandMessage:CommandMessage){
     if(message.author.id !== message.client.user.id) throw new Error("メッセージは応答メッセージではありません");
     const me = new ResponseMessage();
     me.isMessage = true;
     me._message = message;
+    me._commandMessage = commandMessage;
     return me;
   }
 
@@ -33,12 +36,13 @@ export class ResponseMessage {
    * @param message 応答メッセージ
    * @returns 新しいInteractionMessageのインスタンス
    */
-  static createFromInteraction(client:Client, interaction:CommandInteraction|SelectMenuInteraction, message:APIMessage){
+  static createFromInteraction(client:Client, interaction:CommandInteraction|SelectMenuInteraction, message:APIMessage, commandMessage:CommandMessage){
     const me = new ResponseMessage();
     me.isMessage = false;
     me._interaction = interaction;
     if(message.author.id !== client.user.id) throw new Error("メッセージは応答メッセージではありません");
     me._message = new Message(client, message);
+    me._commandMessage = commandMessage;
     return me;
   }
 
@@ -49,12 +53,13 @@ export class ResponseMessage {
    * @param message 応答メッセージ
    * @returns 新しいInteractionMessageのインスタンス
    */
-  static createFromInteractionWithMessage(interaction:CommandInteraction|SelectMenuInteraction, message:Message){
+  static createFromInteractionWithMessage(interaction:CommandInteraction|SelectMenuInteraction, message:Message, commandMessage:CommandMessage){
     if(message.author.id !== message.client.user.id) throw new Error("メッセージは応答メッセージではありません");
     const me = new ResponseMessage();
     me.isMessage = false;
     me._interaction = interaction;
     me._message = message;
+    me._commandMessage = commandMessage;
     return me;
   }
 
@@ -78,7 +83,7 @@ export class ResponseMessage {
           repliedUser: false
         }
       } as MessageEditOptions));
-      return ResponseMessage.createFromMessage(msg);
+      return ResponseMessage.createFromMessage(msg, this._commandMessage);
     }else{
       let _opt = null as (MessageEditOptions & { fetchReply: true});
       if(typeof options === "string"){
@@ -89,11 +94,19 @@ export class ResponseMessage {
       }
       const mes  = (await this._interaction.editReply(_opt));
       if(mes instanceof Message){
-        return ResponseMessage.createFromInteractionWithMessage(this._interaction, mes);
+        return ResponseMessage.createFromInteractionWithMessage(this._interaction, mes, this._commandMessage);
       }else{
-        return ResponseMessage.createFromInteraction(this._message.client, this._interaction, mes);
+        return ResponseMessage.createFromInteraction(this._message.client, this._interaction, mes, this._commandMessage);
       }
     }
+  }
+
+  /**
+   * 対応するコマンドメッセージを返します
+   * @remarks コマンドメッセージは最新のものとは限りません
+   */
+  get command():CommandMessage{
+    return this._commandMessage;
   }
 
   /**
@@ -211,6 +224,8 @@ export class ResponseMessage {
   }
 
   async fetch(){
-    return this.isMessage ? ResponseMessage.createFromMessage(await this._message.fetch()) : ResponseMessage.createFromInteractionWithMessage(this._interaction, await this._message.fetch());
+    return this.isMessage ? 
+      ResponseMessage.createFromMessage(await this._message.fetch(), this._commandMessage) : 
+      ResponseMessage.createFromInteractionWithMessage(this._interaction, await this._message.fetch(), this._commandMessage);
   }
 }
