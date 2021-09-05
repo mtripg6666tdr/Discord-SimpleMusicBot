@@ -6,7 +6,7 @@ import { exportableCustom } from "./AudioSource";
 import { CommandsManager, CommandArgs } from "./Commands";
 import { PageToggle } from "./Component/PageToggle";
 import { TaskCancellationManager } from "./Component/TaskCancellationManager";
-import { GuildVoiceInfo, NotSendableMessage, YmxFormat, YmxVersion } from "./definition";
+import { GuildDataContainer, NotSendableMessage, YmxFormat, YmxVersion } from "./definition";
 import { getColor } from "./Util/colorUtil";
 import { DatabaseAPI } from "./Util/databaseUtil";
 import {
@@ -33,7 +33,7 @@ export class MusicBot {
     // サーバーのボイスチャンネルのステータスを確認する
     discord.Intents.FLAGS.GUILD_VOICE_STATES,
   ]});
-  private data:{[key:string]:GuildVoiceInfo} = {};
+  private data:{[key:string]:GuildDataContainer} = {};
   private instantiatedTime = null as Date;
   private versionInfo = "Could not get info";
   private cancellations = [] as TaskCancellationManager[];
@@ -390,7 +390,7 @@ export class MusicBot {
    */
   private initData(guildid:string, channelid:string){
     if(!this.data[guildid]) {
-      this.data[guildid] = new GuildVoiceInfo(this.Client, guildid, channelid, this);
+      this.data[guildid] = new GuildDataContainer(this.Client, guildid, channelid, this);
       this.data[guildid].Player.SetData(this.data[guildid]);
       this.data[guildid].Queue.SetData(this.data[guildid]);
     }

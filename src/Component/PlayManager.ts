@@ -2,7 +2,7 @@ import { Client, Message, MessageEmbed, TextChannel } from "discord.js";
 import * as voice from "@discordjs/voice";
 import { Readable } from "stream";
 import { AudioSource, defaultM3u8stream, YouTube } from "../AudioSource";
-import { FallBackNotice, GuildVoiceInfo } from "../definition";
+import { FallBackNotice, GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, DownloadAsReadable, InitPassThrough, isAvailableRawVideoURL, log } from "../Util";
 import { ManagerBase } from "./ManagerBase";
@@ -53,7 +53,7 @@ export class PlayManager extends ManagerBase {
   }
 
   // 親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
-  SetData(data:GuildVoiceInfo){
+  SetData(data:GuildDataContainer){
     log("[PlayManager]Set data of guild id " + data.GuildID)
     super.SetData(data);
   }

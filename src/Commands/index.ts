@@ -4,7 +4,7 @@ import * as path from "path";
 import { MusicBot } from "../bot";
 import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
-import { GuildVoiceInfo } from "../definition";
+import { GuildDataContainer } from "../definition";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
 import Commands from "./commands";
 
@@ -29,7 +29,7 @@ export interface SlashCommandArgument {
 
 export interface CommandArgs {
   bot:MusicBot;
-  data:{[key:string]:GuildVoiceInfo};
+  data:{[key:string]:GuildDataContainer};
   rawArgs: string;
   args: string[];
   updateBoundChannel(message:CommandMessage):void;

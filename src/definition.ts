@@ -8,7 +8,7 @@ import { QueueManager } from "./Component/QueueManager";
 /**
  * サーバーごとデータを保存するコンテナ
  */
-export class GuildVoiceInfo{
+export class GuildDataContainer{
   /**
    * 永続的設定を保存するコンテナ
    */

@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, MessageOptions, Client, Collection, MessageAttachment, ReplyMessageOptions } from "discord.js";
-import { GuildVoiceInfo } from "../definition";
+import { GuildDataContainer } from "../definition";
 import { NormalizeText } from "../Util";
 import { ResponseMessage } from "./ResponseMessage";
 
@@ -25,7 +25,7 @@ export class CommandMessage {
    * @param message ユーザーが送信するコマンドを含むメッセージ
    * @returns 新しいCommandMessageのインスタンス
    */
-  static createFromMessage(message:Message, data:{[key:string]:GuildVoiceInfo}){
+  static createFromMessage(message:Message, data:{[key:string]:GuildDataContainer}){
     const me = new CommandMessage();
     me.isMessage = true;
     me._message = message;
@@ -243,7 +243,7 @@ export class CommandMessage {
    * @param data GuildVoiceInfoのデータ
    * @returns 解決されたコマンド名、パース済み引数、生の引数を含むオブジェクト
    */
-  static resolveCommandMessage(content:string, guildid:string, data:{[key:string]:GuildVoiceInfo}){
+  static resolveCommandMessage(content:string, guildid:string, data:{[key:string]:GuildDataContainer}){
     const msg_spl = NormalizeText(content).substr(1, content.length - 1).split(" ");
     let command = msg_spl[0];
     let rawOptions = msg_spl.length > 1 ? content.substring(command.length + (data[guildid] ? data[guildid].PersistentPref.Prefix : ">").length + 1, content.length) : "";

@@ -1,7 +1,7 @@
 import { Client, GuildMember, Message, MessageEmbed, TextChannel } from "discord.js";
 import * as ytdl from "ytdl-core";
 import * as AudioSource from "../AudioSource";
-import { FallBackNotice, GuildVoiceInfo } from "../definition";
+import { FallBackNotice, GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log } from "../Util";
 import { ResponseMessage } from "./ResponseMessage";
@@ -46,7 +46,7 @@ export class QueueManager extends ManagerBase {
     log("[QueueManager]Queue Manager instantiated");
   }
 
-  SetData(data:GuildVoiceInfo){
+  SetData(data:GuildDataContainer){
     log("[QueueManager]Set data of guild id " + data.GuildID);
     super.SetData(data);
   }
