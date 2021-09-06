@@ -1,8 +1,9 @@
 # Discord-SimpleMusicBot
+[![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/mtripg6666tdr/Discord-SimpleMusicBot/discord.js)](https://github.com/discordjs/discord.js)
 [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/testing.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/testing.yml)
 [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml)
 ![GitHub repo size](https://img.shields.io/github/repo-size/mtripg6666tdr/Discord-SimpleMusicBot)
-![GitHub License](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)
+[![GitHub License](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)](LICENSE.md)
 
 Discord向け日本製シンプル音楽ボット。  
 YouTubeなどからの再生に対応。
