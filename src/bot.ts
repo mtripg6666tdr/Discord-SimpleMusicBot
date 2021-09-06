@@ -528,7 +528,7 @@ export class MusicBot {
       }
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
       this.data[message.guild.id].Player.Play();
-    }else if(optiont.indexOf("soundcloud.com") >= 0 && optiont.indexOf("/sets/") > 0){
+    }else if(optiont.match(/https?:\/\/soundcloud.com\/.+\/sets\/.+/)){
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const sc = new Soundcloud();
       const playlist = await sc.playlists.getV2(optiont);
