@@ -540,7 +540,7 @@ export class MusicBot {
           url: item.permalink_url,
           title: item.title,
           description: item.description,
-          length: item.duration,
+          length: Math.floor(item.duration / 1000),
           author: item.user.username,
           thumbnail: item.artwork_url
         } as exportableCustom
