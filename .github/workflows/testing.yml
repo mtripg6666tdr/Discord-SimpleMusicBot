@@ -23,6 +23,9 @@ jobs:
       
       - name: Install dependencies
         run: npm install
+        
+      - name: List dependencies
+        run: npm list
       
       - name: Compile TypeScript
         run: npm run build
