@@ -3,7 +3,7 @@ import * as ytsr from "ytsr";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
-import { log } from "../Util";
+import { log, timer } from "../Util";
 
 export default class Search implements CommandInterface {
   name = "検索";
@@ -28,6 +28,7 @@ export default class Search implements CommandInterface {
       });
       return;
     }
+    const s = timer.start("Search(Command)->BeforeYtsr");
     if(options.data[message.guild.id].SearchPanel !== null){
       message.reply("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
       return;
@@ -44,12 +45,16 @@ export default class Search implements CommandInterface {
         },
         Opts: {}
       };
+      s.end();
       try{
+        const t = timer.start("Search(Command)->Ytsr");
         const result = await ytsr.default(options.rawArgs, {
           limit:12,
           gl: "JP",
           hl: "ja"
         });
+        t.end();
+        const u = timer.start("Search(Command)->AfterYtsr");
         const embed = new discord.MessageEmbed();
         embed.title = "\"" + options.rawArgs + "\"の検索結果✨";
         embed.setColor(getColor("SEARCH"));
@@ -102,6 +107,7 @@ export default class Search implements CommandInterface {
             )
           ]
         });
+        u.end();
       }
       catch(e){
         log(e, "error");

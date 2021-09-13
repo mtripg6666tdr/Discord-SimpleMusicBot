@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, MessageOptions, Client, Collection, MessageAttachment, ReplyMessageOptions } from "discord.js";
 import { GuildDataContainer } from "../definition";
-import { NormalizeText } from "../Util";
+import { NormalizeText, timer } from "../Util";
 import { ResponseMessage } from "./ResponseMessage";
 
 /**
@@ -72,6 +72,7 @@ export class CommandMessage {
    * @returns 応答するメッセージのInteractionMessage
    */
   async reply(options:string|MessageOptions):Promise<ResponseMessage>{
+    const t = timer.start("CommandMessage#reply");
     if(this.isMessage){
       let _opt = null as ReplyMessageOptions;
       if(typeof options === "string"){
@@ -86,7 +87,9 @@ export class CommandMessage {
           repliedUser: false
         }
       } as ReplyMessageOptions));
-      return this._responseMessage = ResponseMessage.createFromMessage(msg, this);
+      const result = this._responseMessage = ResponseMessage.createFromMessage(msg, this);
+      t.end();
+      return result;
     }else{
       if(this._interactionReplied){
         throw new Error("すでに返信済みです");
@@ -101,9 +104,13 @@ export class CommandMessage {
       const mes  = (await this._interaction.editReply(_opt));
       this._interactionReplied = true;
       if(mes instanceof Message){
-        return this._responseMessage = ResponseMessage.createFromInteractionWithMessage(this._interaction, mes, this);
+        this._responseMessage = ResponseMessage.createFromInteractionWithMessage(this._interaction, mes, this);
+        t.end();
+        return this._responseMessage;
       }else{
-        return this._responseMessage = ResponseMessage.createFromInteraction(this._client, this._interaction, mes, this);
+        this._responseMessage = ResponseMessage.createFromInteraction(this._client, this._interaction, mes, this);
+        t.end();
+        return this._responseMessage;
       }
     }
   }

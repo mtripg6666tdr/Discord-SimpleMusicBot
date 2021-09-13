@@ -14,7 +14,8 @@ import {
   GetMemInfo, isAvailableRawAudioURL,
   log,
   logStore,
-  NormalizeText
+  NormalizeText,
+  timer
 } from "./Util";
 import { CommandMessage } from "./Component/CommandMessage"
 import { ResponseMessage } from "./Component/ResponseMessage";
@@ -141,7 +142,7 @@ export class MusicBot {
         this.BackupData();
       };
       setTimeout(tick, 1 * 60 * 1000);
-      log("[Main]Main tick has been set successfully");
+      log("[Main]Main tick was set successfully");
 
       // Command instance preparing
       CommandsManager.Instance.Check();
@@ -228,6 +229,7 @@ export class MusicBot {
       this.initData(interaction.guild.id, interaction.channel.id);
       // コマンドインタラクション
       if(interaction.isCommand()){
+        log("[Main]Command Interaction received");
         if(!interaction.channel.isText()){
           await interaction.reply("テキストチャンネルで実行してください");
           return;
@@ -251,6 +253,7 @@ export class MusicBot {
         }
       // ボタンインタラクション
       }else if(interaction.isButton()){
+        log("[Main]Button Interaction received");
         await interaction.deferUpdate();
         const l = this.EmbedPageToggle.filter(t => 
           t.Message.channelId === interaction.channel.id && 
@@ -270,6 +273,7 @@ export class MusicBot {
             await interaction.editReply("失敗しました!");
           }
       }else if(interaction.isSelectMenu()){
+        log("[Main]SelectMenu Interaction received");
         // 検索パネル取得
         const panel = this.data[interaction.guild.id].SearchPanel;
         // なければ返却
@@ -337,6 +341,7 @@ export class MusicBot {
    */
   BackupData(){
     if(DatabaseAPI.CanOperate){
+      const t = timer.start("MusicBot#BackupData");
       try{
         this.BackupStatus();
         // キューの送信
@@ -356,6 +361,7 @@ export class MusicBot {
       catch(e){
         log(e, "warn");
       };
+      t.end();
     }
   }
 
@@ -363,6 +369,7 @@ export class MusicBot {
    * 接続ステータス等をサーバーにバックアップします
    */
   BackupStatus(){
+    const t = timer.start("MusicBot#BackupStatus");
     try{
       // 参加ステータスの送信
       const speaking = [] as {guildid:string, value:string}[];
@@ -383,6 +390,7 @@ export class MusicBot {
     catch(e){
       log(e, "warn");
     }
+    t.end();
   }
 
   /**
@@ -425,11 +433,13 @@ export class MusicBot {
    * @returns 成功した場合はtrue、それ以外の場合にはfalse
    */
   private async Join(message:CommandMessage, reply:boolean = false):Promise<boolean>{
+    const t = timer.start("MusicBot#Join");
     if(message.member.voice.channel){
       // すでにVC入ってるよ～
       if(message.member.voice.channel.members.has(this.client.user.id)){
         const connection = voice.getVoiceConnection(message.guild.id);
         if(connection){
+          t.end();
           return true;
         }
       }
@@ -445,6 +455,7 @@ export class MusicBot {
         }).on("debug", (mes) => log("[Connection]" + mes));
         log("[Main/" + message.guild.id + "]VC Connected to " + message.member.voice.channel.id);
         await msg.edit(":+1:ボイスチャンネル:speaker:`" + message.member.voice.channel.name + "`に接続しました!");
+        t.end();
         return true;
       }
       catch(e){
@@ -452,6 +463,7 @@ export class MusicBot {
         msg?.delete();
         message.reply("😑接続に失敗しました…もう一度お試しください。").catch(e => log(e, "error"));
         this.data[message.guild.id].Player.Disconnect();
+        t.end();
         return false;
       }
     }else{
@@ -459,6 +471,7 @@ export class MusicBot {
       reply ? 
       await message.reply("ボイスチャンネルに参加してからコマンドを送信してください:relieved:").catch(e => log(e, "error")) :
       await message.channel.send("ボイスチャンネルに参加してからコマンドを送信してください:relieved:").catch(e => log(e, "error"));
+      t.end();
       return false;
     }
   };
@@ -468,6 +481,7 @@ export class MusicBot {
    * @param first キューの先頭に追加するかどうか
    */
   private async PlayFromURL(message:CommandMessage, optiont:string, first:boolean = true){
+    const t = timer.start("MusicBot#PlayFromURL");
     setTimeout(()=> message.suppressEmbeds(true).catch(e => log(e, "warn")), 4000);
     if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
       // Discordメッセへのリンクならば
@@ -569,6 +583,7 @@ export class MusicBot {
         return;
       }
     }
+    t.end();
   }
 
   /**
@@ -611,6 +626,7 @@ export class MusicBot {
    * @param message 検索パネルが添付されたメッセージ自体を指す応答メッセージ
    */
   protected async playFromSearchPanelOptions(nums:string[], guildid:string, message:ResponseMessage){
+    const t = timer.start("MusicBot#playFromSearchPanelOptions");
     const panel = this.data[guildid].SearchPanel;
     const member = await (await this.client.guilds.fetch(guildid)).members.fetch(panel.Msg.userId);
     const num = nums.shift();
@@ -627,5 +643,6 @@ export class MusicBot {
     nums.filter(n => Object.keys(panel.Opts).indexOf(n) >= 0).map(n => Number(n)).forEach(async n => {
       await this.data[guildid].Queue.AutoAddQueue(this.client, panel.Opts[n].url, member, "unknown", false, false, message.channel as discord.TextChannel);
     });
+    t.end();
   }
 }

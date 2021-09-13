@@ -4,7 +4,7 @@ import { Readable } from "stream";
 import { AudioSource, defaultM3u8stream, YouTube } from "../AudioSource";
 import { FallBackNotice, GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, DownloadAsReadable, InitPassThrough, isAvailableRawVideoURL, log } from "../Util";
+import { CalcHourMinSec, CalcMinSec, DownloadAsReadable, InitPassThrough, isAvailableRawVideoURL, log, timer } from "../Util";
 import { ManagerBase } from "./ManagerBase";
 import { FFmpeg } from "prism-media";
 
@@ -100,6 +100,7 @@ export class PlayManager extends ManagerBase {
     try{
       // AudioPlayerがなければ作成
       if(!this.AudioPlayer){
+        const t = timer.start("PlayManager#Play->InitAudioPlayer");
         this.AudioPlayer = voice.createAudioPlayer();
         // 各種イベント設定
         this.AudioPlayer.on(voice.AudioPlayerStatus.Idle, (oldstate, newstate)=> {
@@ -129,7 +130,9 @@ export class PlayManager extends ManagerBase {
           this.AudioPlayer.stop(true);
           this.AudioPlayer = null;
         });
+        t.end();
       }
+      const t = timer.start("PlayManager#Play->FetchAudioSource");
       // QueueContentからストリーム、M3U8プレイリスト(非HLS)または直URLを取得
       const rawStream = await this.CurrentVideoInfo.fetch();
       let stream:voice.AudioResource = this.ResolveStream(rawStream);
@@ -141,9 +144,12 @@ export class PlayManager extends ManagerBase {
       }
       this.error = false;
       this.stopped = false;
+      t.end();
       // 再生
+      const u = timer.start("PlayManager#Play->EnterPlayingState");
       this.AudioPlayer.play(stream);
       await voice.entersState(this.AudioPlayer, voice.AudioPlayerStatus.Playing, 10e3);
+      u.end();
       log("[PlayManager/" + this.info.GuildID + "]Play() started successfully");
       if(this.info.boundTextChannel && ch && mes){
         // 再生開始メッセージ

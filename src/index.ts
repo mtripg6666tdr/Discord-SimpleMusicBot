@@ -50,4 +50,4 @@ if(!process.env.DEBUG){
 }
 
 // ボット開始
-bot.Run(process.env.TOKEN, true, 40);
+bot.Run(process.env.TOKEN, true, 60);

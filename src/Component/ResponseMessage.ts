@@ -1,5 +1,6 @@
 import { APIMessage } from "discord-api-types";
 import { Client, CommandInteraction, EmojiIdentifierResolvable, Message, MessageEditOptions, SelectMenuInteraction } from "discord.js";
+import { timer } from "../Util";
 import { CommandMessage } from "./CommandMessage";
 
 /**
@@ -69,6 +70,7 @@ export class ResponseMessage {
    * @returns 編集後のInteractionMessage
    */
   async edit(options:string|MessageEditOptions):Promise<ResponseMessage>{
+    const t = timer.start("ResponseMessage#edit");
     if(this.isMessage){
       let _opt = null as MessageEditOptions;
       if(typeof options === "string"){
@@ -83,7 +85,9 @@ export class ResponseMessage {
           repliedUser: false
         }
       } as MessageEditOptions));
-      return ResponseMessage.createFromMessage(msg, this._commandMessage);
+      const result = ResponseMessage.createFromMessage(msg, this._commandMessage);
+      t.end();
+      return result;
     }else{
       let _opt = null as (MessageEditOptions & { fetchReply: true});
       if(typeof options === "string"){
@@ -94,9 +98,13 @@ export class ResponseMessage {
       }
       const mes  = (await this._interaction.editReply(_opt));
       if(mes instanceof Message){
-        return ResponseMessage.createFromInteractionWithMessage(this._interaction, mes, this._commandMessage);
+        const result = ResponseMessage.createFromInteractionWithMessage(this._interaction, mes, this._commandMessage);
+        t.end();
+        return result;
       }else{
-        return ResponseMessage.createFromInteraction(this._message.client, this._interaction, mes, this._commandMessage);
+        const result = ResponseMessage.createFromInteraction(this._message.client, this._interaction, mes, this._commandMessage);
+        t.end();
+        return result;
       }
     }
   }

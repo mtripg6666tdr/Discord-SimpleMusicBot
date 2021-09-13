@@ -3,8 +3,7 @@ import { EmbedField } from "discord.js";
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 import m3u8stream from "m3u8stream";
-import { log } from "../Util/logUtil";
-import { DownloadText } from "../Util";
+import { DownloadText, log, timer } from "../Util";
 import { AudioSource } from "./audiosource";
 import { PassThrough, Readable } from "stream";
 
@@ -43,6 +42,7 @@ export class YouTube extends AudioSource {
       try{
         const agent = process.env.PROXY && HttpsProxyAgent.default(process.env.PROXY);
         let info = null as ytdl.videoInfo;
+        const t = timer.start("YouTube(AudioSource)#init->GetInfo");
         if(process.env.PROXY){
           info = await ytdl.getInfo(url, {
             lang: "ja",
@@ -53,6 +53,7 @@ export class YouTube extends AudioSource {
             lang: "ja"
           });
         }
+        t.end();
         if(forceCache){
           this.ytdlInfo = info;
         }
@@ -69,7 +70,9 @@ export class YouTube extends AudioSource {
       catch{
         this.fallback = true;
         log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
+        const t = timer.start("YouTube(AudioSource)#init->GetInfo(Fallback)");
         const info = JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
+        t.end();
         if(forceCache){
           this.youtubeDlInfo = info;
         }
@@ -91,6 +94,7 @@ export class YouTube extends AudioSource {
       let info = this.ytdlInfo;
       let agent = process.env.PROXY && HttpsProxyAgent.default(process.env.PROXY);
       if(!info){
+        const t = timer.start("YouTube(AudioSource)#fetch->GetInfo");
         if(process.env.PROXY){
           info = await ytdl.getInfo(this.Url, {
             requestOptions: {agent},
@@ -101,6 +105,7 @@ export class YouTube extends AudioSource {
             lang: "ja"
           });
         }
+        t.end();
       }
       this.relatedVideos = info.related_videos.map(video => {
         return {
@@ -139,7 +144,9 @@ export class YouTube extends AudioSource {
     catch{
       this.fallback = true;
       log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
+      const t = timer.start("YouTube(AudioSource)#fetch->GetInfo(Fallback)");
       const info = this.youtubeDlInfo ?? JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
+      t.end();
       this.Description = info.description ?? "不明";
       if(info.title) this.Title = info.title;
       if(info.is_live){

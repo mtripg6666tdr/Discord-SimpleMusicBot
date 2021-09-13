@@ -3,7 +3,7 @@ import * as ytdl from "ytdl-core";
 import * as AudioSource from "../AudioSource";
 import { FallBackNotice, GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log } from "../Util";
+import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log, timer } from "../Util";
 import { ResponseMessage } from "./ResponseMessage";
 import { ManagerBase } from "./ManagerBase";
 import { PageToggle } from "./PageToggle";
@@ -93,6 +93,7 @@ export class QueueManager extends ManagerBase {
       gotData:AudioSource.exportableCustom = null
       ):Promise<QueueContent>{
     log("[QueueManager/" + this.info.GuildID + "]AddQueue() called");
+    const t = timer.start("AddQueue");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     const result = {
       BasicInfo:null,
@@ -133,8 +134,10 @@ export class QueueManager extends ManagerBase {
       if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
         this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
       }
+      t.end();
       return result;
     }
+    t.end();
     throw "Provided URL was not resolved as available service";
   }
 
@@ -162,6 +165,7 @@ export class QueueManager extends ManagerBase {
       gotData:AudioSource.exportableCustom = null
       ){
     log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Called");
+    const t = timer.start("AutoAddQueue");
     let ch:TextChannel = null;
     let msg:Message|ResponseMessage = null;
     try{
@@ -233,9 +237,10 @@ export class QueueManager extends ManagerBase {
         msg.edit({content: ":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")", embeds: null}).catch(e => log(e, "error"));
       }
     }
+    t.end();
   }
 
-    /**
+  /**
    * プレイリストを処理します
    * @param client botのクライアント
    * @param msg すでに返信済みの応答メッセージ
@@ -259,6 +264,7 @@ export class QueueManager extends ManagerBase {
     totalCount:number, 
     exportableConsumer:(track:T)=>Promise<exportableCustom>|exportableCustom
     ){
+    const t = timer.start("ProcessPlaylist");
     let index = 0;
     for(let i = 0; i < totalCount; i++){
       const item = playlist[i];
@@ -275,6 +281,7 @@ export class QueueManager extends ManagerBase {
       if(cancellation.Cancelled)
         break;
     }
+    t.end();
     return index;
   }
 
