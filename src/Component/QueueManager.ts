@@ -152,6 +152,7 @@ export class QueueManager extends ManagerBase {
    * @param channel 検索パネルからのキュー追加でない場合に、ユーザーへのインタラクションメッセージを送信するチャンネル。送信しない場合はnull
    * @param message 各インタラクションを上書きするメッセージが既にある場合はここにメッセージを指定します。それ以外の場合はnull
    * @param gotData すでにデータを取得していて新たにフェッチする必要がなくローカルでキューコンテンツをインスタンス化する場合はここにデータを指定します
+   * @returns 成功した場合はtrue、それ以外の場合はfalse
    */
   async AutoAddQueue(
       client:Client, 
@@ -163,7 +164,7 @@ export class QueueManager extends ManagerBase {
       channel:TextChannel = null,
       message:ResponseMessage = null,
       gotData:AudioSource.exportableCustom = null
-      ){
+      ):Promise<boolean>{
     log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Called");
     const t = timer.start("AutoAddQueue");
     let ch:TextChannel = null;
@@ -236,8 +237,11 @@ export class QueueManager extends ManagerBase {
       if(msg){
         msg.edit({content: ":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")", embeds: null}).catch(e => log(e, "error"));
       }
+      t.end();
+      return false;
     }
     t.end();
+    return true;
   }
 
   /**
@@ -252,6 +256,7 @@ export class QueueManager extends ManagerBase {
    * @param title プレイリストのタイトル
    * @param totalCount プレイリストに含まれるトラック数
    * @param exportableConsumer トラックをexportableCustomに処理する関数
+   * @returns 追加に成功した楽曲数
    */
   async ProcessPlaylist<T>(
     client:Client,
@@ -263,14 +268,14 @@ export class QueueManager extends ManagerBase {
     title:string, 
     totalCount:number, 
     exportableConsumer:(track:T)=>Promise<exportableCustom>|exportableCustom
-    ){
+    ):Promise<number> {
     const t = timer.start("ProcessPlaylist");
     let index = 0;
     for(let i = 0; i < totalCount; i++){
       const item = playlist[i];
       const exportable = await exportableConsumer(item);
-      await this.AutoAddQueue(client, exportable.url, msg.command.member, identifer, first, false, null, null, exportable);
-      index++;
+      const _result = await this.AutoAddQueue(client, exportable.url, msg.command.member, identifer, first, false, null, null, exportable);
+      if(_result) index++;
       if(
         index % 50 === 0 || 
         (totalCount <= 50 && index % 10 === 0) || 

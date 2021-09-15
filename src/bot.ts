@@ -483,24 +483,20 @@ export class MusicBot {
   private async PlayFromURL(message:CommandMessage, optiont:string, first:boolean = true){
     const t = timer.start("MusicBot#PlayFromURL");
     setTimeout(()=> message.suppressEmbeds(true).catch(e => log(e, "warn")), 4000);
-    if(optiont.startsWith("http://discord.com/channels/") || optiont.startsWith("https://discord.com/channels/")){
+    if(optiont.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){
       // Discordメッセへのリンクならば
       const smsg = await message.reply("🔍メッセージを取得しています...");
       try{
         const ids = optiont.split("/");
-        const msgId = Number(ids[ids.length - 1]) ?? undefined;
-        const chId = Number(ids[ids.length - 2]) ?? undefined;
-        if(!isNaN(msgId) && !isNaN(chId)){
-          const ch = await this.client.channels.fetch(ids[ids.length - 2]);
-          if(ch.type === "GUILD_TEXT"){
-            const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
-            if(msg.attachments.size > 0 && isAvailableRawAudioURL(msg.attachments.first().url)){
-              await this.data[message.guild.id].Queue.AutoAddQueue(this.client, msg.attachments.first().url, message.member, "custom", first, false, message.channel as discord.TextChannel, smsg);
-              this.data[message.guild.id].Player.Play();
-              return;
-            }else throw "添付ファイルが見つかりません";
-          }else throw "メッセージの取得に失敗"
-        }else throw "解析できないURL";
+        const ch = await this.client.channels.fetch(ids[ids.length - 2]);
+        if(ch.type === "GUILD_TEXT"){
+          const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
+          if(msg.attachments.size > 0 && isAvailableRawAudioURL(msg.attachments.first().url)){
+            await this.data[message.guild.id].Queue.AutoAddQueue(this.client, msg.attachments.first().url, message.member, "custom", first, false, message.channel as discord.TextChannel, smsg);
+            this.data[message.guild.id].Player.Play();
+            return;
+          }else throw "添付ファイルが見つかりません";
+        }else throw "メッセージの取得に失敗"
       }
       catch(e){
         await smsg.edit("✘追加できませんでした(" + e + ")").catch(e => log(e ,"error"));
