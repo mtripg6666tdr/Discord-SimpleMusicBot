@@ -61,7 +61,7 @@ export abstract class DatabaseAPI {
         const result = await this.HttpRequest("POST", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
           guildid: ids,
-          data: JSON.stringify(rawData),
+          data: encodeURIComponent(JSON.stringify(rawData)),
           type: "queue"
         } as requestBody, MIME_JSON);
         return result.status === 200;
@@ -120,7 +120,7 @@ export abstract class DatabaseAPI {
         res.on("data", (chunk) => data+=chunk);
         res.on("end", ()=> {
           try{
-            resolve(JSON.parse(data) as postResult)
+            resolve(JSON.parse(decodeURIComponent(data)) as postResult)
           }
           catch{
             reject();
