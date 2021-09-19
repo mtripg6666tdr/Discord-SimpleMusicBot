@@ -3,6 +3,8 @@
     "target": "ES2019",
     "module": "CommonJS",
     "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "outDir": "dist/",
