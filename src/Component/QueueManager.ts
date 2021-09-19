@@ -378,10 +378,10 @@ export class QueueManager extends ManagerBase {
    * @param validator 条件を表す関数
    * @returns 削除されたオフセットの一覧
    */
-  RemoveIf(validator:(q:QueueContent)=>Boolean){
+  RemoveIf(validator:(q:QueueContent)=>Boolean):number[]{
     log("[QueueManager/" + this.info.GuildID + "]RemoveIf() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
-    if(this._default.length === 0) return;
+    if(this._default.length === 0) return [];
     const first = this.info.Player.IsPlaying ? 1 : 0
     const rmIndex = [] as number[];
     for(let i = first; i < this._default.length; i++){

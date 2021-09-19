@@ -140,7 +140,7 @@ export class PlayManager extends ManagerBase {
       const connection = voice.getVoiceConnection(this.info.GuildID);
       if(!connection) {
         if(mes) await mes.delete();
-        return;
+        return this;
       }
       this.error = false;
       this.stopped = false;
@@ -188,7 +188,7 @@ export class PlayManager extends ManagerBase {
           mes.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(e => log(e, "error"));
           log("Rate limit detected", "error");
           this.Stop();
-          return;
+          return this;
         }
       }catch{};
       if(this.info.boundTextChannel && ch && mes){
