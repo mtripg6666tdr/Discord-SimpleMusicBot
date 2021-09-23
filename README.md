@@ -38,7 +38,7 @@ $ git clone https://github.com/mtripg6666tdr/Discord-SimpleMusicBot.git
 
 2. カレントディレクトリ移動
 ```bash
-$ cd Dicord-SimpleMusicBot
+$ cd Discord-SimpleMusicBot
 ```
 
 3. 必須パッケージインストール
