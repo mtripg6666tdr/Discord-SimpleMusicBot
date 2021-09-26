@@ -4,7 +4,7 @@ import { log } from "../Util";
 
 export default class Dc implements CommandInterface {
   name = "切断";
-  alias = ["終了", "dc", "disconnect", "leave"];
+  alias = ["終了", "dc", "disconnect", "leave", "quit"];
   description = "ボイスチャンネルから切断します。";
   unlist = false;
   category = "voice";
