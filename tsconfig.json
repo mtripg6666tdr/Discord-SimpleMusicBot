@@ -8,7 +8,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "outDir": "dist/",
-    "sourceMap": true
+    "sourceMap": true,
   },
   "include": [
     "./src/**/*.ts"
