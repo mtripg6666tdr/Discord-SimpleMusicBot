@@ -79,6 +79,7 @@ export class CommandsManager {
     for(let i = 0; i < this.commands.length; i++){
       if(this.commands[i].name === command || this.commands[i].alias.indexOf(command) >= 0){
         result = this.commands[i];
+        break;
       }
     }
     if(result)
