@@ -12,6 +12,5 @@ updates:
     allow:
       - dependency-type: "direct"
     ignore:
-      - dependency-name: "discord.js"
       - dependency-name: "soundcloud.ts"
       - dependency-name: "node"
