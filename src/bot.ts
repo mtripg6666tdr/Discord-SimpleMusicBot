@@ -417,11 +417,11 @@ export class MusicBot {
       bot: this,
       data: this.data,
       rawArgs: optiont,
-      updateBoundChannel: this.updateBoundChannel,
+      updateBoundChannel: this.updateBoundChannel.bind(this),
       client: this.client,
-      Join: this.Join,
-      PlayFromURL: this.PlayFromURL,
-      initData: this.initData,
+      Join: this.Join.bind(this),
+      PlayFromURL: this.PlayFromURL.bind(this),
+      initData: this.initData.bind(this),
       cancellations: this.cancellations
     };
   }
