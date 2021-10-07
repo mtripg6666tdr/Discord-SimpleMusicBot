@@ -111,8 +111,10 @@ export class PlayManager extends ManagerBase {
           if(valueLog(oldstate.status === voice.AudioPlayerStatus.Playing, "OldStatusIsPlaying") 
             && valueLog(newstate.status === voice.AudioPlayerStatus.Idle, "NewStatusIsIdle")
             && valueLog(!this.error, "IsNotError")
-            && valueLog(!this.stopped, "IsNotManuaalyStopped")
+            && valueLog(!this.stopped, "IsNotManuallyStopped")
+            && valueLog((oldstate as voice.AudioPlayerPlayingState).resource.ended, "ResourceEnded")
             ){
+            valueLog(true, "AllStateMet");
             this.onStreamFinished();
           }
         });
