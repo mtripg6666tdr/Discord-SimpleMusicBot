@@ -104,10 +104,14 @@ export class PlayManager extends ManagerBase {
         this.AudioPlayer = voice.createAudioPlayer();
         // 各種イベント設定
         this.AudioPlayer.on(voice.AudioPlayerStatus.Idle, (oldstate, newstate)=> {
-          if(oldstate.status === voice.AudioPlayerStatus.Playing 
-            && newstate.status === voice.AudioPlayerStatus.Idle
-            && !this.error
-            && !this.stopped
+          const valueLog = (value:boolean, label:string) => {
+            log("[PlayManager:" + this.info.GuildID + "]AudioPlayerFinishEval: " + value + "(" + label + ")");
+            return value;
+          };
+          if(valueLog(oldstate.status === voice.AudioPlayerStatus.Playing, "OldStatusIsPlaying") 
+            && valueLog(newstate.status === voice.AudioPlayerStatus.Idle, "NewStatusIsIdle")
+            && valueLog(!this.error, "IsNotError")
+            && valueLog(!this.stopped, "IsNotManuaalyStopped")
             ){
             this.onStreamFinished();
           }
