@@ -63,10 +63,13 @@ export class MusicBot {
    */
   get InstantiatedTime(){return this.instantiatedTime}; 
 
-  constructor(){
+  constructor(private maintenance:boolean = false){
     this.instantiatedTime = new Date();
     const client = this.client;
     log("[Main]Main bot is instantiated");
+    if(maintenance){
+      log("[Main]Main bot is now maintainance mode");
+    }
     try{
       this.versionInfo = execSync("git log -n 1 --pretty=format:%h").toString().trim();
     }
@@ -77,10 +80,18 @@ export class MusicBot {
       log("[Main]Starting environment checking and preparation.");
 
       // Set activity as booting
-      client.user.setActivity({
-        type: "PLAYING",
-        name: "起動中..."
-      });
+      if(!maintenance){
+        client.user.setActivity({
+          type: "PLAYING",
+          name: "起動中..."
+        });
+      }else{
+        client.user.setActivity({
+          type: "PLAYING",
+          name: "メンテナンス中..."
+        });
+        client.user.setStatus("dnd");
+      }
 
       // Recover queues
       if(DatabaseAPI.CanOperate){
@@ -129,19 +140,21 @@ export class MusicBot {
       }
 
       // Set activity
-      client.user.setActivity({
-        type: "LISTENING",
-        name: "音楽"
-      });
+      if(!maintenance){
+        client.user.setActivity({
+          type: "LISTENING",
+          name: "音楽"
+        });
 
-      // Set main tick
-      const tick = ()=>{
-        this.Log();
-        setTimeout(tick, 4 * 60 * 1000);
-        PageToggle.Organize(this.EmbedPageToggle, 5);
-        this.BackupData();
-      };
-      setTimeout(tick, 1 * 60 * 1000);
+        // Set main tick
+        const tick = ()=>{
+          this.Log();
+          setTimeout(tick, 4 * 60 * 1000);
+          PageToggle.Organize(this.EmbedPageToggle, 5);
+          this.BackupData();
+        };
+        setTimeout(tick, 1 * 60 * 1000);
+      }
       log("[Main]Main tick was set successfully");
 
       // Command instance preparing
@@ -154,6 +167,10 @@ export class MusicBot {
     });
 
     client.on("messageCreate", async message => {
+      if(maintenance){
+        if(!process.env.ADMIN_USER || message.author.id !== process.env.ADMIN_USER)
+          return;
+      }
       // botのメッセやdm、およびnewsは無視
       if(!this.isReadyFinished || message.author.bot || message.channel.type !== "GUILD_TEXT") return;
       // データ初期化
@@ -224,6 +241,10 @@ export class MusicBot {
     });
 
     client.on("interactionCreate", async(interaction)=>{
+      if(maintenance){
+        if(!process.env.ADMIN_USER || interaction.user.id !== process.env.ADMIN_USER)
+        return;
+      }
       if(interaction.user.bot) return;
       // データ初期化
       this.initData(interaction.guild.id, interaction.channel.id);

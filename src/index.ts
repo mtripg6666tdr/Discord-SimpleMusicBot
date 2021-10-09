@@ -13,7 +13,7 @@ if(Number(nodeVersion) >= 15){
   log("[Entry]Node major version " + nodeVersion + " is incompatible to this project, but I'll do the best!", "warn");
 }
 
-const bot = new MusicBot();
+const bot = new MusicBot(Boolean(process.env.MAINTENANCE));
 
 // Webサーバーのインスタンス化
 http.createServer((req, res) => {
