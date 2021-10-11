@@ -124,9 +124,6 @@ export class CommandsManager {
       .forEach(n => {
         const cp = new (require(path.join(__dirname, n)).default)() as CommandInterface;
         this.commands.push(cp);
-        if(cp.name === "コマンド"){
-          (cp as Commands).commands = this.commands;
-        }
         return cp;
       });
     log("[CommandsManager]Initialized");
