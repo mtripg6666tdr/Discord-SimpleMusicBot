@@ -20,6 +20,7 @@ import {
 import { CommandMessage } from "./Component/CommandMessage"
 import { ResponseMessage } from "./Component/ResponseMessage";
 import Soundcloud from "soundcloud.ts";
+import { addOn } from "./Util/addonUtil";
 
 /**
  * 音楽ボットの本体
@@ -41,6 +42,7 @@ export class MusicBot {
   private EmbedPageToggle:PageToggle[] = [] as PageToggle[];
   private isReadyFinished = false;
   private queueModifiedGuilds = [] as string[];
+  private addOn = new addOn();
   /**
    * ページトグル
    */
@@ -75,251 +77,260 @@ export class MusicBot {
     }
     catch{};
 
-    client.on("ready", async()=> {
-      log("[Main]Socket connection is ready.");
-      log("[Main]Starting environment checking and preparation.");
+    client
+      .on("ready", this.onReady.bind(this))
+      .on("messageCreate", this.onMessageCreate.bind(this))
+      .on("interactionCreate", this.interactionCreate.bind(this))
+      ;
+  }
 
-      // Set activity as booting
-      if(!maintenance){
-        client.user.setActivity({
-          type: "PLAYING",
-          name: "起動中..."
-        });
-      }else{
-        client.user.setActivity({
-          type: "PLAYING",
-          name: "メンテナンス中..."
-        });
-        client.user.setStatus("dnd");
-      }
+  private async onReady(client:discord.Client<true>){
+    this.addOn.emit("ready", client);
+    log("[Main]Socket connection is ready.");
+    log("[Main]Starting environment checking and preparation.");
 
-      // Recover queues
-      if(DatabaseAPI.CanOperate){
-        const queues = await DatabaseAPI.GetQueueData([...client.guilds.cache.keys()]);
-        const speakingIds = await DatabaseAPI.GetIsSpeaking([...client.guilds.cache.keys()]);
-        const queueGuildids = Object.keys(queues);
-        const speakingGuildids = Object.keys(speakingIds);
-        for(let i=0;i<queueGuildids.length;i++){
-          let id = queueGuildids[i];
-          const queue = JSON.parse(queues[id]) as YmxFormat;
-          if(
-            speakingGuildids.indexOf(id) >= 0 && 
-            queue.version === YmxVersion && 
-            speakingIds[id].indexOf(":") >= 0
-            ){
-            //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
-            const [vid, cid, ..._bs] = speakingIds[id].split(":");
-            const [loop, qloop, related] = _bs.map(b => b === "1");
-            this.initData(id, cid);
-            this.data[id].boundTextChannel = cid;
-            this.data[id].Queue.LoopEnabled = loop;
-            this.data[id].Queue.QueueLoopEnabled = qloop;
-            this.data[id].AddRelative = related;
-            try{
-              for(let j=0;j<queue.data.length;j++){
-                await this.data[id].Queue.AutoAddQueue(client, queue.data[j].url, null, "unknown", false, false, null, null, queue.data[j]);
-              }
-              if(vid != "0"){
-                const vc = await client.channels.fetch(vid) as discord.VoiceChannel;
-                voice.joinVoiceChannel({
-                  channelId: vc.id,
-                  guildId: vc.guild.id,
-                  adapterCreator: vc.guild.voiceAdapterCreator
-                });
-                await this.data[id].Player.Play();
-              }
-            }
-            catch(e){
-              log(e, "warn");
-            }
-          }
-        }
-        log("[Main]Finish queues and states recovery.");
-      }else{
-        log("[Main]Cannot perform queues and states recovery. Check .env file to perform.", "warn");
-      }
+    // Set activity as booting
+    if(!this.maintenance){
+      client.user.setActivity({
+        type: "PLAYING",
+        name: "起動中..."
+      });
+    }else{
+      client.user.setActivity({
+        type: "PLAYING",
+        name: "メンテナンス中..."
+      });
+      client.user.setStatus("dnd");
+    }
 
-      // Set activity
-      if(!maintenance){
-        client.user.setActivity({
-          type: "LISTENING",
-          name: "音楽"
-        });
-
-        // Set main tick
-        const tick = ()=>{
-          this.Log();
-          setTimeout(tick, 4 * 60 * 1000);
-          PageToggle.Organize(this.EmbedPageToggle, 5);
-          this.BackupData();
-        };
-        setTimeout(tick, 1 * 60 * 1000);
-      }
-      log("[Main]Main tick was set successfully");
-
-      // Command instance preparing
-      CommandsManager.Instance.Check();
-      log("[Main]Finish preparing commands");
-
-      // Finish initializing
-      this.isReadyFinished = true;
-      log("[Main]Bot is ready");
-    });
-
-    client.on("messageCreate", async message => {
-      if(maintenance){
-        if(!process.env.ADMIN_USER || message.author.id !== process.env.ADMIN_USER)
-          return;
-      }
-      // botのメッセやdm、およびnewsは無視
-      if(!this.isReadyFinished || message.author.bot || message.channel.type !== "GUILD_TEXT") return;
-      // データ初期化
-      this.initData(message.guild.id, message.channel.id);
-      // プレフィックスの更新
-      this.updatePrefix(message);
-      if(message.content === "<@" + client.user.id + ">") {
-        // メンションならば
-        message.channel
-          .send("コマンドは、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`で確認できます")
-          .catch(e => log(e, "error"));
-        return;
-      }
-      if(message.content.startsWith(this.data[message.guild.id].PersistentPref.Prefix)){
-        // コマンドメッセージを作成
-        const commandMessage = CommandMessage.createFromMessage(message, this.data);
-        // コマンドを解決
-        const command = CommandsManager.Instance.resolve(commandMessage.command);
-        if(!command) return;
-        // 送信可能か確認
-        if(!(await CheckSendable(message.channel as discord.TextChannel, message.guild.members.resolve(this.client.user)))){
+    // Recover queues
+    if(DatabaseAPI.CanOperate){
+      const queues = await DatabaseAPI.GetQueueData([...client.guilds.cache.keys()]);
+      const speakingIds = await DatabaseAPI.GetIsSpeaking([...client.guilds.cache.keys()]);
+      const queueGuildids = Object.keys(queues);
+      const speakingGuildids = Object.keys(speakingIds);
+      for(let i=0;i<queueGuildids.length;i++){
+        let id = queueGuildids[i];
+        const queue = JSON.parse(queues[id]) as YmxFormat;
+        if(
+          speakingGuildids.indexOf(id) >= 0 && 
+          queue.version === YmxVersion && 
+          speakingIds[id].indexOf(":") >= 0
+          ){
+          //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
+          const [vid, cid, ..._bs] = speakingIds[id].split(":");
+          const [loop, qloop, related] = _bs.map(b => b === "1");
+          this.initData(id, cid);
+          this.data[id].boundTextChannel = cid;
+          this.data[id].Queue.LoopEnabled = loop;
+          this.data[id].Queue.QueueLoopEnabled = qloop;
+          this.data[id].AddRelative = related;
           try{
-            await message.reply({
-              content: NotSendableMessage,
-              allowedMentions: {
-                repliedUser: false
-              }
-            });
-          }
-          catch{}
-          return;
-        }
-        // コマンドの処理
-        await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
-      }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
-        // searchコマンドのキャンセルを捕捉
-        if(message.content === "キャンセル" || message.content === "cancel") {
-          const msgId = this.data[message.guild.id].SearchPanel.Msg;
-          if(msgId.userId !== message.author.id) return;
-          this.data[message.guild.id].SearchPanel = null;
-          await message.channel.send("✅キャンセルしました");
-          try{
-            const ch = await client.channels.fetch(msgId.chId);
-            const msg = await (ch as discord.TextChannel).messages.fetch(msgId.id);
-            await msg.delete();
+            for(let j=0;j<queue.data.length;j++){
+              await this.data[id].Queue.AutoAddQueue(client, queue.data[j].url, null, "unknown", false, false, null, null, queue.data[j]);
+            }
+            if(vid != "0"){
+              const vc = await client.channels.fetch(vid) as discord.VoiceChannel;
+              voice.joinVoiceChannel({
+                channelId: vc.id,
+                guildId: vc.guild.id,
+                adapterCreator: vc.guild.voiceAdapterCreator
+              });
+              await this.data[id].Player.Play();
+            }
           }
           catch(e){
-            log(e, "error");
+            log(e, "warn");
           }
         }
-        // searchコマンドの選択を捕捉
-        else if(NormalizeText(message.content).match(/^([0-9]\s?)+$/)){
-          const panel = this.data[message.guild.id].SearchPanel;
-          if(!panel) return;
-          // メッセージ送信者が検索者と一致するかを確認
-          if(message.author.id !== panel.Msg.userId) return;
-          const nums = NormalizeText(message.content).split(" ");
-          const responseMessage = await(await this.client.channels.fetch(panel.Msg.chId) as discord.TextChannel).messages.fetch(panel.Msg.id);
-          await this.playFromSearchPanelOptions(nums, message.guild.id, ResponseMessage.createFromMessage(responseMessage, null));
-        }
-      }else if(
-        this.cancellations.filter(c => !c.Cancelled).length > 0 && 
-        (message.content === "キャンセル" || message.content === "cancel")
-        ){
-        this.cancellations.forEach(c => c.Cancel());
-        message.channel.send("処理中の処理をすべてキャンセルしています....").catch(e => log(e, "error"));
       }
-    });
+      log("[Main]Finish queues and states recovery.");
+    }else{
+      log("[Main]Cannot perform queues and states recovery. Check .env file to perform.", "warn");
+    }
 
-    client.on("interactionCreate", async(interaction)=>{
-      if(maintenance){
-        if(!process.env.ADMIN_USER || interaction.user.id !== process.env.ADMIN_USER)
+    // Set activity
+    if(!this.maintenance){
+      client.user.setActivity({
+        type: "LISTENING",
+        name: "音楽"
+      });
+
+      // Set main tick
+      const tick = ()=>{
+        this.Log();
+        setTimeout(tick, 4 * 60 * 1000);
+        PageToggle.Organize(this.EmbedPageToggle, 5);
+        this.BackupData();
+      };
+      setTimeout(tick, 1 * 60 * 1000);
+    }
+    log("[Main]Main tick was set successfully");
+
+    // Command instance preparing
+    CommandsManager.Instance.Check();
+    log("[Main]Finish preparing commands");
+
+    // Finish initializing
+    this.isReadyFinished = true;
+    log("[Main]Bot is ready");
+  }
+
+  private async onMessageCreate(message:discord.Message){
+    this.addOn.emit("messageCreate", message);
+    if(this.maintenance){
+      if(!process.env.ADMIN_USER || message.author.id !== process.env.ADMIN_USER)
+        return;
+    }
+    // botのメッセやdm、およびnewsは無視
+    if(!this.isReadyFinished || message.author.bot || message.channel.type !== "GUILD_TEXT") return;
+    // データ初期化
+    this.initData(message.guild.id, message.channel.id);
+    // プレフィックスの更新
+    this.updatePrefix(message);
+    if(message.content === "<@" + this.client.user.id + ">") {
+      // メンションならば
+      message.channel
+        .send("コマンドは、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`で確認できます")
+        .catch(e => log(e, "error"));
+      return;
+    }
+    if(message.content.startsWith(this.data[message.guild.id].PersistentPref.Prefix)){
+      // コマンドメッセージを作成
+      const commandMessage = CommandMessage.createFromMessage(message, this.data);
+      // コマンドを解決
+      const command = CommandsManager.Instance.resolve(commandMessage.command);
+      if(!command) return;
+      // 送信可能か確認
+      if(!(await CheckSendable(message.channel as discord.TextChannel, message.guild.members.resolve(this.client.user)))){
+        try{
+          await message.reply({
+            content: NotSendableMessage,
+            allowedMentions: {
+              repliedUser: false
+            }
+          });
+        }
+        catch{}
         return;
       }
-      if(interaction.user.bot) return;
-      // データ初期化
-      this.initData(interaction.guild.id, interaction.channel.id);
-      // コマンドインタラクション
-      if(interaction.isCommand()){
-        log("[Main]Command Interaction received");
-        if(!interaction.channel.isText()){
-          await interaction.reply("テキストチャンネルで実行してください");
-          return;
+      // コマンドの処理
+      await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
+    }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
+      // searchコマンドのキャンセルを捕捉
+      if(message.content === "キャンセル" || message.content === "cancel") {
+        const msgId = this.data[message.guild.id].SearchPanel.Msg;
+        if(msgId.userId !== message.author.id) return;
+        this.data[message.guild.id].SearchPanel = null;
+        await message.channel.send("✅キャンセルしました");
+        try{
+          const ch = await this.client.channels.fetch(msgId.chId);
+          const msg = await (ch as discord.TextChannel).messages.fetch(msgId.id);
+          await msg.delete();
         }
-        // 送信可能か確認
-        if(!(await CheckSendable(interaction.channel as discord.TextChannel, interaction.guild.members.resolve(this.client.user)))){
-          await interaction.reply(NotSendableMessage);
-          return;
-        }
-        // コマンドを解決
-        const command = CommandsManager.Instance.resolve(interaction.commandName);
-        if(command){
-          // 遅延リプライ
-          await interaction.deferReply();
-          // メッセージライクに解決してコマンドメッセージに
-          const commandMessage = CommandMessage.createFromInteraction(this.client, interaction);
-          // コマンドを実行
-          await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
-        }else{
-          await interaction.reply("おっと！なにかが間違ってしまったようです。\r\nコマンドが見つかりませんでした。 :sob:");
-        }
-      // ボタンインタラクション
-      }else if(interaction.isButton()){
-        log("[Main]Button Interaction received");
-        await interaction.deferUpdate();
-        const l = this.EmbedPageToggle.filter(t => 
-          t.Message.channelId === interaction.channel.id && 
-          t.Message.id === interaction.message.id);
-        if(
-          l.length >= 1 &&
-          interaction.customId === PageToggle.arrowLeft || interaction.customId === PageToggle.arrowRight
-          ){
-            // ページめくり
-            await l[0].FlipPage(
-              interaction.customId === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
-              interaction.customId === PageToggle.arrowRight ? (l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current ) : 0
-              ,
-              interaction
-              );
-          }else{
-            await interaction.editReply("失敗しました!");
-          }
-      }else if(interaction.isSelectMenu()){
-        log("[Main]SelectMenu Interaction received");
-        // 検索パネル取得
-        const panel = this.data[interaction.guild.id].SearchPanel;
-        // なければ返却
-        if(!panel) return;
-        // インタラクションしたユーザーを確認
-        if(interaction.user.id !== panel.Msg.userId) return;
-        await interaction.deferUpdate();
-        if(interaction.customId === "search"){
-          if(interaction.values.indexOf("cancel") >= 0){
-            this.data[interaction.guild.id].SearchPanel = null;
-            await interaction.channel.send("✅キャンセルしました");
-            await interaction.deleteReply();
-          }else{
-            const message = interaction.message;
-            let responseMessage = null as ResponseMessage;
-            if(message instanceof discord.Message){
-              responseMessage = ResponseMessage.createFromInteractionWithMessage(interaction, message, null);
-            }else{
-              responseMessage = ResponseMessage.createFromInteraction(this.client, interaction, message, null);
-            }
-            await this.playFromSearchPanelOptions(interaction.values, interaction.guild.id, responseMessage)
-          }
+        catch(e){
+          log(e, "error");
         }
       }
-    });
+      // searchコマンドの選択を捕捉
+      else if(NormalizeText(message.content).match(/^([0-9]\s?)+$/)){
+        const panel = this.data[message.guild.id].SearchPanel;
+        if(!panel) return;
+        // メッセージ送信者が検索者と一致するかを確認
+        if(message.author.id !== panel.Msg.userId) return;
+        const nums = NormalizeText(message.content).split(" ");
+        const responseMessage = await(await this.client.channels.fetch(panel.Msg.chId) as discord.TextChannel).messages.fetch(panel.Msg.id);
+        await this.playFromSearchPanelOptions(nums, message.guild.id, ResponseMessage.createFromMessage(responseMessage, null));
+      }
+    }else if(
+      this.cancellations.filter(c => !c.Cancelled).length > 0 && 
+      (message.content === "キャンセル" || message.content === "cancel")
+      ){
+      this.cancellations.forEach(c => c.Cancel());
+      message.channel.send("処理中の処理をすべてキャンセルしています....").catch(e => log(e, "error"));
+    }
+  }
+
+  private async interactionCreate(interaction:discord.Interaction){
+    this.addOn.emit("interactionCreate", interaction);
+    if(this.maintenance){
+      if(!process.env.ADMIN_USER || interaction.user.id !== process.env.ADMIN_USER)
+      return;
+    }
+    if(interaction.user.bot) return;
+    // データ初期化
+    this.initData(interaction.guild.id, interaction.channel.id);
+    // コマンドインタラクション
+    if(interaction.isCommand()){
+      log("[Main]Command Interaction received");
+      if(!interaction.channel.isText()){
+        await interaction.reply("テキストチャンネルで実行してください");
+        return;
+      }
+      // 送信可能か確認
+      if(!(await CheckSendable(interaction.channel as discord.TextChannel, interaction.guild.members.resolve(this.client.user)))){
+        await interaction.reply(NotSendableMessage);
+        return;
+      }
+      // コマンドを解決
+      const command = CommandsManager.Instance.resolve(interaction.commandName);
+      if(command){
+        // 遅延リプライ
+        await interaction.deferReply();
+        // メッセージライクに解決してコマンドメッセージに
+        const commandMessage = CommandMessage.createFromInteraction(this.client, interaction);
+        // コマンドを実行
+        await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
+      }else{
+        await interaction.reply("おっと！なにかが間違ってしまったようです。\r\nコマンドが見つかりませんでした。 :sob:");
+      }
+    // ボタンインタラクション
+    }else if(interaction.isButton()){
+      log("[Main]Button Interaction received");
+      await interaction.deferUpdate();
+      const l = this.EmbedPageToggle.filter(t => 
+        t.Message.channelId === interaction.channel.id && 
+        t.Message.id === interaction.message.id);
+      if(
+        l.length >= 1 &&
+        interaction.customId === PageToggle.arrowLeft || interaction.customId === PageToggle.arrowRight
+        ){
+          // ページめくり
+          await l[0].FlipPage(
+            interaction.customId === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
+            interaction.customId === PageToggle.arrowRight ? (l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current ) : 0
+            ,
+            interaction
+            );
+        }else{
+          await interaction.editReply("失敗しました!");
+        }
+    }else if(interaction.isSelectMenu()){
+      log("[Main]SelectMenu Interaction received");
+      // 検索パネル取得
+      const panel = this.data[interaction.guild.id].SearchPanel;
+      // なければ返却
+      if(!panel) return;
+      // インタラクションしたユーザーを確認
+      if(interaction.user.id !== panel.Msg.userId) return;
+      await interaction.deferUpdate();
+      if(interaction.customId === "search"){
+        if(interaction.values.indexOf("cancel") >= 0){
+          this.data[interaction.guild.id].SearchPanel = null;
+          await interaction.channel.send("✅キャンセルしました");
+          await interaction.deleteReply();
+        }else{
+          const message = interaction.message;
+          let responseMessage = null as ResponseMessage;
+          if(message instanceof discord.Message){
+            responseMessage = ResponseMessage.createFromInteractionWithMessage(interaction, message, null);
+          }else{
+            responseMessage = ResponseMessage.createFromInteraction(this.client, interaction, message, null);
+          }
+          await this.playFromSearchPanelOptions(interaction.values, interaction.guild.id, responseMessage)
+        }
+      }
+    }
   }
 
   /**
@@ -350,7 +361,7 @@ export class MusicBot {
   /**
    * キューをエクスポートしてテキストにします
    */
-  exportQueue(guildId:string){
+  exportQueue(guildId:string):string{
     return JSON.stringify({
       version: YmxVersion,
       data: this.data[guildId].Queue.map(q => q.BasicInfo.exportData())
@@ -607,7 +618,7 @@ export class MusicBot {
    * 状況に応じてバインドチャンネルを更新します
    * @param message 更新元となるメッセージ
    */
-  protected async updateBoundChannel(message:CommandMessage){
+  private async updateBoundChannel(message:CommandMessage){
     // テキストチャンネルバインド
     // コマンドが送信されたチャンネルを後で利用します。
     if(
@@ -624,7 +635,7 @@ export class MusicBot {
    * プレフィックス更新します
    * @param message 更新元となるメッセージ
    */
-  protected updatePrefix(message:discord.Message):void{
+  private updatePrefix(message:discord.Message):void{
     const pmatch = message.guild.members.resolve(this.client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
     if(pmatch){
       if(this.data[message.guild.id].PersistentPref.Prefix !== pmatch.groups.prefix){
@@ -642,7 +653,7 @@ export class MusicBot {
    * @param member 検索者のメンバー
    * @param message 検索パネルが添付されたメッセージ自体を指す応答メッセージ
    */
-  protected async playFromSearchPanelOptions(nums:string[], guildid:string, message:ResponseMessage){
+  private async playFromSearchPanelOptions(nums:string[], guildid:string, message:ResponseMessage){
     const t = timer.start("MusicBot#playFromSearchPanelOptions");
     const panel = this.data[guildid].SearchPanel;
     const member = await (await this.client.guilds.fetch(guildid)).members.fetch(panel.Msg.userId);
