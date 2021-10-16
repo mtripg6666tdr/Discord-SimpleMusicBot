@@ -14,3 +14,5 @@ updates:
     ignore:
       - dependency-name: "soundcloud.ts"
       - dependency-name: "node"
+      - dependency-name: "discord.js"
+      - dependency-name: "discord-api-types"

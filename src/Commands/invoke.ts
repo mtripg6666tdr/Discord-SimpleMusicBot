@@ -5,7 +5,7 @@ export default class Invoke implements CommandInterface {
   name = "インボーク";
   alias = ["invoke"];
   description = "指定されたコマンドを実行します。基本的に使用しないでください";
-  unlist = true;
+  unlist = false;
   category = "utility";
   argument = [{
     name: "command",

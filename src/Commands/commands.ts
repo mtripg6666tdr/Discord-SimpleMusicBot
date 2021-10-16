@@ -10,7 +10,6 @@ export default class Commands implements CommandInterface{
   description = "コマンド一覧を表示します。コマンド名を渡すとそのコマンドの詳細を表示します。";
   unlist = false;
   category = "bot";
-  commands = null as CommandInterface[];
   usage = "command [コマンド名]";
   examples = "command search";
   argument = [{
@@ -35,7 +34,7 @@ export default class Commands implements CommandInterface{
         return categories[label as any] as string;
       };
       const categoriesList = ["voice", "player", "playlist", "utility", "bot"];
-      const rawcommands = this.commands.filter(ci => !ci.unlist);
+      const rawcommands = CommandsManager.Instance.Commands.filter(ci => !ci.unlist);
       const commands = {} as {[category:string]:CommandInterface[]};
       // Generate command list
       for(let i = 0; i < rawcommands.length; i++){
@@ -50,11 +49,11 @@ export default class Commands implements CommandInterface{
         embed.push(
           new discord.MessageEmbed()
           .setTitle(getCategoryText(categoriesList[i]))
-          .addFields(commands[categoriesList[i]].map(ci => {return {
+          .addFields(commands[categoriesList[i]].map(ci => ({
             name: ci.name + ", " + ci.alias.join(", "),
             value: ci.description,
             inline: true
-          } as discord.EmbedField}))
+          } as discord.EmbedField)))
         );
       }
       for(let i = 0; i < embed.length; i++){

@@ -19,6 +19,7 @@ export class PlayManager extends ManagerBase {
   errorCount = 0;
   errorUrl = "";
   private stopped = false;
+  private streamEnd = false;
   get CurrentVideoUrl():string{
     if(this.CurrentVideoInfo) return this.CurrentVideoInfo.Url;
     return "";
@@ -61,9 +62,11 @@ export class PlayManager extends ManagerBase {
   // 再生します
   async Play():Promise<PlayManager>{
     // 再生できる状態か確認
-    if(!this.IsConnecting 
+    if(
+      !this.IsConnecting 
       || (this.AudioPlayer && this.AudioPlayer.state.status !== voice.AudioPlayerStatus.Idle) 
-      || this.info.Queue.Nothing) {
+      || this.info.Queue.Nothing
+    ) {
       log("[PlayManager/" + this.info.GuildID + "]Play() called but operated nothing", "warn");
       return this;
     }
@@ -104,11 +107,20 @@ export class PlayManager extends ManagerBase {
         this.AudioPlayer = voice.createAudioPlayer();
         // 各種イベント設定
         this.AudioPlayer.on(voice.AudioPlayerStatus.Idle, (oldstate, newstate)=> {
-          if(oldstate.status === voice.AudioPlayerStatus.Playing 
-            && newstate.status === voice.AudioPlayerStatus.Idle
-            && !this.error
-            && !this.stopped
-            ){
+          const valueLog = (value:boolean, label:string) => {
+            log("[PlayManager:" + this.info.GuildID + "]AudioPlayerFinishEval: " + value + "(" + label + ")");
+            return value;
+          };
+          if(
+            valueLog(
+              valueLog(oldstate.status === voice.AudioPlayerStatus.Playing, "OldStatusIsPlaying") 
+              && valueLog(newstate.status === voice.AudioPlayerStatus.Idle, "NewStatusIsIdle")
+              && valueLog(!this.error, "IsNotError")
+              && valueLog(!this.stopped, "IsNotManuallyStopped")
+              && valueLog((oldstate as voice.AudioPlayerPlayingState).resource.ended, "ResourceEnded")
+              && valueLog(this.streamEnd, "StreamEndHasAlreadyEmitted")
+            ,"AllStatusesMet")
+          ){
             this.onStreamFinished();
           }
         });
@@ -126,7 +138,7 @@ export class PlayManager extends ManagerBase {
             cantPlay();
           });
         }
-        this.AudioPlayer.on("unsubscribe", (subscription)=>{
+        this.AudioPlayer.on("unsubscribe", (_)=>{
           this.AudioPlayer.stop(true);
           this.AudioPlayer = null;
         });
@@ -144,11 +156,22 @@ export class PlayManager extends ManagerBase {
       }
       this.error = false;
       this.stopped = false;
+      this.streamEnd = false;
       t.end();
       // 再生
       const u = timer.start("PlayManager#Play->EnterPlayingState");
-      this.AudioPlayer.play(stream);
-      await voice.entersState(this.AudioPlayer, voice.AudioPlayerStatus.Playing, 10e3);
+      try{
+        this.AudioPlayer.play(stream);
+        await voice.entersState(this.AudioPlayer, voice.AudioPlayerStatus.Playing, 10e4);
+        if(this.AudioPlayer.state.status === voice.AudioPlayerStatus.Playing){
+          (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource.playStream.on("end", () => {
+            log("[PlayManager/" + this.info.GuildID + "]Stream end emitted");
+            this.streamEnd = true;
+          });
+        }else{
+          this.streamEnd = true;
+        }
+      }catch{}
       u.end();
       log("[PlayManager/" + this.info.GuildID + "]Play() started successfully");
       if(this.info.boundTextChannel && ch && mes){

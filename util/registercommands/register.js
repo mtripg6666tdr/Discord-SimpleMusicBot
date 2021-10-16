@@ -2,7 +2,7 @@
 require("dotenv").config();
 const { REST } = require("@discordjs/rest");
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { Command } = require("../../dist/Commands");
+const { CommandsManager } = require("../../dist/Commands");
 const rest = new REST({version: '9'}).setToken(process.env.TOKEN);
 
 /**
@@ -14,7 +14,7 @@ module.exports = function(route){
   /**
    * @type { import("../../src/Commands").CommandInterface[] }
    */
-  const commands = new Command().commands.filter(
+  const commands = new CommandsManager().commands.filter(
     /**
      * 
      * @param { import("../../src/Commands").CommandInterface } c 
