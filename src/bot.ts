@@ -113,6 +113,7 @@ export class MusicBot {
                 voice.joinVoiceChannel({
                   channelId: vc.id,
                   guildId: vc.guild.id,
+                  // @ts-ignore
                   adapterCreator: vc.guild.voiceAdapterCreator
                 });
                 await this.data[id].Player.Play();
@@ -450,6 +451,7 @@ export class MusicBot {
         voice.joinVoiceChannel({
           channelId: message.member.voice.channel.id,
           guildId: message.member.guild.id,
+          // @ts-ignore
           adapterCreator: message.member.guild.voiceAdapterCreator,
           debug: Boolean(process.env.DEBUG)
         }).on("debug", (mes) => log("[Connection]" + mes));
