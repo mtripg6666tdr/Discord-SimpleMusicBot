@@ -77,6 +77,19 @@ $ npm uninstall node-opus
 $ npm uninstall opusscript
 $ npm install @discordjs/opus
 ```
+
+### ライブラリとして使用する
+本ボットをそのままライブラリとして使用することができます。
+```bash
+npm i mtripg6666tdr/Discord-SimpleMusicBot
+```
+```ts
+import MusicBot from "discord-music-bot";
+const bot = new MusicBot();
+bot.Run(/* token */);
+```
+エクスポートされているのは[`こちら`](src/bot.ts)の`MusicBot`クラスです。型定義についてはこちらを参照してください。
+
 ## 使用する権限
 ボットの権限フラグの整数は`3271680`です。
 |権限名|権限名(日本語)|権限の説明|
@@ -180,6 +193,29 @@ APIサーバーは以下の仕様に沿うようにしてください。
 > ```
 
 レスポンス: トークンが一致すればデータベースを更新し、成功すればHTTP 200を返却。失敗すればそれ以外を返却。コンテンツは不要。
+</details>
+
+## アドオン機能について
+本ボットは、ちょっとした追加機能を追加することができます。
+<details>
+  <summary>詳細は開く</summary>
+  
+  アドオン機能を追加するには、プロジェクトの`src`フォルダと同じ階層に`addon`フォルダを作成します。
+  ボットは、addonフォルダにある拡張子がjsのファイルを自動的にアドオンとして実行します。  
+  `サンプル.js`
+  ```js
+module.exports = function(parent){
+  console.log("aaa");
+  parent.on("ready", ()=> {
+    console.log("Ready called!");
+  });
+}
+  ```
+  jsファイルは、関数ひとつをデフォルトエクスポートしてください。関数はボットの起動時に呼ばれ、引数を一つ受け取ります。  
+  引数は`EventEmitter`となっており、`discord.js`の`Client.on`、`Client.once`、`Client.off`などと同じようにイベントハンドラを設定することができます。
+  サポートされるイベント名は`ready`、`messageCreate`、`interactionCreate`です。イベントの引数は、`discord.js`と同じです。
+  - イベントをハンドルして本来のボットの操作を中断したりフィルターしたりすることはできません。
+  - イベントはボットの本来の動作の前に呼ばれます。
 </details>
   
 ## 注意
