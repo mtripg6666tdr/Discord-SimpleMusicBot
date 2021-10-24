@@ -7,6 +7,7 @@ import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, DownloadAsReadable, InitPassThrough, isAvailableRawVideoURL, log, timer } from "../Util";
 import { ManagerBase } from "./ManagerBase";
 import { FFmpeg } from "prism-media";
+import { FixedAudioResource } from "./AudioResource";
 
 /**
  * サーバーごとの再生を管理するマネージャー。
@@ -147,7 +148,7 @@ export class PlayManager extends ManagerBase {
       const t = timer.start("PlayManager#Play->FetchAudioSource");
       // QueueContentからストリーム、M3U8プレイリスト(非HLS)または直URLを取得
       const rawStream = await this.CurrentVideoInfo.fetch();
-      let stream:voice.AudioResource = this.ResolveStream(rawStream);
+      const stream = FixedAudioResource.fromAudioResource(this.ResolveStream(rawStream));
       // fetchおよび処理中に切断された場合処理を終了
       const connection = voice.getVoiceConnection(this.info.GuildID);
       if(!connection) {
