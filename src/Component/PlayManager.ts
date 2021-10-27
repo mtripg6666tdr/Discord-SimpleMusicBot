@@ -327,6 +327,9 @@ export class PlayManager extends ManagerBase {
   }
 
   private async onStreamFinished(){
+    if(this.AudioPlayer && this.AudioPlayer.state.status !== voice.AudioPlayerStatus.Idle){
+      await voice.entersState(this.AudioPlayer, voice.AudioPlayerStatus.Idle, 1e5);
+    }
     // ストリームが終了したら時間を確認しつつ次の曲へ移行
     log("[PlayManager/" + this.info.GuildID + "]Stream finished");
     // 再生が終わったら
