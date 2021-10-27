@@ -20,7 +20,6 @@ export class PlayManager extends ManagerBase {
   errorCount = 0;
   errorUrl = "";
   private stopped = false;
-  private streamEnd = false;
   get CurrentVideoUrl():string{
     if(this.CurrentVideoInfo) return this.CurrentVideoInfo.Url;
     return "";
@@ -106,25 +105,6 @@ export class PlayManager extends ManagerBase {
       if(!this.AudioPlayer){
         const t = timer.start("PlayManager#Play->InitAudioPlayer");
         this.AudioPlayer = voice.createAudioPlayer();
-        // 各種イベント設定
-        this.AudioPlayer.on(voice.AudioPlayerStatus.Idle, (oldstate, newstate)=> {
-          const valueLog = (value:boolean, label:string) => {
-            log("[PlayManager:" + this.info.GuildID + "]AudioPlayerFinishEval: " + value + "(" + label + ")");
-            return value;
-          };
-          if(
-            valueLog(
-              valueLog(oldstate.status === voice.AudioPlayerStatus.Playing, "OldStatusIsPlaying") 
-              && valueLog(newstate.status === voice.AudioPlayerStatus.Idle, "NewStatusIsIdle")
-              && valueLog(!this.error, "IsNotError")
-              && valueLog(!this.stopped, "IsNotManuallyStopped")
-              && valueLog((oldstate as voice.AudioPlayerPlayingState).resource.ended, "ResourceEnded")
-              && valueLog(this.streamEnd, "StreamEndHasAlreadyEmitted")
-            ,"AllStatusesMet")
-          ){
-            this.onStreamFinished();
-          }
-        });
         voice.getVoiceConnection(this.info.GuildID).subscribe(this.AudioPlayer);
         if(!process.env.DEBUG){
           this.AudioPlayer.on("error", (e)=>{
@@ -157,21 +137,23 @@ export class PlayManager extends ManagerBase {
       }
       this.error = false;
       this.stopped = false;
-      this.streamEnd = false;
       t.end();
       // 再生
       const u = timer.start("PlayManager#Play->EnterPlayingState");
       try{
         this.AudioPlayer.play(stream);
         await voice.entersState(this.AudioPlayer, voice.AudioPlayerStatus.Playing, 10e4);
-        if(this.AudioPlayer.state.status === voice.AudioPlayerStatus.Playing){
-          (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource.playStream.on("end", () => {
-            log("[PlayManager/" + this.info.GuildID + "]Stream end emitted");
-            this.streamEnd = true;
+        stream.events
+          .on("error", er => {
+            log("Error", "error");
+            log(JSON.stringify(er), "error");
+            mes.edit(":tired_face:曲の再生に失敗しました...。" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。"));
+            cantPlay();  
+          })
+          .on("end", () => {
+            this.onStreamFinished();
           });
-        }else{
-          this.streamEnd = true;
-        }
+
       }catch{}
       u.end();
       log("[PlayManager/" + this.info.GuildID + "]Play() started successfully");
