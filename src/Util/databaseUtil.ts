@@ -55,13 +55,13 @@ export abstract class DatabaseAPI {
   static async SetQueueData(data:{guildid:string, queue:string}[]){
     if(this.CanOperate){
       const ids = data.map(d => d.guildid).join(",");
-      let rawData = {} as {[guildis:string]:string};
-      data.forEach(d => rawData[d.guildid] = d.queue);
+      let rawData = {} as {[guildid:string]:string};
+      data.forEach(d => rawData[d.guildid] = encodeURIComponent(d.queue));
       try{
         const result = await this.HttpRequest("POST", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
           guildid: ids,
-          data: encodeURIComponent(JSON.stringify(rawData)),
+          data: JSON.stringify(rawData),
           type: "queue"
         } as requestBody, MIME_JSON);
         return result.status === 200;
