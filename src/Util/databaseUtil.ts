@@ -101,7 +101,7 @@ export abstract class DatabaseAPI {
   static async HttpRequest(method:"GET"|"POST", url:string, data?:requestBody, mimeType?:string){
     return new Promise<postResult>((resolve, reject) => {
       if(method === "GET"){
-        url += "?token=" + data.token + "&guildid=" + data.guildid + "&type=" + data.type + "&data=" + data.data;
+        url += "?" + (Object.keys(data) as (keyof requestBody)[]).map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k])).join("&");
       }
       const durl = new URL(url);
       const opt = {
@@ -120,7 +120,9 @@ export abstract class DatabaseAPI {
         res.on("data", (chunk) => data+=chunk);
         res.on("end", ()=> {
           try{
-            resolve(JSON.parse(decodeURIComponent(data)) as postResult)
+            let parsed = JSON.parse(data) as postResult;
+            Object.keys(parsed.data).forEach(k => parsed.data[k] = decodeURIComponent(parsed.data[k]));
+            resolve(parsed);
           }
           catch{
             reject();
