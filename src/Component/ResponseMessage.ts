@@ -42,6 +42,7 @@ export class ResponseMessage {
     me.isMessage = false;
     me._interaction = interaction;
     if(message.author.id !== client.user.id) throw new Error("メッセージは応答メッセージではありません");
+    // @ts-ignore
     me._message = new Message(client, message);
     me._commandMessage = commandMessage;
     return me;
