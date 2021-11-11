@@ -8,7 +8,7 @@
   "dependencies": {
     "@discordjs/builders": "^0.8.2",
     "@discordjs/rest": "0.1.0-canary.0",
-    "@discordjs/voice": "^0.6.0",
+    "@discordjs/voice": "^0.7.3",
     "@types/follow-redirects": "^1.13.1",
     "@types/node": "^16.11.7",
     "@types/ws": "^8.2.0",
