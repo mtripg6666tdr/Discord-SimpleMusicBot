@@ -11,7 +11,7 @@
     "@discordjs/voice": "^0.6.0",
     "@types/follow-redirects": "^1.13.1",
     "@types/node": "^16.11.10",
-    "@types/ws": "^8.2.0",
+    "@types/ws": "^8.2.1",
     "abort-controller": "^3.0.0",
     "discord-api-types": "^0.22.0",
     "discord.js": "^13.1.0",
