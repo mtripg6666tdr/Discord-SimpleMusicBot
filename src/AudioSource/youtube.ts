@@ -15,8 +15,6 @@ export class YouTube extends AudioSource {
   private ytdlInfo = null as ytdl.videoInfo;
   private youtubeDlInfo = null as YoutubeDlInfo;
   ChannelName:string;
-  Like:number;
-  Dislike:number;
   Thumnail:string;
   LiveStream:boolean;
   relatedVideos:exportableYouTube[] = [];
@@ -36,8 +34,6 @@ export class YouTube extends AudioSource {
       this.ChannelName = prefetched.channel;
       this.Thumnail = prefetched.thumbnail;
       this.LiveStream = prefetched.isLive;
-      this.Like = -1;
-      this.Dislike = -1;
     }else{
       try{
         const agent = process.env.PROXY && HttpsProxyAgent.default(process.env.PROXY);
@@ -61,8 +57,6 @@ export class YouTube extends AudioSource {
         this.Description = info.videoDetails.description;
         this._lengthSeconds = Number(info.videoDetails.lengthSeconds ?? 0);
         this.ChannelName = info.videoDetails.ownerChannelName;
-        this.Like = info.videoDetails.likes ?? -1;
-        this.Dislike = info.videoDetails.dislikes ?? -1;
         this.Thumnail = info.videoDetails.thumbnails[0].url;
         this.LiveStream = info.videoDetails.isLiveContent;
         this.fallback = false;
@@ -81,8 +75,6 @@ export class YouTube extends AudioSource {
         this.Description = info.description;
         this._lengthSeconds = Number(info.duration);
         this.ChannelName = info.channel;
-        this.Like = info.like_count;
-        this.Dislike = info.dislike_count;
         this.Thumnail = info.thumbnail;
       }
     }
@@ -184,13 +176,6 @@ export class YouTube extends AudioSource {
       value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, (verbose ? 1000 : 300)) + "..." : this.Description,
       inline: false
     });
-    if(this.Like !== -1){
-      fields.push({
-        name: "⭐評価",
-        value: ":+1:" + this.Like + "/:-1:" + this.Dislike,
-        inline: false
-      });
-    }
     return fields;
   }
 
