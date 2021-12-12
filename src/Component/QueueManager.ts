@@ -273,6 +273,7 @@ export class QueueManager extends ManagerBase {
     let index = 0;
     for(let i = 0; i < totalCount; i++){
       const item = playlist[i];
+      if(!item) continue;
       const exportable = await exportableConsumer(item);
       const _result = await this.AutoAddQueue(client, exportable.url, msg.command.member, identifer, first, false, null, null, exportable);
       if(_result) index++;

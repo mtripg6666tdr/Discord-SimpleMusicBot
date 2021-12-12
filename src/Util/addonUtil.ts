@@ -39,12 +39,19 @@ export class addOn extends EventEmitter {
 
   constructor(){
     super({captureRejections: false});
-    fs.readdirSync(path.join(__dirname, "../../addon/"), {withFileTypes: true})
-    .filter(d => d.isFile())
-    .map(d => require("../../addon/" + d.name.slice(0, -3)))
-    .filter(d => typeof d === "function")
-    .forEach(d => {
-      d(this);
-    });
+    try{
+      fs.readdirSync(path.join(__dirname, "../../addon/"), {withFileTypes: true})
+      .filter(d => d.isFile())
+      .map(d => require("../../addon/" + d.name.slice(0, -3)))
+      .filter(d => typeof d === "function")
+      .forEach(d => {
+        try {
+          d(this);
+        }
+        catch{}
+      });
+    }
+    catch{
+    }
   }
 }
