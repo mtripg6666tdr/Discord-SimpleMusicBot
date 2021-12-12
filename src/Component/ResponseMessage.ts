@@ -1,5 +1,5 @@
-import { APIMessage } from "discord-api-types";
-import { Client, CommandInteraction, EmojiIdentifierResolvable, Message, MessageEditOptions, SelectMenuInteraction } from "discord.js";
+import type { APIMessage } from "discord-api-types";
+import { type Client, CommandInteraction, EmojiIdentifierResolvable, Message, MessageEditOptions, SelectMenuInteraction } from "discord.js";
 import { timer } from "../Util";
 import { CommandMessage } from "./CommandMessage";
 

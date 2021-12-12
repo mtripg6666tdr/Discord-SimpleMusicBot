@@ -1,4 +1,4 @@
-import { EmbedField } from "discord.js";
+import type { EmbedField } from "discord.js";
 import SoundCloud, { SoundcloudTrackV2 } from "soundcloud.ts";
 import { InitPassThrough } from "../Util";
 import { AudioSource } from "./audiosource";

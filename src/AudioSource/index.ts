@@ -6,3 +6,4 @@ export * from "./hibiki";
 export * from "./soundcloud";
 export * from "./streamable";
 export * from "./youtube";
+export * from "./youtube.spawner";

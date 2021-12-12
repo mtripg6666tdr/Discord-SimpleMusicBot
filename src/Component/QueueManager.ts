@@ -1,13 +1,14 @@
-import { Client, GuildMember, Message, MessageEmbed, TextChannel } from "discord.js";
+import type { Client, GuildMember, Message, TextChannel } from "discord.js";
+import type { exportableCustom } from "../AudioSource";
+import { MessageEmbed } from "discord.js";
 import * as ytdl from "ytdl-core";
 import * as AudioSource from "../AudioSource";
-import { FallBackNotice, GuildDataContainer } from "../definition";
+import { FallBackNotice, type GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log, timer } from "../Util";
 import { ResponseMessage } from "./ResponseMessage";
 import { ManagerBase } from "./ManagerBase";
 import { PageToggle } from "./PageToggle";
-import { exportableCustom } from "../AudioSource";
 import { TaskCancellationManager } from "./TaskCancellationManager";
 
 export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"unknown";
@@ -107,7 +108,8 @@ export class QueueManager extends ManagerBase {
     
     if(type === "youtube" || (type === "unknown" && ytdl.validateURL(url))){
       // youtube
-      result.BasicInfo = await new AudioSource.YouTube().init(url, gotData as AudioSource.exportableYouTube, this.length === 0 || method === "unshift" || this.LengthSeconds < 4 * 60 * 60 * 1000);
+      //result.BasicInfo = await new AudioSource.YouTube().init(url, gotData as AudioSource.exportableYouTube, this.length === 0 || method === "unshift" || this.LengthSeconds < 4 * 60 * 60 * 1000);
+      result.BasicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.exportableYouTube, this.length === 0 || method === "unshift" || this.LengthSeconds < 4 * 60 * 60 * 1000);
     }else if(type === "custom" || (type === "unknown" && isAvailableRawAudioURL(url))){
       // カスタムストリーム
       result.BasicInfo = await new AudioSource.CustomStream().init(url);

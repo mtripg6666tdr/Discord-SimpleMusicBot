@@ -1,10 +1,12 @@
-import { Client, Message, MessageEmbed, TextChannel } from "discord.js";
+import type { Client, Message, TextChannel } from "discord.js";
+import type { defaultM3u8stream } from "../AudioSource";
+import { MessageEmbed } from "discord.js";
 import * as voice from "@discordjs/voice";
 import { Readable } from "stream";
-import { AudioSource, defaultM3u8stream, YouTube } from "../AudioSource";
-import { FallBackNotice, GuildDataContainer } from "../definition";
+import { AudioSource, YouTube } from "../AudioSource";
+import { FallBackNotice, type GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, DownloadAsReadable, InitPassThrough, isAvailableRawVideoURL, log, timer } from "../Util";
+import { CalcHourMinSec, CalcMinSec, InitPassThrough, isAvailableRawVideoURL, log, timer } from "../Util";
 import { ManagerBase } from "./ManagerBase";
 import { FFmpeg } from "prism-media";
 import { FixedAudioResource } from "./AudioResource";

@@ -1,12 +1,14 @@
+import type { exportableCustom } from "./AudioSource";
+import type { YmxFormat } from "./definition";
+import type { CommandArgs } from "./Commands";
 import { execSync } from "child_process";
 import * as discord from "discord.js";
 import * as voice from "@discordjs/voice";
 import * as ytpl from "ytpl";
-import { exportableCustom } from "./AudioSource";
-import { CommandsManager, CommandArgs } from "./Commands";
+import { CommandsManager } from "./Commands";
 import { PageToggle } from "./Component/PageToggle";
 import { TaskCancellationManager } from "./Component/TaskCancellationManager";
-import { GuildDataContainer, NotSendableMessage, YmxFormat, YmxVersion } from "./definition";
+import { GuildDataContainer, NotSendableMessage, YmxVersion } from "./definition";
 import { getColor } from "./Util/colorUtil";
 import { DatabaseAPI } from "./Util/databaseUtil";
 import {

@@ -1,6 +1,6 @@
+import type * as Sources from ".";
 import { EmbedField } from "discord.js";
 import { Readable } from "stream";
-import * as Sources from ".";
 import { exportableCustom } from "./custom";
 
 export abstract class AudioSource {

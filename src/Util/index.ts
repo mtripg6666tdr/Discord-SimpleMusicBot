@@ -1,7 +1,7 @@
 import * as os from "os";
 import * as https from "https";
 import * as miniget from "miniget";
-import { Client, GuildMember, Message, TextChannel, User } from "discord.js";
+import type { Client, GuildMember, Message, TextChannel } from "discord.js";
 import { PassThrough, Readable } from "stream";
 export { log, logStore, timer } from "./logUtil";
 

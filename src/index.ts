@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import type { TextChannel } from "discord.js";
 import * as http from "http";
 import { MusicBot } from "./bot";
 import { btoa, log } from "./Util";

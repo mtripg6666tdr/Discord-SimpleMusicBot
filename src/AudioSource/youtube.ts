@@ -1,5 +1,5 @@
+import type { EmbedField } from "discord.js";
 import { exec } from "child_process";
-import { EmbedField } from "discord.js";
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 import m3u8stream from "m3u8stream";

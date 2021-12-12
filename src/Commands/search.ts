@@ -4,6 +4,7 @@ import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { log, timer } from "../Util";
+import { searchYouTube } from "../AudioSource";
 
 export default class Search implements CommandInterface {
   name = "検索";
@@ -48,11 +49,7 @@ export default class Search implements CommandInterface {
       s.end();
       try{
         const t = timer.start("Search(Command)->Ytsr");
-        const result = await ytsr.default(options.rawArgs, {
-          limit:12,
-          gl: "JP",
-          hl: "ja"
-        });
+        const result = await searchYouTube(options.rawArgs);
         t.end();
         const u = timer.start("Search(Command)->AfterYtsr");
         const embed = new discord.MessageEmbed();
