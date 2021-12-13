@@ -117,6 +117,7 @@ export class YouTube extends AudioSource {
         quality: this.LiveStream ? null : "highestaudio",
         isHLS: this.LiveStream,
       } as any);
+      log("[AudioSource:youtube]Format: " + format.itag + ", Bitrate: " + format.bitrate + ", codec:" + format.codecs);
       let readable = null as Readable;
       if(process.env.PROXY){
         readable = ytdl.downloadFromInfo(info, {
