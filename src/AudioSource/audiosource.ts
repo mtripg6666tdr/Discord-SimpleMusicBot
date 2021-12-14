@@ -1,5 +1,6 @@
 import type * as Sources from ".";
 import { EmbedField } from "discord.js";
+import * as voice from "@discordjs/voice";
 import { Readable } from "stream";
 import { exportableCustom } from "./custom";
 
@@ -25,7 +26,7 @@ export abstract class AudioSource {
   // 現在再生中の曲を示すEmbedField
   abstract toField(verbose:boolean):EmbedField[];
   // 再生するためのストリームをフェッチ
-  abstract fetch():Promise<Readable|string|defaultM3u8stream>;
+  abstract fetch():Promise<StreamInfo>;
   // クラスを初期化する非同期メソッド
   abstract init(url:string, prefetched:exportableCustom):Promise<AudioSource>;
   // 現在再生中の曲に関する追加データ
@@ -42,4 +43,6 @@ export abstract class AudioSource {
   isBestdoriS():this is Sources.BestdoriS {return this.ServiceIdentifer === "bestdori";}
 }
 
-export type defaultM3u8stream = {type:"HLS",url:string}
+export type StreamInfo = ReadableStreamInfo|UrlStreamInfo;
+export type ReadableStreamInfo = {type:"readable", stream:Readable, streamType?:voice.StreamType};
+export type UrlStreamInfo = {type:"url", url:string};

@@ -1,5 +1,6 @@
 import type { EmbedField } from "discord.js";
-import { PassThrough } from "stream";
+import * as voice from "@discordjs/voice";
+import { PassThrough, Readable } from "stream";
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 import m3u8stream from "m3u8stream";
@@ -7,6 +8,7 @@ import { log, timer } from "../Util";
 import { AudioSource } from "./audiosource";
 import { createChunkedYTStream } from "./youtube.stream";
 import { getYouTubeDlInfo, YoutubeDlInfo } from "./youtube.fallback";
+import { StreamInfo } from ".";
 
 export class YouTube extends AudioSource {
   // サービス識別子（固定）
@@ -71,7 +73,7 @@ export class YouTube extends AudioSource {
     return this;
   }
 
-  async fetch(){
+  async fetch():Promise<StreamInfo>{
     try{
       let info = this.ytdlInfo;
       const agent = process.env.PROXY && HttpsProxyAgent.default(process.env.PROXY);
@@ -99,10 +101,19 @@ export class YouTube extends AudioSource {
         quality: this.LiveStream ? null : "highestaudio",
         isHLS: this.LiveStream,
       } as ytdl.chooseFormatOptions);
-      log("[AudioSource:youtube]Format: " + format.itag + ", Bitrate: " + format.bitrate + ", codec:" + format.codecs);
-      const readable = createChunkedYTStream(info, format, 2 * 1024 * 1024);
+      log("[AudioSource:youtube]Format: " + format.itag + ", Bitrate: " + format.bitrate + ", Audio codec:" + format.audioCodec + ", Container: " + format.container);
+      let readable = null as Readable;
+      if(info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow){
+        readable = ytdl.downloadFromInfo(info, {format, lang: "ja"});
+      }else{
+        readable = createChunkedYTStream(info, format, {lang: "ja"}, 2 * 1024 * 1024);
+      }
       this.fallback = false;
-      return readable;
+      return {
+        type: "readable",
+        stream: readable,
+        streamType: format.container === "webm" && format.audioCodec === "opus" ? voice.StreamType.WebmOpus : undefined
+      };
     }
     catch{
       this.fallback = true;
@@ -124,11 +135,17 @@ export class YouTube extends AudioSource {
           .on("error", (e) => stream.emit("error", e))
           .pipe(stream)
           .on('error', (e) => stream.emit("error", e));
-        return stream;
+        return {
+          type: "readable",
+          stream,
+        };
       }else{
         const format = info.formats.filter(f => f.format_note==="tiny");
         format.sort((fa, fb) => fb.abr - fa.tbr);
-        return format[0].url;
+        return {
+          type: "url",
+          url: format[0].url
+        };
       }
     }
   }

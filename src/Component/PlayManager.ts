@@ -1,9 +1,8 @@
 import type { Client, Message, TextChannel } from "discord.js";
-import type { defaultM3u8stream } from "../AudioSource";
 import { MessageEmbed } from "discord.js";
 import * as voice from "@discordjs/voice";
 import { Readable } from "stream";
-import { AudioSource, YouTube } from "../AudioSource";
+import { AudioSource, StreamInfo, YouTube } from "../AudioSource";
 import { FallBackNotice, type GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, InitPassThrough, isAvailableRawVideoURL, log, timer, StringifyObject } from "../Util";
@@ -281,22 +280,14 @@ export class PlayManager extends ManagerBase {
     return this;
   }
 
-  private ResolveStream(rawStream:string|Readable|defaultM3u8stream):voice.AudioResource{
+  private ResolveStream(rawStream:StreamInfo):voice.AudioResource{
     let stream = null as voice.AudioResource;
-    if(typeof rawStream === "string"){
-      if(isAvailableRawVideoURL(rawStream)){
-        // URLでも動画なら直接渡す
-        stream = voice.createAudioResource(rawStream);
-      }else{
-        // ほかならストリーム化
-        stream = this.ResolveResourceURL(rawStream);
-      }
-    }else if((rawStream as defaultM3u8stream).type){
-      // M3U8プレイリストならURLを直接play
-      stream = this.ResolveResourceURL((rawStream as defaultM3u8stream).url);
+    if(rawStream.type === "url"){
+      // URLならFFmpegにわたしてOggOpusに変換
+      stream = voice.createAudioResource(this.CreateReadableFromUrl(rawStream.url), {inputType: voice.StreamType.OggOpus});
     }else{
-      // ストリームなら変換せずにそのままplay
-      const rstream = rawStream as Readable;
+      // ストリームなら変換しない
+      const rstream = rawStream.stream as Readable;
       if(!process.env.DEBUG){
         rstream.on('error', (e)=> {
           this.AudioPlayer.emit("error", {
@@ -305,39 +296,29 @@ export class PlayManager extends ManagerBase {
           } as unknown as voice.AudioPlayerError);
         });
       }
-      stream = voice.createAudioResource(rstream);
+      stream = voice.createAudioResource(rstream, {
+        inputType: rawStream.streamType
+      });
     }
     return stream;
   }
 
-  private ResolveResourceURL(url:string):voice.AudioResource{
-    const FFMPEG_OPUS_ARGUMENTS = [
-      '-analyzeduration',
-      '0',
-      '-loglevel',
-      '0',
-      '-acodec',
-      'libopus',
-      '-f',
-      'opus',
-      '-ar',
-      '48000',
-      '-ac',
-      '2',
-    ];
+  private CreateReadableFromUrl(url:string):Readable{
+    const FFMPEG_OPUS_ARGUMENTS = ['-analyzeduration', '0', '-loglevel', '0', '-acodec', 'libopus', '-f', 'opus', '-ar', '48000', '-ac', '2'];
     const args = ['-reconnect', '1', '-reconnect_streamed', '1', '-reconnect_on_network_error', '1', '-reconnect_on_http_error', '4xx,5xx', '-reconnect_delay_max', '30', '-i', url, ...FFMPEG_OPUS_ARGUMENTS];
     const passThrough = InitPassThrough();
     if(!process.env.DEBUG){
       passThrough.on("error", (e)=> {
         this.AudioPlayer.emit("error", {
-          ...e,
+          errorInfo: e,
           resource: (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource ?? null
-        });
+        } as unknown as voice.AudioPlayerError);
       });
     }
     const stream = new FFmpeg({args})
+      .on("error", (er) => passThrough.emit("error", er))
       .pipe(passThrough);
-    return voice.createAudioResource(stream, {inputType: voice.StreamType.OggOpus});
+    return stream;
   }
 
   private async onStreamFinished(){

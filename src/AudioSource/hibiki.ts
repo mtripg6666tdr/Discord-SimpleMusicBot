@@ -1,6 +1,7 @@
 import type { EmbedField } from "discord.js";
+import { UrlStreamInfo } from ".";
 import { DownloadText } from "../Util";
-import { AudioSource, type defaultM3u8stream } from "./audiosource"
+import { AudioSource } from "./audiosource"
 import { exportableCustom } from "./custom";
 
 export class Hibiki extends AudioSource {
@@ -26,12 +27,12 @@ export class Hibiki extends AudioSource {
     return this;
   }
 
-  async fetch(){
+  async fetch():Promise<UrlStreamInfo>{
     const playcheck = await HibikiApi.playCheck(this.radioInfo.episode.video.id.toString());
     return {
-      type:"HLS",
-      url:playcheck.playlist_url
-    } as defaultM3u8stream;
+      type: "url",
+      url: playcheck.playlist_url
+    };
   }
 
   toField():EmbedField[]{
