@@ -35,24 +35,15 @@ export class YouTube extends AudioSource {
       this.Thumnail = prefetched.thumbnail;
       this.LiveStream = prefetched.isLive;
     }else{
+      const agent = process.env.PROXY && HttpsProxyAgent.default(process.env.PROXY);
+      const requestOptions = agent ? {agent} : undefined;
       try{
-        const agent = process.env.PROXY && HttpsProxyAgent.default(process.env.PROXY);
-        let info = null as ytdl.videoInfo;
         const t = timer.start("YouTube(AudioSource)#init->GetInfo");
-        if(process.env.PROXY){
-          info = await ytdl.getInfo(url, {
-            lang: "ja",
-            requestOptions: {agent}
-          });
-        }else{
-          info = await ytdl.getInfo(url, {
-            lang: "ja"
-          });
-        }
+        let info = await ytdl.getInfo(url, {
+          lang: "ja", requestOptions
+        });
         t.end();
-        if(forceCache){
-          this.ytdlInfo = info;
-        }
+        if(forceCache) this.ytdlInfo = info;
         this.Title = info.videoDetails.title;
         this.Description = info.videoDetails.description;
         this._lengthSeconds = Number(info.videoDetails.lengthSeconds ?? 0);
@@ -67,9 +58,7 @@ export class YouTube extends AudioSource {
         const t = timer.start("YouTube(AudioSource)#init->GetInfo(Fallback)");
         const info = JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
         t.end();
-        if(forceCache){
-          this.youtubeDlInfo = info;
-        }
+        if(forceCache) this.youtubeDlInfo = info;
         this.LiveStream = info.is_live;
         this.Title = info.title;
         this.Description = info.description;
@@ -84,53 +73,35 @@ export class YouTube extends AudioSource {
   async fetch(){
     try{
       let info = this.ytdlInfo;
-      let agent = process.env.PROXY && HttpsProxyAgent.default(process.env.PROXY);
+      const agent = process.env.PROXY && HttpsProxyAgent.default(process.env.PROXY);
+      const requestOptions = agent ? {agent} : undefined;
       if(!info){
         const t = timer.start("YouTube(AudioSource)#fetch->GetInfo");
-        if(process.env.PROXY){
-          info = await ytdl.getInfo(this.Url, {
-            requestOptions: {agent},
-            lang: "ja"
-          });
-        }else{
-          info = await ytdl.getInfo(this.Url, {
-            lang: "ja"
-          });
-        }
+        info = await ytdl.getInfo(this.Url, {
+          lang: "ja", requestOptions
+        })
         t.end();
       }
-      this.relatedVideos = info.related_videos.map(video => {
-        return {
-          url: "https://www.youtube.com/watch?v=" + video.id,
-          title: video.title,
-          description: "関連動画として取得したため詳細は表示されません",
-          length: video.length_seconds,
-          channel: (video.author as ytdl.Author).name,
-          thumbnail: video.thumbnails[0].url,
-          isLive: video.isLive
-        }
-      }).filter(v => !v.isLive);
+      this.relatedVideos = info.related_videos.map(video => ({
+        url: "https://www.youtube.com/watch?v=" + video.id,
+        title: video.title,
+        description: "関連動画として取得したため詳細は表示されません",
+        length: video.length_seconds,
+        channel: (video.author as ytdl.Author).name,
+        thumbnail: video.thumbnails[0].url,
+        isLive: video.isLive
+      })).filter(v => !v.isLive);
       this.Description = info.videoDetails.description ?? "不明";
       if(info.videoDetails.title) this.Title = info.videoDetails.title;
       const format = ytdl.chooseFormat(info.formats, {
         filter: this.LiveStream ? null : "audioonly",
         quality: this.LiveStream ? null : "highestaudio",
         isHLS: this.LiveStream,
-      } as any);
+      } as ytdl.chooseFormatOptions);
       log("[AudioSource:youtube]Format: " + format.itag + ", Bitrate: " + format.bitrate + ", codec:" + format.codecs);
-      let readable = null as Readable;
-      if(process.env.PROXY){
-        readable = ytdl.downloadFromInfo(info, {
-          format: format,
-          requestOptions: {agent},
-          lang: "ja"
-        });
-      }else{
-        readable = ytdl.downloadFromInfo(info, {
-          format: format,
-          lang: "ja"
-        });
-      }
+      const readable = ytdl.downloadFromInfo(info, {
+        lang: "ja", format, requestOptions
+      });
       this.fallback = false;
       return readable;
     }
