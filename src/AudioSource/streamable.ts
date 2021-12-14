@@ -1,4 +1,4 @@
-import { EmbedField } from "discord.js";
+import type { EmbedField } from "discord.js";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { DownloadText } from "../Util";
 import { AudioSource } from "./audiosource";

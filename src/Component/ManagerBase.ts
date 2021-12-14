@@ -1,4 +1,4 @@
-import { GuildDataContainer } from "../definition";
+import type { GuildDataContainer } from "../definition";
 
 /**
  * すべてのマネージャークラスの基底クラスです

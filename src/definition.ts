@@ -1,7 +1,7 @@
-import { Client } from "discord.js";
+import type { Client } from "discord.js";
+import type { exportableCustom } from "./AudioSource";
+import type { MusicBot } from "./bot";
 import * as fs from "fs";
-import { exportableCustom } from "./AudioSource";
-import { MusicBot } from "./bot";
 import { PlayManager } from "./Component/PlayManager";
 import { QueueManager } from "./Component/QueueManager";
 

@@ -1,7 +1,7 @@
-import { EmbedField } from "discord.js";
+import type { EmbedField } from "discord.js";
+import type { exportableCustom } from "./custom";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { AudioSource } from "./audiosource";
-import { exportableCustom } from "./custom";
 
 export class GoogleDrive extends AudioSource {
   protected _lengthSeconds = 0;

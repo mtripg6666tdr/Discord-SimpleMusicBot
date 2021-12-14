@@ -1,4 +1,4 @@
-import { EmbedField } from "discord.js";
+import type { EmbedField } from "discord.js";
 import { AddZero, DownloadText } from "../Util";
 import { AudioSource } from "./audiosource";
 

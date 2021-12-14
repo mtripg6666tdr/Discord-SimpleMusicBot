@@ -1,6 +1,6 @@
-import { EmbedField } from "discord.js";
+import type { EmbedField } from "discord.js";
 import { DownloadText } from "../Util";
-import { AudioSource, defaultM3u8stream } from "./audiosource"
+import { AudioSource, type defaultM3u8stream } from "./audiosource"
 import { exportableCustom } from "./custom";
 
 export class Hibiki extends AudioSource {

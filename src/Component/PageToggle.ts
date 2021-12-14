@@ -1,5 +1,5 @@
+import type { ResponseMessage } from "./ResponseMessage";
 import { MessageActionRow, MessageButton, MessageComponentInteraction, MessageEmbed } from "discord.js";
-import { ResponseMessage } from "./ResponseMessage";
 
 /**
  * 最終的にメッセージの埋め込みに解決されるデータ
