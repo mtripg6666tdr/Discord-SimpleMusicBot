@@ -6,7 +6,7 @@ import { Readable } from "stream";
 import { AudioSource, YouTube } from "../AudioSource";
 import { FallBackNotice, type GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, InitPassThrough, isAvailableRawVideoURL, log, timer } from "../Util";
+import { CalcHourMinSec, CalcMinSec, InitPassThrough, isAvailableRawVideoURL, log, timer, StringifyObject } from "../Util";
 import { ManagerBase } from "./ManagerBase";
 import { FFmpeg } from "prism-media";
 import { FixedAudioResource } from "./AudioResource";
@@ -78,7 +78,7 @@ export class PlayManager extends ManagerBase {
     this.CurrentVideoInfo = this.info.Queue.get(0).BasicInfo;
     if(this.info.boundTextChannel){
       ch = await this.client.channels.fetch(this.info.boundTextChannel) as TextChannel;
-      const [min,sec] = CalcMinSec(this.CurrentVideoInfo.LengthSeconds);
+      const [min, sec] = CalcMinSec(this.CurrentVideoInfo.LengthSeconds);
       mes = await ch.send(":hourglass_flowing_sand: `" + this.CurrentVideoInfo.Title + "` `(" + min + ":" + sec + ")`の再生準備中...");
     }
     // 再生できない時の関数
@@ -109,13 +109,19 @@ export class PlayManager extends ManagerBase {
         this.AudioPlayer = voice.createAudioPlayer();
         voice.getVoiceConnection(this.info.GuildID).subscribe(this.AudioPlayer);
         if(!process.env.DEBUG){
-          this.AudioPlayer.on("error", (e)=>{
+          this.AudioPlayer.on("error", (e) => {
+            if(!e) return;
             // エラーが発生したら再生できないときの関数を呼んで逃げる
-            log(e.name + "\r\n" + e.message + "\r\n" + e.stack, "error");
+            log("Error:" + e.message, "error");
+            // @ts-ignore
+            const einfo = e.errorInfo;
+            if(einfo){
+              log(JSON.stringify(StringifyObject(einfo)), "error");
+            }
             if(this.info.boundTextChannel){
               this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
                 log("[PlayManager/" + this.info.GuildID + "]Some error occurred in AudioPlayer", "error");
-                (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? (e.message ?? e) : "undefined") + ")" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。")).catch(e => log(e, "error"));
+                (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? JSON.stringify(StringifyObject(e)) : "undefined") + ")" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。")).catch(e => log(e, "error"));
               }).catch(e => log(e, "error"));
             }
             cantPlay();
@@ -148,8 +154,13 @@ export class PlayManager extends ManagerBase {
         await voice.entersState(this.AudioPlayer, voice.AudioPlayerStatus.Playing, 10e4);
         stream.events
           .on("error", er => {
+            if(!er) return;
             log("Error", "error");
-            log(JSON.stringify(er), "error");
+            // @ts-ignore
+            const einfo = er.errorInfo;
+            if(einfo){
+              log(JSON.stringify(StringifyObject(einfo)), "error");
+            }
             mes.edit(":tired_face:曲の再生に失敗しました...。" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。"));
             cantPlay();  
           })
@@ -192,7 +203,7 @@ export class PlayManager extends ManagerBase {
     catch(e){
       log(e, "error");
       try{
-        const t = typeof e == "string" ? e : JSON.stringify(e);
+        const t = typeof e == "string" ? e : JSON.stringify(StringifyObject(e));
         if(t.indexOf("429") >= 0){
           mes.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(e => log(e, "error"));
           log("Rate limit detected", "error");
@@ -289,9 +300,9 @@ export class PlayManager extends ManagerBase {
       if(!process.env.DEBUG){
         rstream.on('error', (e)=> {
           this.AudioPlayer.emit("error", {
-            ...e,
+            errorInfo: e,
             resource: (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource ?? null
-          });
+          } as unknown as voice.AudioPlayerError);
         });
       }
       stream = voice.createAudioResource(rstream);
