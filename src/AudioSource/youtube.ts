@@ -5,7 +5,7 @@ import * as ytdl from "ytdl-core";
 import m3u8stream from "m3u8stream";
 import { DownloadText, log, timer } from "../Util";
 import { AudioSource } from "./audiosource";
-import { PassThrough, Readable } from "stream";
+import { PassThrough } from "stream";
 
 export class YouTube extends AudioSource {
   // サービス識別子（固定）
