@@ -4,8 +4,19 @@
     {
       "type": "shell",
       "group": "build",
-      "command": ["npx tsc"],
+      "command": [
+        "npx tsc"
+      ],
       "label": "Transpile TypeScript"
+    },
+    {
+      "type": "shell",
+      "group": "none",
+      "label": "Install dependencies",
+      "command": [
+        "npm install"
+      ],
+      "problemMatcher": []
     }
   ]
 }
