@@ -23,6 +23,7 @@
     "m3u8stream": "^0.8.4",
     "miniget": "^4.2.1",
     "node-opus": "^0.3.3",
+    "ntp-client-promise": "^1.0.1",
     "opusscript": "0.0.8",
     "prism-media": "^1.3.2",
     "rimraf": "^3.0.2",
