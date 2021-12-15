@@ -147,7 +147,7 @@ export class PlayManager extends ManagerBase {
       const t = timer.start("PlayManager#Play->FetchAudioSource");
       // QueueContentからストリーム、M3U8プレイリスト(非HLS)または直URLを取得
       const rawStream = await this.CurrentVideoInfo.fetch();
-      const stream = FixedAudioResource.fromAudioResource(this.ResolveStream(rawStream));
+      const stream = FixedAudioResource.fromAudioResource(this.ResolveStream(rawStream), this.CurrentVideoInfo.LengthSeconds);
       this.Log("Stream edges: Raw -> " + stream.edges.map(e => e.type).join(" -> ") + " ->");
       // fetchおよび処理中に切断された場合処理を終了
       const connection = voice.getVoiceConnection(this.info.GuildID);
