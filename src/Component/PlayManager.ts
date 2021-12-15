@@ -296,7 +296,7 @@ export class PlayManager extends ManagerBase {
     let stream = null as voice.AudioResource;
     if(rawStream.type === "url"){
       // URLならFFmpegにわたしてOggOpusに変換
-      stream = voice.createAudioResource(this.CreateReadableFromUrl(rawStream.url), {inputType: voice.StreamType.Opus});
+      stream = voice.createAudioResource(this.CreateReadableFromUrl(rawStream.url), {inputType: voice.StreamType.OggOpus});
     }else{
       // ストリームなら変換しない
       const rstream = rawStream.stream as Readable;
@@ -316,8 +316,20 @@ export class PlayManager extends ManagerBase {
   }
 
   private CreateReadableFromUrl(url:string):Readable{
-    const FFMPEG_OPUS_ARGUMENTS = ['-analyzeduration', '0', '-loglevel', '0', '-acodec', 'libopus', '-f', 'opus', '-ar', '48000', '-ac', '2'];
-    const args = ['-reconnect', '1', '-reconnect_streamed', '1', '-reconnect_on_network_error', '1', '-reconnect_on_http_error', '4xx,5xx', '-reconnect_delay_max', '30', '-i', url, ...FFMPEG_OPUS_ARGUMENTS];
+    const args = [
+      '-reconnect', '1', 
+      '-reconnect_streamed', '1', 
+      '-reconnect_on_network_error', '1', 
+      '-reconnect_on_http_error', '4xx,5xx', 
+      '-reconnect_delay_max', '30', 
+      '-i', url, 
+      '-analyzeduration', '0', 
+      '-loglevel', '0', 
+      '-acodec', 'libopus', 
+      '-f', 'opus', 
+      '-ar', '48000', 
+      '-ac', '2'
+    ];
     const passThrough = InitPassThrough();
     if(!process.env.DEBUG){
       passThrough.on("error", (e)=> {
