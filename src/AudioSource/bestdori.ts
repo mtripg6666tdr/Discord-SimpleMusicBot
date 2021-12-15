@@ -1,4 +1,5 @@
 import type { EmbedField } from "discord.js";
+import { UrlStreamInfo } from ".";
 import { AddZero, DownloadText } from "../Util";
 import { AudioSource } from "./audiosource";
 
@@ -38,8 +39,11 @@ export class BestdoriS extends AudioSource {
     return this;
   }
 
-  async fetch(){
-    return "https://bestdori.com/assets/jp/sound/bgm" + AddZero(this.id.toString(), 3) +  "_rip/bgm" + AddZero(this.id.toString(), 3) + ".mp3";
+  async fetch():Promise<UrlStreamInfo>{
+    return {
+      type: "url",
+      url:"https://bestdori.com/assets/jp/sound/bgm" + AddZero(this.id.toString(), 3) +  "_rip/bgm" + AddZero(this.id.toString(), 3) + ".mp3"
+    }
   }
 
   toField(){

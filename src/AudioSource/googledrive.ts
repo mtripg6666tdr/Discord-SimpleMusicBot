@@ -2,6 +2,7 @@ import type { EmbedField } from "discord.js";
 import type { exportableCustom } from "./custom";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { AudioSource } from "./audiosource";
+import { UrlStreamInfo } from ".";
 
 export class GoogleDrive extends AudioSource {
   protected _lengthSeconds = 0;
@@ -14,9 +15,12 @@ export class GoogleDrive extends AudioSource {
     return this;
   }
 
-  async fetch(){
+  async fetch():Promise<UrlStreamInfo>{
     const match = this.Url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/);
-    return "https://drive.google.com/uc?id=" + match[1];
+    return {
+      type: "url",
+      url: "https://drive.google.com/uc?id=" + match[1],
+    };
   }
 
   toField(){

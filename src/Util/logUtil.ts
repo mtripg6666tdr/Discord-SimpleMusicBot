@@ -30,7 +30,7 @@ class _timerStore {
 
   end(key:string){
     if(this.timers[key]){
-      log("[Timer]Elapsed " + (Math.floor((performance.now() - this.timers[key]) * 100) / 100) + "ms. (" + key + ")");
+      log("[TimeLogger]Elapsed " + (Math.floor((performance.now() - this.timers[key]) * 100) / 100) + "ms. (" + key + ")");
       delete this.timers[key];
     }
   }
@@ -46,3 +46,32 @@ class timerStopper {
 }
 
 export const timer = new _timerStore();
+
+export abstract class LogEmitter {
+  private tag:string = "";
+  private guildId:string = "";
+  /**
+   * ログに使用するタグを設定します
+   * @param tag タグ
+   */
+  SetTag(tag:string){
+    this.tag = tag;
+  }
+  
+  /**
+   * ログに使用するサーバーIDを設定します（存在する場合）
+   * @param id id
+   */
+  SetGuildId(id:string){
+    this.guildId = id;
+  }
+
+  /**
+   * ログを出力します
+   * @param message メッセージ
+   */
+  Log(message:string, level?:"log"|"warn"|"error"){
+    if(this.tag === "") throw new Error("Tag has not been specified");
+    log(`[${this.tag}${this.guildId !== "" ? `/${this.guildId}` : ""}]${message}`, level);
+  }
+}

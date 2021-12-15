@@ -22,7 +22,7 @@ export default class SystemInfo implements CommandInterface {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // Run default logger
-    options.bot.Log();
+    options.bot.PeriodicLog();
     await message.reply("実行します");
 
     if(message.author.id === (process.env.ADMIN_USER ?? "593758391395155978") && (options.args.indexOf("log") >= 0 || options.args.length == 0)){

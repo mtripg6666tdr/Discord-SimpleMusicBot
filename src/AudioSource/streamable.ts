@@ -1,4 +1,5 @@
 import type { EmbedField } from "discord.js";
+import { UrlStreamInfo } from ".";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { DownloadText } from "../Util";
 import { AudioSource } from "./audiosource";
@@ -28,8 +29,11 @@ export class Streamable extends AudioSource {
     return this;
   }
 
-  async fetch(){
-    return this.streamUrl;
+  async fetch():Promise<UrlStreamInfo>{
+    return {
+      type: "url",
+      url: this.streamUrl
+    };
   }
 
   toField(){

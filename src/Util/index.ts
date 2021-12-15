@@ -232,3 +232,22 @@ export async function CheckSendable(channel:TextChannel, user:GuildMember){
     return false;
   }
 }
+
+/**
+ * オブジェクトを可能な限り文字列化します
+ * @param obj 対象のオブジェクト
+ * @returns 文字列。JSON、またはその他の文字列、および空の文字列の場合があります
+ */
+export function StringifyObject(obj:any){
+  try{
+    return JSON.stringify(obj);
+  }
+  catch{
+    try{
+      return Object.prototype.toString.call(obj);
+    }
+    catch{
+      return "";
+    }
+  }
+}

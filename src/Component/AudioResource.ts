@@ -1,5 +1,6 @@
 import * as voice from "@discordjs/voice";
 import { EventEmitter } from "stream";
+import { log } from "../Util";
 
 class NullMetaAudioResource extends voice.AudioResource<null> {};
 
@@ -8,6 +9,8 @@ const SILENCE_FRAME = Buffer.from([0xf8, 0xff, 0xfe]);
 export class FixedAudioResource extends NullMetaAudioResource {
   public error = false;
   public readonly events = null as AudioResourceEvent;
+  private readLength = 0;
+  private estimatedLengthSeconds = 0;
 
   constructor(...args:ConstructorParameters<typeof NullMetaAudioResource>){
     super(...args);
@@ -22,7 +25,9 @@ export class FixedAudioResource extends NullMetaAudioResource {
       })
       .on("end", () => {
         this.events.emit("end");
+        log(`[AudioResource]Pushed total ${this.readLength} bytes${this.estimatedLengthSeconds !== 0 ? ` (average ${Math.round(this.readLength / this.estimatedLengthSeconds * 8 / 100) / 10} kbps)` : ""}`);
       })
+      ;
   }
 
   private get isStreamReadable() {
@@ -60,12 +65,15 @@ export class FixedAudioResource extends NullMetaAudioResource {
     const packet: Buffer | null = this.playStream.read();
     if (packet) {
       this.playbackDuration += 20;
+      this.readLength += packet.length || 0;
     }
     return packet;
   }
 
-  static fromAudioResource(resource:voice.AudioResource){
-    return new this(resource.edges, [resource.playStream], null, resource.silencePaddingFrames);
+  static fromAudioResource(resource:voice.AudioResource, estimatedLengthSeconds:number){
+    const _this = new this(resource.edges, [resource.playStream], null, resource.silencePaddingFrames);
+    _this.estimatedLengthSeconds = estimatedLengthSeconds;
+    return _this;
   }
 }
 

@@ -1,4 +1,5 @@
 import type { EmbedField } from "discord.js";
+import { UrlStreamInfo } from ".";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { isAvailableRawAudioURL } from "../Util";
 import { AudioSource } from "./audiosource";
@@ -15,8 +16,11 @@ export class CustomStream extends AudioSource {
     return this;
   }
 
-  async fetch(){
-    return this.Url;
+  async fetch():Promise<UrlStreamInfo>{
+    return {
+      type: "url",
+      url: this.Url
+    };
   }
 
   toField(){

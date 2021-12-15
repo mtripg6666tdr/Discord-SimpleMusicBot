@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 import type { TextChannel } from "discord.js";
 import * as http from "http";
 import { MusicBot } from "./bot";
@@ -6,12 +8,6 @@ import { btoa, log } from "./Util";
 // メインエントリ
 // =============
 log("[Entry]Discord-SimpleMusicBot by mtripg6666tdr");
-require("dotenv").config();
-global.AbortController = require("abort-controller");
-const nodeVersion = process.versions.node.split(".")[0];
-if(Number(nodeVersion) >= 15){
-  log("[Entry]Node major version " + nodeVersion + " is incompatible to this project, but I'll do the best!", "warn");
-}
 
 const bot = new MusicBot(Boolean(process.env.MAINTENANCE));
 
