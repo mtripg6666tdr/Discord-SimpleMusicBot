@@ -17,17 +17,19 @@ import {
   log,
   logStore,
   NormalizeText,
+  StringifyObject,
   timer
 } from "./Util";
 import { CommandMessage } from "./Component/CommandMessage"
 import { ResponseMessage } from "./Component/ResponseMessage";
 import Soundcloud from "soundcloud.ts";
 import { addOn } from "./Util/addonUtil";
+import { LogEmitter } from "./Util/logUtil";
 
 /**
  * 音楽ボットの本体
  */
-export class MusicBot {
+export class MusicBot extends LogEmitter {
   // クライアントの初期化
   private client = new discord.Client({intents: [
     // サーバーを認識する
@@ -68,11 +70,13 @@ export class MusicBot {
   get InstantiatedTime(){return this.instantiatedTime}; 
 
   constructor(private maintenance:boolean = false){
+    super();
+    this.SetTag("Main");
     this.instantiatedTime = new Date();
     const client = this.client;
-    log("[Main]Main bot is instantiated");
+    this.Log("Main bot is instantiated");
     if(maintenance){
-      log("[Main]Main bot is now maintainance mode");
+      this.Log("Main bot is now maintainance mode");
     }
     try{
       this.versionInfo = execSync("git log -n 1 --pretty=format:%h").toString().trim();
@@ -88,8 +92,8 @@ export class MusicBot {
 
   private async onReady(client:discord.Client<true>){
     this.addOn.emit("ready", client);
-    log("[Main]Socket connection is ready.");
-    log("[Main]Starting environment checking and preparation.");
+    this.Log("Socket connection is ready.");
+    this.Log("Starting environment checking and preparation.");
 
     // Set activity as booting
     if(!this.maintenance){
@@ -143,13 +147,13 @@ export class MusicBot {
             }
           }
           catch(e){
-            log(e, "warn");
+            this.Log(e, "warn");
           }
         }
       }
-      log("[Main]Finish queues and states recovery.");
+      this.Log("Finish queues and states recovery.");
     }else{
-      log("[Main]Cannot perform queues and states recovery. Check .env file to perform.", "warn");
+      this.Log("Cannot perform queues and states recovery. Check .env file to perform.", "warn");
     }
 
     // Set activity
@@ -161,22 +165,22 @@ export class MusicBot {
 
       // Set main tick
       const tick = ()=>{
-        this.Log();
+        this.PeriodicLog();
         setTimeout(tick, 4 * 60 * 1000);
         PageToggle.Organize(this.EmbedPageToggle, 5);
         this.BackupData();
       };
       setTimeout(tick, 1 * 60 * 1000);
     }
-    log("[Main]Main tick was set successfully");
+    this.Log("Main tick was set successfully");
 
     // Command instance preparing
     CommandsManager.Instance.Check();
-    log("[Main]Finish preparing commands");
+    this.Log("Finish preparing commands");
 
     // Finish initializing
     this.isReadyFinished = true;
-    log("[Main]Bot is ready");
+    this.Log("Bot is ready");
   }
 
   private async onMessageCreate(message:discord.Message){
@@ -193,9 +197,9 @@ export class MusicBot {
     this.updatePrefix(message);
     if(message.content === "<@" + this.client.user.id + ">") {
       // メンションならば
-      message.channel
+      await message.channel
         .send("コマンドは、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`で確認できます")
-        .catch(e => log(e, "error"));
+        .catch(e => this.Log(e, "error"));
       return;
     }
     if(message.content.startsWith(this.data[message.guild.id].PersistentPref.Prefix)){
@@ -232,7 +236,7 @@ export class MusicBot {
           await msg.delete();
         }
         catch(e){
-          log(e, "error");
+          this.Log(e, "error");
         }
       }
       // searchコマンドの選択を捕捉
@@ -250,7 +254,8 @@ export class MusicBot {
       (message.content === "キャンセル" || message.content === "cancel")
       ){
       this.cancellations.forEach(c => c.Cancel());
-      message.channel.send("処理中の処理をすべてキャンセルしています....").catch(e => log(e, "error"));
+      await message.channel.send("処理中の処理をすべてキャンセルしています....")
+        .catch(e => this.Log(e, "error"));
     }
   }
 
@@ -265,7 +270,7 @@ export class MusicBot {
     this.initData(interaction.guild.id, interaction.channel.id);
     // コマンドインタラクション
     if(interaction.isCommand()){
-      log("[Main]Command Interaction received");
+      this.Log("Command Interaction received");
       if(!interaction.channel.isText()){
         await interaction.reply("テキストチャンネルで実行してください");
         return;
@@ -289,7 +294,7 @@ export class MusicBot {
       }
     // ボタンインタラクション
     }else if(interaction.isButton()){
-      log("[Main]Button Interaction received");
+      this.Log("Button Interaction received");
       await interaction.deferUpdate();
       const l = this.EmbedPageToggle.filter(t => 
         t.Message.channelId === interaction.channel.id && 
@@ -309,7 +314,7 @@ export class MusicBot {
           await interaction.editReply("失敗しました!");
         }
     }else if(interaction.isSelectMenu()){
-      log("[Main]SelectMenu Interaction received");
+      this.Log("SelectMenu Interaction received");
       // 検索パネル取得
       const panel = this.data[interaction.guild.id].SearchPanel;
       // なければ返却
@@ -339,7 +344,7 @@ export class MusicBot {
   /**
    *  定期ログを実行します
    */
-  Log(){
+  PeriodicLog(){
     const _d = Object.values(this.data);
     const memory = GetMemInfo();
     log("[Main]Participating Server(s) count: " + this.client.guilds.cache.size);
@@ -356,7 +361,8 @@ export class MusicBot {
    * @param debugLogStoreLength デバッグログの保存する数
    */
   Run(token:string, debugLog:boolean = false, debugLogStoreLength?:number){
-    this.client.login(token).catch(e => log(e, "error"));
+    this.client.login(token)
+      .catch(e => this.Log(e, "error"));
     logStore.log = debugLog;
     if(debugLogStoreLength) logStore.maxLength = debugLogStoreLength;
   }
@@ -394,7 +400,7 @@ export class MusicBot {
         }
       }
       catch(e){
-        log(e, "warn");
+        this.Log(e, "warn");
       };
       t.end();
     }
@@ -423,7 +429,7 @@ export class MusicBot {
       DatabaseAPI.SetIsSpeaking(speaking);
     }
     catch(e){
-      log(e, "warn");
+      this.Log(e, "warn");
     }
     t.end();
   }
@@ -488,16 +494,17 @@ export class MusicBot {
           // @ts-ignore
           adapterCreator: message.member.guild.voiceAdapterCreator,
           debug: Boolean(process.env.DEBUG)
-        }).on("debug", (mes) => log("[Connection]" + mes));
-        log("[Main/" + message.guild.id + "]VC Connected to " + message.member.voice.channel.id);
+        }).on("debug", (mes) => this.Log("[Connection]" + mes));
+        this.Log("[Main/" + message.guild.id + "]VC Connected to " + message.member.voice.channel.id);
         await msg.edit(":+1:ボイスチャンネル:speaker:`" + message.member.voice.channel.name + "`に接続しました!");
         t.end();
         return true;
       }
       catch(e){
-        log(e, "error");
+        this.Log(e, "error");
         msg?.delete();
-        message.reply("😑接続に失敗しました…もう一度お試しください。").catch(e => log(e, "error"));
+        await message.reply("😑接続に失敗しました…もう一度お試しください。")
+          .catch(e => this.Log(e, "error"));
         this.data[message.guild.id].Player.Disconnect();
         t.end();
         return false;
@@ -505,8 +512,10 @@ export class MusicBot {
     }else{
       // あらメッセージの送信者さんはボイチャ入ってないん…
       reply ? 
-      await message.reply("ボイスチャンネルに参加してからコマンドを送信してください:relieved:").catch(e => log(e, "error")) :
-      await message.channel.send("ボイスチャンネルに参加してからコマンドを送信してください:relieved:").catch(e => log(e, "error"));
+      await message.reply("ボイスチャンネルに参加してからコマンドを送信してください:relieved:")
+        .catch(e => this.Log(e, "error")) :
+      await message.channel.send("ボイスチャンネルに参加してからコマンドを送信してください:relieved:")
+        .catch(e => this.Log(e, "error"));
       t.end();
       return false;
     }
@@ -518,7 +527,7 @@ export class MusicBot {
    */
   private async PlayFromURL(message:CommandMessage, optiont:string, first:boolean = true){
     const t = timer.start("MusicBot#PlayFromURL");
-    setTimeout(()=> message.suppressEmbeds(true).catch(e => log(e, "warn")), 4000);
+    setTimeout(() => message.suppressEmbeds(true).catch(e => this.Log(StringifyObject(e), "warn")), 4000);
     if(optiont.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){
       // Discordメッセへのリンクならば
       const smsg = await message.reply("🔍メッセージを取得しています...");
@@ -535,7 +544,8 @@ export class MusicBot {
         }else throw "メッセージの取得に失敗"
       }
       catch(e){
-        await smsg.edit("✘追加できませんでした(" + e + ")").catch(e => log(e ,"error"));
+        await smsg.edit("✘追加できませんでした(" + e + ")")
+          .catch(e => this.Log(e ,"error"));
       }
     }else if(isAvailableRawAudioURL(optiont)){
       // オーディオファイルへの直リンク？
@@ -611,7 +621,8 @@ export class MusicBot {
       }
       catch{
         // なに指定したし…
-        message.reply("🔭有効なURLを指定してください。キーワードで再生する場合はsearchコマンドを使用してください。").catch(e => log(e, "error"));
+        await message.reply("🔭有効なURLを指定してください。キーワードで再生する場合はsearchコマンドを使用してください。")
+          .catch(e => this.Log(e, "error"));
         return;
       }
     }

@@ -101,7 +101,7 @@ export class YouTube extends AudioSource {
         quality: this.LiveStream ? null : "highestaudio",
         isHLS: this.LiveStream,
       } as ytdl.chooseFormatOptions);
-      log("[AudioSource:youtube]Format: " + format.itag + ", Bitrate: " + format.bitrate + ", Audio codec:" + format.audioCodec + ", Container: " + format.container);
+      log("[AudioSource:youtube]Format: " + format.itag + ", Bitrate: " + format.bitrate + "bps, Audio codec:" + format.audioCodec + ", Container: " + format.container);
       let readable = null as Readable;
       if(info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow){
         readable = ytdl.downloadFromInfo(info, {format, lang: "ja"});

@@ -6,8 +6,8 @@ import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
 import { GuildDataContainer } from "../definition";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
-import Commands from "./commands";
 import { log } from "../Util";
+import { LogEmitter } from "../Util/logUtil";
 
 /**
  * すべてのコマンドの規定インターフェースです
@@ -95,7 +95,7 @@ export interface CommandArgs {
 /**
  * コマンドマネージャー
  */
-export class CommandsManager {
+export class CommandsManager extends LogEmitter {
   private static _instance = null as CommandsManager;
   /**
    * コマンドマネージャーの唯一のインスタンスを返します
@@ -114,7 +114,9 @@ export class CommandsManager {
   private commands = null as CommandInterface[];
 
   private constructor(){
-    log("[CommandsManager]Initializing");
+    super();
+    this.SetTag("CommandsManager");
+    this.Log("Initializing");
     this.commands = [];
       fs.readdirSync(__dirname, {withFileTypes: true})
       .filter(d => d.isFile())
@@ -126,7 +128,7 @@ export class CommandsManager {
         this.commands.push(cp);
         return cp;
       });
-    log("[CommandsManager]Initialized");
+    this.Log("Initialized");
   }
 
   /**
@@ -135,7 +137,7 @@ export class CommandsManager {
    * @returns 解決されたコマンド
    */
   resolve(command:string){
-    log("[CommandsManager]Resolve() called");
+    this.Log("Resolve() called");
     let result = null;
     for(let i = 0; i < this.commands.length; i++){
       if(this.commands[i].name === command || this.commands[i].alias.indexOf(command) >= 0){
@@ -144,9 +146,9 @@ export class CommandsManager {
       }
     }
     if(result)
-      log("[CommandsManager]Command `" + command + "` was resolved successfully");
+      this.Log("Command `" + command + "` was resolved successfully");
     else
-      log("[CommandsManager]Command not found");
+      this.Log("Command not found");
     return result;
   }
 

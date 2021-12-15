@@ -5,7 +5,7 @@ import * as ytdl from "ytdl-core";
 import * as AudioSource from "../AudioSource";
 import { FallBackNotice, type GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log, timer } from "../Util";
+import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log, StringifyObject, timer } from "../Util";
 import { ResponseMessage } from "./ResponseMessage";
 import { ManagerBase } from "./ManagerBase";
 import { PageToggle } from "./PageToggle";
@@ -44,11 +44,12 @@ export class QueueManager extends ManagerBase {
 
   constructor(){
     super();
-    log("[QueueManager]Queue Manager instantiated");
+    this.SetTag("Queue Manager");
+    this.Log("Queue Manager instantiated");
   }
 
   SetData(data:GuildDataContainer){
-    log("[QueueManager]Set data of guild id " + data.GuildID);
+    this.Log("Set data of guild id " + data.GuildID);
     super.SetData(data);
   }
 
@@ -93,7 +94,7 @@ export class QueueManager extends ManagerBase {
       type:KnownAudioSourceIdentifer = "unknown", 
       gotData:AudioSource.exportableCustom = null
       ):Promise<QueueContent>{
-    log("[QueueManager/" + this.info.GuildID + "]AddQueue() called");
+    this.Log("AddQueue() called");
     const t = timer.start("AddQueue");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     const result = {
@@ -140,7 +141,7 @@ export class QueueManager extends ManagerBase {
       return result;
     }
     t.end();
-    throw "Provided URL was not resolved as available service";
+    throw new Error("Provided URL was not resolved as available service");
   }
 
   /**
@@ -167,14 +168,14 @@ export class QueueManager extends ManagerBase {
       message:ResponseMessage = null,
       gotData:AudioSource.exportableCustom = null
       ):Promise<boolean>{
-    log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Called");
+    this.Log("AutoAddQueue() Called");
     const t = timer.start("AutoAddQueue");
     let ch:TextChannel = null;
     let msg:Message|ResponseMessage = null;
     try{
       if(fromSearch && this.info.SearchPanel){
         // 検索パネルから
-        log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() From search panel");
+        this.Log("AutoAddQueue() From search panel");
         ch = await client.channels.fetch(this.info.SearchPanel.Msg.chId) as TextChannel;
         if(typeof fromSearch === "boolean"){
           msg = await (ch as TextChannel).messages.fetch(this.info.SearchPanel.Msg.id);
@@ -194,22 +195,22 @@ export class QueueManager extends ManagerBase {
         });
       }else if(message){
         // すでに処理中メッセージがある
-        log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Interaction message specified");
+        this.Log("AutoAddQueue() Interaction message specified");
         ch = message.channel as TextChannel;
         msg = message;
       }else if(channel){
         // まだないので生成
-        log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Interaction channel specified");
+        this.Log("AutoAddQueue() Interaction channel specified");
         ch = channel;
         msg = await channel.send("情報を取得しています。お待ちください...");
       }
       if(this.info.Queue.length > 999){
         // キュー上限
-        log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Failed since too long queue", "warn");
+        this.Log("AutoAddQueue() Failed since too long queue", "warn");
         throw "キューの上限を超えています";
       }
       const info = await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type, gotData ?? null);
-      log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Added successfully");
+      this.Log("AutoAddQueue() Added successfully");
       if(msg){
         // 曲の時間取得＆計算
         const _t = Number(info.BasicInfo.LengthSeconds);
@@ -234,8 +235,8 @@ export class QueueManager extends ManagerBase {
       }
     }
     catch(e){
-      log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Failed");
-      log(e, "error");
+      this.Log("AutoAddQueue() Failed");
+      this.Log(StringifyObject(e), "error");
       if(msg){
         msg.edit({content: ":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")", embeds: null}).catch(e => log(e, "error"));
       }
@@ -297,7 +298,7 @@ export class QueueManager extends ManagerBase {
    * 次の曲に移動します
    */
   async Next(){
-    log("[QueueManager/" + this.info.GuildID + "]Next() Called");
+    this.Log("Next() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this.OnceLoopEnabled = false;
     this.info.Player.errorCount = 0;
@@ -324,7 +325,7 @@ export class QueueManager extends ManagerBase {
    * @param offset 位置
    */
   RemoveAt(offset:number){
-    log("[QueueManager/" + this.info.GuildID + "]RemoveAt() Called (offset:" + offset + ")");
+    this.Log("RemoveAt() Called (offset:" + offset + ")");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default.splice(offset, 1);
     if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
@@ -336,7 +337,7 @@ export class QueueManager extends ManagerBase {
    * すべてのキューコンテンツを消去します
    */
   RemoveAll(){
-    log("[QueueManager/" + this.info.GuildID + "]RemoveAll() Called");
+    this.Log("RemoveAll() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default = [];
     if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
@@ -348,7 +349,7 @@ export class QueueManager extends ManagerBase {
    * 最初のキューコンテンツだけ残し、残りのキューコンテンツを消去します
    */
   RemoveFrom2(){
-    log("[QueueManager/" + this.info.GuildID + "]RemoveFrom2() Called");
+    this.Log("RemoveFrom2() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default = [this.default[0]];
     if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
@@ -360,7 +361,7 @@ export class QueueManager extends ManagerBase {
    * キューをシャッフルします
    */
   Shuffle(){
-    log("[QueueManager/" + this.info.GuildID + "]Shuffle() Called");
+    this.Log("Shuffle() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(this._default.length === 0) return;
     if(this.info.Player.IsPlaying){
@@ -382,7 +383,7 @@ export class QueueManager extends ManagerBase {
    * @returns 削除されたオフセットの一覧
    */
   RemoveIf(validator:(q:QueueContent)=>Boolean):number[]{
-    log("[QueueManager/" + this.info.GuildID + "]RemoveIf() Called");
+    this.Log("RemoveIf() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(this._default.length === 0) return [];
     const first = this.info.Player.IsPlaying ? 1 : 0
@@ -406,7 +407,7 @@ export class QueueManager extends ManagerBase {
    * @param to 移動先のインデックス
    */
   Move(from:number, to:number){
-    log("[QueueManager/" + this.info.GuildID + "]Move() Called");
+    this.Log("Move() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(from < to){
       //要素追加
