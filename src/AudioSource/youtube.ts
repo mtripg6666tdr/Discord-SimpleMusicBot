@@ -106,7 +106,7 @@ export class YouTube extends AudioSource {
       if(info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow){
         readable = ytdl.downloadFromInfo(info, {format, lang: "ja"});
       }else{
-        readable = createChunkedYTStream(info, format, {lang: "ja"}, 5 * 1024 * 1024);
+        readable = createChunkedYTStream(info, format, {lang: "ja"}, 1 * 1024 * 1024);
       }
       this.fallback = false;
       return {

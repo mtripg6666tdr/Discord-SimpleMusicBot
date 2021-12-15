@@ -6,7 +6,7 @@ import { FFmpeg } from "prism-media";
 import { AudioSource, StreamInfo, YouTube } from "../AudioSource";
 import { FallBackNotice, type GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, InitPassThrough, isAvailableRawVideoURL, log, timer, StringifyObject } from "../Util";
+import { CalcHourMinSec, CalcMinSec, InitPassThrough, log, timer, StringifyObject } from "../Util";
 import { ManagerBase } from "./ManagerBase";
 import { FixedAudioResource } from "./AudioResource";
 
@@ -127,12 +127,12 @@ export class PlayManager extends ManagerBase {
             // @ts-ignore
             const einfo = e.errorInfo;
             if(einfo){
-              this.Log(JSON.stringify(StringifyObject(einfo)), "error");
+              this.Log(StringifyObject(einfo), "error");
             }
             if(this.info.boundTextChannel){
               this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
                 this.Log("Some error occurred in AudioPlayer", "error");
-                (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? JSON.stringify(StringifyObject(e)) : "undefined") + ")" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。")).catch(e => log(e, "error"));
+                (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? StringifyObject(e) : "undefined") + ")" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。")).catch(e => log(e, "error"));
               }).catch(e => log(e, "error"));
             }
             cantPlay();
@@ -170,7 +170,7 @@ export class PlayManager extends ManagerBase {
             // @ts-ignore
             const einfo = er.errorInfo;
             if(einfo){
-              log(JSON.stringify(StringifyObject(einfo)), "error");
+              log(StringifyObject(einfo), "error");
             }
             mes.edit(":tired_face:曲の再生に失敗しました...。" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。"));
             cantPlay();  
@@ -214,7 +214,7 @@ export class PlayManager extends ManagerBase {
     catch(e){
       log(e, "error");
       try{
-        const t = typeof e == "string" ? e : JSON.stringify(StringifyObject(e));
+        const t = typeof e == "string" ? e : StringifyObject(e);
         if(t.indexOf("429") >= 0){
           mes.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(e => log(e, "error"));
           this.Log("Rate limit detected", "error");

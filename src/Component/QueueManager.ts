@@ -44,7 +44,7 @@ export class QueueManager extends ManagerBase {
 
   constructor(){
     super();
-    this.SetTag("Queue Manager");
+    this.SetTag("QueueManager");
     this.Log("Queue Manager instantiated");
   }
 
