@@ -577,7 +577,7 @@ export class MusicBot extends LogEmitter {
       }else{
         const embed = new discord.MessageEmbed()
           .setTitle("✅プレイリストが処理されました")
-          .setDescription("[" + result.title + "](" + result.url + ") `(" + result.author.name + ")` \r\n" + index + "曲が追加されました")
+          .setDescription(`[${result.title}](${result.url}) \`(${result.author.name})\` \r\n${index}曲が追加されました`)
           .setThumbnail(result.bestThumbnail.url)
           .setColor(getColor("PLAYLIST_COMPLETED"));
         await msg.edit({content: null, embeds: [embed]});
@@ -606,7 +606,7 @@ export class MusicBot extends LogEmitter {
       }else{
         const embed = new discord.MessageEmbed()
           .setTitle("✅プレイリストが処理されました")
-          .setDescription("[" + playlist.title + "](" + playlist.permalink_url + ") `(" + playlist.user.username + ")` \r\n" + index + "曲が追加されました")
+          .setDescription(`[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n${index}曲が追加されました`)
           .setThumbnail(playlist.artwork_url)
           .setColor(getColor("PLAYLIST_COMPLETED"));
         await msg.edit({content: null, embeds: [embed]});

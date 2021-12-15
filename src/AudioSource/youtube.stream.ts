@@ -18,7 +18,7 @@ export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoForm
       const nextStream = ytdl.downloadFromInfo(info, {format, ...options, range: {
         start: chunkSize * current, end
       }});
-      log("[AudioSource:youtube]Stream #" + (current + 1) + " was created.");
+      log(`[AudioSource:youtube]Stream #${(current + 1)}was created.`);
       nextStream
         .on("error", er => stream.emit("error", er))
         .pipe(stream, {end: end === undefined});
@@ -27,10 +27,11 @@ export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoForm
           pipeNextStream();
         });
       }else{
-        log("[AudioSource:youtube]Last stream (total:" + (current + 1) + ")");
+        log(`[AudioSource:youtube]Last stream (total:${(current + 1)})`);
       }
     };
     pipeNextStream();
+    log(`[AudioSource:youtube]Stream was created as partial stream. ${Math.ceil((contentLength + 1) / chunkSize)} streams will be created.`);
   }
   return stream;
 }
