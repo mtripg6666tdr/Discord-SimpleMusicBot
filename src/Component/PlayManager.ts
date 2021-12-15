@@ -2,12 +2,12 @@ import type { Client, Message, TextChannel } from "discord.js";
 import { MessageEmbed } from "discord.js";
 import * as voice from "@discordjs/voice";
 import { Readable } from "stream";
+import { FFmpeg } from "prism-media";
 import { AudioSource, StreamInfo, YouTube } from "../AudioSource";
 import { FallBackNotice, type GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, InitPassThrough, isAvailableRawVideoURL, log, timer, StringifyObject } from "../Util";
 import { ManagerBase } from "./ManagerBase";
-import { FFmpeg } from "prism-media";
 import { FixedAudioResource } from "./AudioResource";
 
 /**
@@ -23,44 +23,55 @@ export class PlayManager extends ManagerBase {
   private stopped = false;
   get CurrentVideoUrl():string{
     if(this.CurrentVideoInfo) return this.CurrentVideoInfo.Url;
-    return "";
+    else return "";
   }
   CurrentVideoInfo:AudioSource;
-  // 接続され、再生途中にあるか（たとえ一時停止されていても）
+  /**
+   *  接続され、再生途中にあるか（たとえ一時停止されていても）
+   */
   get IsPlaying():boolean {
     return this.IsConnecting
       && this.AudioPlayer
       && this.AudioPlayer.state.status !== voice.AudioPlayerStatus.Idle;
   }
-  // VCに接続中かどうか
-  get IsConnecting():boolean{
-    return Boolean(voice.getVoiceConnection(this.info.GuildID));
-  }
-  // 一時停止されているか
+  /**
+   *  VCに接続中かどうか
+   */
+  get IsConnecting():boolean{return Boolean(voice.getVoiceConnection(this.info.GuildID));}
+  /**
+   * 一時停止されているか
+   */
   get IsPaused():boolean{
     return this.AudioPlayer && this.AudioPlayer.state.status === voice.AudioPlayerStatus.Paused;
   }
-  // 現在ストリーミングした時間
+  /**
+   *  現在ストリーミングした時間
+   */
   get CurrentTime():number{
     return (this.AudioPlayer && this.AudioPlayer.state.status === voice.AudioPlayerStatus.Playing) 
       ? (this.AudioPlayer.state as voice.AudioPlayerPlayingState).playbackDuration : 0;
   }
-  get Client(){
-    return this.client
-  };
+  /**
+   * クライアント
+   */
+  get Client(){return this.client};
   // コンストラクタ
   constructor(private client:Client){
     super();
     log("[PlayManager]Play Manager instantiated");
   }
 
-  // 親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
+  /**
+   *  親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
+   */
   SetData(data:GuildDataContainer){
     log("[PlayManager]Set data of guild id " + data.GuildID)
     super.SetData(data);
   }
 
-  // 再生します
+  /**
+   *  再生します
+   */
   async Play():Promise<PlayManager>{
     // 再生できる状態か確認
     if(
