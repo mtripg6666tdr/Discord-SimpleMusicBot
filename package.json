@@ -10,7 +10,7 @@
     "@discordjs/rest": "0.1.0-canary.0",
     "@discordjs/voice": "^0.7.5",
     "@types/follow-redirects": "^1.13.1",
-    "@types/node": "^16.11.13",
+    "@types/node": "^17.0.0",
     "@types/ws": "^8.2.2",
     "discord-api-types": "^0.24.0",
     "discord.js": "^13.3.1",
