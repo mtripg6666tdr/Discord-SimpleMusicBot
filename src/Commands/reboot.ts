@@ -1,13 +1,14 @@
 import { exec, execSync } from "child_process";
 import { CommandArgs, CommandInterface } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
+import { config } from "../Util";
 
 export default class Reboot implements CommandInterface {
   name = "reboot";
   alias = [] as string[];
   unlist = true;
   async run(message:CommandMessage, options:CommandArgs){
-    if(message.author.id === "593758391395155978"){
+    if(message.author.id === (config.adminId ?? "593758391395155978")){
       if(options.rawArgs === ""){
         message.channel.send("再起動を実行します...お待ちください...");
         exec("npm run onlystart");
