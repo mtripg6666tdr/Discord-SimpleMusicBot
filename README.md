@@ -84,20 +84,20 @@ $ npm install
   こちらには主にトークンなどの認証情報を記述します。
   任意指定の設定に関しては、**`CSE_KEY=`の部分も記述しないでください。**
   `.env.sample`がサンプルファイルとなっていますので、コピー＆リネームしてお使いください。
-  - TOKEN
+  - TOKEN  
     ボットのトークンです。Discord Developer Portalから取得してください。
-  - CSE_KEY
+  - CSE_KEY  
     歌詞検索に使用するGoogle Custom Searchのkeyです。(任意指定)
-  - CLIENT_ID
+  - CLIENT_ID  
     スラッシュコマンドの登録に使用するクライアントIDです。(任意指定)  
     Discord Developer Portalから取得してください。
-  - GUILD_ID
+  - GUILD_ID  
     スラッシュコマンドの登録に使用するサーバーIDです。(任意指定)  
     Discord Developer Portalから取得してください。
-  - GAS_URL
+  - GAS_URL  
     「キューやループの有効無効等のデータのバックアップ」に使用するデータベースサーバーのURLです。(任意指定)  
     サーバーの仕様等についてはあとのセクションを参照してください。
-  - GAS_TOKEN
+  - GAS_TOKEN  
     「キューやループの有効無効等のデータのバックアップ」に使用するデータベースサーバーのトークンです。(任意指定)  
     サーバーの仕様等についてはあとのセクションを参照してください。
 
@@ -105,15 +105,15 @@ $ npm install
   こちらにはボットの設定情報などを記述します。
   任意指定の設定に関しては、**値をnullにしてください("null"ではなくnull)**
   `config.json.sample`がサンプルファイルとなっていますので、コピー＆リネームしてお使いください。
-  - adminId (string|null)
+  - adminId (string|null)  
     管理人のユーザーのID (任意指定)
-  - debug (boolean)
+  - debug (boolean)  
     デバッグ用の構成で起動するか
-  - maintenance (boolean)
+  - maintenance (boolean)  
     メンテナンス用の構成で起動するか
-  - errorChannel (string|null)
+  - errorChannel (string|null)  
     エラーレポートを送信するテキストチャンネルのID (任意指定)
-  - proxy (string|null)
+  - proxy (string|null)  
     プロキシを使用する場合はそのURL (任意指定)
   </details>
 
