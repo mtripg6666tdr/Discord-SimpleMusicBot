@@ -4,9 +4,16 @@ on:
   push:
     branches: 
       - master
+    paths-ignore:
+      - .env.sample
+      - .gitignore
+      - .replit
+      - config.json.sample
+      - LICENSE
+      - README.md
+      - .github/**
+      - .vscode/**
   pull_request:
-    branches: 
-      - master
   workflow_dispatch:
 
 jobs:
