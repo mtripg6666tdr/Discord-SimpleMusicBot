@@ -6,7 +6,7 @@ import { FFmpeg } from "prism-media";
 import { AudioSource, StreamInfo, YouTube } from "../AudioSource";
 import { FallBackNotice, type GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, InitPassThrough, log, timer, StringifyObject } from "../Util";
+import { CalcHourMinSec, CalcMinSec, InitPassThrough, log, timer, StringifyObject, config } from "../Util";
 import { ManagerBase } from "./ManagerBase";
 import { FixedAudioResource } from "./AudioResource";
 
@@ -119,7 +119,7 @@ export class PlayManager extends ManagerBase {
         const t = timer.start("PlayManager#Play->InitAudioPlayer");
         this.AudioPlayer = voice.createAudioPlayer();
         voice.getVoiceConnection(this.info.GuildID).subscribe(this.AudioPlayer);
-        if(!process.env.DEBUG){
+        if(!config.debug){
           this.AudioPlayer.on("error", (e) => {
             if(!e) return;
             // エラーが発生したら再生できないときの関数を呼んで逃げる
@@ -300,7 +300,7 @@ export class PlayManager extends ManagerBase {
     }else{
       // ストリームなら変換しない
       const rstream = rawStream.stream as Readable;
-      if(!process.env.DEBUG){
+      if(!config.debug){
         rstream.on('error', (e)=> {
           this.AudioPlayer.emit("error", {
             errorInfo: e,
@@ -331,7 +331,7 @@ export class PlayManager extends ManagerBase {
       '-ac', '2'
     ];
     const passThrough = InitPassThrough();
-    if(!process.env.DEBUG){
+    if(!config.debug){
       passThrough.on("error", (e)=> {
         this.AudioPlayer.emit("error", {
           errorInfo: e,

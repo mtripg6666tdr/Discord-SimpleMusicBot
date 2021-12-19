@@ -3,13 +3,13 @@ require("dotenv").config();
 import type { TextChannel } from "discord.js";
 import * as http from "http";
 import { MusicBot } from "./bot";
-import { btoa, log } from "./Util";
+import { btoa, config, log } from "./Util";
 // =============
 // メインエントリ
 // =============
 log("[Entry]Discord-SimpleMusicBot by mtripg6666tdr");
 
-const bot = new MusicBot(Boolean(process.env.MAINTENANCE));
+const bot = new MusicBot(Boolean(config.maintenance));
 
 // Webサーバーのインスタンス化
 http.createServer((req, res) => {
@@ -25,13 +25,13 @@ http.createServer((req, res) => {
   res.end(JSON.stringify(data));
 }).listen(8081);
 
-if(!process.env.DEBUG){
+if(!config.debug){
   // ハンドルされなかったエラーのハンドル
   process.on("uncaughtException", (error)=>{
-    if(bot.Client && process.env.ERROR_REPORT){
+    if(bot.Client && config.errorChannel){
       try{
         const errorText = typeof error === "string" ? error : JSON.stringify(error);
-        (bot.Client.channels.resolve(process.env.ERROR_REPORT) as TextChannel).send(errorText);
+        (bot.Client.channels.resolve(config.errorChannel) as TextChannel).send(errorText);
       }
       catch(e){
         console.error(e);
@@ -39,8 +39,8 @@ if(!process.env.DEBUG){
       }
     }
   }).on("SIGINT", ()=>{
-    if(bot.Client && process.env.ERROR_REPORT){
-      (bot.Client.channels.resolve(process.env.ERROR_REPORT) as TextChannel).send("Process terminated");
+    if(bot.Client && config.errorChannel){
+      (bot.Client.channels.resolve(config.errorChannel) as TextChannel).send("Process terminated");
     }
   });
 }

@@ -13,6 +13,7 @@ import { getColor } from "./Util/colorUtil";
 import { DatabaseAPI } from "./Util/databaseUtil";
 import {
   CheckSendable,
+  config,
   GetMemInfo, isAvailableRawAudioURL,
   log,
   logStore,
@@ -186,7 +187,7 @@ export class MusicBot extends LogEmitter {
   private async onMessageCreate(message:discord.Message){
     this.addOn.emit("messageCreate", message);
     if(this.maintenance){
-      if(!process.env.ADMIN_USER || message.author.id !== process.env.ADMIN_USER)
+      if(!config.adminId || message.author.id !== config.adminId)
         return;
     }
     // botのメッセやdm、およびnewsは無視
@@ -262,7 +263,7 @@ export class MusicBot extends LogEmitter {
   private async interactionCreate(interaction:discord.Interaction){
     this.addOn.emit("interactionCreate", interaction);
     if(this.maintenance){
-      if(!process.env.ADMIN_USER || interaction.user.id !== process.env.ADMIN_USER)
+      if(!config.adminId || interaction.user.id !== config.adminId)
       return;
     }
     if(interaction.user.bot) return;
@@ -493,7 +494,7 @@ export class MusicBot extends LogEmitter {
           guildId: message.member.guild.id,
           // @ts-ignore
           adapterCreator: message.member.guild.voiceAdapterCreator,
-          debug: Boolean(process.env.DEBUG)
+          debug: config.debug
         }).on("debug", (mes) => this.Log("[Connection]" + mes));
         log(`[Main/${message.guild.id}]Connected to ${message.member.voice.channel.id}`);
         await msg.edit(":+1:ボイスチャンネル:speaker:`" + message.member.voice.channel.name + "`に接続しました!");

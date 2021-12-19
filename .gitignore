@@ -8,3 +8,4 @@ node
 *.template.*
 *.log
 addon
+config.json

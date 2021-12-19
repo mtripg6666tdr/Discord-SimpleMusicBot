@@ -4,7 +4,7 @@ import { PassThrough, Readable } from "stream";
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 import m3u8stream from "m3u8stream";
-import { log, timer } from "../Util";
+import { config, log, timer } from "../Util";
 import { AudioSource } from "./audiosource";
 import { createChunkedYTStream } from "./youtube.stream";
 import { getYouTubeDlInfo, YoutubeDlInfo } from "./youtube.fallback";
@@ -38,7 +38,7 @@ export class YouTube extends AudioSource {
       this.Thumnail = prefetched.thumbnail;
       this.LiveStream = prefetched.isLive;
     }else{
-      const agent = process.env.PROXY && HttpsProxyAgent.default(process.env.PROXY);
+      const agent = config.proxy && HttpsProxyAgent.default(config.proxy);
       const requestOptions = agent ? {agent} : undefined;
       try{
         const t = timer.start("YouTube(AudioSource)#init->GetInfo");
@@ -76,7 +76,7 @@ export class YouTube extends AudioSource {
   async fetch():Promise<StreamInfo>{
     try{
       let info = this.ytdlInfo;
-      const agent = process.env.PROXY && HttpsProxyAgent.default(process.env.PROXY);
+      const agent = config.proxy && HttpsProxyAgent.default(config.proxy);
       const requestOptions = agent ? {agent} : undefined;
       if(!info){
         const t = timer.start("YouTube(AudioSource)#fetch->GetInfo");

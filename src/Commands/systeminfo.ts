@@ -3,7 +3,7 @@ import * as os from "os";
 import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage";
 import { getColor } from "../Util/colorUtil";
-import { GetMBytes, GetMemInfo, GetPercentage, log, logStore } from "../Util";
+import { config, GetMBytes, GetMemInfo, GetPercentage, log, logStore } from "../Util";
 
 export default class SystemInfo implements CommandInterface {
   name = "システム情報";
@@ -25,7 +25,7 @@ export default class SystemInfo implements CommandInterface {
     options.bot.PeriodicLog();
     await message.reply("実行します");
 
-    if(message.author.id === (process.env.ADMIN_USER ?? "593758391395155978") && (options.args.indexOf("log") >= 0 || options.args.length == 0)){
+    if(message.author.id === (config.adminId ?? "593758391395155978") && (options.args.indexOf("log") >= 0 || options.args.length == 0)){
       // Process Logs
       const logEmbed = new discord.MessageEmbed();
       logEmbed.setColor(getColor("UPTIME"));

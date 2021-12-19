@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "config.json.sample": "jsonc",
+    "config.json": "jsonc",
+    ".env.sample": "env"
+  }
+}
