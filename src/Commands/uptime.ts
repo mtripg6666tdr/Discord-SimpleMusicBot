@@ -14,8 +14,7 @@ export default class Uptime implements CommandInterface {
   category = "utility";
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    const now = await getExactTime("time.google.com");
-    const sno = new Date();
+    const now = new Date();
     const insta = CalcTime(now.getTime() - options.bot.InstantiatedTime.getTime());
     const ready = CalcTime(now.getTime() - options.client.readyAt.getTime());
     const embed = new discord.MessageEmbed()
@@ -28,7 +27,6 @@ export default class Uptime implements CommandInterface {
         + options.client.ws.ping + "ミリ秒(ボットWebSocket接続取得値)\r\n"
         + (voice.getVoiceConnection(message.guild.id)?.ping.udp ?? "-") + "ミリ秒(ボイスチャンネルUDP接続取得値)"
       )
-      .addField("時刻設定", `システム時刻: ${sno.toISOString()}\r\n正確な時刻: ${now.toISOString()}\r\n遅延: ${now.getTime() - sno.getTime()}ミリ秒`)
       .addField("データベースに登録されたサーバー数", Object.keys(options.data).length + "サーバー");
     message.reply({embeds:[embed]}).catch(e => log(e, "error"));
   }
