@@ -1,6 +1,5 @@
 import * as discord from "discord.js";
 import * as voice from "@discordjs/voice";
-import getExactTime from "ntp-client-promise";
 import { CommandArgs, CommandInterface } from ".";
 import { getColor } from "../Util/colorUtil";
 import { CalcTime, log } from "../Util";
