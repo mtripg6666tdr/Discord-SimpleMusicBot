@@ -5,6 +5,9 @@
   "private": "true",
   "main": "dist/lib.js",
   "types": "typings/lib.d.ts",
+  "engines": {
+    "node": ">=16.6.0"
+  },
   "dependencies": {
     "@discordjs/builders": "^0.9.0",
     "@discordjs/rest": "0.1.0-canary.0",
