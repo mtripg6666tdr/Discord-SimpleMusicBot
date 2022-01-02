@@ -17,18 +17,19 @@ export default class Play implements CommandInterface {
   }] as SlashCommandArgument[];
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
+    const server = options.data[message.guild.id];
     // 一時停止されてるね
-    if(options.data[message.guild.id].Player.IsPaused){
-      options.data[message.guild.id].Player.Resume();
-      message.reply(":arrow_forward: 再生を再開します。").catch(e => log(e, "error"))
+    if(server.Player.IsPaused){
+      server.Player.Resume();
+      await message.reply(":arrow_forward: 再生を再開します。").catch(e => log(e, "error"))
       return;
     }
     // キューが空だし引数もないし添付ファイルもない
-    if(options.data[message.guild.id].Queue.length == 0 && options.rawArgs == "" && message.attachments.size === 0) {
-      message.reply("再生するコンテンツがありません").catch(e => log(e, "error"));
+    if(server.Queue.length == 0 && options.rawArgs == "" && message.attachments.size === 0) {
+      await message.reply("再生するコンテンツがありません").catch(e => log(e, "error"));
       return;
     }
-    const wasConnected = options.data[message.guild.id].Player.IsConnecting;
+    const wasConnected = server.Player.IsConnecting;
     // VCに入れない
     if(!(await options.Join(message))) {
       await(await message.reply("VCに参加してください")).delete();
@@ -54,19 +55,23 @@ export default class Play implements CommandInterface {
           return;
         }
         options.rawArgs = (result[0] as ytsr.Video).url;
-        await options.PlayFromURL(message, options.rawArgs, !options.data[message.guild.id].Player.IsConnecting);
+        await options.PlayFromURL(message, options.rawArgs, !server.Player.IsConnecting);
         await msg.delete();
       }
     // 添付ファイルを確認
     }else if(message.attachments.size >= 1){
       options.rawArgs = message.attachments.first().url;
-      await options.PlayFromURL(message, options.rawArgs, !options.data[message.guild.id].Player.IsConnecting);
+      await options.PlayFromURL(message, options.rawArgs, !server.Player.IsConnecting);
     // なにもないからキューから再生
-    }else if(options.data[message.guild.id].Queue.length >= 1){
-      message.reply("再生します");
-      options.data[message.guild.id].Player.Play();
+    }else if(server.Queue.length >= 1){
+      if(!server.Player.IsPlaying){
+        await message.reply("再生します");
+        await server.Player.Play();
+      }else{
+        await message.reply("すでに再生中です");
+      }
     }else{
-      message.reply("✘キューが空です").catch(e => log(e, "error"));
+      await message.reply("✘キューが空です").catch(e => log(e, "error"));
     }
   }
 }
