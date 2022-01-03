@@ -40,7 +40,7 @@
     "node": "^17.1.0"
   },
   "optionalDependencies": {
-    "ffmpeg-static": "^4.4.0"
+    "ffmpeg-static": "^4.4.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
