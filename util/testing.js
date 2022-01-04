@@ -1,6 +1,6 @@
 // @ts-check
 require("dotenv").config();
-const { MusicBot } = require("../dist/lib");
+
 const CJSON = require("comment-json");
 const fs = require("fs");
 const path = require("path");
@@ -12,6 +12,9 @@ if(!fs.existsSync(path.join(__dirname, "../config.json"))){
   });
   fs.writeFileSync(path.join(__dirname, "../config.json"), JSON.stringify(config), {encoding:"utf-8"});
 }
+
+const { MusicBot } = require("../dist/lib");
+
 const bot = new MusicBot(false);
 bot.client.on("ready", ()=>{
   bot.client.destroy();
