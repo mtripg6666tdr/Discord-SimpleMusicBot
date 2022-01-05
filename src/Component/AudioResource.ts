@@ -46,7 +46,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
 
   public get ended() {
     return !this.isStreamReadable && this.silenceRemaining === 0;
-	}
+  }
 
   public read(): Buffer | null {
     if (this.silenceRemaining === 0) {
