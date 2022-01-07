@@ -75,7 +75,7 @@ $ npm install
 4. Botのトークンなどの設定  
 ボットのトークンを[`.env`](.env)ファイルに指定します。  
 書き方は[`.env.sample`](.env.sample)に書いてありますので、コピー＆リネームしてお使いください。  
-さらに細かい設定ができる`config.json`もあります。
+さらに細かい設定ができる`config.json`もありますので、こちらも設定してください。
   <details>
     <summary>詳細は開く</summary>
 
