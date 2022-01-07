@@ -11,7 +11,7 @@ export default class Searchb implements CommandInterface {
   unlist = true;
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    options.Join(message);
+    options.JoinVoiceChannel(message);
     if(options.data[message.guild.id].SearchPanel !== null){
       message.reply("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
       return;

@@ -14,7 +14,7 @@ export default class Join implements CommandInterface {
     if(message.member.voice.channel && message.member.voice.channel.members.has(options.client.user.id) && voice.getVoiceConnection(message.guild.id)){
       message.reply("✘すでにボイスチャンネルに接続中です。").catch(e => log(e, "error"));
     }else{
-      options.Join(message, true);
+      options.JoinVoiceChannel(message, true);
     }
   }
 }

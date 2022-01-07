@@ -288,6 +288,8 @@ export class MusicBot extends LogEmitter {
         await interaction.deferReply();
         // メッセージライクに解決してコマンドメッセージに
         const commandMessage = CommandMessage.createFromInteraction(this.client, interaction);
+        // プレフィックス更新
+        this.updatePrefix(commandMessage);
         // コマンドを実行
         await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
       }else{
@@ -362,8 +364,7 @@ export class MusicBot extends LogEmitter {
    * @param debugLogStoreLength デバッグログの保存する数
    */
   Run(token:string, debugLog:boolean = false, debugLogStoreLength?:number){
-    this.client.login(token)
-      .catch(e => this.Log(e, "error"));
+    this.client.login(token).catch(e => this.Log(e, "error"));
     logStore.log = debugLog;
     if(debugLogStoreLength) logStore.maxLength = debugLogStoreLength;
   }
@@ -461,7 +462,7 @@ export class MusicBot extends LogEmitter {
       rawArgs: optiont,
       updateBoundChannel: this.updateBoundChannel.bind(this),
       client: this.client,
-      Join: this.Join.bind(this),
+      JoinVoiceChannel: this.JoinVoiceChannel.bind(this),
       PlayFromURL: this.PlayFromURL.bind(this),
       initData: this.initData.bind(this),
       cancellations: this.cancellations
@@ -474,7 +475,7 @@ export class MusicBot extends LogEmitter {
    * @param reply 応答が必要な際に、コマンドに対して返信で応じるか新しいメッセージとして応答するか。(デフォルトではfalse)
    * @returns 成功した場合はtrue、それ以外の場合にはfalse
    */
-  private async Join(message:CommandMessage, reply:boolean = false):Promise<boolean>{
+  private async JoinVoiceChannel(message:CommandMessage, reply:boolean = false):Promise<boolean>{
     const t = timer.start("MusicBot#Join");
     if(message.member.voice.channel){
       // すでにVC入ってるよ～
@@ -651,7 +652,7 @@ export class MusicBot extends LogEmitter {
    * プレフィックス更新します
    * @param message 更新元となるメッセージ
    */
-  private updatePrefix(message:discord.Message):void{
+  private updatePrefix(message:CommandMessage|discord.Message):void{
     const pmatch = message.guild.members.resolve(this.client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
     if(pmatch){
       if(this.data[message.guild.id].PersistentPref.Prefix !== pmatch.groups.prefix){

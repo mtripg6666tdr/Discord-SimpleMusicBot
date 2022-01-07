@@ -9,7 +9,7 @@ export default class Bgm implements CommandInterface {
   category = "playlist";
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(!(await options.Join(message))) return;
+    if(!(await options.JoinVoiceChannel(message))) return;
     const url = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
     await options.PlayFromURL(message, url, !options.data[message.guild.id].Player.IsConnecting);
   }

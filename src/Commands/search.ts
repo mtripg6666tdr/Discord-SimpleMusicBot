@@ -22,7 +22,7 @@ export default class Search implements CommandInterface {
   }] as SlashCommandArgument[];
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    options.Join(message);
+    options.JoinVoiceChannel(message);
     if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){
       options.args.forEach(async u => {
         await options.PlayFromURL(message, u, !options.data[message.guild.id].Player.IsConnecting);
