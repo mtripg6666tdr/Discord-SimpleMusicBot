@@ -36,8 +36,3 @@ jobs:
       
       - name: Compile TypeScript
         run: npm run build
-        
-      - name: Test run
-        run: npx node util/testing
-        env: 
-          TOKEN: ${{secrets.TOKEN}}
