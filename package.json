@@ -24,7 +24,7 @@
     "html-entities": "^2.3.2",
     "https-proxy-agent": "^5.0.0",
     "libsodium-wrappers": "^0.7.9",
-    "m3u8stream": "^0.8.4",
+    "m3u8stream": "^0.8.6",
     "miniget": "^4.2.2",
     "node-opus": "^0.3.3",
     "opusscript": "0.0.8",
