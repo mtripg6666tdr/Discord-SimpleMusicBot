@@ -34,7 +34,7 @@
     "typescript": "^4.5.4",
     "ytdl-core": "^4.10.0",
     "ytpl": "^2.2.3",
-    "ytsr": "^3.5.3"
+    "ytsr": "^3.6.0"
   },
   "devDependencies": {
     "node": "^17.3.0"
