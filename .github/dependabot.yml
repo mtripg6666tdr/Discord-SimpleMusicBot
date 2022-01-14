@@ -16,7 +16,6 @@ updates:
         versions: ["^18.0.0"]
       - dependency-name: "@types/node"
         versions: ["^18.0.0"]
-      - dependency-name: "soundcloud.ts"
       - dependency-name: "discord.js"
       - dependency-name: "discord-api-types"
       - dependency-name: "@discordjs/builders"
