@@ -5,6 +5,8 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/mtripg6666tdr/Discord-SimpleMusicBot)
 [![GitHub License](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)](LICENSE.md)
 
+![Bot use image](https://user-images.githubusercontent.com/56076195/149505763-276ec199-44c5-4ccc-a72d-5ac630ff4c0f.png)
+
 Discord向け日本製シンプル音楽ボット。  
 YouTubeなどからの再生に対応。
 選曲はキーワードで指定可能なのでURLを控える必要はありません。  
@@ -291,7 +293,8 @@ module.exports = function(parent){
 本リポジトリへの貢献は大歓迎です！  
 バグを発見した場合等も重複したIssueがないことを確認し、Issueをまず開いてください。可能な場合、Pull Requestをそのうえで開いてください。  
 Issueのほか、下記のサポートサーバーでも各種お問い合わせを受け付けています。  
-いづれかの手段でお気軽にどうぞ！
+いづれかの手段でお気軽にどうぞ！  
+**ただし、現在多忙のため、依存関係のアップデート関連にしか時間を割くことができず、Issueにdefermentタグをつけさせていただく場合があります。可能な限り早く対応できるように努力いたしますので、何卒ご了承ください。**  
 
 ## コード使用について
 - コードの使用時は必ず[ライセンス](LICENSE)に沿った使い方をしてください
