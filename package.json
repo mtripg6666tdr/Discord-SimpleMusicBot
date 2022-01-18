@@ -18,7 +18,7 @@
     "comment-json": "^4.1.1",
     "discord-api-types": "^0.26.0",
     "discord.js": "^13.6.0",
-    "dotenv": "^13.0.1",
+    "dotenv": "^14.2.0",
     "follow-redirects": "^1.14.7",
     "genius-lyrics": "^4.3.5",
     "html-entities": "^2.3.2",
