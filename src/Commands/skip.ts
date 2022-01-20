@@ -1,6 +1,6 @@
 import { CommandArgs, CommandInterface } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { log } from "../Util";
+import { log, StringifyObject } from "../Util";
 
 export default class Skip implements CommandInterface {
   name = "スキップ";
@@ -10,15 +10,19 @@ export default class Skip implements CommandInterface {
   category = "player";
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
+    const server = options.data[message.guild.id];
     // そもそも再生状態じゃないよ...
-    if(!options.data[message.guild.id].Player.IsPlaying){
-      message.reply("再生中ではありません").catch(e => log(e, "error"));
+    if(!server.Player.IsPlaying){
+      await message.reply("再生中ではありません").catch(e => log(StringifyObject(e), "error"));
+      return;
+    }else if(server.Player.preparing){
+      await message.reply("再生準備中です").catch(e => log(StringifyObject(e), "error"))
       return;
     }
-    const title = options.data[message.guild.id].Queue.get(0).BasicInfo.Title;
-    options.data[message.guild.id].Player.Stop();
-    await options.data[message.guild.id].Queue.Next();
-    options.data[message.guild.id].Player.Play();
+    const title = server.Queue.get(0).BasicInfo.Title;
+    server.Player.Stop();
+    await server.Queue.Next();
+    await server.Player.Play();
     message.reply(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => log(e, "error"));
   }
 }

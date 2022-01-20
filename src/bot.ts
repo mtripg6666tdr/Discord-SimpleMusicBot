@@ -565,15 +565,25 @@ export class MusicBot extends LogEmitter {
       });
       const cancellation = new TaskCancellationManager();
       this.cancellations.push(cancellation);
-      const index = await this.data[message.guild.id].Queue.ProcessPlaylist(this.client, msg, cancellation, first, "youtube", result.items, result.title, result.estimatedItemCount, (c) => ({
-        url: c.url,
-        channel: c.author.name,
-        description: "プレイリストから指定のため詳細は表示されません",
-        isLive: c.isLive,
-        length: c.durationSec,
-        thumbnail: c.thumbnails[0].url,
-        title: c.title
-      } as exportableCustom));
+      const index = await this.data[message.guild.id].Queue.ProcessPlaylist(
+        this.client, 
+        msg, 
+        cancellation, 
+        first, 
+        /* known source */ "youtube", 
+        /* result */ result.items, 
+        /* playlist name */ result.title, 
+        /* tracks count */ result.estimatedItemCount, 
+        /* consumer */ (c) => ({
+          url: c.url,
+          channel: c.author.name,
+          description: "プレイリストから指定のため詳細は表示されません",
+          isLive: c.isLive,
+          length: c.durationSec,
+          thumbnail: c.thumbnails[0].url,
+          title: c.title
+        } as exportableCustom)
+      );
       if(cancellation.Cancelled){
         await msg.edit("✅キャンセルされました。");
       }else{
@@ -617,8 +627,8 @@ export class MusicBot extends LogEmitter {
       this.data[message.guild.id].Player.Play();
     }else{
       try{
-        await this.data[message.guild.id].Queue.AutoAddQueue(this.client, optiont, message.member, "unknown", first, false, message.channel as discord.TextChannel, await message.reply("お待ちください..."));
-        this.data[message.guild.id].Player.Play();
+        const success = await this.data[message.guild.id].Queue.AutoAddQueue(this.client, optiont, message.member, "unknown", first, false, message.channel as discord.TextChannel, await message.reply("お待ちください..."));
+        if(success) this.data[message.guild.id].Player.Play();
         return;
       }
       catch{

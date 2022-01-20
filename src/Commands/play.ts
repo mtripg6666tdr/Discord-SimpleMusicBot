@@ -61,7 +61,7 @@ export default class Play implements CommandInterface {
       await options.PlayFromURL(message, options.rawArgs, !server.Player.IsConnecting);
     // なにもないからキューから再生
     }else if(server.Queue.length >= 1){
-      if(!server.Player.IsPlaying){
+      if(!server.Player.IsPlaying && !server.Player.preparing){
         await message.reply("再生します");
         await server.Player.Play();
       }else{

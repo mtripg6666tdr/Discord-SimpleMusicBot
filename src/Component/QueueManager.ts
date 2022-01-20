@@ -364,7 +364,7 @@ export class QueueManager extends ManagerBase {
     this.Log("Shuffle() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(this._default.length === 0) return;
-    if(this.info.Player.IsPlaying){
+    if(this.info.Player.IsPlaying || this.info.Player.preparing){
       const first = this._default[0];
       this._default.shift();
       this._default.sort(() => Math.random() - 0.5);

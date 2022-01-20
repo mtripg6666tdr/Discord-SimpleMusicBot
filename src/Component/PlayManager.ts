@@ -20,7 +20,7 @@ export class PlayManager extends ManagerBase {
   error = false;
   errorCount = 0;
   errorUrl = "";
-  private stopped = false;
+  preparing = false;
   get CurrentVideoUrl():string{
     if(this.CurrentVideoInfo) return this.CurrentVideoInfo.Url;
     else return "";
@@ -75,15 +75,18 @@ export class PlayManager extends ManagerBase {
    */
   async Play():Promise<PlayManager>{
     // 再生できる状態か確認
-    if(
-      !this.IsConnecting 
-      || (this.AudioPlayer && this.AudioPlayer.state.status !== voice.AudioPlayerStatus.Idle) 
-      || this.info.Queue.Nothing
-    ) {
+    const badCondition = 
+      /* 接続中でない　　　　　　　　　 */    !this.IsConnecting 
+      /* プレイヤーがアイドル状態でない */ || (this.AudioPlayer && this.AudioPlayer.state.status !== voice.AudioPlayerStatus.Idle) 
+      /* キューが空　　　　　　　　　　 */ || this.info.Queue.Nothing
+      /* 準備中　　　　　　　　　　　　 */ || this.preparing
+    ;
+    if(badCondition) {
       this.Log("Play() called but operated nothing", "warn");
       return this;
     }
     this.Log("Play() called");
+    this.preparing = true;
     let mes:Message = null;
     let ch:TextChannel = null;
     this.CurrentVideoInfo = this.info.Queue.get(0).BasicInfo;
@@ -106,7 +109,7 @@ export class PlayManager extends ManagerBase {
         }
       }
       this.Log("Play() failed, (" + this.errorCount + "times)", "warn");
-      this.error = true;
+      this.error = this.preparing = false;
       this.Stop();
       if(this.errorCount >= this.retryLimit){
         await this.info.Queue.Next();
@@ -139,14 +142,15 @@ export class PlayManager extends ManagerBase {
           });
         }
         this.AudioPlayer.on("unsubscribe", (_)=>{
-          this.AudioPlayer.stop(true);
+          this.AudioPlayer.stop();
           this.AudioPlayer = null;
         });
         t.end();
       }
       const t = timer.start("PlayManager#Play->FetchAudioSource");
-      // QueueContentからストリーム、M3U8プレイリスト(非HLS)または直URLを取得
+      // QueueContentからストリーム情報を取得
       const rawStream = await this.CurrentVideoInfo.fetch();
+      // 情報からストリームを作成
       const stream = FixedAudioResource.fromAudioResource(this.ResolveStream(rawStream), this.CurrentVideoInfo.LengthSeconds);
       this.Log("Stream edges: Raw -> " + stream.edges.map(e => e.type).join(" -> ") + " ->");
       // fetchおよび処理中に切断された場合処理を終了
@@ -156,13 +160,13 @@ export class PlayManager extends ManagerBase {
         return this;
       }
       this.error = false;
-      this.stopped = false;
       t.end();
       // 再生
       const u = timer.start("PlayManager#Play->EnterPlayingState");
       try{
         this.AudioPlayer.play(stream);
         await voice.entersState(this.AudioPlayer, voice.AudioPlayerStatus.Playing, 10e4);
+        this.preparing = false;
         stream.events
           .on("error", er => {
             if(!er) return;
@@ -178,8 +182,9 @@ export class PlayManager extends ManagerBase {
           .on("end", () => {
             this.onStreamFinished();
           });
-
-      }catch{}
+      }catch(e){
+        this.Log(StringifyObject(e), "error");
+      }
       u.end();
       this.Log("Play() started successfully");
       if(this.info.boundTextChannel && ch && mes){
@@ -212,13 +217,14 @@ export class PlayManager extends ManagerBase {
       }
     }
     catch(e){
-      log(e, "error");
+      log(StringifyObject(e), "error");
       try{
         const t = typeof e == "string" ? e : StringifyObject(e);
         if(t.indexOf("429") >= 0){
           mes.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(e => log(e, "error"));
           this.Log("Rate limit detected", "error");
           this.Stop();
+          this.preparing = false;
           return this;
         }
       }catch{};
@@ -237,7 +243,6 @@ export class PlayManager extends ManagerBase {
   Stop():PlayManager{
     this.Log("Stop() called");
     if(this.AudioPlayer){
-      this.stopped = true;
       this.AudioPlayer.stop(true);
     }
     this.info.Bot.BackupData();
