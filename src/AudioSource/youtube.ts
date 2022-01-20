@@ -73,7 +73,7 @@ export class YouTube extends AudioSource {
     return this;
   }
 
-  async fetch():Promise<StreamInfo>{
+  async fetch(url?:boolean):Promise<StreamInfo>{
     try{
       let info = this.ytdlInfo;
       const agent = config.proxy && HttpsProxyAgent.default(config.proxy);
@@ -102,6 +102,14 @@ export class YouTube extends AudioSource {
         isHLS: this.LiveStream,
       } as ytdl.chooseFormatOptions);
       log("[AudioSource:youtube]Format: " + format.itag + ", Bitrate: " + format.bitrate + "bps, Audio codec:" + format.audioCodec + ", Container: " + format.container);
+      if(url){
+        this.fallback = false;
+        log("[AudioSource:youtube]Returning the url instead of stream");
+        return {
+          type: "url",
+          url: format.url
+        }
+      }
       let readable = null as Readable;
       if(info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow){
         readable = ytdl.downloadFromInfo(info, {format, lang: "ja"});

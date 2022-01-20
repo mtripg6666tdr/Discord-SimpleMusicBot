@@ -26,7 +26,7 @@ export abstract class AudioSource {
   // 現在再生中の曲を示すEmbedField
   abstract toField(verbose:boolean):EmbedField[];
   // 再生するためのストリームをフェッチ
-  abstract fetch():Promise<StreamInfo>;
+  abstract fetch(url?:boolean):Promise<StreamInfo>;
   // クラスを初期化する非同期メソッド
   abstract init(url:string, prefetched:exportableCustom):Promise<AudioSource>;
   // 現在再生中の曲に関する追加データ

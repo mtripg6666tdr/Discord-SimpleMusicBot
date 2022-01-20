@@ -3,8 +3,8 @@ import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
 
 export default class Cancel implements CommandInterface {
-  name = "cancel";
-  alias = ["キャンセル", "中止", "abort"];
+  name = "キャンセル";
+  alias = ["cancel" ,"中止", "abort"];
   description = "実行中のキャンセル可能な処理がある場合それをすべて中止します。";
   unlist = false;
   category = "utility";

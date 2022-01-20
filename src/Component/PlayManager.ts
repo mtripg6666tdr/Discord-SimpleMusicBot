@@ -4,7 +4,7 @@ import * as voice from "@discordjs/voice";
 import { Readable } from "stream";
 import { FFmpeg } from "prism-media";
 import { AudioSource, StreamInfo, YouTube } from "../AudioSource";
-import { FallBackNotice, type GuildDataContainer } from "../definition";
+import { DefaultUserAgent, FallBackNotice, type GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, InitPassThrough, log, timer, StringifyObject, config } from "../Util";
 import { ManagerBase } from "./ManagerBase";
@@ -17,6 +17,7 @@ import { FixedAudioResource } from "./AudioResource";
 export class PlayManager extends ManagerBase {
   private AudioPlayer:voice.AudioPlayer = null;
   private readonly retryLimit = 3;
+  private seek = 0;
   error = false;
   errorCount = 0;
   errorUrl = "";
@@ -49,7 +50,7 @@ export class PlayManager extends ManagerBase {
    */
   get CurrentTime():number{
     return (this.AudioPlayer && this.AudioPlayer.state.status === voice.AudioPlayerStatus.Playing) 
-      ? (this.AudioPlayer.state as voice.AudioPlayerPlayingState).playbackDuration : 0;
+      ? this.seek + (this.AudioPlayer.state as voice.AudioPlayerPlayingState).playbackDuration : 0;
   }
   /**
    * クライアント
@@ -73,7 +74,7 @@ export class PlayManager extends ManagerBase {
   /**
    *  再生します
    */
-  async Play():Promise<PlayManager>{
+  async Play(time:number = 0):Promise<PlayManager>{
     // 再生できる状態か確認
     const badCondition = 
       /* 接続中でない　　　　　　　　　 */    !this.IsConnecting 
@@ -147,11 +148,15 @@ export class PlayManager extends ManagerBase {
         });
         t.end();
       }
+      // シーク位置を確認
+      if(this.CurrentVideoInfo.LengthSeconds <= time) time = 0;
+      this.seek = time;
       const t = timer.start("PlayManager#Play->FetchAudioSource");
       // QueueContentからストリーム情報を取得
-      const rawStream = await this.CurrentVideoInfo.fetch();
+      // @ts-ignore
+      const rawStream = await this.CurrentVideoInfo.fetch(time > 0);
       // 情報からストリームを作成
-      const stream = FixedAudioResource.fromAudioResource(this.ResolveStream(rawStream), this.CurrentVideoInfo.LengthSeconds);
+      const stream = FixedAudioResource.fromAudioResource(this.ResolveStream(rawStream, time), this.CurrentVideoInfo.LengthSeconds);
       this.Log("Stream edges: Raw -> " + stream.edges.map(e => e.type).join(" -> ") + " ->");
       // fetchおよび処理中に切断された場合処理を終了
       const connection = voice.getVoiceConnection(this.info.GuildID);
@@ -297,11 +302,20 @@ export class PlayManager extends ManagerBase {
     return this;
   }
 
-  private ResolveStream(rawStream:StreamInfo):voice.AudioResource{
+  private ResolveStream(rawStream:StreamInfo, time:number):voice.AudioResource{
     let stream = null as voice.AudioResource;
     if(rawStream.type === "url"){
       // URLならFFmpegにわたしてOggOpusに変換
-      stream = voice.createAudioResource(this.CreateReadableFromUrl(rawStream.url), {inputType: voice.StreamType.OggOpus});
+      stream = voice.createAudioResource(
+        this.CreateReadableFromUrl(rawStream.url, time > 0 ? ["-ss", time.toString()] : []),
+        {inputType: voice.StreamType.OggOpus}
+      );
+    }else if(time > 0){
+      // シークが必要ならFFmpegを通す
+      stream = voice.createAudioResource(
+        this.CreateFFmpegReadableFromReadable(rawStream.stream, ["-ss", time.toString()]),
+        {inputType: voice.StreamType.OggOpus}
+      );
     }else{
       // ストリームなら変換しない
       const rstream = rawStream.stream as Readable;
@@ -320,7 +334,39 @@ export class PlayManager extends ManagerBase {
     return stream;
   }
 
-  private CreateReadableFromUrl(url:string):Readable{
+  private CreateFFmpegReadableFromReadable(original:Readable, additionalArgs:string[]){
+    const args = [
+      '-reconnect', '1', 
+      '-reconnect_streamed', '1', 
+      '-reconnect_on_network_error', '1', 
+      '-reconnect_on_http_error', '4xx,5xx', 
+      '-reconnect_delay_max', '30', 
+      '-analyzeduration', '0', 
+      '-loglevel', '0', 
+      '-acodec', 'libopus', 
+      '-f', 'opus', 
+      '-ar', '48000', 
+      '-ac', '2',
+      ...additionalArgs
+    ];
+    const passThrough = InitPassThrough();
+    if(!config.debug){
+      passThrough.on("error", (e)=> {
+        this.AudioPlayer.emit("error", {
+          errorInfo: e,
+          resource: (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource ?? null
+        } as unknown as voice.AudioPlayerError);
+      });
+    }
+    const stream = original
+      .on("error", (er) => passThrough.emit("error", er))
+      .pipe(new FFmpeg({args}))
+      .on("error", (er) => passThrough.emit("error", er))
+      .pipe(passThrough);
+    return stream;
+  }
+
+  private CreateReadableFromUrl(url:string, additionalArgs:string[]):Readable{
     const args = [
       '-reconnect', '1', 
       '-reconnect_streamed', '1', 
@@ -333,7 +379,9 @@ export class PlayManager extends ManagerBase {
       '-acodec', 'libopus', 
       '-f', 'opus', 
       '-ar', '48000', 
-      '-ac', '2'
+      '-ac', '2',
+      '-user_agent', DefaultUserAgent,
+      ...additionalArgs
     ];
     const passThrough = InitPassThrough();
     if(!config.debug){
