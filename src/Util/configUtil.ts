@@ -7,9 +7,13 @@ type ConfigJson = {
   maintenance: boolean, 
   errorChannel: string, 
   proxy: string,
+  prefix:string,
 }
 
-const config:ConfigJson = CJSON.parse(fs.readFileSync(path.join(__dirname, "../../config.json"), {encoding: "utf-8"}));
+const config:ConfigJson = {
+  prefix: ">",
+  ...CJSON.parse(fs.readFileSync(path.join(__dirname, "../../config.json"), {encoding: "utf-8"}))
+};
 
 if(![
   config.adminId === null || typeof config.adminId === "string",
@@ -17,8 +21,10 @@ if(![
   config.errorChannel === null || typeof config.errorChannel === "string",
   typeof config.maintenance === "boolean",
   config.proxy === null || typeof config.proxy === "string",
+  typeof config.prefix === "string",
+  config.prefix === null || config.prefix.length === 1
 ].every(test => test)){
   throw new Error("Invalid config.json");
 }
 
-export const { adminId, debug, errorChannel, maintenance, proxy } = config;
+export const { prefix, adminId, debug, errorChannel, maintenance, proxy } = config;

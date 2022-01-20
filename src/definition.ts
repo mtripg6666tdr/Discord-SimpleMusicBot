@@ -4,6 +4,7 @@ import type { MusicBot } from "./bot";
 import * as fs from "fs";
 import { PlayManager } from "./Component/PlayManager";
 import { QueueManager } from "./Component/QueueManager";
+import { config } from "./Util";
 
 /**
  * サーバーごとデータを保存するコンテナ
@@ -60,15 +61,21 @@ export class GuildDataContainer{
       this.PersistentPref = JSON.parse(fs.readFileSync(this.DataPath, { encoding: "utf-8"}));
     }else{
       this.PersistentPref = {
-        Prefix: ">"
+        Prefix: config.prefix || ">"
       }
     }
   }
 
+  /**
+   * @deprecated
+   */
   SavePersistentPrefs(){
     fs.writeFileSync(this.DataPath, JSON.stringify(this.PersistentPref));
   }
 
+  /**
+   * @deprecated
+   */
   ResetPersistentPrefs(){
     fs.unlinkSync(this.DataPath);
   }

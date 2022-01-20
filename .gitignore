@@ -11,6 +11,8 @@ typings
 youtube-dl
 node
 *.template.*
+*.temp.*
+*.tmp*
 *.log
 addon
 config.json

@@ -196,7 +196,7 @@ export class MusicBot extends LogEmitter {
     this.initData(message.guild.id, message.channel.id);
     // プレフィックスの更新
     this.updatePrefix(message);
-    if(message.content === "<@" + this.client.user.id + ">") {
+    if(message.content === `<@${this.client.user.id}>`) {
       // メンションならば
       await message.channel
         .send("コマンドは、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`で確認できます")
@@ -444,6 +444,7 @@ export class MusicBot extends LogEmitter {
       this.data[guildid] = new GuildDataContainer(this.Client, guildid, channelid, this);
       this.data[guildid].Player.SetData(this.data[guildid]);
       this.data[guildid].Queue.SetData(this.data[guildid]);
+      this.Log(`Prefix was set to '${this.data[guildid].PersistentPref.Prefix}' (${guildid})`);
     }
   }
 
@@ -668,8 +669,8 @@ export class MusicBot extends LogEmitter {
       if(this.data[message.guild.id].PersistentPref.Prefix !== pmatch.groups.prefix){
         this.data[message.guild.id].PersistentPref.Prefix = pmatch.groups.prefix;
       }
-    }else if(this.data[message.guild.id].PersistentPref.Prefix !== ">"){
-      this.data[message.guild.id].PersistentPref.Prefix = ">";
+    }else if(this.data[message.guild.id].PersistentPref.Prefix !== config.prefix){
+      this.data[message.guild.id].PersistentPref.Prefix = config.prefix;
     }
   }
 
