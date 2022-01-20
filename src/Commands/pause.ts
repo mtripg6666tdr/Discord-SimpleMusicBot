@@ -13,7 +13,8 @@ export default class Pause implements CommandInterface {
     const server = options.data[message.guild.id];
     // そもそも再生状態じゃないよ...
     if(!server.Player.IsPlaying || server.Player.IsPaused){
-      message.reply("再生中ではありません").catch(e => log(e, "error"));
+      await message.reply("再生中ではありません").catch(e => log(e, "error"));
+      return;
     }
     // 停止しま～す
     server.Player.Pause();
