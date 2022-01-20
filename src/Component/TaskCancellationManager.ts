@@ -4,8 +4,9 @@
 export class TaskCancellationManager {
   private _cancelled = false;
   private _message = "";
-  constructor(){
-    //
+  private _guildid = "";
+  constructor(guildid:string){
+    this._guildid = guildid;
   }
 
   /**
@@ -13,6 +14,13 @@ export class TaskCancellationManager {
    */
   get Cancelled(){
     return this._cancelled;
+  }
+
+  /**
+   * タスクが実行されているサーバーIDを取得します
+   */
+  get GuildId(){
+    return this._guildid;
   }
 
   /**

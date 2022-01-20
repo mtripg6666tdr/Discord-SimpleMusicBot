@@ -254,7 +254,7 @@ export class MusicBot extends LogEmitter {
       this.cancellations.filter(c => !c.Cancelled).length > 0 && 
       (message.content === "キャンセル" || message.content === "cancel")
       ){
-      this.cancellations.forEach(c => c.Cancel());
+      this.cancellations.forEach(c => c.GuildId === message.guild.id && c.Cancel());
       await message.channel.send("処理中の処理をすべてキャンセルしています....")
         .catch(e => this.Log(e, "error"));
     }
@@ -562,9 +562,9 @@ export class MusicBot extends LogEmitter {
       const result = await ytpl.default(id, {
         gl: "JP",
         hl: "ja",
-        limit: 999
+        limit: 999 - this.data[message.guild.id].Queue.length
       });
-      const cancellation = new TaskCancellationManager();
+      const cancellation = new TaskCancellationManager(message.guild.id);
       this.cancellations.push(cancellation);
       const index = await this.data[message.guild.id].Queue.ProcessPlaylist(
         this.client, 
@@ -601,7 +601,7 @@ export class MusicBot extends LogEmitter {
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const sc = new Soundcloud();
       const playlist = await sc.playlists.getV2(optiont);
-      const cancellation = new TaskCancellationManager();
+      const cancellation = new TaskCancellationManager(message.guild.id);
       this.cancellations.push(cancellation);
       const index = await this.data[message.guild.id].Queue.ProcessPlaylist(this.client, msg, cancellation, first, "soundcloud", playlist.tracks, playlist.title, playlist.track_count, async (track) => {
         const item = await sc.tracks.getV2(track.id);

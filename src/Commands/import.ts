@@ -34,7 +34,7 @@ export default class Import implements CommandInterface {
     }
     if(url.startsWith("http://discord.com/channels/") || url.startsWith("https://discord.com/channels/")){
       let smsg = null as ResponseMessage;
-      const cancellation = new TaskCancellationManager();
+      const cancellation = new TaskCancellationManager(message.guild.id);
       options.cancellations.push(cancellation);
       try{
         smsg = await message.reply("🔍メッセージを取得しています...");
