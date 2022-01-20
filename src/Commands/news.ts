@@ -6,8 +6,8 @@ import { log } from "../Util";
 import { getColor } from "../Util/colorUtil";
 
 export default class News implements CommandInterface {
-  name = "news";
-  alias = ["ニュース"];
+  name = "ニュース";
+  alias = ["news"];
   description = "現在配信されているニューストピックスを閲覧・視聴できます。";
   unlist = false;
   category = "playlist";
