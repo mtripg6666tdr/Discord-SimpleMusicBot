@@ -53,7 +53,7 @@ export default class Search implements CommandInterface {
         t.end();
         const u = timer.start("Search(Command)->AfterYtsr");
         const embed = new discord.MessageEmbed();
-        embed.title = "\"" + options.rawArgs + "\"の検索結果✨";
+        embed.setTitle("\"" + options.rawArgs + "\"の検索結果✨");
         embed.setColor(getColor("SEARCH"));
         let desc = "";
         let index = 1;
@@ -61,7 +61,7 @@ export default class Search implements CommandInterface {
         for(let i = 0; i < result.items.length; i++){
           if(result.items[i].type == "video"){
             const video = (result.items[i] as ytsr.Video);
-            desc += "`" + index + ".` [" + video.title + "](" + video.url + ") `" + video.duration + "` - `" + video.author.name + "` \r\n\r\n";
+            desc += `\`${index}.\` [${video.title}](${video.url}) \`${video.duration}\` - \`${video.author.name}\` \r\n\r\n`;
             options.data[message.guild.id].SearchPanel.Opts[index] = {
               url: video.url,
               title: video.title,
@@ -70,7 +70,7 @@ export default class Search implements CommandInterface {
             };
             selectOpts.push({
               label: index + ". " + (video.title.length > 90 ? video.title.substring(0, 90) + "…" : video.title),
-              description: "長さ: " + video.duration + ", チャンネル名: " + video.author.name,
+              description: `長さ: ${video.duration}, チャンネル名: ${video.author.name}`,
               value: index.toString()
             });
             index++;
@@ -81,11 +81,13 @@ export default class Search implements CommandInterface {
           await msg.edit(":pensive:見つかりませんでした。");
           return;
         }
-        embed.description = desc;
-        embed.footer = {
-          iconURL: message.author.avatarURL(),
-          text:"動画のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
-        };
+        embed
+          .setDescription(desc)
+          .setFooter({
+            iconURL: message.author.avatarURL(),
+            text:"動画のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
+          })
+        ;
         await msg.edit({
           content: null, 
           embeds:[embed],
