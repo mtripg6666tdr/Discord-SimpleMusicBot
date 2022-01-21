@@ -32,7 +32,7 @@ export default class News implements CommandInterface {
         Opts: {}
       };
       const {items: result} = await ytpl.default(url, {
-        gl: "JP", hl: "ja"
+        gl: "JP", hl: "ja", limit: 20
       });
       let desc = "";
       const selectOpts = [] as MessageSelectOptionData[];
