@@ -72,7 +72,7 @@ export interface CommandArgs {
    * @param message 参加に使うメッセージ
    * @param reply メッセージに返信するかどうか
    */
-  JoinVoiceChannel(message:CommandMessage, reply?:boolean):Promise<boolean>;
+  JoinVoiceChannel(message:CommandMessage, reply?:boolean, replyOnFail?:boolean):Promise<boolean>;
   /**
    * URLからキューに追加する関数
    * @param message 追加に使うメッセージ

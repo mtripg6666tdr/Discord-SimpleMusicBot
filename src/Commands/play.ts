@@ -32,10 +32,7 @@ export default class Play implements CommandInterface {
     }
     const wasConnected = server.Player.IsConnecting;
     // VCに入れない
-    if(!(await options.JoinVoiceChannel(message))) {
-      await(await message.reply("VCに参加してください")).delete();
-      return;
-    }
+    if(!(await options.JoinVoiceChannel(message, /* reply */ false, /* reply when failed */ true))) return;
     // 引数ついてたらそれ優先
     if(options.rawArgs !== ""){
       if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){

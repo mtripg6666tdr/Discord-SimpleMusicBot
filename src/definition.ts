@@ -5,6 +5,7 @@ import * as fs from "fs";
 import { PlayManager } from "./Component/PlayManager";
 import { QueueManager } from "./Component/QueueManager";
 import { config } from "./Util";
+import { CommandMessage } from "./Component/CommandMessage";
 
 /**
  * サーバーごとデータを保存するコンテナ
@@ -106,6 +107,10 @@ export type SearchPanel = {
      * 検索者のユーザー名
      */
     userName: string
+    /**
+     * 検索が要求されたときのメッセージ
+     */
+    commandMessage: CommandMessage
   },
   /**
    * 検索窓の内容を保存します

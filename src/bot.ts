@@ -248,7 +248,7 @@ export class MusicBot extends LogEmitter {
         if(message.author.id !== panel.Msg.userId) return;
         const nums = NormalizeText(message.content).split(" ");
         const responseMessage = await(await this.client.channels.fetch(panel.Msg.chId) as discord.TextChannel).messages.fetch(panel.Msg.id);
-        await this.playFromSearchPanelOptions(nums, message.guild.id, ResponseMessage.createFromMessage(responseMessage, null));
+        await this.playFromSearchPanelOptions(nums, message.guild.id, ResponseMessage.createFromMessage(responseMessage, panel.Msg.commandMessage));
       }
     }else if(
       this.cancellations.filter(c => !c.Cancelled).length > 0 && 
@@ -334,9 +334,9 @@ export class MusicBot extends LogEmitter {
           const message = interaction.message;
           let responseMessage = null as ResponseMessage;
           if(message instanceof discord.Message){
-            responseMessage = ResponseMessage.createFromInteractionWithMessage(interaction, message, null);
+            responseMessage = ResponseMessage.createFromInteractionWithMessage(interaction, message, panel.Msg.commandMessage);
           }else{
-            responseMessage = ResponseMessage.createFromInteraction(this.client, interaction, message, null);
+            responseMessage = ResponseMessage.createFromInteraction(this.client, interaction, message, panel.Msg.commandMessage);
           }
           await this.playFromSearchPanelOptions(interaction.values, interaction.guild.id, responseMessage)
         }
@@ -354,7 +354,7 @@ export class MusicBot extends LogEmitter {
     log("[Main]Registered Server(s) count: " + Object.keys(this.data).length);
     log("[Main]Connecting Server(s) count: " + _d.filter(info => info.Player.IsPlaying).length);
     log("[Main]Paused Server(s) count: " + _d.filter(_d => _d.Player.IsPaused).length);
-    log("[System]Free:" + Math.floor(memory.free) + "MB; Total:" + Math.floor(memory.total) + "MB; Usage:" + memory.usage + "%");
+    log(`[System]Free:${Math.floor(memory.free)}MB; Total:${Math.floor(memory.total)}MB; Usage:${memory.usage}%`);
   }
 
   /**
@@ -476,7 +476,7 @@ export class MusicBot extends LogEmitter {
    * @param reply 応答が必要な際に、コマンドに対して返信で応じるか新しいメッセージとして応答するか。(デフォルトではfalse)
    * @returns 成功した場合はtrue、それ以外の場合にはfalse
    */
-  private async JoinVoiceChannel(message:CommandMessage, reply:boolean = false):Promise<boolean>{
+  private async JoinVoiceChannel(message:CommandMessage, reply:boolean = false, replyOnFail:boolean = false):Promise<boolean>{
     const t = timer.start("MusicBot#Join");
     if(message.member.voice.channel){
       // すでにVC入ってるよ～
@@ -489,7 +489,12 @@ export class MusicBot extends LogEmitter {
       }
 
       // 入ってないね～参加しよう
-      const msg = reply ? await message.reply(":electric_plug:接続中...") : await message.channel.send(":electric_plug:接続中...");
+      const msg = await ((mes:string) => {
+        if(reply)
+          return message.reply(mes)
+        else 
+          return message.channel.send(mes)
+      })(":electric_plug:接続中...");
       try{
         voice.joinVoiceChannel({
           channelId: message.member.voice.channel.id,
@@ -505,20 +510,30 @@ export class MusicBot extends LogEmitter {
       }
       catch(e){
         this.Log(e, "error");
-        msg?.delete();
-        await message.reply("😑接続に失敗しました…もう一度お試しください。")
-          .catch(e => this.Log(e, "error"));
+        const failedMsg = "😑接続に失敗しました…もう一度お試しください。";
+          if(!reply && replyOnFail){
+            await msg.delete()
+              .catch(e => this.Log(e, "error"));
+            await message.reply(failedMsg)
+              .catch(e => this.Log(e, "error"));
+          }else{
+            await msg?.edit(failedMsg)
+              .catch(e => this.Log(e, "error")); 
+          }
         this.data[message.guild.id].Player.Disconnect();
         t.end();
         return false;
       }
     }else{
       // あらメッセージの送信者さんはボイチャ入ってないん…
-      reply ? 
-      await message.reply("ボイスチャンネルに参加してからコマンドを送信してください:relieved:")
-        .catch(e => this.Log(e, "error")) :
-      await message.channel.send("ボイスチャンネルに参加してからコマンドを送信してください:relieved:")
-        .catch(e => this.Log(e, "error"));
+      await (mes => {
+      if(reply || replyOnFail)
+          return message.reply(mes)
+            .catch(e => this.Log(e, "error"));
+        else
+          return message.channel.send(mes)
+            .catch(e => this.Log(e, "error"));
+      })("ボイスチャンネルに参加してからコマンドを送信してください:relieved:");
       t.end();
       return false;
     }
@@ -654,7 +669,7 @@ export class MusicBot extends LogEmitter {
       (message.member.voice.channel && message.member.voice.channel.members.has(this.client.user.id)) || 
       message.content.indexOf("join") >= 0
       ){
-      if(message.content !== (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">"))
+      if(message.content !== (this.data[message.guild.id]?.PersistentPref.Prefix || ">"))
       this.data[message.guild.id].boundTextChannel = message.channelId;
     }
   }
@@ -689,6 +704,11 @@ export class MusicBot extends LogEmitter {
     if(Object.keys(panel.Opts).indexOf(num) >= 0){
       await this.data[guildid].Queue.AutoAddQueue(this.client, panel.Opts[Number(num)].url, member, "unknown", false, message);
       this.data[guildid].SearchPanel = null;
+      // 現在の状態を確認してVCに接続中なら接続試行
+      if(member.voice.channel){
+        await this.JoinVoiceChannel(message.command, false, false);
+      }
+      // 接続中なら再生を開始
       if(
         this.data[guildid].Player.IsConnecting && 
         !this.data[guildid].Player.IsPlaying
@@ -696,9 +716,10 @@ export class MusicBot extends LogEmitter {
         this.data[guildid].Player.Play();
       }
     }
-    nums.filter(n => Object.keys(panel.Opts).indexOf(n) >= 0).map(n => Number(n)).forEach(async n => {
-      await this.data[guildid].Queue.AutoAddQueue(this.client, panel.Opts[n].url, member, "unknown", false, false, message.channel as discord.TextChannel);
-    });
+    const rest = nums.filter(n => Object.keys(panel.Opts).indexOf(n) >= 0).map(n => Number(n));
+    for(let i = 0; i < rest.length; i++){
+      await this.data[guildid].Queue.AutoAddQueue(this.client, panel.Opts[rest[i]].url, member, "unknown", false, false, message.channel as discord.TextChannel);
+    };
     t.end();
   }
 }

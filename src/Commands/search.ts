@@ -42,7 +42,8 @@ export default class Search implements CommandInterface {
           id: msg.id,
           chId: msg.channel.id,
           userId: message.author.id,
-          userName: message.member.displayName
+          userName: message.member.displayName,
+          commandMessage: message
         },
         Opts: {}
       };

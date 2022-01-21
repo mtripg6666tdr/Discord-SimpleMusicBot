@@ -13,7 +13,7 @@ export default class Bgm implements CommandInterface {
   category = "playlist";
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(!(await options.JoinVoiceChannel(message))) return;
+    if(!(await options.JoinVoiceChannel(message, /* reply */ false, /* reply when failed */ true))) return;
     const url = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
     if(options.data[message.guild.id].SearchPanel !== null){
       message.reply("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
@@ -26,7 +26,8 @@ export default class Bgm implements CommandInterface {
           chId: message.channel.id,
           id: reply.id,
           userId: message.author.id,
-          userName: message.member.displayName
+          userName: message.member.displayName,
+          commandMessage: message
         },
         Opts: {}
       };
@@ -45,7 +46,7 @@ export default class Bgm implements CommandInterface {
           thumbnail: vid.thumbnails[0].url
         };
         selectOpts.push({
-          label: `${i}. ${vid.title.length > 90 ? vid.title.substring(0, 90) : vid.title}`,
+          label: `${i + 1}. ${vid.title.length > 90 ? vid.title.substring(0, 90) : vid.title}`,
           description: `長さ: ${vid.duration}, チャンネル名: ${vid.author.name}`,
           value: (i + 1).toString()
         });
