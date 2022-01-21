@@ -53,9 +53,10 @@ module.exports = function(route){
 
   (async()=>{
     try{
-      await rest.put(route, {
+      console.log(await rest.put(route, {
         body: commandsInfo
-      });
+      }));
+      process.exit(0);
     }
     catch(e){
       console.error(e);
