@@ -1,4 +1,4 @@
-# Discord-SimpleMusicBot
+# Discord-SimpleMusicBot 
 [![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/mtripg6666tdr/Discord-SimpleMusicBot/discord.js)](https://github.com/discordjs/discord.js)
 [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/testing.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/testing.yml)
 [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml)
@@ -40,20 +40,21 @@ YouTubeなどからの再生に対応。
 </details>
 
 ## 機能
-- 取得できる限り高音質で再生
-- URLから再生
+- 🎵できる限り高音質で再生
+- ⌨️スラッシュコマンドに対応
+- 🔗 URLから再生
   - YouTubeの動画のリンク
   - YouTubeのプレイリストのリンク
   - SoundCloudの楽曲ページのリンク
   - Discordの音声の添付ファイル付メッセージへのリンク
   - Googleドライブの音声ファイルへの限定公開URL
   - 音声ファイルへの直URL
-- キーワードから検索して再生(YouTubeとSoundCloud)
-- トラックごと及びキュー全体でループ
-- プレフィックス変更
+- 🔎 キーワードから検索して再生(YouTubeとSoundCloud)
+- 🔁 トラックごと及びキュー全体でループ
+- ❕ プレフィックス変更
   - デフォルトのプレフィックスは`>`です。
   - 変更にはボット名の先頭に角括弧を付けてプレフィックスを記述します。たとえば、プレフィックスを`?`に変更する場合、ボット名を`[?]サンプルボット`などとします。
-- Botに関するサポート（下記）
+- 👍 Botに関するサポート（下記）
 
 ## インストール＆実行
 devDependenciesの(npmパッケージとしての)Node.jsを利用するようになっていますので、グローバルにインストールされているNode.jsのバージョンに制約はありませんが、最新の安定版のNode.jsを利用することをお勧めします。  
