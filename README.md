@@ -3,7 +3,7 @@
 [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/testing.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/testing.yml)
 [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml)
 ![GitHub repo size](https://img.shields.io/github/repo-size/mtripg6666tdr/Discord-SimpleMusicBot)
-[![GitHub License](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)](LICENSE.md)
+[![GitHub License](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)](LICENSE)
 
 ![Bot use image](https://user-images.githubusercontent.com/56076195/149505763-276ec199-44c5-4ccc-a72d-5ac630ff4c0f.png)
 
@@ -118,6 +118,9 @@ $ npm install
     エラーレポートを送信するテキストチャンネルのID (任意指定)
   - proxy (string|null)  
     プロキシを使用する場合はそのURL (任意指定)
+  - prefix (string|null)  
+    指定する場合は一文字でデフォルトプレフィックスを指定してください。(任意指定)  
+    こちらは互換性のため、プロパティ自体が省略されていても動作するようになっています。
   </details>
 
 5. スラッシュコマンドの登録  
