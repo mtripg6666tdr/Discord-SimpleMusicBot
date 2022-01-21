@@ -19,10 +19,16 @@ export default class Skip implements CommandInterface {
       await message.reply("再生準備中です").catch(e => log(StringifyObject(e), "error"))
       return;
     }
-    const title = server.Queue.get(0).BasicInfo.Title;
-    server.Player.Stop();
-    await server.Queue.Next();
-    await server.Player.Play();
-    message.reply(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => log(e, "error"));
+    try{
+      const response = await message.reply(":ok: スキップしています");
+      const title = server.Queue.get(0).BasicInfo.Title;
+      server.Player.Stop();
+      await server.Queue.Next();
+      await server.Player.Play();
+      await response.edit(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => log(e, "error"));
+    }
+    catch(e){
+      await message.channel.send(":astonished:スキップに失敗しました").catch(e => log(e, "error"));
+    }
   }
 }

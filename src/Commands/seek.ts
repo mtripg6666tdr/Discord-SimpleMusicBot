@@ -38,8 +38,14 @@ export default class Seek implements CommandInterface {
       await message.reply(":warning:シーク先の時間が正しくありません").catch(e => log(e, "error"))
       return;
     }
-    server.Player.Stop();
-    await server.Player.Play(time);
-    await message.reply(":white_check_mark:シークしました").catch(e => log(e, "error"));
+    try{
+      const response = await message.reply(":rocket:シークしています...");
+      server.Player.Stop();
+      await server.Player.Play(time);
+      await response.edit(":white_check_mark:シークしました").catch(e => log(e, "error"));
+    }
+    catch(e){
+      await message.channel.send(":astonished:シークに失敗しました")
+    }
   }
 }

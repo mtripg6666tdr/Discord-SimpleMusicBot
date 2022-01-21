@@ -307,7 +307,10 @@ export class PlayManager extends ManagerBase {
     if(rawStream.type === "url"){
       // URLならFFmpegにわたしてOggOpusに変換
       stream = voice.createAudioResource(
-        this.CreateReadableFromUrl(rawStream.url, time > 0 ? ["-ss", time.toString()] : []),
+        this.CreateReadableFromUrl(rawStream.url, time > 0 ? [
+          "-ss", time.toString(),
+          "-user_agent", rawStream.userAgent ?? DefaultUserAgent
+        ] : []),
         {inputType: voice.StreamType.OggOpus}
       );
     }else if(time > 0){
@@ -350,19 +353,22 @@ export class PlayManager extends ManagerBase {
       ...additionalArgs
     ];
     const passThrough = InitPassThrough();
-    if(!config.debug){
-      passThrough.on("error", (e)=> {
+    const ffmpeg = new FFmpeg({args})
+    const stream = original
+      .on("error", (e) => passThrough.emit("error", e))
+      .pipe(ffmpeg)
+      .on("close", () => original.destroy())
+      .on("error", (e) => passThrough.emit("error", e))
+      .pipe(passThrough)
+      .on("close", () => ffmpeg.destroy())
+      .on("error", (e) => {
+        if(config.debug) throw e;
         this.AudioPlayer.emit("error", {
           errorInfo: e,
           resource: (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource ?? null
         } as unknown as voice.AudioPlayerError);
-      });
-    }
-    const stream = original
-      .on("error", (er) => passThrough.emit("error", er))
-      .pipe(new FFmpeg({args}))
-      .on("error", (er) => passThrough.emit("error", er))
-      .pipe(passThrough);
+      })
+    ;
     return stream;
   }
 
@@ -373,6 +379,7 @@ export class PlayManager extends ManagerBase {
       '-reconnect_on_network_error', '1', 
       '-reconnect_on_http_error', '4xx,5xx', 
       '-reconnect_delay_max', '30', 
+      ...additionalArgs,
       '-i', url, 
       '-analyzeduration', '0', 
       '-loglevel', '0', 
@@ -380,21 +387,22 @@ export class PlayManager extends ManagerBase {
       '-f', 'opus', 
       '-ar', '48000', 
       '-ac', '2',
-      '-user_agent', DefaultUserAgent,
-      ...additionalArgs
     ];
     const passThrough = InitPassThrough();
-    if(!config.debug){
-      passThrough.on("error", (e)=> {
+    const ffmpeg = new FFmpeg({args})
+      .on("error", (e) => passThrough.emit("error", e));
+    const stream = ffmpeg
+      .on("error", (e) => passThrough.emit("error", e))
+      .pipe(passThrough)
+      .on("close", () => ffmpeg.destroy())
+      .on("error", (e) => {
+        if(config.debug) throw e;
         this.AudioPlayer.emit("error", {
           errorInfo: e,
           resource: (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource ?? null
         } as unknown as voice.AudioPlayerError);
-      });
-    }
-    const stream = new FFmpeg({args})
-      .on("error", (er) => passThrough.emit("error", er))
-      .pipe(passThrough);
+      })
+    ;
     return stream;
   }
 

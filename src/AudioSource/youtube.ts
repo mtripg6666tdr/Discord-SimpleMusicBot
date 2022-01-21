@@ -103,25 +103,29 @@ export class YouTube extends AudioSource {
       } as ytdl.chooseFormatOptions);
       log("[AudioSource:youtube]Format: " + format.itag + ", Bitrate: " + format.bitrate + "bps, Audio codec:" + format.audioCodec + ", Container: " + format.container);
       if(url){
+        // return url when forced
         this.fallback = false;
         log("[AudioSource:youtube]Returning the url instead of stream");
         return {
           type: "url",
-          url: format.url
+          url: format.url,
+          userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36"
         }
-      }
-      let readable = null as Readable;
-      if(info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow){
-        readable = ytdl.downloadFromInfo(info, {format, lang: "ja"});
       }else{
-        readable = createChunkedYTStream(info, format, {lang: "ja"}, 1 * 1024 * 1024);
+        // otherwise return readable stream
+        let readable = null as Readable;
+        if(info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow){
+          readable = ytdl.downloadFromInfo(info, {format, lang: "ja"});
+        }else{
+          readable = createChunkedYTStream(info, format, {lang: "ja"}, 1 * 1024 * 1024);
+        }
+        this.fallback = false;
+        return {
+          type: "readable",
+          stream: readable,
+          streamType: format.container === "webm" && format.audioCodec === "opus" ? voice.StreamType.WebmOpus : undefined
+        };
       }
-      this.fallback = false;
-      return {
-        type: "readable",
-        stream: readable,
-        streamType: format.container === "webm" && format.audioCodec === "opus" ? voice.StreamType.WebmOpus : undefined
-      };
     }
     catch{
       this.fallback = true;
