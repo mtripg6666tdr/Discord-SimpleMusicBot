@@ -9,7 +9,6 @@ import { AudioSource } from "./audiosource";
 import { createChunkedYTStream } from "./youtube.stream";
 import { getYouTubeDlInfo, YoutubeDlInfo } from "./youtube.fallback";
 import { StreamInfo } from ".";
-export * from "./youtube.spawner";
 
 export class YouTube extends AudioSource {
   // サービス識別子（固定）
@@ -53,7 +52,7 @@ export class YouTube extends AudioSource {
         this._lengthSeconds = Number(info.videoDetails.lengthSeconds ?? 0);
         this.ChannelName = info.videoDetails.ownerChannelName;
         this.Thumnail = info.videoDetails.thumbnails[0].url;
-        this.LiveStream = info.videoDetails.isLiveContent;
+        this.LiveStream = info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails?.isLiveNow;
         this.fallback = false;
       }
       catch{
