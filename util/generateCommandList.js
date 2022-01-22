@@ -52,7 +52,7 @@ categoriesList.forEach(category => {
      * @type { (command:import("../src/Commands").CommandInterface)=>void }
      */
     command => {
-      addLine(`### \`${command.name}\``);
+      addLine(`### \`${command.name}\`コマンド`);
       addLine(command.description + "  ");
       addLine(`#### エイリアス`);
       addLine("`" + command.alias.join("`, `") + "`");
