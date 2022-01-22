@@ -58,7 +58,7 @@ export default class Commands implements CommandInterface{
       }
       for(let i = 0; i < embed.length; i++){
         embed[i].setTitle("コマンド一覧(" + embed[i].title + ")");
-        embed[i].setDescription("コマンドの一覧です。\r\n`" + (i+1) + "ページ目(" + embed.length + "ページ中)`\r\nコマンドプレフィックスは、`" + options.data[message.guild.id].PersistentPref.Prefix + "`です。");
+        embed[i].setDescription("コマンドの一覧です。\r\n`" + (i+1) + "ページ目(" + embed.length + "ページ中)`\r\nコマンドプレフィックスは、`" + options.data[message.guild.id].PersistentPref.Prefix + "`です。\r\n`!コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。");
         embed[i].setColor(getColor("COMMAND"));
       }
       const msg = await message.reply({embeds:[embed[0]]});
