@@ -545,6 +545,7 @@ export class MusicBot extends LogEmitter {
    */
   private async PlayFromURL(message:CommandMessage, optiont:string, first:boolean = true){
     const t = timer.start("MusicBot#PlayFromURL");
+    const server = this.data[message.guild.id];
     setTimeout(() => message.suppressEmbeds(true).catch(e => this.Log(StringifyObject(e), "warn")), 4000);
     if(optiont.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){
       // Discordメッセへのリンクならば
@@ -552,23 +553,22 @@ export class MusicBot extends LogEmitter {
       try{
         const ids = optiont.split("/");
         const ch = await this.client.channels.fetch(ids[ids.length - 2]);
-        if(ch.type === "GUILD_TEXT"){
-          const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
-          if(msg.attachments.size > 0 && isAvailableRawAudioURL(msg.attachments.first().url)){
-            await this.data[message.guild.id].Queue.AutoAddQueue(this.client, msg.attachments.first().url, message.member, "custom", first, false, message.channel as discord.TextChannel, smsg);
-            this.data[message.guild.id].Player.Play();
-            return;
-          }else throw "添付ファイルが見つかりません";
-        }else throw "メッセージの取得に失敗"
+        if(ch.type !== "GUILD_TEXT") throw new Error("サーバーのテキストチャンネルではありません");
+        const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
+        if(ch.guild.id !== msg.guild.id) throw new Error("異なるサーバーのコンテンツは再生できません");
+        if(msg.attachments.size <= 0 || !isAvailableRawAudioURL(msg.attachments.first().url))
+          throw new Error("添付ファイルが見つかりません");
+        await server.Queue.AutoAddQueue(this.client, msg.attachments.first().url, message.member, "custom", first, false, message.channel as discord.TextChannel, smsg);
+        await server.Player.Play();
+        return;
       }
       catch(e){
-        await smsg.edit("✘追加できませんでした(" + e + ")")
-          .catch(e => this.Log(e ,"error"));
+        await smsg.edit(`✘追加できませんでした(${StringifyObject(e)})`).catch(e => this.Log(e ,"error"));
       }
     }else if(isAvailableRawAudioURL(optiont)){
       // オーディオファイルへの直リンク？
-      await this.data[message.guild.id].Queue.AutoAddQueue(this.client, optiont, message.member, "custom", first, false, message.channel as discord.TextChannel);
-      this.data[message.guild.id].Player.Play();
+      await server.Queue.AutoAddQueue(this.client, optiont, message.member, "custom", first, false, message.channel as discord.TextChannel);
+      server.Player.Play();
       return;
     }else if(optiont.indexOf("v=") < 0 && ytpl.validateID(optiont)){
       //違うならYouTubeプレイリストの直リンクか？
@@ -577,11 +577,11 @@ export class MusicBot extends LogEmitter {
       const result = await ytpl.default(id, {
         gl: "JP",
         hl: "ja",
-        limit: 999 - this.data[message.guild.id].Queue.length
+        limit: 999 - server.Queue.length
       });
       const cancellation = new TaskCancellationManager(message.guild.id);
       this.cancellations.push(cancellation);
-      const index = await this.data[message.guild.id].Queue.ProcessPlaylist(
+      const index = await server.Queue.ProcessPlaylist(
         this.client, 
         msg, 
         cancellation, 
@@ -611,14 +611,14 @@ export class MusicBot extends LogEmitter {
         await msg.edit({content: null, embeds: [embed]});
       }
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
-      this.data[message.guild.id].Player.Play();
+      await server.Player.Play();
     }else if(SoundCloudS.validatePlaylistUrl(optiont)){
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const sc = new Soundcloud();
       const playlist = await sc.playlists.getV2(optiont);
       const cancellation = new TaskCancellationManager(message.guild.id);
       this.cancellations.push(cancellation);
-      const index = await this.data[message.guild.id].Queue.ProcessPlaylist(this.client, msg, cancellation, first, "soundcloud", playlist.tracks, playlist.title, playlist.track_count, async (track) => {
+      const index = await server.Queue.ProcessPlaylist(this.client, msg, cancellation, first, "soundcloud", playlist.tracks, playlist.title, playlist.track_count, async (track) => {
         const item = await sc.tracks.getV2(track.id);
         return{
           url: item.permalink_url,
@@ -640,11 +640,11 @@ export class MusicBot extends LogEmitter {
         await msg.edit({content: null, embeds: [embed]});
       }
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
-      this.data[message.guild.id].Player.Play();
+      await server.Player.Play();
     }else{
       try{
-        const success = await this.data[message.guild.id].Queue.AutoAddQueue(this.client, optiont, message.member, "unknown", first, false, message.channel as discord.TextChannel, await message.reply("お待ちください..."));
-        if(success) this.data[message.guild.id].Player.Play();
+        const success = await server.Queue.AutoAddQueue(this.client, optiont, message.member, "unknown", first, false, message.channel as discord.TextChannel, await message.reply("お待ちください..."));
+        if(success) server.Player.Play();
         return;
       }
       catch{
