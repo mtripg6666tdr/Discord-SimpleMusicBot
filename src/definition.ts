@@ -154,3 +154,12 @@ export const FallBackNotice = "現在、通常の方法で情報を取得でき�
 export const DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36";
 export const EventEmitterLike = {emit: ()=>{}};
 export const NotSendableMessage = ":warning: コマンドが実行されたチャンネルでのボットの権限が不足しています。[メッセージの送信][埋め込みリンク][メッセージの管理][ファイルの添付]の権限があるかどうかご確認ください。";
+export const FFmpegDefaultArgs = [
+  '-reconnect', '1', 
+  '-reconnect_streamed', '1', 
+  '-reconnect_on_network_error', '1', 
+  '-reconnect_on_http_error', '4xx,5xx', 
+  '-reconnect_delay_max', '30', 
+  '-analyzeduration', '0', 
+  '-loglevel', '0', 
+];

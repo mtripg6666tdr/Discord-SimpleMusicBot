@@ -10,6 +10,7 @@ import { createChunkedYTStream } from "./youtube.stream";
 import { getYouTubeDlInfo, YoutubeDlInfo } from "./youtube.fallback";
 import { StreamInfo } from ".";
 
+const ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36";
 export class YouTube extends AudioSource {
   // サービス識別子（固定）
   protected _serviceIdentifer = "youtube";
@@ -109,7 +110,7 @@ export class YouTube extends AudioSource {
         return {
           type: "url",
           url: format.url,
-          userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36"
+          userAgent: ua
         }
       }else{
         // otherwise return readable stream
@@ -160,6 +161,20 @@ export class YouTube extends AudioSource {
         };
       }
     }
+  }
+
+  async fetchVideo(){
+    let info = this.ytdlInfo;
+    const agent = config.proxy && HttpsProxyAgent.default(config.proxy);
+    const requestOptions = agent ? {agent} : undefined;
+    if(!info){
+      info = await ytdl.getInfo(this.Url, {
+        lang: "ja", requestOptions
+      })
+    }
+    const format = ytdl.chooseFormat(info.formats, {quality: "highestvideo"});
+    const { url } = format;
+    return {url, ua};
   }
 
   toField(verbose:boolean = false){

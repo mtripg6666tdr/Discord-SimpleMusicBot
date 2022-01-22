@@ -4,7 +4,7 @@ import * as voice from "@discordjs/voice";
 import { Readable } from "stream";
 import { FFmpeg } from "prism-media";
 import { AudioSource, StreamInfo, YouTube } from "../AudioSource";
-import { DefaultUserAgent, FallBackNotice, type GuildDataContainer } from "../definition";
+import { DefaultUserAgent, FallBackNotice, FFmpegDefaultArgs, type GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, InitPassThrough, log, timer, StringifyObject, config } from "../Util";
 import { ManagerBase } from "./ManagerBase";
@@ -46,11 +46,12 @@ export class PlayManager extends ManagerBase {
     return this.AudioPlayer && this.AudioPlayer.state.status === voice.AudioPlayerStatus.Paused;
   }
   /**
-   *  現在ストリーミングした時間
+   *  現在ストリーミングした時間(ミリ秒!)
+   * @remarks ミリ秒単位なので秒に直すには1000分の一する必要がある
    */
   get CurrentTime():number{
     return (this.AudioPlayer && this.AudioPlayer.state.status === voice.AudioPlayerStatus.Playing) 
-      ? this.seek + (this.AudioPlayer.state as voice.AudioPlayerPlayingState).playbackDuration : 0;
+      ? this.seek * 1000 + (this.AudioPlayer.state as voice.AudioPlayerPlayingState).playbackDuration : 0;
   }
   /**
    * クライアント
@@ -339,13 +340,7 @@ export class PlayManager extends ManagerBase {
 
   private CreateFFmpegReadableFromReadable(original:Readable, additionalArgs:string[]){
     const args = [
-      '-reconnect', '1', 
-      '-reconnect_streamed', '1', 
-      '-reconnect_on_network_error', '1', 
-      '-reconnect_on_http_error', '4xx,5xx', 
-      '-reconnect_delay_max', '30', 
-      '-analyzeduration', '0', 
-      '-loglevel', '0', 
+      ...FFmpegDefaultArgs,
       '-acodec', 'libopus', 
       '-f', 'opus', 
       '-ar', '48000', 
@@ -374,15 +369,9 @@ export class PlayManager extends ManagerBase {
 
   private CreateReadableFromUrl(url:string, additionalArgs:string[]):Readable{
     const args = [
-      '-reconnect', '1', 
-      '-reconnect_streamed', '1', 
-      '-reconnect_on_network_error', '1', 
-      '-reconnect_on_http_error', '4xx,5xx', 
-      '-reconnect_delay_max', '30', 
+      ...FFmpegDefaultArgs,
       ...additionalArgs,
       '-i', url, 
-      '-analyzeduration', '0', 
-      '-loglevel', '0', 
       '-acodec', 'libopus', 
       '-f', 'opus', 
       '-ar', '48000', 
