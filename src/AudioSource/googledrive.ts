@@ -40,4 +40,8 @@ export class GoogleDrive extends AudioSource {
       url:this.Url
     };
   }
+
+  static validateUrl(url:string){
+    return Boolean(url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/));
+  }
 }

@@ -70,6 +70,14 @@ export class SoundCloudS extends AudioSource {
       thumbnail: this.Thumnail
     };
   }
+
+  static validateUrl(url:string){
+    return Boolean(url.match(/https?:\/\/soundcloud.com\/.+\/.+/));
+  }
+
+  static validatePlaylistUrl(url:string){
+    return Boolean(url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/));
+  }
 }
 
 export type exportableSoundCloud = {

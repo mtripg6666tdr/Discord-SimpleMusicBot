@@ -1,4 +1,4 @@
-import type { exportableCustom } from "./AudioSource";
+import { exportableCustom, SoundCloudS } from "./AudioSource";
 import type { YmxFormat } from "./definition";
 import type { CommandArgs } from "./Commands";
 import { execSync } from "child_process";
@@ -612,7 +612,7 @@ export class MusicBot extends LogEmitter {
       }
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
       this.data[message.guild.id].Player.Play();
-    }else if(optiont.match(/https?:\/\/soundcloud.com\/[^\/?]+\/sets\/[^\/?]+/)){
+    }else if(SoundCloudS.validatePlaylistUrl(optiont)){
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const sc = new Soundcloud();
       const playlist = await sc.playlists.getV2(optiont);

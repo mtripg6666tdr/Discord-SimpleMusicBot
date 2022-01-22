@@ -1,5 +1,5 @@
 import type { Client, GuildMember, Message, TextChannel } from "discord.js";
-import type { exportableCustom } from "../AudioSource";
+import { exportableCustom, GoogleDrive, SoundCloudS } from "../AudioSource";
 import { MessageEmbed } from "discord.js";
 import * as ytdl from "ytdl-core";
 import * as AudioSource from "../AudioSource";
@@ -114,12 +114,12 @@ export class QueueManager extends ManagerBase {
     }else if(type === "custom" || (type === "unknown" && isAvailableRawAudioURL(url))){
       // カスタムストリーム
       result.BasicInfo = await new AudioSource.CustomStream().init(url);
-    }else if(type === "soundcloud" || url.match(/https?:\/\/soundcloud.com\/.+\/.+/)){
+    }else if(type === "soundcloud" || SoundCloudS.validateUrl(url)){
         // soundcloud
         result.BasicInfo = await new AudioSource.SoundCloudS().init(url, gotData as AudioSource.exportableSoundCloud);
     }else if(type === "unknown"){
       // google drive
-      if(url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/)){
+      if(GoogleDrive.validateUrl(url)){
         result.BasicInfo = await new AudioSource.GoogleDrive().init(url);
       }else if(AudioSource.StreamableApi.getVideoId(url)){
         // Streamable
