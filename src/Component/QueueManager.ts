@@ -98,7 +98,11 @@ export class QueueManager extends ManagerBase {
     const t = timer.start("AddQueue");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     const result = {
-      BasicInfo:null,
+      BasicInfo: await AudioSource.Resolve({
+        url, type, 
+        knownData:gotData, 
+        forceCache: this.length === 0 || method === "unshift" || this.LengthSeconds < 4 * 60 * 60 * 1000
+      }),
       AdditionalInfo:{
         AddedBy: {
           userId: addedBy?.id ?? "0",
@@ -106,32 +110,6 @@ export class QueueManager extends ManagerBase {
         }
       }
     } as QueueContent;
-    
-    if(type === "youtube" || (type === "unknown" && ytdl.validateURL(url))){
-      // youtube
-      //result.BasicInfo = await new AudioSource.YouTube().init(url, gotData as AudioSource.exportableYouTube, this.length === 0 || method === "unshift" || this.LengthSeconds < 4 * 60 * 60 * 1000);
-      result.BasicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.exportableYouTube, this.length === 0 || method === "unshift" || this.LengthSeconds < 4 * 60 * 60 * 1000);
-    }else if(type === "custom" || (type === "unknown" && isAvailableRawAudioURL(url))){
-      // カスタムストリーム
-      result.BasicInfo = await new AudioSource.CustomStream().init(url);
-    }else if(type === "soundcloud" || SoundCloudS.validateUrl(url)){
-        // soundcloud
-        result.BasicInfo = await new AudioSource.SoundCloudS().init(url, gotData as AudioSource.exportableSoundCloud);
-    }else if(type === "unknown"){
-      // google drive
-      if(GoogleDrive.validateUrl(url)){
-        result.BasicInfo = await new AudioSource.GoogleDrive().init(url);
-      }else if(AudioSource.StreamableApi.getVideoId(url)){
-        // Streamable
-        result.BasicInfo = await new AudioSource.Streamable().init(url, gotData as AudioSource.exportableStreamable);
-      }else if(AudioSource.BestdoriApi.getAudioId(url)){
-        // Bestdori
-        result.BasicInfo = await new AudioSource.BestdoriS().init(url, gotData as AudioSource.exportableBestdori);
-      }else if(AudioSource.HibikiApi.validateURL(url)){
-        // Hibiki
-        result.BasicInfo = await new AudioSource.Hibiki().init(url);
-      }
-    }
     if(result.BasicInfo){
       this._default[method](result);
       if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){

@@ -9,6 +9,7 @@ import { AudioSource } from "./audiosource";
 import { createChunkedYTStream } from "./youtube.stream";
 import { getYouTubeDlInfo, YoutubeDlInfo } from "./youtube.fallback";
 import { StreamInfo } from ".";
+export * from "./youtube.spawner";
 
 export class YouTube extends AudioSource {
   // サービス識別子（固定）
