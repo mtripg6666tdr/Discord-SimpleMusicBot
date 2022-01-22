@@ -8,7 +8,7 @@ import { getColor } from "../Util/colorUtil";
 export default class Bgm implements CommandInterface {
   name = "bgm";
   alias = ["study"];
-  description = "開発者が勝手に作った勉強用・作業用BGMのプレイリストをキューに追加します。再生されてない場合再生が開始されます(可能な場合)。";
+  description = "開発者が勝手に作った勉強用・作業用BGMのプリセットプレイリストを表示し、聞きたいものを選択して再生することができます。";
   unlist = false;
   category = "playlist";
   async run(message:CommandMessage, options:CommandArgs){

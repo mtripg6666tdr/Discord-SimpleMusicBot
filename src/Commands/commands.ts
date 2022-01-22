@@ -4,6 +4,14 @@ import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/colorUtil";
 
+export const categories = {
+  "voice": "ボイスチャンネル操作系",
+  "player": "音楽プレイヤー制御系",
+  "playlist": "プレイリスト操作系",
+  "utility": "ユーティリティ系",
+  "bot": "ボット操作全般"
+};
+export const categoriesList = ["voice", "player", "playlist", "utility", "bot"];
 export default class Commands implements CommandInterface{
   name = "コマンド";
   alias = ["command", "commands", "cmd"];
@@ -23,17 +31,9 @@ export default class Commands implements CommandInterface{
       // 引数がない場合は全コマンドの一覧を表示
       const embed = [] as discord.MessageEmbed[];
       const getCategoryText = (label:string)=>{
-        const categories = {
-          "voice": "ボイスチャンネル操作系",
-          "player": "音楽プレイヤー制御系",
-          "playlist": "プレイリスト操作系",
-          "utility": "ユーティリティ系",
-          "bot": "ボット操作全般"
-        };
         // @ts-ignore
         return categories[label as any] as string;
       };
-      const categoriesList = ["voice", "player", "playlist", "utility", "bot"];
       const rawcommands = CommandsManager.Instance.Commands.filter(ci => !ci.unlist);
       const commands = {} as {[category:string]:CommandInterface[]};
       // Generate command list
