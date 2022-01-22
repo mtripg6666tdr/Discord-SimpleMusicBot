@@ -78,7 +78,10 @@ function getFrame(url:string, time:number, ua:string){
     ];
     const bufs = [] as Buffer[];
     const ffmpeg = new FFmpeg({args})
-      .on("error", reject)
+      .on("error", (er) => {
+        if(!ffmpeg.destroyed) ffmpeg.destroy();
+        reject(er);
+      })
       .on("data", (chunks) => {
         bufs.push(chunks);
       })
