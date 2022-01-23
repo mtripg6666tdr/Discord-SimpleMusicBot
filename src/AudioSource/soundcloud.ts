@@ -76,7 +76,7 @@ export class SoundCloudS extends AudioSource {
   }
 
   static validatePlaylistUrl(url:string){
-    return Boolean(url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/));
+    return Boolean(url.match(/https?:\/\/soundcloud.com\/[^\/?]+\/sets\/[^\/?]+/));
   }
 }
 
