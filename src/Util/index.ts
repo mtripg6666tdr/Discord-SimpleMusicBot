@@ -316,7 +316,7 @@ export function RetriveLengthSeconds(url:string){
             .map(n => Number(n))
             .reduce((prev, current) => prev * 60 + current)
             ;
-          resolve(Math.floor(lengthSec * 1000) / 1000);
+          resolve(Math.ceil(lengthSec));
         } else {
           reject("not match");
         }
