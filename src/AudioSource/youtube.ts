@@ -1,16 +1,19 @@
 import type { EmbedField } from "discord.js";
-import * as voice from "@discordjs/voice";
+import type { StreamInfo } from ".";
+
 import { PassThrough, Readable } from "stream";
+import * as voice from "@discordjs/voice";
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 import m3u8stream from "m3u8stream";
+
 import { config, log, timer } from "../Util";
+import { SecondaryUserAgent } from "../Util/ua";
 import { AudioSource } from "./audiosource";
 import { createChunkedYTStream } from "./youtube.stream";
 import { getYouTubeDlInfo, YoutubeDlInfo } from "./youtube.fallback";
-import { StreamInfo } from ".";
 
-const ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36";
+const ua = SecondaryUserAgent;
 export class YouTube extends AudioSource {
   // サービス識別子（固定）
   protected _serviceIdentifer = "youtube";

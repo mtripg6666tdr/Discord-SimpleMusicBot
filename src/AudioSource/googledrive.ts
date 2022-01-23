@@ -3,6 +3,7 @@ import type { exportableCustom } from "./custom";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { AudioSource } from "./audiosource";
 import { UrlStreamInfo } from ".";
+import { RetriveHttpStatusCode, RetriveLengthSeconds } from "../Util";
 
 export class GoogleDrive extends AudioSource {
   protected _lengthSeconds = 0;
@@ -12,22 +13,24 @@ export class GoogleDrive extends AudioSource {
   async init(url:string){
     this.Title = "Googleドライブストリーム";
     this.Url = url;
+    if(await RetriveHttpStatusCode(this.Url) !== 200) throw new Error("URLがみつかりません");
+    try{
+      this._lengthSeconds = await RetriveLengthSeconds((await this.fetch()).url);
+    }
+    catch{}
     return this;
   }
 
   async fetch():Promise<UrlStreamInfo>{
-    const match = this.Url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/);
+    const id = GoogleDrive.getId(this.Url);
     return {
       type: "url",
-      url: "https://drive.google.com/uc?id=" + match[1],
+      url: "https://drive.google.com/uc?id=" + id,
     };
   }
 
   toField(){
     return [{
-      name: ":link:URL",
-      value: this.Url
-    }, {
       name: ":asterisk:詳細",
       value: "Googleドライブにて共有されたファイル"
     }] as EmbedField[];
@@ -37,11 +40,17 @@ export class GoogleDrive extends AudioSource {
 
   exportData():exportableCustom{
     return {
-      url:this.Url
+      url: this.Url,
+      length: this._lengthSeconds,
     };
   }
 
   static validateUrl(url:string){
-    return Boolean(url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/));
+    return Boolean(url.match(/^https?:\/\/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?$/));
+  }
+
+  static getId(url:string){
+    const match = url.match(/^https?:\/\/drive\.google\.com\/file\/d\/(?<id>[^\/\?]+)(\/.+)?$/);
+    return match ? match.groups.id : null;
   }
 }

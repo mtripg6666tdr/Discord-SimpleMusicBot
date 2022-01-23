@@ -56,7 +56,8 @@ export class Hibiki extends AudioSource {
 
   exportData():exportableCustom{
     return {
-      url: this.Url
+      url: this.Url,
+      length: this._lengthSeconds,
     };
   }
 }

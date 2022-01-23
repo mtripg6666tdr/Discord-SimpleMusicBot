@@ -1,8 +1,11 @@
 import * as os from "os";
 import * as https from "https";
+import * as http from "http";
+import { spawn } from "child_process";
 import * as miniget from "miniget";
 import type { Client, GuildMember, Message, TextChannel } from "discord.js";
 import { PassThrough, Readable } from "stream";
+import { DefaultUserAgent } from "./ua";
 export { log, logStore, timer } from "./logUtil";
 export * as config from "./configUtil";
 
@@ -113,10 +116,13 @@ export function btoa(txt:string){
 export function DownloadText(url:string, headers?:{[key:string]:string}, requestBody?:any):Promise<string>{
   return new Promise((resolve,reject)=>{
     const durl = new URL(url);
-    const req = https.request({
+    const req = ({
+      "https:": https, 
+      "http:": http
+    })[durl.protocol].request({
       protocol: durl.protocol,
       host: durl.host,
-      path: durl.pathname + durl.search,
+      path: durl.pathname + durl.search + durl.hash,
       method: requestBody ? "POST" : "GET",
       headers: headers ?? undefined
     }, res => {
@@ -128,9 +134,39 @@ export function DownloadText(url:string, headers?:{[key:string]:string}, request
         resolve(data);
       });
       res.on("error", reject);
-    }).on("error", reject);
+    }).on("error", (er) => {
+      reject(er);
+      if(!req.destroyed) req.destroy();
+    });
     req.end(requestBody ?? undefined);
   });
+}
+
+export function RetriveHttpStatusCode(url:string, headers?:{[key:string]:string}){
+  return new Promise<number>((resolve, reject) => {
+    const durl = new URL(url);
+    const req = ({
+      "https:": https,
+      "http:": http
+    })[durl.protocol].request({
+      protocol: durl.protocol,
+      host: durl.hostname,
+      path: durl.pathname,
+      method: "HEAD",
+      headers: {
+        "User-Agent": DefaultUserAgent,
+        ...(headers ?? {})
+      }
+    }, (res) => {
+      resolve(res.statusCode);
+    })
+      .on("error", (er) => {
+        reject(er);
+        if(!req.destroyed) req.destroy();
+      })
+      .end()
+    ;
+  })
 }
 
 /**
@@ -254,4 +290,39 @@ export function StringifyObject(obj:any){
       return "";
     }
   }
+}
+
+/**
+ * URLからリソースの長さを秒数で取得します
+ * @param url リソースのURL
+ * @returns 取得された秒数
+ */
+export function RetriveLengthSeconds(url:string){
+  return new Promise<number>((resolve, reject) => {
+    let data = "";
+    const proc = spawn(require("ffmpeg-static"), [
+      "-i", url,
+      "-user_agent", DefaultUserAgent
+    ], {
+      windowsHide: true,
+      stdio: ["ignore", "ignore", "pipe"]
+    })
+      .on("exit", () => {
+        if(data.length === 0) reject("zero");
+        const match = data.match(/Duration: (?<length>(\d+:)*\d+(\.\d+)?),/i);
+        if(match){
+          const lengthSec = match.groups["length"]
+            .split(":")
+            .map(n => Number(n))
+            .reduce((prev, current) => prev * 60 + current)
+            ;
+          resolve(Math.floor(lengthSec * 1000) / 1000);
+        } else {
+          reject("not match");
+        }
+      });
+    proc.stderr.on("data", (chunk) => {
+      data += chunk;
+    });
+  });
 }

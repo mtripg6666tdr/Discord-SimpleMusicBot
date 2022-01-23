@@ -1,8 +1,9 @@
 import type { workerErrorMessage, workerMessage, workerInitSuccessMessage } from "./youtube.spawner";
+import type { workerSearchSuccessMessage } from ".";
 import { parentPort } from "worker_threads";
 import { YouTube } from "./youtube";
 import * as ytsr from "ytsr";
-import { workerSearchSuccessMessage } from ".";
+// DO NOT import unnecessary module preventing from infinite spawned workers.
 
 parentPort.on("message", (value) => {
   const data = value as workerMessage;
