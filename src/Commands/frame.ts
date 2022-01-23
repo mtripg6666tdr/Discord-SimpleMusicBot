@@ -13,7 +13,7 @@ export default class Frame implements CommandInterface {
   unlist = false;
   category = "player";
   examples = "フレーム 1:20";
-  usage = "サムネイル [時間]";
+  usage = "フレーム [時間]";
   argument = [{
     type: "string",
     name: "time",
