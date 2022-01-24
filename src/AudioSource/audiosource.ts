@@ -41,6 +41,10 @@ export abstract class AudioSource {
   isGoogleDrive():this is Sources.GoogleDrive {return this.ServiceIdentifer === "goodledrive";}
   isCustomStream():this is Sources.CustomStream {return this.ServiceIdentifer === "custom";}
   isBestdoriS():this is Sources.BestdoriS {return this.ServiceIdentifer === "bestdori";}
+
+  isUnseekable(){
+    return this.isSoundCloudS();
+  }
 }
 
 export type StreamInfo = ReadableStreamInfo|UrlStreamInfo;

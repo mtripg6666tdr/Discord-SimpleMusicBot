@@ -23,7 +23,7 @@ export default class Seek implements CommandInterface {
     if(!server.Player.IsPlaying || server.Player.preparing){
       await message.reply("再生中ではありません").catch(e => log(e, "error"));
       return;
-    }else if(server.Player.CurrentAudioInfo.LengthSeconds === 0){
+    }else if(server.Player.CurrentAudioInfo.LengthSeconds === 0 || server.Player.CurrentAudioInfo.isUnseekable()){
       await message.reply(":warning:シーク先に対応していない楽曲です").catch(e => log(e, "error"));
       return;
     }
