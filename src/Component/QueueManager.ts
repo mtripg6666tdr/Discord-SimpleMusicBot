@@ -284,8 +284,8 @@ export class QueueManager extends ManagerBase {
     if(this.QueueLoopEnabled){
       this.default.push(this.default[0]);
     }else{
-      if(this.info.AddRelative && this.info.Player.CurrentVideoInfo.ServiceIdentifer === "youtube"){
-        const relatedVideos = (this.info.Player.CurrentVideoInfo as AudioSource.YouTube).relatedVideos;
+      if(this.info.AddRelative && this.info.Player.CurrentAudioInfo.ServiceIdentifer === "youtube"){
+        const relatedVideos = (this.info.Player.CurrentAudioInfo as AudioSource.YouTube).relatedVideos;
         if(relatedVideos.length >= 1){
           const video = relatedVideos[0];
           await this.info.Queue.AddQueue(video.url, null, "push", "youtube", video);

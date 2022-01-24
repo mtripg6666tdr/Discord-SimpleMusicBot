@@ -23,7 +23,7 @@ export default class Seek implements CommandInterface {
     if(!server.Player.IsPlaying || server.Player.preparing){
       await message.reply("再生中ではありません").catch(e => log(e, "error"));
       return;
-    }else if(server.Player.CurrentVideoInfo.LengthSeconds === 0){
+    }else if(server.Player.CurrentAudioInfo.LengthSeconds === 0){
       await message.reply(":warning:シーク先に対応していない楽曲です").catch(e => log(e, "error"));
       return;
     }
@@ -34,7 +34,7 @@ export default class Seek implements CommandInterface {
         return NaN;
       }
     })(options.rawArgs);
-    if(time > server.Player.CurrentVideoInfo.LengthSeconds || isNaN(time)){
+    if(time > server.Player.CurrentAudioInfo.LengthSeconds || isNaN(time)){
       await message.reply(":warning:シーク先の時間が正しくありません").catch(e => log(e, "error"))
       return;
     }

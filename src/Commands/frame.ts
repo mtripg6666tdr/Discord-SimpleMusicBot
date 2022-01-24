@@ -28,7 +28,7 @@ export default class Frame implements CommandInterface {
       await message.reply("再生中ではありません").catch(e => log(e, "error"));
       return;
     }
-    const vinfo = server.Player.CurrentVideoInfo;
+    const vinfo = server.Player.CurrentAudioInfo;
     if(!vinfo.isYouTube()){
       await message.reply(":warning:フレームのキャプチャ機能に非対応のソースです。").catch(e => log(e, "error"));
       return;

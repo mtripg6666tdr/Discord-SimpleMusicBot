@@ -25,10 +25,10 @@ export default class NowPlaying implements CommandInterface {
       return;
     }
     const _s = Math.floor(options.data[message.guild.id].Player.CurrentTime / 1000);
-    const _t = Number(options.data[message.guild.id].Player.CurrentVideoInfo.LengthSeconds);
+    const _t = Number(options.data[message.guild.id].Player.CurrentAudioInfo.LengthSeconds);
     const [min, sec] = CalcMinSec(_s);
     const [tmin,tsec] = CalcMinSec(_t);
-    const info = options.data[message.guild.id].Player.CurrentVideoInfo;
+    const info = options.data[message.guild.id].Player.CurrentAudioInfo;
     const embed = new discord.MessageEmbed();
     embed.setColor(getColor("NP"));
     let progressBar = "";

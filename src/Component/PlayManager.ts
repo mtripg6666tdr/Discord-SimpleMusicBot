@@ -1,10 +1,10 @@
-import type { Client, Message, TextChannel } from "discord.js";
+import type { Client, Message, TextBasedChannel, TextChannel } from "discord.js";
+import type { Readable } from "stream";
 import { MessageEmbed } from "discord.js";
 import * as voice from "@discordjs/voice";
-import { Readable } from "stream";
 import { FFmpeg } from "prism-media";
 import { AudioSource, StreamInfo, YouTube } from "../AudioSource";
-import { DefaultUserAgent, FallBackNotice, FFmpegDefaultArgs, type GuildDataContainer } from "../definition";
+import { DefaultUserAgent, FallBackNotice, FFmpegDefaultArgs, GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, InitPassThrough, log, timer, StringifyObject, config } from "../Util";
 import { ManagerBase } from "./ManagerBase";
@@ -22,11 +22,13 @@ export class PlayManager extends ManagerBase {
   errorCount = 0;
   errorUrl = "";
   preparing = false;
-  get CurrentVideoUrl():string{
-    if(this.CurrentVideoInfo) return this.CurrentVideoInfo.Url;
-    else return "";
+  get CurrentAudioUrl():string{
+    if(this.CurrentAudioInfo) 
+      return this.CurrentAudioInfo.Url;
+    else
+      return "";
   }
-  CurrentVideoInfo:AudioSource;
+  CurrentAudioInfo:AudioSource;
   /**
    *  接続され、再生途中にあるか（たとえ一時停止されていても）
    */
@@ -91,73 +93,24 @@ export class PlayManager extends ManagerBase {
     this.preparing = true;
     let mes:Message = null;
     let ch:TextChannel = null;
-    this.CurrentVideoInfo = this.info.Queue.get(0).BasicInfo;
+    this.CurrentAudioInfo = this.info.Queue.get(0).BasicInfo;
     if(this.info.boundTextChannel){
       ch = await this.client.channels.fetch(this.info.boundTextChannel) as TextChannel;
-      const [min, sec] = CalcMinSec(this.CurrentVideoInfo.LengthSeconds);
-      mes = await ch.send(":hourglass_flowing_sand: `" + this.CurrentVideoInfo.Title + "` `(" + min + ":" + sec + ")`の再生準備中...");
+      const [min, sec] = CalcMinSec(this.CurrentAudioInfo.LengthSeconds);
+      mes = await ch.send(":hourglass_flowing_sand: `" + this.CurrentAudioInfo.Title + "` `(" + min + ":" + sec + ")`の再生準備中...");
     }
-    // 再生できない時の関数
-    const cantPlay = async()=>{
-      if(this.info.Queue.LoopEnabled) this.info.Queue.LoopEnabled = false;
-      if(this.info.Queue.length === 1 && this.info.Queue.QueueLoopEnabled) this.info.Queue.QueueLoopEnabled = false;
-      if(this.errorUrl == this.CurrentVideoInfo.Url){
-        this.errorCount++;
-      }else{
-        this.errorCount = 1;
-        this.errorUrl = this.CurrentVideoInfo.Url;
-        if((this.CurrentVideoInfo as YouTube).disableCache){
-          (this.CurrentVideoInfo as YouTube).disableCache();
-        }
-      }
-      this.Log("Play() failed, (" + this.errorCount + "times)", "warn");
-      this.error = this.preparing = false;
-      this.Stop();
-      if(this.errorCount >= this.retryLimit){
-        await this.info.Queue.Next();
-      }
-      this.Play();
-    };
     try{
       // AudioPlayerがなければ作成
-      if(!this.AudioPlayer){
-        const t = timer.start("PlayManager#Play->InitAudioPlayer");
-        this.AudioPlayer = voice.createAudioPlayer();
-        voice.getVoiceConnection(this.info.GuildID).subscribe(this.AudioPlayer);
-        if(!config.debug){
-          this.AudioPlayer.on("error", (e) => {
-            if(!e) return;
-            // エラーが発生したら再生できないときの関数を呼んで逃げる
-            this.Log("Error:" + e.message, "error");
-            // @ts-ignore
-            const einfo = e.errorInfo;
-            if(einfo){
-              this.Log(StringifyObject(einfo), "error");
-            }
-            if(this.info.boundTextChannel){
-              this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
-                this.Log("Some error occurred in AudioPlayer", "error");
-                (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? StringifyObject(e) : "undefined") + ")" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。")).catch(e => log(e, "error"));
-              }).catch(e => log(e, "error"));
-            }
-            cantPlay();
-          });
-        }
-        this.AudioPlayer.on("unsubscribe", (_)=>{
-          this.AudioPlayer.stop();
-          this.AudioPlayer = null;
-        });
-        t.end();
-      }
+      if(!this.AudioPlayer) this.InitAudioPlayer();
       // シーク位置を確認
-      if(this.CurrentVideoInfo.LengthSeconds <= time) time = 0;
+      if(this.CurrentAudioInfo.LengthSeconds <= time) time = 0;
       this.seek = time;
       const t = timer.start("PlayManager#Play->FetchAudioSource");
       // QueueContentからストリーム情報を取得
-      // @ts-ignore
-      const rawStream = await this.CurrentVideoInfo.fetch(time > 0);
+      const rawStream = await this.CurrentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
-      const stream = FixedAudioResource.fromAudioResource(this.ResolveStream(rawStream, time), this.CurrentVideoInfo.LengthSeconds);
+      const stream = FixedAudioResource.fromAudioResource(this.ResolveStream(rawStream, time), this.CurrentAudioInfo.LengthSeconds);
+      this.HandleEvents(stream, /* errorReportChannel */ mes.channel);
       this.Log("Stream edges: Raw -> " + stream.edges.map(e => e.type).join(" -> ") + " ->");
       // fetchおよび処理中に切断された場合処理を終了
       const connection = voice.getVoiceConnection(this.info.GuildID);
@@ -169,37 +122,18 @@ export class PlayManager extends ManagerBase {
       t.end();
       // 再生
       const u = timer.start("PlayManager#Play->EnterPlayingState");
-      try{
-        this.AudioPlayer.play(stream);
-        await voice.entersState(this.AudioPlayer, voice.AudioPlayerStatus.Playing, 10e4);
-        this.preparing = false;
-        stream.events
-          .on("error", er => {
-            if(!er) return;
-            log("Error", "error");
-            // @ts-ignore
-            const einfo = er.errorInfo;
-            if(einfo){
-              log(StringifyObject(einfo), "error");
-            }
-            mes.edit(":tired_face:曲の再生に失敗しました...。" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。"));
-            cantPlay();  
-          })
-          .on("end", () => {
-            this.onStreamFinished();
-          });
-      }catch(e){
-        this.Log(StringifyObject(e), "error");
-      }
+      this.AudioPlayer.play(stream);
+      await voice.entersState(this.AudioPlayer, voice.AudioPlayerStatus.Playing, 10e4);
+      this.preparing = false;
       u.end();
       this.Log("Play() started successfully");
       if(this.info.boundTextChannel && ch && mes){
         // 再生開始メッセージ
-        const _t = Number(this.CurrentVideoInfo.LengthSeconds);
+        const _t = Number(this.CurrentAudioInfo.LengthSeconds);
         const [min, sec] = CalcMinSec(_t);
         const embed = new MessageEmbed({
           title: ":cd:現在再生中:musical_note:",
-          description: "[" + this.CurrentVideoInfo.Title + "](" + this.CurrentVideoUrl + ") `" + ((this.CurrentVideoInfo.ServiceIdentifer === "youtube" && (this.CurrentVideoInfo as YouTube).LiveStream) ? "(ライブストリーム)" : _t === 0 ? "(不明)" : (min + ":" + sec)) + "`"
+          description: "[" + this.CurrentAudioInfo.Title + "](" + this.CurrentAudioUrl + ") `" + ((this.CurrentAudioInfo.ServiceIdentifer === "youtube" && (this.CurrentAudioInfo as YouTube).LiveStream) ? "(ライブストリーム)" : _t === 0 ? "(不明)" : (min + ":" + sec)) + "`"
         });
         embed.setColor(getColor("AUTO_NP"));
         embed.addField("リクエスト", this.info.Queue.get(0).AdditionalInfo.AddedBy.displayName, true);
@@ -213,10 +147,10 @@ export class PlayManager extends ManagerBase {
           // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
           "次の曲がまだ登録されていません"
           , true);
-        const [qhour, qmin, qsec] = CalcHourMinSec(this.info.Queue.LengthSeconds - this.CurrentVideoInfo.LengthSeconds);
+        const [qhour, qmin, qsec] = CalcHourMinSec(this.info.Queue.LengthSeconds - this.CurrentAudioInfo.LengthSeconds);
         embed.addField("再生待ちの曲", this.info.Queue.LoopEnabled ? "ループします" : ((this.info.Queue.length - 1) + "曲(" + (qhour === "0" ? "" : qhour + ":") + qmin + ":" + qsec + ")"), true);
-        embed.setThumbnail(this.CurrentVideoInfo.Thumnail);
-        if(this.CurrentVideoInfo.ServiceIdentifer === "youtube" && (this.CurrentVideoInfo as YouTube).IsFallbacked){
+        embed.setThumbnail(this.CurrentAudioInfo.Thumnail);
+        if(this.CurrentAudioInfo.ServiceIdentifer === "youtube" && (this.CurrentAudioInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
         mes.edit({content: null, embeds:[embed]}).catch(e => log(e, "error"));
@@ -236,7 +170,7 @@ export class PlayManager extends ManagerBase {
       }catch{};
       if(this.info.boundTextChannel && ch && mes){
         mes.edit(":tired_face:曲の再生に失敗しました...。" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。"));
-        cantPlay();
+        this.onStreamFailed();
       }
     }
     return this;
@@ -301,6 +235,57 @@ export class PlayManager extends ManagerBase {
     this.Log("Rewind() called");
     this.Stop().Play();
     return this;
+  }
+
+  private InitAudioPlayer() {
+    const t = timer.start("PlayManager#Play->InitAudioPlayer");
+    this.AudioPlayer = voice.createAudioPlayer();
+    voice.getVoiceConnection(this.info.GuildID).subscribe(this.AudioPlayer);
+    if(!config.debug){
+      this.AudioPlayer.on("error", (e) => {
+        if(!e) return;
+        // エラーが発生したら再生できないときの関数を呼んで逃げる
+        this.Log("Error:" + e.message, "error");
+        // @ts-ignore
+        const einfo = e.errorInfo;
+        if(einfo){
+          this.Log(StringifyObject(einfo), "error");
+        }
+        if(this.info.boundTextChannel){
+          this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
+            this.Log("Some error occurred in AudioPlayer", "error");
+            (ch as TextChannel).send(":tired_face:曲の再生に失敗しました...。(" + (e ? StringifyObject(e) : "undefined") + ")" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。")).catch(e => log(e, "error"));
+          }).catch(e => log(e, "error"));
+        }
+        this.onStreamFailed();
+      });
+    }
+    this.AudioPlayer.on("unsubscribe", (_)=>{
+      this.AudioPlayer.stop();
+      this.AudioPlayer = null;
+    });
+    t.end();
+  }
+
+  private HandleEvents(resource:FixedAudioResource, errorReportChannel:TextBasedChannel){
+    resource.events
+      .on("error", er => {
+        log("Error", "error");
+        if(er){
+          // @ts-ignore
+          const einfo = er.errorInfo;
+          if(einfo){
+            log(StringifyObject(einfo), "error");
+          }
+        }
+        errorReportChannel.send(":tired_face:曲の再生に失敗しました...。" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。"));
+        this.onStreamFailed();
+      })
+      .on("end", () => {
+        this.onStreamFinished();
+      })
+    ;
+    return resource;
   }
 
   private ResolveStream(rawStream:StreamInfo, time:number):voice.AudioResource{
@@ -430,5 +415,24 @@ export class PlayManager extends ManagerBase {
     }else{
       this.Play();
     }
+  }
+
+  private async onStreamFailed(){
+    if(this.info.Queue.LoopEnabled) this.info.Queue.LoopEnabled = false;
+    if(this.info.Queue.length === 1 && this.info.Queue.QueueLoopEnabled) this.info.Queue.QueueLoopEnabled = false;
+    if(this.errorUrl == this.CurrentAudioInfo.Url){
+      this.errorCount++;
+    }else{
+      this.errorCount = 1;
+      this.errorUrl = this.CurrentAudioInfo.Url;
+      if(this.CurrentAudioInfo.isYouTube()) this.CurrentAudioInfo.disableCache();
+    }
+    this.Log(`Play() failed, (${this.errorCount}times)`, "warn");
+    this.error = this.preparing = false;
+    this.Stop();
+    if(this.errorCount >= this.retryLimit){
+      await this.info.Queue.Next();
+    }
+    this.Play();
   }
 }
