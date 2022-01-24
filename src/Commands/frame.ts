@@ -34,14 +34,15 @@ export default class Frame implements CommandInterface {
       return;
     }
     const time = (function(rawTime){
-      if(rawTime === "") 
+      if(rawTime === "" || vinfo.LiveStream) 
         return server.Player.CurrentTime / 1000;
       else if(rawTime.match(/^(\d+:)*\d+(\.\d+)?$/))
         return rawTime.split(":").map(n => Number(n)).reduce((prev,current) => prev * 60 + current);
       else
         return NaN;
     })(options.rawArgs);
-    if(isNaN(time) || time > vinfo.LengthSeconds){
+    if(options.rawArgs !== "" && vinfo.LiveStream) await message.channel.send("ライブストリームでは時間指定できません");
+    if(!vinfo.LiveStream && (isNaN(time) || time > vinfo.LengthSeconds)){
       await message.reply(":warning:時間の指定が正しくありません。").catch(e => log(e, "error"));
       return;
     }
@@ -55,7 +56,7 @@ export default class Frame implements CommandInterface {
         files: [attachment]
       });
       await response.edit({
-        content: `:white_check_mark:完了! (${hour}:${min}:${sec}時点)`,
+        content: ":white_check_mark:完了!" + (vinfo.LiveStream ? "" : `(${hour}:${min}:${sec}時点)`),
       });
     }
     catch(e){
