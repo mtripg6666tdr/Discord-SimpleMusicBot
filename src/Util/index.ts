@@ -142,6 +142,12 @@ export function DownloadText(url:string, headers?:{[key:string]:string}, request
   });
 }
 
+/**
+ * 指定されたURLにHEADリクエストをしてステータスコードを取得します
+ * @param url URL
+ * @param headers 追加のカスタムリクエストヘッダ
+ * @returns ステータスコード
+ */
 export function RetriveHttpStatusCode(url:string, headers?:{[key:string]:string}){
   return new Promise<number>((resolve, reject) => {
     const durl = new URL(url);
