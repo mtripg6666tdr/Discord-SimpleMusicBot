@@ -80,15 +80,17 @@ export class YouTube extends AudioSource {
   async fetch(url?:boolean):Promise<StreamInfo>{
     try{
       let info = this.ytdlInfo;
-      const agent = config.proxy && HttpsProxyAgent.default(config.proxy);
-      const requestOptions = agent ? {agent} : undefined;
       if(!info){
+        // no cache then get
+        const agent = config.proxy && HttpsProxyAgent.default(config.proxy);
+        const requestOptions = agent ? {agent} : undefined;  
         const t = timer.start("YouTube(AudioSource)#fetch->GetInfo");
         info = await ytdl.getInfo(this.Url, {
           lang: "ja", requestOptions
         })
         t.end();
       }
+      // store related videos
       this.relatedVideos = info.related_videos.map(video => ({
         url: "https://www.youtube.com/watch?v=" + video.id,
         title: video.title,
@@ -98,16 +100,21 @@ export class YouTube extends AudioSource {
         thumbnail: video.thumbnails[0].url,
         isLive: video.isLive
       })).filter(v => !v.isLive);
+      // update description
       this.Description = info.videoDetails.description ?? "不明";
-      if(info.videoDetails.title) this.Title = info.videoDetails.title;
+      // update is live status
+      this.LiveStream = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
+      // update title
+      this.Title = info.videoDetails.title;
+      // format selection
       const format = ytdl.chooseFormat(info.formats, {
         filter: this.LiveStream ? null : "audioonly",
         quality: this.LiveStream ? null : "highestaudio",
         isHLS: this.LiveStream,
       } as ytdl.chooseFormatOptions);
-      log("[AudioSource:youtube]Format: " + format.itag + ", Bitrate: " + format.bitrate + "bps, Audio codec:" + format.audioCodec + ", Container: " + format.container);
+      log(`[AudioSource:youtube]Format: ${format.itag}, Bitrate: ${format.bitrate}bps, Audio codec:${format.audioCodec}, Container: ${format.container}`);
       if(url){
-        // return url when forced
+        // return url when forced it
         this.fallback = false;
         log("[AudioSource:youtube]Returning the url instead of stream");
         return {
@@ -141,6 +148,12 @@ export class YouTube extends AudioSource {
       if(info.title) this.Title = info.title;
       if(info.is_live){
         const format = info.formats.filter(f => f.format_id === info.format_id);
+        if(url){
+          return {
+            type: "url",
+            url: format[0].url
+          }
+        }
         const stream = new PassThrough({highWaterMark: 1024 * 512});
         stream._destroy = () => { stream.destroyed = true; };
         const req = m3u8stream(format[0].url, {
@@ -168,14 +181,18 @@ export class YouTube extends AudioSource {
 
   async fetchVideo(){
     let info = this.ytdlInfo;
-    const agent = config.proxy && HttpsProxyAgent.default(config.proxy);
-    const requestOptions = agent ? {agent} : undefined;
     if(!info){
+      const agent = config.proxy && HttpsProxyAgent.default(config.proxy);
+      const requestOptions = agent ? {agent} : undefined;  
       info = await ytdl.getInfo(this.Url, {
         lang: "ja", requestOptions
       })
     }
-    const format = ytdl.chooseFormat(info.formats, {quality: "highestvideo"});
+    const isLive = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
+    const format = ytdl.chooseFormat(info.formats, {
+      quality: isLive ? null : "highestvideo",
+      isHLS: isLive
+    } as ytdl.chooseFormatOptions);
     const { url } = format;
     return {url, ua};
   }
