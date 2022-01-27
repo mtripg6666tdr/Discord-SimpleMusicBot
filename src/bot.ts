@@ -26,6 +26,7 @@ import { ResponseMessage } from "./Component/ResponseMessage";
 import Soundcloud from "soundcloud.ts";
 import { addOn } from "./Util/addonUtil";
 import { LogEmitter } from "./Util/logUtil";
+import { EffectsCustomIds, getCurrentEffectPanel } from "./Util/effectUtil";
 
 /**
  * 音楽ボットの本体
@@ -299,23 +300,49 @@ export class MusicBot extends LogEmitter {
     }else if(interaction.isButton()){
       this.Log("Button Interaction received");
       await interaction.deferUpdate();
-      const l = this.EmbedPageToggle.filter(t => 
-        t.Message.channelId === interaction.channel.id && 
-        t.Message.id === interaction.message.id);
-      if(
-        l.length >= 1 &&
-        interaction.customId === PageToggle.arrowLeft || interaction.customId === PageToggle.arrowRight
-        ){
-          // ページめくり
-          await l[0].FlipPage(
-            interaction.customId === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
-            interaction.customId === PageToggle.arrowRight ? (l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current ) : 0
-            ,
-            interaction
-            );
+      if(interaction.customId === PageToggle.arrowLeft || interaction.customId === PageToggle.arrowRight){
+        const l = this.EmbedPageToggle.filter(t => 
+          t.Message.channelId === interaction.channel.id && 
+          t.Message.id === interaction.message.id);
+        if(l.length >= 1){
+            // ページめくり
+            await l[0].FlipPage(
+              interaction.customId === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
+              interaction.customId === PageToggle.arrowRight ? (l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current ) : 0
+              ,
+              interaction
+              );
         }else{
           await interaction.editReply("失敗しました!");
         }
+      }else{
+        const updateEffectPanel = () => {
+          const mes = interaction.message as discord.Message;
+          const { embed, messageActions } = getCurrentEffectPanel(interaction.user.avatarURL(), this.data[interaction.guild.id]);
+          mes.edit({
+            content: null,
+            embeds: [embed],
+            components: [messageActions]
+          });
+        };
+        switch(interaction.customId){
+          case EffectsCustomIds.Reload: {
+            updateEffectPanel();
+          } break;
+          case EffectsCustomIds.BassBoost: {
+            this.data[interaction.guild.id].EffectPrefs.BassBoost = !this.data[interaction.guild.id].EffectPrefs.BassBoost;
+            updateEffectPanel();
+          } break;
+          case EffectsCustomIds.Reverb : {
+            this.data[interaction.guild.id].EffectPrefs.Reverb = !this.data[interaction.guild.id].EffectPrefs.Reverb;
+            updateEffectPanel();
+          } break;
+          case EffectsCustomIds.LoudnessEqualization : {
+            this.data[interaction.guild.id].EffectPrefs.LoudnessEqualization = !this.data[interaction.guild.id].EffectPrefs.LoudnessEqualization;
+            updateEffectPanel();
+          } break;
+        }
+      }
     }else if(interaction.isSelectMenu()){
       this.Log("SelectMenu Interaction received");
       // 検索パネル取得

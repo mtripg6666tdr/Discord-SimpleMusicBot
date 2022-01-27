@@ -9,6 +9,7 @@ import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, InitPassThrough, log, timer, StringifyObject, config } from "../Util";
 import { ManagerBase } from "./ManagerBase";
 import { FixedAudioResource } from "./AudioResource";
+import { getFFmpegEffectArgs } from "../Util/effectUtil";
 
 /**
  * サーバーごとの再生を管理するマネージャー。
@@ -110,7 +111,8 @@ export class PlayManager extends ManagerBase {
       // QueueContentからストリーム情報を取得
       const rawStream = await this.CurrentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
-      const stream = FixedAudioResource.fromAudioResource(this.ResolveStream(rawStream, time), this.CurrentAudioInfo.LengthSeconds);
+      const resource = this.ResolveStream(rawStream, time);
+      const stream = FixedAudioResource.fromAudioResource(resource, this.CurrentAudioInfo.LengthSeconds);
       this.HandleEvents(stream, /* errorReportChannel */ mes.channel);
       this.Log("Stream edges: Raw -> " + stream.edges.map(e => e.type).join(" -> ") + " ->");
       // fetchおよび処理中に切断された場合処理を終了
@@ -291,19 +293,27 @@ export class PlayManager extends ManagerBase {
 
   private ResolveStream(rawStream:StreamInfo, time:number):voice.AudioResource{
     let stream = null as voice.AudioResource;
+    const effects = getFFmpegEffectArgs(this.info);
+    this.Log("Effect: " + effects.join(" "));
     if(rawStream.type === "url"){
       // URLならFFmpegにわたしてOggOpusに変換
       stream = voice.createAudioResource(
         this.CreateReadableFromUrl(rawStream.url, time > 0 ? [
+          ...effects,
           "-ss", time.toString(),
           "-user_agent", rawStream.userAgent ?? DefaultUserAgent
-        ] : []),
+        ] : [
+          ...effects,
+        ]),
         {inputType: voice.StreamType.OggOpus}
       );
-    }else if(time > 0){
+    }else if(time > 0 || effects.length >= 1){
       // シークが必要ならFFmpegを通す
       stream = voice.createAudioResource(
-        this.CreateFFmpegReadableFromReadable(rawStream.stream, ["-ss", time.toString()]),
+        this.CreateFFmpegReadableFromReadable(rawStream.stream, [
+          ...effects,
+          "-ss", time.toString()
+        ]),
         {inputType: voice.StreamType.OggOpus}
       );
     }else{
@@ -353,11 +363,12 @@ export class PlayManager extends ManagerBase {
     return stream;
   }
 
-  private CreateReadableFromUrl(url:string, additionalArgs:string[]):Readable{
+  private CreateReadableFromUrl(url:string, beforeAdditionalArgs:string[] = [], afterAdditionalArgs:string[] = []):Readable{
     const args = [
       ...FFmpegDefaultArgs,
-      ...additionalArgs,
+      ...beforeAdditionalArgs,
       '-i', url, 
+      ...afterAdditionalArgs,
       '-acodec', 'libopus', 
       '-f', 'opus', 
       '-ar', '48000', 

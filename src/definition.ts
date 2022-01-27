@@ -46,10 +46,14 @@ export class GuildDataContainer{
   /**
    * 関連動画自動追加が有効
    */
-  AddRelative:boolean
+  AddRelative:boolean;
+  /**
+   * オーディオエフェクトエフェクトの設定
+   */
+  EffectPrefs:AudioEffect;
 
   constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBot){
-    this.SearchPanel =null;
+    this.SearchPanel = null;
     this.Queue = new QueueManager();
     this.Player = new PlayManager(client);
     this.boundTextChannel = boundchannelid;
@@ -57,6 +61,7 @@ export class GuildDataContainer{
     this.DataPath = ".data/" + guildid + ".preferences.json";
     this.Bot = bot;
     this.AddRelative = false;
+    this.EffectPrefs = {BassBoost: false, Reverb: false, LoudnessEqualization: false};
 
     if(fs.existsSync(".data") && fs.existsSync(this.DataPath)){
       this.PersistentPref = JSON.parse(fs.readFileSync(this.DataPath, { encoding: "utf-8"}));
@@ -84,6 +89,12 @@ export class GuildDataContainer{
 
 type PersistentPref = {
   Prefix:string;
+}
+
+type AudioEffect = {
+  BassBoost:boolean;
+  Reverb:boolean;
+  LoudnessEqualization:boolean;
 }
 
 export type SearchPanel = {

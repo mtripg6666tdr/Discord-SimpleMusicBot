@@ -12,6 +12,7 @@ export function getColor(key:colorkey):number{
     "PLAYLIST_COMPLETED": 0xF152DA,
     "THUMB": 0xBEEF16,
     "RELATIVE_SETUP": 0xFD0202,
+    "EFFECT": 0xCCFFCC,
   };
   return cmap[key];
 }
@@ -19,5 +20,5 @@ export function getColor(key:colorkey):number{
 type colorkey = 
 "COMMAND"|"HELP"|"SEARCH"|"NP"|"QUEUE"|
 "UPTIME"|"SONG_ADDED"|"LYRIC"|"AUTO_NP"|"PLAYLIST_COMPLETED"|
-"THUMB"|"RELATIVE_SETUP"
+"THUMB"|"RELATIVE_SETUP"|"EFFECT"
 ;
