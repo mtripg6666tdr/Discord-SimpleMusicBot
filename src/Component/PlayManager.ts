@@ -97,7 +97,8 @@ export class PlayManager extends ManagerBase {
     if(this.info.boundTextChannel){
       ch = await this.client.channels.fetch(this.info.boundTextChannel) as TextChannel;
       const [min, sec] = CalcMinSec(this.CurrentAudioInfo.LengthSeconds);
-      mes = await ch.send(":hourglass_flowing_sand: `" + this.CurrentAudioInfo.Title + "` `(" + min + ":" + sec + ")`の再生準備中...");
+      const isLive = this.CurrentAudioInfo.isYouTube() && this.CurrentAudioInfo.LiveStream;
+      mes = await ch.send(`:hourglass_flowing_sand: \`${this.CurrentAudioInfo.Title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`);
     }
     try{
       // AudioPlayerがなければ作成
