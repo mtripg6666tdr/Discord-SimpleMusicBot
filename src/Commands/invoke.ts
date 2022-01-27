@@ -14,7 +14,7 @@ export default class Invoke implements CommandInterface {
     required: true
   }] as SlashCommandArgument[];
   async run(message:CommandMessage, options:CommandArgs){
-    const commandInfo = CommandMessage.resolveCommandMessage("/" + options.rawArgs, message.guild.id, options.data);
+    const commandInfo = CommandMessage.resolveCommandMessage("/" + options.rawArgs);
     if(commandInfo.command === "invoke"){
       await message.reply("invokeコマンドをinvokeコマンドで実行することはできません");
       return;

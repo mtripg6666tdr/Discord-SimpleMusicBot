@@ -25,11 +25,11 @@ export class CommandMessage {
    * @param message ユーザーが送信するコマンドを含むメッセージ
    * @returns 新しいCommandMessageのインスタンス
    */
-  static createFromMessage(message:Message, data:{[key:string]:GuildDataContainer}){
+  static createFromMessage(message:Message){
     const me = new CommandMessage();
     me.isMessage = true;
     me._message = message;
-    const { command, options, rawOptions } = this.resolveCommandMessage(message.content, message.guild.id, data);
+    const { command, options, rawOptions } = this.resolveCommandMessage(message.content);
     me._command = command;
     me._options = options;
     me._rawOptions = rawOptions;
@@ -250,17 +250,20 @@ export class CommandMessage {
    * @param data GuildVoiceInfoのデータ
    * @returns 解決されたコマンド名、パース済み引数、生の引数を含むオブジェクト
    */
-  static resolveCommandMessage(content:string, guildid:string, data:{[key:string]:GuildDataContainer}){
-    const msg_spl = NormalizeText(content).substr(1, content.length - 1).split(" ");
-    let command = msg_spl[0];
-    let rawOptions = msg_spl.length > 1 ? content.substring(command.length + (data[guildid] ? data[guildid].PersistentPref.Prefix : ">").length + 1, content.length) : "";
-    let options = msg_spl.length > 1 ? msg_spl.slice(1, msg_spl.length) : [];
-    
+  static resolveCommandMessage(content:string, prefixLength:number = 1){
+    const parseCommand = (cmd:string) => {
+      const commandString = NormalizeText(cmd).substring(1);
+      let [command, ...options] = commandString.split(" ").filter(content => content.length > 0);
+      let rawOptions = options.join(" ");
+      return {command, options, rawOptions};
+    };
+    let { command, options, rawOptions } = parseCommand(content);
+
     // 超省略形を捕捉
     if(command.startsWith("http")){
       rawOptions = command;
       options.push(rawOptions);
-      command = "p";
+      command = "play";
     }
     command = command.toLowerCase();
     return {

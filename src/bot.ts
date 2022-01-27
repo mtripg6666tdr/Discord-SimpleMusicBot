@@ -205,7 +205,7 @@ export class MusicBot extends LogEmitter {
     }
     if(message.content.startsWith(this.data[message.guild.id].PersistentPref.Prefix)){
       // コマンドメッセージを作成
-      const commandMessage = CommandMessage.createFromMessage(message, this.data);
+      const commandMessage = CommandMessage.createFromMessage(message);
       // コマンドを解決
       const command = CommandsManager.Instance.resolve(commandMessage.command);
       if(!command) return;
