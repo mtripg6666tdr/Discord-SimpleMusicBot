@@ -19,7 +19,7 @@
     "discord-api-types": "^0.26.0",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
-    "follow-redirects": "^1.14.8",
+    "follow-redirects": "^1.14.9",
     "genius-lyrics": "^4.3.5",
     "html-entities": "^2.3.2",
     "https-proxy-agent": "^5.0.0",
