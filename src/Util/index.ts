@@ -272,6 +272,8 @@ export async function CheckSendable(channel:TextChannel, user:GuildMember){
       && permissions.has("EMBED_LINKS")
       && permissions.has("MANAGE_MESSAGES")
       && permissions.has("ATTACH_FILES")
+      && permissions.has("READ_MESSAGE_HISTORY")
+      && permissions.has("VIEW_CHANNEL")
       ;
   }
   catch{
@@ -284,7 +286,9 @@ export async function CheckSendable(channel:TextChannel, user:GuildMember){
  * @param obj 対象のオブジェクト
  * @returns 文字列。JSON、またはその他の文字列、および空の文字列の場合があります
  */
-export function StringifyObject(obj:any){
+export function StringifyObject(obj:any):string{
+  if(typeof obj === "string") return obj;
+  if(obj["message"]) return obj.message;
   try{
     return JSON.stringify(obj);
   }
