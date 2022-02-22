@@ -88,7 +88,8 @@ export class MusicBot extends LogEmitter {
     client
       .on("ready", this.onReady.bind(this))
       .on("messageCreate", this.onMessageCreate.bind(this))
-      .on("interactionCreate", this.interactionCreate.bind(this))
+      .on("interactionCreate", this.onInteractionCreate.bind(this))
+      .on("voiceStateUpdate", this.onVoiceStateUpdate.bind(this))
       ;
   }
 
@@ -117,7 +118,7 @@ export class MusicBot extends LogEmitter {
       const speakingIds = await DatabaseAPI.GetIsSpeaking([...client.guilds.cache.keys()]);
       const queueGuildids = Object.keys(queues);
       const speakingGuildids = Object.keys(speakingIds);
-      for(let i=0;i<queueGuildids.length;i++){
+      for(let i=0; i < queueGuildids.length; i++){
         let id = queueGuildids[i];
         const queue = JSON.parse(queues[id]) as YmxFormat;
         if(
@@ -134,7 +135,7 @@ export class MusicBot extends LogEmitter {
           this.data[id].Queue.QueueLoopEnabled = qloop;
           this.data[id].AddRelative = related;
           try{
-            for(let j=0;j<queue.data.length;j++){
+            for(let j=0; j < queue.data.length; j++){
               await this.data[id].Queue.AutoAddQueue(client, queue.data[j].url, null, "unknown", false, false, null, null, queue.data[j]);
             }
             if(vid != "0"){
@@ -261,7 +262,7 @@ export class MusicBot extends LogEmitter {
     }
   }
 
-  private async interactionCreate(interaction:discord.Interaction){
+  private async onInteractionCreate(interaction:discord.Interaction){
     this.addOn.emit("interactionCreate", interaction);
     if(this.maintenance){
       if(!config.adminId || interaction.user.id !== config.adminId)
@@ -368,6 +369,18 @@ export class MusicBot extends LogEmitter {
           await this.playFromSearchPanelOptions(interaction.values, interaction.guild.id, responseMessage)
         }
       }
+    }
+  }
+
+  private async onVoiceStateUpdate(oldState:discord.VoiceState, newState:discord.VoiceState){
+    if(newState.member.id !== this.client.user.id) return;
+    if(oldState.channelId !== newState.channelId && !newState.channelId){
+      const guild = this.data[newState.guild.id];
+      if(!guild.Player.IsConnecting) return;
+      guild.Player.Disconnect();
+      const bound = await this.client.channels.fetch(guild.boundTextChannel).catch(() => null) as discord.TextChannel;
+      if(!bound) return;
+      await bound.send(":postbox: 正常に切断しました").catch(e => this.Log(e));
     }
   }
 
