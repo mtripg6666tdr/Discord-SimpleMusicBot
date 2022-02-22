@@ -59,8 +59,11 @@ export default class Queue implements CommandInterface {
         .setTitle(message.guild.name + "のキュー")
         .setDescription("`" + page + "ページ目(" + totalpage + "ページ中)`")
         .addFields(fields)
-        .setAuthor(options.client.user.username, options.client.user.avatarURL())
-        .setFooter(queue.length + "曲 | 合計:" + thour + ":" + tmin + ":" + tsec + " | トラックループ:" + (queue.LoopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.QueueLoopEnabled ? "⭕" : "❌"))
+        .setAuthor({
+          name: options.client.user.username, 
+          iconURL: options.client.user.avatarURL()
+        })
+        .setFooter({text: queue.length + "曲 | 合計:" + thour + ":" + tmin + ":" + tsec + " | トラックループ:" + (queue.LoopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.QueueLoopEnabled ? "⭕" : "❌")})
         .setThumbnail(message.guild.iconURL())
         .setColor(getColor("QUEUE"));
     }
