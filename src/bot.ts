@@ -522,9 +522,12 @@ export class MusicBot extends LogEmitter {
         else 
           return message.channel.send(mes)
       })(":electric_plug:接続中...");
+      const vc = await message.member.voice.channel.fetch();
       try{
+        if(!vc.joinable)
+          throw new Error("ボイスチャンネルに参加できません。権限を確認してください。");
         voice.joinVoiceChannel({
-          channelId: message.member.voice.channel.id,
+          channelId: vc.id,
           guildId: message.member.guild.id,
           // @ts-ignore
           adapterCreator: message.member.guild.voiceAdapterCreator,
@@ -537,7 +540,7 @@ export class MusicBot extends LogEmitter {
       }
       catch(e){
         this.Log(e, "error");
-        const failedMsg = "😑接続に失敗しました…もう一度お試しください。";
+        const failedMsg = "😑接続に失敗しました…もう一度お試しください: " + StringifyObject(e);
           if(!reply && replyOnFail){
             await msg.delete()
               .catch(e => this.Log(e, "error"));
