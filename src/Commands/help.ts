@@ -30,6 +30,7 @@ export default class Help implements CommandInterface {
       + "・Streamable(動画ページURL指定)\r\n"
       + "・Discord(音声ファイルの添付付きメッセージのURL指定)\r\n"
       + "・Googleドライブ(音声ファイルの限定公開リンクのURL指定)\r\n"
+      + "・ニコニコ動画(動画ページURL指定)\r\n"
       + "・オーディオファイルへの直URL"
       )
       .setColor(getColor("HELP"));

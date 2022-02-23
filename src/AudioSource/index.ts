@@ -6,6 +6,7 @@ export * from "./resolver";
 export * from "./bestdori";
 export * from "./custom";
 export * from "./googledrive";
+export * from "./niconico";
 export * from "./hibiki";
 export * from "./soundcloud";
 export * from "./streamable";

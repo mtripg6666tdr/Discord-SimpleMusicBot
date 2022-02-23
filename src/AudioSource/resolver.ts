@@ -35,6 +35,9 @@ export async function Resolve(info:AudioSourceBasicInfo){
     }else if(AudioSource.HibikiApi.validateURL(url)){
       // Hibiki
       basicInfo = await new AudioSource.Hibiki().init(url);
+    }else if(AudioSource.NicoNicoS.validateUrl(url)){
+      // NicoNico
+      basicInfo = await new AudioSource.NicoNicoS().init(url, gotData as AudioSource.exportableNicoNico);
     }
   }
 
