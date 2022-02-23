@@ -6,7 +6,7 @@ import { AudioSource } from "./audiosource";
 
 export class Streamable extends AudioSource {
   protected _lengthSeconds = 0;
-  protected _serviceIdentifer = "streamable";
+  protected readonly _serviceIdentifer = "streamable";
   Thumnail = DefaultAudioThumbnailURL;
   private streamUrl = "";
 

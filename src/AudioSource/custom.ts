@@ -6,7 +6,7 @@ import { AudioSource } from "./audiosource";
 
 export class CustomStream extends AudioSource {
   protected _lengthSeconds = 0;
-  protected _serviceIdentifer = "custom";
+  protected readonly _serviceIdentifer = "custom";
   Thumnail:string = DefaultAudioThumbnailURL;
 
   async init(url:string){

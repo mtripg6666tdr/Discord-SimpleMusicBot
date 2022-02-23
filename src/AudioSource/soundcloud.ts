@@ -6,7 +6,7 @@ import { AudioSource } from "./audiosource";
 
 export class SoundCloudS extends AudioSource {
   protected _lengthSeconds = 0;
-  protected _serviceIdentifer = "soundcloud";
+  protected readonly _serviceIdentifer = "soundcloud";
   Author:string;
   Thumnail:string;
   

@@ -6,7 +6,7 @@ import { exportableCustom } from "./custom";
 
 export class Hibiki extends AudioSource {
   protected _lengthSeconds = 0;
-  protected _serviceIdentifer = "hibiki";
+  protected readonly _serviceIdentifer = "hibiki";
   Thumnail = "";
   private programId = "";
   private radioInfo:HibikiAPIResult;

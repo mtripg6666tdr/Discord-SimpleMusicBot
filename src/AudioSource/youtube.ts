@@ -16,7 +16,7 @@ import { getYouTubeDlInfo, YoutubeDlInfo } from "./youtube.fallback";
 const ua = SecondaryUserAgent;
 export class YouTube extends AudioSource {
   // サービス識別子（固定）
-  protected _serviceIdentifer = "youtube";
+  protected readonly _serviceIdentifer = "youtube";
   protected _lengthSeconds = 0;
   private fallback = false;
   private ytdlInfo = null as ytdl.videoInfo;

@@ -5,7 +5,7 @@ import { AudioSource } from "./audiosource";
 
 export class BestdoriS extends AudioSource {
   protected _lengthSeconds = 0;
-  protected _serviceIdentifer = "bestdori";
+  protected readonly _serviceIdentifer = "bestdori";
   Thumnail = "";
   Artist = "";
   Type:"anime"|"normal"|null = null;

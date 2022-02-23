@@ -7,7 +7,7 @@ import { RetriveHttpStatusCode, RetriveLengthSeconds } from "../Util";
 
 export class GoogleDrive extends AudioSource {
   protected _lengthSeconds = 0;
-  protected _serviceIdentifer = "googledrive";
+  protected readonly _serviceIdentifer = "googledrive";
   Thumnail:string = DefaultAudioThumbnailURL;
 
   async init(url:string){
