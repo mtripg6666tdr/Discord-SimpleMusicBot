@@ -11,7 +11,6 @@ export default class Help implements CommandInterface {
   unlist = false;
   category = "bot";
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
     const developer = await options.client.users.fetch("593758391395155978").catch(_ => null);
     const embed = new discord.MessageEmbed()
       .setTitle(options.client.user.username + ":notes:")
