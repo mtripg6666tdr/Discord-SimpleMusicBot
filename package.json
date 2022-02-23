@@ -40,7 +40,7 @@
     "ytsr": "^3.6.0"
   },
   "devDependencies": {
-    "node": "^17.4.0"
+    "node": "^16.13.0"
   },
   "optionalDependencies": {
     "ffmpeg-static": "^4.4.1"
