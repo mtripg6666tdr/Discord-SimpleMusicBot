@@ -13,7 +13,7 @@ updates:
       - dependency-type: "direct"
     ignore:
       - dependency-name: "node"
-        versions: ["^16.13.0"]
+        versions: ["^17.0.0", "^18.0.0"]
       - dependency-name: "@types/node"
         versions: ["^18.0.0"]
       - dependency-name: "discord.js"
