@@ -374,13 +374,25 @@ export class MusicBot extends LogEmitter {
 
   private async onVoiceStateUpdate(oldState:discord.VoiceState, newState:discord.VoiceState){
     if(newState.member.id !== this.client.user.id) return;
-    if(oldState.channelId !== newState.channelId && !newState.channelId){
+    if(oldState.channelId !== newState.channelId){
       const guild = this.data[newState.guild.id];
-      if(!guild.Player.IsConnecting) return;
-      guild.Player.Disconnect();
-      const bound = await this.client.channels.fetch(guild.boundTextChannel).catch(() => null) as discord.TextChannel;
-      if(!bound) return;
-      await bound.send(":postbox: 正常に切断しました").catch(e => this.Log(e));
+      if(!guild) return;
+      if(!newState.channelId){
+        // サーバー側の切断
+        if(!guild.Player.IsConnecting) return;
+        guild.Player.Disconnect();
+        const bound = await this.client.channels.fetch(guild.boundTextChannel).catch(() => null) as discord.TextChannel;
+        if(!bound) return;
+        await bound.send(":postbox: 正常に切断しました").catch(e => this.Log(e));
+      }else if(!oldState.channelId && (newState.suppress || newState.serverMute)){
+        // VC参加
+        newState.setMute(false).catch(async () => {
+          newState.setSuppressed(false).catch(async () => {
+            const ch = await this.client.channels.fetch(guild.boundTextChannel) as discord.TextChannel;
+            ch.send(":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。").catch(e => this.Log(e));
+          })
+        });
+      }
     }
   }
 
