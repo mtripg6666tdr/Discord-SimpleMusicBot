@@ -1,5 +1,6 @@
-import Genius from "genius-lyrics";
 import * as https from "https";
+import Genius from "genius-lyrics";
+import { convert } from "html-to-text";
 import { decode } from "html-entities";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { DownloadText } from ".";
@@ -31,9 +32,9 @@ export async function GetLyrics(keyword:string):Promise<songInfo>{
     [lyric, ] = lyric.split("</div>");
     lyric = lyric.replace(/<span class="rt rt_hidden">.+?<\/span>/g, "");
     lyric = lyric.replace(/\n/g, "");
-    lyric = lyric.replace(/<br \/>/g, "\n");
-    lyric = lyric.replace(/[\r\n]{2}/g, "\n");
-    lyric = lyric.replace(/<.+?>/g, "");
+    lyric = lyric.replace(/<br \/>/g, "<br>");
+    lyric = lyric.replace(/[\r\n]{2}/g, "<br>");
+    lyric = convert(lyric);
     const match = doc.match(/<meta name="description" content="(?<artist>.+?)が歌う(?<title>.+)の歌詞ページ.+です。.+">/);
     const artwork = doc.match(/<img src="(?<url>.+?)" alt=".+? 歌詞" \/>/).groups?.url;
     return {
