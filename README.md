@@ -146,7 +146,7 @@ $ npm run applyslashcommandguild
 
 7. 実行
 ```bash
-$ npm onlystart
+$ npm run onlystart
 ```
 
 本リポジトリではより多くの環境で利用可能な`node-opus`および`opusscript`を使用していますが、ご利用の環境で`@discordjs/opus`が利用できる場合には安定性などの点からこちらを利用することをおすすめします。
