@@ -299,11 +299,15 @@ export class PlayManager extends ManagerBase {
       // URLならFFmpegにわたしてOggOpusに変換
       stream = voice.createAudioResource(
         this.CreateReadableFromUrl(rawStream.url, time > 0 ? [
-          ...effects,
+          // additional args before input
           "-ss", time.toString(),
-          "-user_agent", rawStream.userAgent ?? DefaultUserAgent
+          "-user_agent", rawStream.userAgent ?? DefaultUserAgent,
         ] : [
-          ...effects,
+          "-user_agent", rawStream.userAgent ?? DefaultUserAgent,
+        ], 
+        [
+          // additional args after input
+          ...effects
         ]),
         {inputType: voice.StreamType.OggOpus}
       );
