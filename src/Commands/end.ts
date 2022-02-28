@@ -10,15 +10,17 @@ export default class End implements CommandInterface {
   category = "playlist";
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(!options.data[message.guild.id].Player.IsPlaying){
+    const guild = options.data[message.guild.id];
+    if(!guild.Player.IsPlaying){
       message.reply("再生中ではありません").catch(e => log(e, "error"));
       return;
     }
-    if(options.data[message.guild.id].Queue.length <= 1){
+    if(guild.Queue.length <= 1){
       message.reply("キューが空、もしくは一曲しかないため削除されませんでした。").catch(e => log(e, "error"));
       return;
     }
-    options.data[message.guild.id].Queue.RemoveFrom2();
+    guild.Queue.RemoveFrom2();
+    guild.Queue.QueueLoopEnabled = guild.Queue.OnceLoopEnabled = guild.Queue.LoopEnabled = false;
     message.reply("✅キューに残された曲を削除しました").catch(e => log(e, "error"));
   }
 }
