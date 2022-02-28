@@ -41,7 +41,10 @@ export default class Frame implements CommandInterface {
       else
         return NaN;
     })(options.rawArgs);
-    if(options.rawArgs !== "" && vinfo.LiveStream) await message.channel.send("ライブストリームでは時間指定できません");
+    if(options.rawArgs !== "" && vinfo.LiveStream){
+      await message.channel.send("ライブストリームでは時間指定できません");
+      return;
+    }
     if(!vinfo.LiveStream && (isNaN(time) || time > vinfo.LengthSeconds)){
       await message.reply(":warning:時間の指定が正しくありません。").catch(e => log(e, "error"));
       return;
