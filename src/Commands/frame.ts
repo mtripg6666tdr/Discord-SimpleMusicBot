@@ -6,6 +6,9 @@ import type { CommandMessage } from "../Component/CommandMessage"
 import { FFmpegDefaultArgs } from "../definition";
 import { CalcHourMinSec, log, StringifyObject } from "../Util";
 
+import { spawn } from "child_process";
+import * as fs from "fs";
+
 export default class Frame implements CommandInterface {
   name = "フレーム";
   alias = ["frame", "キャプチャ", "capture"];
@@ -51,8 +54,10 @@ export default class Frame implements CommandInterface {
     }
     try{
       const [hour, min, sec] = CalcHourMinSec(time);
+      log(`[cmd:frame]Calculated time ${hour}:${min}:${sec}`);
       const response = await message.reply(":camera_with_flash:取得中...");
       const {url, ua} = await vinfo.fetchVideo();
+      log(`[cmd:frame]Got video url: ${url.substring(0, 50)}...`);
       const frame = await getFrame(url, time, ua);
       const attachment = new MessageAttachment(frame).setName(`capture_${ytdl.getVideoID(vinfo.Url)}-${hour}${min}${sec}.png`);
       await response.channel.send({
@@ -81,18 +86,45 @@ function getFrame(url:string, time:number, ua:string){
       "-vcodec", "png"
     ];
     const bufs = [] as Buffer[];
-    const ffmpeg = new FFmpeg({args})
+    const logWriter = fs.createWriteStream("./frameRetrive.log", {encoding:"utf-8"});
+    logWriter.write(new Date().toString() + "\r\n");
+    logWriter.write(args.join(" ") + "\r\n");
+    const ffmpeg = spawn(require("ffmpeg-static"), [
+      ...args,
+      "pipe:1"
+    ], {
+      windowsHide: true,
+      shell: false,
+      stdio: ["ignore", "pipe", "pipe"]
+    });
+    let ffmpegDestroyed = false;
+    const destroyffmpeg = () => {
+      if(ffmpegDestroyed) return;
+      ffmpegDestroyed = true;
+      ffmpeg.once("error", () => {});
+      ffmpeg.kill("SIGKILL");
+    };
+    ffmpeg
       .on("error", (er) => {
-        if(!ffmpeg.destroyed) ffmpeg.destroy();
+        log(StringifyObject(er), "error");
         reject(er);
+        destroyffmpeg();
+        logWriter.write("\r\n" + StringifyObject(er));
+        logWriter.destroy();
       })
+    ffmpeg.stdout
       .on("data", (chunks) => {
+        log("[cmd:frame]Receive chunk");
         bufs.push(chunks);
       })
       .on("end", () => {
-        resolve(Buffer.concat(bufs));
-        if(!ffmpeg.destroyed) ffmpeg.destroy();
+        const result = Buffer.concat(bufs);
+        log(`[cmd:frame]Finish retriving: ${result.byteLength}bytes`);
+        resolve(result);
+        destroyffmpeg();
+        logWriter.destroy();
       })
     ;
+    ffmpeg.stderr.on("data", (chunk) => logWriter.write(chunk));
   });
 }

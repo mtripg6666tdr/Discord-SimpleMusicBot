@@ -172,5 +172,5 @@ export const FFmpegDefaultArgs = [
   '-reconnect_on_http_error', '4xx,5xx', 
   '-reconnect_delay_max', '30', 
   '-analyzeduration', '0', 
-  '-loglevel', '0', 
+  //'-loglevel', '0', 
 ];
