@@ -58,7 +58,7 @@ export default class Frame implements CommandInterface {
       const response = await message.reply(":camera_with_flash:取得中...");
       const {url, ua} = await vinfo.fetchVideo();
       log(`[cmd:frame]Got video url: ${url.substring(0, 50)}...`);
-      const frame = await getFrame(url, time, ua);
+      const frame = await getFrame(url, time, ua, options.bot.Version);
       const attachment = new MessageAttachment(frame).setName(`capture_${ytdl.getVideoID(vinfo.Url)}-${hour}${min}${sec}.png`);
       await response.channel.send({
         files: [attachment]
@@ -74,7 +74,7 @@ export default class Frame implements CommandInterface {
   }
 }
 
-function getFrame(url:string, time:number, ua:string){
+function getFrame(url:string, time:number, ua:string, version:string){
   return new Promise<Buffer>((resolve, reject) => {
     const args = [
       ...FFmpegDefaultArgs,
@@ -87,7 +87,8 @@ function getFrame(url:string, time:number, ua:string){
     ];
     const bufs = [] as Buffer[];
     const logWriter = fs.createWriteStream("./frameRetrive.log", {encoding:"utf-8"});
-    logWriter.write(new Date().toString() + "\r\n");
+    logWriter.write(new Date().toString() + "(" + Date.now() +  ")" + "\r\n");
+    logWriter.write("Version:" + version + "\r\n");
     logWriter.write(args.join(" ") + "\r\n");
     const ffmpeg = spawn(require("ffmpeg-static"), [
       ...args,
@@ -122,7 +123,8 @@ function getFrame(url:string, time:number, ua:string){
         log(`[cmd:frame]Finish retriving: ${result.byteLength}bytes`);
         resolve(result);
         destroyffmpeg();
-        logWriter.destroy();
+        logWriter.write("Finish retriving\r\n");
+        logWriter.end(new Date().toString() + "(" + Date.now() +  ")" + "\r\n");
       })
     ;
     ffmpeg.stderr.on("data", (chunk) => logWriter.write(chunk));
