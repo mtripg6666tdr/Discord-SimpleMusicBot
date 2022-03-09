@@ -626,7 +626,7 @@ export class MusicBot extends LogEmitter {
       await server.Queue.AutoAddQueue(this.client, optiont, message.member, "custom", first, false, message.channel as discord.TextChannel);
       server.Player.Play();
       return;
-    }else if(optiont.indexOf("v=") < 0 && ytpl.validateID(optiont)){
+    }else if(optiont.indexOf("v=") < 0 && optiont.indexOf("/channel/") < 0 && ytpl.validateID(optiont)){
       //違うならYouTubeプレイリストの直リンクか？
       const id = await ytpl.getPlaylistID(optiont);
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
