@@ -252,7 +252,7 @@ export class CommandMessage {
    */
   static resolveCommandMessage(content:string, prefixLength:number = 1){
     const parseCommand = (cmd:string) => {
-      const commandString = NormalizeText(cmd).substring(1);
+      const commandString = NormalizeText(cmd).substring(prefixLength);
       let [command, ...options] = commandString.split(" ").filter(content => content.length > 0);
       let rawOptions = options.join(" ");
       return {command, options, rawOptions};
