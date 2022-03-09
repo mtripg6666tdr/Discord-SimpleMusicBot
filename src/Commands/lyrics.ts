@@ -23,20 +23,27 @@ export default class Lyrics implements CommandInterface {
     options.updateBoundChannel(message);
     const msg = await message.reply("🔍検索中...");
     try{
-      const song = await GetLyrics(options.rawArgs);
-      const embed = new discord.MessageEmbed();
-      embed.title = "\"" + song.title + "\"(" + song.artist + ")の歌詞";
-      embed.footer = {
-        text: message.member.displayName,
-        iconURL: message.author.avatarURL()
-      };
-      embed.setColor(getColor("LYRIC"));
-      embed.description = song.lyric;
-      embed.url = song.url;
-      embed.thumbnail = {
-        url: song.artwork
+      const songInfo = await GetLyrics(options.rawArgs);
+      const embeds = [] as discord.MessageEmbed[];
+      if(!songInfo.lyric) throw new Error("取得した歌詞が空でした");
+      const chunkLength = Math.ceil(songInfo.lyric.length / 4000);
+      for(let i = 0; i < chunkLength; i++){
+        const partial = songInfo.lyric.substring(4000 * i, 4000 * (i + 1) - 1);
+        embeds.push(
+          new discord.MessageEmbed()
+          .setDescription(partial)
+          .setColor(getColor("LYRIC"))
+        );
       }
-      msg.edit({content: null, embeds:[embed]});
+      embeds[0]
+        .setTitle("\"" + songInfo.title + "\"(" + songInfo.artist + ")の歌詞")
+        .setURL(songInfo.url)
+        .setThumbnail(songInfo.artwork)
+      ;
+      embeds[embeds.length - 1]
+        .setFooter({text: message.member.displayName, iconURL: message.author.avatarURL()})
+      ;
+      msg.edit({content: null, embeds});
     }
     catch(e){
       log(e, "error");
