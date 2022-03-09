@@ -22,6 +22,7 @@ export class YouTube extends AudioSource {
   private ytdlInfo = null as ytdl.videoInfo;
   private youtubeDlInfo = null as YoutubeDlInfo;
   ChannelName:string;
+  ChannelUrl:string;
   Thumnail:string;
   LiveStream:boolean;
   relatedVideos:exportableYouTube[] = [];
@@ -39,6 +40,7 @@ export class YouTube extends AudioSource {
       this.Description = prefetched.description;
       this._lengthSeconds = prefetched.length;
       this.ChannelName = prefetched.channel;
+      this.ChannelUrl = prefetched.channelUrl;
       this.Thumnail = prefetched.thumbnail;
       this.LiveStream = prefetched.isLive;
     }else{
@@ -55,6 +57,7 @@ export class YouTube extends AudioSource {
         this.Description = info.videoDetails.description;
         this._lengthSeconds = Number(info.videoDetails.lengthSeconds ?? 0);
         this.ChannelName = info.videoDetails.ownerChannelName;
+        this.ChannelUrl = info.videoDetails.author.channel_url;
         this.Thumnail = info.videoDetails.thumbnails[0].url;
         this.LiveStream = info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails?.isLiveNow;
         this.fallback = false;
@@ -71,6 +74,7 @@ export class YouTube extends AudioSource {
         this.Description = info.description;
         this._lengthSeconds = Number(info.duration);
         this.ChannelName = info.channel;
+        this.ChannelUrl = info.channel_url;
         this.Thumnail = info.thumbnail;
       }
     }
@@ -96,7 +100,8 @@ export class YouTube extends AudioSource {
         title: video.title,
         description: "関連動画として取得したため詳細は表示されません",
         length: video.length_seconds,
-        channel: (video.author as ytdl.Author).name,
+        channel: (video.author as ytdl.Author)?.name,
+        channelUrl: (video.author as ytdl.Author)?.channel_url,
         thumbnail: video.thumbnails[0].url,
         isLive: video.isLive
       })).filter(v => !v.isLive);
@@ -201,7 +206,7 @@ export class YouTube extends AudioSource {
     const fields = [] as EmbedField[];
     fields.push({
       name: ":cinema:チャンネル名",
-      value: this.ChannelName,
+      value: this.ChannelUrl ? `[${this.ChannelName}](${this.ChannelUrl})` : this.ChannelName,
       inline: false
     }, {
       name: ":asterisk:概要",
@@ -222,8 +227,9 @@ export class YouTube extends AudioSource {
       description: this.Description,
       length: this.LengthSeconds,
       channel: this.ChannelName,
+      channelUrl: this.ChannelUrl,
       thumbnail: this.Thumnail,
-      isLive: this.LiveStream
+      isLive: this.LiveStream,
     };
   };
 
@@ -239,6 +245,7 @@ export type exportableYouTube = {
   description:string;
   length:number;
   channel:string;
+  channelUrl:string;
   thumbnail:string;
-  isLive:boolean
+  isLive:boolean;
 }
