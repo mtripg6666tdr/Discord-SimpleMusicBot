@@ -206,7 +206,8 @@ export class MusicBot extends LogEmitter {
       return;
     }
     const prefix = this.data[message.guild.id].PersistentPref.Prefix;
-    if(message.content.startsWith(prefix) && message.content.length > prefix.length){
+    const messageContent = NormalizeText(message.content);
+    if(messageContent.startsWith(prefix) && messageContent.length > prefix.length){
       // コマンドメッセージを作成
       const commandMessage = CommandMessage.createFromMessage(message);
       // コマンドを解決
@@ -738,7 +739,7 @@ export class MusicBot extends LogEmitter {
     const pmatch = message.guild.members.resolve(this.client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
     if(pmatch){
       if(this.data[message.guild.id].PersistentPref.Prefix !== pmatch.groups.prefix){
-        this.data[message.guild.id].PersistentPref.Prefix = pmatch.groups.prefix;
+        this.data[message.guild.id].PersistentPref.Prefix = NormalizeText(pmatch.groups.prefix);
       }
     }else if(this.data[message.guild.id].PersistentPref.Prefix !== config.prefix){
       this.data[message.guild.id].PersistentPref.Prefix = config.prefix;

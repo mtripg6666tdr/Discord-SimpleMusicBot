@@ -235,25 +235,51 @@ export function InitPassThrough():PassThrough{
   return stream;
 }
 
+const normalizeTemplate = [
+  {from: /０/g, to: "0"},
+  {from: /１/g, to: "1"},
+  {from: /２/g, to: "2"},
+  {from: /３/g, to: "3"},
+  {from: /４/g, to: "4"},
+  {from: /５/g, to: "5"},
+  {from: /６/g, to: "6"},
+  {from: /７/g, to: "7"},
+  {from: /８/g, to: "8"},
+  {from: /９/g, to: "9"},
+  {from: /　/g, to: " "},
+  {from: /！/g, to: "!"},
+  {from: /？/g, to: "?"},
+  {from: /ｂ/g, to: "b"},
+  {from: /ｃ/g, to: "c"},
+  {from: /ｄ/g, to: "d"},
+  {from: /ｆ/g, to: "f"},
+  {from: /ｇ/g, to: "g"},
+  {from: /ｈ/g, to: "h"},
+  {from: /ｊ/g, to: "j"},
+  {from: /ｋ/g, to: "k"},
+  {from: /ｌ/g, to: "l"},
+  {from: /ｍ/g, to: "m"},
+  {from: /ｎ/g, to: "n"},
+  {from: /ｐ/g, to: "p"},
+  {from: /ｑ/g, to: "q"},
+  {from: /ｒ/g, to: "r"},
+  {from: /ｓ/g, to: "s"},
+  {from: /ｔ/g, to: "t"},
+  {from: /ｖ/g, to: "v"},
+  {from: /ｗ/g, to: "w"},
+  {from: /ｘ/g, to: "x"},
+  {from: /ｙ/g, to: "y"},
+  {from: /ｚ/g, to: "z"},
+  {from: /＞/g, to: ">"},
+] as {from:RegExp, to:string}[];
+
 /**
  * 文字列を正規化します
  */
 export function NormalizeText(rawText:string){
   let result = rawText;
-  ([
-    {key: /０/g, value: "0"},
-    {key: /１/g, value: "1"},
-    {key: /２/g, value: "2"},
-    {key: /３/g, value: "3"},
-    {key: /４/g, value: "4"},
-    {key: /５/g, value: "5"},
-    {key: /６/g, value: "6"},
-    {key: /７/g, value: "7"},
-    {key: /８/g, value: "8"},
-    {key: /９/g, value: "9"},
-    {key: /　/g, value: " "},
-  ] as {key:RegExp, value:string}[]).forEach(reg => {
-    result = result.replace(reg.key, reg.value);
+  normalizeTemplate.forEach(reg => {
+    result = result.replace(reg.from, reg.to);
   });
   return result;
 }
