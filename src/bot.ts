@@ -291,7 +291,7 @@ export class MusicBot extends LogEmitter {
         // 遅延リプライ
         await interaction.deferReply();
         // メッセージライクに解決してコマンドメッセージに
-        const commandMessage = CommandMessage.createFromInteraction(this.client, interaction);
+        const commandMessage = CommandMessage.createFromInteraction(interaction);
         // プレフィックス更新
         this.updatePrefix(commandMessage);
         // コマンドを実行
@@ -362,12 +362,7 @@ export class MusicBot extends LogEmitter {
           await interaction.deleteReply();
         }else{
           const message = interaction.message;
-          let responseMessage = null as ResponseMessage;
-          if(message instanceof discord.Message){
-            responseMessage = ResponseMessage.createFromInteractionWithMessage(interaction, message, panel.Msg.commandMessage);
-          }else{
-            responseMessage = ResponseMessage.createFromInteraction(this.client, interaction, message, panel.Msg.commandMessage);
-          }
+          const responseMessage = ResponseMessage.createFromInteraction(interaction, message, panel.Msg.commandMessage);
           await this.playFromSearchPanelOptions(interaction.values, interaction.guild.id, responseMessage)
         }
       }
