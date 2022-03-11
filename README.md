@@ -149,13 +149,6 @@ $ npm run applyslashcommandguild
 $ npm run onlystart
 ```
 
-本リポジトリではより多くの環境で利用可能な`node-opus`および`opusscript`を使用していますが、ご利用の環境で`@discordjs/opus`が利用できる場合には安定性などの点からこちらを利用することをおすすめします。
-```bash
-$ npm uninstall node-opus
-$ npm uninstall opusscript
-$ npm install @discordjs/opus
-```
-
 ### ライブラリとして使用する
 本ボットをそのままライブラリとして使用することができます。
 ```bash
