@@ -1,8 +1,8 @@
 {
   "name": "discord-music-bot",
   "version": "2.0.0-dev",
-  "description": "Simple Music Bot for Discord",
-  "private": "true",
+  "description": "Simple Music Bot for Discord without any database",
+  "private": true,
   "main": "dist/lib.js",
   "types": "typings/lib.d.ts",
   "engines": {
@@ -30,7 +30,6 @@
     "m3u8stream": "^0.8.6",
     "miniget": "^4.2.2",
     "niconico-dl.js": "^1.1.3",
-    "node-opus": "^0.3.3",
     "opusscript": "0.0.8",
     "prism-media": "^1.3.2",
     "rimraf": "^3.0.2",
@@ -44,6 +43,7 @@
     "node": "^16.13.2"
   },
   "optionalDependencies": {
+    "@discordjs/opus": "^0.7.0",
     "ffmpeg-static": "^5.0.0"
   },
   "scripts": {
