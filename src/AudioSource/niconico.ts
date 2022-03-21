@@ -1,6 +1,6 @@
 import { EmbedField } from "discord.js";
 import NiconicoDL, { isValidURL } from "niconico-dl.js";
-import { convert } from "html-to-text";
+import { convert as htmlToText } from "html-to-text";
 import { exportableCustom, ReadableStreamInfo } from ".";
 import { InitPassThrough } from "../Util";
 import { AudioSource } from "./audiosource";
@@ -18,7 +18,7 @@ export class NicoNicoS extends AudioSource {
     this.nico = new NiconicoDL(url, /* quality */ "low");
     if(prefetched){
       this.Title = prefetched.title;
-      this.Description = convert(prefetched.description);
+      this.Description = htmlToText(prefetched.description);
       this._lengthSeconds = prefetched.length;
       this.Author = prefetched.author;
       this.Thumnail = prefetched.thumbnail;
@@ -27,7 +27,7 @@ export class NicoNicoS extends AudioSource {
       const info = await this.nico.getVideoInfo();
       if(info.isDeleted || info.isPrivate) throw new Error("動画が再生できません");
       this.Title = info.title;
-      this.Description = info.description;
+      this.Description = htmlToText(info.description);
       this._lengthSeconds = info.duration;
       this.Author = info.owner.nickname;
       this.Thumnail = info.thumbnail.url;
