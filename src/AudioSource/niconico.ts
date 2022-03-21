@@ -15,7 +15,7 @@ export class NicoNicoS extends AudioSource {
 
   async init(url:string, prefetched:exportableNicoNico){
     this.Url = url;
-    this.nico = new NiconicoDL(url, /* quality */ "low");
+    this.nico = new NiconicoDL(url, /* quality */ "high");
     if(prefetched){
       this.Title = prefetched.title;
       this.Description = htmlToText(prefetched.description);
