@@ -33,6 +33,7 @@ jobs:
         
       - name: List dependencies
         run: npm list --all
+        continue-on-error: true
       
       - name: Compile TypeScript
         run: npm run build
