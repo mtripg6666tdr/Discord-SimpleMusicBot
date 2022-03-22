@@ -32,7 +32,7 @@ jobs:
         run: npm install
         
       - name: List dependencies
-        run: npm list
+        run: npm list --all
       
       - name: Compile TypeScript
         run: npm run build
