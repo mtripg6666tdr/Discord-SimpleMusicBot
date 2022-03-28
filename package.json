@@ -23,7 +23,7 @@
     "dotenv": "^16.0.0",
     "follow-redirects": "^1.14.9",
     "genius-lyrics": "^4.3.6",
-    "html-entities": "^2.3.2",
+    "html-entities": "^2.3.3",
     "html-to-text": "^8.1.0",
     "https-proxy-agent": "^5.0.0",
     "libsodium-wrappers": "^0.7.10",
