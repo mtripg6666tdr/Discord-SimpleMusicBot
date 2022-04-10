@@ -201,7 +201,7 @@ export class MusicBot extends LogEmitter {
     if(message.content === `<@${this.client.user.id}>`) {
       // メンションならば
       await message.channel
-        .send("コマンドは、`" + this.data[message.guild.id].PersistentPref.Prefix + "command`で確認できます")
+        .send("コマンドの一覧は、`/command`で確認できます。\r\nメッセージでコマンドを送信する場合のプレフィックスは`" + this.data[message.guild.id].PersistentPref.Prefix + "`です。")
         .catch(e => this.Log(e, "error"));
       return;
     }
