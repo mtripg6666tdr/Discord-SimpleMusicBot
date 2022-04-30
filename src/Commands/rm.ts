@@ -1,21 +1,26 @@
-import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
 
-export default class Rm implements CommandInterface {
-  name = "削除";
-  alias = ["消去", "rm", "remove"];
-  description = "キュー内の指定された位置の曲を削除します。";
-  unlist = false;
-  category = "playlist";
-  examples = "rm 5";
-  usage = "削除 <削除する位置>"
-  argument = [{
-    type: "string",
-    name: "index",
-    description: "削除するインデックスはキューに併記されているものです。ハイフンを使って2-5のように範囲指定したり、スペースを使って1 4 8のように複数指定することも可能です。",
-    required: true
-  }] as SlashCommandArgument[]
+export default class Rm extends BaseCommand {
+  constructor(){
+    super({
+      name: "削除",
+      alias: ["消去", "rm", "remove"],
+      description: "キュー内の指定された位置の曲を削除します。",
+      unlist: false,
+      category: "playlist",
+      examples: "rm 5",
+      usage: "削除 <削除する位置>",
+      argument: [{
+        type: "string",
+        name: "index",
+        description: "削除するインデックスはキューに併記されているものです。ハイフンを使って2-5のように範囲指定したり、スペースを使って1 4 8のように複数指定することも可能です。",
+        required: true
+      }]
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.args.length == 0){

@@ -1,24 +1,29 @@
 import * as discord from "discord.js";
 import * as os from "os";
-import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage";
 import { getColor } from "../Util/colorUtil";
 import { config, GetMBytes, GetMemInfo, GetPercentage, log, logStore } from "../Util";
 
-export default class SystemInfo implements CommandInterface {
-  name = "システム情報";
-  alias = ["ログ", "log", "システム情報", "systeminfo", "sysinfo"];
-  description = "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`または`cpu`)を指定して特定の内容のみ取得することもできます。";
-  unlist = false;
-  category = "utility";
-  examples = "sysinfo mem";
-  usage = "sysinfo [mem|cpu]";
-  argument = [{
-    type: "string",
-    name: "content",
-    description: "memまたはcpuのどちらかを指定できます",
-    required: false
-  }] as SlashCommandArgument[];
+export default class SystemInfo extends BaseCommand {
+  constructor(){
+    super({
+      name: "システム情報",
+      alias: ["ログ", "log", "システム情報", "systeminfo", "sysinfo"],
+      description: "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`または`cpu`)を指定して特定の内容のみ取得することもできます。",
+      unlist: false,
+      category: "utility",
+      examples: "sysinfo mem",
+      usage: "sysinfo [mem|cpu]",
+      argument: [{
+        type: "string",
+        name: "content",
+        description: "memまたはcpuのどちらかを指定できます",
+        required: false
+      }]
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // Run default logger

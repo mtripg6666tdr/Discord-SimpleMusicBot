@@ -1,5 +1,5 @@
 import * as discord from "discord.js";
-import { CommandsManager, CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandsManager, CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/colorUtil";
@@ -12,20 +12,25 @@ export const categories = {
   "bot": "ボット操作全般"
 };
 export const categoriesList = ["voice", "player", "playlist", "utility", "bot"];
-export default class Commands implements CommandInterface{
-  name = "コマンド";
-  alias = ["command", "commands", "cmd"];
-  description = "コマンド一覧を表示します。コマンド名を渡すとそのコマンドの詳細を表示します。";
-  unlist = false;
-  category = "bot";
-  usage = "command [コマンド名]";
-  examples = "command search";
-  argument = [{
-    type: "string",
-    description: "詳細表示するするコマンド名",
-    name: "command",
-    required: false
-  }] as SlashCommandArgument[]
+export default class Commands extends BaseCommand{
+  constructor(){
+    super({
+      unlist: false,
+      name: "コマンド",
+      alias: ["command", "commands", "cmd"],
+      description: "コマンド一覧を表示します。コマンド名を渡すとそのコマンドの詳細を表示します。",
+      category: "bot",
+      usage: "command [コマンド名]",
+      examples: "command search",
+      argument: [{
+        type: "string",
+        description: "詳細表示するするコマンド名",
+        name: "command",
+        required: false
+      }]
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     if(options.rawArgs == ""){
       // 引数がない場合は全コマンドの一覧を表示
@@ -35,7 +40,7 @@ export default class Commands implements CommandInterface{
         return categories[label as any] as string;
       };
       const rawcommands = CommandsManager.Instance.Commands.filter(ci => !ci.unlist);
-      const commands = {} as {[category:string]:CommandInterface[]};
+      const commands = {} as {[category:string]:BaseCommand[]};
       // Generate command list
       for(let i = 0; i < rawcommands.length; i++){
         if(commands[rawcommands[i].category]){

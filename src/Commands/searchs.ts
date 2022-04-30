@@ -1,26 +1,31 @@
 import * as discord from "discord.js";
 import Soundcloud, { SoundcloudTrackV2 } from "soundcloud.ts";
-import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import { SoundCloudTrackCollection } from "../AudioSource";
 import { CommandMessage } from "../Component/CommandMessage";
 import { DefaultUserAgent } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcMinSec, DownloadText, log } from "../Util";
 
-export default class Searchs implements CommandInterface {
-  name = "サウンドクラウドを検索";
-  alias = ["soundcloudを検索", "searchs", "ses", "ss"];
-  description = "曲をSoundCloudで検索します";
-  unlist = false;
-  category = "playlist";
-  examples = "ses sakura trip";
-  usage = "ses <キーワード>";
-  argument = [{
-    type: "string",
-    name: "keyword",
-    description: "検索したい楽曲のキーワードまたはURL。",
-    required: true
-  }] as SlashCommandArgument[];
+export default class Searchs extends BaseCommand {
+  constructor(){
+    super({
+      name: "サウンドクラウドを検索",
+      alias: ["soundcloudを検索", "searchs", "ses", "ss"],
+      description: "曲をSoundCloudで検索します",
+      unlist: false,
+      category: "playlist",
+      examples: "ses sakura trip",
+      usage: "ses <キーワード>",
+      argument: [{
+        type: "string",
+        name: "keyword",
+        description: "検索したい楽曲のキーワードまたはURL。",
+        required: true
+      }]
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     options.JoinVoiceChannel(message);

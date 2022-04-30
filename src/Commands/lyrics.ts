@@ -1,24 +1,29 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { GetLyrics } from "../Util/lyricsUtil";
 import { log } from "../Util";
 
-export default class Lyrics implements CommandInterface {
-  name = "歌詞";
-  alias = ["lyrics", "l", "lyric"];
-  description = "指定された曲の歌詞を検索します。`utaten`をキーワードに入れると、Utatenを優先して検索します。";
-  unlist = false;
-  category = "utility";
-  examples = "l 夜に駆ける";
-  usage = "l <タイトル、アーティスト等>";
-  argument = [{
-    type: "string",
-    name: "keyword",
-    description: "楽曲を検索するキーワード",
-    required: true
-  }] as SlashCommandArgument[];
+export default class Lyrics extends BaseCommand {
+  constructor(){
+    super({
+      name: "歌詞",
+      alias: ["lyrics", "l", "lyric"],
+      description: "指定された曲の歌詞を検索します。`utaten`をキーワードに入れると、Utatenを優先して検索します。",
+      unlist: false,
+      category: "utility",
+      examples: "l 夜に駆ける",
+      usage: "l <タイトル、アーティスト等>",
+      argument: [{
+        type: "string",
+        name: "keyword",
+        description: "楽曲を検索するキーワード",
+        required: true
+      }]
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const msg = await message.reply("🔍検索中...");

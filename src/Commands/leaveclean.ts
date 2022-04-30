@@ -1,15 +1,20 @@
 import * as discord from "discord.js";
 import * as voice from "@discordjs/voice";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { log } from "../Util";
 import { CommandMessage } from "../Component/CommandMessage"
 
-export default class LeaveClean implements CommandInterface {
-  name = "leaveclean";
-  alias = ["lc"];
-  description = "ボイスチャンネルから離脱した人がリクエストした曲をキューから削除して整理します";
-  unlist = false;
-  category = "playlist";
+export default class LeaveClean extends BaseCommand {
+  constructor(){
+    super({
+      name: "leaveclean",
+      alias: ["lc"],
+      description: "ボイスチャンネルから離脱した人がリクエストした曲をキューから削除して整理します",
+      unlist: false,
+      category: "playlist",
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(!options.data[message.guild.id].Player.IsConnecting){

@@ -1,16 +1,21 @@
 import * as discord from "discord.js";
 import * as voice from "@discordjs/voice";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { getColor } from "../Util/colorUtil";
 import { CalcTime, log } from "../Util";
 import { CommandMessage } from "../Component/CommandMessage";
 
-export default class Uptime implements CommandInterface {
-  name = "アップタイム";
-  alias = ["アップタイム", "ピング", "uptime", "ping"];
-  description = "ボットのアップタイムおよびping時間(レイテンシ)を表示します。";
-  unlist = false;
-  category = "utility";
+export default class Uptime extends BaseCommand {
+  constructor(){
+    super({
+      name: "アップタイム",
+      alias: ["アップタイム", "ピング", "uptime", "ping"],
+      description: "ボットのアップタイムおよびping時間(レイテンシ)を表示します。",
+      unlist: false,
+      category: "utility",
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const now = new Date();

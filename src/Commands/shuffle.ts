@@ -1,13 +1,18 @@
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage";
 import { log } from "../Util";
 
-export default class Shuffle implements CommandInterface {
-  name = "シャッフル";
-  alias = ["shuffle"];
-  description = "キューの内容をシャッフルします。";
-  unlist = false;
-  category = "playlist";
+export default class Shuffle extends BaseCommand {
+  constructor(){
+    super({
+      name: "シャッフル",
+      alias: ["shuffle"],
+      description: "キューの内容をシャッフルします。",
+      unlist: false,
+      category: "playlist",
+    });
+  }
+  
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.length === 0){

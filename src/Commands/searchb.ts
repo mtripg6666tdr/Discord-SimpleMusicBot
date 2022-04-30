@@ -1,14 +1,19 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { bestdori, BestdoriApi } from "../AudioSource";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { log } from "../Util";
 
-export default class Searchb implements CommandInterface {
-  name = "searchb";
-  alias = ["seb", "sb"];
-  unlist = true;
+export default class Searchb extends BaseCommand {
+  constructor(){
+    super({
+      name: "searchb",
+      alias: ["seb", "sb"],
+      unlist: true,
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     options.JoinVoiceChannel(message);

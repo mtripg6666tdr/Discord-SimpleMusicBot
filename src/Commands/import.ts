@@ -1,25 +1,30 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { ResponseMessage } from "../Component/ResponseMessage";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
 import { YmxFormat, YmxVersion } from "../definition";
 import { DownloadText, log } from "../Util";
 
-export default class Import implements CommandInterface {
-  name = "インポート";
-  alias = ["import"];
-  description = "指定されたメッセージからキューをインポートします。exportコマンドで出力されたファイルが添付されたURL、もしくはキューの埋め込みのあるメッセージのURLを引数として指定してください。";
-  unlist = false;
-  category = "playlist";
-  examples = "import https://discord.com/channels/...";
-  usage = "インポート <インポート元のURL>"
-  argument = [{
-    type: "string",
-    name: "url",
-    description: "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURL、もしくはキューの埋め込みが添付されたURLを指定できます。",
-    required: true
-  }] as SlashCommandArgument[]
+export default class Import extends BaseCommand {
+  constructor(){
+    super({
+      name: "インポート",
+      alias: ["import"],
+      description: "指定されたメッセージからキューをインポートします。exportコマンドで出力されたファイルが添付されたURL、もしくはキューの埋め込みのあるメッセージのURLを引数として指定してください。",
+      unlist: false,
+      category: "playlist",
+      examples: "import https://discord.com/channels/...",
+      usage: "インポート <インポート元のURL>",
+      argument:[{
+        type: "string",
+        name: "url",
+        description: "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURL、もしくはキューの埋め込みが添付されたURLを指定できます。",
+        required: true
+      }],
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.rawArgs === ""){

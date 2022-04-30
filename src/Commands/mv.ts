@@ -1,26 +1,31 @@
-import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
 
-export default class Mv implements CommandInterface {
-  name = "移動";
-  alias = ["mv", "move"];
-  description = "曲を指定された位置から指定された位置までキュー内で移動します。2番目の曲を5番目に移動したい場合は`mv 2 5`のようにします。";
-  unlist = false;
-  category = "playlist";
-  examples = "移動 2 5";
-  usage = "移動 <from> <to>";
-  argument = [{
-    type: "integer",
-    name: "from",
-    description: "移動元のインデックス。キューに併記されているものです",
-    required: true
-  }, {
-    type: "integer",
-    name: "to",
-    description: "移動先のインデックス。キューに併記されているものです",
-    required: true
-  }] as SlashCommandArgument[];
+export default class Mv extends BaseCommand {
+  constructor(){
+    super({
+      name: "移動",
+      alias: ["mv", "move"],
+      description: "曲を指定された位置から指定された位置までキュー内で移動します。2番目の曲を5番目に移動したい場合は`mv 2 5`のようにします。",
+      unlist: false,
+      category: "playlist",
+      examples: "移動 2 5",
+      usage: "移動 <from> <to>",
+      argument: [{
+        type: "integer",
+        name: "from",
+        description: "移動元のインデックス。キューに併記されているものです",
+        required: true
+      }, {
+        type: "integer",
+        name: "to",
+        description: "移動先のインデックス。キューに併記されているものです",
+        required: true
+      }]
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.args.length !== 2){

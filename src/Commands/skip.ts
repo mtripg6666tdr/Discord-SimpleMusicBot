@@ -1,13 +1,18 @@
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log, StringifyObject } from "../Util";
 
-export default class Skip implements CommandInterface {
-  name = "スキップ";
-  alias = ["skip", "s"];
-  description = "現在再生中の曲をスキップします。";
-  unlist = false;
-  category = "player";
+export default class Skip extends BaseCommand {
+  constructor(){
+    super({
+      name: "スキップ",
+      alias: ["skip", "s"],
+      description: "現在再生中の曲をスキップします。",
+      unlist: false,
+      category: "player",
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const server = options.data[message.guild.id];

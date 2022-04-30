@@ -1,27 +1,75 @@
 import { Client } from "discord.js";
 import * as fs from "fs";
 import * as path from "path";
-import { MusicBot } from "../bot";
-import { CommandMessage } from "../Component/CommandMessage"
-import { PageToggle } from "../Component/PageToggle";
-import { GuildDataContainer } from "../definition";
-import { TaskCancellationManager } from "../Component/TaskCancellationManager";
-import { log } from "../Util";
+import type { MusicBot } from "../bot";
+import type { CommandMessage } from "../Component/CommandMessage"
+import type { PageToggle } from "../Component/PageToggle";
+import type { GuildDataContainer } from "../definition";
+import type { TaskCancellationManager } from "../Component/TaskCancellationManager";
+import type { categories } from "./commands";
 import { LogEmitter } from "../Util/logUtil";
 
+type BaseCommandInitializeOptions = {
+  name:string,
+  alias:Readonly<string[]>,
+}
+
+type ListCommandWithArgumentsInitializeOptions = BaseCommandInitializeOptions & {
+  description:string,
+  unlist:boolean,
+  examples:string,
+  usage:string,
+  category:keyof typeof categories,
+  argument:SlashCommandArgument[],
+}
+
+type ListCommandWithoutArgumentsInitializeOptions = BaseCommandInitializeOptions & {
+  description:string,
+  unlist:false,
+  category:keyof typeof categories,
+}
+
+type ListCommandInitializeOptions = ListCommandWithArgumentsInitializeOptions | ListCommandWithoutArgumentsInitializeOptions;
+
+type UnlistCommandInitializeOptions = BaseCommandInitializeOptions & {
+  unlist:true,
+}
+
 /**
- * すべてのコマンドの規定インターフェースです
+ * すべてのコマンドハンドラーの基底クラスです
  */
-export interface CommandInterface {
-  run(message:CommandMessage, options:CommandArgs):Promise<void>;
-  name: string;
-  alias: string[];
-  description?: string;
-  unlist: boolean;
-  examples?: string;
-  usage?: string;
-  category?:string;
-  argument?:SlashCommandArgument[]
+export abstract class BaseCommand {
+  abstract run(message:CommandMessage, options:CommandArgs):Promise<void>;
+  public readonly _name: string;
+  public get name(){return this._name;}
+  public readonly _alias: Readonly<string[]>;
+  public get alias(){return this._alias;}
+  public readonly _description: string = null;
+  public get description(){return this._description;}
+  public readonly _unlist: boolean;
+  public get unlist(){return this._unlist;}
+  public readonly _examples: string = null;
+  public get examples(){return this._examples;}
+  public readonly _usage: string = null;
+  public get usage(){return this._usage;}
+  public readonly _category:string = null;
+  public get category(){return this._category;}
+  public readonly _argument:Readonly<SlashCommandArgument[]> = null;
+  public get argument(){return this._argument;}
+
+  constructor(opts:ListCommandInitializeOptions|UnlistCommandInitializeOptions){
+    this._name = opts.name;
+    this._alias = opts.alias;
+    this._unlist = opts.unlist;
+    if(!this._unlist){
+      const { description, examples, usage, category, argument } = opts as ListCommandWithArgumentsInitializeOptions;
+      this._description = description;
+      this._examples = examples || null;
+      this._usage = usage || null;
+      this._category = category;
+      this._argument = argument || null;
+    }
+  }
 }
 
 /**
@@ -31,7 +79,8 @@ export interface SlashCommandArgument {
   type:"bool"|"integer"|"string",
   name:string,
   description:string,
-  required:boolean
+  required:boolean,
+  choises?:[],
 }
 
 /**
@@ -111,7 +160,7 @@ export class CommandsManager extends LogEmitter {
     return this.commands;
   }
 
-  private commands = null as CommandInterface[];
+  private commands = null as BaseCommand[];
 
   private constructor(){
     super();
@@ -124,7 +173,7 @@ export class CommandsManager extends LogEmitter {
       .filter(n => n.endsWith(".js") && n !== "index.js")
       .map(n => n.slice(0, -3))
       .forEach(n => {
-        const cp = new (require(path.join(__dirname, n)).default)() as CommandInterface;
+        const cp = new (require(path.join(__dirname, n)).default)() as BaseCommand;
         this.commands.push(cp);
         return cp;
       });

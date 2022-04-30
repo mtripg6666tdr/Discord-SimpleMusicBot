@@ -12,12 +12,12 @@ const rest = new REST({version: '9'}).setToken(process.env.TOKEN);
 module.exports = function(route){
   const commandsInfo = [];
   /**
-   * @type { import("../../src/Commands").CommandInterface[] }
+   * @type { import("../../src/Commands").BaseCommand[] }
    */
   const commands = new CommandsManager().commands.filter(
     /**
      * 
-     * @param { import("../../src/Commands").CommandInterface } c 
+     * @param { import("../../src/Commands").BaseCommand } c 
      * @returns { boolean }
      */
     c => !c.unlist

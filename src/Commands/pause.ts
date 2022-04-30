@@ -1,13 +1,18 @@
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
 
-export default class Pause implements CommandInterface {
-  name = "一時停止";
-  alias = ["一旦停止", "停止", "pause", "stop"];
-  description = "再生を一時停止します。";
-  unlist = false;
-  category = "player";
+export default class Pause extends BaseCommand {
+  constructor(){
+    super({
+      name: "一時停止",
+      alias: ["一旦停止", "停止", "pause", "stop"],
+      description: "再生を一時停止します。",
+      unlist: false,
+      category: "player",
+    });
+  }
+  
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const server = options.data[message.guild.id];

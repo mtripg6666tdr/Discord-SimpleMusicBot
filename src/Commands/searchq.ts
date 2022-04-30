@@ -1,24 +1,29 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import { YouTube } from "../AudioSource";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { CalcMinSec, log } from "../Util";
 
-export default class Searchq implements CommandInterface {
-  name = "キュー内を検索";
-  alias = ["searchq", "seq", "sq"];
-  description = "キュー内を検索します。引数にキーワードを指定します。";
-  unlist = false;
-  category = "playlist";
-  examples = "seq milk boy";
-  usage = "seq <キーワード>";
-  argument = [{
-    type: "string",
-    name: "keyword",
-    description: "検索したい楽曲のキーワード",
-    required: true
-  }] as SlashCommandArgument[];
+export default class Searchq extends BaseCommand {
+  constructor(){
+    super({
+      name: "キュー内を検索",
+      alias: ["searchq", "seq", "sq"],
+      description: "キュー内を検索します。引数にキーワードを指定します。",
+      unlist: false,
+      category: "playlist",
+      examples: "seq milk boy",
+      usage: "seq <キーワード>",
+      argument: [{
+        type: "string",
+        name: "keyword",
+        description: "検索したい楽曲のキーワード",
+        required: true
+      }]
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.length === 0){

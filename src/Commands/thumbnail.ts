@@ -1,23 +1,28 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { log, NormalizeText } from "../Util";
 
-export default class Thumbnail implements CommandInterface {
-  name = "サムネイル";
-  alias = ["thumbnail", "t"];
-  description = "現在再生中のサムネイルを表示します。検索パネルが開いていて検索パネル中の番号が指定された場合にはその曲のサムネイルを表示します。";
-  unlist = false;
-  category = "player";
-  examples = "サムネイル 5";
-  usage = "サムネイル [検索パネル中のインデックス]";
-  argument = [{
-    type: "integer",
-    name: "index",
-    description: "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します",
-    required: false
-  }] as SlashCommandArgument[];
+export default class Thumbnail extends BaseCommand {
+  constructor(){
+    super({
+      name: "サムネイル",
+      alias: ["thumbnail", "t"],
+      description: "現在再生中のサムネイルを表示します。検索パネルが開いていて検索パネル中の番号が指定された場合にはその曲のサムネイルを表示します。",
+      unlist: false,
+      category: "player",
+      examples: "サムネイル 5",
+      usage: "サムネイル [検索パネル中のインデックス]",
+      argument: [{
+        type: "integer",
+        name: "index",
+        description: "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します",
+        required: false
+      }]
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const embed = new discord.MessageEmbed();

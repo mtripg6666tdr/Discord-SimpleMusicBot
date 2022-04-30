@@ -1,16 +1,21 @@
 import { MessageActionRow, MessageEmbed, MessageSelectMenu, MessageSelectOptionData } from "discord.js";
 import * as ytpl from "ytpl";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
 import { getColor } from "../Util/colorUtil";
 
-export default class News implements CommandInterface {
-  name = "ニュース";
-  alias = ["news"];
-  description = "現在配信されているニューストピックスを閲覧・視聴できます。";
-  unlist = false;
-  category = "playlist";
+export default class News extends BaseCommand {
+  constructor(){
+    super({
+      name: "ニュース",
+      alias: ["news"],
+      description: "現在配信されているニューストピックスを閲覧・視聴できます。",
+      unlist: false,
+      category: "playlist",
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     await options.JoinVoiceChannel(message);

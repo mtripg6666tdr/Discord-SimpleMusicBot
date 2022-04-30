@@ -1,15 +1,20 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { YmxVersion } from "../definition";
 import { log } from "../Util";
 
-export default class Export implements CommandInterface {
-  name = "エクスポート";
-  alias = ["export"];
-  description = "キューの内容をインポートできるようエクスポートします。";
-  unlist = false;
-  category = "playlist";
+export default class Export extends BaseCommand {
+  constructor(){
+    super({
+      name: "エクスポート",
+      alias: ["export"],
+      description: "キューの内容をインポートできるようエクスポートします。",
+      unlist: false,
+      category: "playlist",
+    })
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.length === 0){

@@ -1,13 +1,18 @@
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
 
-export default class Loop implements CommandInterface {
-  name = "ループ";
-  alias = ["トラックループ", "loop", "repeat", "trackloop", "trackrepeat"];
-  description = "トラックごとのループを設定します。";
-  unlist = false;
-  category = "player";
+export default class Loop extends BaseCommand {
+  constructor(){
+    super({
+      name: "ループ",
+      alias: ["トラックループ", "loop", "repeat", "trackloop", "trackrepeat"],
+      description: "トラックごとのループを設定します。",
+      unlist: false,
+      category: "player",
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.LoopEnabled){

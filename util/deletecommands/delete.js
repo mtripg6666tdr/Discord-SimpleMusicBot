@@ -16,9 +16,10 @@ module.exports = function(route){
       let data = null;
       // @ts-ignore
       data = await rest.get(route);
-      await Promise.all(data.map(async(c) => {
+      await Promise.all(data.map(async(c,i) => {
         // @ts-ignore
-        console.log(await rest.delete(route + "/" + c.id));
+        await rest.delete(route + "/" + c.id);
+        console.log(c.name, "was deleted", "#" + i);
       }));
       process.exit(0);
     }

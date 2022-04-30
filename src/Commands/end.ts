@@ -1,13 +1,18 @@
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
 
-export default class End implements CommandInterface {
-  name = "この曲で終了";
-  alias = ["end"];
-  description = "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します";
-  unlist = false;
-  category = "playlist";
+export default class End extends BaseCommand {
+  constructor(){
+    super({
+      name: "この曲で終了",
+      alias: ["end"],
+      description: "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します",
+      unlist: false,
+      category: "playlist",
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const guild = options.data[message.guild.id];

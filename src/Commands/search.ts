@@ -1,25 +1,30 @@
 import * as discord from "discord.js";
 import * as ytsr from "ytsr";
-import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { log, timer } from "../Util";
 import { searchYouTube } from "../AudioSource";
 
-export default class Search implements CommandInterface {
-  name = "検索";
-  alias = ["search", "se"];
-  description = "曲をYouTubeで検索します。直接URLを直接指定することもできます。";
-  unlist = false;
-  category = "playlist";
-  examples = "検索 夜に駆ける";
-  usage = "検索 <キーワード>";
-  argument = [{
-    type: "string",
-    name: "keyword",
-    description: "検索したい動画のキーワードまたはURL。",
-    required: true
-  }] as SlashCommandArgument[];
+export default class Search extends BaseCommand {
+  constructor(){
+    super({
+      name: "検索",
+      alias: ["search", "se"],
+      description: "曲をYouTubeで検索します。直接URLを直接指定することもできます。",
+      unlist: false,
+      category: "playlist",
+      examples: "検索 夜に駆ける",
+      usage: "検索 <キーワード>",
+      argument: [{
+        type: "string",
+        name: "keyword",
+        description: "検索したい動画のキーワードまたはURL。",
+        required: true
+      }],
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     options.JoinVoiceChannel(message);

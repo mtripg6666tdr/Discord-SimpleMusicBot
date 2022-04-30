@@ -1,15 +1,20 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { log } from "../Util";
 
-export default class Help implements CommandInterface {
-  name = "ヘルプ";
-  alias = ["help"];
-  description = "ヘルプを表示します。";
-  unlist = false;
-  category = "bot";
+export default class Help extends BaseCommand {
+  constructor(){
+    super({
+      name: "ヘルプ",
+      alias: ["help"],
+      description: "ヘルプを表示します",
+      unlist: false,
+      category: "bot",
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     const developer = await options.client.users.fetch("593758391395155978").catch(_ => null);
     const embed = new discord.MessageEmbed()

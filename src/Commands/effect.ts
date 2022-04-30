@@ -1,14 +1,19 @@
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
 import { getCurrentEffectPanel } from "../Util/effectUtil";
 
-export default class Effect implements CommandInterface {
-  name = "エフェクト";
-  alias = ["effect", "音声エフェクト", "音声効果", "効果"];
-  description = "エフェクトコントロールパネルを表示します";
-  unlist = false;
-  category = "player";
+export default class Effect extends BaseCommand {
+  constructor(){
+    super({
+      name: "エフェクト",
+      alias: ["effect", "音声エフェクト", "音声効果", "効果"],
+      description: "エフェクトコントロールパネルを表示します",
+      unlist: true,
+      category: "player",
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     try{

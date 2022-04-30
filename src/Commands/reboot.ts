@@ -1,12 +1,17 @@
 import { exec, execSync } from "child_process";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { config } from "../Util";
 
-export default class Reboot implements CommandInterface {
-  name = "reboot";
-  alias = [] as string[];
-  unlist = true;
+export default class Reboot extends BaseCommand {
+  constructor(){
+    super({
+      name: "reboot",
+      alias: [] as string[],
+      unlist: true,
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     if(message.author.id === (config.adminId ?? "593758391395155978")){
       if(options.rawArgs === ""){

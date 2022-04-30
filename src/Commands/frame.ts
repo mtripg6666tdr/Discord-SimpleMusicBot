@@ -1,25 +1,30 @@
 import { MessageAttachment } from "discord.js";
 import { FFmpeg } from "prism-media";
 import * as ytdl from "ytdl-core";
-import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import type { CommandMessage } from "../Component/CommandMessage"
 import { FFmpegDefaultArgs } from "../definition";
 import { CalcHourMinSec, log, StringifyObject } from "../Util";
 
-export default class Frame implements CommandInterface {
-  name = "フレーム";
-  alias = ["frame", "キャプチャ", "capture"];
-  description = "現在の再生位置の動画のフレーム画像を可能な場合取得します。引数が指定された場合その時点でのフレームを取得します";
-  unlist = false;
-  category = "player";
-  examples = "フレーム 1:20";
-  usage = "フレーム [時間]";
-  argument = [{
-    type: "string",
-    name: "time",
-    description: "指定された場合その時点でのフレームを取得します",
-    required: false
-  }] as SlashCommandArgument[];
+export default class Frame extends BaseCommand {
+  constructor(){
+    super({
+      name: "フレーム",
+      alias: ["frame", "キャプチャ", "capture"],
+      description: "現在の再生位置の動画のフレーム画像を可能な場合取得します。引数が指定された場合その時点でのフレームを取得します",
+      unlist: false,
+      category: "player",
+      examples: "フレーム 1:20",
+      usage: "フレーム [時間]",
+      argument: [{
+        type: "string",
+        name: "time",
+        description: "指定された場合その時点でのフレームを取得します",
+        required: false
+      }]
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const server = options.data[message.guild.id];

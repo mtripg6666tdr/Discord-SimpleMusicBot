@@ -1,13 +1,18 @@
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
 
-export default class QueueLoop implements CommandInterface {
-  name = "キューループ";
-  alias = ["queueloop", "loopqueue"];
-  description = "キュー内のループを設定します。";
-  unlist = false;
-  category = "player";
+export default class QueueLoop extends BaseCommand {
+  constructor(){
+    super({
+      name: "キューループ",
+      alias: ["queueloop", "loopqueue"],
+      description: "キュー内のループを設定します。",
+      unlist: false,
+      category: "player",
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.QueueLoopEnabled){

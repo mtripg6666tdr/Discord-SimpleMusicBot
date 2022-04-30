@@ -1,13 +1,18 @@
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
 
-export default class OnceLoop implements CommandInterface {
-  name = "ワンスループ";
-  alias = ["onceloop", "looponce"];
-  description = "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。";
-  unlist = false;
-  category = "player";
+export default class OnceLoop extends BaseCommand {
+  constructor(){
+    super({
+      name: "ワンスループ",
+      alias: ["onceloop", "looponce"],
+      description: "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
+      unlist: false,
+      category: "player",
+    })
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.OnceLoopEnabled){

@@ -1,13 +1,18 @@
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
 
-export default class Dc implements CommandInterface {
-  name = "切断";
-  alias = ["終了", "dc", "disconnect", "leave", "quit"];
-  description = "ボイスチャンネルから切断します。";
-  unlist = false;
-  category = "voice";
+export default class Dc extends BaseCommand {
+  constructor(){
+    super({
+      unlist: false,
+      name: "切断",
+      alias: ["終了", "dc", "disconnect", "leave", "quit"] as const,
+      description: "ボイスチャンネルから切断します。",
+      category: "voice",
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...

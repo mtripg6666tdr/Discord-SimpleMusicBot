@@ -1,16 +1,21 @@
 import { MessageActionRow, MessageEmbed, MessageSelectMenu, MessageSelectOptionData } from "discord.js";
 import * as ytpl from "ytpl";
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
 import { getColor } from "../Util/colorUtil";
 
-export default class Bgm implements CommandInterface {
-  name = "bgm";
-  alias = ["study"];
-  description = "開発者が勝手に作った勉強用・作業用BGMのプリセットプレイリストを表示し、聞きたいものを選択して再生することができます。";
-  unlist = false;
-  category = "playlist";
+export default class Bgm extends BaseCommand {
+  constructor(){
+    super({
+      name: "bgm",
+      alias: ["study"],
+      description: "開発者が勝手に作った勉強用・作業用BGMのプリセットプレイリストを表示し、聞きたいものを選択して再生することができます。",
+      unlist: false,
+      category: "playlist",
+    });
+  }
+  
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(!(await options.JoinVoiceChannel(message, /* reply */ false, /* reply when failed */ true))) return;

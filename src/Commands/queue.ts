@@ -1,23 +1,28 @@
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import { YouTube } from "../AudioSource";
 import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, log } from "../Util";
 
-export default class Queue implements CommandInterface {
-  name = "キュー";
-  alias = ["キューを表示", "再生待ち", "queue", "q"];
-  description = "キューを表示します。";
-  unlist = false;
-  category = "playlist";
-  argument = [{
-    type: "integer",
-    name: "page",
-    description: "表示するキューのページを指定することができます",
-    required: false
-  }] as SlashCommandArgument[];
+export default class Queue extends BaseCommand {
+  constructor(){
+    super({
+      name: "キュー",
+      alias: ["キューを表示", "再生待ち", "queue", "q"],
+      description: "キューを表示します。",
+      unlist: false,
+      category: "playlist",
+      argument: [{
+        type: "integer",
+        name: "page",
+        description: "表示するキューのページを指定することができます",
+        required: false
+      }]
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const msg = await message.reply(":eyes: キューを確認しています。お待ちください...");

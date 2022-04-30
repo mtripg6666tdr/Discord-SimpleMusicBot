@@ -1,13 +1,18 @@
-import { CommandArgs, CommandInterface } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
 
-export default class Reset implements CommandInterface {
-  name = "リセット";
-  alias = ["reset"];
-  description = "サーバーのキュー、設定やデータを削除して初期化します。\r\n※接続中の場合ボイスチャンネルから離脱します。";
-  unlist = false;
-  category = "utility";
+export default class Reset extends BaseCommand {
+  constructor(){
+    super({
+      name: "リセット",
+      alias: ["reset"],
+      description: "サーバーのキュー、設定やデータを削除して初期化します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
+      unlist: false,
+      category: "utility",
+    });
+  }
+
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // VC接続中なら切断
