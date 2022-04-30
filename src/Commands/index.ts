@@ -80,7 +80,7 @@ export interface SlashCommandArgument {
   name:string,
   description:string,
   required:boolean,
-  choises?:[],
+  choices?:{[key:string]:string|number},
 }
 
 /**

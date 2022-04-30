@@ -4,13 +4,14 @@ import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage";
 import { getColor } from "../Util/colorUtil";
 import { config, GetMBytes, GetMemInfo, GetPercentage, log, logStore } from "../Util";
+import { generateDependencyReport } from "@discordjs/voice";
 
 export default class SystemInfo extends BaseCommand {
   constructor(){
     super({
       name: "システム情報",
       alias: ["ログ", "log", "システム情報", "systeminfo", "sysinfo"],
-      description: "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`または`cpu`)を指定して特定の内容のみ取得することもできます。",
+      description: "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`、`cpu`、`basic`のうちいずれか)を指定して特定の内容のみ取得することもできます。",
       unlist: false,
       category: "utility",
       examples: "sysinfo mem",
@@ -19,7 +20,13 @@ export default class SystemInfo extends BaseCommand {
         type: "string",
         name: "content",
         description: "memまたはcpuのどちらかを指定できます",
-        required: false
+        required: false,
+        choices: {
+          "基本情報": "basic",
+          "メモリ": "mem",
+          "CPU": "cpu",
+          "ログ(管理者のみ)": "log",
+        }
       }]
     });
   }
@@ -30,13 +37,28 @@ export default class SystemInfo extends BaseCommand {
     options.bot.PeriodicLog();
     await message.reply("実行します");
 
+    const embeds = [] as discord.MessageEmbed[];
+
+    if(options.args.indexOf("basic") >= 0 || options.args.length === 0){
+      embeds.push(
+        new discord.MessageEmbed()
+          .setTitle("Discord-SimpleMusicBot")
+          .setDescription("Basic info")
+          .addField("Version (commit hash)", `\`${options.bot.Version}\``, true)
+          .addField("Managed embed toggles", `\`${options.EmbedPageToggle.length}\``, true)
+          .addField("Guilds that have modified data", `\`${options.bot.QueueModifiedGuilds.length}\``, true)
+          .addField("Voice environment configuration", `\`\`\`\r\n${generateDependencyReport()}\r\n\`\`\``, true)
+          .setColor(getColor("UPTIME"))
+      );
+    }
+
     if(message.author.id === (config.adminId ?? "593758391395155978") && (options.args.indexOf("log") >= 0 || options.args.length == 0)){
       // Process Logs
       const logEmbed = new discord.MessageEmbed();
       logEmbed.setColor(getColor("UPTIME"));
       logEmbed.title = "Log";
       logEmbed.description = "Last " + logStore.data.length + " bot logs\r\n```\r\n" + logStore.data.join("\r\n") + "\r\n```";
-      message.channel.send({embeds:[logEmbed]}).catch(e => log(e, "error"));
+      embeds.push(logEmbed);
     }
 
     if(options.args.indexOf("cpu") >= 0 || options.args.length == 0){
@@ -57,7 +79,7 @@ export default class SystemInfo extends BaseCommand {
         + "Times(idle): `" + Math.round(cpus[i].times.idle / 1000) + "s(" + GetPercentage(cpus[i].times.idle, all) + "%)`"
         , true);
       }
-      message.channel.send({embeds:[cpuInfoEmbed]}).catch(e => log(e, "error"));
+      embeds.push(cpuInfoEmbed);
     }
 
     if(options.args.indexOf("mem") >= 0 || options.args.length == 0){
@@ -83,7 +105,9 @@ export default class SystemInfo extends BaseCommand {
         + "External: `" + ext + "MB`\r\n"
         + "Total: `" + GetPercentage(rss + ext, memory.total) + "%`"
       , true);
-      message.channel.send({embeds:[memInfoEmbed]}).catch(e => log(e, "error"));
+      embeds.push(memInfoEmbed);
     }
+    
+    message.channel.send({embeds}).catch(e => log(e, "error"));
   }
 }
