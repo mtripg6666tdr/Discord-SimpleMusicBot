@@ -8,7 +8,7 @@ export default class EquallyPlayback extends BaseCommand {
   constructor(){
     super({
       name: "均等再生",
-      alias: ["equallyplayback", "eqpb"],
+      alias: ["equallyplayback", "eqpb", "equally"],
       description: "追加ユーザーごとにキュー内の楽曲を均等に再生します",
       unlist: true,
       category: "playlist",
