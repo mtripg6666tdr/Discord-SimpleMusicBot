@@ -1,11 +1,10 @@
-import type { Client, GuildMember, Message, TextChannel } from "discord.js";
-import { exportableCustom, GoogleDrive, SoundCloudS } from "../AudioSource";
+import { Client, GuildMember, Message, TextChannel } from "discord.js";
+import { exportableCustom } from "../AudioSource";
 import { MessageEmbed } from "discord.js";
-import * as ytdl from "ytdl-core";
 import * as AudioSource from "../AudioSource";
 import { FallBackNotice, type GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log, StringifyObject, timer } from "../Util";
+import { CalcHourMinSec, CalcMinSec, log, StringifyObject, timer } from "../Util";
 import { ResponseMessage } from "./ResponseMessage";
 import { ManagerBase } from "./ManagerBase";
 import { PageToggle } from "./PageToggle";
@@ -40,6 +39,22 @@ export class QueueManager extends ManagerBase {
   }
   get Nothing():boolean{
     return this.length === 0;
+  }
+
+  private processPending = [] as (()=>void)[];
+  private waitForProcess(){
+    return this.nowProcessing ? new Promise<void>((resolve) => this.processPending.push(resolve)) : Promise.resolve();
+  }
+  private _nowProcessing = false;
+  private get nowProcessing(){
+    return this._nowProcessing;
+  }
+  private set nowProcessing(val:boolean){
+    this._nowProcessing = val;
+    if(!val) {
+      this.processPending.forEach(d => d());
+      this.processPending = [];
+    }
   }
 
   constructor(){
@@ -87,13 +102,25 @@ export class QueueManager extends ManagerBase {
     return this.default.map(callbackfn, thisArg);
   }
 
+  getLengthSecondsTo(index:number){
+    let sec = 0;
+    if(index <= 0) throw new Error("Invalid argument: " + index);
+    const target = Math.min(index, this.length);
+    for(let i = 0; i < target; i++){
+      sec += this.get(i).BasicInfo.LengthSeconds;
+    }
+    return sec;
+  }
+
   async AddQueue(
       url:string, 
-      addedBy:GuildMember, 
+      addedBy:GuildMember|AddedBy, 
       method:"push"|"unshift" = "push", 
       type:KnownAudioSourceIdentifer = "unknown", 
       gotData:AudioSource.exportableCustom = null
-      ):Promise<QueueContent>{
+      ):Promise<QueueContent & {index:number}>{
+    await this.waitForProcess();
+    this.nowProcessing = true;
     this.Log("AddQueue() called");
     const t = timer.start("AddQueue");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
@@ -105,20 +132,26 @@ export class QueueManager extends ManagerBase {
       }),
       AdditionalInfo:{
         AddedBy: {
-          userId: addedBy?.id ?? "0",
+          userId: (addedBy && (addedBy instanceof GuildMember ? addedBy.id : (addedBy as AddedBy).userId)) ?? "0",
           displayName: addedBy?.displayName ?? "不明"
         }
       }
     } as QueueContent;
     if(result.BasicInfo){
       this._default[method](result);
+      if(this.info.EquallyPlayback) this.SortWithAddedBy();
       if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
         this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
       }
       t.end();
-      return result;
+      this.nowProcessing = false;
+      return {
+        ...result,
+        index: this._default.findIndex(q => q === result)
+      };
     }
     t.end();
+    this.nowProcessing = false;
     throw new Error("Provided URL was not resolved as available service");
   }
 
@@ -138,7 +171,7 @@ export class QueueManager extends ManagerBase {
   async AutoAddQueue(
       client:Client, 
       url:string, 
-      addedBy:GuildMember, 
+      addedBy:GuildMember|AddedBy|null|undefined, 
       type:KnownAudioSourceIdentifer,
       first:boolean = false, 
       fromSearch:boolean|ResponseMessage = false, 
@@ -194,9 +227,9 @@ export class QueueManager extends ManagerBase {
         const _t = Number(info.BasicInfo.LengthSeconds);
         const [min,sec] = CalcMinSec(_t);
         // キュー内のオフセット取得
-        const index = first ? "0" : (this.info.Queue.length - 1).toString();
+        const index = info.index.toString();
         // ETAの計算
-        const [ehour, emin, esec] = CalcHourMinSec(this.LengthSeconds - _t - Math.floor(this.info.Player.CurrentTime / 1000));
+        const [ehour, emin, esec] = CalcHourMinSec(this.getLengthSecondsTo(info.index) - _t - Math.floor(this.info.Player.CurrentTime / 1000));
         const embed = new MessageEmbed()
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
@@ -402,6 +435,31 @@ export class QueueManager extends ManagerBase {
       this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
     }
   }
+
+  /**
+   * 追加者によってできるだけ交互になるようにソートします
+   */
+  SortWithAddedBy(){
+    const count = this._default.length;
+    // 追加者の一覧とマップを作成
+    const addedByUsers = [] as string[];
+    const queueByAdded = {} as {[key:string]:QueueContent[]};
+    for(let i = 0; i < this._default.length; i++){
+      if(!addedByUsers.includes(this._default[i].AdditionalInfo.AddedBy.userId)){
+        addedByUsers.push(this._default[i].AdditionalInfo.AddedBy.userId);
+        queueByAdded[this._default[i].AdditionalInfo.AddedBy.userId] = [this._default[i]];
+      }else{
+        queueByAdded[this._default[i].AdditionalInfo.AddedBy.userId].push(this._default[i]);
+      }
+    }
+    // ソートをもとにキューを再構築
+    const sorted = [] as QueueContent[];
+    const maxLengthByUser = Math.max(...addedByUsers.map(user => queueByAdded[user].length))
+    for(let i = 0; i < maxLengthByUser; i++){
+      sorted.push(...addedByUsers.map(user => queueByAdded[user][i]).filter(q => !!q));
+    }
+    this._default = sorted;
+  }
 }
 
 /**
@@ -418,6 +476,17 @@ type QueueContent = {
   AdditionalInfo:AdditionalInfo;
 }
 
+type AddedBy = {
+  /**
+   * 曲の追加者の表示名。表示名は追加された時点での名前になります。
+   */
+  displayName:string,
+  /**
+   * 曲の追加者のユーザーID
+   */
+  userId:string
+};
+
 /**
  * 曲の情報とは別の追加情報を示します。
  */
@@ -425,14 +494,5 @@ type AdditionalInfo = {
   /**
    * 曲の追加者を示します
    */
-  AddedBy:{
-    /**
-     * 曲の追加者の表示名。表示名は追加された時点での名前になります。
-     */
-    displayName:string,
-    /**
-     * 曲の追加者のユーザーID
-     */
-    userId:string
-  }
+  AddedBy: AddedBy,
 }

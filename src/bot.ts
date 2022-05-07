@@ -118,7 +118,7 @@ export class MusicBot extends LogEmitter {
       const speakingIds = await DatabaseAPI.GetIsSpeaking([...client.guilds.cache.keys()]);
       const queueGuildids = Object.keys(queues);
       const speakingGuildids = Object.keys(speakingIds);
-      for(let i=0; i < queueGuildids.length; i++){
+      for(let i = 0; i < queueGuildids.length; i++){
         let id = queueGuildids[i];
         const queue = JSON.parse(queues[id]) as YmxFormat;
         if(
@@ -128,15 +128,16 @@ export class MusicBot extends LogEmitter {
           ){
           //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
           const [vid, cid, ..._bs] = speakingIds[id].split(":");
-          const [loop, qloop, related] = _bs.map(b => b === "1");
+          const [loop, qloop, related, equallypb] = _bs.map(b => b === "1");
           this.initData(id, cid);
           this.data[id].boundTextChannel = cid;
-          this.data[id].Queue.LoopEnabled = loop;
-          this.data[id].Queue.QueueLoopEnabled = qloop;
-          this.data[id].AddRelative = related;
+          this.data[id].Queue.LoopEnabled = !!loop;
+          this.data[id].Queue.QueueLoopEnabled = !!qloop;
+          this.data[id].AddRelative = !!related;
+          this.data[id].EquallyPlayback = !!equallypb;
           try{
             for(let j=0; j < queue.data.length; j++){
-              await this.data[id].Queue.AutoAddQueue(client, queue.data[j].url, null, "unknown", false, false, null, null, queue.data[j]);
+              await this.data[id].Queue.AutoAddQueue(client, queue.data[j].url, queue.data[j].addBy, "unknown", false, false, null, null, queue.data[j]);
             }
             if(vid != "0"){
               const vc = await client.channels.fetch(vid) as discord.VoiceChannel;
@@ -424,7 +425,10 @@ export class MusicBot extends LogEmitter {
   exportQueue(guildId:string):string{
     return JSON.stringify({
       version: YmxVersion,
-      data: this.data[guildId].Queue.map(q => q.BasicInfo.exportData())
+      data: this.data[guildId].Queue.map(q => ({
+        ...(q.BasicInfo.exportData()),
+        addBy: q.AdditionalInfo.AddedBy
+      })),
     } as YmxFormat);
   }
 
@@ -579,7 +583,7 @@ export class MusicBot extends LogEmitter {
     }else{
       // あらメッセージの送信者さんはボイチャ入ってないん…
       await (mes => {
-      if(reply || replyOnFail)
+        if(reply || replyOnFail)
           return message.reply(mes)
             .catch(e => this.Log(e, "error"));
         else
