@@ -479,6 +479,7 @@ export class MusicBot extends LogEmitter {
             + ":" + (this.data[id].Queue.LoopEnabled ? "1" : "0") 
             + ":" + (this.data[id].Queue.QueueLoopEnabled ? "1" : "0") 
             + ":" + (this.data[id].AddRelative ? "1" : "0")
+            + ":" + (this.data[id].EquallyPlayback ? "1" : "0")
         });
       });
       DatabaseAPI.SetIsSpeaking(speaking);
