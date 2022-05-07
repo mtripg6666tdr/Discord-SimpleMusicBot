@@ -1,11 +1,10 @@
-import type { Client, GuildMember, Message, TextChannel } from "discord.js";
-import { exportableCustom, GoogleDrive, SoundCloudS } from "../AudioSource";
+import { Client, GuildMember, Message, TextChannel } from "discord.js";
+import { exportableCustom } from "../AudioSource";
 import { MessageEmbed } from "discord.js";
-import * as ytdl from "ytdl-core";
 import * as AudioSource from "../AudioSource";
 import { FallBackNotice, type GuildDataContainer } from "../definition";
 import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log, StringifyObject, timer } from "../Util";
+import { CalcHourMinSec, CalcMinSec, log, StringifyObject, timer } from "../Util";
 import { ResponseMessage } from "./ResponseMessage";
 import { ManagerBase } from "./ManagerBase";
 import { PageToggle } from "./PageToggle";
@@ -89,7 +88,7 @@ export class QueueManager extends ManagerBase {
 
   async AddQueue(
       url:string, 
-      addedBy:GuildMember, 
+      addedBy:GuildMember|AddedBy, 
       method:"push"|"unshift" = "push", 
       type:KnownAudioSourceIdentifer = "unknown", 
       gotData:AudioSource.exportableCustom = null
@@ -105,7 +104,7 @@ export class QueueManager extends ManagerBase {
       }),
       AdditionalInfo:{
         AddedBy: {
-          userId: addedBy?.id ?? "0",
+          userId: (addedBy && (addedBy instanceof GuildMember ? addedBy.id : (addedBy as AddedBy).userId)) ?? "0",
           displayName: addedBy?.displayName ?? "不明"
         }
       }
@@ -138,7 +137,7 @@ export class QueueManager extends ManagerBase {
   async AutoAddQueue(
       client:Client, 
       url:string, 
-      addedBy:GuildMember, 
+      addedBy:GuildMember|AddedBy|null|undefined, 
       type:KnownAudioSourceIdentifer,
       first:boolean = false, 
       fromSearch:boolean|ResponseMessage = false, 
@@ -418,6 +417,17 @@ type QueueContent = {
   AdditionalInfo:AdditionalInfo;
 }
 
+type AddedBy = {
+  /**
+   * 曲の追加者の表示名。表示名は追加された時点での名前になります。
+   */
+  displayName:string,
+  /**
+   * 曲の追加者のユーザーID
+   */
+  userId:string
+};
+
 /**
  * 曲の情報とは別の追加情報を示します。
  */
@@ -425,14 +435,5 @@ type AdditionalInfo = {
   /**
    * 曲の追加者を示します
    */
-  AddedBy:{
-    /**
-     * 曲の追加者の表示名。表示名は追加された時点での名前になります。
-     */
-    displayName:string,
-    /**
-     * 曲の追加者のユーザーID
-     */
-    userId:string
-  }
+  AddedBy: AddedBy,
 }

@@ -51,6 +51,10 @@ export class GuildDataContainer{
    * オーディオエフェクトエフェクトの設定
    */
   EffectPrefs:AudioEffect;
+  /**
+   * 均等再生が有効
+   */
+  EquallyPlayback:boolean;
 
   constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBot){
     this.SearchPanel = null;
@@ -158,7 +162,10 @@ export const DefaultAudioThumbnailURL = "https://cdn.discordapp.com/attachments/
 export const YmxVersion = 2;
 export type YmxFormat = {
   version:number,
-  data:exportableCustom[]
+  data:(exportableCustom & {addBy: {
+    displayName:string,
+    userId:string
+  }})[]
 }
 
 export const FallBackNotice = "現在、通常の方法で情報を取得できなかったため、代替としてPythonライブラリにフォールバックして取得しました。処理に時間がかかるなど、正常なオペレーションができない場合があります。";
