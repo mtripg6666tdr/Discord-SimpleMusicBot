@@ -104,9 +104,9 @@ export class QueueManager extends ManagerBase {
 
   getLengthSecondsTo(index:number){
     let sec = 0;
-    if(index <= 0) throw new Error("Invalid argument: " + index);
+    if(index < 0) throw new Error("Invalid argument: " + index);
     const target = Math.min(index, this.length);
-    for(let i = 0; i < target; i++){
+    for(let i = 0; i <= target; i++){
       sec += this.get(i).BasicInfo.LengthSeconds;
     }
     return sec;
@@ -145,10 +145,9 @@ export class QueueManager extends ManagerBase {
       }
       t.end();
       this.nowProcessing = false;
-      return {
-        ...result,
-        index: this._default.findIndex(q => q === result)
-      };
+      const index = this._default.findIndex(q => q === result);
+      this.Log("queue content added in position " + index);
+      return {...result, index};
     }
     t.end();
     this.nowProcessing = false;
