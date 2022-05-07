@@ -54,7 +54,7 @@ export default class Play extends BaseCommand {
           return;
         }
         options.rawArgs = (result[0] as ytsr.Video).url;
-        await options.PlayFromURL(message, options.rawArgs, !server.Player.IsConnecting);
+        await options.PlayFromURL(message, options.rawArgs, !wasConnected);
         await msg.delete();
       }
     // 添付ファイルを確認
