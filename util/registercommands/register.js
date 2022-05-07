@@ -31,10 +31,16 @@ module.exports = function(route){
     if(commands[i].argument){
       commands[i].argument.forEach(arg => {
         const addingOptionArgs = option =>
+        {
           option
             .setName(arg.name)
             .setDescription(arg.description)
             .setRequired(arg.required)
+          if(arg.choices && Object.keys(arg.choices).length > 0){
+            Object.keys(arg.choices).forEach(key => option.addChoice(key, arg.choices[key]));
+          }
+          return option;
+        };
         switch(arg.type){
           case "bool":
             builder.addBooleanOption(addingOptionArgs);
