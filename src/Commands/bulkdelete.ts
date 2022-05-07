@@ -1,7 +1,7 @@
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 
-export default class Bgm extends BaseCommand {
+export default class BulkDelete extends BaseCommand {
   constructor(){
     super({
       name: "バルク削除",
