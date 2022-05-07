@@ -7,7 +7,7 @@ export default class BulkDelete extends BaseCommand {
       name: "バルク削除",
       alias: ["bulk-delete", "bulkdelete"],
       description: "ボットが送信したメッセージを一括削除します。",
-      unlist: false,
+      unlist: true,
       category: "playlist",
     });
   }
