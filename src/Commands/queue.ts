@@ -68,7 +68,7 @@ export default class Queue extends BaseCommand {
           name: options.client.user.username, 
           iconURL: options.client.user.avatarURL()
         })
-        .setFooter({text: queue.length + "曲 | 合計:" + thour + ":" + tmin + ":" + tsec + " | トラックループ:" + (queue.LoopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.QueueLoopEnabled ? "⭕" : "❌")})
+        .setFooter({text: queue.length + "曲 | 合計:" + thour + ":" + tmin + ":" + tsec + " | トラックループ:" + (queue.LoopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.QueueLoopEnabled ? "⭕" : "❌") + " | 関連曲自動再生:" + (options.data[message.guild.id].AddRelative ? "⭕" : "❌") + " | 均等再生:" + (options.data[message.guild.id].EquallyPlayback ? "⭕" : "❌")})
         .setThumbnail(message.guild.iconURL())
         .setColor(getColor("QUEUE"));
     }
