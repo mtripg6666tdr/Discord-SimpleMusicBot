@@ -41,6 +41,22 @@ export class QueueManager extends ManagerBase {
     return this.length === 0;
   }
 
+  private processPending = [] as (()=>void)[];
+  private waitForProcess(){
+    return this.nowProcessing ? new Promise<void>((resolve) => this.processPending.push(resolve)) : Promise.resolve();
+  }
+  private _nowProcessing = false;
+  private get nowProcessing(){
+    return this._nowProcessing;
+  }
+  private set nowProcessing(val:boolean){
+    this._nowProcessing = val;
+    if(!val) {
+      this.processPending.forEach(d => d());
+      this.processPending = [];
+    }
+  }
+
   constructor(){
     super();
     this.SetTag("QueueManager");
@@ -103,6 +119,8 @@ export class QueueManager extends ManagerBase {
       type:KnownAudioSourceIdentifer = "unknown", 
       gotData:AudioSource.exportableCustom = null
       ):Promise<QueueContent & {index:number}>{
+    await this.waitForProcess();
+    this.nowProcessing = true;
     this.Log("AddQueue() called");
     const t = timer.start("AddQueue");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
@@ -126,12 +144,14 @@ export class QueueManager extends ManagerBase {
         this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
       }
       t.end();
+      this.nowProcessing = false;
       return {
         ...result,
         index: this._default.findIndex(q => q === result)
       };
     }
     t.end();
+    this.nowProcessing = false;
     throw new Error("Provided URL was not resolved as available service");
   }
 
