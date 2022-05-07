@@ -582,7 +582,7 @@ export class MusicBot extends LogEmitter {
       }
     }else{
       // あらメッセージの送信者さんはボイチャ入ってないん…
-      await (mes => {
+      await ((mes:string) => {
         if(reply || replyOnFail)
           return message.reply(mes)
             .catch(e => this.Log(e, "error"));

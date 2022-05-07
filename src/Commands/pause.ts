@@ -17,8 +17,12 @@ export default class Pause extends BaseCommand {
     options.updateBoundChannel(message);
     const server = options.data[message.guild.id];
     // そもそも再生状態じゃないよ...
-    if(!server.Player.IsPlaying || server.Player.IsPaused){
+    if(!server.Player.IsPlaying){
       await message.reply("再生中ではありません").catch(e => log(e, "error"));
+      return;
+    }
+    if(server.Player.IsPaused){
+      await message.reply(":pause_button: すでに一時停止されています\r\n再生を再開するには`再生`コマンドを使用してください").catch(e => log(e, "error"));
       return;
     }
     // 停止しま～す

@@ -24,12 +24,6 @@ export default class Play extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const server = options.data[message.guild.id];
-    // 一時停止されてるね
-    if(server.Player.IsPaused){
-      server.Player.Resume();
-      await message.reply(":arrow_forward: 再生を再開します。").catch(e => log(e, "error"))
-      return;
-    }
     // キューが空だし引数もないし添付ファイルもない
     if(server.Queue.length == 0 && options.rawArgs == "" && message.attachments.size === 0) {
       await message.reply("再生するコンテンツがありません").catch(e => log(e, "error"));
@@ -38,6 +32,12 @@ export default class Play extends BaseCommand {
     const wasConnected = server.Player.IsConnecting;
     // VCに入れない
     if(!(await options.JoinVoiceChannel(message, /* reply */ false, /* reply when failed */ true))) return;
+    // 一時停止されてるね
+    if(options.rawArgs === "" && server.Player.IsPaused){
+      server.Player.Resume();
+      await message.reply(":arrow_forward: 再生を再開します。").catch(e => log(e, "error"))
+      return;
+    }    
     // 引数ついてたらそれ優先
     if(options.rawArgs !== ""){
       if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){
