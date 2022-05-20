@@ -1,7 +1,7 @@
 import type { EmbedField } from "discord.js";
 import { UrlStreamInfo } from ".";
 import { DefaultAudioThumbnailURL } from "../definition";
-import { isAvailableRawAudioURL, RetriveLengthSeconds } from "../Util";
+import { Util } from "../Util";
 import { AudioSource } from "./audiosource";
 
 export class CustomStream extends AudioSource {
@@ -10,11 +10,11 @@ export class CustomStream extends AudioSource {
   Thumnail:string = DefaultAudioThumbnailURL;
 
   async init(url:string){
-    if(!isAvailableRawAudioURL(url)) throw "正しいストリームではありません"
+    if(!Util.fs.isAvailableRawAudioURL(url)) throw "正しいストリームではありません"
     this.Url = url;
     this.Title = this.extractFilename() || "カスタムストリーム";
     try{
-      this._lengthSeconds = await RetriveLengthSeconds(url);
+      this._lengthSeconds = await Util.web.RetriveLengthSeconds(url);
     }
     catch{};
     return this;

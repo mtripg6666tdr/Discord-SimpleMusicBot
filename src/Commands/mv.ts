@@ -1,6 +1,6 @@
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { log } from "../Util";
+import { Util } from "../Util";
 
 export default class Mv extends BaseCommand {
   constructor(){
@@ -29,10 +29,10 @@ export default class Mv extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.args.length !== 2){
-      message.reply("✘引数は`移動したい曲の元のオフセット(番号) 移動先のオフセット(番号)`のように指定します。").catch(e => log(e, "error"));
+      message.reply("✘引数は`移動したい曲の元のオフセット(番号) 移動先のオフセット(番号)`のように指定します。").catch(e => Util.logger.log(e, "error"));
       return;
     }else if(options.args.includes("0") && options.data[message.guild.id].Player.IsPlaying){
-      message.reply("✘音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。").catch(e => log(e, "error"));
+      message.reply("✘音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const from = Number(options.args[0]);
@@ -45,12 +45,12 @@ export default class Mv extends BaseCommand {
         const title = q.get(from).BasicInfo.Title;
         if(from !== to){
           q.Move(from, to);
-          message.reply("✅ `" + title +  "`を`" + from + "`番目から`"+ to + "`番目に移動しました").catch(e => log(e, "error"));
+          message.reply("✅ `" + title +  "`を`" + from + "`番目から`"+ to + "`番目に移動しました").catch(e => Util.logger.log(e, "error"));
         }else{
-          message.reply("✘移動元と移動先の要素が同じでした。").catch(e => log(e, "error"));
+          message.reply("✘移動元と移動先の要素が同じでした。").catch(e => Util.logger.log(e, "error"));
         }
       }else{
-        message.reply("✘失敗しました。引数がキューの範囲外です").catch(e => log(e, "error"));
+        message.reply("✘失敗しました。引数がキューの範囲外です").catch(e => Util.logger.log(e, "error"));
       }
   }
 }

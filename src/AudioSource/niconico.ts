@@ -2,7 +2,7 @@ import { EmbedField } from "discord.js";
 import NiconicoDL, { isValidURL } from "niconico-dl.js";
 import { convert as htmlToText } from "html-to-text";
 import { exportableCustom, ReadableStreamInfo } from ".";
-import { InitPassThrough } from "../Util";
+import { Util } from "../Util";
 import { AudioSource } from "./audiosource";
 
 export class NicoNicoS extends AudioSource {
@@ -37,7 +37,7 @@ export class NicoNicoS extends AudioSource {
   }
 
   async fetch():Promise<ReadableStreamInfo>{
-    const stream = InitPassThrough();
+    const stream = Util.general.InitPassThrough();
     (await this.nico.download())
       .on("error", e => stream.emit("error", e))
       .pipe(stream);

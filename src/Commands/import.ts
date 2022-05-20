@@ -1,10 +1,10 @@
 import * as discord from "discord.js";
-import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { ResponseMessage } from "../Component/ResponseMessage";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
 import { YmxFormat, YmxVersion } from "../Structure";
-import { DownloadText, log } from "../Util";
+import { Util } from "../Util";
 
 export default class Import extends BaseCommand {
   constructor(){
@@ -28,7 +28,7 @@ export default class Import extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.rawArgs === ""){
-      message.reply("❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(e => log(e, "error"));
+      message.reply("❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(e => Util.logger.log(e, "error"));
       return;
     }
     let force = false;
@@ -72,7 +72,7 @@ export default class Import extends BaseCommand {
             await smsg.edit("✅キャンセルされました");
           }
         }else if(attac && attac.name.endsWith(".ymx")){
-          const raw = JSON.parse(await DownloadText(attac.url)) as YmxFormat;
+          const raw = JSON.parse(await Util.web.DownloadText(attac.url)) as YmxFormat;
           if(raw.version !== YmxVersion){
             await smsg.edit("✘指定されたファイルはバージョンに互換性がないためインポートできません(現行:v" + YmxVersion + "; ファイル:v" + raw.version + ")");
             return;
@@ -96,14 +96,14 @@ export default class Import extends BaseCommand {
         }
       }
       catch(e){
-        log(e, "error");
+        Util.logger.log(e, "error");
         smsg?.edit("😭失敗しました...");
       }
       finally{
         options.cancellations.splice(options.cancellations.findIndex(c => c === cancellation), 1);
       }
     }else{
-      message.reply("❌Discordのメッセージへのリンクを指定してください").catch(e => log(e, "error"));
+      message.reply("❌Discordのメッセージへのリンクを指定してください").catch(e => Util.logger.log(e, "error"));
     }
   }
 }

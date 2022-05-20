@@ -1,8 +1,8 @@
 import * as discord from "discord.js";
 import * as voice from "@discordjs/voice";
 import { CommandArgs, BaseCommand } from ".";
-import { getColor } from "../Util/colorUtil";
-import { CalcTime, log } from "../Util";
+import { getColor } from "../Util/color";
+import { Util } from "../Util";
 import { CommandMessage } from "../Component/CommandMessage";
 
 export default class Uptime extends BaseCommand {
@@ -19,8 +19,8 @@ export default class Uptime extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const now = new Date();
-    const insta = CalcTime(now.getTime() - options.bot.InstantiatedTime.getTime());
-    const ready = CalcTime(now.getTime() - options.client.readyAt.getTime());
+    const insta = Util.time.CalcTime(now.getTime() - options.bot.InstantiatedTime.getTime());
+    const ready = Util.time.CalcTime(now.getTime() - options.client.readyAt.getTime());
     const embed = new discord.MessageEmbed()
       .setColor(getColor("UPTIME"))
       .setTitle(options.client.user.username + "のアップタイム")
@@ -32,6 +32,6 @@ export default class Uptime extends BaseCommand {
         + (voice.getVoiceConnection(message.guild.id)?.ping.udp ?? "-") + "ミリ秒(ボイスチャンネルUDP接続取得値)"
       )
       .addField("データベースに登録されたサーバー数", Object.keys(options.data).length + "サーバー");
-    message.reply({embeds:[embed]}).catch(e => log(e, "error"));
+    message.reply({embeds:[embed]}).catch(e => Util.logger.log(e, "error"));
   }
 }

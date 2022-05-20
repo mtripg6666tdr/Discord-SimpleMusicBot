@@ -1,8 +1,8 @@
 import * as discord from "discord.js";
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/colorUtil";
-import { log } from "../Util";
+import { getColor } from "../Util/color";
+import { Util } from "../Util";
 
 export default class Help extends BaseCommand {
   constructor(){
@@ -39,6 +39,6 @@ export default class Help extends BaseCommand {
       + "・オーディオファイルへの直URL"
       )
       .setColor(getColor("HELP"));
-    message.reply({embeds:[embed]}).catch(e => log(e, "error"));
+    message.reply({embeds:[embed]}).catch(e => Util.logger.log(e, "error"));
   }
 }

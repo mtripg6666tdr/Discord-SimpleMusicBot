@@ -4,7 +4,7 @@ import * as ytdl from "ytdl-core";
 import { CommandArgs, BaseCommand } from ".";
 import type { CommandMessage } from "../Component/CommandMessage"
 import { FFmpegDefaultArgs } from "../definition";
-import { CalcHourMinSec, log, StringifyObject } from "../Util";
+import { Util } from "../Util";
 
 export default class Frame extends BaseCommand {
   constructor(){
@@ -30,12 +30,12 @@ export default class Frame extends BaseCommand {
     const server = options.data[message.guild.id];
     // そもそも再生状態じゃないよ...
     if(!server.Player.IsConnecting || !server.Player.IsPlaying){
-      await message.reply("再生中ではありません").catch(e => log(e, "error"));
+      await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const vinfo = server.Player.CurrentAudioInfo;
     if(!vinfo.isYouTube()){
-      await message.reply(":warning:フレームのキャプチャ機能に非対応のソースです。").catch(e => log(e, "error"));
+      await message.reply(":warning:フレームのキャプチャ機能に非対応のソースです。").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const time = (function(rawTime){
@@ -51,11 +51,11 @@ export default class Frame extends BaseCommand {
       return;
     }
     if(!vinfo.LiveStream && (isNaN(time) || time > vinfo.LengthSeconds)){
-      await message.reply(":warning:時間の指定が正しくありません。").catch(e => log(e, "error"));
+      await message.reply(":warning:時間の指定が正しくありません。").catch(e => Util.logger.log(e, "error"));
       return;
     }
     try{
-      const [hour, min, sec] = CalcHourMinSec(time);
+      const [hour, min, sec] = Util.time.CalcHourMinSec(time);
       const response = await message.reply(":camera_with_flash:取得中...");
       const {url, ua} = await vinfo.fetchVideo();
       const frame = await getFrame(url, time, ua);
@@ -68,8 +68,8 @@ export default class Frame extends BaseCommand {
       });
     }
     catch(e){
-      log(StringifyObject(e), "error");
-      message.channel.send(":sob:失敗しました...").catch(e => log(e, "error"));
+      Util.logger.log(Util.general.StringifyObject(e), "error");
+      message.channel.send(":sob:失敗しました...").catch(e => Util.logger.log(e, "error"));
     }
   }
 }

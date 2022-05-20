@@ -1,7 +1,7 @@
 import type { EmbedField } from "discord.js";
 import { UrlStreamInfo } from ".";
 import { DefaultAudioThumbnailURL } from "../definition";
-import { DownloadText } from "../Util";
+import { Util } from "../Util";
 import { AudioSource } from "./audiosource";
 
 export class Streamable extends AudioSource {
@@ -87,7 +87,7 @@ export abstract class StreamableApi {
 
   static async  getVideoDetails(id:string):Promise<StreamableAPIResult> {
     const BASE_API = "https://api.streamable.com/videos/";
-    return JSON.parse(await DownloadText(BASE_API + id)) as StreamableAPIResult;
+    return JSON.parse(await Util.web.DownloadText(BASE_API + id)) as StreamableAPIResult;
   }
 }
 

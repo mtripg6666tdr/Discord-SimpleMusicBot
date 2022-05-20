@@ -3,7 +3,7 @@ import Genius from "genius-lyrics";
 import { convert } from "html-to-text";
 import { decode } from "html-entities";
 import { DefaultAudioThumbnailURL } from "../definition";
-import { DownloadText } from ".";
+import { DownloadText } from "./web";
 
 export async function GetLyrics(keyword:string):Promise<songInfo>{
   try{

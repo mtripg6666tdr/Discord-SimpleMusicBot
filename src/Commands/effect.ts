@@ -1,7 +1,7 @@
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { log } from "../Util";
-import { getCurrentEffectPanel } from "../Util/effectUtil";
+import { Util } from "../Util";
+import { getCurrentEffectPanel } from "../Util/effect";
 
 export default class Effect extends BaseCommand {
   constructor(){
@@ -28,7 +28,7 @@ export default class Effect extends BaseCommand {
       }, 5 * 60 * 1000)
     }
     catch(e){
-      log(JSON.stringify(e));
+      Util.logger.log(JSON.stringify(e));
       message.reply(":cry:エラーが発生しました");
     }
   }

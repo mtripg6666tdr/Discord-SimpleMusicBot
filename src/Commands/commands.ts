@@ -1,8 +1,8 @@
 import * as discord from "discord.js";
-import { CommandsManager, CommandArgs, BaseCommand, SlashCommandArgument } from ".";
+import { CommandsManager, CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";
-import { getColor } from "../Util/colorUtil";
+import { getColor } from "../Util/color";
 
 export const categories = {
   "voice": "ボイスチャンネル操作系",

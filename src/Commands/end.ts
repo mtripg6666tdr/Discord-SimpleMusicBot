@@ -1,6 +1,6 @@
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { log } from "../Util";
+import { Util } from "../Util";
 
 export default class End extends BaseCommand {
   constructor(){
@@ -17,15 +17,15 @@ export default class End extends BaseCommand {
     options.updateBoundChannel(message);
     const guild = options.data[message.guild.id];
     if(!guild.Player.IsPlaying){
-      message.reply("再生中ではありません").catch(e => log(e, "error"));
+      message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     if(guild.Queue.length <= 1){
-      message.reply("キューが空、もしくは一曲しかないため削除されませんでした。").catch(e => log(e, "error"));
+      message.reply("キューが空、もしくは一曲しかないため削除されませんでした。").catch(e => Util.logger.log(e, "error"));
       return;
     }
     guild.Queue.RemoveFrom2();
     guild.Queue.QueueLoopEnabled = guild.Queue.OnceLoopEnabled = guild.Queue.LoopEnabled = false;
-    message.reply("✅キューに残された曲を削除しました").catch(e => log(e, "error"));
+    message.reply("✅キューに残された曲を削除しました").catch(e => Util.logger.log(e, "error"));
   }
 }

@@ -1,6 +1,6 @@
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { log } from "../Util";
+import { Util } from "../Util";
 
 export default class QueueLoop extends BaseCommand {
   constructor(){
@@ -17,10 +17,10 @@ export default class QueueLoop extends BaseCommand {
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.QueueLoopEnabled){
       options.data[message.guild.id].Queue.QueueLoopEnabled = false;
-      message.reply(":repeat:キューリピートを無効にしました:x:").catch(e => log(e, "error"));
+      message.reply(":repeat:キューリピートを無効にしました:x:").catch(e => Util.logger.log(e, "error"));
     }else{
       options.data[message.guild.id].Queue.QueueLoopEnabled = true;
-      message.reply(":repeat:キューリピートを有効にしました:o:").catch(e => log(e, "error"));
+      message.reply(":repeat:キューリピートを有効にしました:o:").catch(e => Util.logger.log(e, "error"));
     }
   }
 }

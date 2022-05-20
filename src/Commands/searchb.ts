@@ -2,8 +2,8 @@ import * as discord from "discord.js";
 import { CommandArgs, BaseCommand } from ".";
 import { bestdori, BestdoriApi } from "../AudioSource";
 import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/colorUtil";
-import { log } from "../Util";
+import { getColor } from "../Util/color";
+import { Util } from "../Util";
 
 export default class Searchb extends BaseCommand {
   constructor(){
@@ -18,7 +18,7 @@ export default class Searchb extends BaseCommand {
     options.updateBoundChannel(message);
     options.JoinVoiceChannel(message);
     if(options.data[message.guild.id].SearchPanel !== null){
-      message.reply("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
+      message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
     if(options.rawArgs !== ""){
@@ -99,11 +99,11 @@ export default class Searchb extends BaseCommand {
       catch(e){
         console.log(e);
         options.data[message.guild.id].SearchPanel = null;
-        if(msg) msg.edit("失敗しました").catch(e => log(e, "error"));
-        else message.reply("失敗しました").catch(e => log(e, "error"));
+        if(msg) msg.edit("失敗しました").catch(e => Util.logger.log(e, "error"));
+        else message.reply("失敗しました").catch(e => Util.logger.log(e, "error"));
       }
     }else{
-      message.reply("引数を指定してください").catch(e => log(e, "error"));
+      message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));
     }
   }
 }

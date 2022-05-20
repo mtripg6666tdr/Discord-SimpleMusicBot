@@ -8,6 +8,7 @@ interface EventKeys {
   messageCreate: [message: Message];
   interactionCreate: [interaction: Interaction];
 }
+
 export class addOn extends EventEmitter {  
   on<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any):this{
     super.on(event, callback);

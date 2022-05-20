@@ -1,6 +1,6 @@
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { log } from "../Util";
+import { Util } from "../Util";
 
 export default class Dc extends BaseCommand {
   constructor(){
@@ -17,11 +17,11 @@ export default class Dc extends BaseCommand {
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.data[message.guild.id].Player.IsConnecting){
-      message.reply("再生中ではありません").catch(e => log(e, "error"));
+      message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     // 停止しま～す
     options.data[message.guild.id].Player.Disconnect();
-    message.reply(":postbox: 正常に切断しました").catch(e => log(e, "error"));
+    message.reply(":postbox: 正常に切断しました").catch(e => Util.logger.log(e, "error"));
   }
 }

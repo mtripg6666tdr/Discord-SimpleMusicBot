@@ -1,9 +1,9 @@
 import * as discord from "discord.js";
 import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/colorUtil";
-import { GetLyrics } from "../Util/lyricsUtil";
-import { log } from "../Util";
+import { getColor } from "../Util/color";
+import { GetLyrics } from "../Util/lyrics";
+import { Util } from "../Util";
 
 export default class Lyrics extends BaseCommand {
   constructor(){
@@ -51,8 +51,8 @@ export default class Lyrics extends BaseCommand {
       msg.edit({content: null, embeds});
     }
     catch(e){
-      log(e, "error");
-      msg.edit(":confounded:失敗しました。曲名を確認してもう一度試してみてください。").catch(e => log(e, "error"));
+      Util.logger.log(e, "error");
+      msg.edit(":confounded:失敗しました。曲名を確認してもう一度試してみてください。").catch(e => Util.logger.log(e, "error"));
       return;
     }
   }

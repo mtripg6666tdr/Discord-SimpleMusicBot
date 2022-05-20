@@ -1,7 +1,7 @@
 import type { EmbedField } from "discord.js";
 import SoundCloud, { SoundcloudTrackV2 } from "soundcloud.ts";
 import { ReadableStreamInfo } from ".";
-import { InitPassThrough } from "../Util";
+import { Util } from "../Util";
 import { AudioSource } from "./audiosource";
 
 export class SoundCloudS extends AudioSource {
@@ -32,7 +32,7 @@ export class SoundCloudS extends AudioSource {
 
   async fetch():Promise<ReadableStreamInfo>{
     const sc = new SoundCloud();
-    const stream = InitPassThrough();
+    const stream = Util.general.InitPassThrough();
     (await sc.util.streamTrack(this.Url)).on("error", (e)=>{
       stream.emit("error", e);
     }).pipe(stream);

@@ -3,7 +3,7 @@ import type { exportableCustom } from "./custom";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { AudioSource } from "./audiosource";
 import { UrlStreamInfo } from ".";
-import { RetriveHttpStatusCode, RetriveLengthSeconds } from "../Util";
+import { Util } from "../Util";
 
 export class GoogleDrive extends AudioSource {
   protected _lengthSeconds = 0;
@@ -13,9 +13,9 @@ export class GoogleDrive extends AudioSource {
   async init(url:string){
     this.Title = "Googleドライブストリーム";
     this.Url = url;
-    if(await RetriveHttpStatusCode(this.Url) !== 200) throw new Error("URLがみつかりません");
+    if(await Util.web.RetriveHttpStatusCode(this.Url) !== 200) throw new Error("URLがみつかりません");
     try{
-      this._lengthSeconds = await RetriveLengthSeconds((await this.fetch()).url);
+      this._lengthSeconds = await Util.web.RetriveLengthSeconds((await this.fetch()).url);
     }
     catch{}
     return this;

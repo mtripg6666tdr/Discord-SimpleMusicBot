@@ -1,5 +1,5 @@
 import type { GuildDataContainer } from "./GuildDataContainer";
-import { LogEmitter } from "../Util/logUtil";
+import { LogEmitter } from "../Structure";
 
 /**
  * すべてのマネージャークラスの基底クラスです

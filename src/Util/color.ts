@@ -13,7 +13,7 @@ const cmap = {
   "RELATIVE_SETUP": 0xFD0202,
   "EFFECT": 0xCCFFCC,
   "EQUALLY": 0xF8D53E,
-};
+} as const;
 
 export function getColor(key:colorkey):number{
   return cmap[key];

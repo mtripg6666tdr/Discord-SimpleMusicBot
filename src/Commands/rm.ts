@@ -1,6 +1,6 @@
 import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { log } from "../Util";
+import { Util } from "../Util";
 
 export default class Rm extends BaseCommand {
   constructor(){
@@ -24,7 +24,7 @@ export default class Rm extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.args.length == 0){
-      message.reply("引数に消去する曲のオフセット(番号)を入力してください。").catch(e => log(e, "error"));
+      message.reply("引数に消去する曲のオフセット(番号)を入力してください。").catch(e => Util.logger.log(e, "error"));
       return;
     }
     if(options.args.indexOf("0") >= 0 && options.data[message.guild.id].Player.IsPlaying) {
@@ -74,6 +74,6 @@ export default class Rm extends BaseCommand {
       q.RemoveAt(Number(dels[i]));
     }
     const resultStr = dels.sort((a,b)=>a-b).join(",");
-    message.reply("🚮" + (resultStr.length > 100 ? "指定された" : resultStr + "番目の") + "曲" + (title ? ("(`" + title + "`)") : "") + "を削除しました").catch(e => log(e, "error"));
+    message.reply("🚮" + (resultStr.length > 100 ? "指定された" : resultStr + "番目の") + "曲" + (title ? ("(`" + title + "`)") : "") + "を削除しました").catch(e => Util.logger.log(e, "error"));
   }
 }

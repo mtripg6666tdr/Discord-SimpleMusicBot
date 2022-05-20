@@ -2,8 +2,8 @@ import * as discord from "discord.js";
 import { CommandArgs, BaseCommand } from ".";
 import { YouTube } from "../AudioSource";
 import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/colorUtil";
-import { CalcMinSec, log } from "../Util";
+import { getColor } from "../Util/color";
+import { Util } from "../Util";
 
 export default class Searchq extends BaseCommand {
   constructor(){
@@ -27,7 +27,7 @@ export default class Searchq extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.length === 0){
-      message.reply("✘キューが空です").catch(e => log(e, "error"));
+      message.reply("✘キューが空です").catch(e => Util.logger.log(e, "error"));
       return;
     }
     let qsresult = options.data[message.guild.id].Queue
@@ -37,14 +37,14 @@ export default class Searchq extends BaseCommand {
                       .filter(c => c.BasicInfo.Url.toLowerCase().indexOf(options.rawArgs.toLowerCase()) >= 0)
                     );
     if(qsresult.length === 0){
-      message.reply(":confused:見つかりませんでした").catch(e => log(e, "error"));
+      message.reply(":confused:見つかりませんでした").catch(e => Util.logger.log(e, "error"));
       return;
     }
     if(qsresult.length > 20) qsresult = qsresult.slice(0,20);
     const fields = qsresult.map(c => {
       const index = options.data[message.guild.id].Queue.findIndex(d => d.BasicInfo.Title === c.BasicInfo.Title).toString()
       const _t = c.BasicInfo.LengthSeconds;
-      const [min,sec] = CalcMinSec(_t);
+      const [min,sec] = Util.time.CalcMinSec(_t);
       return {
         name: index === "0" ? "現在再生中/再生待ち" : index,
         value: "[" + c.BasicInfo.Title + "](" + c.BasicInfo.Url + ")\r\nリクエスト: `" + c.AdditionalInfo.AddedBy.displayName + "` \r\n長さ: " + ((c.BasicInfo.ServiceIdentifer === "youtube" && (c.BasicInfo as YouTube).LiveStream) ? "(ライブストリーム)" : " `" + (_t === 0 ? "(不明)" : min + ":" + sec + "`")),

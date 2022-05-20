@@ -1,7 +1,7 @@
 import { exec, execSync } from "child_process";
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { config } from "../Util";
+import { Util } from "../Util";
 
 export default class Reboot extends BaseCommand {
   constructor(){
@@ -13,7 +13,7 @@ export default class Reboot extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(message.author.id === (config.adminId ?? "593758391395155978")){
+    if(message.author.id === (Util.config.adminId ?? "593758391395155978")){
       if(options.rawArgs === ""){
         message.channel.send("再起動を実行します...お待ちください...");
         exec("npm run onlystart");

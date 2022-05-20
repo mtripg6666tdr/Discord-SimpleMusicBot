@@ -1,6 +1,6 @@
 import type { EmbedField } from "discord.js";
 import { UrlStreamInfo } from ".";
-import { AddZero, DownloadText } from "../Util";
+import { Util } from "../Util";
 import { AudioSource } from "./audiosource";
 
 export class BestdoriS extends AudioSource {
@@ -42,7 +42,7 @@ export class BestdoriS extends AudioSource {
   async fetch():Promise<UrlStreamInfo>{
     return {
       type: "url",
-      url:"https://bestdori.com/assets/jp/sound/bgm" + AddZero(this.id.toString(), 3) +  "_rip/bgm" + AddZero(this.id.toString(), 3) + ".mp3"
+      url:"https://bestdori.com/assets/jp/sound/bgm" + Util.general.AddZero(this.id.toString(), 3) +  "_rip/bgm" + Util.general.AddZero(this.id.toString(), 3) + ".mp3"
     }
   }
 
@@ -112,10 +112,10 @@ export abstract class BestdoriApi {
 
   static async setupData(){
     if(!bestdori.allbandinfo){
-      bestdori.allbandinfo = JSON.parse(await DownloadText(BestdoriAllBandInfoEndPoint));
+      bestdori.allbandinfo = JSON.parse(await Util.web.DownloadText(BestdoriAllBandInfoEndPoint));
     }
     if(!bestdori.allsonginfo){
-      bestdori.allsonginfo = JSON.parse(await DownloadText(BestdoriAllSongInfoEndPoint));
+      bestdori.allsonginfo = JSON.parse(await Util.web.DownloadText(BestdoriAllSongInfoEndPoint));
     }
   }
 
@@ -125,7 +125,7 @@ export abstract class BestdoriApi {
 
   static async getDetailedInfo(id:number){
     const apiUrl = "https://bestdori.com/api/songs/" + id.toString() + ".json";
-    return JSON.parse(await DownloadText(apiUrl)) as BestdoriDetailedSongInfo;
+    return JSON.parse(await Util.web.DownloadText(apiUrl)) as BestdoriDetailedSongInfo;
   }
 
   static getThumbnail(id:number, jacketimage:string){

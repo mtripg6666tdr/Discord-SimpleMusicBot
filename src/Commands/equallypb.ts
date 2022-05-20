@@ -1,8 +1,8 @@
 import * as discord from "discord.js";
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/colorUtil";
-import { log } from "../Util";
+import { getColor } from "../Util/color";
+import { Util } from "../Util";
 
 export default class EquallyPlayback extends BaseCommand {
   constructor(){
@@ -19,7 +19,7 @@ export default class EquallyPlayback extends BaseCommand {
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].EquallyPlayback){
       options.data[message.guild.id].EquallyPlayback = false;
-      message.reply("❌均等再生をオフにしました").catch(e => log(e, "error"));
+      message.reply("❌均等再生をオフにしました").catch(e => Util.logger.log(e, "error"));
     }else{
       options.data[message.guild.id].EquallyPlayback = true;
       const embed = new discord.MessageEmbed()

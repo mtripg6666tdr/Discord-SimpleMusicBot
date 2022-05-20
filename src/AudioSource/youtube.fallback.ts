@@ -1,5 +1,5 @@
 import { exec } from "child_process";
-import { DownloadText, log } from "../Util";
+import { Util } from "../Util";
 
 export function execAsync(command:string):Promise<string>{
   return new Promise((resolve, reject) => {
@@ -13,7 +13,7 @@ export function execAsync(command:string):Promise<string>{
       });
     }
     catch(e){
-      log(e, "error");
+      Util.logger.log(e, "error");
       reject("Main library threw an error and fallback library also threw an error");
     }
   });
@@ -22,7 +22,7 @@ export function execAsync(command:string):Promise<string>{
 export async function getYouTubeDlInfo(url:string):Promise<Promise<string>>{
   try{
     const dlbinary = async (ver:string)=>{
-      const releases = JSON.parse(await DownloadText("https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest", {
+      const releases = JSON.parse(await Util.web.DownloadText("https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest", {
         "Accept": "application/vnd.github.v3+json",
         "User-Agent": "Discord-SimpleMusicBot"
       })) as GitHubRelease;

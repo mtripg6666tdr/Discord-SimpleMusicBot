@@ -1,6 +1,6 @@
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { log } from "../Util";
+import { Util } from "../Util";
 
 export default class Reset extends BaseCommand {
   constructor(){
@@ -23,6 +23,6 @@ export default class Reset extends BaseCommand {
     options.data[message.guild.id] = null;
     // データ初期化
     options.initData(message.guild.id, message.channel.id);
-    message.reply("✅サーバーの設定を初期化しました").catch(e => log(e, "error"));
+    message.reply("✅サーバーの設定を初期化しました").catch(e => Util.logger.log(e, "error"));
   }
 }

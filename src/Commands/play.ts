@@ -2,7 +2,7 @@ import type * as ytsr from "ytsr";
 import type { CommandMessage } from "../Component/CommandMessage"
 import { CommandArgs, BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
-import { log } from "../Util";
+import { Util } from "../Util";
 
 export default class Play extends BaseCommand {
   constructor(){
@@ -26,7 +26,7 @@ export default class Play extends BaseCommand {
     const server = options.data[message.guild.id];
     // キューが空だし引数もないし添付ファイルもない
     if(server.Queue.length == 0 && options.rawArgs == "" && message.attachments.size === 0) {
-      await message.reply("再生するコンテンツがありません").catch(e => log(e, "error"));
+      await message.reply("再生するコンテンツがありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const wasConnected = server.Player.IsConnecting;
@@ -35,7 +35,7 @@ export default class Play extends BaseCommand {
     // 一時停止されてるね
     if(options.rawArgs === "" && server.Player.IsPaused){
       server.Player.Resume();
-      await message.reply(":arrow_forward: 再生を再開します。").catch(e => log(e, "error"))
+      await message.reply(":arrow_forward: 再生を再開します。").catch(e => Util.logger.log(e, "error"))
       return;
     }    
     // 引数ついてたらそれ優先
@@ -70,7 +70,7 @@ export default class Play extends BaseCommand {
         await message.reply("すでに再生中です");
       }
     }else{
-      await message.reply("✘キューが空です").catch(e => log(e, "error"));
+      await message.reply("✘キューが空です").catch(e => Util.logger.log(e, "error"));
     }
   }
 }

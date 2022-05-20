@@ -1,6 +1,6 @@
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { log } from "../Util";
+import { Util } from "../Util";
 
 export default class Rmall extends BaseCommand {
   constructor(){
@@ -17,12 +17,12 @@ export default class Rmall extends BaseCommand {
     options.updateBoundChannel(message);
     if(!message.member.voice.channel || (message.member.voice.channel && !message.member.voice.channel.members.has(options.client.user.id))){
       if(!message.member.permissions.has("MANAGE_GUILD") && !message.member.permissions.has("MANAGE_CHANNELS")){
-        message.reply("この操作を実行する権限がありません。").catch(e => log(e, "error"));
+        message.reply("この操作を実行する権限がありません。").catch(e => Util.logger.log(e, "error"));
         return;
       }
     }
     options.data[message.guild.id].Player.Disconnect();
     options.data[message.guild.id].Queue.RemoveAll();
-    message.reply("✅すべて削除しました").catch(e => log(e, "error"))
+    message.reply("✅すべて削除しました").catch(e => Util.logger.log(e, "error"))
   }
 }

@@ -1,6 +1,6 @@
 import * as voice from "@discordjs/voice";
 import { EventEmitter } from "stream";
-import { log } from "../Util";
+import { Util } from "../Util";
 
 class NullMetaAudioResource extends voice.AudioResource<null> {};
 
@@ -25,7 +25,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
       })
       .on("end", () => {
         this.events.emit("end");
-        log(`[AudioResource]Pushed total ${this.readLength} bytes${this.estimatedLengthSeconds !== 0 ? ` (average ${Math.round(this.readLength / this.estimatedLengthSeconds * 8 / 100) / 10} kbps)` : ""}`);
+        Util.logger.log(`[AudioResource]Pushed total ${this.readLength} bytes${this.estimatedLengthSeconds !== 0 ? ` (average ${Math.round(this.readLength / this.estimatedLengthSeconds * 8 / 100) / 10} kbps)` : ""}`);
       })
       ;
   }

@@ -2,8 +2,8 @@ import * as discord from "discord.js";
 import * as ytsr from "ytsr";
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/colorUtil";
-import { log, timer } from "../Util";
+import { getColor } from "../Util/color";
+import { Util } from "../Util";
 import { searchYouTube } from "../AudioSource";
 
 export default class Search extends BaseCommand {
@@ -34,9 +34,9 @@ export default class Search extends BaseCommand {
       });
       return;
     }
-    const s = timer.start("Search(Command)->BeforeYtsr");
+    const s = Util.time.timer.start("Search(Command)->BeforeYtsr");
     if(options.data[message.guild.id].SearchPanel !== null){
-      message.reply("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
+      message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
     if(options.rawArgs !== ""){
@@ -54,10 +54,10 @@ export default class Search extends BaseCommand {
       };
       s.end();
       try{
-        const t = timer.start("Search(Command)->Ytsr");
+        const t = Util.time.timer.start("Search(Command)->Ytsr");
         const result = await searchYouTube(options.rawArgs);
         t.end();
-        const u = timer.start("Search(Command)->AfterYtsr");
+        const u = Util.time.timer.start("Search(Command)->AfterYtsr");
         const embed = new discord.MessageEmbed();
         embed.setTitle("\"" + options.rawArgs + "\"の検索結果✨");
         embed.setColor(getColor("SEARCH"));
@@ -115,13 +115,13 @@ export default class Search extends BaseCommand {
         u.end();
       }
       catch(e){
-        log(e, "error");
+        Util.logger.log(e, "error");
         options.data[message.guild.id].SearchPanel = null;
-        if(msg) msg.edit("✘内部エラーが発生しました").catch(e => log(e, "error"));
-        else message.reply("✘内部エラーが発生しました").catch(e => log(e, "error"));
+        if(msg) msg.edit("✘内部エラーが発生しました").catch(e => Util.logger.log(e, "error"));
+        else message.reply("✘内部エラーが発生しました").catch(e => Util.logger.log(e, "error"));
       }
     }else{
-      message.reply("引数を指定してください").catch(e => log(e, "error"));
+      message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));
     }
   }
 }

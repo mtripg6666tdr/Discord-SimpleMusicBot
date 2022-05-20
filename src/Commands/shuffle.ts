@@ -1,6 +1,6 @@
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage";
-import { log } from "../Util";
+import { Util } from "../Util";
 
 export default class Shuffle extends BaseCommand {
   constructor(){
@@ -16,10 +16,10 @@ export default class Shuffle extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.length === 0){
-      message.reply("キューが空です。").catch(e => log(e, "error"));
+      message.reply("キューが空です。").catch(e => Util.logger.log(e, "error"));
       return;
     }
     options.data[message.guild.id].Queue.Shuffle();
-    message.reply(":twisted_rightwards_arrows:シャッフルしました✅").catch(e => log(e, "error"));
+    message.reply(":twisted_rightwards_arrows:シャッフルしました✅").catch(e => Util.logger.log(e, "error"));
   }
 }

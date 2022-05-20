@@ -2,8 +2,8 @@ import { MessageActionRow, MessageEmbed, MessageSelectMenu, MessageSelectOptionD
 import * as ytpl from "ytpl";
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { log } from "../Util";
-import { getColor } from "../Util/colorUtil";
+import { Util } from "../Util";
+import { getColor } from "../Util/color";
 
 export default class News extends BaseCommand {
   constructor(){
@@ -21,7 +21,7 @@ export default class News extends BaseCommand {
     await options.JoinVoiceChannel(message);
     const url = "https://www.youtube.com/playlist?list=PL3ZQ5CpNulQk8-p0CWo9ufI81IdrGoyNZ";
     if(options.data[message.guild.id].SearchPanel !== null){
-      message.reply("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
+      message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
     try{
@@ -85,7 +85,7 @@ export default class News extends BaseCommand {
       });
     }
     catch(e){
-      log(JSON.stringify(e));
+      Util.logger.log(JSON.stringify(e));
       message.reply(":cry:エラーが発生しました");
     }
   }

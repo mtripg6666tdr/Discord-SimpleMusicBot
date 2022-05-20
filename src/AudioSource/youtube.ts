@@ -7,7 +7,7 @@ import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 import m3u8stream from "m3u8stream";
 
-import { config, log, timer } from "../Util";
+import { Util } from "../Util";
 import { SecondaryUserAgent } from "../Util/ua";
 import { AudioSource } from "./audiosource";
 import { createChunkedYTStream } from "./youtube.stream";
@@ -44,10 +44,10 @@ export class YouTube extends AudioSource {
       this.Thumnail = prefetched.thumbnail;
       this.LiveStream = prefetched.isLive;
     }else{
-      const agent = config.proxy && HttpsProxyAgent.default(config.proxy);
+      const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
       const requestOptions = agent ? {agent} : undefined;
       try{
-        const t = timer.start("YouTube(AudioSource)#init->GetInfo");
+        const t = Util.time.timer.start("YouTube(AudioSource)#init->GetInfo");
         let info = await ytdl.getInfo(url, {
           lang: "ja", requestOptions
         });
@@ -64,8 +64,8 @@ export class YouTube extends AudioSource {
       }
       catch{
         this.fallback = true;
-        log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
-        const t = timer.start("YouTube(AudioSource)#init->GetInfo(Fallback)");
+        Util.logger.log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
+        const t = Util.time.timer.start("YouTube(AudioSource)#init->GetInfo(Fallback)");
         const info = JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
         t.end();
         if(forceCache) this.youtubeDlInfo = info;
@@ -86,9 +86,9 @@ export class YouTube extends AudioSource {
       let info = this.ytdlInfo;
       if(!info){
         // no cache then get
-        const agent = config.proxy && HttpsProxyAgent.default(config.proxy);
+        const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
         const requestOptions = agent ? {agent} : undefined;  
-        const t = timer.start("YouTube(AudioSource)#fetch->GetInfo");
+        const t = Util.time.timer.start("YouTube(AudioSource)#fetch->GetInfo");
         info = await ytdl.getInfo(this.Url, {
           lang: "ja", requestOptions
         })
@@ -117,11 +117,11 @@ export class YouTube extends AudioSource {
         quality: this.LiveStream ? null : "highestaudio",
         isHLS: this.LiveStream,
       } as ytdl.chooseFormatOptions);
-      log(`[AudioSource:youtube]Format: ${format.itag}, Bitrate: ${format.bitrate}bps, Audio codec:${format.audioCodec}, Container: ${format.container}`);
+      Util.logger.log(`[AudioSource:youtube]Format: ${format.itag}, Bitrate: ${format.bitrate}bps, Audio codec:${format.audioCodec}, Container: ${format.container}`);
       if(url){
         // return url when forced it
         this.fallback = false;
-        log("[AudioSource:youtube]Returning the url instead of stream");
+        Util.logger.log("[AudioSource:youtube]Returning the url instead of stream");
         return {
           type: "url",
           url: format.url,
@@ -145,8 +145,8 @@ export class YouTube extends AudioSource {
     }
     catch{
       this.fallback = true;
-      log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
-      const t = timer.start("YouTube(AudioSource)#fetch->GetInfo(Fallback)");
+      Util.logger.log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
+      const t = Util.time.timer.start("YouTube(AudioSource)#fetch->GetInfo(Fallback)");
       const info = this.youtubeDlInfo ?? JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
       t.end();
       this.Description = info.description ?? "不明";
@@ -187,7 +187,7 @@ export class YouTube extends AudioSource {
   async fetchVideo(){
     let info = this.ytdlInfo;
     if(!info){
-      const agent = config.proxy && HttpsProxyAgent.default(config.proxy);
+      const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
       const requestOptions = agent ? {agent} : undefined;  
       info = await ytdl.getInfo(this.Url, {
         lang: "ja", requestOptions

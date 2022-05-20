@@ -2,8 +2,8 @@ import * as discord from "discord.js";
 import { CommandArgs, BaseCommand } from ".";
 import { YouTube } from "../AudioSource";
 import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/colorUtil";
-import { CalcMinSec, log } from "../Util";
+import { getColor } from "../Util/color";
+import { Util } from "../Util";
 
 export default class NowPlaying extends BaseCommand {
   constructor(){
@@ -26,13 +26,13 @@ export default class NowPlaying extends BaseCommand {
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.data[message.guild.id].Player.IsPlaying){
-      message.reply("再生中ではありません").catch(e => log(e, "error"));
+      message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const _s = Math.floor(options.data[message.guild.id].Player.CurrentTime / 1000);
     const _t = Number(options.data[message.guild.id].Player.CurrentAudioInfo.LengthSeconds);
-    const [min, sec] = CalcMinSec(_s);
-    const [tmin,tsec] = CalcMinSec(_t);
+    const [min, sec] = Util.time.CalcMinSec(_s);
+    const [tmin,tsec] = Util.time.CalcMinSec(_t);
     const info = options.data[message.guild.id].Player.CurrentAudioInfo;
     const embed = new discord.MessageEmbed();
     embed.setColor(getColor("NP"));
@@ -55,6 +55,6 @@ export default class NowPlaying extends BaseCommand {
     );
     embed.addField(":link:URL", info.Url);
 
-    message.reply({embeds:[embed]}).catch(e => log(e, "error"));
+    message.reply({embeds:[embed]}).catch(e => Util.logger.log(e, "error"));
   }
 }

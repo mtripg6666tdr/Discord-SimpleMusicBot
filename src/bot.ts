@@ -5,18 +5,13 @@ import * as ytpl from "ytpl";
 import Soundcloud from "soundcloud.ts";
 import { exportableCustom, SoundCloudS } from "./AudioSource";
 import { CommandsManager, CommandArgs } from "./Commands";
+import { CommandMessage } from "./Component/CommandMessage";
+import { ResponseMessage } from "./Component/ResponseMessage";
 import { PageToggle } from "./Component/PageToggle";
 import { TaskCancellationManager } from "./Component/TaskCancellationManager";
 import { NotSendableMessage } from "./definition";
-import { GuildDataContainer, YmxVersion, YmxFormat } from "./Structure";
-import { getColor } from "./Util/colorUtil";
-import { DatabaseAPI } from "./Util/databaseUtil";
-import { CheckSendable, config, GetMemInfo, isAvailableRawAudioURL, log, logStore, NormalizeText, StringifyObject, timer } from "./Util";
-import { CommandMessage } from "./Component/CommandMessage"
-import { ResponseMessage } from "./Component/ResponseMessage";
-import { addOn } from "./Util/addonUtil";
-import { LogEmitter } from "./Util/logUtil";
-import { EffectsCustomIds, getCurrentEffectPanel } from "./Util/effectUtil";
+import { GuildDataContainer, YmxVersion, YmxFormat, LogEmitter } from "./Structure";
+import { Util } from "./Util";
 
 /**
  * 音楽ボットの本体
@@ -38,7 +33,7 @@ export class MusicBot extends LogEmitter {
   private EmbedPageToggle:PageToggle[] = [] as PageToggle[];
   private isReadyFinished = false;
   private queueModifiedGuilds = [] as string[];
-  private addOn = new addOn();
+  private addOn = new Util.addOn.addOn();
   /**
    * ページトグル
    */
@@ -103,9 +98,9 @@ export class MusicBot extends LogEmitter {
     }
 
     // Recover queues
-    if(DatabaseAPI.CanOperate){
-      const queues = await DatabaseAPI.GetQueueData([...client.guilds.cache.keys()]);
-      const speakingIds = await DatabaseAPI.GetIsSpeaking([...client.guilds.cache.keys()]);
+    if(Util.db.DatabaseAPI.CanOperate){
+      const queues = await Util.db.DatabaseAPI.GetQueueData([...client.guilds.cache.keys()]);
+      const speakingIds = await Util.db.DatabaseAPI.GetIsSpeaking([...client.guilds.cache.keys()]);
       const queueGuildids = Object.keys(queues);
       const speakingGuildids = Object.keys(speakingIds);
       for(let i = 0; i < queueGuildids.length; i++){
@@ -180,7 +175,7 @@ export class MusicBot extends LogEmitter {
   private async onMessageCreate(message:discord.Message){
     this.addOn.emit("messageCreate", message);
     if(this.maintenance){
-      if(!config.adminId || message.author.id !== config.adminId)
+      if(!Util.config.adminId || message.author.id !== Util.config.adminId)
         return;
     }
     // botのメッセやdm、およびnewsは無視
@@ -197,7 +192,7 @@ export class MusicBot extends LogEmitter {
       return;
     }
     const prefix = this.data[message.guild.id].PersistentPref.Prefix;
-    const messageContent = NormalizeText(message.content);
+    const messageContent = Util.string.NormalizeText(message.content);
     if(messageContent.startsWith(prefix) && messageContent.length > prefix.length){
       // コマンドメッセージを作成
       const commandMessage = CommandMessage.createFromMessage(message);
@@ -205,7 +200,7 @@ export class MusicBot extends LogEmitter {
       const command = CommandsManager.Instance.resolve(commandMessage.command);
       if(!command) return;
       // 送信可能か確認
-      if(!(await CheckSendable(message.channel as discord.TextChannel, message.guild.members.resolve(this.client.user)))){
+      if(!(await Util.djs.CheckSendable(message.channel as discord.TextChannel, message.guild.members.resolve(this.client.user)))){
         try{
           await message.reply({
             content: NotSendableMessage,
@@ -236,12 +231,12 @@ export class MusicBot extends LogEmitter {
         }
       }
       // searchコマンドの選択を捕捉
-      else if(NormalizeText(message.content).match(/^([0-9]\s?)+$/)){
+      else if(Util.string.NormalizeText(message.content).match(/^([0-9]\s?)+$/)){
         const panel = this.data[message.guild.id].SearchPanel;
         if(!panel) return;
         // メッセージ送信者が検索者と一致するかを確認
         if(message.author.id !== panel.Msg.userId) return;
-        const nums = NormalizeText(message.content).split(" ");
+        const nums = Util.string.NormalizeText(message.content).split(" ");
         const responseMessage = await(await this.client.channels.fetch(panel.Msg.chId) as discord.TextChannel).messages.fetch(panel.Msg.id);
         await this.playFromSearchPanelOptions(nums, message.guild.id, ResponseMessage.createFromMessage(responseMessage, panel.Msg.commandMessage));
       }
@@ -258,7 +253,7 @@ export class MusicBot extends LogEmitter {
   private async onInteractionCreate(interaction:discord.Interaction){
     this.addOn.emit("interactionCreate", interaction);
     if(this.maintenance){
-      if(!config.adminId || interaction.user.id !== config.adminId)
+      if(!Util.config.adminId || interaction.user.id !== Util.config.adminId)
       return;
     }
     if(interaction.user.bot) return;
@@ -272,7 +267,7 @@ export class MusicBot extends LogEmitter {
         return;
       }
       // 送信可能か確認
-      if(!(await CheckSendable(interaction.channel as discord.TextChannel, interaction.guild.members.resolve(this.client.user)))){
+      if(!(await Util.djs.CheckSendable(interaction.channel as discord.TextChannel, interaction.guild.members.resolve(this.client.user)))){
         await interaction.reply(NotSendableMessage);
         return;
       }
@@ -312,7 +307,7 @@ export class MusicBot extends LogEmitter {
       }else{
         const updateEffectPanel = () => {
           const mes = interaction.message as discord.Message;
-          const { embed, messageActions } = getCurrentEffectPanel(interaction.user.avatarURL(), this.data[interaction.guild.id]);
+          const { embed, messageActions } = Util.effects.getCurrentEffectPanel(interaction.user.avatarURL(), this.data[interaction.guild.id]);
           mes.edit({
             content: null,
             embeds: [embed],
@@ -320,18 +315,18 @@ export class MusicBot extends LogEmitter {
           });
         };
         switch(interaction.customId){
-          case EffectsCustomIds.Reload: {
+          case Util.effects.EffectsCustomIds.Reload: {
             updateEffectPanel();
           } break;
-          case EffectsCustomIds.BassBoost: {
+          case Util.effects.EffectsCustomIds.BassBoost: {
             this.data[interaction.guild.id].EffectPrefs.BassBoost = !this.data[interaction.guild.id].EffectPrefs.BassBoost;
             updateEffectPanel();
           } break;
-          case EffectsCustomIds.Reverb : {
+          case Util.effects.EffectsCustomIds.Reverb : {
             this.data[interaction.guild.id].EffectPrefs.Reverb = !this.data[interaction.guild.id].EffectPrefs.Reverb;
             updateEffectPanel();
           } break;
-          case EffectsCustomIds.LoudnessEqualization : {
+          case Util.effects.EffectsCustomIds.LoudnessEqualization : {
             this.data[interaction.guild.id].EffectPrefs.LoudnessEqualization = !this.data[interaction.guild.id].EffectPrefs.LoudnessEqualization;
             updateEffectPanel();
           } break;
@@ -389,12 +384,12 @@ export class MusicBot extends LogEmitter {
    */
   PeriodicLog(){
     const _d = Object.values(this.data);
-    const memory = GetMemInfo();
-    log("[Main]Participating Server(s) count: " + this.client.guilds.cache.size);
-    log("[Main]Registered Server(s) count: " + Object.keys(this.data).length);
-    log("[Main]Connecting Server(s) count: " + _d.filter(info => info.Player.IsPlaying).length);
-    log("[Main]Paused Server(s) count: " + _d.filter(_d => _d.Player.IsPaused).length);
-    log(`[System]Free:${Math.floor(memory.free)}MB; Total:${Math.floor(memory.total)}MB; Usage:${memory.usage}%`);
+    const memory = Util.system.GetMemInfo();
+    Util.logger.log("[Main]Participating Server(s) count: " + this.client.guilds.cache.size);
+    Util.logger.log("[Main]Registered Server(s) count: " + Object.keys(this.data).length);
+    Util.logger.log("[Main]Connecting Server(s) count: " + _d.filter(info => info.Player.IsPlaying).length);
+    Util.logger.log("[Main]Paused Server(s) count: " + _d.filter(_d => _d.Player.IsPaused).length);
+    Util.logger.log(`[System]Free:${Math.floor(memory.free)}MB; Total:${Math.floor(memory.total)}MB; Usage:${memory.usage}%`);
   }
 
   /**
@@ -405,8 +400,8 @@ export class MusicBot extends LogEmitter {
    */
   Run(token:string, debugLog:boolean = false, debugLogStoreLength?:number){
     this.client.login(token).catch(e => this.Log(e, "error"));
-    logStore.log = debugLog;
-    if(debugLogStoreLength) logStore.maxLength = debugLogStoreLength;
+    Util.logger.logStore.log = debugLog;
+    if(debugLogStoreLength) Util.logger.logStore.maxLength = debugLogStoreLength;
   }
 
   /**
@@ -426,8 +421,8 @@ export class MusicBot extends LogEmitter {
    * 接続ステータスやキューを含む全データをサーバーにバックアップします
    */
   BackupData(){
-    if(DatabaseAPI.CanOperate){
-      const t = timer.start("MusicBot#BackupData");
+    if(Util.db.DatabaseAPI.CanOperate){
+      const t = Util.time.timer.start("MusicBot#BackupData");
       try{
         this.BackupStatus();
         // キューの送信
@@ -441,7 +436,7 @@ export class MusicBot extends LogEmitter {
           });
         });
         if(queue.length > 0){
-          DatabaseAPI.SetQueueData(queue);
+          Util.db.DatabaseAPI.SetQueueData(queue);
         }
       }
       catch(e){
@@ -455,7 +450,7 @@ export class MusicBot extends LogEmitter {
    * 接続ステータス等をサーバーにバックアップします
    */
   BackupStatus(){
-    const t = timer.start("MusicBot#BackupStatus");
+    const t = Util.time.timer.start("MusicBot#BackupStatus");
     try{
       // 参加ステータスの送信
       const speaking = [] as {guildid:string, value:string}[];
@@ -472,7 +467,7 @@ export class MusicBot extends LogEmitter {
             + ":" + (this.data[id].EquallyPlayback ? "1" : "0")
         });
       });
-      DatabaseAPI.SetIsSpeaking(speaking);
+      Util.db.DatabaseAPI.SetIsSpeaking(speaking);
     }
     catch(e){
       this.Log(e, "warn");
@@ -521,7 +516,7 @@ export class MusicBot extends LogEmitter {
    * @returns 成功した場合はtrue、それ以外の場合にはfalse
    */
   private async JoinVoiceChannel(message:CommandMessage, reply:boolean = false, replyOnFail:boolean = false):Promise<boolean>{
-    const t = timer.start("MusicBot#Join");
+    const t = Util.time.timer.start("MusicBot#Join");
     if(message.member.voice.channel){
       // すでにVC入ってるよ～
       if(message.member.voice.channel.members.has(this.client.user.id)){
@@ -548,16 +543,16 @@ export class MusicBot extends LogEmitter {
           guildId: message.member.guild.id,
           // @ts-ignore
           adapterCreator: message.member.guild.voiceAdapterCreator,
-          debug: config.debug
+          debug: Util.config.debug
         }).on("debug", (mes) => this.Log("[Connection]" + mes));
-        log(`[Main/${message.guild.id}]Connected to ${message.member.voice.channel.id}`);
+        Util.logger.log(`[Main/${message.guild.id}]Connected to ${message.member.voice.channel.id}`);
         await msg.edit(":+1:ボイスチャンネル:speaker:`" + message.member.voice.channel.name + "`に接続しました!");
         t.end();
         return true;
       }
       catch(e){
         this.Log(e, "error");
-        const failedMsg = "😑接続に失敗しました…もう一度お試しください: " + StringifyObject(e);
+        const failedMsg = "😑接続に失敗しました…もう一度お試しください: " + Util.general.StringifyObject(e);
           if(!reply && replyOnFail){
             await msg.delete()
               .catch(e => this.Log(e, "error"));
@@ -591,9 +586,9 @@ export class MusicBot extends LogEmitter {
    * @param first キューの先頭に追加するかどうか
    */
   private async PlayFromURL(message:CommandMessage, optiont:string, first:boolean = true){
-    const t = timer.start("MusicBot#PlayFromURL");
+    const t = Util.time.timer.start("MusicBot#PlayFromURL");
     const server = this.data[message.guild.id];
-    setTimeout(() => message.suppressEmbeds(true).catch(e => this.Log(StringifyObject(e), "warn")), 4000);
+    setTimeout(() => message.suppressEmbeds(true).catch(e => this.Log(Util.general.StringifyObject(e), "warn")), 4000);
     if(optiont.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){
       // Discordメッセへのリンクならば
       const smsg = await message.reply("🔍メッセージを取得しています...");
@@ -603,16 +598,16 @@ export class MusicBot extends LogEmitter {
         if(ch.type !== "GUILD_TEXT") throw new Error("サーバーのテキストチャンネルではありません");
         const msg = await (ch as discord.TextChannel).messages.fetch(ids[ids.length - 1]);
         if(ch.guild.id !== msg.guild.id) throw new Error("異なるサーバーのコンテンツは再生できません");
-        if(msg.attachments.size <= 0 || !isAvailableRawAudioURL(msg.attachments.first().url))
+        if(msg.attachments.size <= 0 || !Util.fs.isAvailableRawAudioURL(msg.attachments.first().url))
           throw new Error("添付ファイルが見つかりません");
         await server.Queue.AutoAddQueue(this.client, msg.attachments.first().url, message.member, "custom", first, false, message.channel as discord.TextChannel, smsg);
         await server.Player.Play();
         return;
       }
       catch(e){
-        await smsg.edit(`✘追加できませんでした(${StringifyObject(e)})`).catch(e => this.Log(e ,"error"));
+        await smsg.edit(`✘追加できませんでした(${Util.general.StringifyObject(e)})`).catch(e => this.Log(e ,"error"));
       }
-    }else if(isAvailableRawAudioURL(optiont)){
+    }else if(Util.fs.isAvailableRawAudioURL(optiont)){
       // オーディオファイルへの直リンク？
       await server.Queue.AutoAddQueue(this.client, optiont, message.member, "custom", first, false, message.channel as discord.TextChannel);
       server.Player.Play();
@@ -654,7 +649,7 @@ export class MusicBot extends LogEmitter {
           .setTitle("✅プレイリストが処理されました")
           .setDescription(`[${result.title}](${result.url}) \`(${result.author.name})\` \r\n${index}曲が追加されました`)
           .setThumbnail(result.bestThumbnail.url)
-          .setColor(getColor("PLAYLIST_COMPLETED"));
+          .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
         await msg.edit({content: null, embeds: [embed]});
       }
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
@@ -683,7 +678,7 @@ export class MusicBot extends LogEmitter {
           .setTitle("✅プレイリストが処理されました")
           .setDescription(`[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n${index}曲が追加されました`)
           .setThumbnail(playlist.artwork_url)
-          .setColor(getColor("PLAYLIST_COMPLETED"));
+          .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
         await msg.edit({content: null, embeds: [embed]});
       }
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
@@ -729,10 +724,10 @@ export class MusicBot extends LogEmitter {
     const pmatch = message.guild.members.resolve(this.client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
     if(pmatch){
       if(this.data[message.guild.id].PersistentPref.Prefix !== pmatch.groups.prefix){
-        this.data[message.guild.id].PersistentPref.Prefix = NormalizeText(pmatch.groups.prefix);
+        this.data[message.guild.id].PersistentPref.Prefix = Util.string.NormalizeText(pmatch.groups.prefix);
       }
-    }else if(this.data[message.guild.id].PersistentPref.Prefix !== config.prefix){
-      this.data[message.guild.id].PersistentPref.Prefix = config.prefix;
+    }else if(this.data[message.guild.id].PersistentPref.Prefix !== Util.config.prefix){
+      this.data[message.guild.id].PersistentPref.Prefix = Util.config.prefix;
     }
   }
 
@@ -744,7 +739,7 @@ export class MusicBot extends LogEmitter {
    * @param message 検索パネルが添付されたメッセージ自体を指す応答メッセージ
    */
   private async playFromSearchPanelOptions(nums:string[], guildid:string, message:ResponseMessage){
-    const t = timer.start("MusicBot#playFromSearchPanelOptions");
+    const t = Util.time.timer.start("MusicBot#playFromSearchPanelOptions");
     const panel = this.data[guildid].SearchPanel;
     const member = await (await this.client.guilds.fetch(guildid)).members.fetch(panel.Msg.userId);
     const num = nums.shift();

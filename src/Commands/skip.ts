@@ -1,6 +1,6 @@
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { log, StringifyObject } from "../Util";
+import { Util } from "../Util";
 
 export default class Skip extends BaseCommand {
   constructor(){
@@ -18,10 +18,10 @@ export default class Skip extends BaseCommand {
     const server = options.data[message.guild.id];
     // そもそも再生状態じゃないよ...
     if(!server.Player.IsPlaying){
-      await message.reply("再生中ではありません").catch(e => log(StringifyObject(e), "error"));
+      await message.reply("再生中ではありません").catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"));
       return;
     }else if(server.Player.preparing){
-      await message.reply("再生準備中です").catch(e => log(StringifyObject(e), "error"))
+      await message.reply("再生準備中です").catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"))
       return;
     }
     try{
@@ -30,10 +30,10 @@ export default class Skip extends BaseCommand {
       server.Player.Stop();
       await server.Queue.Next();
       await server.Player.Play();
-      await response.edit(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => log(e, "error"));
+      await response.edit(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => Util.logger.log(e, "error"));
     }
     catch(e){
-      await message.channel.send(":astonished:スキップに失敗しました").catch(e => log(e, "error"));
+      await message.channel.send(":astonished:スキップに失敗しました").catch(e => Util.logger.log(e, "error"));
     }
   }
 }

@@ -1,6 +1,6 @@
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { log } from "../Util";
+import { Util } from "../Util";
 
 export default class Rewind extends BaseCommand {
   constructor(){
@@ -16,10 +16,10 @@ export default class Rewind extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     if(!options.data[message.guild.id].Player.IsPlaying){
-      message.reply("再生中ではありません").catch(e => log(e, "error"));
+      message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
     }else{
       options.data[message.guild.id].Player.Rewind();
-      message.reply(":rewind:再生中の楽曲を頭出ししました:+1:").catch(e => log(e, "error"));
+      message.reply(":rewind:再生中の楽曲を頭出ししました:+1:").catch(e => Util.logger.log(e, "error"));
     }
   }
 }

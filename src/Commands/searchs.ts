@@ -4,8 +4,8 @@ import { CommandArgs, BaseCommand } from ".";
 import { SoundCloudTrackCollection } from "../AudioSource";
 import { CommandMessage } from "../Component/CommandMessage";
 import { DefaultUserAgent } from "../definition";
-import { getColor } from "../Util/colorUtil";
-import { CalcMinSec, DownloadText, log } from "../Util";
+import { getColor } from "../Util/color";
+import { Util } from "../Util";
 
 export default class Searchs extends BaseCommand {
   constructor(){
@@ -30,7 +30,7 @@ export default class Searchs extends BaseCommand {
     options.updateBoundChannel(message);
     options.JoinVoiceChannel(message);
     if(options.data[message.guild.id].SearchPanel !== null){
-      message.reply("✘既に開かれている検索窓があります").catch(e => log(e, "error"));
+      message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
     if(options.rawArgs !== ""){
@@ -60,7 +60,7 @@ export default class Searchs extends BaseCommand {
           result.push(...rawResult.collection);
           nextUrl = rawResult.next_href + "&client_id=" + await soundcloud.api.getClientID();
           while(nextUrl && result.length < 10){
-            const data = await DownloadText(nextUrl, {
+            const data = await Util.web.DownloadText(nextUrl, {
               "User-Agent": DefaultUserAgent
             });
             rawResult = JSON.parse(data) as SoundCloudTrackCollection
@@ -78,7 +78,7 @@ export default class Searchs extends BaseCommand {
         let index = 1;
         let selectOpts = [] as discord.MessageSelectOptionData[];
         for(let i = 0; i < result.length; i++){
-          const [min,sec] = CalcMinSec(Math.floor(result[i].duration / 1000));
+          const [min,sec] = Util.time.CalcMinSec(Math.floor(result[i].duration / 1000));
           desc += "`" + index + ".` [" + result[i].title + "](" + result[i].permalink_url + ") " + min + ":" + sec + " - [" + result[i].user.username + "](" + result[i].user.permalink_url + ") \r\n\r\n";
           options.data[message.guild.id].SearchPanel.Opts[index] = {
             url: result[i].permalink_url,
@@ -123,13 +123,13 @@ export default class Searchs extends BaseCommand {
         });
       }
       catch(e){
-        log(e, "error");
+        Util.logger.log(e, "error");
         options.data[message.guild.id].SearchPanel = null;
-        if(msg) msg.edit("✘内部エラーが発生しました").catch(e => log(e, "error"));
-        else message.reply("✘内部エラーが発生しました").catch(e => log(e, "error"));
+        if(msg) msg.edit("✘内部エラーが発生しました").catch(e => Util.logger.log(e, "error"));
+        else message.reply("✘内部エラーが発生しました").catch(e => Util.logger.log(e, "error"));
       }
     }else{
-      message.reply("引数を指定してください").catch(e => log(e, "error"));
+      message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));
     }
   }
 }

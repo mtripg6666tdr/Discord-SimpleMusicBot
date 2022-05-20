@@ -1,6 +1,6 @@
 import type { GuildDataContainer } from "../Structure";
 import { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
-import { getColor } from "./colorUtil";
+import { getColor } from "./color";
 
 export const EffectsCustomIds = {
   Reload: "reload",

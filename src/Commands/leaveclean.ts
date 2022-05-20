@@ -1,7 +1,7 @@
 import * as discord from "discord.js";
 import * as voice from "@discordjs/voice";
 import { CommandArgs, BaseCommand } from ".";
-import { log } from "../Util";
+import { Util } from "../Util";
 import { CommandMessage } from "../Component/CommandMessage"
 
 export default class LeaveClean extends BaseCommand {
@@ -19,14 +19,14 @@ export default class LeaveClean extends BaseCommand {
     options.updateBoundChannel(message);
     if(!options.data[message.guild.id].Player.IsConnecting){
       options.data[message.guild.id].Queue.RemoveAll();
-      message.reply("✅すべて削除しました").catch(e => log(e, "error"));
+      message.reply("✅すべて削除しました").catch(e => Util.logger.log(e, "error"));
       return;
     }else if(options.data[message.guild.id].Queue.length === 0){
-      message.reply("キューが空です").catch(e => log(e, "error"));
+      message.reply("キューが空です").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const members = [...((await options.client.channels.resolve(voice.getVoiceConnection(message.guild.id).joinConfig.channelId).fetch()) as discord.VoiceChannel).members.keys()];
     const number = options.data[message.guild.id].Queue.RemoveIf(q => members.indexOf(q.AdditionalInfo.AddedBy.userId) < 0).length;
-    message.reply(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => log(e, "error"));;
+    message.reply(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => Util.logger.log(e, "error"));;
   }
 }

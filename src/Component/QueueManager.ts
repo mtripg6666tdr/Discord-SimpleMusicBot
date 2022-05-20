@@ -3,8 +3,8 @@ import { exportableCustom } from "../AudioSource";
 import { MessageEmbed } from "discord.js";
 import * as AudioSource from "../AudioSource";
 import { FallBackNotice } from "../definition";
-import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, log, StringifyObject, timer } from "../Util";
+import { getColor } from "../Util/color";
+import { Util } from "../Util";
 import { ResponseMessage } from "./ResponseMessage";
 import { GuildDataContainer, ManagerBase } from "../Structure";
 import { PageToggle } from "./PageToggle";
@@ -122,7 +122,7 @@ export class QueueManager extends ManagerBase {
     await this.waitForProcess();
     this.nowProcessing = true;
     this.Log("AddQueue() called");
-    const t = timer.start("AddQueue");
+    const t = Util.time.timer.start("AddQueue");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     const result = {
       BasicInfo: await AudioSource.Resolve({
@@ -179,7 +179,7 @@ export class QueueManager extends ManagerBase {
       gotData:AudioSource.exportableCustom = null
       ):Promise<boolean>{
     this.Log("AutoAddQueue() Called");
-    const t = timer.start("AutoAddQueue");
+    const t = Util.time.timer.start("AutoAddQueue");
     let ch:TextChannel = null;
     let msg:Message|ResponseMessage = null;
     try{
@@ -224,11 +224,11 @@ export class QueueManager extends ManagerBase {
       if(msg){
         // 曲の時間取得＆計算
         const _t = Number(info.BasicInfo.LengthSeconds);
-        const [min,sec] = CalcMinSec(_t);
+        const [min,sec] = Util.time.CalcMinSec(_t);
         // キュー内のオフセット取得
         const index = info.index.toString();
         // ETAの計算
-        const [ehour, emin, esec] = CalcHourMinSec(this.getLengthSecondsTo(info.index) - _t - Math.floor(this.info.Player.CurrentTime / 1000));
+        const [ehour, emin, esec] = Util.time.CalcHourMinSec(this.getLengthSecondsTo(info.index) - _t - Math.floor(this.info.Player.CurrentTime / 1000));
         const embed = new MessageEmbed()
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
@@ -246,9 +246,9 @@ export class QueueManager extends ManagerBase {
     }
     catch(e){
       this.Log("AutoAddQueue() Failed");
-      this.Log(StringifyObject(e), "error");
+      this.Log(Util.general.StringifyObject(e), "error");
       if(msg){
-        msg.edit({content: ":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")", embeds: null}).catch(e => log(e, "error"));
+        msg.edit({content: ":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")", embeds: null}).catch(e => Util.logger.log(e, "error"));
       }
       t.end();
       return false;
@@ -282,7 +282,7 @@ export class QueueManager extends ManagerBase {
     totalCount:number, 
     exportableConsumer:(track:T)=>Promise<exportableCustom>|exportableCustom
     ):Promise<number> {
-    const t = timer.start("ProcessPlaylist");
+    const t = Util.time.timer.start("ProcessPlaylist");
     let index = 0;
     for(let i = 0; i < totalCount; i++){
       const item = playlist[i];

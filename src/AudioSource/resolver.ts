@@ -1,7 +1,7 @@
 import type { KnownAudioSourceIdentifer } from "../Component/QueueManager";
 import * as ytdl from "ytdl-core";
 import * as AudioSource from ".";
-import { isAvailableRawAudioURL } from "../Util";
+import { Util } from "../Util";
 
 type AudioSourceBasicInfo = {
   type: KnownAudioSourceIdentifer;
@@ -16,7 +16,7 @@ export async function Resolve(info:AudioSourceBasicInfo){
   if(type === "youtube" || (type === "unknown" && ytdl.validateURL(url))){
     // youtube
     basicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.exportableYouTube, cache);
-  }else if(type === "custom" || (type === "unknown" && isAvailableRawAudioURL(url))){
+  }else if(type === "custom" || (type === "unknown" && Util.fs.isAvailableRawAudioURL(url))){
     // カスタムストリーム
     basicInfo = await new AudioSource.CustomStream().init(url);
   }else if(type === "soundcloud" || AudioSource.SoundCloudS.validateUrl(url)){
