@@ -1,4 +1,4 @@
-import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { log } from "../Util";
 

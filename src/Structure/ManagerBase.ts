@@ -1,4 +1,4 @@
-import type { GuildDataContainer } from "../definition";
+import type { GuildDataContainer } from "./GuildDataContainer";
 import { LogEmitter } from "../Util/logUtil";
 
 /**

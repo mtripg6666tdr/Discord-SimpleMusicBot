@@ -1,7 +1,7 @@
 import { MessageAttachment } from "discord.js";
 import { FFmpeg } from "prism-media";
 import * as ytdl from "ytdl-core";
-import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import type { CommandMessage } from "../Component/CommandMessage"
 import { FFmpegDefaultArgs } from "../definition";
 import { CalcHourMinSec, log, StringifyObject } from "../Util";

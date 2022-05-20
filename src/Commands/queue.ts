@@ -1,5 +1,5 @@
 import * as discord from "discord.js";
-import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { YouTube } from "../AudioSource";
 import { CommandMessage } from "../Component/CommandMessage"
 import { PageToggle } from "../Component/PageToggle";

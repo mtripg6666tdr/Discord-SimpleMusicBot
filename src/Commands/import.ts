@@ -3,7 +3,7 @@ import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { ResponseMessage } from "../Component/ResponseMessage";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
-import { YmxFormat, YmxVersion } from "../definition";
+import { YmxFormat, YmxVersion } from "../Structure";
 import { DownloadText, log } from "../Util";
 
 export default class Import extends BaseCommand {

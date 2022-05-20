@@ -1,12 +1,12 @@
-import { Client } from "discord.js";
-import * as fs from "fs";
-import * as path from "path";
 import type { MusicBot } from "../bot";
 import type { CommandMessage } from "../Component/CommandMessage"
 import type { PageToggle } from "../Component/PageToggle";
-import type { GuildDataContainer } from "../definition";
+import type { GuildDataContainer } from "../Structure";
 import type { TaskCancellationManager } from "../Component/TaskCancellationManager";
 import type { categories } from "./commands";
+import type { Client } from "discord.js";
+import * as fs from "fs";
+import * as path from "path";
 import { LogEmitter } from "../Util/logUtil";
 
 type BaseCommandInitializeOptions = {

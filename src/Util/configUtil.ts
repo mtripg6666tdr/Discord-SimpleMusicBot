@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import CJSON, { CommentObject } from "comment-json";
+
 type ConfigJson = {
   adminId: string, 
   debug: boolean, 

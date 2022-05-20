@@ -4,10 +4,10 @@ import { MessageEmbed } from "discord.js";
 import * as voice from "@discordjs/voice";
 import { FFmpeg } from "prism-media";
 import { AudioSource, StreamInfo, YouTube } from "../AudioSource";
-import { DefaultUserAgent, FallBackNotice, FFmpegDefaultArgs, GuildDataContainer } from "../definition";
+import { DefaultUserAgent, FallBackNotice, FFmpegDefaultArgs } from "../definition";
+import { GuildDataContainer, ManagerBase } from "../Structure";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, InitPassThrough, log, timer, StringifyObject, config } from "../Util";
-import { ManagerBase } from "./ManagerBase";
 import { FixedAudioResource } from "./AudioResource";
 import { getFFmpegEffectArgs } from "../Util/effectUtil";
 

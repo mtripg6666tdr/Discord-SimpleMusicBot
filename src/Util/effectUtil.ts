@@ -1,4 +1,4 @@
-import type { GuildDataContainer } from "../definition";
+import type { GuildDataContainer } from "../Structure";
 import { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 import { getColor } from "./colorUtil";
 

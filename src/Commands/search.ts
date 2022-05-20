@@ -1,6 +1,6 @@
 import * as discord from "discord.js";
 import * as ytsr from "ytsr";
-import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
+import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
 import { getColor } from "../Util/colorUtil";
 import { log, timer } from "../Util";

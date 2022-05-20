@@ -2,11 +2,11 @@ import { Client, GuildMember, Message, TextChannel } from "discord.js";
 import { exportableCustom } from "../AudioSource";
 import { MessageEmbed } from "discord.js";
 import * as AudioSource from "../AudioSource";
-import { FallBackNotice, type GuildDataContainer } from "../definition";
+import { FallBackNotice } from "../definition";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, log, StringifyObject, timer } from "../Util";
 import { ResponseMessage } from "./ResponseMessage";
-import { ManagerBase } from "./ManagerBase";
+import { GuildDataContainer, ManagerBase } from "../Structure";
 import { PageToggle } from "./PageToggle";
 import { TaskCancellationManager } from "./TaskCancellationManager";
 

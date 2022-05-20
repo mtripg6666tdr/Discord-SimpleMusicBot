@@ -1,7 +1,7 @@
 import * as discord from "discord.js";
 import { CommandArgs, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage"
-import { YmxVersion } from "../definition";
+import { YmxVersion } from "../Structure";
 import { log } from "../Util";
 
 export default class Export extends BaseCommand {
