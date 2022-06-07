@@ -11,7 +11,7 @@
   "dependencies": {
     "@discordjs/builders": "^0.11.0",
     "@discordjs/rest": "0.4.1",
-    "@discordjs/voice": "^0.9.0",
+    "@discordjs/voice": "^0.10.0",
     "@types/follow-redirects": "^1.14.1",
     "@types/html-to-text": "^8.1.0",
     "@types/mocha": "^9.1.1",
