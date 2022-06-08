@@ -188,7 +188,7 @@ bot.Run(/* token */);
 作成する場合、[Google Apps Script](https://script.google.com)を利用するか、任意の言語を使用してサーバーを作成することができます。
 
 ### Google Apps Scriptを使用する場合
-Google Apps Scriptを使用する場合、新規プロジェクトを作成し、[サンプルのGSファイル](util/exampleDbServer.gs)の内容を`コード.gs`にペーストして、スクリプト内にある通り定数を設定して、Webアプリとしてデプロイしてください。  
+Google Apps Scriptを使用する場合、新規プロジェクトを作成し、[サンプルのGSファイル](util/exampleDbServer/gas/exampleDbServer.gs)の内容を`コード.gs`にペーストして、スクリプト内にある通り定数を設定して、Webアプリとしてデプロイしてください。  
 デプロイが完了したら、URLの[.env](.env)への登録を忘れずに。
 
 ### 自分でAPIサーバーを構築する場合
