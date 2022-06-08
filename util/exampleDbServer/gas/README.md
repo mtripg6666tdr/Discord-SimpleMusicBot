@@ -1,0 +1,1 @@
+Google Apps Script用のサンプルデータベースサーバーです
