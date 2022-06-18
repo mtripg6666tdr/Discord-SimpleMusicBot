@@ -195,7 +195,7 @@ export class MusicBot extends LogEmitter {
     const messageContent = Util.string.NormalizeText(message.content);
     if(messageContent.startsWith(prefix) && messageContent.length > prefix.length){
       // コマンドメッセージを作成
-      const commandMessage = CommandMessage.createFromMessage(message);
+      const commandMessage = CommandMessage.createFromMessage(message, prefix.length);
       // コマンドを解決
       const command = CommandsManager.Instance.resolve(commandMessage.command);
       if(!command) return;
