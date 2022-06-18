@@ -22,8 +22,7 @@ if(![
   config.errorChannel === null || typeof config.errorChannel === "string",
   typeof config.maintenance === "boolean",
   config.proxy === null || typeof config.proxy === "string",
-  typeof config.prefix === "string",
-  config.prefix === null || config.prefix.length === 1
+  (typeof config.prefix === "string" && config.prefix.length >= 1) || config.prefix === null,
 ].every(test => test)){
   throw new Error("Invalid config.json");
 }
