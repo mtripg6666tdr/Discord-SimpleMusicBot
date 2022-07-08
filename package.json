@@ -41,7 +41,7 @@
     "ytsr": "^3.8.0"
   },
   "devDependencies": {
-    "node": "^16.15.1"
+    "node": "^16.16.0"
   },
   "optionalDependencies": {
     "@discordjs/opus": "^0.8.0",
