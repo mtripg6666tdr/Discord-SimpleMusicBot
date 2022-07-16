@@ -13,5 +13,8 @@
   "author": "mtripg6666tdr",
   "devDependencies": {
     "typescript": "^4.7.3"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.1"
   }
 }

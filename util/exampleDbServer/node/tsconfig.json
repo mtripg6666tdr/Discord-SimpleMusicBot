@@ -8,8 +8,10 @@
     "noImplicitThis": true,
     "outDir": "dist",
     "sourceMap": true,
+    "module": "CommonJS",
+    "target": "ES2019"
   },
   "include": [
-    "./src/**/*.ts"
+    "src/**/*.ts"
   ]
 }
