@@ -72,6 +72,10 @@
     "type": "git",
     "url": "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot"
   },
+  "bugs": {
+    "url": "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/issues"
+  },
+  "readme": "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot#readme",
   "commitlint": {
     "extends": [
       "@mtripg6666tdr/commitlint-config"
