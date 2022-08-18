@@ -46,4 +46,4 @@ if(!Util.config.debug){
 }
 
 // ボット開始
-bot.Run(process.env.TOKEN, true, 60);
+bot.Run(process.env.TOKEN, true, 40);

@@ -26,6 +26,13 @@ export class YouTube extends AudioSource {
   Thumnail:string;
   LiveStream:boolean;
   relatedVideos:exportableYouTube[] = [];
+  logger:((content:string, level?:"log"|"warn"|"error")=>void);
+
+  constructor(logger?:typeof YouTube.prototype.logger){
+    super();
+    this.logger = logger || ((content, level?) => Util.logger.log(content, level));
+  }
+
   get IsFallbacked(){
     return this.fallback;
   }
@@ -64,7 +71,7 @@ export class YouTube extends AudioSource {
       }
       catch{
         this.fallback = true;
-        Util.logger.log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
+        this.logger("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
         const t = Util.time.timer.start("YouTube(AudioSource)#init->GetInfo(Fallback)");
         const info = JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
         t.end();
@@ -117,11 +124,11 @@ export class YouTube extends AudioSource {
         quality: this.LiveStream ? null : "highestaudio",
         isHLS: this.LiveStream,
       } as ytdl.chooseFormatOptions);
-      Util.logger.log(`[AudioSource:youtube]Format: ${format.itag}, Bitrate: ${format.bitrate}bps, Audio codec:${format.audioCodec}, Container: ${format.container}`);
+      this.logger(`[AudioSource:youtube]Format: ${format.itag}, Bitrate: ${format.bitrate}bps, Audio codec:${format.audioCodec}, Container: ${format.container}`);
       if(url){
         // return url when forced it
         this.fallback = false;
-        Util.logger.log("[AudioSource:youtube]Returning the url instead of stream");
+        this.logger("[AudioSource:youtube]Returning the url instead of stream");
         return {
           type: "url",
           url: format.url,
@@ -145,7 +152,7 @@ export class YouTube extends AudioSource {
     }
     catch{
       this.fallback = true;
-      Util.logger.log("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
+      this.logger("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
       const t = Util.time.timer.start("YouTube(AudioSource)#fetch->GetInfo(Fallback)");
       const info = this.youtubeDlInfo ?? JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
       t.end();

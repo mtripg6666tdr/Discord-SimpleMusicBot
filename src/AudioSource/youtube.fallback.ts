@@ -1,13 +1,23 @@
 import { exec } from "child_process";
 import { Util } from "../Util";
 
+const log = (content:string) => {
+  if(Util.config.debug){
+    Util.logger.log("[YouTube(fallback)]" + content.replace(/\n/g, ""));
+  }
+};
+
 export function execAsync(command:string):Promise<string>{
   return new Promise((resolve, reject) => {
     try{
+      const id = Date.now();
+      log(`Executing the following command(#${id}): ${command}`);
       exec(command, (error, stdout, stderr) => {
         if(error){
+          log(`Command execution #${id} failed: ${stderr}`);
           reject(stderr);
         }else{
+          log(`Command execution #${id} ends successfully: ${stdout}`);
           resolve(stdout);
         }
       });
@@ -19,21 +29,25 @@ export function execAsync(command:string):Promise<string>{
   });
 }
 
+async function dlbinary(ver:string){
+  const releases = JSON.parse(await Util.web.DownloadText("https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest", {
+    "Accept": "application/vnd.github.v3+json",
+    "User-Agent": "Discord-SimpleMusicBot"
+  })) as GitHubRelease;
+  log(`Latest: ${releases.tag_name}`);
+  if(ver !== releases.tag_name){
+    log(`Start downloading`);
+    await execAsync("curl -L -o \"youtube-dl" + (process.platform === "win32" ? ".exe" : "") + "\" " + releases.assets.filter(a => a.name === (process.platform === "win32" ? "youtube-dl.exe" : "youtube-dl"))[0].browser_download_url);
+    if(process.platform !== "win32"){
+      log("Configuring permission");
+      await execAsync("chmod 777 youtube-dl");
+    }
+  }
+  ytdlUpdateCheck.last = new Date();
+}
+
 export async function getYouTubeDlInfo(url:string):Promise<Promise<string>>{
   try{
-    const dlbinary = async (ver:string)=>{
-      const releases = JSON.parse(await Util.web.DownloadText("https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest", {
-        "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "Discord-SimpleMusicBot"
-      })) as GitHubRelease;
-      if(ver !== releases.tag_name){
-        await execAsync("curl -L -o \"youtube-dl" + (process.platform === "win32" ? ".exe" : "") + "\" " + releases.assets.filter(a => a.name === (process.platform === "win32" ? "youtube-dl.exe" : "youtube-dl"))[0].browser_download_url);
-        if(process.platform !== "win32"){
-          await execAsync("chmod 777 youtube-dl");
-        }
-      }
-      ytdlUpdateCheck.last = new Date();
-    }
     let version = "";
     try{
       const buf = await execAsync("." + (process.platform === "win32" ? "\\" : "/") + "youtube-dl --version");
@@ -221,7 +235,7 @@ interface GitHubRelease {
   author:           Author;
   node_id:          string;
   tag_name:         string;
-  target_commitish: TargetCommitish;
+  target_commitish: any;
   name:             string;
   draft:            boolean;
   prerelease:       boolean;
@@ -296,8 +310,4 @@ interface Reactions {
   heart:       number;
   rocket:      number;
   eyes:        number;
-}
-
-enum TargetCommitish {
-  Master = "master",
 }

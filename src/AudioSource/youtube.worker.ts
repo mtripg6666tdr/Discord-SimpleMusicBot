@@ -1,27 +1,37 @@
-import type { workerErrorMessage, workerMessage, workerInitSuccessMessage } from "./youtube.spawner";
-import type { workerSearchSuccessMessage } from ".";
+import type { workerErrorMessage, workerMessage, workerInitSuccessMessage, workerSearchSuccessMessage, workerLoggingMessage } from "./youtube.spawner";
 import { parentPort } from "worker_threads";
 import { YouTube } from "./youtube";
 import * as ytsr from "ytsr";
 // DO NOT import unnecessary module preventing from infinite spawned workers.
 
+type WithId<T> = T & {id:number};
+
 parentPort.on("message", (value) => {
   const data = value as workerMessage;
   if(data && data.type === "init"){
     const { id, url, prefetched, forceCache } = data;
-    const youtube = new YouTube();
+    const youtube = new YouTube(/* logger */ (content, level?) => {
+      parentPort.postMessage({
+        type: "log",
+        data: content,
+        level,
+        id,
+      } as WithId<workerLoggingMessage>);
+    });
     youtube.init(url, prefetched, forceCache).then(() => {
+      const data = Object.assign({}, youtube);
+      delete data.logger;
       parentPort.postMessage({
         type: "initOk",
-        data: youtube,
+        data,
         id,
-      } as workerInitSuccessMessage & {type:number});
+      } as WithId<workerInitSuccessMessage>);
     }).catch((er) => {
       parentPort.postMessage({
         type: "error",
         data: er,
         id,
-      } as workerErrorMessage & {type:number});
+      } as WithId<workerErrorMessage>);
     });
   }else if(data && data.type === "search"){
     const id = data.id;
@@ -34,13 +44,13 @@ parentPort.on("message", (value) => {
         type: "searchOk",
         data: result,
         id
-      } as workerSearchSuccessMessage & {type:number})
+      } as WithId<workerSearchSuccessMessage>);
     }).catch((er) => {
       parentPort.postMessage({
         type: "error",
         data: er,
         id
-      } as workerErrorMessage & {type:number});
+      } as WithId<workerErrorMessage>);
     });
   }
 })
