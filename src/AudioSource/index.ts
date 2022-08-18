@@ -11,4 +11,4 @@ export * from "./hibiki";
 export * from "./soundcloud";
 export * from "./streamable";
 export * from "./youtube";
-export * from "./youtube.spawner"; // must export from here not in "./youtube", preventing from inifinite spawned workers
+export * from "./youtube/spawner"; // must export from here not in "./youtube", preventing from inifinite spawned workers

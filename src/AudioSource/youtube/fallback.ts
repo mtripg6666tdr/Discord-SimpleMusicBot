@@ -1,5 +1,5 @@
 import { exec } from "child_process";
-import { Util } from "../Util";
+import { Util } from "../../Util";
 
 const log = (content:string) => {
   if(Util.config.debug){

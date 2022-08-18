@@ -1,5 +1,5 @@
 import type { EmbedField } from "discord.js";
-import type { StreamInfo } from ".";
+import type { StreamInfo } from "..";
 
 import { PassThrough, Readable } from "stream";
 import * as voice from "@discordjs/voice";
@@ -7,11 +7,11 @@ import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 import m3u8stream from "m3u8stream";
 
-import { Util } from "../Util";
-import { SecondaryUserAgent } from "../Util/ua";
-import { AudioSource } from "./audiosource";
-import { createChunkedYTStream } from "./youtube.stream";
-import { getYouTubeDlInfo, YoutubeDlInfo } from "./youtube.fallback";
+import { Util } from "../../Util";
+import { SecondaryUserAgent } from "../../Util/ua";
+import { AudioSource } from "../audiosource";
+import { createChunkedYTStream } from "./stream";
+import { getYouTubeDlInfo, YoutubeDlInfo } from "./fallback";
 
 const ua = SecondaryUserAgent;
 export class YouTube extends AudioSource {
