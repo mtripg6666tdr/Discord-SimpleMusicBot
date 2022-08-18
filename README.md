@@ -63,6 +63,7 @@ YouTubeなどからの再生に対応。
 ## インストール＆実行
 devDependenciesの(npmパッケージとしての)Node.jsを利用するようになっていますので、グローバルにインストールされているNode.jsのバージョンに制約はありませんが、最新の安定版のNode.jsを利用することをお勧めします。  
 npmパッケージの`ffmpeg-stable`(optionalDependencies)を利用できない場合、手動で`ffmpeg`へのパスを通す必要があります。    
+また、Python2.xまたはPython3.xが実行できるようにしておくことをお勧めします。
 
 1. リポジトリをクローン
 ```bash
