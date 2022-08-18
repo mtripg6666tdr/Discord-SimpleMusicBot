@@ -1,75 +1,158 @@
 import { exec } from "child_process";
+import m3u8stream from "m3u8stream";
+import { PassThrough } from "stream";
+import { Cache, Strategy } from ".";
+import type { exportableYouTube } from "..";
 import { Util } from "../../../Util";
+import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 
-const log = (content:string) => {
-  if(Util.config.debug){
-    Util.logger.log("[YouTube(fallback)]" + content.replace(/\n/g, ""));
+type youtubeDl = "youtubeDl";
+const youtubeDl:youtubeDl = "youtubeDl";
+
+export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>{
+  last:number = 0;
+
+  async getInfo(url:string){
+    const t = Util.time.timer.start("YouTube(AudioSource)#init->GetInfo(Fallback)");
+    const info = JSON.parse(await this.getYouTubeDlInfo(url)) as YoutubeDlInfo;
+    t.end();
+    return {
+      data: this.mapToExportable(url, info),
+      cache: {
+        type: youtubeDl,
+        data: info,
+      }
+    }
   }
-};
 
-function execAsync(command:string):Promise<string>{
-  return new Promise((resolve, reject) => {
-    try{
-      const id = Date.now();
-      log(`Executing the following command(#${id}): ${command}`);
-      exec(command, (error, stdout, stderr) => {
-        if(error){
-          log(`Command execution #${id} failed: ${stderr}`);
-          reject(stderr);
-        }else{
-          log(`Command execution #${id} ends successfully: ${stdout}`);
-          resolve(stdout);
-        }
+  async fetch(url: string, forceUrl:boolean = false, cache?: Cache<"youtubeDl", YoutubeDlInfo>){
+    const info = (cache.type === "youtubeDl" && cache.data) || JSON.parse(await this.getYouTubeDlInfo(url)) as YoutubeDlInfo;
+    const partialResult = {
+      info: this.mapToExportable(url, info),
+      relatedVideos: null as exportableYouTube[]
+    };
+    if(info.is_live){
+      const format = info.formats.filter(f => f.format_id === info.format_id);
+      if(forceUrl){
+        return {
+          ...partialResult,
+          stream: {
+            type: "url",
+            url: format[0].url,
+          } as UrlStreamInfo
+        };
+      }
+      const stream = new PassThrough({
+        highWaterMark: 1024 * 512,
       });
-    }
-    catch(e){
-      Util.logger.log(e, "error");
-      reject("Main library threw an error and fallback library also threw an error");
-    }
-  });
-}
-
-async function dlbinary(ver:string){
-  const releases = JSON.parse(await Util.web.DownloadText("https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest", {
-    "Accept": "application/vnd.github.v3+json",
-    "User-Agent": "Discord-SimpleMusicBot"
-  })) as GitHubRelease;
-  log(`Latest: ${releases.tag_name}`);
-  if(ver !== releases.tag_name){
-    log(`Start downloading`);
-    await execAsync("curl -L -o \"youtube-dl" + (process.platform === "win32" ? ".exe" : "") + "\" " + releases.assets.filter(a => a.name === (process.platform === "win32" ? "youtube-dl.exe" : "youtube-dl"))[0].browser_download_url);
-    if(process.platform !== "win32"){
-      log("Configuring permission");
-      await execAsync("chmod 777 youtube-dl");
+      stream._destroy = () => stream.destroyed = true;
+      const req = m3u8stream(format[0].url, {
+        begin: Date.now(),
+        parser: "m3u8",
+      });
+      req
+        .on("error", e => stream.emit("error", e))
+        .pipe(stream)
+        .on("error", e => stream.emit("error", e))
+      ;
+      return {
+        ...partialResult,
+        stream: {
+          type: "readable",
+          stream,
+        } as ReadableStreamInfo
+      }
+    }else{
+      const format = info.formats.filter(f => f.format_note === "tiny");
+      format.sort((fa, fb) => fb.abr - fa.abr);
+      return {
+        ...partialResult,
+        stream: {
+          type: "url",
+          url: format[0].url
+        } as UrlStreamInfo
+      };
     }
   }
-  ytdlUpdateCheck.last = new Date();
-}
 
-export async function getYouTubeDlInfo(url:string):Promise<Promise<string>>{
-  try{
-    let version = "";
+  private log = (content:string) => {
+    if(Util.config.debug){
+      Util.logger.log("[YouTube(fallback)]" + content.replace(/\n/g, ""));
+    }
+  };
+
+  private mapToExportable(url:string, info:YoutubeDlInfo):exportableYouTube{
+    return {
+      url: url,
+      title: info.title,
+      description: info.description,
+      length: Number(info.duration),
+      channel: info.channel,
+      channelUrl: info.channel_url,
+      thumbnail: info.thumbnail,
+      isLive: info.is_live,
+    }
+  }
+
+  private execAsync(command:string):Promise<string>{
+    return new Promise((resolve, reject) => {
+      try{
+        const id = Date.now();
+        this.log(`Executing the following command(#${id}): ${command}`);
+        exec(command, (error, stdout, stderr) => {
+          if(error){
+            this.log(`Command execution #${id} failed: ${stderr}`);
+            reject(stderr);
+          }else{
+            this.log(`Command execution #${id} ends successfully: ${stdout}`);
+            resolve(stdout);
+          }
+        });
+      }
+      catch(e){
+        Util.logger.log(e, "error");
+        reject("Main library threw an error and fallback library also threw an error");
+      }
+    });
+  }
+
+  private async dlbinary(ver:string){
+    const releases = JSON.parse(await Util.web.DownloadText("https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest", {
+      "Accept": "application/vnd.github.v3+json",
+      "User-Agent": "Discord-SimpleMusicBot"
+    })) as GitHubRelease;
+    this.log(`Latest: ${releases.tag_name}`);
+    if(ver !== releases.tag_name){
+      this.log(`Start downloading`);
+      await this.execAsync("curl -L -o \"youtube-dl" + (process.platform === "win32" ? ".exe" : "") + "\" " + releases.assets.filter(a => a.name === (process.platform === "win32" ? "youtube-dl.exe" : "youtube-dl"))[0].browser_download_url);
+      if(process.platform !== "win32"){
+        this.log("Configuring permission");
+        await this.execAsync("chmod 777 youtube-dl");
+      }
+    }
+    this.last = Date.now();
+  }
+
+  private async getYouTubeDlInfo(url:string):Promise<Promise<string>>{
     try{
-      const buf = await execAsync("." + (process.platform === "win32" ? "\\" : "/") + "youtube-dl --version");
-      version = buf.trim();
+      let version = "";
+      try{
+        const buf = await this.execAsync("." + (process.platform === "win32" ? "\\" : "/") + "youtube-dl --version");
+        version = buf.trim();
+      }
+      catch(e){
+        await this.dlbinary("");
+      }
+      if(new Date().getTime() - this.last >= 1000 * 60 /*1sec*/ * 60 /*1min*/ * 60 /*1hour*/ * 3){
+        await this.dlbinary(version);
+      }
+      return this.execAsync("." + (process.platform === "win32" ? "\\" : "/") + "youtube-dl --skip-download --print-json \"" + url + "\"");
     }
     catch(e){
-      await dlbinary("");
+      throw "Main library threw an error and fallback library was not found or occurred an error";
     }
-    if(new Date().getTime() - ytdlUpdateCheck.last.getTime() >= 1000 * 60 /*1sec*/ * 60 /*1min*/ * 60 /*1hour*/ * 3){
-      await dlbinary(version);
-    }
-    return execAsync("." + (process.platform === "win32" ? "\\" : "/") + "youtube-dl --skip-download --print-json \"" + url + "\"");
-  }
-  catch(e){
-    throw "Main library threw an error and fallback library was not found or occurred an error";
   }
 }
-
-class ytdlUpdateCheckData {
-  last:Date = new Date(0);
-}
-export const ytdlUpdateCheck = new ytdlUpdateCheckData();
 
 // QuickType of youtube-dl json
 export interface YoutubeDlInfo {
@@ -92,8 +175,8 @@ export interface YoutubeDlInfo {
   categories:           string[];
   tags:                 string[];
   is_live:              null;
-  automatic_captions:   { [key: string]: AutomaticCaption[] };
-  subtitles:            Subtitles;
+  automatic_captions:   { [key: string]: any[] };
+  subtitles:            any;
   like_count:           number;
   dislike_count:        number;
   channel:              string;
@@ -131,19 +214,6 @@ enum Acodec {
   Mp4A402 = "mp4a.40.2",
   None = "none",
   Opus = "opus",
-}
-
-interface AutomaticCaption {
-  ext: AutomaticCaptionEXT;
-  url: string;
-}
-
-enum AutomaticCaptionEXT {
-  Srv1 = "srv1",
-  Srv2 = "srv2",
-  Srv3 = "srv3",
-  Ttml = "ttml",
-  Vtt = "vtt",
 }
 
 enum TempEXT {
@@ -211,9 +281,6 @@ enum AcceptLanguage {
 
 enum Protocol {
   HTTPS = "https",
-}
-
-interface Subtitles {
 }
 
 interface Thumbnail {
