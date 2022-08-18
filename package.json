@@ -56,7 +56,7 @@
     "prepare": "husky install",
     "start": "npm run build && npm run onlystart",
     "onlystart": "npx node dist/index.js",
-    "build": "npm run cleanup && tsc",
+    "build": "tsc",
     "postinstall": "npx node util/preparelib.js",
     "cleanup": "rimraf dist/ typings/",
     "checkvoiceenv": "node util/voiceenvcheck",

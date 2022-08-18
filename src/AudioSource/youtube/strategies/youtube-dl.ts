@@ -1,5 +1,5 @@
 import { exec } from "child_process";
-import { Util } from "../../Util";
+import { Util } from "../../../Util";
 
 const log = (content:string) => {
   if(Util.config.debug){
@@ -7,7 +7,7 @@ const log = (content:string) => {
   }
 };
 
-export function execAsync(command:string):Promise<string>{
+function execAsync(command:string):Promise<string>{
   return new Promise((resolve, reject) => {
     try{
       const id = Date.now();
