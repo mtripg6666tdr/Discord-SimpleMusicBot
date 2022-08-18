@@ -19,7 +19,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
     });
     this.playStream
       .on("error", (er) => {
-        console.error(er);
+        Util.logger.log(er.message || er.toString(), "error");
         this.error = true;
         this.events.emit("error", er);
       })

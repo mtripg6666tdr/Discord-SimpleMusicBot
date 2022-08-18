@@ -97,7 +97,7 @@ export default class Searchb extends BaseCommand {
         });
       }
       catch(e){
-        console.log(e);
+        Util.logger.log(e);
         options.data[message.guild.id].SearchPanel = null;
         if(msg) msg.edit("失敗しました").catch(e => Util.logger.log(e, "error"));
         else message.reply("失敗しました").catch(e => Util.logger.log(e, "error"));
