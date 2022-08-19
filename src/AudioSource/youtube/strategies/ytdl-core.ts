@@ -1,6 +1,6 @@
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
-import { Cache, Strategy } from ".";
+import { Cache, Strategy } from "./base";
 import * as voice from "@discordjs/voice";
 import Util from "../../../Util";
 import { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";

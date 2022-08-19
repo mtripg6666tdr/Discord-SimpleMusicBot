@@ -1,29 +1,7 @@
-import type { exportableYouTube } from "..";
+import { Strategy, Cache } from "./base";
 import Util from "../../../Util";
-import { StreamInfo } from "../../audiosource";
 import { youtubeDlStrategy } from "./youtube-dl";
 import { ytdlCoreStrategy } from "./ytdl-core";
-
-export type Cache<T extends string, U> = {
-  type:T,
-  data:U,
-};
-
-export abstract class Strategy<T extends Cache<any, any>>{
-  constructor(protected priority:number){}
-  abstract getInfo(url:string):Promise<{
-    data:exportableYouTube,
-    cache:T,
-  }>;
-  abstract fetch(url:string, forceCache?:boolean, cache?:Cache<any, any>):Promise<{
-    stream:StreamInfo,
-    info:exportableYouTube,
-    relatedVideos:exportableYouTube[],
-  }>;
-  protected useLog(){
-    Util.logger.log("[AudioSource:youtube] using strategy #" + this.priority);
-  }
-}
 
 export const strategies = [ytdlCoreStrategy, youtubeDlStrategy].map((proto, i) => new proto(i));
 

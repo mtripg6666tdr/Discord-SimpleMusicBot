@@ -4,7 +4,8 @@ import * as ytdl from "ytdl-core";
 import { Util } from "../../Util";
 import { SecondaryUserAgent } from "../../Util/ua";
 import { AudioSource } from "../audiosource";
-import { attemptGetInfoForStrategies, attemptFetchForStrategies, Cache, strategies } from "./strategies";
+import { attemptGetInfoForStrategies, attemptFetchForStrategies, strategies } from "./strategies";
+import type { Cache } from "./strategies/base";
 import { ytdlCore, ytdlCoreStrategy } from "./strategies/ytdl-core";
 
 const ua = SecondaryUserAgent;

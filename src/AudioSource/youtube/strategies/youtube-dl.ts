@@ -1,7 +1,7 @@
 import { exec } from "child_process";
 import m3u8stream from "m3u8stream";
 import { PassThrough } from "stream";
-import { Cache, Strategy } from ".";
+import { Cache, Strategy } from "./base";
 import type { exportableYouTube } from "..";
 import { Util } from "../../../Util";
 import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
