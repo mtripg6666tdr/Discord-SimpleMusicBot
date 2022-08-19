@@ -60,7 +60,7 @@ export class QueueManager extends ManagerBase {
   constructor(){
     super();
     this.SetTag("QueueManager");
-    this.Log("Queue Manager instantiated");
+    this.Log("QueueManager instantiated");
   }
 
   SetData(data:GuildDataContainer){
@@ -121,7 +121,7 @@ export class QueueManager extends ManagerBase {
       ):Promise<QueueContent & {index:number}>{
     await this.waitForProcess();
     this.nowProcessing = true;
-    this.Log("AddQueue() called");
+    this.Log("AddQueue called");
     const t = Util.time.timer.start("AddQueue");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     const result = {
@@ -178,14 +178,14 @@ export class QueueManager extends ManagerBase {
       message:ResponseMessage = null,
       gotData:AudioSource.exportableCustom = null
       ):Promise<boolean>{
-    this.Log("AutoAddQueue() Called");
+    this.Log("AutoAddQueue Called");
     const t = Util.time.timer.start("AutoAddQueue");
     let ch:TextChannel = null;
     let msg:Message|ResponseMessage = null;
     try{
       if(fromSearch && this.info.SearchPanel){
         // 検索パネルから
-        this.Log("AutoAddQueue() From search panel");
+        this.Log("AutoAddQueue from search panel");
         ch = await client.channels.fetch(this.info.SearchPanel.Msg.chId) as TextChannel;
         if(typeof fromSearch === "boolean"){
           msg = await (ch as TextChannel).messages.fetch(this.info.SearchPanel.Msg.id);
@@ -205,22 +205,22 @@ export class QueueManager extends ManagerBase {
         });
       }else if(message){
         // すでに処理中メッセージがある
-        this.Log("AutoAddQueue() Interaction message specified");
+        this.Log("AutoAddQueue will report statuses to the specified message");
         ch = message.channel as TextChannel;
         msg = message;
       }else if(channel){
         // まだないので生成
-        this.Log("AutoAddQueue() Interaction channel specified");
+        this.Log("AutoAddQueue will make a message that will be used to report statuses");
         ch = channel;
         msg = await channel.send("情報を取得しています。お待ちください...");
       }
       if(this.info.Queue.length > 999){
         // キュー上限
-        this.Log("AutoAddQueue() Failed since too long queue", "warn");
+        this.Log("AutoAddQueue failed due to too long queue", "warn");
         throw "キューの上限を超えています";
       }
       const info = await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type, gotData ?? null);
-      this.Log("AutoAddQueue() Added successfully");
+      this.Log("AutoAddQueue worked successfully");
       if(msg){
         // 曲の時間取得＆計算
         const _t = Number(info.BasicInfo.LengthSeconds);
@@ -245,7 +245,7 @@ export class QueueManager extends ManagerBase {
       }
     }
     catch(e){
-      this.Log("AutoAddQueue() Failed");
+      this.Log("AutoAddQueue failed");
       this.Log(Util.general.StringifyObject(e), "error");
       if(msg){
         msg.edit({content: ":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")", embeds: null}).catch(e => Util.logger.log(e, "error"));
@@ -308,7 +308,7 @@ export class QueueManager extends ManagerBase {
    * 次の曲に移動します
    */
   async Next(){
-    this.Log("Next() Called");
+    this.Log("Next Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this.OnceLoopEnabled = false;
     this.info.Player.errorCount = 0;
@@ -335,7 +335,7 @@ export class QueueManager extends ManagerBase {
    * @param offset 位置
    */
   RemoveAt(offset:number){
-    this.Log("RemoveAt() Called (offset:" + offset + ")");
+    this.Log(`RemoveAt Called (offset:${offset})`);
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default.splice(offset, 1);
     if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
@@ -347,7 +347,7 @@ export class QueueManager extends ManagerBase {
    * すべてのキューコンテンツを消去します
    */
   RemoveAll(){
-    this.Log("RemoveAll() Called");
+    this.Log("RemoveAll Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default = [];
     if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
@@ -359,7 +359,7 @@ export class QueueManager extends ManagerBase {
    * 最初のキューコンテンツだけ残し、残りのキューコンテンツを消去します
    */
   RemoveFrom2(){
-    this.Log("RemoveFrom2() Called");
+    this.Log("RemoveFrom2 Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default = [this.default[0]];
     if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
@@ -371,7 +371,7 @@ export class QueueManager extends ManagerBase {
    * キューをシャッフルします
    */
   Shuffle(){
-    this.Log("Shuffle() Called");
+    this.Log("Shuffle Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(this._default.length === 0) return;
     if(this.info.Player.IsPlaying || this.info.Player.preparing){
@@ -393,7 +393,7 @@ export class QueueManager extends ManagerBase {
    * @returns 削除されたオフセットの一覧
    */
   RemoveIf(validator:(q:QueueContent)=>Boolean):number[]{
-    this.Log("RemoveIf() Called");
+    this.Log("RemoveIf Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(this._default.length === 0) return [];
     const first = this.info.Player.IsPlaying ? 1 : 0
@@ -417,7 +417,7 @@ export class QueueManager extends ManagerBase {
    * @param to 移動先のインデックス
    */
   Move(from:number, to:number){
-    this.Log("Move() Called");
+    this.Log("Move Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(from < to){
       //要素追加

@@ -54,7 +54,7 @@ export class YouTube extends AudioSource {
     // store related videos
     this.relatedVideos = result.relatedVideos;
     this.importData(result.info);
-    if(forceUrl) this.logger("[AudioSource:youtube]Returning the url instead of stream");
+    if(forceUrl) this.logger("[AudioSource:youtube]Returning a url instead of stream");
     return result.stream;
   }
 

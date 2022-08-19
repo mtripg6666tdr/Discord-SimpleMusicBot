@@ -186,7 +186,7 @@ export class CommandsManager extends LogEmitter {
    * @returns 解決されたコマンド
    */
   resolve(command:string){
-    this.Log("Resolve() called");
+    this.Log("Resolving command");
     let result = null;
     for(let i = 0; i < this.commands.length; i++){
       if(this.commands[i].name === command || this.commands[i].alias.indexOf(command) >= 0){
@@ -195,7 +195,7 @@ export class CommandsManager extends LogEmitter {
       }
     }
     if(result)
-      this.Log("Command `" + command + "` was resolved successfully");
+      this.Log(`Command "${command}" was resolved successfully`);
     else
       this.Log("Command not found");
     return result;
