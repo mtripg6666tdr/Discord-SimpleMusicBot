@@ -1,19 +1,23 @@
+import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
+import type { Cache } from "./base";
+import type { Readable } from "stream";
+
+import * as voice from "@discordjs/voice";
+
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
-import { Cache, Strategy } from "./base";
-import * as voice from "@discordjs/voice";
+
 import Util from "../../../Util";
-import { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 import { SecondaryUserAgent } from "../../../Util/ua";
-import { Readable } from "stream";
 import { createChunkedYTStream } from "../stream";
+import { Strategy } from "./base";
 
 const ua = SecondaryUserAgent;
 
 type ytdlCore = "ytdlCore";
 export const ytdlCore:ytdlCore = "ytdlCore";
 
-export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, ytdl.videoInfo>{
+export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, ytdl.videoInfo> {
   async getInfo(url:string){
     this.useLog();
     const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
@@ -49,6 +53,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
         const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
         const requestOptions = agent ? {agent} : undefined;
         const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch`);
+        // eslint-disable-next-line @typescript-eslint/no-shadow
         let info = null as ytdl.videoInfo;
         try{
           info = await ytdl.getInfo(url, {

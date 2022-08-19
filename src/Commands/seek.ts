@@ -1,5 +1,7 @@
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Seek extends BaseCommand {
@@ -34,13 +36,14 @@ export default class Seek extends BaseCommand {
     }
     const time = (function(rawTime){
       if(rawTime.match(/^(\d+:)*\d+$/)){
-        return rawTime.split(":").map(d => Number(d)).reduce((prev, current) => prev * 60 + current);
+        return rawTime.split(":").map(d => Number(d))
+          .reduce((prev, current) => prev * 60 + current);
       }else{
         return NaN;
       }
-    })(options.rawArgs);
+    }(options.rawArgs));
     if(time > server.Player.CurrentAudioInfo.LengthSeconds || isNaN(time)){
-      await message.reply(":warning:シーク先の時間が正しくありません").catch(e => Util.logger.log(e, "error"))
+      await message.reply(":warning:シーク先の時間が正しくありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     try{
@@ -50,7 +53,7 @@ export default class Seek extends BaseCommand {
       await response.edit(":white_check_mark:シークしました").catch(e => Util.logger.log(e, "error"));
     }
     catch(e){
-      await message.channel.send(":astonished:シークに失敗しました")
+      await message.channel.send(":astonished:シークに失敗しました");
     }
   }
 }

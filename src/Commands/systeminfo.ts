@@ -1,10 +1,14 @@
-import * as discord from "discord.js";
-import * as os from "os";
-import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
-import { CommandMessage } from "../Component/CommandMessage";
-import { getColor } from "../Util/color";
-import { Util } from "../Util";
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
 import { generateDependencyReport } from "@discordjs/voice";
+import * as discord from "discord.js";
+
+import * as os from "os";
+
+import { BaseCommand } from ".";
+import { Util } from "../Util";
+import { getColor } from "../Util/color";
 
 export default class SystemInfo extends BaseCommand {
   constructor(){
@@ -39,7 +43,7 @@ export default class SystemInfo extends BaseCommand {
 
     const embeds = [] as discord.MessageEmbed[];
 
-    if(options.args.indexOf("basic") >= 0 || options.args.length === 0){
+    if(options.args.includes("basic") || options.args.length === 0){
       embeds.push(
         new discord.MessageEmbed()
           .setTitle("Discord-SimpleMusicBot")
@@ -52,7 +56,7 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(message.author.id === (Util.config.adminId ?? "593758391395155978") && (options.args.indexOf("log") >= 0 || options.args.length == 0)){
+    if(message.author.id === (Util.config.adminId ?? "593758391395155978") && (options.args.includes("log") || options.args.length === 0)){
       // Process Logs
       const logEmbed = new discord.MessageEmbed();
       logEmbed.setColor(getColor("UPTIME"));
@@ -61,7 +65,7 @@ export default class SystemInfo extends BaseCommand {
       embeds.push(logEmbed);
     }
 
-    if(options.args.indexOf("cpu") >= 0 || options.args.length == 0){
+    if(options.args.includes("cpu") || options.args.length === 0){
       // Process CPU Info
       const cpuInfoEmbed = new discord.MessageEmbed();
       cpuInfoEmbed.setColor(getColor("UPTIME"));
@@ -70,41 +74,41 @@ export default class SystemInfo extends BaseCommand {
       for(let i = 0; i < cpus.length; i++){
         const all = cpus[i].times.user + cpus[i].times.sys + cpus[i].times.nice + cpus[i].times.irq + cpus[i].times.idle;
         cpuInfoEmbed.addField(
-          "CPU" + (i + 1), "Model: `" + cpus[i].model + "`\r\n" 
+          "CPU" + (i + 1), "Model: `" + cpus[i].model + "`\r\n"
         + "Speed: `" + cpus[i].speed + "MHz`\r\n"
         + "Times(user): `" + Math.round(cpus[i].times.user / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.user, all) + "%)`\r\n"
         + "Times(sys): `" + Math.round(cpus[i].times.sys / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.sys, all) + "%)`\r\n"
         + "Times(nice): `" + Math.round(cpus[i].times.nice / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.nice, all) + "%)`\r\n"
         + "Times(irq): `" + Math.round(cpus[i].times.irq / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.irq, all) + "%)`\r\n"
         + "Times(idle): `" + Math.round(cpus[i].times.idle / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.idle, all) + "%)`"
-        , true);
+          , true);
       }
       embeds.push(cpuInfoEmbed);
     }
 
-    if(options.args.indexOf("mem") >= 0 || options.args.length == 0){
+    if(options.args.includes("mem") || options.args.length === 0){
       // Process Mem Info
       const memInfoEmbed = new discord.MessageEmbed();
       memInfoEmbed.setColor(getColor("UPTIME"));
       const memory = Util.system.GetMemInfo();
       const nMem = process.memoryUsage();
       memInfoEmbed.title = "Memory Info";
-      memInfoEmbed.addField("Total Memory", 
-          "Total: `" + memory.total + "MB`\r\n"
+      memInfoEmbed.addField("Total Memory",
+        "Total: `" + memory.total + "MB`\r\n"
         + "Used: `" + memory.used + "MB`\r\n"
         + "Free: `" + memory.free + "MB`\r\n"
         + "Usage: `" + memory.usage + "%`"
-      , true);
-      let rss = Util.system.GetMBytes(nMem.rss);
-      let ext = Util.system.GetMBytes(nMem.external);
-      memInfoEmbed.addField("Main Process Memory", 
-          "RSS: `" + rss + "MB`\r\n"
+        , true);
+      const rss = Util.system.GetMBytes(nMem.rss);
+      const ext = Util.system.GetMBytes(nMem.external);
+      memInfoEmbed.addField("Main Process Memory",
+        "RSS: `" + rss + "MB`\r\n"
         + "Heap total: `" + Util.system.GetMBytes(nMem.heapTotal) + "MB`\r\n"
         + "Heap used: `" + Util.system.GetMBytes(nMem.heapUsed) + "MB`\r\n"
         + "Array buffers: `" + Util.system.GetMBytes(nMem.arrayBuffers) + "MB`\r\n"
         + "External: `" + ext + "MB`\r\n"
         + "Total: `" + Util.math.GetPercentage(rss + ext, memory.total) + "%`"
-      , true);
+        , true);
       embeds.push(memInfoEmbed);
     }
     

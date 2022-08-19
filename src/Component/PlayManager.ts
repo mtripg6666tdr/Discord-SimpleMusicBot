@@ -1,15 +1,19 @@
+import type { AudioSource, StreamInfo, YouTube } from "../AudioSource";
+import type { GuildDataContainer } from "../Structure";
 import type { Client, Message, TextBasedChannel, TextChannel } from "discord.js";
 import type { Readable } from "stream";
-import { MessageEmbed } from "discord.js";
+
 import * as voice from "@discordjs/voice";
+import { MessageEmbed } from "discord.js";
+
 import { FFmpeg } from "prism-media";
-import { AudioSource, StreamInfo, YouTube } from "../AudioSource";
-import { DefaultUserAgent, FallBackNotice, FFmpegDefaultArgs } from "../definition";
-import { GuildDataContainer, ManagerBase } from "../Structure";
-import { getColor } from "../Util/color";
+
+import { ManagerBase } from "../Structure";
 import { Util } from "../Util";
-import { FixedAudioResource } from "./AudioResource";
+import { getColor } from "../Util/color";
 import { getFFmpegEffectArgs } from "../Util/effect";
+import { DefaultUserAgent, FallBackNotice, FFmpegDefaultArgs } from "../definition";
+import { FixedAudioResource } from "./AudioResource";
 
 /**
  * サーバーごとの再生を管理するマネージャー。
@@ -24,20 +28,20 @@ export class PlayManager extends ManagerBase {
   errorUrl = "";
   preparing = false;
   get CurrentAudioUrl():string{
-    if(this.CurrentAudioInfo) 
-      return this.CurrentAudioInfo.Url;
-    else
-      return "";
+    if(this.CurrentAudioInfo) return this.CurrentAudioInfo.Url;
+    else return "";
   }
+
   CurrentAudioInfo:AudioSource;
   /**
    *  接続され、再生途中にあるか（たとえ一時停止されていても）
    */
-  get IsPlaying():boolean {
+  get IsPlaying():boolean{
     return this.IsConnecting
       && this.AudioPlayer
       && this.AudioPlayer.state.status !== voice.AudioPlayerStatus.Idle;
   }
+
   /**
    *  VCに接続中かどうか
    */
@@ -48,22 +52,24 @@ export class PlayManager extends ManagerBase {
   get IsPaused():boolean{
     return this.AudioPlayer && this.AudioPlayer.state.status === voice.AudioPlayerStatus.Paused;
   }
+
   /**
    *  現在ストリーミングした時間(ミリ秒!)
    * @remarks ミリ秒単位なので秒に直すには1000分の一する必要がある
    */
   get CurrentTime():number{
-    return (this.AudioPlayer && this.AudioPlayer.state.status === voice.AudioPlayerStatus.Playing) 
+    return (this.AudioPlayer && this.AudioPlayer.state.status === voice.AudioPlayerStatus.Playing)
       ? this.seek * 1000 + (this.AudioPlayer.state as voice.AudioPlayerPlayingState).playbackDuration : 0;
   }
+
   /**
    * クライアント
    */
-  get Client(){return this.client};
+  get Client(){return this.client;}
   // コンストラクタ
-  constructor(private client:Client){
+  constructor(private readonly client:Client){
     super();
-    this.SetTag("PlayManager")
+    this.SetTag("PlayManager");
     this.Log("Play Manager instantiated");
   }
 
@@ -79,14 +85,16 @@ export class PlayManager extends ManagerBase {
    *  再生します
    */
   async Play(time:number = 0):Promise<PlayManager>{
+    /* eslint-disable no-irregular-whitespace */
     // 再生できる状態か確認
-    const badCondition = 
-      /* 接続中でない　　　　　　　　　 */    !this.IsConnecting 
-      /* プレイヤーがアイドル状態でない */ || (this.AudioPlayer && this.AudioPlayer.state.status !== voice.AudioPlayerStatus.Idle) 
-      /* キューが空　　　　　　　　　　 */ || this.info.Queue.Nothing
-      /* 準備中　　　　　　　　　　　　 */ || this.preparing
+    const badCondition
+    /* 接続中でない　　　　　　　　　 */ = !this.IsConnecting
+    /* プレイヤーがアイドル状態でない */ || (this.AudioPlayer && this.AudioPlayer.state.status !== voice.AudioPlayerStatus.Idle)
+    /* キューが空　　　　　　　　　　 */ || this.info.Queue.Nothing
+    /* 準備中　　　　　　　　　　　　 */ || this.preparing
     ;
-    if(badCondition) {
+    /* eslint-enable no-irregular-whitespace */
+    if(badCondition){
       this.Log("Play called but operated nothing", "warn");
       return this;
     }
@@ -114,10 +122,10 @@ export class PlayManager extends ManagerBase {
       const resource = this.ResolveStream(rawStream, time);
       const stream = FixedAudioResource.fromAudioResource(resource, this.CurrentAudioInfo.LengthSeconds);
       this.HandleEvents(stream, /* errorReportChannel */ mes.channel);
-      this.Log(`Stream edges: ${["Raw", ...stream.edges.map(e => e.type)].join("->")} ->`);
+      this.Log(`Stream edges: ${["Raw", ...stream.edges.map(e => e.type)].join(" -> ")} ->`);
       // fetchおよび処理中に切断された場合処理を終了
       const connection = voice.getVoiceConnection(this.info.GuildID);
-      if(!connection) {
+      if(!connection){
         if(mes) await mes.delete();
         return this;
       }
@@ -140,15 +148,15 @@ export class PlayManager extends ManagerBase {
         });
         embed.setColor(getColor("AUTO_NP"));
         embed.addField("リクエスト", this.info.Queue.get(0).AdditionalInfo.AddedBy.displayName, true);
-        embed.addField("次の曲", 
+        embed.addField("次の曲",
           // トラックループオンなら現在の曲
           this.info.Queue.LoopEnabled ? this.info.Queue.get(0).BasicInfo.Title :
           // (トラックループはオフ)長さが2以上ならオフセット1の曲
-          this.info.Queue.length >= 2 ? this.info.Queue.get(1).BasicInfo.Title :
-          // (トラックループオフ,長さ1)キューループがオンなら現在の曲
-          this.info.Queue.QueueLoopEnabled ? this.info.Queue.get(0).BasicInfo.Title :
-          // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
-          "次の曲がまだ登録されていません"
+            this.info.Queue.length >= 2 ? this.info.Queue.get(1).BasicInfo.Title :
+            // (トラックループオフ,長さ1)キューループがオンなら現在の曲
+              this.info.Queue.QueueLoopEnabled ? this.info.Queue.get(0).BasicInfo.Title :
+              // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
+                "次の曲がまだ登録されていません"
           , true);
         const [qhour, qmin, qsec] = Util.time.CalcHourMinSec(this.info.Queue.LengthSeconds - this.CurrentAudioInfo.LengthSeconds);
         embed.addField("再生待ちの曲", this.info.Queue.LoopEnabled ? "ループします" : ((this.info.Queue.length - 1) + "曲(" + (qhour === "0" ? "" : qhour + ":") + qmin + ":" + qsec + ")"), true);
@@ -156,21 +164,22 @@ export class PlayManager extends ManagerBase {
         if(this.CurrentAudioInfo.ServiceIdentifer === "youtube" && (this.CurrentAudioInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
-        mes.edit({content: null, embeds:[embed]}).catch(e => Util.logger.log(e, "error"));
+        mes.edit({content: null, embeds: [embed]}).catch(e => Util.logger.log(e, "error"));
       }
     }
     catch(e){
       Util.logger.log(Util.general.StringifyObject(e), "error");
       try{
-        const t = typeof e == "string" ? e : Util.general.StringifyObject(e);
-        if(t.indexOf("429") >= 0){
-          mes.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(e => Util.logger.log(e, "error"));
+        const t = typeof e === "string" ? e : Util.general.StringifyObject(e);
+        if(t.includes("429")){
+          mes.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(er => Util.logger.log(er, "error"));
           this.Log("Rate limit detected", "error");
           this.Stop();
           this.preparing = false;
           return this;
         }
-      }catch{};
+        // eslint-disable-next-line no-empty
+      } catch{}
       if(this.info.boundTextChannel && ch && mes){
         mes.edit(":tired_face:曲の再生に失敗しました...。" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。"));
         this.onStreamFailed();
@@ -240,13 +249,13 @@ export class PlayManager extends ManagerBase {
     return this;
   }
 
-  private InitAudioPlayer() {
+  private InitAudioPlayer(){
     const t = Util.time.timer.start("PlayManager#Play->InitAudioPlayer");
     this.AudioPlayer = voice.createAudioPlayer();
     voice.getVoiceConnection(this.info.GuildID).subscribe(this.AudioPlayer);
     if(!Util.config.debug){
       this.AudioPlayer.on("error", (e) => {
-        if(e) {
+        if(e){
           this.Log("Error:" + e.message, "error");
           // @ts-ignore
           const einfo = e.errorInfo;
@@ -255,21 +264,24 @@ export class PlayManager extends ManagerBase {
           }
         }
         if(this.info.boundTextChannel){
-          this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
-            this.Log("Some error occurred in AudioPlayer", "error");
-            (ch as TextChannel)
-              .send(
-                ":tired_face:曲の再生に失敗しました...。(" + (e ? Util.general.StringifyObject(e) : "undefined") + ")" 
-                + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。"))
-              .catch(e => Util.logger.log(e, "error"))
+          this.client.channels.fetch(this.info.boundTextChannel)
+            .then(ch => {
+              this.Log("Some error occurred in AudioPlayer", "error");
+              (ch as TextChannel)
+                .send(
+                  ":tired_face:曲の再生に失敗しました...。(" + (e ? Util.general.StringifyObject(e) : "undefined") + ")"
+                  + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。"))
+                .catch(er => Util.logger.log(er, "error"))
               ;
-          }).catch(e => Util.logger.log(e, "error"));
+            })
+            .catch(er => Util.logger.log(er, "error"))
+          ;
         }
         // エラーが発生したら再生できないときの関数を呼んで逃げる
         this.onStreamFailed();
       });
     }
-    this.AudioPlayer.on("unsubscribe", (_)=>{
+    this.AudioPlayer.on("unsubscribe", ()=>{
       this.AudioPlayer.stop();
       this.AudioPlayer = null;
     });
@@ -310,7 +322,7 @@ export class PlayManager extends ManagerBase {
           "-user_agent", rawStream.userAgent ?? DefaultUserAgent,
         ] : [
           "-user_agent", rawStream.userAgent ?? DefaultUserAgent,
-        ], 
+        ],
         [
           // additional args after input
           ...effects
@@ -330,7 +342,7 @@ export class PlayManager extends ManagerBase {
       // ストリームなら変換しない
       const rstream = rawStream.stream as Readable;
       if(!Util.config.debug){
-        rstream.on('error', (e)=> {
+        rstream.on("error", (e)=> {
           this.AudioPlayer.emit("error", {
             errorInfo: e,
             resource: (this.AudioPlayer.state as voice.AudioPlayerPlayingState).resource ?? null
@@ -347,14 +359,14 @@ export class PlayManager extends ManagerBase {
   private CreateFFmpegReadableFromReadable(original:Readable, additionalArgs:string[]){
     const args = [
       ...FFmpegDefaultArgs,
-      '-acodec', 'libopus', 
-      '-f', 'opus', 
-      '-ar', '48000', 
-      '-ac', '2',
+      "-acodec", "libopus",
+      "-f", "opus",
+      "-ar", "48000",
+      "-ac", "2",
       ...additionalArgs
     ];
     const passThrough = Util.general.InitPassThrough();
-    const ffmpeg = new FFmpeg({args})
+    const ffmpeg = new FFmpeg({args});
     const stream = original
       .on("error", (e) => passThrough.emit("error", e))
       .pipe(ffmpeg)
@@ -377,12 +389,12 @@ export class PlayManager extends ManagerBase {
     const args = [
       ...FFmpegDefaultArgs,
       ...beforeAdditionalArgs,
-      '-i', url, 
+      "-i", url,
       ...afterAdditionalArgs,
-      '-acodec', 'libopus', 
-      '-f', 'opus', 
-      '-ar', '48000', 
-      '-ac', '2',
+      "-acodec", "libopus",
+      "-f", "opus",
+      "-ar", "48000",
+      "-ac", "2",
     ];
     const passThrough = Util.general.InitPassThrough();
     const ffmpeg = new FFmpeg({args})
@@ -430,7 +442,8 @@ export class PlayManager extends ManagerBase {
       if(this.info.boundTextChannel){
         this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
           (ch as TextChannel).send(":wave:キューが空になったため終了します").catch(e => Util.logger.log(e, "error"));
-        }).catch(e => Util.logger.log(e, "error"));
+        })
+          .catch(e => Util.logger.log(e, "error"));
       }
       this.Disconnect();
     // なくなってないなら再生開始！
@@ -442,7 +455,7 @@ export class PlayManager extends ManagerBase {
   private async onStreamFailed(){
     if(this.info.Queue.LoopEnabled) this.info.Queue.LoopEnabled = false;
     if(this.info.Queue.length === 1 && this.info.Queue.QueueLoopEnabled) this.info.Queue.QueueLoopEnabled = false;
-    if(this.errorUrl == this.CurrentAudioInfo.Url){
+    if(this.errorUrl === this.CurrentAudioInfo.Url){
       this.errorCount++;
     }else{
       this.errorCount = 1;

@@ -1,8 +1,9 @@
+import type { UrlStreamInfo } from ".";
+import type { exportableCustom } from "./custom";
 import type { EmbedField } from "discord.js";
-import { UrlStreamInfo } from ".";
+
 import { Util } from "../Util";
-import { AudioSource } from "./audiosource"
-import { exportableCustom } from "./custom";
+import { AudioSource } from "./audiosource";
 
 export class Hibiki extends AudioSource {
   protected _lengthSeconds = 0;
@@ -15,7 +16,7 @@ export class Hibiki extends AudioSource {
   
   async init(url:string){
     this.Url = url;
-    const match = this.Url.match(/^https?:\/\/hibiki-radio.jp\/description\/(?<id>.+)\/detail([\/#].+)?$/);
+    const match = this.Url.match(/^https?:\/\/hibiki-radio.jp\/description\/(?<id>.+)\/detail([/#].+)?$/);
     this.programId = match.groups.id;
     this.radioInfo = await HibikiApi.getBasicData(this.programId);
     this.Thumnail = this.radioInfo.sp_image_url;
@@ -63,9 +64,10 @@ export class Hibiki extends AudioSource {
 }
 
 export abstract class HibikiApi {
-  static validateURL(url:string):boolean {
+  static validateURL(url:string):boolean{
     return Boolean(url.match(/^https?:\/\/hibiki-radio.jp\/description\/(.+)\/detail(\/.+)?$/));
   }
+
   static async getBasicData(programId:string):Promise<HibikiAPIResult>{
     const api = "https://vcms-api.hibiki-radio.jp/api/v1/programs/" + programId;
     return JSON.parse(await Util.web.DownloadText(api, {
@@ -75,6 +77,7 @@ export abstract class HibikiApi {
       "X-Requested-With": "XMLHttpRequest"
     })) as HibikiAPIResult;
   }
+
   static async playCheck(videoId:string):Promise<playCheckResult>{
     const playCheckURL = "https://vcms-api.hibiki-radio.jp/api/v1/videos/play_check?video_id=" + videoId;
     return JSON.parse(await Util.web.DownloadText(playCheckURL, {
@@ -86,117 +89,117 @@ export abstract class HibikiApi {
 }
 
 interface HibikiAPIResult {
-  access_id:                 string;
-  id:                        number;
-  name:                      string;
-  name_kana:                 string;
-  day_of_week:               number;
-  description:               string;
-  pc_image_url:              string;
-  pc_image_info:             ImageInfo;
-  sp_image_url:              string;
-  sp_image_info:             ImageInfo;
-  onair_information:         string;
-  message_form_url:          string;
-  email:                     string;
-  new_program_flg:           boolean;
-  copyright:                 string;
-  priority:                  number;
-  meta_title:                string;
-  meta_keyword:              string;
-  meta_description:          string;
-  hash_tag:                  string;
-  share_text:                string;
-  share_url:                 string;
-  cast:                      string;
-  publish_start_at:          string;
-  publish_end_at:            null;
-  updated_at:                string;
-  latest_episode_id:         number;
-  latest_episode_name:       string;
-  episode_updated_at:        string;
-  update_flg:                boolean;
-  episode:                   Episode;
-  chapter_flg:               boolean;
-  additional_video_flg:      boolean;
-  segment_count:             number;
+  access_id: string;
+  id: number;
+  name: string;
+  name_kana: string;
+  day_of_week: number;
+  description: string;
+  pc_image_url: string;
+  pc_image_info: ImageInfo;
+  sp_image_url: string;
+  sp_image_info: ImageInfo;
+  onair_information: string;
+  message_form_url: string;
+  email: string;
+  new_program_flg: boolean;
+  copyright: string;
+  priority: number;
+  meta_title: string;
+  meta_keyword: string;
+  meta_description: string;
+  hash_tag: string;
+  share_text: string;
+  share_url: string;
+  cast: string;
+  publish_start_at: string;
+  publish_end_at: null;
+  updated_at: string;
+  latest_episode_id: number;
+  latest_episode_name: string;
+  episode_updated_at: string;
+  update_flg: boolean;
+  episode: Episode;
+  chapter_flg: boolean;
+  additional_video_flg: boolean;
+  segment_count: number;
   program_information_count: number;
   product_information_count: number;
-  user_favorite_flg:         boolean;
-  program_links:             ProgramLink[];
-  casts:                     Cast[];
-  segments:                  Segment[];
+  user_favorite_flg: boolean;
+  program_links: ProgramLink[];
+  casts: Cast[];
+  segments: Segment[];
 }
 
 interface Cast {
-  id:               number;
-  name:             string;
-  roll_name:        null;
-  pc_image_url:     string;
-  pc_image_info:    ImageInfo;
-  sp_image_url:     string;
-  sp_image_info:    ImageInfo;
+  id: number;
+  name: string;
+  roll_name: null;
+  pc_image_url: string;
+  pc_image_info: ImageInfo;
+  sp_image_url: string;
+  sp_image_info: ImageInfo;
   publish_start_at: string;
-  publish_end_at:   null;
-  updated_at:       string;
+  publish_end_at: null;
+  updated_at: string;
 }
 
 interface ImageInfo {
-  width:  number;
+  width: number;
   height: number;
 }
 
 interface Episode {
-  id:               number;
-  program_id:       number;
-  program_name:     string;
-  name:             string;
-  media_type:       number;
-  video:            Video;
+  id: number;
+  program_id: number;
+  program_name: string;
+  name: string;
+  media_type: number;
+  video: Video;
   additional_video: Video;
   html_description: string;
-  link_url:         string;
-  updated_at:       string;
-  episode_parts:    ProgramLink[];
-  chapters:         ProgramLink[];
+  link_url: string;
+  updated_at: string;
+  episode_parts: ProgramLink[];
+  chapters: ProgramLink[];
 }
 
 interface Video {
-  id:                number;
-  duration:          number;
-  live_flg:          boolean;
+  id: number;
+  duration: number;
+  live_flg: boolean;
   delivery_start_at: null;
-  delivery_end_at:   null;
-  dvr_flg:           boolean;
-  replay_flg:        boolean;
-  media_type:        number;
+  delivery_end_at: null;
+  dvr_flg: boolean;
+  replay_flg: boolean;
+  media_type: number;
 }
 
 interface ProgramLink {
-  id:            number;
-  start_time?:   number;
-  pc_image_url:  string;
+  id: number;
+  start_time?: number;
+  pc_image_url: string;
   pc_image_info: ImageInfo | null;
-  sp_image_url:  string;
+  sp_image_url: string;
   sp_image_info: ImageInfo | null;
-  name?:         string;
-  description?:  string;
-  sort_order?:   number | null;
-  updated_at?:   string;
-  link_url?:     string;
+  name?: string;
+  description?: string;
+  sort_order?: number | null;
+  updated_at?: string;
+  link_url?: string;
 }
 
 interface Segment {
-  id:               number;
-  name:             string;
-  segment_parts:    ProgramLink[];
+  id: number;
+  name: string;
+  segment_parts: ProgramLink[];
   html_description: string;
   publish_start_at: string;
-  publish_end_at:   null;
-  updated_at:       string;
+  publish_end_at: null;
+  updated_at: string;
 }
 
 interface playCheckResult {
-    token:        string;
-    playlist_url: string;
+  token: string;
+  playlist_url: string;
 }

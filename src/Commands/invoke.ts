@@ -1,5 +1,7 @@
-import { CommandsManager, CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
+import type { CommandArgs } from ".";
+
+import { CommandsManager, BaseCommand } from ".";
+import { CommandMessage } from "../Component/CommandMessage";
 
 export default class Invoke extends BaseCommand {
   constructor(){

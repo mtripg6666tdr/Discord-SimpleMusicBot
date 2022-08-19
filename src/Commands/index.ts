@@ -1,18 +1,20 @@
-import type { Client } from "discord.js";
-import type { MusicBot } from "../bot";
-import type { CommandMessage } from "../Component/CommandMessage"
+import type { CommandMessage } from "../Component/CommandMessage";
 import type { PageToggle } from "../Component/PageToggle";
 import type { TaskCancellationManager } from "../Component/TaskCancellationManager";
+import type { GuildDataContainer } from "../Structure";
+import type { MusicBot } from "../bot";
 import type { categories } from "./commands";
+import type { Client } from "discord.js";
 
 import * as fs from "fs";
 import * as path from "path";
-import { LogEmitter, GuildDataContainer } from "../Structure";
+
+import { LogEmitter } from "../Structure";
 
 type BaseCommandInitializeOptions = {
   name:string,
   alias:Readonly<string[]>,
-}
+};
 
 type ListCommandWithArgumentsInitializeOptions = BaseCommandInitializeOptions & {
   description:string,
@@ -21,19 +23,19 @@ type ListCommandWithArgumentsInitializeOptions = BaseCommandInitializeOptions & 
   usage:string,
   category:keyof typeof categories,
   argument:SlashCommandArgument[],
-}
+};
 
 type ListCommandWithoutArgumentsInitializeOptions = BaseCommandInitializeOptions & {
   description:string,
   unlist:false,
   category:keyof typeof categories,
-}
+};
 
 type ListCommandInitializeOptions = ListCommandWithArgumentsInitializeOptions | ListCommandWithoutArgumentsInitializeOptions;
 
 type UnlistCommandInitializeOptions = BaseCommandInitializeOptions & {
   unlist:true,
-}
+};
 
 /**
  * すべてのコマンドハンドラーの基底クラスです
@@ -76,11 +78,11 @@ export abstract class BaseCommand {
  * スラッシュコマンドの引数として取れるものを定義するインターフェースです
  */
 export interface SlashCommandArgument {
-  type:"bool"|"integer"|"string",
-  name:string,
-  description:string,
-  required:boolean,
-  choices?:{[key:string]:string|number},
+  type:"bool"|"integer"|"string";
+  name:string;
+  description:string;
+  required:boolean;
+  choices?:{[key:string]:string|number};
 }
 
 /**
@@ -107,7 +109,7 @@ export interface CommandArgs {
    * 紐づけチャンネルの更新関数
    * @param message 更新に使うコマンドメッセージ
    */
-  updateBoundChannel(message:CommandMessage):void;
+  updateBoundChannel: (message:CommandMessage) => void;
   /**
    * 生存しているPageToggleの配列
    */
@@ -121,20 +123,20 @@ export interface CommandArgs {
    * @param message 参加に使うメッセージ
    * @param reply メッセージに返信するかどうか
    */
-  JoinVoiceChannel(message:CommandMessage, reply?:boolean, replyOnFail?:boolean):Promise<boolean>;
+  JoinVoiceChannel: (message:CommandMessage, reply?:boolean, replyOnFail?:boolean) => Promise<boolean>;
   /**
    * URLからキューに追加する関数
    * @param message 追加に使うメッセージ
    * @param optiont URL
    * @param first 最初に追加するかどうか
    */
-  PlayFromURL(message:CommandMessage, optiont:string, first:boolean):Promise<void>;
+  PlayFromURL: (message:CommandMessage, optiont:string, first:boolean) => Promise<void>;
   /**
    * サーバーデータの初期化関数
    * @param guildid サーバーID
    * @param channelid チャンネルID
    */
-  initData(guildid:string, channelid:string):void;
+  initData: (guildid:string, channelid:string) => void;
   /**
    * キャンセルマネージャー
    */
@@ -153,6 +155,7 @@ export class CommandsManager extends LogEmitter {
     if(this._instance) return this._instance;
     else return this._instance = new CommandsManager();
   }
+
   /**
    * コマンドマネージャーの唯一のインスタンスを返します
    */
@@ -160,19 +163,20 @@ export class CommandsManager extends LogEmitter {
     return this.commands;
   }
 
-  private commands = null as BaseCommand[];
+  private readonly commands = null as BaseCommand[];
 
   private constructor(){
     super();
     this.SetTag("CommandsManager");
     this.Log("Initializing");
     this.commands = [];
-      fs.readdirSync(__dirname, {withFileTypes: true})
+    fs.readdirSync(__dirname, {withFileTypes: true})
       .filter(d => d.isFile())
       .map(d => d.name)
       .filter(n => n.endsWith(".js") && n !== "index.js")
       .map(n => n.slice(0, -3))
       .forEach(n => {
+        // eslint-disable-next-line new-cap
         const cp = new (require(path.join(__dirname, n)).default)() as BaseCommand;
         this.commands.push(cp);
         return cp;
@@ -189,15 +193,13 @@ export class CommandsManager extends LogEmitter {
     this.Log("Resolving command");
     let result = null;
     for(let i = 0; i < this.commands.length; i++){
-      if(this.commands[i].name === command || this.commands[i].alias.indexOf(command) >= 0){
+      if(this.commands[i].name === command || this.commands[i].alias.includes(command)){
         result = this.commands[i];
         break;
       }
     }
-    if(result)
-      this.Log(`Command "${command}" was resolved successfully`);
-    else
-      this.Log("Command not found");
+    if(result) this.Log(`Command "${command}" was resolved successfully`);
+    else this.Log("Command not found");
     return result;
   }
 

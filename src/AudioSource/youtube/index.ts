@@ -1,12 +1,16 @@
-import type { EmbedField } from "discord.js";
 import type { StreamInfo } from "..";
+import type { LoggerType } from "../../Util";
+import type { Cache } from "./strategies/base";
+import type { ytdlCoreStrategy } from "./strategies/ytdl-core";
+import type { EmbedField } from "discord.js";
+
 import * as ytdl from "ytdl-core";
-import { LoggerType, Util } from "../../Util";
+
+import { Util } from "../../Util";
 import { SecondaryUserAgent } from "../../Util/ua";
 import { AudioSource } from "../audiosource";
 import { attemptGetInfoForStrategies, attemptFetchForStrategies, strategies } from "./strategies";
-import type { Cache } from "./strategies/base";
-import { ytdlCore, ytdlCoreStrategy } from "./strategies/ytdl-core";
+import { ytdlCore } from "./strategies/ytdl-core";
 
 const ua = SecondaryUserAgent;
 
@@ -31,6 +35,7 @@ export class YouTube extends AudioSource {
   get IsFallbacked(){
     return this.fallback;
   }
+
   get IsCached(){
     return !!this.cache;
   }
@@ -99,7 +104,7 @@ export class YouTube extends AudioSource {
       thumbnail: this.Thumnail,
       isLive: this.LiveStream,
     };
-  };
+  }
 
   private importData(exportable:exportableYouTube){
     this.Title = exportable.title;
@@ -117,12 +122,12 @@ export class YouTube extends AudioSource {
 }
 
 export type exportableYouTube = {
-  url:string;
-  title:string;
-  description:string;
-  length:number;
-  channel:string;
-  channelUrl:string;
-  thumbnail:string;
-  isLive:boolean;
-}
+  url:string,
+  title:string,
+  description:string,
+  length:number,
+  channel:string,
+  channelUrl:string,
+  thumbnail:string,
+  isLive:boolean,
+};

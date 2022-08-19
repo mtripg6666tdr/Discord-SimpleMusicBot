@@ -1,9 +1,13 @@
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+import type { ResponseMessage } from "djs-command-resolver";
+
 import * as discord from "discord.js";
-import { CommandArgs, BaseCommand } from ".";
+
+import { BaseCommand } from ".";
 import { bestdori, BestdoriApi } from "../AudioSource";
-import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/color";
 import { Util } from "../Util";
+import { getColor } from "../Util/color";
 
 export default class Searchb extends BaseCommand {
   constructor(){
@@ -22,11 +26,11 @@ export default class Searchb extends BaseCommand {
       return;
     }
     if(options.rawArgs !== ""){
-      let msg = null as discord.Message;
+      let msg = null as discord.Message|ResponseMessage;
       let desc = "※最大20件まで表示されます\r\n\r\n";
       try{
         options.data[message.guild.id].SearchPanel = {} as any;
-        const msg = await message.reply("準備中...");
+        msg = await message.reply("準備中...");
         options.data[message.guild.id].SearchPanel = {
           Msg: {
             id: msg.id,
@@ -42,13 +46,13 @@ export default class Searchb extends BaseCommand {
         const keys = Object.keys(bestdori.allsonginfo);
         const result = keys.filter(k => {
           const info = bestdori.allsonginfo[Number(k)];
-          return (info.musicTitle[0] + bestdori.allbandinfo[info.bandId].bandName[0]).toLowerCase().indexOf(options.rawArgs.toLowerCase()) >= 0
+          return (info.musicTitle[0] + bestdori.allbandinfo[info.bandId].bandName[0]).toLowerCase().includes(options.rawArgs.toLowerCase());
         });
         const embed = new discord.MessageEmbed();
         embed.setColor(getColor("SEARCH"));
-        embed.title = "\"" + options.rawArgs + "\"の検索結果✨"
+        embed.title = "\"" + options.rawArgs + "\"の検索結果✨";
         let index = 1;
-        let selectOpts = [] as discord.MessageSelectOptionData[];
+        const selectOpts = [] as discord.MessageSelectOptionData[];
         for(let i = 0; i < result.length; i++){
           const title = bestdori.allsonginfo[Number(result[i])].musicTitle[0];
           desc += "`" + index + ".` [" + bestdori.allsonginfo[Number(result[i])].musicTitle[0] + "](" + BestdoriApi.getAudioPage(Number(result[i])) + ") - `" + bestdori.allbandinfo[bestdori.allsonginfo[Number(result[i])].bandId].bandName[0] + "` \r\n\r\n";
@@ -64,7 +68,7 @@ export default class Searchb extends BaseCommand {
             value: index.toString()
           });
           index++;
-          if(index>=21){
+          if(index >= 21){
             break;
           }
         }
@@ -76,31 +80,31 @@ export default class Searchb extends BaseCommand {
         embed.description = desc;
         embed.footer = {
           iconURL: message.author.avatarURL(),
-          text:"楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
+          text: "楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
         };
         await msg.edit({
-          embeds:[embed],
+          embeds: [embed],
           components: [
             new discord.MessageActionRow()
-            .addComponents(
-              new discord.MessageSelectMenu()
-              .setCustomId("search")
-              .setPlaceholder("数字を送信するか、ここから選択...")
-              .setMinValues(1)
-              .setMaxValues(index - 1)
-              .addOptions([...selectOpts, {
-                label: "キャンセル",
-                value: "cancel"
-              }])
-            )
+              .addComponents(
+                new discord.MessageSelectMenu()
+                  .setCustomId("search")
+                  .setPlaceholder("数字を送信するか、ここから選択...")
+                  .setMinValues(1)
+                  .setMaxValues(index - 1)
+                  .addOptions([...selectOpts, {
+                    label: "キャンセル",
+                    value: "cancel"
+                  }])
+              )
           ]
         });
       }
       catch(e){
         Util.logger.log(e);
         options.data[message.guild.id].SearchPanel = null;
-        if(msg) msg.edit("失敗しました").catch(e => Util.logger.log(e, "error"));
-        else message.reply("失敗しました").catch(e => Util.logger.log(e, "error"));
+        if(msg) msg.edit("失敗しました").catch(er => Util.logger.log(er, "error"));
+        else message.reply("失敗しました").catch(er => Util.logger.log(er, "error"));
       }
     }else{
       message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));

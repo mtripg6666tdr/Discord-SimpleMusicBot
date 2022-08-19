@@ -1,14 +1,15 @@
-import { LoggerType } from "../../../Util";
-import { Strategy, Cache } from "./base";
+import type { LoggerType } from "../../../Util";
+import type { Strategy, Cache } from "./base";
+
 import { playDlStrategy } from "./play-dl";
 import { youtubeDlStrategy } from "./youtube-dl";
 import { ytdlCoreStrategy } from "./ytdl-core";
 
 export const strategies = [
-  ytdlCoreStrategy, 
-  playDlStrategy, 
+  ytdlCoreStrategy,
+  playDlStrategy,
   youtubeDlStrategy
-].map((proto, i) => new proto(i));
+].map((Proto, i) => new Proto(i));
 
 function setupLogger(logger: LoggerType){
   strategies.forEach(strategy => strategy.logger = logger);
@@ -20,9 +21,9 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(l
     try{
       const result = await strategies[i].fetch(...parameters);
       return {
-        result, 
-        resolved:i,
-      }
+        result,
+        resolved: i,
+      };
     }
     catch(e){
       logger(`[AudioSource:youtube] fetch in strategy#${i} failed: ${e}`, "error");

@@ -1,5 +1,6 @@
+import type { UrlStreamInfo } from ".";
 import type { EmbedField } from "discord.js";
-import { UrlStreamInfo } from ".";
+
 import { Util } from "../Util";
 import { AudioSource } from "./audiosource";
 
@@ -18,7 +19,7 @@ export class BestdoriS extends AudioSource {
     this.Url = url;
     await BestdoriApi.setupData();
     this.id = BestdoriApi.getAudioId(url);
-    if(!this.id) throw "Invalid streamable url";
+    if(!this.id) throw new Error("Invalid streamable url");
     const data = bestdori.allsonginfo[this.id];
     this.Title = data.musicTitle[0];
     this.Type = data.tag;
@@ -42,8 +43,8 @@ export class BestdoriS extends AudioSource {
   async fetch():Promise<UrlStreamInfo>{
     return {
       type: "url",
-      url:"https://bestdori.com/assets/jp/sound/bgm" + Util.general.AddZero(this.id.toString(), 3) +  "_rip/bgm" + Util.general.AddZero(this.id.toString(), 3) + ".mp3"
-    }
+      url: "https://bestdori.com/assets/jp/sound/bgm" + Util.general.AddZero(this.id.toString(), 3) + "_rip/bgm" + Util.general.AddZero(this.id.toString(), 3) + ".mp3"
+    };
   }
 
   toField(){
@@ -71,7 +72,7 @@ export class BestdoriS extends AudioSource {
     ] as EmbedField[];
   }
 
-  npAdditional(){return "\r\nアーティスト:`" + this.Artist + "`"};
+  npAdditional(){return "\r\nアーティスト:`" + this.Artist + "`";}
 
   exportData():exportableBestdori{
     return {
@@ -85,12 +86,12 @@ export class BestdoriS extends AudioSource {
 }
 
 export type exportableBestdori = {
-  url:string;
-  length:number;
-  lyricist:string;
-  composer:string;
-  arranger:string;
-}
+  url:string,
+  length:number,
+  lyricist:string,
+  composer:string,
+  arranger:string,
+};
 
 /**
  * Bestdori ( https://bestdori.com )のAPIラッパ
@@ -119,7 +120,7 @@ export abstract class BestdoriApi {
     }
   }
 
-  static getAudioPage(id:number):string {
+  static getAudioPage(id:number):string{
     return "https://bestdori.com/info/songs/" + id;
   }
 
@@ -129,7 +130,7 @@ export abstract class BestdoriApi {
   }
 
   static getThumbnail(id:number, jacketimage:string){
-    return "https://bestdori.com/assets/jp/musicjacket/musicjacket" + (Math.ceil(id / 10) * 10) + "_rip/assets-star-forassetbundle-startapp-musicjacket-musicjacket" + Math.ceil(id / 10) * 10 + "-" + jacketimage + "-jacket.png"
+    return "https://bestdori.com/assets/jp/musicjacket/musicjacket" + (Math.ceil(id / 10) * 10) + "_rip/assets-star-forassetbundle-startapp-musicjacket-musicjacket" + Math.ceil(id / 10) * 10 + "-" + jacketimage + "-jacket.png";
   }
 }
 
@@ -151,87 +152,87 @@ export type SongID = number;
  */
 export type BestdoriAllSongInfo = {
   [key:number]:{
-      tag:"anime"|"normal",
-      bandId:BandID,
-      jacketImage:[string],
-      musicTitle:[string,string,string,string,string],
-      publishedAt:[string,string,string,string,string],
-      closedAt:[string,string,string,string,string],
-      difficulty:{[key in "0"|"1"|"2"|"3"|"4"]:{playLevel:number}}
-  }
-}
+    tag:"anime"|"normal",
+    bandId:BandID,
+    jacketImage:[string],
+    musicTitle:[string, string, string, string, string],
+    publishedAt:[string, string, string, string, string],
+    closedAt:[string, string, string, string, string],
+    difficulty:{[key in "0"|"1"|"2"|"3"|"4"]:{playLevel:number}},
+  },
+};
 export type BestdoriAllBandInfo = {
   [key:number]:{
-      bandName:[string,string,string,string,string]
-  }
-}
+    bandName:[string, string, string, string, string],
+  },
+};
 export interface BestdoriDetailedSongInfo {
-  bgmId:        SongID;
-  bgmFile:      string;
-  tag:          Tag;
-  bandId:       BandID;
+  bgmId: SongID;
+  bgmFile: string;
+  tag: Tag;
+  bandId: BandID;
   achievements: Achievement[];
-  jacketImage:  string[];
-  seq:          number;
-  musicTitle:   Array<null | string>;
-  lyricist:     Array<null | string>;
-  composer:     Array<null | string>;
-  arranger:     Array<null | string>;
-  howToGet:     Array<null | string>;
-  publishedAt:  Array<null | string>;
-  closedAt:     Array<null | string>;
-  difficulty:   { [key: string]: Difficulty };
-  length:       number;
-  notes:        { [key: string]: number };
-  bpm:          { [key: string]: BPM[] };
+  jacketImage: string[];
+  seq: number;
+  musicTitle: (null | string)[];
+  lyricist: (null | string)[];
+  composer: (null | string)[];
+  arranger: (null | string)[];
+  howToGet: (null | string)[];
+  publishedAt: (null | string)[];
+  closedAt: (null | string)[];
+  difficulty: { [key: string]: Difficulty };
+  length: number;
+  notes: { [key: string]: number };
+  bpm: { [key: string]: BPM[] };
 }
 
 export interface Achievement {
-  musicId:         number;
+  musicId: number;
   achievementType: string;
-  rewardType:      RewardType;
-  quantity:        number;
-  rewardId?:       number;
+  rewardType: RewardType;
+  quantity: number;
+  rewardId?: number;
 }
 
 export enum RewardType {
   Coin = "coin",
   PracticeTicket = "practice_ticket",
-  Star = "star",
+  Star = "star"
 }
 
 export interface BPM {
-  bpm:   number;
+  bpm: number;
   start: number;
-  end:   number;
+  end: number;
 }
 
 export interface Difficulty {
-  playLevel:         number;
+  playLevel: number;
   multiLiveScoreMap: { [key: string]: MultiLiveScoreMap };
-  notesQuantity:     number;
-  scoreC:            number;
-  scoreB:            number;
-  scoreA:            number;
-  scoreS:            number;
-  scoreSS:           number;
+  notesQuantity: number;
+  scoreC: number;
+  scoreB: number;
+  scoreA: number;
+  scoreS: number;
+  scoreSS: number;
 }
 
 export interface MultiLiveScoreMap {
-  musicId:                 number;
-  musicDifficulty:         Tag;
-  multiLiveDifficultyId:   number;
-  scoreS:                  number;
-  scoreA:                  number;
-  scoreB:                  number;
-  scoreC:                  number;
+  musicId: number;
+  musicDifficulty: Tag;
+  multiLiveDifficultyId: number;
+  scoreS: number;
+  scoreA: number;
+  scoreB: number;
+  scoreC: number;
   multiLiveDifficultyType: string;
-  scoreSS:                 number;
+  scoreSS: number;
 }
 
 export enum Tag {
   Easy = "easy",
   Expert = "expert",
   Hard = "hard",
-  Normal = "normal",
+  Normal = "normal"
 }

@@ -1,15 +1,19 @@
-import { exec } from "child_process";
-import m3u8stream from "m3u8stream";
-import { PassThrough } from "stream";
-import { Cache, Strategy } from "./base";
 import type { exportableYouTube } from "..";
-import { Util } from "../../../Util";
 import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
+import type { Cache } from "./base";
+
+import { exec } from "child_process";
+import { PassThrough } from "stream";
+
+import m3u8stream from "m3u8stream";
+
+import { Util } from "../../../Util";
+import { Strategy } from "./base";
 
 type youtubeDl = "youtubeDl";
 const youtubeDl:youtubeDl = "youtubeDl";
 
-export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>, YoutubeDlInfo>{
+export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>, YoutubeDlInfo> {
   last:number = 0;
 
   async getInfo(url:string){
@@ -28,7 +32,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
         type: youtubeDl,
         data: info,
       }
-    }
+    };
   }
 
   async fetch(url: string, forceUrl:boolean = false, cache?: Cache<any, any>){
@@ -78,7 +82,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
           type: "readable",
           stream,
         } as ReadableStreamInfo
-      }
+      };
     }else{
       const format = info.formats.filter(f => f.format_note === "tiny");
       if(format.length === 0) throw new Error("no format found!");
@@ -93,7 +97,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
     }
   }
 
-  private debugLog = (content:string) => {
+  private readonly debugLog = (content:string) => {
     if(Util.config.debug){
       this.logger("[YouTube(fallback)]" + content.replace(/\n/g, ""), "debug");
     }
@@ -109,7 +113,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
       channelUrl: info.channel_url,
       thumbnail: info.thumbnail,
       isLive: info.is_live,
-    }
+    };
   }
 
   private execAsync(command:string):Promise<string>{
@@ -141,7 +145,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
     })) as GitHubRelease;
     this.debugLog(`Latest: ${releases.tag_name}`);
     if(ver !== releases.tag_name){
-      this.debugLog(`Start downloading`);
+      this.debugLog("Start downloading");
       await this.execAsync("curl -L -o \"youtube-dl" + (process.platform === "win32" ? ".exe" : "") + "\" " + releases.assets.filter(a => a.name === (process.platform === "win32" ? "youtube-dl.exe" : "youtube-dl"))[0].browser_download_url);
       if(process.platform !== "win32"){
         this.debugLog("Configuring permission");
@@ -167,6 +171,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
       return this.execAsync("." + (process.platform === "win32" ? "\\" : "/") + "youtube-dl --skip-download --print-json \"" + url + "\"");
     }
     catch(e){
+      // eslint-disable-next-line @typescript-eslint/no-throw-literal
       throw "Main library threw an error and fallback library was not found or occurred an error";
     }
   }
@@ -174,99 +179,99 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
 
 // QuickType of youtube-dl json
 export interface YoutubeDlInfo {
-  id:                   string;
-  title:                string;
-  formats:              Format[];
-  thumbnails:           Thumbnail[];
-  description:          string;
-  upload_date:          string;
-  uploader:             string;
-  uploader_id:          string;
-  uploader_url:         string;
-  channel_id:           string;
-  channel_url:          string;
-  duration:             number;
-  view_count:           number;
-  average_rating:       number;
-  age_limit:            number;
-  webpage_url:          string;
-  categories:           string[];
-  tags:                 string[];
-  is_live:              null;
-  automatic_captions:   { [key: string]: any[] };
-  subtitles:            any;
-  like_count:           number;
-  dislike_count:        number;
-  channel:              string;
-  track:                string;
-  artist:               string;
-  album:                string;
-  creator:              string;
-  alt_title:            string;
-  extractor:            string;
+  id: string;
+  title: string;
+  formats: Format[];
+  thumbnails: Thumbnail[];
+  description: string;
+  upload_date: string;
+  uploader: string;
+  uploader_id: string;
+  uploader_url: string;
+  channel_id: string;
+  channel_url: string;
+  duration: number;
+  view_count: number;
+  average_rating: number;
+  age_limit: number;
+  webpage_url: string;
+  categories: string[];
+  tags: string[];
+  is_live: null;
+  automatic_captions: { [key: string]: any[] };
+  subtitles: any;
+  like_count: number;
+  dislike_count: number;
+  channel: string;
+  track: string;
+  artist: string;
+  album: string;
+  creator: string;
+  alt_title: string;
+  extractor: string;
   webpage_url_basename: string;
-  extractor_key:        string;
-  playlist:             null;
-  playlist_index:       null;
-  thumbnail:            string;
-  display_id:           string;
-  requested_subtitles:  null;
-  requested_formats:    Format[];
-  format:               string;
-  format_id:            string;
-  width:                number;
-  height:               number;
-  resolution:           null;
-  fps:                  number;
-  vcodec:               string;
-  vbr:                  number;
-  stretched_ratio:      null;
-  acodec:               Acodec;
-  abr:                  number;
-  ext:                  TempEXT;
-  fulltitle:            string;
-  _filename:            string;
+  extractor_key: string;
+  playlist: null;
+  playlist_index: null;
+  thumbnail: string;
+  display_id: string;
+  requested_subtitles: null;
+  requested_formats: Format[];
+  format: string;
+  format_id: string;
+  width: number;
+  height: number;
+  resolution: null;
+  fps: number;
+  vcodec: string;
+  vbr: number;
+  stretched_ratio: null;
+  acodec: Acodec;
+  abr: number;
+  ext: TempEXT;
+  fulltitle: string;
+  _filename: string;
 }
 
 enum Acodec {
   Mp4A402 = "mp4a.40.2",
   None = "none",
-  Opus = "opus",
+  Opus = "opus"
 }
 
 enum TempEXT {
   M4A = "m4a",
   Mp4 = "mp4",
-  Webm = "webm",
+  Webm = "webm"
 }
 
 interface Format {
-  asr:                 number | null;
-  filesize:            number;
-  format_id:           string;
-  format_note:         string;
-  fps:                 number | null;
-  height:              number | null;
-  quality:             number;
-  tbr:                 number;
-  url:                 string;
-  width:               number | null;
-  ext:                 TempEXT;
-  vcodec:              string;
-  acodec:              Acodec;
-  abr?:                number;
+  asr: number | null;
+  filesize: number;
+  format_id: string;
+  format_note: string;
+  fps: number | null;
+  height: number | null;
+  quality: number;
+  tbr: number;
+  url: string;
+  width: number | null;
+  ext: TempEXT;
+  vcodec: string;
+  acodec: Acodec;
+  abr?: number;
   downloader_options?: DownloaderOptions;
-  container?:          Container;
-  format:              string;
-  protocol:            Protocol;
-  http_headers:        HTTPHeaders;
-  vbr?:                number;
+  container?: Container;
+  format: string;
+  protocol: Protocol;
+  http_headers: HTTPHeaders;
+  vbr?: number;
 }
 
 enum Container {
   M4ADash = "m4a_dash",
   Mp4Dash = "mp4_dash",
-  WebmDash = "webm_dash",
+  WebmDash = "webm_dash"
 }
 
 interface DownloaderOptions {
@@ -274,125 +279,124 @@ interface DownloaderOptions {
 }
 
 interface HTTPHeaders {
-  "User-Agent":      string;
-  "Accept-Charset":  AcceptCharset;
-  Accept:            Accept;
+  "User-Agent": string;
+  "Accept-Charset": AcceptCharset;
+  Accept: Accept;
   "Accept-Encoding": AcceptEncoding;
   "Accept-Language": AcceptLanguage;
 }
 
 enum Accept {
-  TextHTMLApplicationXHTMLXMLApplicationXMLQ09Q08 = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  TextHTMLApplicationXHTMLXMLApplicationXMLQ09Q08 = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
 }
 
 enum AcceptCharset {
-  ISO88591UTF8Q07Q07 = "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+  ISO88591UTF8Q07Q07 = "ISO-8859-1,utf-8;q=0.7,*;q=0.7"
 }
 
 enum AcceptEncoding {
-  GzipDeflate = "gzip, deflate",
+  GzipDeflate = "gzip, deflate"
 }
 
 enum AcceptLanguage {
-  EnUsEnQ05 = "en-us,en;q=0.5",
+  EnUsEnQ05 = "en-us,en;q=0.5"
 }
 
 enum Protocol {
-  HTTPS = "https",
+  HTTPS = "https"
 }
 
 interface Thumbnail {
-  height:     number;
-  url:        string;
-  width:      number;
+  height: number;
+  url: string;
+  width: number;
   resolution: string;
-  id:         string;
+  id: string;
 }
-
 
 // QuickType of GitHub Releases API
 interface GitHubRelease {
-  url:              string;
-  assets_url:       string;
-  upload_url:       string;
-  html_url:         string;
-  id:               number;
-  author:           Author;
-  node_id:          string;
-  tag_name:         string;
+  url: string;
+  assets_url: string;
+  upload_url: string;
+  html_url: string;
+  id: number;
+  author: Author;
+  node_id: string;
+  tag_name: string;
   target_commitish: any;
-  name:             string;
-  draft:            boolean;
-  prerelease:       boolean;
-  created_at:       string;
-  published_at:     string;
-  assets:           Asset[];
-  tarball_url:      string;
-  zipball_url:      string;
-  body:             string;
-  reactions?:       Reactions;
+  name: string;
+  draft: boolean;
+  prerelease: boolean;
+  created_at: string;
+  published_at: string;
+  assets: Asset[];
+  tarball_url: string;
+  zipball_url: string;
+  body: string;
+  reactions?: Reactions;
 }
 
 export interface Asset {
-  url:                  string;
-  id:                   number;
-  node_id:              string;
-  name:                 string;
-  label:                string;
-  uploader:             Author;
-  content_type:         ContentType;
-  state:                State;
-  size:                 number;
-  download_count:       number;
-  created_at:           string;
-  updated_at:           string;
+  url: string;
+  id: number;
+  node_id: string;
+  name: string;
+  label: string;
+  uploader: Author;
+  content_type: ContentType;
+  state: State;
+  size: number;
+  download_count: number;
+  created_at: string;
+  updated_at: string;
   browser_download_url: string;
 }
 
 export enum ContentType {
   ApplicationOctetStream = "application/octet-stream",
   ApplicationPGPSignature = "application/pgp-signature",
-  ApplicationXTar = "application/x-tar",
+  ApplicationXTar = "application/x-tar"
 }
 
 export enum State {
-  Uploaded = "uploaded",
+  Uploaded = "uploaded"
 }
 
 export interface Author {
-  login:               any;
-  id:                  number;
-  node_id:             any;
-  avatar_url:          string;
-  gravatar_id:         string;
-  url:                 string;
-  html_url:            string;
-  followers_url:       string;
-  following_url:       any;
-  gists_url:           any;
-  starred_url:         any;
-  subscriptions_url:   string;
-  organizations_url:   string;
-  repos_url:           string;
-  events_url:          any;
+  login: any;
+  id: number;
+  node_id: any;
+  avatar_url: string;
+  gravatar_id: string;
+  url: string;
+  html_url: string;
+  followers_url: string;
+  following_url: any;
+  gists_url: any;
+  starred_url: any;
+  subscriptions_url: string;
+  organizations_url: string;
+  repos_url: string;
+  events_url: any;
   received_events_url: string;
-  type:                Type;
-  site_admin:          boolean;
+  type: Type;
+  site_admin: boolean;
 }
 
 enum Type {
-  User = "User",
+  User = "User"
 }
 
 interface Reactions {
-  url:         string;
+  url: string;
   total_count: number;
-  "+1":        number;
-  "-1":        number;
-  laugh:       number;
-  hooray:      number;
-  confused:    number;
-  heart:       number;
-  rocket:      number;
-  eyes:        number;
+  "+1": number;
+  "-1": number;
+  laugh: number;
+  hooray: number;
+  confused: number;
+  heart: number;
+  rocket: number;
+  eyes: number;
 }

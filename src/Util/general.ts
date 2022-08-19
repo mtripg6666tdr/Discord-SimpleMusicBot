@@ -52,7 +52,7 @@ export function InitPassThrough():PassThrough{
   const stream = new PassThrough({
     highWaterMark: 1024 * 512
   });
-  stream._destroy = () => { 
+  stream._destroy = () => {
     stream.destroyed = true;
     stream.emit("close", []);
   };

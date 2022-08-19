@@ -1,14 +1,16 @@
-import { EmbedField } from "discord.js";
-import NiconicoDL, { isValidURL } from "niconico-dl.js";
+import type { exportableCustom, ReadableStreamInfo } from ".";
+import type { EmbedField } from "discord.js";
+
 import { convert as htmlToText } from "html-to-text";
-import { exportableCustom, ReadableStreamInfo } from ".";
+import NiconicoDL, { isValidURL } from "niconico-dl.js";
+
 import { Util } from "../Util";
 import { AudioSource } from "./audiosource";
 
 export class NicoNicoS extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "niconico";
-  private nico = null as NiconicoDL
+  private nico = null as NiconicoDL;
   Thumnail = "";
   Author = "";
   Views = 0;
@@ -86,9 +88,9 @@ export class NicoNicoS extends AudioSource {
 }
 
 export type exportableNicoNico = exportableCustom & {
-  title:string;
-  description:string;
-  author:string;
-  thumbnail:string;
-  views:number;
-}
+  title:string,
+  description:string,
+  author:string,
+  thumbnail:string,
+  views:number,
+};

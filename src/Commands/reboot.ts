@@ -1,6 +1,9 @@
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
 import { exec, execSync } from "child_process";
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Reboot extends BaseCommand {
@@ -17,7 +20,7 @@ export default class Reboot extends BaseCommand {
       if(options.rawArgs === ""){
         message.channel.send("再起動を実行します...お待ちください...");
         exec("npm run onlystart");
-        setTimeout(()=> process.exit(0),500);
+        setTimeout(()=> process.exit(0), 500);
       }else if(options.rawArgs === "update"){
         await message.channel.send("アップデートして再起動を実行します。完了まで10分程度要することがあります。");
         await message.channel.send("アップデート中...");
@@ -28,7 +31,7 @@ export default class Reboot extends BaseCommand {
         await message.channel.send("実行結果:\r\n```" + buf.toString() + "\r\n```");
         await message.channel.send("再起動しています...");
         exec("npm run onlystart");
-        setTimeout(()=> process.exit(0),500);
+        setTimeout(()=> process.exit(0), 500);
       }
     }
   }

@@ -1,8 +1,10 @@
 import * as voice from "@discordjs/voice";
+
 import { EventEmitter } from "stream";
+
 import { Util } from "../Util";
 
-class NullMetaAudioResource extends voice.AudioResource<null> {};
+class NullMetaAudioResource extends voice.AudioResource<null> {}
 
 const SILENCE_FRAME = Buffer.from([0xf8, 0xff, 0xfe]);
 
@@ -28,34 +30,34 @@ export class FixedAudioResource extends NullMetaAudioResource {
         this.events.emit("end");
         Util.logger.log(`[AudioResource]Pushed total ${this.readLength} bytes${this.estimatedLengthSeconds !== 0 ? ` (average ${Math.round(this.readLength / this.estimatedLengthSeconds * 8 / 100) / 10} kbps)` : ""}`);
       })
-      ;
+    ;
   }
 
-  private get isStreamReadable() {
-    return !(this.playStream.readableEnded || this.playStream.destroyed || this.error)
+  private get isStreamReadable(){
+    return !(this.playStream.readableEnded || this.playStream.destroyed || this.error);
   }
 
   public get readable(){
-    if (this.silenceRemaining === 0) return false;
+    if(this.silenceRemaining === 0) return false;
     const real = this.isStreamReadable;
-    if (!real) {
-      if (this.silenceRemaining === -1) this.silenceRemaining = this.silencePaddingFrames;
+    if(!real){
+      if(this.silenceRemaining === -1) this.silenceRemaining = this.silencePaddingFrames;
       return this.silenceRemaining !== 0;
     }
     return real;
   }
 
-  public get ended() {
+  public get ended(){
     return !this.isStreamReadable && this.silenceRemaining === 0;
   }
 
-  public read(): Buffer | null {
-    if (this.silenceRemaining === 0) {
+  public read(): Buffer | null{
+    if(this.silenceRemaining === 0){
       return null;
-    } else if (this.silenceRemaining > 0) {
-      if (this.isStreamReadable){
+    }else if(this.silenceRemaining > 0){
+      if(this.isStreamReadable){
         this.silenceRemaining = -1;
-      } else {
+      }else{
         this.silenceRemaining--;
         return SILENCE_FRAME;
       }
@@ -64,7 +66,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
       return SILENCE_FRAME;
     }
     const packet: Buffer | null = this.playStream.read();
-    if (packet) {
+    if(packet){
       this.playbackDuration += 20;
       this.readLength += packet.length || 0;
     }
@@ -88,26 +90,32 @@ class AudioResourceEvent extends EventEmitter {
     super.on(event, callback);
     return this;
   }
-  off<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any) {
+
+  off<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
     super.off(event, callback);
     return this;
   }
-  once<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any) {
+
+  once<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
     super.once(event, callback);
     return this;
   }
-  addListener<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any) {
+
+  addListener<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
     super.addListener(event, callback);
     return this;
   }
-  removeListener<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any) {
+
+  removeListener<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
     super.removeListener(event, callback);
     return this;
   }
-  removeAllListeners<T extends keyof EventKeys>(event:T) {
+
+  removeAllListeners<T extends keyof EventKeys>(event:T){
     super.removeAllListeners(event);
     return this;
   }
+
   emit<T extends keyof EventKeys>(event:T, ...args:EventKeys[T]){
     return super.emit(event, args);
   }

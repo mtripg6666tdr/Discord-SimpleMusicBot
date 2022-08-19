@@ -1,7 +1,12 @@
-import { MessageActionRow, MessageEmbed, MessageSelectMenu, MessageSelectOptionData } from "discord.js";
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+import type { MessageSelectOptionData } from "discord.js";
+
+import { MessageActionRow, MessageEmbed, MessageSelectMenu } from "discord.js";
+
 import * as ytpl from "ytpl";
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
 
@@ -62,7 +67,7 @@ export default class News extends BaseCommand {
         .setColor(getColor("SEARCH"))
         .setFooter({
           iconURL: message.author.avatarURL(),
-          text:"ニュースのタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
+          text: "ニュースのタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
         })
       ;
       await reply.edit({
@@ -70,17 +75,17 @@ export default class News extends BaseCommand {
         embeds: [embed],
         components: [
           new MessageActionRow()
-          .addComponents(
-            new MessageSelectMenu()
-            .setCustomId("search")
-            .setPlaceholder("数字を送信するか、ここから選択...")
-            .setMinValues(1)
-            .setMaxValues(result.length)
-            .addOptions([...selectOpts, {
-              label: "キャンセル",
-              value: "cancel"
-            }])
-          )
+            .addComponents(
+              new MessageSelectMenu()
+                .setCustomId("search")
+                .setPlaceholder("数字を送信するか、ここから選択...")
+                .setMinValues(1)
+                .setMaxValues(result.length)
+                .addOptions([...selectOpts, {
+                  label: "キャンセル",
+                  value: "cancel"
+                }])
+            )
         ]
       });
     }

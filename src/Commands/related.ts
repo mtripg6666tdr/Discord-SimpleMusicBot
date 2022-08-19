@@ -1,8 +1,11 @@
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
 import * as discord from "discord.js";
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/color";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
+import { getColor } from "../Util/color";
 
 export default class Related extends BaseCommand {
   constructor(){
@@ -25,8 +28,8 @@ export default class Related extends BaseCommand {
       const embed = new discord.MessageEmbed()
         .setTitle("⭕関連曲自動再生をオンにしました")
         .setDescription("YouTubeからの楽曲再生終了時に、関連曲をキューの末尾に自動追加する機能です。\r\n※YouTube以外のソースからの再生時、ループ有効時には追加されません")
-        .setColor(getColor("RELATIVE_SETUP"))
-      message.reply({embeds:[embed]});
+        .setColor(getColor("RELATIVE_SETUP"));
+      message.reply({embeds: [embed]});
     }
   }
 }

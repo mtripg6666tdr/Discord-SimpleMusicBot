@@ -1,6 +1,8 @@
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
 import type * as ytsr from "ytsr";
-import type { CommandMessage } from "../Component/CommandMessage"
-import { CommandArgs, BaseCommand } from ".";
+
+import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
 import { Util } from "../Util";
 
@@ -25,7 +27,7 @@ export default class Play extends BaseCommand {
     options.updateBoundChannel(message);
     const server = options.data[message.guild.id];
     // キューが空だし引数もないし添付ファイルもない
-    if(server.Queue.length == 0 && options.rawArgs == "" && message.attachments.size === 0) {
+    if(server.Queue.length === 0 && options.rawArgs === "" && message.attachments.size === 0){
       await message.reply("再生するコンテンツがありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -35,9 +37,9 @@ export default class Play extends BaseCommand {
     // 一時停止されてるね
     if(options.rawArgs === "" && server.Player.IsPaused){
       server.Player.Resume();
-      await message.reply(":arrow_forward: 再生を再開します。").catch(e => Util.logger.log(e, "error"))
+      await message.reply(":arrow_forward: 再生を再開します。").catch(e => Util.logger.log(e, "error"));
       return;
-    }    
+    }
     // 引数ついてたらそれ優先
     if(options.rawArgs !== ""){
       if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){

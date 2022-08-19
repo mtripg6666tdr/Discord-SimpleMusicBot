@@ -1,13 +1,15 @@
 import type { exportableYouTube } from "..";
+import type { LoggerType } from "../../../Util";
 import type { StreamInfo } from "../../audiosource";
-import { LoggerType, Util } from "../../../Util";
+
+import { Util } from "../../../Util";
 
 export type Cache<T extends string, U> = {
   type:T,
   data:U,
 };
 
-export abstract class Strategy<T extends Cache<any, U>, U>{
+export abstract class Strategy<T extends Cache<any, U>, U> {
   public logger: LoggerType;
 
   constructor(protected priority:number){

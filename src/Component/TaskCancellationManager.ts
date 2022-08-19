@@ -4,7 +4,7 @@
 export class TaskCancellationManager {
   private _cancelled = false;
   private _message = "";
-  private _guildid = "";
+  private readonly _guildid = "" as string;
   constructor(guildid:string){
     this._guildid = guildid;
   }

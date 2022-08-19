@@ -1,5 +1,7 @@
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
 import { getCurrentEffectPanel } from "../Util/effect";
 
@@ -24,8 +26,8 @@ export default class Effect extends BaseCommand {
         components: [messageActions]
       });
       setTimeout(() => {
-        reply.edit({components:[]});
-      }, 5 * 60 * 1000)
+        reply.edit({components: []});
+      }, 5 * 60 * 1000);
     }
     catch(e){
       Util.logger.log(JSON.stringify(e), "error");

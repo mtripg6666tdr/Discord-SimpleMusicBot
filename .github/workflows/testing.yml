@@ -34,6 +34,9 @@ jobs:
       - name: List dependencies
         run: npm list --all
         continue-on-error: true
+
+      - name: Lint
+        run: npm run lint -- --max-warnings 0
       
       - name: Compile TypeScript
         run: npm run build

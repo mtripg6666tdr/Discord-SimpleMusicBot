@@ -1,5 +1,7 @@
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class OnceLoop extends BaseCommand {
@@ -10,7 +12,7 @@ export default class OnceLoop extends BaseCommand {
       description: "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
       unlist: false,
       category: "player",
-    })
+    });
   }
 
   async run(message:CommandMessage, options:CommandArgs){

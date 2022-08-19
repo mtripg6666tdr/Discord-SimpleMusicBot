@@ -1,5 +1,7 @@
-import { CommandArgs, BaseCommand, SlashCommandArgument } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Rm extends BaseCommand {
@@ -23,11 +25,11 @@ export default class Rm extends BaseCommand {
 
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(options.args.length == 0){
+    if(options.args.length === 0){
       message.reply("引数に消去する曲のオフセット(番号)を入力してください。").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    if(options.args.indexOf("0") >= 0 && options.data[message.guild.id].Player.IsPlaying) {
+    if(options.args.includes("0") && options.data[message.guild.id].Player.IsPlaying){
       message.reply("現在再生中の楽曲を削除することはできません。");
       return;
     }
@@ -38,7 +40,7 @@ export default class Rm extends BaseCommand {
       if(match){
         const from = Number(match.groups.from);
         const to = Number(match.groups.to);
-        if(!isNaN(from) && !isNaN(to) && from<=to){
+        if(!isNaN(from) && !isNaN(to) && from <= to){
           for(let i = from; i <= to; i++){
             addition.push(i);
           }
@@ -65,15 +67,16 @@ export default class Rm extends BaseCommand {
         }
       }
     });
-    let indexes = options.args.concat(addition.map(n => n.toString()));
+    const indexes = options.args.concat(addition.map(n => n.toString()));
     const dels = Array.from(new Set(
-      indexes.map(str => Number(str)).filter(n => !isNaN(n)).sort((a,b)=>b-a)
+      indexes.map(str => Number(str)).filter(n => !isNaN(n))
+        .sort((a, b)=>b - a)
     ));
     const title = dels.length === 1 ? q.get(dels[0]).BasicInfo.Title : null;
     for(let i = 0; i < dels.length; i++){
       q.RemoveAt(Number(dels[i]));
     }
-    const resultStr = dels.sort((a,b)=>a-b).join(",");
+    const resultStr = dels.sort((a, b)=>a - b).join(",");
     message.reply("🚮" + (resultStr.length > 100 ? "指定された" : resultStr + "番目の") + "曲" + (title ? ("(`" + title + "`)") : "") + "を削除しました").catch(e => Util.logger.log(e, "error"));
   }
 }

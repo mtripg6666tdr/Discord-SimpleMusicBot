@@ -34,7 +34,7 @@ categoriesList.forEach(category => {
   addLine(`- [${categories[category]}](#${categories[category]})`);
 })
 /**
- * @type { {[key in keyof typeof categories]:import("../src/Commands").CommandInterface[]} }
+ * @type { {[key in keyof typeof categories]:import("../src/Commands").CommandInterface[] } }
  */
 // @ts-ignore
 const categorized = {};

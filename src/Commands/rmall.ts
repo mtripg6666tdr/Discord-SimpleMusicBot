@@ -1,5 +1,7 @@
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Rmall extends BaseCommand {
@@ -23,6 +25,6 @@ export default class Rmall extends BaseCommand {
     }
     options.data[message.guild.id].Player.Disconnect();
     options.data[message.guild.id].Queue.RemoveAll();
-    message.reply("✅すべて削除しました").catch(e => Util.logger.log(e, "error"))
+    message.reply("✅すべて削除しました").catch(e => Util.logger.log(e, "error"));
   }
 }

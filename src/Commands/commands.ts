@@ -1,6 +1,9 @@
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
 import * as discord from "discord.js";
-import { CommandsManager, CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
+
+import { CommandsManager, BaseCommand } from ".";
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/color";
 
@@ -12,7 +15,7 @@ export const categories = {
   "bot": "ボット操作全般"
 };
 export const categoriesList = ["voice", "player", "playlist", "utility", "bot"];
-export default class Commands extends BaseCommand{
+export default class Commands extends BaseCommand {
   constructor(){
     super({
       unlist: false,
@@ -32,7 +35,7 @@ export default class Commands extends BaseCommand{
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(options.rawArgs == ""){
+    if(options.rawArgs === ""){
       // 引数がない場合は全コマンドの一覧を表示
       const embed = [] as discord.MessageEmbed[];
       const getCategoryText = (label:string)=>{
@@ -53,32 +56,32 @@ export default class Commands extends BaseCommand{
       for(let i = 0; i < categoriesList.length; i++){
         embed.push(
           new discord.MessageEmbed()
-          .setTitle(getCategoryText(categoriesList[i]))
-          .addFields(commands[categoriesList[i]].map(ci => ({
-            name: ci.name + ", " + ci.alias.join(", "),
-            value: ci.description,
-            inline: true
-          } as discord.EmbedField)))
+            .setTitle(getCategoryText(categoriesList[i]))
+            .addFields(commands[categoriesList[i]].map(ci => ({
+              name: ci.name + ", " + ci.alias.join(", "),
+              value: ci.description,
+              inline: true
+            } as discord.EmbedField)))
         );
       }
       for(let i = 0; i < embed.length; i++){
         embed[i].setTitle("コマンド一覧(" + embed[i].title + ")");
-        embed[i].setDescription("コマンドの一覧です。\r\n`" + (i+1) + "ページ目(" + embed.length + "ページ中)`\r\nコマンドプレフィックスは、`" + options.data[message.guild.id].PersistentPref.Prefix + "`です。\r\n`!コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。");
+        embed[i].setDescription("コマンドの一覧です。\r\n`" + (i + 1) + "ページ目(" + embed.length + "ページ中)`\r\nコマンドプレフィックスは、`" + options.data[message.guild.id].PersistentPref.Prefix + "`です。\r\n`!コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。");
         embed[i].setColor(getColor("COMMAND"));
       }
-      const msg = await message.reply({embeds:[embed[0]]});
+      const msg = await message.reply({embeds: [embed[0]]});
       const toggle = await PageToggle.init(msg, embed);
       options.EmbedPageToggle.push(toggle);
     }else{
       const ci = CommandsManager.Instance.resolve(options.rawArgs);
       if(ci && !ci.unlist){
         const prefix = options.data[message.guild.id] ? options.data[message.guild.id].PersistentPref.Prefix : ">";
-        const embed = 
-          new discord.MessageEmbed()
-          .setTitle("コマンド `" + ci.name + "` の詳細")
-          .setDescription(ci.description)
-          .setColor(getColor("COMMAND"))
-          .addField("エイリアス", "`" + ci.alias.join("`, `") + "`")
+        const embed
+          = new discord.MessageEmbed()
+            .setTitle("コマンド `" + ci.name + "` の詳細")
+            .setDescription(ci.description)
+            .setColor(getColor("COMMAND"))
+            .addField("エイリアス", "`" + ci.alias.join("`, `") + "`")
         ;
         if(ci.usage){
           embed.addField("使い方", "`" + prefix + ci.usage + "` \r\n`<>` 内の引数は必須の引数、`[]`内の引数は任意の引数です。");
@@ -86,7 +89,7 @@ export default class Commands extends BaseCommand{
         if(ci.examples){
           embed.addField("使用例", "`" + prefix + ci.examples + "`");
         }
-        await message.reply({embeds:[embed]});
+        await message.reply({embeds: [embed]});
       }else{
         await message.reply(":face_with_raised_eyebrow: コマンドが見つかりませんでした");
       }
