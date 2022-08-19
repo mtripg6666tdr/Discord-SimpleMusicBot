@@ -93,7 +93,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>
 
   private debugLog = (content:string) => {
     if(Util.config.debug){
-      this.logger("[YouTube(fallback)]" + content.replace(/\n/g, ""));
+      this.logger("[YouTube(fallback)]" + content.replace(/\n/g, ""), "debug");
     }
   };
 

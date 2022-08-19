@@ -3,7 +3,8 @@ import * as path from "path";
 import { isMainThread } from "worker_threads";
 import * as config from "./config";
 
-export type LoggerType = (content:string, level?:"log"|"warn"|"error")=>void;
+type LogLevels = "log"|"warn"|"error"|"debug";
+export type LoggerType = (content:string, level?:LogLevels)=>void;
 
 class LogStore{
   private readonly loggingStream = null as fs.WriteStream;
@@ -29,25 +30,32 @@ class LogStore{
   maxLength = 30;
   data:string[] = [];
   
-  addLog(log:string){
-    this.data.push(log);
-    if(this.data.length > this.maxLength){
-      this.data.shift();
+  addLog(level:LogLevels, log:string){
+    if(level !== "debug"){
+      this.data.push(`${level[0].toUpperCase()}:${log}`);
+      if(this.data.length > this.maxLength){
+        this.data.shift();
+      }
     }
     if(this.loggingStream && !this.loggingStream.destroyed){
-      this.loggingStream.write(Buffer.from(log + "\r\n"));
+      this.loggingStream.write(Buffer.from(`${{
+        "log": "INFO ",
+        "warn": "WARN ",
+        "error": "ERROR",
+        "debug": "DEBUG",
+      }[level]} ${new Date().toISOString()} ${log}`));
     }
   }
 }
 
 export const logStore = new LogStore();
 
-export function log(content:string, level:"log"|"warn"|"error" = "log"){
+export function log(content:string, level:LogLevels = "log"){
   if(!logStore.log && level === "log") return;
   if(content.length < 200){
     console[level](content);
   }else{
     console.warn("[Logger] truncated because content was too big; see logs directory to get complete logs (if not exists, make sure debug is set true in config.json)");
   }
-  logStore.addLog(level[0].toUpperCase() + ":" + content);
+  logStore.addLog(level, content);
 }
