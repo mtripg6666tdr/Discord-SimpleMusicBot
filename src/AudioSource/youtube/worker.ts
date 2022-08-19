@@ -1,7 +1,10 @@
 import type { workerErrorMessage, workerMessage, workerInitSuccessMessage, workerSearchSuccessMessage, workerLoggingMessage } from "./spawner";
+
 import { parentPort } from "worker_threads";
-import { YouTube } from ".";
+
 import * as ytsr from "ytsr";
+
+import { YouTube } from ".";
 // DO NOT import unnecessary module preventing from infinite spawned workers.
 
 type WithId<T> = T & {id:number};
@@ -26,7 +29,8 @@ parentPort.on("message", (value) => {
         data,
         id,
       } as WithId<workerInitSuccessMessage>);
-    }).catch((er) => {
+    })
+.catch((er) => {
       parentPort.postMessage({
         type: "error",
         data: er,
@@ -36,7 +40,7 @@ parentPort.on("message", (value) => {
   }else if(data && data.type === "search"){
     const id = data.id;
     ytsr.default(data.keyword, {
-      limit:12,
+      limit: 12,
       gl: "JP",
       hl: "ja"
     }).then((result) => {
@@ -45,7 +49,8 @@ parentPort.on("message", (value) => {
         data: result,
         id
       } as WithId<workerSearchSuccessMessage>);
-    }).catch((er) => {
+    })
+.catch((er) => {
       parentPort.postMessage({
         type: "error",
         data: er,
@@ -53,4 +58,4 @@ parentPort.on("message", (value) => {
       } as WithId<workerErrorMessage>);
     });
   }
-})
+});

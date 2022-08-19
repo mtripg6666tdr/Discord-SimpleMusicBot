@@ -1,7 +1,8 @@
-import { Client, Interaction, Message } from "discord.js";
-import { EventEmitter } from "stream";
+import type { Client, Interaction, Message } from "discord.js";
+
 import * as fs from "fs";
 import * as path from "path";
+import { EventEmitter } from "stream";
 
 interface EventKeys {
   ready: [client:Client<true>];
@@ -9,31 +10,37 @@ interface EventKeys {
   interactionCreate: [interaction: Interaction];
 }
 
-export class addOn extends EventEmitter {  
+export class addOn extends EventEmitter {
   on<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any):this{
     super.on(event, callback);
     return this;
   }
-  off<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any) {
+
+  off<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
     super.off(event, callback);
     return this;
   }
-  once<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any) {
+
+  once<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
     super.once(event, callback);
     return this;
   }
-  addListener<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any) {
+
+  addListener<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
     super.addListener(event, callback);
     return this;
   }
-  removeListener<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any) {
+
+  removeListener<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
     super.removeListener(event, callback);
     return this;
   }
-  removeAllListeners<T extends keyof EventKeys>(event:T) {
+
+  removeAllListeners<T extends keyof EventKeys>(event:T){
     super.removeAllListeners(event);
     return this;
   }
+
   emit<T extends keyof EventKeys>(event:T, ...args:EventKeys[T]){
     return super.emit(event, args);
   }
@@ -46,7 +53,7 @@ export class addOn extends EventEmitter {
       .map(d => require("../../addon/" + d.name.slice(0, -3)))
       .filter(d => typeof d === "function")
       .forEach(d => {
-        try {
+        try{
           d(this);
         }
         catch{}

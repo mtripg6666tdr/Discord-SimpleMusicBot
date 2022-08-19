@@ -1,4 +1,5 @@
 import * as ytdl from "ytdl-core";
+
 import { Util } from "../../Util";
 
 export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoFormat, options:ytdl.downloadOptions, chunkSize:number = 512 * 1024){
@@ -9,7 +10,7 @@ export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoForm
     ytdl.downloadFromInfo(info, {format, ...options})
       .on("error", er => stream.emit("error", er))
       .pipe(stream);
-    Util.logger.log("[AudioSource:youtube]Stream was created as single stream")
+    Util.logger.log("[AudioSource:youtube]Stream was created as single stream");
   }else{
     const pipeNextStream = () => {
       current++;

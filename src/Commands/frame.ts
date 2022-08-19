@@ -1,10 +1,13 @@
+import type { CommandArgs} from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
 import { MessageAttachment } from "discord.js";
 import { FFmpeg } from "prism-media";
 import * as ytdl from "ytdl-core";
-import { CommandArgs, BaseCommand } from ".";
-import type { CommandMessage } from "../Component/CommandMessage"
-import { FFmpegDefaultArgs } from "../definition";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
+import { FFmpegDefaultArgs } from "../definition";
 
 export default class Frame extends BaseCommand {
   constructor(){
@@ -39,13 +42,11 @@ export default class Frame extends BaseCommand {
       return;
     }
     const time = (function(rawTime){
-      if(rawTime === "" || vinfo.LiveStream) 
-        return server.Player.CurrentTime / 1000;
-      else if(rawTime.match(/^(\d+:)*\d+(\.\d+)?$/))
-        return rawTime.split(":").map(n => Number(n)).reduce((prev,current) => prev * 60 + current);
-      else
-        return NaN;
-    })(options.rawArgs);
+      if(rawTime === "" || vinfo.LiveStream) return server.Player.CurrentTime / 1000;
+      else if(rawTime.match(/^(\d+:)*\d+(\.\d+)?$/)) return rawTime.split(":").map(n => Number(n))
+.reduce((prev, current) => prev * 60 + current);
+      else return NaN;
+    }(options.rawArgs));
     if(options.rawArgs !== "" && vinfo.LiveStream){
       await message.channel.send("ライブストリームでは時間指定できません");
       return;

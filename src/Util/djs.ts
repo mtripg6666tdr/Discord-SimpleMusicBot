@@ -9,7 +9,7 @@ import type { TextChannel, GuildMember } from "discord.js";
 export async function CheckSendable(channel:TextChannel, user:GuildMember){
   try{
     const permissions = ((await channel.fetch()) as TextChannel).permissionsFor(user);
-    return permissions.has("SEND_MESSAGES") 
+    return permissions.has("SEND_MESSAGES")
       && permissions.has("EMBED_LINKS")
       && permissions.has("MANAGE_MESSAGES")
       && permissions.has("ATTACH_FILES")

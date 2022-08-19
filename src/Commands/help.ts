@@ -1,8 +1,11 @@
+import type { CommandArgs} from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
 import * as discord from "discord.js";
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/color";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
+import { getColor } from "../Util/color";
 
 export default class Help extends BaseCommand {
   constructor(){
@@ -24,9 +27,9 @@ export default class Help extends BaseCommand {
       + "利用可能なコマンドを確認するには、`" + options.data[message.guild.id].PersistentPref.Prefix + "command`を使用してください。")
       .addField("開発者", `[${(developer || {}).username ?? "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`)
       .addField("バージョン", "`" + options.bot.Version + "`")
-      .addField("レポジトリ/ソースコード","https://github.com/mtripg6666tdr/Discord-SimpleMusicBot")
+      .addField("レポジトリ/ソースコード", "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot")
       .addField("サポートサーバー", "https://discord.gg/7DrAEXBMHe")
-      .addField("現在対応している再生ソース", 
+      .addField("現在対応している再生ソース",
         "・YouTube(キーワード検索)\r\n"
       + "・YouTube(動画URL指定)\r\n"
       + "・YouTube(プレイリストURL指定)\r\n"
@@ -39,6 +42,6 @@ export default class Help extends BaseCommand {
       + "・オーディオファイルへの直URL"
       )
       .setColor(getColor("HELP"));
-    message.reply({embeds:[embed]}).catch(e => Util.logger.log(e, "error"));
+    message.reply({embeds: [embed]}).catch(e => Util.logger.log(e, "error"));
   }
 }

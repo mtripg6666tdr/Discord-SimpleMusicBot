@@ -1,10 +1,14 @@
+import type { CommandArgs} from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+import type * as ytsr from "ytsr";
+
 import * as discord from "discord.js";
-import * as ytsr from "ytsr";
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/color";
-import { Util } from "../Util";
+
+
+import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
+import { Util } from "../Util";
+import { getColor } from "../Util/color";
 
 export default class Search extends BaseCommand {
   constructor(){
@@ -91,12 +95,12 @@ export default class Search extends BaseCommand {
           .setDescription(desc)
           .setFooter({
             iconURL: message.author.avatarURL(),
-            text:"動画のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
+            text: "動画のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
           })
         ;
         await msg.edit({
-          content: null, 
-          embeds:[embed],
+          content: null,
+          embeds: [embed],
           components: [
             new discord.MessageActionRow()
             .addComponents(

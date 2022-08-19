@@ -1,11 +1,16 @@
+import type { CommandArgs} from ".";
+import type { SoundCloudTrackCollection } from "../AudioSource";
+import type { CommandMessage } from "../Component/CommandMessage";
+import type { SoundcloudTrackV2 } from "soundcloud.ts";
+
 import * as discord from "discord.js";
-import Soundcloud, { SoundcloudTrackV2 } from "soundcloud.ts";
-import { CommandArgs, BaseCommand } from ".";
-import { SoundCloudTrackCollection } from "../AudioSource";
-import { CommandMessage } from "../Component/CommandMessage";
-import { DefaultUserAgent } from "../definition";
-import { getColor } from "../Util/color";
+import Soundcloud from "soundcloud.ts";
+
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
+import { getColor } from "../Util/color";
+import { DefaultUserAgent } from "../definition";
 
 export default class Searchs extends BaseCommand {
   constructor(){
@@ -34,7 +39,7 @@ export default class Searchs extends BaseCommand {
       return;
     }
     if(options.rawArgs !== ""){
-      let msg = null as discord.Message;
+      const msg = null as discord.Message;
       let desc = "";
       try{
         options.data[message.guild.id].SearchPanel = {} as any;
@@ -54,16 +59,16 @@ export default class Searchs extends BaseCommand {
         if(options.rawArgs.match(/^https:\/\/soundcloud.com\/[^\/]+$/)){
           // ユーザーの楽曲検索
           const user = (await soundcloud.users.getV2(options.rawArgs));
-          options.rawArgs = user.username
+          options.rawArgs = user.username;
           let nextUrl = "";
-          let rawResult = (await soundcloud.api.getV2("users/" + user.id+ "/tracks") as SoundCloudTrackCollection);
+          let rawResult = (await soundcloud.api.getV2("users/" + user.id + "/tracks") as SoundCloudTrackCollection);
           result.push(...rawResult.collection);
           nextUrl = rawResult.next_href + "&client_id=" + await soundcloud.api.getClientID();
           while(nextUrl && result.length < 10){
             const data = await Util.web.DownloadText(nextUrl, {
               "User-Agent": DefaultUserAgent
             });
-            rawResult = JSON.parse(data) as SoundCloudTrackCollection
+            rawResult = JSON.parse(data) as SoundCloudTrackCollection;
             result.push(...rawResult.collection);
             nextUrl = rawResult.next_href ? rawResult.next_href + "&client_id=" + await soundcloud.api.getClientID() : rawResult.next_href;
           }
@@ -74,11 +79,11 @@ export default class Searchs extends BaseCommand {
         if(result.length > 12) result = result.splice(0, 11);
         const embed = new discord.MessageEmbed();
         embed.setColor(getColor("SEARCH"));
-        embed.title = "\"" + options.rawArgs + "\"の検索結果✨"
+        embed.title = "\"" + options.rawArgs + "\"の検索結果✨";
         let index = 1;
-        let selectOpts = [] as discord.MessageSelectOptionData[];
+        const selectOpts = [] as discord.MessageSelectOptionData[];
         for(let i = 0; i < result.length; i++){
-          const [min,sec] = Util.time.CalcMinSec(Math.floor(result[i].duration / 1000));
+          const [min, sec] = Util.time.CalcMinSec(Math.floor(result[i].duration / 1000));
           desc += "`" + index + ".` [" + result[i].title + "](" + result[i].permalink_url + ") " + min + ":" + sec + " - [" + result[i].user.username + "](" + result[i].user.permalink_url + ") \r\n\r\n";
           options.data[message.guild.id].SearchPanel.Opts[index] = {
             url: result[i].permalink_url,
@@ -101,11 +106,11 @@ export default class Searchs extends BaseCommand {
         embed.description = desc;
         embed.footer = {
           iconURL: message.author.avatarURL(),
-          text:"楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
+          text: "楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
         };
         await msg.edit({
-          content: null, 
-          embeds:[embed],
+          content: null,
+          embeds: [embed],
           components: [
             new discord.MessageActionRow()
             .addComponents(

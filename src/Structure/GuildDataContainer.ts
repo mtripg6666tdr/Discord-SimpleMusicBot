@@ -1,13 +1,14 @@
-import type { Client } from "discord.js";
 import type { MusicBot } from "../bot";
 import type { SearchPanel } from "./SearchPanel";
+import type { Client } from "discord.js";
+
 import { PlayManager } from "../Component/PlayManager";
 import { QueueManager } from "../Component/QueueManager";
 
 /**
  * サーバーごとデータを保存するコンテナ
  */
-export class GuildDataContainer{
+export class GuildDataContainer {
   /**
    * 永続的設定を保存するコンテナ
    */
@@ -70,11 +71,11 @@ export class GuildDataContainer{
 }
 
 type PersistentPref = {
-  Prefix:string;
-}
+  Prefix:string,
+};
 
 type AudioEffect = {
-  BassBoost:boolean;
-  Reverb:boolean;
-  LoudnessEqualization:boolean;
-}
+  BassBoost:boolean,
+  Reverb:boolean,
+  LoudnessEqualization:boolean,
+};

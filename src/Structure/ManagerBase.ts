@@ -1,4 +1,5 @@
 import type { GuildDataContainer } from "./GuildDataContainer";
+
 import { LogEmitter } from "../Structure";
 
 /**

@@ -1,4 +1,5 @@
 import { CommandMessage as LibCommandMessage } from "djs-command-resolver";
+
 import { Util } from "../Util";
 
 export class CommandMessage extends LibCommandMessage {

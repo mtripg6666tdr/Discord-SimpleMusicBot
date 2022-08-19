@@ -1,9 +1,12 @@
+import type { CommandArgs} from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
 import * as discord from "discord.js";
-import { CommandArgs, BaseCommand } from ".";
+
+import { BaseCommand } from ".";
 import { bestdori, BestdoriApi } from "../AudioSource";
-import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/color";
 import { Util } from "../Util";
+import { getColor } from "../Util/color";
 
 export default class Searchb extends BaseCommand {
   constructor(){
@@ -22,7 +25,7 @@ export default class Searchb extends BaseCommand {
       return;
     }
     if(options.rawArgs !== ""){
-      let msg = null as discord.Message;
+      const msg = null as discord.Message;
       let desc = "※最大20件まで表示されます\r\n\r\n";
       try{
         options.data[message.guild.id].SearchPanel = {} as any;
@@ -42,13 +45,13 @@ export default class Searchb extends BaseCommand {
         const keys = Object.keys(bestdori.allsonginfo);
         const result = keys.filter(k => {
           const info = bestdori.allsonginfo[Number(k)];
-          return (info.musicTitle[0] + bestdori.allbandinfo[info.bandId].bandName[0]).toLowerCase().indexOf(options.rawArgs.toLowerCase()) >= 0
+          return (info.musicTitle[0] + bestdori.allbandinfo[info.bandId].bandName[0]).toLowerCase().includes(options.rawArgs.toLowerCase());
         });
         const embed = new discord.MessageEmbed();
         embed.setColor(getColor("SEARCH"));
-        embed.title = "\"" + options.rawArgs + "\"の検索結果✨"
+        embed.title = "\"" + options.rawArgs + "\"の検索結果✨";
         let index = 1;
-        let selectOpts = [] as discord.MessageSelectOptionData[];
+        const selectOpts = [] as discord.MessageSelectOptionData[];
         for(let i = 0; i < result.length; i++){
           const title = bestdori.allsonginfo[Number(result[i])].musicTitle[0];
           desc += "`" + index + ".` [" + bestdori.allsonginfo[Number(result[i])].musicTitle[0] + "](" + BestdoriApi.getAudioPage(Number(result[i])) + ") - `" + bestdori.allbandinfo[bestdori.allsonginfo[Number(result[i])].bandId].bandName[0] + "` \r\n\r\n";
@@ -64,7 +67,7 @@ export default class Searchb extends BaseCommand {
             value: index.toString()
           });
           index++;
-          if(index>=21){
+          if(index >= 21){
             break;
           }
         }
@@ -76,10 +79,10 @@ export default class Searchb extends BaseCommand {
         embed.description = desc;
         embed.footer = {
           iconURL: message.author.avatarURL(),
-          text:"楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
+          text: "楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
         };
         await msg.edit({
-          embeds:[embed],
+          embeds: [embed],
           components: [
             new discord.MessageActionRow()
             .addComponents(

@@ -15,9 +15,9 @@ import * as time from "./time";
 import * as ua from "./ua";
 import * as web from "./web";
 export const Util = {
-  addOn, 
+  addOn,
   color,
-  config, 
+  config,
   db,
   djs,
   effects,
@@ -31,6 +31,6 @@ export const Util = {
   time,
   ua,
   web,
-}
+};
 export default Util;
 export type LoggerType = logger.LoggerType;

@@ -1,9 +1,10 @@
-import type { EmbedField } from "discord.js";
+import type { UrlStreamInfo } from ".";
 import type { exportableCustom } from "./custom";
+import type { EmbedField } from "discord.js";
+
+import { Util } from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { AudioSource } from "./audiosource";
-import { UrlStreamInfo } from ".";
-import { Util } from "../Util";
 
 export class GoogleDrive extends AudioSource {
   protected _lengthSeconds = 0;
@@ -36,7 +37,7 @@ export class GoogleDrive extends AudioSource {
     }] as EmbedField[];
   }
 
-  npAdditional(){return ""};
+  npAdditional(){return "";}
 
   exportData():exportableCustom{
     return {

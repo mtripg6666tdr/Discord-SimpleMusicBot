@@ -1,17 +1,18 @@
 import * as fs from "fs";
 import * as path from "path";
 import { isMainThread } from "worker_threads";
+
 import * as config from "./config";
 
 type LogLevels = "log"|"warn"|"error"|"debug";
 export type LoggerType = (content:string, level?:LogLevels)=>void;
 
-class LogStore{
+class LogStore {
   private readonly loggingStream = null as fs.WriteStream;
   
   constructor(){
     if(config.debug && isMainThread){
-      const dirPath = "../../logs"
+      const dirPath = "../../logs";
       if(!fs.existsSync(path.join(__dirname, dirPath))){
         fs.mkdirSync(path.join(__dirname, dirPath));
       }
@@ -44,7 +45,8 @@ class LogStore{
         "warn": "WARN ",
         "error": "ERROR",
         "debug": "DEBUG",
-      }[level]} ${new Date().toISOString()} ${log.replace(/\r\n/g, "\r").replace(/\r/g, "\n").replace(/\n/g, "<br>")}\r\n`));
+      }[level]} ${new Date().toISOString()} ${log.replace(/\r\n/g, "\r").replace(/\r/g, "\n")
+.replace(/\n/g, "<br>")}\r\n`));
     }
   }
 }
