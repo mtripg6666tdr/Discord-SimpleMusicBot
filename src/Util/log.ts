@@ -44,7 +44,7 @@ class LogStore{
         "warn": "WARN ",
         "error": "ERROR",
         "debug": "DEBUG",
-      }[level]} ${new Date().toISOString()} ${log}\r\n`));
+      }[level]} ${new Date().toISOString()} ${log.replace(/\r\n/g, "\r").replace(/\r/g, "\n").replace(/\n/g, "<br>")}\r\n`));
     }
   }
 }
