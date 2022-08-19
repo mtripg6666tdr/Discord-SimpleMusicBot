@@ -1,7 +1,7 @@
 import type { EmbedField } from "discord.js";
 import type { StreamInfo } from "..";
 import * as ytdl from "ytdl-core";
-import { Util } from "../../Util";
+import { LoggerType, Util } from "../../Util";
 import { SecondaryUserAgent } from "../../Util/ua";
 import { AudioSource } from "../audiosource";
 import { attemptGetInfoForStrategies, attemptFetchForStrategies, strategies } from "./strategies";
@@ -21,11 +21,11 @@ export class YouTube extends AudioSource {
   Thumnail:string;
   LiveStream:boolean;
   relatedVideos:exportableYouTube[] = [];
-  logger:((content:string, level?:"log"|"warn"|"error")=>void);
+  logger: LoggerType;
 
   constructor(logger?:typeof YouTube.prototype.logger){
     super();
-    this.logger = logger || ((content, level?) => Util.logger.log(content, level));
+    this.logger = logger || Util.logger.log.bind(Util.logger);
   }
 
   get IsFallbacked(){
@@ -40,7 +40,7 @@ export class YouTube extends AudioSource {
     if(prefetched){
       this.importData(prefetched);
     }else{
-      const { result, resolved } = await attemptGetInfoForStrategies(url);
+      const { result, resolved } = await attemptGetInfoForStrategies(this.logger, url);
       this.fallback = resolved === 0;
       if(forceCache) this.cache = result.cache;
       this.importData(result.data);
@@ -49,7 +49,7 @@ export class YouTube extends AudioSource {
   }
 
   async fetch(forceUrl?:boolean):Promise<StreamInfo>{
-    const { result, resolved } = await attemptFetchForStrategies(this.Url, forceUrl, this.cache);
+    const { result, resolved } = await attemptFetchForStrategies(this.logger, this.Url, forceUrl, this.cache);
     this.fallback = resolved === 0;
     // store related videos
     this.relatedVideos = result.relatedVideos;

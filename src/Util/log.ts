@@ -1,12 +1,15 @@
 import * as fs from "fs";
 import * as path from "path";
+import { isMainThread } from "worker_threads";
 import * as config from "./config";
+
+export type LoggerType = (content:string, level?:"log"|"warn"|"error")=>void;
 
 class LogStore{
   private readonly loggingStream = null as fs.WriteStream;
   
   constructor(){
-    if(config.debug){
+    if(config.debug && isMainThread){
       if(!fs.existsSync(path.join(__dirname, "../../logs"))){
         fs.mkdirSync(path.join(__dirname, "../../logs"));
       }

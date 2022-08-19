@@ -1,6 +1,6 @@
 import type { exportableYouTube } from "..";
 import { StreamInfo } from "../../audiosource";
-import { Util } from "../../../Util";
+import { LoggerType, Util } from "../../../Util";
 
 export type Cache<T extends string, U> = {
   type:T,
@@ -8,7 +8,11 @@ export type Cache<T extends string, U> = {
 };
 
 export abstract class Strategy<T extends Cache<any, any>>{
-  constructor(protected priority:number){}
+  public logger: LoggerType;
+
+  constructor(protected priority:number){
+    this.logger = Util.logger.log.bind(Util.logger);
+  }
 
   abstract getInfo(url:string):Promise<{
     data:exportableYouTube,
@@ -22,6 +26,6 @@ export abstract class Strategy<T extends Cache<any, any>>{
   }>;
   
   protected useLog(){
-    Util.logger.log("[AudioSource:youtube] using strategy #" + this.priority);
+    this.logger("[AudioSource:youtube] using strategy #" + this.priority);
   }
 }

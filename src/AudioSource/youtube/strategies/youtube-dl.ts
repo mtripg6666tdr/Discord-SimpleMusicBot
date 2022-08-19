@@ -20,7 +20,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>
       info = JSON.parse(await this.getYouTubeDlInfo(url)) as YoutubeDlInfo;
     }
     finally{
-      t.end();
+      t.end(this.logger);
     }
     return {
       data: this.mapToExportable(url, info),
@@ -37,11 +37,11 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>
     let info = null as YoutubeDlInfo;
     try{
       const availableCache = cache.type === youtubeDl && cache.data as YoutubeDlInfo;
-      Util.logger.log(`[AudioSource:youtube] ${availableCache ? "using cache without obtaining" : "obtaining info"}`);
+      this.logger(`[AudioSource:youtube] ${availableCache ? "using cache without obtaining" : "obtaining info"}`);
       info = availableCache || JSON.parse(await this.getYouTubeDlInfo(url)) as YoutubeDlInfo;
     }
     finally{
-      t.end();
+      t.end(this.logger);
     }
     const partialResult = {
       info: this.mapToExportable(url, info),
@@ -91,9 +91,9 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>
     }
   }
 
-  private log = (content:string) => {
+  private debugLog = (content:string) => {
     if(Util.config.debug){
-      Util.logger.log("[YouTube(fallback)]" + content.replace(/\n/g, ""));
+      this.logger("[YouTube(fallback)]" + content.replace(/\n/g, ""));
     }
   };
 
@@ -114,19 +114,19 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>
     return new Promise((resolve, reject) => {
       try{
         const id = Date.now();
-        this.log(`Executing the following command(#${id}): ${command}`);
+        this.debugLog(`Executing the following command(#${id}): ${command}`);
         exec(command, (error, stdout, stderr) => {
           if(error){
-            this.log(`Command execution #${id} failed: ${stderr}`);
+            this.debugLog(`Command execution #${id} failed: ${stderr}`);
             reject(stderr);
           }else{
-            this.log(`Command execution #${id} ends successfully: ${stdout}`);
+            this.debugLog(`Command execution #${id} ends successfully: ${stdout}`);
             resolve(stdout);
           }
         });
       }
       catch(e){
-        Util.logger.log(e, "error");
+        this.logger(e, "error");
         reject("Main library threw an error and fallback library also threw an error");
       }
     });
@@ -137,12 +137,12 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>
       "Accept": "application/vnd.github.v3+json",
       "User-Agent": "Discord-SimpleMusicBot"
     })) as GitHubRelease;
-    this.log(`Latest: ${releases.tag_name}`);
+    this.debugLog(`Latest: ${releases.tag_name}`);
     if(ver !== releases.tag_name){
-      this.log(`Start downloading`);
+      this.debugLog(`Start downloading`);
       await this.execAsync("curl -L -o \"youtube-dl" + (process.platform === "win32" ? ".exe" : "") + "\" " + releases.assets.filter(a => a.name === (process.platform === "win32" ? "youtube-dl.exe" : "youtube-dl"))[0].browser_download_url);
       if(process.platform !== "win32"){
-        this.log("Configuring permission");
+        this.debugLog("Configuring permission");
         await this.execAsync("chmod 777 youtube-dl");
       }
     }

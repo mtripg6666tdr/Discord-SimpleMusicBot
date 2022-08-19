@@ -49,9 +49,11 @@ class _timerStore {
     return new timerStopper(this, key);
   }
 
-  end(key:string){
+  end(key:string, logger?: (content:string) => void){
     if(this.timers[key]){
-      log("[TimeLogger]Elapsed " + (Math.floor((performance.now() - this.timers[key]) * 100) / 100) + "ms. (" + key + ")");
+      const conteet = "[TimeLogger]Elapsed " + (Math.floor((performance.now() - this.timers[key]) * 100) / 100) + "ms. (" + key + ")";
+      if(logger) logger(conteet);
+      else log(conteet);
       delete this.timers[key];
     }
   }
@@ -61,8 +63,8 @@ class timerStopper {
   constructor(private parent:_timerStore, private key:string){
     //
   }
-  end(){
-    this.parent.end(this.key);
+  end(logger?: (content:string) => void){
+    this.parent.end(this.key, logger);
   }
 }
 

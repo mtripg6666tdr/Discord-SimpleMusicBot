@@ -26,7 +26,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>>{
       });
     }
     finally{
-      t.end();
+      t.end(this.logger);
     }
     return {
       data: this.mapToExportable(url, info),
@@ -41,10 +41,10 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>>{
     this.useLog();
     const info = await (async () => {
       if(cache && cache.type === "ytdlCore"){
-        Util.logger.log("[AudioSource:youtube] using cache without obtaining");
+        this.logger("[AudioSource:youtube] using cache without obtaining");
         return cache.data as ytdl.videoInfo;
       }else{
-        Util.logger.log("[AudioSource:youtube] obtaining info");
+        this.logger("[AudioSource:youtube] obtaining info");
         const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
         const requestOptions = agent ? {agent} : undefined;
         const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch`);
@@ -56,7 +56,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>>{
           });
         }
         finally{
-          t.end();
+          t.end(this.logger);
         }
         return info;
       }
@@ -69,7 +69,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>>{
       filter: "audioonly",
       quality: "highestaudio",
     });
-    Util.logger.log(`[AudioSource:youtube]Format: ${format.itag}, Bitrate: ${format.bitrate}bps, Audio codec:${format.audioCodec}, Container: ${format.container}`);
+    this.logger(`[AudioSource:youtube]Format: ${format.itag}, Bitrate: ${format.bitrate}bps, Audio codec:${format.audioCodec}, Container: ${format.container}`);
     const partialResult = {
       info: this.mapToExportable(url, info),
       relatedVideos: info.related_videos.map(video => ({
