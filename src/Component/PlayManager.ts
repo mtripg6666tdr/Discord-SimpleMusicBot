@@ -122,7 +122,7 @@ export class PlayManager extends ManagerBase {
       const resource = this.ResolveStream(rawStream, time);
       const stream = FixedAudioResource.fromAudioResource(resource, this.CurrentAudioInfo.LengthSeconds);
       this.HandleEvents(stream, /* errorReportChannel */ mes.channel);
-      this.Log(`Stream edges: ${["Raw", ...stream.edges.map(e => e.type)].join("->")} ->`);
+      this.Log(`Stream edges: ${["Raw", ...stream.edges.map(e => e.type)].join(" -> ")} ->`);
       // fetchおよび処理中に切断された場合処理を終了
       const connection = voice.getVoiceConnection(this.info.GuildID);
       if(!connection){
