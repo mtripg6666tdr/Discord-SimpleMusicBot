@@ -2,10 +2,11 @@ import type { exportableCustom } from "./AudioSource";
 import type { CommandArgs } from "./Commands";
 import type { YmxFormat } from "./Structure";
 
-import { execSync } from "child_process";
-
 import * as voice from "@discordjs/voice";
 import * as discord from "discord.js";
+
+import { execSync } from "child_process";
+
 import Soundcloud from "soundcloud.ts";
 import * as ytpl from "ytpl";
 

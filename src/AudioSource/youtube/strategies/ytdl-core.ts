@@ -3,6 +3,7 @@ import type { Cache } from "./base";
 import type { Readable } from "stream";
 
 import * as voice from "@discordjs/voice";
+
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 

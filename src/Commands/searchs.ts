@@ -5,6 +5,7 @@ import type { ResponseMessage } from "djs-command-resolver";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 
 import * as discord from "discord.js";
+
 import Soundcloud from "soundcloud.ts";
 
 import { BaseCommand } from ".";

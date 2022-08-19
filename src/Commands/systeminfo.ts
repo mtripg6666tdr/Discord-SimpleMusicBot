@@ -1,10 +1,10 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import * as os from "os";
-
 import { generateDependencyReport } from "@discordjs/voice";
 import * as discord from "discord.js";
+
+import * as os from "os";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";

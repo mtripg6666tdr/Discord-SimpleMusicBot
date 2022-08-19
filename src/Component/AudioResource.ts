@@ -1,6 +1,6 @@
-import { EventEmitter } from "stream";
-
 import * as voice from "@discordjs/voice";
+
+import { EventEmitter } from "stream";
 
 import { Util } from "../Util";
 
