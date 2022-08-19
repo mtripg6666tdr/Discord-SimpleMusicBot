@@ -13,7 +13,8 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>
   last:number = 0;
 
   async getInfo(url:string){
-    const t = Util.time.timer.start("YouTube(AudioSource)#init->GetInfo(Fallback)");
+    this.useLog();
+    const t = Util.time.timer.start(`YouTube(Strategy${this.priority})#init->GetInfo()`);
     const info = JSON.parse(await this.getYouTubeDlInfo(url)) as YoutubeDlInfo;
     t.end();
     return {
@@ -25,8 +26,13 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>
     }
   }
 
-  async fetch(url: string, forceUrl:boolean = false, cache?: Cache<"youtubeDl", YoutubeDlInfo>){
-    const info = (cache.type === "youtubeDl" && cache.data) || JSON.parse(await this.getYouTubeDlInfo(url)) as YoutubeDlInfo;
+  async fetch(url: string, forceUrl:boolean = false, cache?: Cache<any, any>){
+    this.useLog();
+    const t = Util.time.timer.start("YouTube(AudioSource)#init->GetInfo");
+    const availableCache = cache.type === youtubeDl && cache.data as YoutubeDlInfo;
+    Util.logger.log(`[AudioSource:youtube] ${availableCache ? "using cache without obtaining" : "obtaining info"}`);
+    const info = availableCache || JSON.parse(await this.getYouTubeDlInfo(url)) as YoutubeDlInfo;
+    t.end();
     const partialResult = {
       info: this.mapToExportable(url, info),
       relatedVideos: null as exportableYouTube[]

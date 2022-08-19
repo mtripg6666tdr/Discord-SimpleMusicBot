@@ -1,26 +1,20 @@
 import type { EmbedField } from "discord.js";
 import type { StreamInfo } from "..";
-
-import { PassThrough, Readable } from "stream";
-import * as voice from "@discordjs/voice";
-import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
-import m3u8stream from "m3u8stream";
-
 import { Util } from "../../Util";
 import { SecondaryUserAgent } from "../../Util/ua";
 import { AudioSource } from "../audiosource";
-import { createChunkedYTStream } from "./stream";
-import { getYouTubeDlInfo, YoutubeDlInfo } from "./strategies/youtube-dl";
+import { attemptGetInfoForStrategies, attemptFetchForStrategies, Cache, strategies } from "./strategies";
+import { ytdlCore, ytdlCoreStrategy } from "./strategies/ytdl-core";
 
 const ua = SecondaryUserAgent;
+
 export class YouTube extends AudioSource {
   // サービス識別子（固定）
   protected readonly _serviceIdentifer = "youtube";
   protected _lengthSeconds = 0;
   private fallback = false;
-  private ytdlInfo = null as ytdl.videoInfo;
-  private youtubeDlInfo = null as YoutubeDlInfo;
+  private cache:Cache<any, any> = null;
   ChannelName:string;
   ChannelUrl:string;
   Thumnail:string;
@@ -37,169 +31,35 @@ export class YouTube extends AudioSource {
     return this.fallback;
   }
   get IsCached(){
-    return Boolean(this.ytdlInfo || this.youtubeDlInfo);
+    return !!this.cache;
   }
 
   async init(url:string, prefetched:exportableYouTube, forceCache?:boolean){
     this.Url = "https://www.youtube.com/watch?v=" + ytdl.getVideoID(url);
     if(prefetched){
-      this.Title = prefetched.title;
-      this.Description = prefetched.description;
-      this._lengthSeconds = prefetched.length;
-      this.ChannelName = prefetched.channel;
-      this.ChannelUrl = prefetched.channelUrl;
-      this.Thumnail = prefetched.thumbnail;
-      this.LiveStream = prefetched.isLive;
+      this.importData(prefetched);
     }else{
-      const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
-      const requestOptions = agent ? {agent} : undefined;
-      try{
-        const t = Util.time.timer.start("YouTube(AudioSource)#init->GetInfo");
-        let info = await ytdl.getInfo(url, {
-          lang: "ja", requestOptions
-        });
-        t.end();
-        if(forceCache) this.ytdlInfo = info;
-        this.Title = info.videoDetails.title;
-        this.Description = info.videoDetails.description;
-        this._lengthSeconds = Number(info.videoDetails.lengthSeconds ?? 0);
-        this.ChannelName = info.videoDetails.ownerChannelName;
-        this.ChannelUrl = info.videoDetails.author.channel_url;
-        this.Thumnail = info.videoDetails.thumbnails[0].url;
-        this.LiveStream = info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails?.isLiveNow;
-        this.fallback = false;
-      }
-      catch{
-        this.fallback = true;
-        this.logger("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
-        const t = Util.time.timer.start("YouTube(AudioSource)#init->GetInfo(Fallback)");
-        const info = JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
-        t.end();
-        if(forceCache) this.youtubeDlInfo = info;
-        this.LiveStream = info.is_live;
-        this.Title = info.title;
-        this.Description = info.description;
-        this._lengthSeconds = Number(info.duration);
-        this.ChannelName = info.channel;
-        this.ChannelUrl = info.channel_url;
-        this.Thumnail = info.thumbnail;
-      }
+      const { result, resolved } = await attemptGetInfoForStrategies(url);
+      this.fallback = resolved === 0;
+      if(forceCache) this.cache = result.cache;
+      this.importData(result.data);
     }
     return this;
   }
 
-  async fetch(url?:boolean):Promise<StreamInfo>{
-    try{
-      let info = this.ytdlInfo;
-      if(!info){
-        // no cache then get
-        const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
-        const requestOptions = agent ? {agent} : undefined;  
-        const t = Util.time.timer.start("YouTube(AudioSource)#fetch->GetInfo");
-        info = await ytdl.getInfo(this.Url, {
-          lang: "ja", requestOptions
-        })
-        t.end();
-      }
-      // store related videos
-      this.relatedVideos = info.related_videos.map(video => ({
-        url: "https://www.youtube.com/watch?v=" + video.id,
-        title: video.title,
-        description: "関連動画として取得したため詳細は表示されません",
-        length: video.length_seconds,
-        channel: (video.author as ytdl.Author)?.name,
-        channelUrl: (video.author as ytdl.Author)?.channel_url,
-        thumbnail: video.thumbnails[0].url,
-        isLive: video.isLive
-      })).filter(v => !v.isLive);
-      // update description
-      this.Description = info.videoDetails.description ?? "不明";
-      // update is live status
-      this.LiveStream = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
-      // update title
-      this.Title = info.videoDetails.title;
-      // format selection
-      const format = ytdl.chooseFormat(info.formats, {
-        filter: this.LiveStream ? null : "audioonly",
-        quality: this.LiveStream ? null : "highestaudio",
-        isHLS: this.LiveStream,
-      } as ytdl.chooseFormatOptions);
-      this.logger(`[AudioSource:youtube]Format: ${format.itag}, Bitrate: ${format.bitrate}bps, Audio codec:${format.audioCodec}, Container: ${format.container}`);
-      if(url){
-        // return url when forced it
-        this.fallback = false;
-        this.logger("[AudioSource:youtube]Returning the url instead of stream");
-        return {
-          type: "url",
-          url: format.url,
-          userAgent: ua
-        }
-      }else{
-        // otherwise return readable stream
-        let readable = null as Readable;
-        if(info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow){
-          readable = ytdl.downloadFromInfo(info, {format, lang: "ja"});
-        }else{
-          readable = createChunkedYTStream(info, format, {lang: "ja"}, 1 * 1024 * 1024);
-        }
-        this.fallback = false;
-        return {
-          type: "readable",
-          stream: readable,
-          streamType: format.container === "webm" && format.audioCodec === "opus" ? voice.StreamType.WebmOpus : undefined
-        };
-      }
-    }
-    catch{
-      this.fallback = true;
-      this.logger("ytdl.getInfo() failed, fallback to youtube-dl", "warn");
-      const t = Util.time.timer.start("YouTube(AudioSource)#fetch->GetInfo(Fallback)");
-      const info = this.youtubeDlInfo ?? JSON.parse(await getYouTubeDlInfo(this.Url)) as YoutubeDlInfo;
-      t.end();
-      this.Description = info.description ?? "不明";
-      if(info.title) this.Title = info.title;
-      if(info.is_live){
-        const format = info.formats.filter(f => f.format_id === info.format_id);
-        if(url){
-          return {
-            type: "url",
-            url: format[0].url
-          }
-        }
-        const stream = new PassThrough({highWaterMark: 1024 * 512});
-        stream._destroy = () => { stream.destroyed = true; };
-        const req = m3u8stream(format[0].url, {
-          begin: Date.now(),
-          parser: "m3u8"
-        });
-        req
-          .on("error", (e) => stream.emit("error", e))
-          .pipe(stream)
-          .on('error', (e) => stream.emit("error", e));
-        return {
-          type: "readable",
-          stream,
-        };
-      }else{
-        const format = info.formats.filter(f => f.format_note==="tiny");
-        format.sort((fa, fb) => fb.abr - fa.tbr);
-        return {
-          type: "url",
-          url: format[0].url
-        };
-      }
-    }
+  async fetch(forceUrl?:boolean):Promise<StreamInfo>{
+    const { result, resolved } = await attemptFetchForStrategies(this.Url, forceUrl, this.cache);
+    this.fallback = resolved === 0;
+    // store related videos
+    this.relatedVideos = result.relatedVideos;
+    this.importData(result.info);
+    if(forceUrl) this.logger("[AudioSource:youtube]Returning the url instead of stream");
+    return result.stream;
   }
 
   async fetchVideo(){
-    let info = this.ytdlInfo;
-    if(!info){
-      const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
-      const requestOptions = agent ? {agent} : undefined;  
-      info = await ytdl.getInfo(this.Url, {
-        lang: "ja", requestOptions
-      })
-    }
+    let info = this.cache.type === ytdlCore && this.cache.data as ytdl.videoInfo;
+    if(!info) info = await (strategies[0] as ytdlCoreStrategy).getInfo(this.Url).then(result => (this.cache = result.cache).data);
     const isLive = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
     const format = ytdl.chooseFormat(info.formats, {
       quality: isLive ? null : "highestvideo",
@@ -240,9 +100,18 @@ export class YouTube extends AudioSource {
     };
   };
 
+  private importData(exportable:exportableYouTube){
+    this.Title = exportable.title;
+    this.Description = exportable.description;
+    this._lengthSeconds = exportable.length;
+    this.ChannelName = exportable.channel;
+    this.ChannelUrl = exportable.channelUrl;
+    this.Thumnail = exportable.thumbnail;
+    this.LiveStream = exportable.isLive;
+  }
+
   disableCache(){
-    this.ytdlInfo = null;
-    this.youtubeDlInfo = null;
+    this.cache = null;
   }
 }
 

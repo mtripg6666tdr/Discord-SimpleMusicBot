@@ -10,16 +10,19 @@ import { createChunkedYTStream } from "../stream";
 const ua = SecondaryUserAgent;
 
 type ytdlCore = "ytdlCore";
-const ytdlCore:ytdlCore = "ytdlCore";
+export const ytdlCore:ytdlCore = "ytdlCore";
 
 export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>>{
   async getInfo(url:string){
+    this.useLog();
     const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
     const requestOptions = agent ? {agent} : undefined;
+    const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#init->GetInfo()`);
     const info = await ytdl.getInfo(url, {
       lang: "ja",
       requestOptions,
     });
+    t.end();
     return {
       data: this.mapToExportable(url, info),
       cache: {
@@ -29,17 +32,23 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>>{
     };
   }
 
-  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<"ytdlCore", ytdl.videoInfo>){
+  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
+    this.useLog();
     const info = await (() => {
-      if(cache){
-        return cache.data;
+      if(cache && cache.type === "ytdlCore"){
+        Util.logger.log("[AudioSource:youtube] using cache without obtaining");
+        return cache.data as ytdl.videoInfo;
       }else{
+        Util.logger.log("[AudioSource:youtube] obtaining info");
         const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
         const requestOptions = agent ? {agent} : undefined;
-        return ytdl.getInfo(url, {
+        const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch->GetInfo`);
+        const info = ytdl.getInfo(url, {
           lang: "ja",
           requestOptions,
         });
+        t.end();
+        return info;
       }
     })();
     const format = ytdl.chooseFormat(info.formats, info.videoDetails.liveBroadcastDetails?.isLiveNow ? {
@@ -50,6 +59,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>>{
       filter: "audioonly",
       quality: "highestaudio",
     });
+    Util.logger.log(`[AudioSource:youtube]Format: ${format.itag}, Bitrate: ${format.bitrate}bps, Audio codec:${format.audioCodec}, Container: ${format.container}`);
     const partialResult = {
       info: this.mapToExportable(url, info),
       relatedVideos: info.related_videos.map(video => ({
