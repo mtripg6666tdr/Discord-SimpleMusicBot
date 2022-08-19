@@ -43,7 +43,7 @@ class LogStore{
         "warn": "WARN ",
         "error": "ERROR",
         "debug": "DEBUG",
-      }[level]} ${new Date().toISOString()} ${log}`));
+      }[level]} ${new Date().toISOString()} ${log}\r\n`));
     }
   }
 }
