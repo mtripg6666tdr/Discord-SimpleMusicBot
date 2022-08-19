@@ -1,5 +1,4 @@
-require("dotenv").config();
-
+import "./dotenv";
 import type { TextChannel } from "discord.js";
 import * as http from "http";
 import { MusicBot } from "./bot";
