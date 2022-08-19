@@ -124,12 +124,12 @@ export class QueueManager extends ManagerBase {
   }
 
   async AddQueue(
-      url:string,
-      addedBy:GuildMember|AddedBy,
-      method:"push"|"unshift" = "push",
-      type:KnownAudioSourceIdentifer = "unknown",
-      gotData:AudioSource.exportableCustom = null
-      ):Promise<QueueContent & {index:number}>{
+    url:string,
+    addedBy:GuildMember|AddedBy,
+    method:"push"|"unshift" = "push",
+    type:KnownAudioSourceIdentifer = "unknown",
+    gotData:AudioSource.exportableCustom = null
+  ):Promise<QueueContent & {index:number}>{
     await this.waitForProcess();
     this.nowProcessing = true;
     this.Log("AddQueue called");
@@ -179,16 +179,16 @@ export class QueueManager extends ManagerBase {
    * @returns 成功した場合はtrue、それ以外の場合はfalse
    */
   async AutoAddQueue(
-      client:Client,
-      url:string,
-      addedBy:GuildMember|AddedBy|null|undefined,
-      type:KnownAudioSourceIdentifer,
-      first:boolean = false,
-      fromSearch:boolean|ResponseMessage = false,
-      channel:TextChannel = null,
-      message:ResponseMessage = null,
-      gotData:AudioSource.exportableCustom = null
-      ):Promise<boolean>{
+    client:Client,
+    url:string,
+    addedBy:GuildMember|AddedBy|null|undefined,
+    type:KnownAudioSourceIdentifer,
+    first:boolean = false,
+    fromSearch:boolean|ResponseMessage = false,
+    channel:TextChannel = null,
+    message:ResponseMessage = null,
+    gotData:AudioSource.exportableCustom = null
+  ):Promise<boolean>{
     this.Log("AutoAddQueue Called");
     const t = Util.time.timer.start("AutoAddQueue");
     let ch:TextChannel = null;
@@ -293,7 +293,7 @@ export class QueueManager extends ManagerBase {
     title:string,
     totalCount:number,
     exportableConsumer:(track:T)=>Promise<exportableCustom>|exportableCustom
-    ):Promise<number>{
+  ):Promise<number>{
     const t = Util.time.timer.start("ProcessPlaylist");
     let index = 0;
     for(let i = 0; i < totalCount; i++){
@@ -327,12 +327,12 @@ export class QueueManager extends ManagerBase {
     if(this.QueueLoopEnabled){
       this.default.push(this.default[0]);
     }else if(this.info.AddRelative && this.info.Player.CurrentAudioInfo.ServiceIdentifer === "youtube"){
-        const relatedVideos = (this.info.Player.CurrentAudioInfo as AudioSource.YouTube).relatedVideos;
-        if(relatedVideos.length >= 1){
-          const video = relatedVideos[0];
-          await this.info.Queue.AddQueue(video.url, null, "push", "youtube", video);
-        }
+      const relatedVideos = (this.info.Player.CurrentAudioInfo as AudioSource.YouTube).relatedVideos;
+      if(relatedVideos.length >= 1){
+        const video = relatedVideos[0];
+        await this.info.Queue.AddQueue(video.url, null, "push", "youtube", video);
       }
+    }
     this._default.shift();
     if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
       this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);

@@ -74,17 +74,17 @@ export default class News extends BaseCommand {
         embeds: [embed],
         components: [
           new MessageActionRow()
-          .addComponents(
-            new MessageSelectMenu()
-            .setCustomId("search")
-            .setPlaceholder("数字を送信するか、ここから選択...")
-            .setMinValues(1)
-            .setMaxValues(result.length)
-            .addOptions([...selectOpts, {
-              label: "キャンセル",
-              value: "cancel"
-            }])
-          )
+            .addComponents(
+              new MessageSelectMenu()
+                .setCustomId("search")
+                .setPlaceholder("数字を送信するか、ここから選択...")
+                .setMinValues(1)
+                .setMaxValues(result.length)
+                .addOptions([...selectOpts, {
+                  label: "キャンセル",
+                  value: "cancel"
+                }])
+            )
         ]
       });
     }

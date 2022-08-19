@@ -32,15 +32,15 @@ module.exports = function(route:RouteLike){
           return option;
         };
         switch(arg.type){
-          case "bool":
-            builder.addBooleanOption(addingOptionArgs);
-            break;
-          case "integer":
-            builder.addIntegerOption(addingOptionArgs);
-            break;
-          case "string":
-            builder.addStringOption(addingOptionArgs);
-            break;
+        case "bool":
+          builder.addBooleanOption(addingOptionArgs);
+          break;
+        case "integer":
+          builder.addIntegerOption(addingOptionArgs);
+          break;
+        case "string":
+          builder.addStringOption(addingOptionArgs);
+          break;
         }
       });
     }

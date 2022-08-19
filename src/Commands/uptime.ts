@@ -30,7 +30,7 @@ export default class Uptime extends BaseCommand {
       .addField("サーバー起動からの経過した時間", insta[0] + "時間" + insta[1] + "分" + insta[2] + "秒")
       .addField("Botが起動してからの経過時間", ready[0] + "時間" + ready[1] + "分" + ready[2] + "秒")
       .addField("レイテンシ",
-          (now.getTime() - message.createdAt.getTime()) + "ミリ秒(ボット接続実測値)\r\n"
+        (now.getTime() - message.createdAt.getTime()) + "ミリ秒(ボット接続実測値)\r\n"
         + options.client.ws.ping + "ミリ秒(ボットWebSocket接続取得値)\r\n"
         + (voice.getVoiceConnection(message.guild.id)?.ping.udp ?? "-") + "ミリ秒(ボイスチャンネルUDP接続取得値)"
       )

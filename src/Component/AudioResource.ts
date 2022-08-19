@@ -30,7 +30,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
         this.events.emit("end");
         Util.logger.log(`[AudioResource]Pushed total ${this.readLength} bytes${this.estimatedLengthSeconds !== 0 ? ` (average ${Math.round(this.readLength / this.estimatedLengthSeconds * 8 / 100) / 10} kbps)` : ""}`);
       })
-      ;
+    ;
   }
 
   private get isStreamReadable(){

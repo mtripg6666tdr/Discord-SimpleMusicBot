@@ -43,16 +43,16 @@ export default class Mv extends BaseCommand {
     if(
       from >= 0 && from <= q.length
       && to >= 0 && to <= q.length
-      ){
-        const title = q.get(from).BasicInfo.Title;
-        if(from !== to){
-          q.Move(from, to);
-          message.reply("✅ `" + title + "`を`" + from + "`番目から`" + to + "`番目に移動しました").catch(e => Util.logger.log(e, "error"));
-        }else{
-          message.reply("✘移動元と移動先の要素が同じでした。").catch(e => Util.logger.log(e, "error"));
-        }
+    ){
+      const title = q.get(from).BasicInfo.Title;
+      if(from !== to){
+        q.Move(from, to);
+        message.reply("✅ `" + title + "`を`" + from + "`番目から`" + to + "`番目に移動しました").catch(e => Util.logger.log(e, "error"));
       }else{
-        message.reply("✘失敗しました。引数がキューの範囲外です").catch(e => Util.logger.log(e, "error"));
+        message.reply("✘移動元と移動先の要素が同じでした。").catch(e => Util.logger.log(e, "error"));
       }
+    }else{
+      message.reply("✘失敗しました。引数がキューの範囲外です").catch(e => Util.logger.log(e, "error"));
+    }
   }
 }

@@ -201,6 +201,6 @@ interface Segment {
 }
 
 interface playCheckResult {
-    token: string;
-    playlist_url: string;
+  token: string;
+  playlist_url: string;
 }

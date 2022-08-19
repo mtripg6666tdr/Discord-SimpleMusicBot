@@ -87,10 +87,10 @@ export class PlayManager extends ManagerBase {
     /* eslint-disable no-irregular-whitespace */
     // 再生できる状態か確認
     const badCondition
-      /* 接続中でない　　　　　　　　　 */ = !this.IsConnecting
-      /* プレイヤーがアイドル状態でない */ || (this.AudioPlayer && this.AudioPlayer.state.status !== voice.AudioPlayerStatus.Idle)
-      /* キューが空　　　　　　　　　　 */ || this.info.Queue.Nothing
-      /* 準備中　　　　　　　　　　　　 */ || this.preparing
+    /* 接続中でない　　　　　　　　　 */ = !this.IsConnecting
+    /* プレイヤーがアイドル状態でない */ || (this.AudioPlayer && this.AudioPlayer.state.status !== voice.AudioPlayerStatus.Idle)
+    /* キューが空　　　　　　　　　　 */ || this.info.Queue.Nothing
+    /* 準備中　　　　　　　　　　　　 */ || this.preparing
     ;
     /* eslint-enable no-irregular-whitespace */
     if(badCondition){
@@ -151,11 +151,11 @@ export class PlayManager extends ManagerBase {
           // トラックループオンなら現在の曲
           this.info.Queue.LoopEnabled ? this.info.Queue.get(0).BasicInfo.Title :
           // (トラックループはオフ)長さが2以上ならオフセット1の曲
-          this.info.Queue.length >= 2 ? this.info.Queue.get(1).BasicInfo.Title :
-          // (トラックループオフ,長さ1)キューループがオンなら現在の曲
-          this.info.Queue.QueueLoopEnabled ? this.info.Queue.get(0).BasicInfo.Title :
-          // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
-          "次の曲がまだ登録されていません"
+            this.info.Queue.length >= 2 ? this.info.Queue.get(1).BasicInfo.Title :
+            // (トラックループオフ,長さ1)キューループがオンなら現在の曲
+              this.info.Queue.QueueLoopEnabled ? this.info.Queue.get(0).BasicInfo.Title :
+              // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
+                "次の曲がまだ登録されていません"
           , true);
         const [qhour, qmin, qsec] = Util.time.CalcHourMinSec(this.info.Queue.LengthSeconds - this.CurrentAudioInfo.LengthSeconds);
         embed.addField("再生待ちの曲", this.info.Queue.LoopEnabled ? "ループします" : ((this.info.Queue.length - 1) + "曲(" + (qhour === "0" ? "" : qhour + ":") + qmin + ":" + qsec + ")"), true);
@@ -442,7 +442,7 @@ export class PlayManager extends ManagerBase {
         this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
           (ch as TextChannel).send(":wave:キューが空になったため終了します").catch(e => Util.logger.log(e, "error"));
         })
-.catch(e => Util.logger.log(e, "error"));
+          .catch(e => Util.logger.log(e, "error"));
       }
       this.Disconnect();
     // なくなってないなら再生開始！

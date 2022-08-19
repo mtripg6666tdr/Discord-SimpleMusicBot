@@ -49,16 +49,16 @@ export class AddOn extends EventEmitter {
     super({captureRejections: false});
     try{
       fs.readdirSync(path.join(__dirname, "../../addon/"), {withFileTypes: true})
-      .filter(d => d.isFile())
-      .map(d => require("../../addon/" + d.name.slice(0, -3)))
-      .filter(d => typeof d === "function")
-      .forEach(d => {
-        try{
-          d(this);
-        }
-        // eslint-disable-next-line no-empty
-        catch{}
-      });
+        .filter(d => d.isFile())
+        .map(d => require("../../addon/" + d.name.slice(0, -3)))
+        .filter(d => typeof d === "function")
+        .forEach(d => {
+          try{
+            d(this);
+          }
+          // eslint-disable-next-line no-empty
+          catch{}
+        });
     }
     // eslint-disable-next-line no-empty
     catch{}

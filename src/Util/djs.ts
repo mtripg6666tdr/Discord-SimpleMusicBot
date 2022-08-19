@@ -15,7 +15,7 @@ export async function CheckSendable(channel:TextChannel, user:GuildMember){
       && permissions.has("ATTACH_FILES")
       && permissions.has("READ_MESSAGE_HISTORY")
       && permissions.has("VIEW_CHANNEL")
-      ;
+    ;
   }
   catch{
     return false;

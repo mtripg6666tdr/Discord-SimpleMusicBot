@@ -74,7 +74,7 @@ export class MusicBot extends LogEmitter {
     }
     try{
       this.versionInfo = execSync("git log -n 1 --pretty=format:%h").toString()
-.trim();
+        .trim();
       this.Log(`Version: ${this.versionInfo}`);
     }
     catch{
@@ -86,7 +86,7 @@ export class MusicBot extends LogEmitter {
       .on("messageCreate", this.onMessageCreate.bind(this))
       .on("interactionCreate", this.onInteractionCreate.bind(this))
       .on("voiceStateUpdate", this.onVoiceStateUpdate.bind(this))
-      ;
+    ;
   }
 
   private async onReady(client:discord.Client<true>){
@@ -121,7 +121,7 @@ export class MusicBot extends LogEmitter {
           speakingGuildids.includes(id)
           && queue.version === YmxVersion
           && speakingIds[id].includes(":")
-          ){
+        ){
           //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
           const [vid, cid, ..._bs] = speakingIds[id].split(":");
           const [loop, qloop, related, equallypb] = _bs.map(b => b === "1");
@@ -253,7 +253,7 @@ export class MusicBot extends LogEmitter {
     }else if(
       this.cancellations.filter(c => !c.Cancelled).length > 0
       && (message.content === "キャンセル" || message.content === "cancel")
-      ){
+    ){
       this.cancellations.forEach(c => c.GuildId === message.guild.id && c.Cancel());
       await message.channel.send("処理中の処理をすべてキャンセルしています....")
         .catch(e => this.Log(e, "error"));
@@ -303,13 +303,13 @@ export class MusicBot extends LogEmitter {
           t.Message.channelId === interaction.channel.id
           && t.Message.id === interaction.message.id);
         if(l.length >= 1){
-            // ページめくり
-            await l[0].FlipPage(
-              interaction.customId === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
+          // ページめくり
+          await l[0].FlipPage(
+            interaction.customId === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
               interaction.customId === PageToggle.arrowRight ? (l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current) : 0
-              ,
-              interaction
-              );
+            ,
+            interaction
+          );
         }else{
           await interaction.editReply("失敗しました!");
         }
@@ -324,21 +324,21 @@ export class MusicBot extends LogEmitter {
           });
         };
         switch(interaction.customId){
-          case Util.effects.EffectsCustomIds.Reload:
-            updateEffectPanel();
-            break;
-          case Util.effects.EffectsCustomIds.BassBoost:
-            this.data[interaction.guild.id].EffectPrefs.BassBoost = !this.data[interaction.guild.id].EffectPrefs.BassBoost;
-            updateEffectPanel();
-            break;
-          case Util.effects.EffectsCustomIds.Reverb:
-            this.data[interaction.guild.id].EffectPrefs.Reverb = !this.data[interaction.guild.id].EffectPrefs.Reverb;
-            updateEffectPanel();
-            break;
-          case Util.effects.EffectsCustomIds.LoudnessEqualization:
-            this.data[interaction.guild.id].EffectPrefs.LoudnessEqualization = !this.data[interaction.guild.id].EffectPrefs.LoudnessEqualization;
-            updateEffectPanel();
-            break;
+        case Util.effects.EffectsCustomIds.Reload:
+          updateEffectPanel();
+          break;
+        case Util.effects.EffectsCustomIds.BassBoost:
+          this.data[interaction.guild.id].EffectPrefs.BassBoost = !this.data[interaction.guild.id].EffectPrefs.BassBoost;
+          updateEffectPanel();
+          break;
+        case Util.effects.EffectsCustomIds.Reverb:
+          this.data[interaction.guild.id].EffectPrefs.Reverb = !this.data[interaction.guild.id].EffectPrefs.Reverb;
+          updateEffectPanel();
+          break;
+        case Util.effects.EffectsCustomIds.LoudnessEqualization:
+          this.data[interaction.guild.id].EffectPrefs.LoudnessEqualization = !this.data[interaction.guild.id].EffectPrefs.LoudnessEqualization;
+          updateEffectPanel();
+          break;
         }
       }
     }else if(interaction.isSelectMenu()){
@@ -559,15 +559,15 @@ export class MusicBot extends LogEmitter {
       catch(e){
         this.Log(e, "error");
         const failedMsg = "😑接続に失敗しました…もう一度お試しください: " + Util.general.StringifyObject(e);
-          if(!reply && replyOnFail){
-            await msg.delete()
-              .catch(er => this.Log(er, "error"));
-            await message.reply(failedMsg)
-              .catch(er => this.Log(er, "error"));
-          }else{
-            await msg?.edit(failedMsg)
-              .catch(er => this.Log(er, "error"));
-          }
+        if(!reply && replyOnFail){
+          await msg.delete()
+            .catch(er => this.Log(er, "error"));
+          await message.reply(failedMsg)
+            .catch(er => this.Log(er, "error"));
+        }else{
+          await msg?.edit(failedMsg)
+            .catch(er => this.Log(er, "error"));
+        }
         this.data[message.guild.id].Player.Disconnect();
         t.end();
         return false;
@@ -576,9 +576,9 @@ export class MusicBot extends LogEmitter {
       // あらメッセージの送信者さんはボイチャ入ってないん…
       await ((mes:string) => {
         if(reply || replyOnFail) return message.reply(mes)
-            .catch(e => this.Log(e, "error"));
+          .catch(e => this.Log(e, "error"));
         else return message.channel.send(mes)
-            .catch(e => this.Log(e, "error"));
+          .catch(e => this.Log(e, "error"));
       })("ボイスチャンネルに参加してからコマンドを送信してください:relieved:");
       t.end();
       return false;
@@ -713,7 +713,7 @@ export class MusicBot extends LogEmitter {
       !this.data[message.guild.id].Player.IsConnecting
       || (message.member.voice.channel && message.member.voice.channel.members.has(this.client.user.id))
       || message.content.includes("join")
-      ){
+    ){
       if(message.content !== (this.data[message.guild.id]?.PersistentPref.Prefix || ">")) this.data[message.guild.id].boundTextChannel = message.channelId;
     }
   }
@@ -757,7 +757,7 @@ export class MusicBot extends LogEmitter {
       if(
         this.data[guildid].Player.IsConnecting
         && !this.data[guildid].Player.IsPlaying
-        ){
+      ){
         this.data[guildid].Player.Play();
       }
     }

@@ -44,7 +44,7 @@ export default class Frame extends BaseCommand {
     const time = (function(rawTime){
       if(rawTime === "" || vinfo.LiveStream) return server.Player.CurrentTime / 1000;
       else if(rawTime.match(/^(\d+:)*\d+(\.\d+)?$/)) return rawTime.split(":").map(n => Number(n))
-.reduce((prev, current) => prev * 60 + current);
+        .reduce((prev, current) => prev * 60 + current);
       else return NaN;
     }(options.rawArgs));
     if(options.rawArgs !== "" && vinfo.LiveStream){

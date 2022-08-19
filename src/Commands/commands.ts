@@ -56,12 +56,12 @@ export default class Commands extends BaseCommand {
       for(let i = 0; i < categoriesList.length; i++){
         embed.push(
           new discord.MessageEmbed()
-          .setTitle(getCategoryText(categoriesList[i]))
-          .addFields(commands[categoriesList[i]].map(ci => ({
-            name: ci.name + ", " + ci.alias.join(", "),
-            value: ci.description,
-            inline: true
-          } as discord.EmbedField)))
+            .setTitle(getCategoryText(categoriesList[i]))
+            .addFields(commands[categoriesList[i]].map(ci => ({
+              name: ci.name + ", " + ci.alias.join(", "),
+              value: ci.description,
+              inline: true
+            } as discord.EmbedField)))
         );
       }
       for(let i = 0; i < embed.length; i++){
@@ -78,10 +78,10 @@ export default class Commands extends BaseCommand {
         const prefix = options.data[message.guild.id] ? options.data[message.guild.id].PersistentPref.Prefix : ">";
         const embed
           = new discord.MessageEmbed()
-          .setTitle("コマンド `" + ci.name + "` の詳細")
-          .setDescription(ci.description)
-          .setColor(getColor("COMMAND"))
-          .addField("エイリアス", "`" + ci.alias.join("`, `") + "`")
+            .setTitle("コマンド `" + ci.name + "` の詳細")
+            .setDescription(ci.description)
+            .setColor(getColor("COMMAND"))
+            .addField("エイリアス", "`" + ci.alias.join("`, `") + "`")
         ;
         if(ci.usage){
           embed.addField("使い方", "`" + prefix + ci.usage + "` \r\n`<>` 内の引数は必須の引数、`[]`内の引数は任意の引数です。");

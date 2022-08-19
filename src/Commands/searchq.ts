@@ -34,11 +34,11 @@ export default class Searchq extends BaseCommand {
       return;
     }
     let qsresult = options.data[message.guild.id].Queue
-                    .filter(c => c.BasicInfo.Title.toLowerCase().includes(options.rawArgs.toLowerCase()))
-                    .concat(
-                      options.data[message.guild.id].Queue
-                      .filter(c => c.BasicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase()))
-                    );
+      .filter(c => c.BasicInfo.Title.toLowerCase().includes(options.rawArgs.toLowerCase()))
+      .concat(
+        options.data[message.guild.id].Queue
+          .filter(c => c.BasicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase()))
+      );
     if(qsresult.length === 0){
       message.reply(":confused:見つかりませんでした").catch(e => Util.logger.log(e, "error"));
       return;

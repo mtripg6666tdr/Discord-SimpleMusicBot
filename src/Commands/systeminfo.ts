@@ -82,7 +82,7 @@ export default class SystemInfo extends BaseCommand {
         + "Times(nice): `" + Math.round(cpus[i].times.nice / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.nice, all) + "%)`\r\n"
         + "Times(irq): `" + Math.round(cpus[i].times.irq / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.irq, all) + "%)`\r\n"
         + "Times(idle): `" + Math.round(cpus[i].times.idle / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.idle, all) + "%)`"
-        , true);
+          , true);
       }
       embeds.push(cpuInfoEmbed);
     }
@@ -95,21 +95,21 @@ export default class SystemInfo extends BaseCommand {
       const nMem = process.memoryUsage();
       memInfoEmbed.title = "Memory Info";
       memInfoEmbed.addField("Total Memory",
-          "Total: `" + memory.total + "MB`\r\n"
+        "Total: `" + memory.total + "MB`\r\n"
         + "Used: `" + memory.used + "MB`\r\n"
         + "Free: `" + memory.free + "MB`\r\n"
         + "Usage: `" + memory.usage + "%`"
-      , true);
+        , true);
       const rss = Util.system.GetMBytes(nMem.rss);
       const ext = Util.system.GetMBytes(nMem.external);
       memInfoEmbed.addField("Main Process Memory",
-          "RSS: `" + rss + "MB`\r\n"
+        "RSS: `" + rss + "MB`\r\n"
         + "Heap total: `" + Util.system.GetMBytes(nMem.heapTotal) + "MB`\r\n"
         + "Heap used: `" + Util.system.GetMBytes(nMem.heapUsed) + "MB`\r\n"
         + "Array buffers: `" + Util.system.GetMBytes(nMem.arrayBuffers) + "MB`\r\n"
         + "External: `" + ext + "MB`\r\n"
         + "Total: `" + Util.math.GetPercentage(rss + ext, memory.total) + "%`"
-      , true);
+        , true);
       embeds.push(memInfoEmbed);
     }
     

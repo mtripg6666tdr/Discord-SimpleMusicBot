@@ -70,7 +70,7 @@ export default class Rm extends BaseCommand {
     const indexes = options.args.concat(addition.map(n => n.toString()));
     const dels = Array.from(new Set(
       indexes.map(str => Number(str)).filter(n => !isNaN(n))
-.sort((a, b)=>b - a)
+        .sort((a, b)=>b - a)
     ));
     const title = dels.length === 1 ? q.get(dels[0]).BasicInfo.Title : null;
     for(let i = 0; i < dels.length; i++){

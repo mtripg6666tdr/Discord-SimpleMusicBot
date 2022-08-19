@@ -55,16 +55,16 @@ export class PageToggle {
       embeds: n._message.embeds,
       components: [
         new MessageActionRow()
-        .addComponents(
-          new MessageButton()
-          .setCustomId(this.arrowLeft)
-          .setLabel(this.arrowLeftEmoji)
-          .setStyle("PRIMARY"),
-          new MessageButton()
-          .setCustomId(this.arrowRight)
-          .setLabel(this.arrowRightEmoji)
-          .setStyle("PRIMARY")
-        )
+          .addComponents(
+            new MessageButton()
+              .setCustomId(this.arrowLeft)
+              .setLabel(this.arrowLeftEmoji)
+              .setStyle("PRIMARY"),
+            new MessageButton()
+              .setCustomId(this.arrowRight)
+              .setLabel(this.arrowRightEmoji)
+              .setStyle("PRIMARY")
+          )
       ]
     });
     return n;

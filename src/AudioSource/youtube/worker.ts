@@ -31,13 +31,13 @@ parentPort.on("message", (value) => {
         id,
       } as WithId<workerInitSuccessMessage>);
     })
-    .catch((er) => {
-      parentPort.postMessage({
-        type: "error",
-        data: er,
-        id,
-      } as WithId<workerErrorMessage>);
-    });
+      .catch((er) => {
+        parentPort.postMessage({
+          type: "error",
+          data: er,
+          id,
+        } as WithId<workerErrorMessage>);
+      });
   }else if(data && data.type === "search"){
     const id = data.id;
     ytsr.default(data.keyword, {
@@ -51,12 +51,12 @@ parentPort.on("message", (value) => {
         id
       } as WithId<workerSearchSuccessMessage>);
     })
-.catch((er) => {
-      parentPort.postMessage({
-        type: "error",
-        data: er,
-        id
-      } as WithId<workerErrorMessage>);
-    });
+      .catch((er) => {
+        parentPort.postMessage({
+          type: "error",
+          data: er,
+          id
+        } as WithId<workerErrorMessage>);
+      });
   }
 });

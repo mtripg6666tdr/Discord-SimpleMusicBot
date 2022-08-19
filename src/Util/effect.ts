@@ -39,20 +39,20 @@ export function getCurrentEffectPanel(avatarUrl:string, data:GuildDataContainer)
   ;
   const messageActions = new MessageActionRow()
     .addComponents([
-        new MessageButton()
+      new MessageButton()
         .setCustomId("reload")
         .setStyle("PRIMARY")
         .setEmoji("🔁")
         .setLabel("更新"),
-        new MessageButton()
+      new MessageButton()
         .setCustomId("bass_boost")
         .setStyle(data.EffectPrefs.BassBoost ? "SUCCESS" : "SECONDARY")
         .setLabel("Bass Boost"),
-        new MessageButton()
+      new MessageButton()
         .setCustomId("reverb")
         .setStyle(data.EffectPrefs.Reverb ? "SUCCESS" : "SECONDARY")
         .setLabel("Reverb"),
-        new MessageButton()
+      new MessageButton()
         .setCustomId("loudness_eq")
         .setStyle(data.EffectPrefs.LoudnessEqualization ? "SUCCESS" : "SECONDARY")
         .setLabel("Loudness Eq")

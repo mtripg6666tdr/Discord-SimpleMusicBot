@@ -114,17 +114,17 @@ export default class Searchs extends BaseCommand {
           embeds: [embed],
           components: [
             new discord.MessageActionRow()
-            .addComponents(
-              new discord.MessageSelectMenu()
-              .setCustomId("search")
-              .setPlaceholder("数字を送信するか、ここから選択...")
-              .setMinValues(1)
-              .setMaxValues(index - 1)
-              .addOptions([...selectOpts, {
-                label: "キャンセル",
-                value: "cancel"
-              }])
-            )
+              .addComponents(
+                new discord.MessageSelectMenu()
+                  .setCustomId("search")
+                  .setPlaceholder("数字を送信するか、ここから選択...")
+                  .setMinValues(1)
+                  .setMaxValues(index - 1)
+                  .addOptions([...selectOpts, {
+                    label: "キャンセル",
+                    value: "cancel"
+                  }])
+              )
           ]
         });
       }

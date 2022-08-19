@@ -39,8 +39,8 @@ export default class Lyrics extends BaseCommand {
         const partial = songInfo.lyric.substring(4000 * i, 4000 * (i + 1) - 1);
         embeds.push(
           new discord.MessageEmbed()
-          .setDescription(partial)
-          .setColor(getColor("LYRIC"))
+            .setDescription(partial)
+            .setColor(getColor("LYRIC"))
         );
       }
       embeds[0]

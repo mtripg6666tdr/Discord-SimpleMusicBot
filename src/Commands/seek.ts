@@ -37,7 +37,7 @@ export default class Seek extends BaseCommand {
     const time = (function(rawTime){
       if(rawTime.match(/^(\d+:)*\d+$/)){
         return rawTime.split(":").map(d => Number(d))
-.reduce((prev, current) => prev * 60 + current);
+          .reduce((prev, current) => prev * 60 + current);
       }else{
         return NaN;
       }

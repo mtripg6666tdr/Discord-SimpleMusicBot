@@ -171,7 +171,7 @@ export class CommandsManager extends LogEmitter {
     this.SetTag("CommandsManager");
     this.Log("Initializing");
     this.commands = [];
-      fs.readdirSync(__dirname, {withFileTypes: true})
+    fs.readdirSync(__dirname, {withFileTypes: true})
       .filter(d => d.isFile())
       .map(d => d.name)
       .filter(n => n.endsWith(".js") && n !== "index.js")
