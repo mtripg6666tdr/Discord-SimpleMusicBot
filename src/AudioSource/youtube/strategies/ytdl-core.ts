@@ -1,5 +1,5 @@
 import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
-import type { Cache} from "./base";
+import type { Cache } from "./base";
 import type { Readable } from "stream";
 
 import * as voice from "@discordjs/voice";

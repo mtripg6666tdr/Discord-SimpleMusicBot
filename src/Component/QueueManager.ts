@@ -1,5 +1,5 @@
 import type { exportableCustom } from "../AudioSource";
-import type { GuildDataContainer} from "../Structure";
+import type { GuildDataContainer } from "../Structure";
 import type { ResponseMessage } from "./ResponseMessage";
 import type { TaskCancellationManager } from "./TaskCancellationManager";
 import type { Client, Message, TextChannel } from "discord.js";

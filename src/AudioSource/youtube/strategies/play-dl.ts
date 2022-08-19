@@ -1,7 +1,7 @@
 import type { exportableYouTube } from "..";
 import type { UrlStreamInfo } from "../../audiosource";
 import type { Cache } from "./base";
-import type { InfoData} from "play-dl";
+import type { InfoData } from "play-dl";
 
 import { video_info } from "play-dl";
 

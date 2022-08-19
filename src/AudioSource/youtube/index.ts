@@ -1,5 +1,5 @@
 import type { StreamInfo } from "..";
-import type { LoggerType} from "../../Util";
+import type { LoggerType } from "../../Util";
 import type { Cache } from "./strategies/base";
 import type { ytdlCoreStrategy } from "./strategies/ytdl-core";
 import type { EmbedField } from "discord.js";

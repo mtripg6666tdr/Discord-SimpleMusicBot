@@ -1,4 +1,4 @@
-import type { CommandArgs} from ".";
+import type { CommandArgs } from ".";
 import type { SoundCloudTrackCollection } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { ResponseMessage } from "djs-command-resolver";

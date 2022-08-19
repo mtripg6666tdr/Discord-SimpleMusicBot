@@ -1,5 +1,5 @@
 import type { AudioSource, StreamInfo, YouTube } from "../AudioSource";
-import type { GuildDataContainer} from "../Structure";
+import type { GuildDataContainer } from "../Structure";
 import type { Client, Message, TextBasedChannel, TextChannel } from "discord.js";
 import type { Readable } from "stream";
 

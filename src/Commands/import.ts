@@ -1,7 +1,7 @@
-import type { CommandArgs} from ".";
+import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { ResponseMessage } from "../Component/ResponseMessage";
-import type { YmxFormat} from "../Structure";
+import type { YmxFormat } from "../Structure";
 import type * as discord from "discord.js";
 
 import { BaseCommand } from ".";

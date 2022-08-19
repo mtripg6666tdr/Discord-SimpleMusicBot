@@ -1,6 +1,6 @@
 import type { exportableYouTube } from "..";
 import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
-import type { Cache} from "./base";
+import type { Cache } from "./base";
 
 import { exec } from "child_process";
 import { PassThrough } from "stream";

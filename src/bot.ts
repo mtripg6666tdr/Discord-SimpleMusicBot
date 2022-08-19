@@ -1,6 +1,6 @@
-import type { exportableCustom} from "./AudioSource";
+import type { exportableCustom } from "./AudioSource";
 import type { CommandArgs } from "./Commands";
-import type { YmxFormat} from "./Structure";
+import type { YmxFormat } from "./Structure";
 
 import { execSync } from "child_process";
 

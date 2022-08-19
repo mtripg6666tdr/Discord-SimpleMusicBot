@@ -1,4 +1,4 @@
-import type { CommandArgs} from ".";
+import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";

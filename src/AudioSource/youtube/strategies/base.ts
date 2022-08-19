@@ -1,5 +1,5 @@
 import type { exportableYouTube } from "..";
-import type { LoggerType} from "../../../Util";
+import type { LoggerType } from "../../../Util";
 import type { StreamInfo } from "../../audiosource";
 
 import { Util } from "../../../Util";
