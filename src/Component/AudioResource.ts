@@ -14,6 +14,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
 
   constructor(...args:ConstructorParameters<typeof NullMetaAudioResource>){
     super(...args);
+    Util.logger.log("[AudioResource] instantiated");
     this.events = new AudioResourceEvent({
       captureRejections: false
     });

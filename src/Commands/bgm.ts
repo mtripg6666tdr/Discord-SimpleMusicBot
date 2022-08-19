@@ -85,7 +85,7 @@ export default class Bgm extends BaseCommand {
       });
     }
     catch(e){
-      Util.logger.log(JSON.stringify(e));
+      Util.logger.log(JSON.stringify(e), "error");
       message.reply(":cry:エラーが発生しました");
     }
   }

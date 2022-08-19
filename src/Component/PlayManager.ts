@@ -87,10 +87,10 @@ export class PlayManager extends ManagerBase {
       /* 準備中　　　　　　　　　　　　 */ || this.preparing
     ;
     if(badCondition) {
-      this.Log("Play() called but operated nothing", "warn");
+      this.Log("Play called but operated nothing", "warn");
       return this;
     }
-    this.Log("Play() called");
+    this.Log("Play called");
     this.preparing = true;
     let mes:Message = null;
     let ch:TextChannel = null;
@@ -114,7 +114,7 @@ export class PlayManager extends ManagerBase {
       const resource = this.ResolveStream(rawStream, time);
       const stream = FixedAudioResource.fromAudioResource(resource, this.CurrentAudioInfo.LengthSeconds);
       this.HandleEvents(stream, /* errorReportChannel */ mes.channel);
-      this.Log("Stream edges: Raw -> " + stream.edges.map(e => e.type).join(" -> ") + " ->");
+      this.Log(`Stream edges: ${["Raw", ...stream.edges.map(e => e.type)].join("->")} ->`);
       // fetchおよび処理中に切断された場合処理を終了
       const connection = voice.getVoiceConnection(this.info.GuildID);
       if(!connection) {
@@ -129,7 +129,7 @@ export class PlayManager extends ManagerBase {
       await voice.entersState(this.AudioPlayer, voice.AudioPlayerStatus.Playing, 10e4);
       this.preparing = false;
       u.end();
-      this.Log("Play() started successfully");
+      this.Log("Play started successfully");
       if(this.info.boundTextChannel && ch && mes){
         // 再生開始メッセージ
         const _t = Number(this.CurrentAudioInfo.LengthSeconds);
@@ -184,7 +184,7 @@ export class PlayManager extends ManagerBase {
    * @returns this
   */
   Stop():PlayManager{
-    this.Log("Stop() called");
+    this.Log("Stop called");
     if(this.AudioPlayer){
       this.AudioPlayer.stop(true);
     }
@@ -203,7 +203,7 @@ export class PlayManager extends ManagerBase {
       this.Log("Disconnected from " + connection.joinConfig.channelId);
       connection.destroy();
     }else{
-      this.Log("Disconnect() called but no connection", "warn");
+      this.Log("Disconnect called but no connection", "warn");
     }
     return this;
   }
@@ -214,7 +214,7 @@ export class PlayManager extends ManagerBase {
    */
   Pause():PlayManager{
     this.info.Bot.BackupStatus();
-    this.Log("Pause() called");
+    this.Log("Pause called");
     this.AudioPlayer?.pause();
     return this;
   }
@@ -225,7 +225,7 @@ export class PlayManager extends ManagerBase {
    */
   Resume():PlayManager{
     this.info.Bot.BackupStatus();
-    this.Log("Resume() called");
+    this.Log("Resume called");
     this.AudioPlayer?.unpause();
     return this;
   }
@@ -235,7 +235,7 @@ export class PlayManager extends ManagerBase {
    * @returns this
    */
   Rewind():PlayManager{
-    this.Log("Rewind() called");
+    this.Log("Rewind called");
     this.Stop().Play();
     return this;
   }
@@ -246,13 +246,13 @@ export class PlayManager extends ManagerBase {
     voice.getVoiceConnection(this.info.GuildID).subscribe(this.AudioPlayer);
     if(!Util.config.debug){
       this.AudioPlayer.on("error", (e) => {
-        if(!e) return;
-        // エラーが発生したら再生できないときの関数を呼んで逃げる
-        this.Log("Error:" + e.message, "error");
-        // @ts-ignore
-        const einfo = e.errorInfo;
-        if(einfo){
-          this.Log(Util.general.StringifyObject(einfo), "error");
+        if(e) {
+          this.Log("Error:" + e.message, "error");
+          // @ts-ignore
+          const einfo = e.errorInfo;
+          if(einfo){
+            this.Log(Util.general.StringifyObject(einfo), "error");
+          }
         }
         if(this.info.boundTextChannel){
           this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
@@ -265,6 +265,7 @@ export class PlayManager extends ManagerBase {
               ;
           }).catch(e => Util.logger.log(e, "error"));
         }
+        // エラーが発生したら再生できないときの関数を呼んで逃げる
         this.onStreamFailed();
       });
     }
@@ -299,7 +300,7 @@ export class PlayManager extends ManagerBase {
   private ResolveStream(rawStream:StreamInfo, time:number):voice.AudioResource{
     let stream = null as voice.AudioResource;
     const effects = getFFmpegEffectArgs(this.info);
-    this.Log("Effect: " + effects.join(" "));
+    this.Log(`Effect: ${effects.join(" ") || "none"}`);
     if(rawStream.type === "url"){
       // URLならFFmpegにわたしてOggOpusに変換
       stream = voice.createAudioResource(
@@ -448,7 +449,7 @@ export class PlayManager extends ManagerBase {
       this.errorUrl = this.CurrentAudioInfo.Url;
       if(this.CurrentAudioInfo.isYouTube()) this.CurrentAudioInfo.disableCache();
     }
-    this.Log(`Play() failed, (${this.errorCount}times)`, "warn");
+    this.Log(`Play failed, (${this.errorCount}times)`, "warn");
     this.error = this.preparing = false;
     this.Stop();
     if(this.errorCount >= this.retryLimit){

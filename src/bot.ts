@@ -61,14 +61,17 @@ export class MusicBot extends LogEmitter {
     this.SetTag("Main");
     this.instantiatedTime = new Date();
     const client = this.client;
-    this.Log("Main bot is instantiated");
+    this.Log("bot is instantiated");
     if(maintenance){
-      this.Log("Main bot is now maintainance mode");
+      this.Log("bot is now maintainance mode");
     }
     try{
       this.versionInfo = execSync("git log -n 1 --pretty=format:%h").toString().trim();
+      this.Log(`Version: ${this.versionInfo}`);
     }
-    catch{};
+    catch{
+      this.Log("Something went wrong when obtaining version", "warn");
+    };
 
     client
       .on("ready", this.onReady.bind(this))
@@ -80,8 +83,8 @@ export class MusicBot extends LogEmitter {
 
   private async onReady(client:discord.Client<true>){
     this.addOn.emit("ready", client);
-    this.Log("Socket connection is ready.");
-    this.Log("Starting environment checking and preparation.");
+    this.Log("Socket connection is ready now");
+    this.Log("Starting environment checking and preparation now");
 
     // Set activity as booting
     if(!this.maintenance){
@@ -140,9 +143,9 @@ export class MusicBot extends LogEmitter {
           }
         }
       }
-      this.Log("Finish queues and states recovery.");
+      this.Log("Finish recovery of queues and statuses.");
     }else{
-      this.Log("Cannot perform queues and states recovery. Check .env file to perform.", "warn");
+      this.Log("Cannot perform recovery of queues and statuses. Check .env file to perform this. See README for more info", "warn");
     }
 
     // Set activity
@@ -161,15 +164,14 @@ export class MusicBot extends LogEmitter {
       };
       setTimeout(tick, 1 * 60 * 1000);
     }
-    this.Log("Main tick was set successfully");
+    this.Log("Interval jobs set up successfully");
 
     // Command instance preparing
     CommandsManager.Instance.Check();
-    this.Log("Finish preparing commands");
 
     // Finish initializing
     this.isReadyFinished = true;
-    this.Log("Bot is ready");
+    this.Log("Bot is ready now");
   }
 
   private async onMessageCreate(message:discord.Message){
@@ -261,7 +263,7 @@ export class MusicBot extends LogEmitter {
     this.initData(interaction.guild.id, interaction.channel.id);
     // コマンドインタラクション
     if(interaction.isCommand()){
-      this.Log("Command Interaction received");
+      this.Log("reveived command interaction");
       if(!interaction.channel.isText()){
         await interaction.reply("テキストチャンネルで実行してください");
         return;
@@ -287,7 +289,7 @@ export class MusicBot extends LogEmitter {
       }
     // ボタンインタラクション
     }else if(interaction.isButton()){
-      this.Log("Button Interaction received");
+      this.Log("received button interaction");
       await interaction.deferUpdate();
       if(interaction.customId === PageToggle.arrowLeft || interaction.customId === PageToggle.arrowRight){
         const l = this.EmbedPageToggle.filter(t => 
@@ -333,7 +335,7 @@ export class MusicBot extends LogEmitter {
         }
       }
     }else if(interaction.isSelectMenu()){
-      this.Log("SelectMenu Interaction received");
+      this.Log("received selectmenu interaction");
       // 検索パネル取得
       const panel = this.data[interaction.guild.id].SearchPanel;
       // なければ返却
@@ -385,11 +387,12 @@ export class MusicBot extends LogEmitter {
   PeriodicLog(){
     const _d = Object.values(this.data);
     const memory = Util.system.GetMemInfo();
-    Util.logger.log("[Main]Participating Server(s) count: " + this.client.guilds.cache.size);
-    Util.logger.log("[Main]Registered Server(s) count: " + Object.keys(this.data).length);
-    Util.logger.log("[Main]Connecting Server(s) count: " + _d.filter(info => info.Player.IsPlaying).length);
-    Util.logger.log("[Main]Paused Server(s) count: " + _d.filter(_d => _d.Player.IsPaused).length);
+    Util.logger.log(`[Main]Participating: ${this.client.guilds.cache.size}, Registered: ${Object.keys(this.data).length} Connecting: ${_d.filter(info => info.Player.IsPlaying).length} Paused: ${_d.filter(_d => _d.Player.IsPaused).length}`);
     Util.logger.log(`[System]Free:${Math.floor(memory.free)}MB; Total:${Math.floor(memory.total)}MB; Usage:${memory.usage}%`);
+    const nMem = process.memoryUsage();
+    const rss = Util.system.GetMBytes(nMem.rss);
+    const ext = Util.system.GetMBytes(nMem.external);
+    Util.logger.log(`[Main]Memory RSS: ${rss}MB, Heap total: ${Util.system.GetMBytes(nMem.heapTotal)}MB, Total: ${Util.math.GetPercentage(rss + ext, memory.total)}% (use systeminfo command for more info)`);
   }
 
   /**
@@ -483,7 +486,6 @@ export class MusicBot extends LogEmitter {
       this.data[guildid] = new GuildDataContainer(this.Client, guildid, channelid, this);
       this.data[guildid].Player.SetData(this.data[guildid]);
       this.data[guildid].Queue.SetData(this.data[guildid]);
-      this.Log(`Prefix was set to '${this.data[guildid].PersistentPref.Prefix}' (${guildid})`);
     }
   }
 
@@ -729,6 +731,7 @@ export class MusicBot extends LogEmitter {
     }else if(this.data[message.guild.id].PersistentPref.Prefix !== Util.config.prefix){
       this.data[message.guild.id].PersistentPref.Prefix = Util.config.prefix;
     }
+    this.Log(`Prefix was set to '${this.data[message.guild.id].PersistentPref.Prefix}' (${message.guild.id})`);
   }
 
   /**
