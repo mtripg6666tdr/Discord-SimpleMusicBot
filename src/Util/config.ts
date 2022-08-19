@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import CJSON, { CommentObject } from "comment-json";
+import CJSON from "comment-json";
 
 type ConfigJson = {
   adminId: string, 
@@ -11,10 +11,11 @@ type ConfigJson = {
   prefix:string,
 }
 
-const config = {
+const rawConfig = fs.readFileSync(path.join(__dirname, "../../config.json"), {encoding: "utf-8"});
+
+const config = Object.assign({
   prefix: ">",
-  ...(CJSON.parse(fs.readFileSync(path.join(__dirname, "../../config.json"), {encoding: "utf-8"})) as CommentObject)
-} as ConfigJson;
+}, CJSON.parse(rawConfig, null, true)) as unknown as ConfigJson;
 
 if(![
   config.adminId === null || typeof config.adminId === "string",
