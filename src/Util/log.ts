@@ -19,7 +19,7 @@ class LogStore {
       this.loggingStream = fs.createWriteStream(path.join(__dirname, `${dirPath}/log-${Date.now()}.log`));
       const onExit = () => {
         if(!this.loggingStream.destroyed){
-          this.loggingStream.write(Buffer.from("[Logger] detect process exiting, closing stream..."));
+          this.loggingStream.write(Buffer.from(`INFO  ${new Date().toISOString()} [Logger] detect process exiting, closing stream...`));
           this.loggingStream.destroy();
         }
       };
