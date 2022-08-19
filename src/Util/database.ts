@@ -116,11 +116,11 @@ export abstract class DatabaseAPI {
         };
       }
       const req = https.request(opt, (res) => {
-        let data = "";
-        res.on("data", (chunk) => data += chunk);
+        const bufs = [] as Buffer[];
+        res.on("data", chunk => bufs.push(chunk));
         res.on("end", ()=> {
           try{
-            const parsed = JSON.parse(data) as postResult;
+            const parsed = JSON.parse(Buffer.concat(bufs).toString("utf-8")) as postResult;
             Object.keys(parsed.data).forEach(k => parsed.data[k] = decodeURIComponent(parsed.data[k]));
             resolve(parsed);
           }

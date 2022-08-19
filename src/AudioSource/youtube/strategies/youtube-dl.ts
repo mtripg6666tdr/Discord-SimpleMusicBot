@@ -172,6 +172,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
       return this.execAsync("." + (process.platform === "win32" ? "\\" : "/") + "youtube-dl --skip-download --print-json \"" + url + "\"");
     }
     catch(e){
+      // eslint-disable-next-line @typescript-eslint/no-throw-literal
       throw "Main library threw an error and fallback library was not found or occurred an error";
     }
   }

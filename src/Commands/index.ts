@@ -177,6 +177,7 @@ export class CommandsManager extends LogEmitter {
       .filter(n => n.endsWith(".js") && n !== "index.js")
       .map(n => n.slice(0, -3))
       .forEach(n => {
+        // eslint-disable-next-line new-cap
         const cp = new (require(path.join(__dirname, n)).default)() as BaseCommand;
         this.commands.push(cp);
         return cp;

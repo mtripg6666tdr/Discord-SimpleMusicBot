@@ -69,7 +69,7 @@ export default class Search extends BaseCommand {
         let index = 1;
         const selectOpts = [] as discord.MessageSelectOptionData[];
         for(let i = 0; i < result.items.length; i++){
-          if(result.items[i].type == "video"){
+          if(result.items[i].type === "video"){
             const video = (result.items[i] as ytsr.Video);
             desc += `\`${index}.\` [${video.title}](${video.url}) \`${video.duration}\` - \`${video.author.name}\` \r\n\r\n`;
             options.data[message.guild.id].SearchPanel.Opts[index] = {
@@ -121,8 +121,8 @@ export default class Search extends BaseCommand {
       catch(e){
         Util.logger.log(e, "error");
         options.data[message.guild.id].SearchPanel = null;
-        if(msg) msg.edit("✘内部エラーが発生しました").catch(e => Util.logger.log(e, "error"));
-        else message.reply("✘内部エラーが発生しました").catch(e => Util.logger.log(e, "error"));
+        if(msg) msg.edit("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
+        else message.reply("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
       }
     }else{
       message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));

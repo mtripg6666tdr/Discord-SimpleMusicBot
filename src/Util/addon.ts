@@ -10,7 +10,7 @@ interface EventKeys {
   interactionCreate: [interaction: Interaction];
 }
 
-export class addOn extends EventEmitter {
+export class AddOn extends EventEmitter {
   on<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any):this{
     super.on(event, callback);
     return this;
@@ -56,10 +56,11 @@ export class addOn extends EventEmitter {
         try{
           d(this);
         }
+        // eslint-disable-next-line no-empty
         catch{}
       });
     }
-    catch{
-    }
+    // eslint-disable-next-line no-empty
+    catch{}
   }
 }

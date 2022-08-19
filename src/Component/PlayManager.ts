@@ -84,6 +84,7 @@ export class PlayManager extends ManagerBase {
    *  再生します
    */
   async Play(time:number = 0):Promise<PlayManager>{
+    /* eslint-disable no-irregular-whitespace */
     // 再生できる状態か確認
     const badCondition
       /* 接続中でない　　　　　　　　　 */ = !this.IsConnecting
@@ -91,6 +92,7 @@ export class PlayManager extends ManagerBase {
       /* キューが空　　　　　　　　　　 */ || this.info.Queue.Nothing
       /* 準備中　　　　　　　　　　　　 */ || this.preparing
     ;
+    /* eslint-enable no-irregular-whitespace */
     if(badCondition){
       this.Log("Play called but operated nothing", "warn");
       return this;
@@ -169,12 +171,13 @@ export class PlayManager extends ManagerBase {
       try{
         const t = typeof e === "string" ? e : Util.general.StringifyObject(e);
         if(t.includes("429")){
-          mes.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(e => Util.logger.log(e, "error"));
+          mes.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(er => Util.logger.log(er, "error"));
           this.Log("Rate limit detected", "error");
           this.Stop();
           this.preparing = false;
           return this;
         }
+        // eslint-disable-next-line no-empty
       } catch{}
       if(this.info.boundTextChannel && ch && mes){
         mes.edit(":tired_face:曲の再生に失敗しました...。" + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。"));
@@ -260,22 +263,24 @@ export class PlayManager extends ManagerBase {
           }
         }
         if(this.info.boundTextChannel){
-          this.client.channels.fetch(this.info.boundTextChannel).then(ch => {
-            this.Log("Some error occurred in AudioPlayer", "error");
-            (ch as TextChannel)
-              .send(
-                ":tired_face:曲の再生に失敗しました...。(" + (e ? Util.general.StringifyObject(e) : "undefined") + ")"
-                + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。"))
-              .catch(e => Util.logger.log(e, "error"))
+          this.client.channels.fetch(this.info.boundTextChannel)
+            .then(ch => {
+              this.Log("Some error occurred in AudioPlayer", "error");
+              (ch as TextChannel)
+                .send(
+                  ":tired_face:曲の再生に失敗しました...。(" + (e ? Util.general.StringifyObject(e) : "undefined") + ")"
+                  + ((this.errorCount + 1) >= this.retryLimit ? "スキップします。" : "再試行します。"))
+                .catch(er => Util.logger.log(er, "error"))
               ;
-          })
-.catch(e => Util.logger.log(e, "error"));
+            })
+            .catch(er => Util.logger.log(er, "error"))
+          ;
         }
         // エラーが発生したら再生できないときの関数を呼んで逃げる
         this.onStreamFailed();
       });
     }
-    this.AudioPlayer.on("unsubscribe", (_)=>{
+    this.AudioPlayer.on("unsubscribe", ()=>{
       this.AudioPlayer.stop();
       this.AudioPlayer = null;
     });
@@ -449,7 +454,7 @@ export class PlayManager extends ManagerBase {
   private async onStreamFailed(){
     if(this.info.Queue.LoopEnabled) this.info.Queue.LoopEnabled = false;
     if(this.info.Queue.length === 1 && this.info.Queue.QueueLoopEnabled) this.info.Queue.QueueLoopEnabled = false;
-    if(this.errorUrl == this.CurrentAudioInfo.Url){
+    if(this.errorUrl === this.CurrentAudioInfo.Url){
       this.errorCount++;
     }else{
       this.errorCount = 1;

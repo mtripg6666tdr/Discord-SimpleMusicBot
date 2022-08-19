@@ -47,7 +47,7 @@ class _timerStore {
 
   start(key:string){
     this.timers[key] = performance.now();
-    return new timerStopper(this, key);
+    return new TimerStopper(this, key);
   }
 
   end(key:string, logger?: (content:string) => void){
@@ -60,7 +60,7 @@ class _timerStore {
   }
 }
 
-class timerStopper {
+class TimerStopper {
   constructor(private readonly parent:_timerStore, private readonly key:string){
     //
   }

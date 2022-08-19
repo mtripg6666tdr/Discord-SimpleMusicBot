@@ -228,6 +228,7 @@ export class QueueManager extends ManagerBase {
       if(this.info.Queue.length > 999){
         // キュー上限
         this.Log("AutoAddQueue failed due to too long queue", "warn");
+        // eslint-disable-next-line @typescript-eslint/no-throw-literal
         throw "キューの上限を超えています";
       }
       const info = await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type, gotData ?? null);
@@ -259,7 +260,7 @@ export class QueueManager extends ManagerBase {
       this.Log("AutoAddQueue failed");
       this.Log(Util.general.StringifyObject(e), "error");
       if(msg){
-        msg.edit({content: ":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")", embeds: null}).catch(e => Util.logger.log(e, "error"));
+        msg.edit({content: ":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")", embeds: null}).catch(er => Util.logger.log(er, "error"));
       }
       t.end();
       return false;
@@ -447,7 +448,6 @@ export class QueueManager extends ManagerBase {
    * 追加者によってできるだけ交互になるようにソートします
    */
   SortWithAddedBy(){
-    const count = this._default.length;
     // 追加者の一覧とマップを作成
     const addedByUsers = [] as string[];
     const queueByAdded = {} as {[key:string]:QueueContent[]};

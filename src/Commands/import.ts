@@ -83,7 +83,7 @@ export default class Import extends BaseCommand {
           const qs = raw.data;
           for(let i = 0; i < qs.length; i++){
             await options.data[message.guild.id].Queue.AutoAddQueue(options.client, qs[i].url, message.member, "unknown", false, false, null, null, qs[i]);
-            if(qs.length <= 10 || i % 10 == 9){
+            if(qs.length <= 10 || i % 10 === 9){
               await smsg.edit(qs.length + "曲中" + (i + 1) + "曲処理しました。");
             }
             if(cancellation.Cancelled) break;

@@ -22,6 +22,7 @@ parentPort.on("message", (value) => {
       } as WithId<workerLoggingMessage>);
     });
     youtube.init(url, prefetched, forceCache).then(() => {
+      // eslint-disable-next-line @typescript-eslint/no-shadow
       const data = Object.assign({}, youtube);
       delete data.logger;
       parentPort.postMessage({
@@ -30,7 +31,7 @@ parentPort.on("message", (value) => {
         id,
       } as WithId<workerInitSuccessMessage>);
     })
-.catch((er) => {
+    .catch((er) => {
       parentPort.postMessage({
         type: "error",
         data: er,

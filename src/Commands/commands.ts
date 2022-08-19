@@ -35,7 +35,7 @@ export default class Commands extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(options.rawArgs == ""){
+    if(options.rawArgs === ""){
       // 引数がない場合は全コマンドの一覧を表示
       const embed = [] as discord.MessageEmbed[];
       const getCategoryText = (label:string)=>{

@@ -14,7 +14,7 @@ export class Streamable extends AudioSource {
   async init(url:string, prefetched?:exportableStreamable){
     this.Url = url;
     const id = StreamableApi.getVideoId(url);
-    if(!id) throw "Invalid streamable url";
+    if(!id) throw new Error("Invalid streamable url");
     if(prefetched){
       this._lengthSeconds = prefetched.length;
       this.Thumnail = prefetched.thumbnail;

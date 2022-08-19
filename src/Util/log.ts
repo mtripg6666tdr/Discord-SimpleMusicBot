@@ -32,6 +32,7 @@ class LogStore {
   maxLength = 30;
   data:string[] = [];
   
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   addLog(level:LogLevels, log:string){
     if(level !== "debug"){
       this.data.push(`${level[0].toUpperCase()}:${log}`);
@@ -45,8 +46,11 @@ class LogStore {
         "warn": "WARN ",
         "error": "ERROR",
         "debug": "DEBUG",
-      }[level]} ${new Date().toISOString()} ${log.replace(/\r\n/g, "\r").replace(/\r/g, "\n")
-.replace(/\n/g, "<br>")}\r\n`));
+      }[level]} ${new Date().toISOString()} ${log
+        .replace(/\r\n/g, "\r")
+        .replace(/\r/g, "\n")
+        .replace(/\n/g, "<br>")
+      }\r\n`));
     }
   }
 }

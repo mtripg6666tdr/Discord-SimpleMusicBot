@@ -1,5 +1,6 @@
 import type { CommandArgs} from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
+import type { ResponseMessage } from "djs-command-resolver";
 
 import * as discord from "discord.js";
 
@@ -25,11 +26,11 @@ export default class Searchb extends BaseCommand {
       return;
     }
     if(options.rawArgs !== ""){
-      const msg = null as discord.Message;
+      let msg = null as discord.Message|ResponseMessage;
       let desc = "※最大20件まで表示されます\r\n\r\n";
       try{
         options.data[message.guild.id].SearchPanel = {} as any;
-        const msg = await message.reply("準備中...");
+        msg = await message.reply("準備中...");
         options.data[message.guild.id].SearchPanel = {
           Msg: {
             id: msg.id,
@@ -102,8 +103,8 @@ export default class Searchb extends BaseCommand {
       catch(e){
         Util.logger.log(e);
         options.data[message.guild.id].SearchPanel = null;
-        if(msg) msg.edit("失敗しました").catch(e => Util.logger.log(e, "error"));
-        else message.reply("失敗しました").catch(e => Util.logger.log(e, "error"));
+        if(msg) msg.edit("失敗しました").catch(er => Util.logger.log(er, "error"));
+        else message.reply("失敗しました").catch(er => Util.logger.log(er, "error"));
       }
     }else{
       message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));

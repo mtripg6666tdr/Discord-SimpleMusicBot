@@ -27,7 +27,7 @@ export default class Play extends BaseCommand {
     options.updateBoundChannel(message);
     const server = options.data[message.guild.id];
     // キューが空だし引数もないし添付ファイルもない
-    if(server.Queue.length == 0 && options.rawArgs == "" && message.attachments.size === 0){
+    if(server.Queue.length === 0 && options.rawArgs === "" && message.attachments.size === 0){
       await message.reply("再生するコンテンツがありません").catch(e => Util.logger.log(e, "error"));
       return;
     }

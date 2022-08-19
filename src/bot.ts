@@ -35,12 +35,12 @@ export class MusicBot extends LogEmitter {
 
   private data:{[key:string]:GuildDataContainer} = {};
   private readonly instantiatedTime = null as Date;
-  private readonly versionInfo = "Could not get info";
+  private readonly versionInfo = "Could not get info" as string;
   private readonly cancellations = [] as TaskCancellationManager[];
   private readonly EmbedPageToggle:PageToggle[] = [] as PageToggle[];
   private isReadyFinished = false;
   private queueModifiedGuilds = [] as string[];
-  private readonly addOn = new Util.addOn.addOn();
+  private readonly addOn = new Util.addOn.AddOn();
   /**
    * ページトグル
    */
@@ -135,7 +135,7 @@ export class MusicBot extends LogEmitter {
             for(let j = 0; j < queue.data.length; j++){
               await this.data[id].Queue.AutoAddQueue(client, queue.data[j].url, queue.data[j].addBy, "unknown", false, false, null, null, queue.data[j]);
             }
-            if(vid != "0"){
+            if(vid !== "0"){
               const vc = await client.channels.fetch(vid) as discord.VoiceChannel;
               voice.joinVoiceChannel({
                 channelId: vc.id,
@@ -218,6 +218,7 @@ export class MusicBot extends LogEmitter {
             }
           });
         }
+        // eslint-disable-next-line no-empty
         catch{}
         return;
       }
@@ -323,21 +324,21 @@ export class MusicBot extends LogEmitter {
           });
         };
         switch(interaction.customId){
-          case Util.effects.EffectsCustomIds.Reload: {
+          case Util.effects.EffectsCustomIds.Reload:
             updateEffectPanel();
-          } break;
-          case Util.effects.EffectsCustomIds.BassBoost: {
+            break;
+          case Util.effects.EffectsCustomIds.BassBoost:
             this.data[interaction.guild.id].EffectPrefs.BassBoost = !this.data[interaction.guild.id].EffectPrefs.BassBoost;
             updateEffectPanel();
-          } break;
-          case Util.effects.EffectsCustomIds.Reverb : {
+            break;
+          case Util.effects.EffectsCustomIds.Reverb:
             this.data[interaction.guild.id].EffectPrefs.Reverb = !this.data[interaction.guild.id].EffectPrefs.Reverb;
             updateEffectPanel();
-          } break;
-          case Util.effects.EffectsCustomIds.LoudnessEqualization : {
+            break;
+          case Util.effects.EffectsCustomIds.LoudnessEqualization:
             this.data[interaction.guild.id].EffectPrefs.LoudnessEqualization = !this.data[interaction.guild.id].EffectPrefs.LoudnessEqualization;
             updateEffectPanel();
-          } break;
+            break;
         }
       }
     }else if(interaction.isSelectMenu()){
@@ -393,7 +394,7 @@ export class MusicBot extends LogEmitter {
   PeriodicLog(){
     const _d = Object.values(this.data);
     const memory = Util.system.GetMemInfo();
-    Util.logger.log(`[Main]Participating: ${this.client.guilds.cache.size}, Registered: ${Object.keys(this.data).length} Connecting: ${_d.filter(info => info.Player.IsPlaying).length} Paused: ${_d.filter(_d => _d.Player.IsPaused).length}`);
+    Util.logger.log(`[Main]Participating: ${this.client.guilds.cache.size}, Registered: ${Object.keys(this.data).length} Connecting: ${_d.filter(info => info.Player.IsPlaying).length} Paused: ${_d.filter(__d => __d.Player.IsPaused).length}`);
     Util.logger.log(`[System]Free:${Math.floor(memory.free)}MB; Total:${Math.floor(memory.total)}MB; Usage:${memory.usage}%`);
     const nMem = process.memoryUsage();
     const rss = Util.system.GetMBytes(nMem.rss);
@@ -560,12 +561,12 @@ export class MusicBot extends LogEmitter {
         const failedMsg = "😑接続に失敗しました…もう一度お試しください: " + Util.general.StringifyObject(e);
           if(!reply && replyOnFail){
             await msg.delete()
-              .catch(e => this.Log(e, "error"));
+              .catch(er => this.Log(er, "error"));
             await message.reply(failedMsg)
-              .catch(e => this.Log(e, "error"));
+              .catch(er => this.Log(er, "error"));
           }else{
             await msg?.edit(failedMsg)
-              .catch(e => this.Log(e, "error"));
+              .catch(er => this.Log(er, "error"));
           }
         this.data[message.guild.id].Player.Disconnect();
         t.end();
@@ -607,7 +608,7 @@ export class MusicBot extends LogEmitter {
         return;
       }
       catch(e){
-        await smsg.edit(`✘追加できませんでした(${Util.general.StringifyObject(e)})`).catch(e => this.Log(e, "error"));
+        await smsg.edit(`✘追加できませんでした(${Util.general.StringifyObject(e)})`).catch(er => this.Log(er, "error"));
       }
     }else if(Util.fs.isAvailableRawAudioURL(optiont)){
       // オーディオファイルへの直リンク？

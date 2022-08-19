@@ -1,6 +1,7 @@
 import type { CommandArgs} from ".";
 import type { SoundCloudTrackCollection } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
+import type { ResponseMessage } from "djs-command-resolver";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 
 import * as discord from "discord.js";
@@ -39,11 +40,11 @@ export default class Searchs extends BaseCommand {
       return;
     }
     if(options.rawArgs !== ""){
-      const msg = null as discord.Message;
+      let msg = null as discord.Message|ResponseMessage;
       let desc = "";
       try{
         options.data[message.guild.id].SearchPanel = {} as any;
-        const msg = await message.reply("🔍検索中...");
+        msg = await message.reply("🔍検索中...");
         options.data[message.guild.id].SearchPanel = {
           Msg: {
             id: msg.id,
@@ -56,7 +57,7 @@ export default class Searchs extends BaseCommand {
         };
         const soundcloud = new Soundcloud();
         let result:SoundcloudTrackV2[] = [];
-        if(options.rawArgs.match(/^https:\/\/soundcloud.com\/[^\/]+$/)){
+        if(options.rawArgs.match(/^https:\/\/soundcloud.com\/[^/]+$/)){
           // ユーザーの楽曲検索
           const user = (await soundcloud.users.getV2(options.rawArgs));
           options.rawArgs = user.username;
@@ -130,8 +131,8 @@ export default class Searchs extends BaseCommand {
       catch(e){
         Util.logger.log(e, "error");
         options.data[message.guild.id].SearchPanel = null;
-        if(msg) msg.edit("✘内部エラーが発生しました").catch(e => Util.logger.log(e, "error"));
-        else message.reply("✘内部エラーが発生しました").catch(e => Util.logger.log(e, "error"));
+        if(msg) msg.edit("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
+        else message.reply("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
       }
     }else{
       message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));

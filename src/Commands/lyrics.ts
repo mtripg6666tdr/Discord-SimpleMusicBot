@@ -3,7 +3,7 @@ import type { CommandMessage } from "../Component/CommandMessage";
 
 import * as discord from "discord.js";
 
-import { BaseCommand, SlashCommandArgument } from ".";
+import { BaseCommand } from ".";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
 import { GetLyrics } from "../Util/lyrics";
@@ -55,7 +55,7 @@ export default class Lyrics extends BaseCommand {
     }
     catch(e){
       Util.logger.log(e, "error");
-      msg.edit(":confounded:失敗しました。曲名を確認してもう一度試してみてください。").catch(e => Util.logger.log(e, "error"));
+      msg.edit(":confounded:失敗しました。曲名を確認してもう一度試してみてください。").catch(er => Util.logger.log(er, "error"));
     }
   }
 }

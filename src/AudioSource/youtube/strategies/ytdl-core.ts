@@ -52,6 +52,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
         const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
         const requestOptions = agent ? {agent} : undefined;
         const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch`);
+        // eslint-disable-next-line @typescript-eslint/no-shadow
         let info = null as ytdl.videoInfo;
         try{
           info = await ytdl.getInfo(url, {

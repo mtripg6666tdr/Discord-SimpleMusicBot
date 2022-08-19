@@ -6,7 +6,7 @@ import * as os from "os";
 import { generateDependencyReport } from "@discordjs/voice";
 import * as discord from "discord.js";
 
-import { BaseCommand, SlashCommandArgument } from ".";
+import { BaseCommand } from ".";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
 
@@ -57,7 +57,7 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(message.author.id === (Util.config.adminId ?? "593758391395155978") && (options.args.includes("log") || options.args.length == 0)){
+    if(message.author.id === (Util.config.adminId ?? "593758391395155978") && (options.args.includes("log") || options.args.length === 0)){
       // Process Logs
       const logEmbed = new discord.MessageEmbed();
       logEmbed.setColor(getColor("UPTIME"));
@@ -66,7 +66,7 @@ export default class SystemInfo extends BaseCommand {
       embeds.push(logEmbed);
     }
 
-    if(options.args.includes("cpu") || options.args.length == 0){
+    if(options.args.includes("cpu") || options.args.length === 0){
       // Process CPU Info
       const cpuInfoEmbed = new discord.MessageEmbed();
       cpuInfoEmbed.setColor(getColor("UPTIME"));
@@ -87,7 +87,7 @@ export default class SystemInfo extends BaseCommand {
       embeds.push(cpuInfoEmbed);
     }
 
-    if(options.args.includes("mem") || options.args.length == 0){
+    if(options.args.includes("mem") || options.args.length === 0){
       // Process Mem Info
       const memInfoEmbed = new discord.MessageEmbed();
       memInfoEmbed.setColor(getColor("UPTIME"));

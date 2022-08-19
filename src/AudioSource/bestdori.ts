@@ -19,7 +19,7 @@ export class BestdoriS extends AudioSource {
     this.Url = url;
     await BestdoriApi.setupData();
     this.id = BestdoriApi.getAudioId(url);
-    if(!this.id) throw "Invalid streamable url";
+    if(!this.id) throw new Error("Invalid streamable url");
     const data = bestdori.allsonginfo[this.id];
     this.Title = data.musicTitle[0];
     this.Type = data.tag;

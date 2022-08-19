@@ -9,7 +9,7 @@ export const strategies = [
   ytdlCoreStrategy,
   playDlStrategy,
   youtubeDlStrategy
-].map((proto, i) => new proto(i));
+].map((Proto, i) => new Proto(i));
 
 function setupLogger(logger: LoggerType){
   strategies.forEach(strategy => strategy.logger = logger);

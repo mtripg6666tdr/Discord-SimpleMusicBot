@@ -70,7 +70,7 @@ export default class Frame extends BaseCommand {
     }
     catch(e){
       Util.logger.log(Util.general.StringifyObject(e), "error");
-      message.channel.send(":sob:失敗しました...").catch(e => Util.logger.log(e, "error"));
+      message.channel.send(":sob:失敗しました...").catch(er => Util.logger.log(er, "error"));
     }
   }
 }
