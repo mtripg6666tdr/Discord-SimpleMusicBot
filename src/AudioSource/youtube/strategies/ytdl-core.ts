@@ -17,12 +17,17 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>>{
     this.useLog();
     const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
     const requestOptions = agent ? {agent} : undefined;
-    const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#init->GetInfo()`);
-    const info = await ytdl.getInfo(url, {
-      lang: "ja",
-      requestOptions,
-    });
-    t.end();
+    const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#getInfo`);
+    let info = null as ytdl.videoInfo;
+    try{
+      info = await ytdl.getInfo(url, {
+        lang: "ja",
+        requestOptions,
+      });
+    }
+    finally{
+      t.end();
+    }
     return {
       data: this.mapToExportable(url, info),
       cache: {
@@ -34,7 +39,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>>{
 
   async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
     this.useLog();
-    const info = await (() => {
+    const info = await (async () => {
       if(cache && cache.type === "ytdlCore"){
         Util.logger.log("[AudioSource:youtube] using cache without obtaining");
         return cache.data as ytdl.videoInfo;
@@ -42,12 +47,17 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>>{
         Util.logger.log("[AudioSource:youtube] obtaining info");
         const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
         const requestOptions = agent ? {agent} : undefined;
-        const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch->GetInfo`);
-        const info = ytdl.getInfo(url, {
-          lang: "ja",
-          requestOptions,
-        });
-        t.end();
+        const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch`);
+        let info = null as ytdl.videoInfo;
+        try{
+          info = await ytdl.getInfo(url, {
+            lang: "ja",
+            requestOptions,
+          });
+        }
+        finally{
+          t.end();
+        }
         return info;
       }
     })();
