@@ -18,6 +18,7 @@ YouTubeなどからの再生に対応。
 
 - [Discord-SimpleMusicBot](#discord-simplemusicbot)
   - [機能](#機能)
+  - [実行環境の準備](#実行環境の準備)
   - [インストール＆実行](#インストール実行)
     - [設定ファイルの詳細について](#設定ファイルの詳細について)
       - [`.env`ファイル](#envファイル)
@@ -70,9 +71,9 @@ YouTubeなどからの再生に対応。
     ```
     - このあと更新する際には、以下のように、ワークスペースをリセットしたうえでプルしてもういちどnodeを消す必要があります。
     ```bash
-    git restore . // ワークスペースリセット
+    git restore . # ワークスペースリセット
     git pull
-    npm uninstall node　// 上に同じ
+    npm uninstall node # 上に同じ
     npm install
     ```
   - [npmのffmpeg](https://www.npmjs.com/package/ffmpeg-static)が利用できない場合は、`npm install`したときに、その旨の表示がされます。
