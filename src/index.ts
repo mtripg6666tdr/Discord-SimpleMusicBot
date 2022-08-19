@@ -28,6 +28,7 @@ http.createServer((req, res) => {
 if(!Util.config.debug){
   // ハンドルされなかったエラーのハンドル
   process.on("uncaughtException", (error)=>{
+    console.error(error);
     if(bot.Client && Util.config.errorChannel){
       try{
         const errorText = typeof error === "string" ? error : JSON.stringify(error);

@@ -18,6 +18,7 @@ YouTubeなどからの再生に対応。
 
 - [Discord-SimpleMusicBot](#discord-simplemusicbot)
   - [機能](#機能)
+  - [実行環境の準備](#実行環境の準備)
   - [インストール＆実行](#インストール実行)
     - [設定ファイルの詳細について](#設定ファイルの詳細について)
       - [`.env`ファイル](#envファイル)
@@ -60,25 +61,42 @@ YouTubeなどからの再生に対応。
 
 [コマンドの一覧はこちらからご覧になれます](docs/commands.md)
 
-## インストール＆実行
-devDependenciesの(npmパッケージとしての)Node.jsを利用するようになっていますので、グローバルにインストールされているNode.jsのバージョンに制約はありませんが、最新の安定版のNode.jsを利用することをお勧めします。  
-npmパッケージの`ffmpeg-stable`(optionalDependencies)を利用できない場合、手動で`ffmpeg`へのパスを通す必要があります。    
-また、Python2.xまたはPython3.xが実行できるようにしておくことをお勧めします。
+## 実行環境の準備
+- Node.js v16がサポートされている環境  
+  - ほとんどのデバイスがサポートされています  
+  - nodeは[npmのnode](https://npmjs.com/package/node)から自動で取得されるので、バージョンに制約はありませんが、最新のLTSを使用することをお勧めします。  
+  - npmのnodeがサポートされていない環境では、`npm install`した際にその旨のエラーが発生します。その場合、以下を実行したうえで、別途Node.js v16をインストールして実行できるようにしておいてください。  
+    ```bash
+    npm uninstall node # nodeを依存パッケージから消す
+    ```
+    - このあと更新する際には、以下のように、ワークスペースをリセットしたうえでプルしてもういちどnodeを消す必要があります。
+    ```bash
+    git restore . # ワークスペースリセット
+    git pull
+    npm uninstall node # 上に同じ
+    npm install
+    ```
+  - [npmのffmpeg](https://www.npmjs.com/package/ffmpeg-static)が利用できない場合は、`npm install`したときに、その旨の表示がされます。
+    - その場合は、自分で別途ffmpegをインストールする必要があります。
+    - 最新版でも入れておきましょう
+  - Python2.xまたはPython3.xをインストールしておくことを推奨します。
+    - `python --version`でバージョンが出ればインストールされています
 
+## インストール＆実行
 1. リポジトリをクローン
-```bash
-$ git clone https://github.com/mtripg6666tdr/Discord-SimpleMusicBot.git
-```
+  ```bash
+  git clone https://github.com/mtripg6666tdr/Discord-SimpleMusicBot.git
+  ```
 
 2. カレントディレクトリ移動
-```bash
-$ cd Discord-SimpleMusicBot
-```
+  ```bash
+  cd Discord-SimpleMusicBot
+  ```
 
 3. 必須パッケージインストール
-```bash
-$ npm install
-```
+  ```bash
+  npm install
+  ```
 
 4. Botのトークンなどの設定  
 ボットのトークンを[`.env`](.env)ファイルに指定します。  

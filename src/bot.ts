@@ -544,7 +544,7 @@ export class MusicBot extends LogEmitter {
           // @ts-ignore
           adapterCreator: message.member.guild.voiceAdapterCreator,
           debug: Util.config.debug
-        }).on("debug", (mes) => this.Log("[Connection]" + mes));
+        }).on("debug", (mes) => Util.logger.log("[Main][Connection]" + mes, "debug"));
         Util.logger.log(`[Main/${message.guild.id}]Connected to ${message.member.voice.channel.id}`);
         await msg.edit(":+1:ボイスチャンネル:speaker:`" + message.member.voice.channel.name + "`に接続しました!");
         t.end();

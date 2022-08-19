@@ -1,6 +1,6 @@
-import type { workerErrorMessage, workerMessage, workerInitSuccessMessage, workerSearchSuccessMessage, workerLoggingMessage } from "./youtube.spawner";
+import type { workerErrorMessage, workerMessage, workerInitSuccessMessage, workerSearchSuccessMessage, workerLoggingMessage } from "./spawner";
 import { parentPort } from "worker_threads";
-import { YouTube } from "./youtube";
+import { YouTube } from ".";
 import * as ytsr from "ytsr";
 // DO NOT import unnecessary module preventing from infinite spawned workers.
 

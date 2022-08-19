@@ -1,5 +1,5 @@
 import * as ytdl from "ytdl-core";
-import { Util } from "../Util";
+import { Util } from "../../Util";
 
 export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoFormat, options:ytdl.downloadOptions, chunkSize:number = 512 * 1024){
   const stream = Util.general.InitPassThrough();

@@ -33,3 +33,4 @@ export const Util = {
   web,
 }
 export default Util;
+export type LoggerType = logger.LoggerType;
