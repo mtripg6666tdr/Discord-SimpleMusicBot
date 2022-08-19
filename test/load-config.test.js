@@ -58,5 +58,7 @@ describe("Config", function() {
 process.on("exit", () => {
   if(original){
     fs.writeFileSync(configPath, original, {encoding: "utf-8"});
+  }else{
+    fs.unlinkSync(configPath);
   }
 });
