@@ -11,10 +11,11 @@ class LogStore{
   
   constructor(){
     if(config.debug && isMainThread){
-      if(!fs.existsSync(path.join(__dirname, "../../logs"))){
-        fs.mkdirSync(path.join(__dirname, "../../logs"));
+      const dirPath = "../../logs"
+      if(!fs.existsSync(path.join(__dirname, dirPath))){
+        fs.mkdirSync(path.join(__dirname, dirPath));
       }
-      this.loggingStream = fs.createWriteStream(path.join(__dirname, `../../logs/log-${Date.now()}.txt`));
+      this.loggingStream = fs.createWriteStream(path.join(__dirname, `${dirPath}/log-${Date.now()}.log`));
       const onExit = () => {
         if(!this.loggingStream.destroyed){
           this.loggingStream.write(Buffer.from("[Logger] detect process exiting, closing stream..."));
