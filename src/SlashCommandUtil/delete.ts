@@ -4,7 +4,6 @@ import type { APIApplicationCommand } from "discord-api-types";
 
 import { REST } from "@discordjs/rest";
 
-
 const rest = new REST({version: "9"}).setToken(process.env.TOKEN);
 
 module.exports = function(route:RouteLike){

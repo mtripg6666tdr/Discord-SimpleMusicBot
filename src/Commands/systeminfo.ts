@@ -10,7 +10,6 @@ import { BaseCommand } from ".";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
 
-
 export default class SystemInfo extends BaseCommand {
   constructor(){
     super({

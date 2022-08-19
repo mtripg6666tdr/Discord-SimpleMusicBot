@@ -5,7 +5,6 @@ import type { EmbedField } from "discord.js";
 import { Util } from "../Util";
 import { AudioSource } from "./audiosource";
 
-
 export class Hibiki extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "hibiki";

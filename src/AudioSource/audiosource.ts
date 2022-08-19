@@ -4,7 +4,6 @@ import type * as voice from "@discordjs/voice";
 import type { EmbedField } from "discord.js";
 import type { Readable } from "stream";
 
-
 export abstract class AudioSource {
   // ソースのURL
   Url:string;

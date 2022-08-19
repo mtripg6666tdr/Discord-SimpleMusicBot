@@ -4,7 +4,6 @@ import type * as ytsr from "ytsr";
 
 import * as discord from "discord.js";
 
-
 import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
 import { Util } from "../Util";

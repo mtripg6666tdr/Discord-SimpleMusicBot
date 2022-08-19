@@ -9,7 +9,6 @@ import type { Client } from "discord.js";
 import * as fs from "fs";
 import * as path from "path";
 
-
 import { LogEmitter } from "../Structure";
 
 type BaseCommandInitializeOptions = {

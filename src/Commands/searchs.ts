@@ -7,7 +7,6 @@ import type { SoundcloudTrackV2 } from "soundcloud.ts";
 import * as discord from "discord.js";
 import Soundcloud from "soundcloud.ts";
 
-
 import { BaseCommand } from ".";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";

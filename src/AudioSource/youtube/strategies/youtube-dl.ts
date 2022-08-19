@@ -10,7 +10,6 @@ import m3u8stream from "m3u8stream";
 import { Util } from "../../../Util";
 import { Strategy } from "./base";
 
-
 type youtubeDl = "youtubeDl";
 const youtubeDl:youtubeDl = "youtubeDl";
 
@@ -314,7 +313,6 @@ interface Thumbnail {
   resolution: string;
   id: string;
 }
-
 
 // QuickType of GitHub Releases API
 interface GitHubRelease {

@@ -4,7 +4,6 @@ import type * as discord from "discord.js";
 
 import * as voice from "@discordjs/voice";
 
-
 import { BaseCommand } from ".";
 import { Util } from "../Util";
 
