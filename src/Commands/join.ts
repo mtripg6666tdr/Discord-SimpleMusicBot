@@ -1,7 +1,10 @@
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
 import * as voice from "@discordjs/voice";
-import { CommandArgs, BaseCommand } from ".";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
-import { CommandMessage } from "../Component/CommandMessage"
 
 export default class Join extends BaseCommand {
   constructor(){

@@ -1,9 +1,10 @@
-require("dotenv").config();
-
+import "./dotenv";
 import type { TextChannel } from "discord.js";
+
 import * as http from "http";
-import { MusicBot } from "./bot";
+
 import { Util } from "./Util";
+import { MusicBot } from "./bot";
 // =============
 // メインエントリ
 // =============
@@ -28,6 +29,7 @@ http.createServer((req, res) => {
 if(!Util.config.debug){
   // ハンドルされなかったエラーのハンドル
   process.on("uncaughtException", (error)=>{
+    console.error(error);
     if(bot.Client && Util.config.errorChannel){
       try{
         const errorText = typeof error === "string" ? error : JSON.stringify(error);
@@ -46,4 +48,4 @@ if(!Util.config.debug){
 }
 
 // ボット開始
-bot.Run(process.env.TOKEN, true, 60);
+bot.Run(process.env.TOKEN, true, 40);

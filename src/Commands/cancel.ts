@@ -1,5 +1,7 @@
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Cancel extends BaseCommand {
@@ -10,7 +12,7 @@ export default class Cancel extends BaseCommand {
       description: "実行中のキャンセル可能な処理がある場合それをすべて中止します。",
       unlist: false,
       category: "utility",
-    })
+    });
   }
   
   async run(message:CommandMessage, options:CommandArgs){

@@ -1,5 +1,7 @@
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Mltf extends BaseCommand {
@@ -10,7 +12,7 @@ export default class Mltf extends BaseCommand {
       description: "キューの最後の曲をキューの先頭に移動します。",
       unlist: false,
       category: "playlist",
-    })
+    });
   }
 
   async run(message:CommandMessage, options:CommandArgs){

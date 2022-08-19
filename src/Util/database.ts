@@ -2,12 +2,12 @@ import { https } from "follow-redirects";
 
 const MIME_JSON = "application/json";
 export abstract class DatabaseAPI {
-  private constructor(){};
+  private constructor(){}
 
   static async SetIsSpeaking(data:{guildid:string, value:string}[]){
     if(this.CanOperate){
       const ids = data.map(d => d.guildid).join(",");
-      let rawData = {} as {[key:string]:string};
+      const rawData = {} as {[key:string]:string};
       data.forEach(d => rawData[d.guildid] = d.value);
       try{
         const result = await this.HttpRequest("POST", process.env.GAS_URL, {
@@ -39,7 +39,7 @@ export abstract class DatabaseAPI {
           type: "j"
         } as requestBody, MIME_JSON);
         if(result.status === 200){
-          return result.data as {[guildid:string]:string}
+          return result.data as {[guildid:string]:string};
         }else{
           return null;
         }
@@ -55,7 +55,7 @@ export abstract class DatabaseAPI {
   static async SetQueueData(data:{guildid:string, queue:string}[]){
     if(this.CanOperate){
       const ids = data.map(d => d.guildid).join(",");
-      let rawData = {} as {[guildid:string]:string};
+      const rawData = {} as {[guildid:string]:string};
       data.forEach(d => rawData[d.guildid] = encodeURIComponent(d.queue));
       try{
         const result = await this.HttpRequest("POST", process.env.GAS_URL, {
@@ -95,7 +95,7 @@ export abstract class DatabaseAPI {
   }
 
   static get CanOperate(){
-    return Boolean(process.env.GAS_TOKEN && process.env.GAS_URL)
+    return Boolean(process.env.GAS_TOKEN && process.env.GAS_URL);
   }
 
   static async HttpRequest(method:"GET"|"POST", url:string, data?:requestBody, mimeType?:string){
@@ -113,14 +113,14 @@ export abstract class DatabaseAPI {
       if(mimeType){
         opt.headers = {
           "Content-Type": mimeType
-        }
+        };
       }
       const req = https.request(opt, (res) => {
-        let data = "";
-        res.on("data", (chunk) => data+=chunk);
+        const bufs = [] as Buffer[];
+        res.on("data", chunk => bufs.push(chunk));
         res.on("end", ()=> {
           try{
-            let parsed = JSON.parse(data) as postResult;
+            const parsed = JSON.parse(Buffer.concat(bufs).toString("utf-8")) as postResult;
             Object.keys(parsed.data).forEach(k => parsed.data[k] = decodeURIComponent(parsed.data[k]));
             resolve(parsed);
           }
@@ -140,14 +140,14 @@ export abstract class DatabaseAPI {
 }
 
 type getResult = {
-  status: 200|404;
-}
+  status: 200|404,
+};
 type postResult = getResult & {
-  data:any;
-}
+  data:any,
+};
 type requestBody = {
-  token:string;
-  guildid:string;
-  data?:any;
-  type:"queue"|"j";
-}
+  token:string,
+  guildid:string,
+  data?:any,
+  type:"queue"|"j",
+};

@@ -1,10 +1,13 @@
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+import type * as ytsr from "ytsr";
+
 import * as discord from "discord.js";
-import * as ytsr from "ytsr";
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/color";
-import { Util } from "../Util";
+
+import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
+import { Util } from "../Util";
+import { getColor } from "../Util/color";
 
 export default class Search extends BaseCommand {
   constructor(){
@@ -65,7 +68,7 @@ export default class Search extends BaseCommand {
         let index = 1;
         const selectOpts = [] as discord.MessageSelectOptionData[];
         for(let i = 0; i < result.items.length; i++){
-          if(result.items[i].type == "video"){
+          if(result.items[i].type === "video"){
             const video = (result.items[i] as ytsr.Video);
             desc += `\`${index}.\` [${video.title}](${video.url}) \`${video.duration}\` - \`${video.author.name}\` \r\n\r\n`;
             options.data[message.guild.id].SearchPanel.Opts[index] = {
@@ -91,25 +94,25 @@ export default class Search extends BaseCommand {
           .setDescription(desc)
           .setFooter({
             iconURL: message.author.avatarURL(),
-            text:"動画のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
+            text: "動画のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
           })
         ;
         await msg.edit({
-          content: null, 
-          embeds:[embed],
+          content: null,
+          embeds: [embed],
           components: [
             new discord.MessageActionRow()
-            .addComponents(
-              new discord.MessageSelectMenu()
-              .setCustomId("search")
-              .setPlaceholder("数字を送信するか、ここから選択...")
-              .setMinValues(1)
-              .setMaxValues(index - 1)
-              .addOptions([...selectOpts, {
-                label: "キャンセル",
-                value: "cancel"
-              }])
-            )
+              .addComponents(
+                new discord.MessageSelectMenu()
+                  .setCustomId("search")
+                  .setPlaceholder("数字を送信するか、ここから選択...")
+                  .setMinValues(1)
+                  .setMaxValues(index - 1)
+                  .addOptions([...selectOpts, {
+                    label: "キャンセル",
+                    value: "cancel"
+                  }])
+              )
           ]
         });
         u.end();
@@ -117,8 +120,8 @@ export default class Search extends BaseCommand {
       catch(e){
         Util.logger.log(e, "error");
         options.data[message.guild.id].SearchPanel = null;
-        if(msg) msg.edit("✘内部エラーが発生しました").catch(e => Util.logger.log(e, "error"));
-        else message.reply("✘内部エラーが発生しました").catch(e => Util.logger.log(e, "error"));
+        if(msg) msg.edit("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
+        else message.reply("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
       }
     }else{
       message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));

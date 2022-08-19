@@ -1,5 +1,7 @@
 import type { GuildDataContainer } from "../Structure";
+
 import { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
+
 import { getColor } from "./color";
 
 export const EffectsCustomIds = {
@@ -7,16 +9,13 @@ export const EffectsCustomIds = {
   BassBoost: "bass_boost",
   Reverb: "reverb",
   LoudnessEqualization: "loudness_eq",
-}
+};
 
 export function getFFmpegEffectArgs(data:GuildDataContainer){
   const effect = [];
-  if(data.EffectPrefs.BassBoost)
-    effect.push("firequalizer=gain_entry='entry(80,6)'")
-  if(data.EffectPrefs.Reverb)
-    effect.push("aecho=1.0:0.7:20:0.5")
-  if(data.EffectPrefs.LoudnessEqualization)
-    effect.push("loudnorm")
+  if(data.EffectPrefs.BassBoost) effect.push("firequalizer=gain_entry='entry(80,6)'");
+  if(data.EffectPrefs.Reverb) effect.push("aecho=1.0:0.7:20:0.5");
+  if(data.EffectPrefs.LoudnessEqualization) effect.push("loudnorm");
   
   if(effect.length >= 1){
     return ["-af", effect.join(",")];
@@ -35,32 +34,29 @@ export function getCurrentEffectPanel(avatarUrl:string, data:GuildDataContainer)
     .setColor(getColor("EFFECT"))
     .setFooter({
       iconURL: avatarUrl,
-      text:"エフェクトを選択してボタンを押してください"
+      text: "エフェクトを選択してボタンを押してください"
     })
   ;
   const messageActions = new MessageActionRow()
     .addComponents([
-        new MessageButton()
+      new MessageButton()
         .setCustomId("reload")
         .setStyle("PRIMARY")
         .setEmoji("🔁")
-        .setLabel("更新")
-      ,
-        new MessageButton()
+        .setLabel("更新"),
+      new MessageButton()
         .setCustomId("bass_boost")
         .setStyle(data.EffectPrefs.BassBoost ? "SUCCESS" : "SECONDARY")
-        .setLabel("Bass Boost")
-      ,
-        new MessageButton()
+        .setLabel("Bass Boost"),
+      new MessageButton()
         .setCustomId("reverb")
         .setStyle(data.EffectPrefs.Reverb ? "SUCCESS" : "SECONDARY")
-        .setLabel("Reverb")
-      ,
-        new MessageButton()
+        .setLabel("Reverb"),
+      new MessageButton()
         .setCustomId("loudness_eq")
         .setStyle(data.EffectPrefs.LoudnessEqualization ? "SUCCESS" : "SECONDARY")
         .setLabel("Loudness Eq")
     ]);
-  ;
+  
   return { embed, messageActions };
 }

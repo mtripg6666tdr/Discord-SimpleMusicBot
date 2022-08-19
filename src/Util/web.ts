@@ -1,8 +1,11 @@
-import * as https from "https";
-import * as http from "http";
-import { Readable } from "stream";
+import type { Readable } from "stream";
+
 import { spawn } from "child_process";
+import * as http from "http";
+import * as https from "https";
+
 import * as miniget from "miniget";
+
 import { InitPassThrough } from "./general";
 import { DefaultUserAgent } from "./ua";
 
@@ -12,10 +15,10 @@ import { DefaultUserAgent } from "./ua";
  * @returns ダウンロードされたテキストデータ
  */
 export function DownloadText(url:string, headers?:{[key:string]:string}, requestBody?:any):Promise<string>{
-  return new Promise((resolve,reject)=>{
+  return new Promise((resolve, reject)=>{
     const durl = new URL(url);
     const req = ({
-      "https:": https, 
+      "https:": https,
       "http:": http
     })[durl.protocol].request({
       protocol: durl.protocol,
@@ -70,7 +73,7 @@ export function RetriveHttpStatusCode(url:string, headers?:{[key:string]:string}
       })
       .end()
     ;
-  })
+  });
 }
 
 /**
@@ -86,7 +89,7 @@ export function DownloadAsReadable(url:string):Readable{
     backoff: { inc: 500, max: 10000 },
   });
   req.on("error", (e)=>{
-    stream.emit("error",e);
+    stream.emit("error", e);
   }).pipe(stream);
   return stream;
 }
@@ -116,7 +119,7 @@ export function RetriveLengthSeconds(url:string){
             .reduce((prev, current) => prev * 60 + current)
             ;
           resolve(Math.ceil(lengthSec));
-        } else {
+        }else{
           reject("not match");
         }
       });

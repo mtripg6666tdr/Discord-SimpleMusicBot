@@ -1,5 +1,7 @@
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class End extends BaseCommand {

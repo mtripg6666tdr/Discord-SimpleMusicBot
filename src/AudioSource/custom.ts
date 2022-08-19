@@ -1,7 +1,8 @@
+import type { UrlStreamInfo } from ".";
 import type { EmbedField } from "discord.js";
-import { UrlStreamInfo } from ".";
-import { DefaultAudioThumbnailURL } from "../definition";
+
 import { Util } from "../Util";
+import { DefaultAudioThumbnailURL } from "../definition";
 import { AudioSource } from "./audiosource";
 
 export class CustomStream extends AudioSource {
@@ -10,13 +11,14 @@ export class CustomStream extends AudioSource {
   Thumnail:string = DefaultAudioThumbnailURL;
 
   async init(url:string){
-    if(!Util.fs.isAvailableRawAudioURL(url)) throw "正しいストリームではありません"
+    if(!Util.fs.isAvailableRawAudioURL(url)) throw new Error("正しいストリームではありません");
     this.Url = url;
     this.Title = this.extractFilename() || "カスタムストリーム";
     try{
       this._lengthSeconds = await Util.web.RetriveLengthSeconds(url);
     }
-    catch{};
+    // eslint-disable-next-line no-empty
+    catch{}
     return this;
   }
 
@@ -37,11 +39,11 @@ export class CustomStream extends AudioSource {
     }] as EmbedField[];
   }
 
-  npAdditional(){return ""};
+  npAdditional(){return "";}
 
   exportData():exportableCustom{
     return {
-      url:this.Url,
+      url: this.Url,
       length: this._lengthSeconds
     };
   }
@@ -53,6 +55,6 @@ export class CustomStream extends AudioSource {
 }
 
 export type exportableCustom = {
-  url: string;
-  length: number;
-}
+  url: string,
+  length: number,
+};

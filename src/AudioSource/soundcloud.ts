@@ -1,6 +1,9 @@
+import type { ReadableStreamInfo } from ".";
 import type { EmbedField } from "discord.js";
-import SoundCloud, { SoundcloudTrackV2 } from "soundcloud.ts";
-import { ReadableStreamInfo } from ".";
+import type { SoundcloudTrackV2 } from "soundcloud.ts";
+
+import SoundCloud from "soundcloud.ts";
+
 import { Util } from "../Util";
 import { AudioSource } from "./audiosource";
 
@@ -37,7 +40,7 @@ export class SoundCloudS extends AudioSource {
       stream.emit("error", e);
     }).pipe(stream);
     return {
-      type: "readable", 
+      type: "readable",
       stream
     };
   }
@@ -76,24 +79,24 @@ export class SoundCloudS extends AudioSource {
   }
 
   static validatePlaylistUrl(url:string){
-    return Boolean(url.match(/https?:\/\/soundcloud.com\/[^\/?]+\/sets\/[^\/?]+/));
+    return Boolean(url.match(/https?:\/\/soundcloud.com\/[^/?]+\/sets\/[^/?]+/));
   }
 }
 
 export type exportableSoundCloud = {
-  url:string;
-  title:string;
-  description:string;
-  length:number;
-  author:string;
-  thumbnail:string;
-}
+  url:string,
+  title:string,
+  description:string,
+  length:number,
+  author:string,
+  thumbnail:string,
+};
 
 /**
  * SoundCloud API Track Collection
  */
 export interface SoundCloudTrackCollection {
   collection: SoundcloudTrackV2[];
-  next_href:  string;
-  query_urn:  null;
+  next_href: string;
+  query_urn: null;
 }

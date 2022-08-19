@@ -1,9 +1,12 @@
+import type { CommandArgs } from ".";
+import type { YouTube } from "../AudioSource";
+import type { CommandMessage } from "../Component/CommandMessage";
+
 import * as discord from "discord.js";
-import { CommandArgs, BaseCommand } from ".";
-import { YouTube } from "../AudioSource";
-import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/color";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
+import { getColor } from "../Util/color";
 
 export default class Searchq extends BaseCommand {
   constructor(){
@@ -31,31 +34,31 @@ export default class Searchq extends BaseCommand {
       return;
     }
     let qsresult = options.data[message.guild.id].Queue
-                    .filter(c => c.BasicInfo.Title.toLowerCase().indexOf(options.rawArgs.toLowerCase()) >= 0)
-                    .concat(
-                      options.data[message.guild.id].Queue
-                      .filter(c => c.BasicInfo.Url.toLowerCase().indexOf(options.rawArgs.toLowerCase()) >= 0)
-                    );
+      .filter(c => c.BasicInfo.Title.toLowerCase().includes(options.rawArgs.toLowerCase()))
+      .concat(
+        options.data[message.guild.id].Queue
+          .filter(c => c.BasicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase()))
+      );
     if(qsresult.length === 0){
       message.reply(":confused:見つかりませんでした").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    if(qsresult.length > 20) qsresult = qsresult.slice(0,20);
+    if(qsresult.length > 20) qsresult = qsresult.slice(0, 20);
     const fields = qsresult.map(c => {
-      const index = options.data[message.guild.id].Queue.findIndex(d => d.BasicInfo.Title === c.BasicInfo.Title).toString()
+      const index = options.data[message.guild.id].Queue.findIndex(d => d.BasicInfo.Title === c.BasicInfo.Title).toString();
       const _t = c.BasicInfo.LengthSeconds;
-      const [min,sec] = Util.time.CalcMinSec(_t);
+      const [min, sec] = Util.time.CalcMinSec(_t);
       return {
         name: index === "0" ? "現在再生中/再生待ち" : index,
         value: "[" + c.BasicInfo.Title + "](" + c.BasicInfo.Url + ")\r\nリクエスト: `" + c.AdditionalInfo.AddedBy.displayName + "` \r\n長さ: " + ((c.BasicInfo.ServiceIdentifer === "youtube" && (c.BasicInfo as YouTube).LiveStream) ? "(ライブストリーム)" : " `" + (_t === 0 ? "(不明)" : min + ":" + sec + "`")),
         inline: false
-      } as discord.EmbedField
+      } as discord.EmbedField;
     });
     const embed = new discord.MessageEmbed();
     embed.title = "\"" + options.rawArgs + "\"の検索結果✨";
     embed.description = "キュー内での検索結果です。最大20件表示されます。";
     embed.fields = fields;
     embed.setColor(getColor("SEARCH"));
-    message.reply({embeds:[embed]});
+    message.reply({embeds: [embed]});
   }
 }

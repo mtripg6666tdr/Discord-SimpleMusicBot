@@ -1,8 +1,11 @@
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
 import * as discord from "discord.js";
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/color";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
+import { getColor } from "../Util/color";
 
 export default class EquallyPlayback extends BaseCommand {
   constructor(){
@@ -25,8 +28,8 @@ export default class EquallyPlayback extends BaseCommand {
       const embed = new discord.MessageEmbed()
         .setTitle("⭕均等再生をオンにしました")
         .setDescription("楽曲追加時に、楽曲を追加したユーザーごとにできるだけ均等になるようにする機能です。")
-        .setColor(getColor("EQUALLY"))
-      message.reply({embeds:[embed]});
+        .setColor(getColor("EQUALLY"));
+      message.reply({embeds: [embed]});
     }
   }
 }

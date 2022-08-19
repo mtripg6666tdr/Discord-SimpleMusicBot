@@ -1,6 +1,9 @@
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
 import * as discord from "discord.js";
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
+
+import { BaseCommand } from ".";
 import { YmxVersion } from "../Structure";
 import { Util } from "../Util";
 
@@ -12,7 +15,7 @@ export default class Export extends BaseCommand {
       description: "キューの内容をインポートできるようエクスポートします。",
       unlist: false,
       category: "playlist",
-    })
+    });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
@@ -23,7 +26,7 @@ export default class Export extends BaseCommand {
     }
     const qd = options.bot.exportQueue(message.guild.id);
     message.reply({
-      content:"✅エクスポートしました", 
+      content: "✅エクスポートしました",
       files: [new discord.MessageAttachment(Buffer.from(qd), "exported_queue.ymx")]
     })
       .then(msg => msg.edit(`✅エクスポートしました (バージョン: v${YmxVersion}互換)\r\nインポート時は、「${msg.url}」をimportコマンドの引数に指定してください`))

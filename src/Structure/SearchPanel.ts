@@ -1,4 +1,4 @@
-import { CommandMessage } from "../Component/CommandMessage";
+import type { CommandMessage } from "../Component/CommandMessage";
 
 export type SearchPanel = {
   /**
@@ -16,25 +16,25 @@ export type SearchPanel = {
     /**
      * 検索したユーザーのID
      */
-    userId: string
+    userId: string,
     /**
      * 検索者のユーザー名
      */
-    userName: string
+    userName: string,
     /**
      * 検索が要求されたときのメッセージ
      */
-    commandMessage: CommandMessage
+    commandMessage: CommandMessage,
   },
   /**
    * 検索窓の内容を保存します
    */
-  Opts: {[num:number]: VideoInfo}
+  Opts: {[num:number]: VideoInfo},
 };
 
 type VideoInfo = {
-  url:string;
-  title:string;
-  duration:string;
-  thumbnail:string;
+  url:string,
+  title:string,
+  duration:string,
+  thumbnail:string,
 };

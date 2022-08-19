@@ -1,8 +1,11 @@
-import * as discord from "discord.js";
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+import type * as discord from "discord.js";
+
 import * as voice from "@discordjs/voice";
-import { CommandArgs, BaseCommand } from ".";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
-import { CommandMessage } from "../Component/CommandMessage"
 
 export default class LeaveClean extends BaseCommand {
   constructor(){
@@ -26,7 +29,7 @@ export default class LeaveClean extends BaseCommand {
       return;
     }
     const members = [...((await options.client.channels.resolve(voice.getVoiceConnection(message.guild.id).joinConfig.channelId).fetch()) as discord.VoiceChannel).members.keys()];
-    const number = options.data[message.guild.id].Queue.RemoveIf(q => members.indexOf(q.AdditionalInfo.AddedBy.userId) < 0).length;
-    message.reply(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => Util.logger.log(e, "error"));;
+    const number = options.data[message.guild.id].Queue.RemoveIf(q => !members.includes(q.AdditionalInfo.AddedBy.userId)).length;
+    message.reply(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => Util.logger.log(e, "error"));
   }
 }

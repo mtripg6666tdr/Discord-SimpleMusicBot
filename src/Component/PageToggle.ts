@@ -1,5 +1,7 @@
 import type { ResponseMessage } from "./ResponseMessage";
-import { MessageActionRow, MessageButton, MessageComponentInteraction, MessageEmbed } from "discord.js";
+import type { MessageComponentInteraction, MessageEmbed } from "discord.js";
+
+import { MessageActionRow, MessageButton } from "discord.js";
 
 /**
  * 最終的にメッセージの埋め込みに解決されるデータ
@@ -14,18 +16,22 @@ export class PageToggle {
   get Message(){
     return this._message;
   }
+
   private _embeds:MessageEmbedsResolvable;
   get Embeds(){
     return this._embeds;
   }
+
   private _current:number = 0;
   get Current(){
     return this._current;
   }
+
   private _total:number = -1;
   get Length(){
     return this._embeds instanceof Array ? (this.Embeds as MessageEmbed[]).length : this._total === -1 ? NaN : this._total;
   }
+
   IsFreshNecessary = false;
 
   private constructor(){}
@@ -49,16 +55,16 @@ export class PageToggle {
       embeds: n._message.embeds,
       components: [
         new MessageActionRow()
-        .addComponents(
-          new MessageButton()
-          .setCustomId(this.arrowLeft)
-          .setLabel(this.arrowLeftEmoji)
-          .setStyle("PRIMARY"),
-          new MessageButton()
-          .setCustomId(this.arrowRight)
-          .setLabel(this.arrowRightEmoji)
-          .setStyle("PRIMARY")
-        )
+          .addComponents(
+            new MessageButton()
+              .setCustomId(this.arrowLeft)
+              .setLabel(this.arrowLeftEmoji)
+              .setStyle("PRIMARY"),
+            new MessageButton()
+              .setCustomId(this.arrowRight)
+              .setLabel(this.arrowRightEmoji)
+              .setStyle("PRIMARY")
+          )
       ]
     });
     return n;
@@ -71,7 +77,7 @@ export class PageToggle {
         delIndex.push(i);
       }
     }
-    delIndex.sort((a,b)=>b-a);
+    delIndex.sort((a, b)=>b - a);
     delIndex.forEach(i => {
       toggles[i].Message.edit({
         content: toggles[i].Message.content === "" ? null : toggles[i].Message.content,
@@ -86,19 +92,19 @@ export class PageToggle {
     let embed = null as MessageEmbed;
     this._current = page;
     if(this._embeds instanceof Array){
-      embed = (this._embeds as MessageEmbed[])[page]
+      embed = (this._embeds as MessageEmbed[])[page];
     }else if(typeof this._embeds === "function"){
       embed = await (this._embeds as any)(page);
     }
     if(interaction){
       await interaction.editReply({
         content: this.Message.content === "" ? null : this.Message.content,
-        embeds:[embed]
+        embeds: [embed]
       });
     }else{
       await this.Message.edit({
         content: this.Message.content === "" ? null : this.Message.content,
-        embeds:[embed]
+        embeds: [embed]
       });
     }
   }

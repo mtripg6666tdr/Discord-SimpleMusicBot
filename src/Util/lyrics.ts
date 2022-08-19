@@ -1,7 +1,9 @@
 import * as https from "https";
+
 import Genius from "genius-lyrics";
-import { convert } from "html-to-text";
 import { decode } from "html-entities";
+import { convert } from "html-to-text";
+
 import { DefaultAudioThumbnailURL } from "../definition";
 import { DownloadText } from "./web";
 
@@ -15,21 +17,21 @@ export async function GetLyrics(keyword:string):Promise<songInfo>{
       lyric: await song.lyrics(),
       title: song.title,
       url: song.url
-    }
+    };
   }
   catch(e){
     // Fallback to utaten
     if(!process.env.CSE_KEY) throw e;
     const data = JSON.parse(await DownloadText("https://customsearch.googleapis.com/customsearch/v1?cx=89ebccacdc32461f2&key=" + process.env.CSE_KEY + "&q=" + encodeURIComponent(keyword))) as CSE_Result;
     const items = data.items?.filter(i => new URL(i.link).pathname.startsWith("/lyric/"));
-    if(!items || items.length === 0) {
-      throw "No lyric was found";
+    if(!items || items.length === 0){
+      throw new Error("No lyric was found");
     }
     const url = items[0].link;
     let lyric = await DownloadWithoutRuby(url);
     let doc = "";
     [doc, lyric] = lyric.split("<div class=\"hiragana\" >");
-    [lyric, ] = lyric.split("</div>");
+    [lyric ] = lyric.split("</div>");
     lyric = lyric.replace(/<span class="rt rt_hidden">.+?<\/span>/g, "");
     lyric = lyric.replace(/\n/g, "");
     lyric = lyric.replace(/<br \/>/g, "<br>");
@@ -48,7 +50,7 @@ export async function GetLyrics(keyword:string):Promise<songInfo>{
 }
 
 function DownloadWithoutRuby(url:string):Promise<string>{
-  return new Promise((resolve,reject)=>{
+  return new Promise((resolve, reject)=>{
     const durl = new URL(url);
     const req = https.request({
       protocol: durl.protocol,
@@ -75,20 +77,20 @@ function DownloadWithoutRuby(url:string):Promise<string>{
 }
 
 type songInfo = {
-  lyric:string;
-  artist:string;
-  title:string;
-  artwork:string;
-  url:string;
-}
+  lyric:string,
+  artist:string,
+  title:string,
+  artwork:string,
+  url:string,
+};
 
 interface CSE_Result {
-  kind:              string;
-  url:               URL;
-  queries:           Queries;
-  context:           Context;
+  kind: string;
+  url: URL;
+  queries: Queries;
+  context: Context;
   searchInformation: SearchInformation;
-  items:             Item[];
+  items: Item[];
 }
 
 interface Context {
@@ -96,34 +98,34 @@ interface Context {
 }
 
 interface Item {
-  kind:             any;
-  title:            string;
-  htmlTitle:        string;
-  link:             string;
-  displayLink:      any;
-  snippet:          string;
-  htmlSnippet:      string;
-  cacheId:          string;
-  formattedUrl:     string;
+  kind: any;
+  title: string;
+  htmlTitle: string;
+  link: string;
+  displayLink: any;
+  snippet: string;
+  htmlSnippet: string;
+  cacheId: string;
+  formattedUrl: string;
   htmlFormattedUrl: string;
-  pagemap:          Pagemap;
+  pagemap: Pagemap;
 }
 
 interface Pagemap {
   cse_thumbnail?: CSEThumbnail[];
-  metatags:       { [key: string]: string }[];
-  cse_image:      CSEImage[];
-  listitem?:      Listitem[];
-  Article?:       Article[];
+  metatags: { [key: string]: string }[];
+  cse_image: CSEImage[];
+  listitem?: Listitem[];
+  Article?: Article[];
 }
 
 interface Article {
   datePublished: string;
-  image:         string;
-  itemtype:      string;
-  description:   string;
-  dateModified:  string;
-  headline:      string;
+  image: string;
+  itemtype: string;
+  description: string;
+  dateModified: string;
+  headline: string;
 }
 
 interface CSEImage {
@@ -131,14 +133,14 @@ interface CSEImage {
 }
 
 interface CSEThumbnail {
-  src:    string;
-  width:  string;
+  src: string;
+  width: string;
   height: string;
 }
 
 interface Listitem {
-  item:     string;
-  name:     string;
+  item: string;
+  name: string;
   position: string;
 }
 
@@ -147,25 +149,25 @@ interface Queries {
 }
 
 interface Request {
-  title:          string;
-  totalResults:   string;
-  searchTerms:    string;
-  count:          number;
-  startIndex:     number;
-  inputEncoding:  string;
+  title: string;
+  totalResults: string;
+  searchTerms: string;
+  count: number;
+  startIndex: number;
+  inputEncoding: string;
   outputEncoding: string;
-  safe:           string;
-  cx:             string;
+  safe: string;
+  cx: string;
 }
 
 interface SearchInformation {
-  searchTime:            number;
-  formattedSearchTime:   string;
-  totalResults:          string;
+  searchTime: number;
+  formattedSearchTime: string;
+  totalResults: string;
   formattedTotalResults: string;
 }
 
 interface URL {
-  type:     string;
+  type: string;
   template: string;
 }

@@ -1,9 +1,12 @@
-import * as discord from "discord.js";
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
 import * as voice from "@discordjs/voice";
-import { CommandArgs, BaseCommand } from ".";
-import { getColor } from "../Util/color";
+import * as discord from "discord.js";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
-import { CommandMessage } from "../Component/CommandMessage";
+import { getColor } from "../Util/color";
 
 export default class Uptime extends BaseCommand {
   constructor(){
@@ -26,12 +29,12 @@ export default class Uptime extends BaseCommand {
       .setTitle(options.client.user.username + "のアップタイム")
       .addField("サーバー起動からの経過した時間", insta[0] + "時間" + insta[1] + "分" + insta[2] + "秒")
       .addField("Botが起動してからの経過時間", ready[0] + "時間" + ready[1] + "分" + ready[2] + "秒")
-      .addField("レイテンシ", 
-          (now.getTime() - message.createdAt.getTime()) + "ミリ秒(ボット接続実測値)\r\n"
+      .addField("レイテンシ",
+        (now.getTime() - message.createdAt.getTime()) + "ミリ秒(ボット接続実測値)\r\n"
         + options.client.ws.ping + "ミリ秒(ボットWebSocket接続取得値)\r\n"
         + (voice.getVoiceConnection(message.guild.id)?.ping.udp ?? "-") + "ミリ秒(ボイスチャンネルUDP接続取得値)"
       )
       .addField("データベースに登録されたサーバー数", Object.keys(options.data).length + "サーバー");
-    message.reply({embeds:[embed]}).catch(e => Util.logger.log(e, "error"));
+    message.reply({embeds: [embed]}).catch(e => Util.logger.log(e, "error"));
   }
 }

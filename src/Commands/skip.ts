@@ -1,5 +1,7 @@
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Skip extends BaseCommand {
@@ -21,7 +23,7 @@ export default class Skip extends BaseCommand {
       await message.reply("再生中ではありません").catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"));
       return;
     }else if(server.Player.preparing){
-      await message.reply("再生準備中です").catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"))
+      await message.reply("再生準備中です").catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"));
       return;
     }
     try{
@@ -33,7 +35,7 @@ export default class Skip extends BaseCommand {
       await response.edit(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => Util.logger.log(e, "error"));
     }
     catch(e){
-      await message.channel.send(":astonished:スキップに失敗しました").catch(e => Util.logger.log(e, "error"));
+      await message.channel.send(":astonished:スキップに失敗しました").catch(er => Util.logger.log(er, "error"));
     }
   }
 }

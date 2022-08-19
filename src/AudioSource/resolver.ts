@@ -1,18 +1,20 @@
 import type { KnownAudioSourceIdentifer } from "../Component/QueueManager";
+
 import * as ytdl from "ytdl-core";
+
 import * as AudioSource from ".";
 import { Util } from "../Util";
 
 type AudioSourceBasicInfo = {
-  type: KnownAudioSourceIdentifer;
-  url: string;
-  knownData: AudioSource.exportableCustom;
-  forceCache: boolean;
-}
+  type: KnownAudioSourceIdentifer,
+  url: string,
+  knownData: AudioSource.exportableCustom,
+  forceCache: boolean,
+};
 
 export async function Resolve(info:AudioSourceBasicInfo){
   let basicInfo = null as AudioSource.AudioSource;
-  const {type, url, knownData:gotData, forceCache: cache} = info;
+  const {type, url, knownData: gotData, forceCache: cache} = info;
   if(type === "youtube" || (type === "unknown" && ytdl.validateURL(url))){
     // youtube
     basicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.exportableYouTube, cache);

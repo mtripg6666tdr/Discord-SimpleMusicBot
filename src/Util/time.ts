@@ -1,4 +1,5 @@
 import { performance } from "perf_hooks";
+
 import { AddZero } from "./general";
 import { log } from "./log";
 
@@ -46,23 +47,26 @@ class _timerStore {
 
   start(key:string){
     this.timers[key] = performance.now();
-    return new timerStopper(this, key);
+    return new TimerStopper(this, key);
   }
 
-  end(key:string){
+  end(key:string, logger?: (content:string) => void){
     if(this.timers[key]){
-      log("[TimeLogger]Elapsed " + (Math.floor((performance.now() - this.timers[key]) * 100) / 100) + "ms. (" + key + ")");
+      const conteet = "[TimeLogger]Elapsed " + (Math.floor((performance.now() - this.timers[key]) * 100) / 100) + "ms. (" + key + ")";
+      if(logger) logger(conteet);
+      else log(conteet);
       delete this.timers[key];
     }
   }
 }
 
-class timerStopper {
-  constructor(private parent:_timerStore, private key:string){
+class TimerStopper {
+  constructor(private readonly parent:_timerStore, private readonly key:string){
     //
   }
-  end(){
-    this.parent.end(this.key);
+
+  end(logger?: (content:string) => void){
+    this.parent.end(this.key, logger);
   }
 }
 

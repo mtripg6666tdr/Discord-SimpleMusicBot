@@ -1,9 +1,10 @@
-import type { EmbedField } from "discord.js";
+import type { UrlStreamInfo } from ".";
 import type { exportableCustom } from "./custom";
+import type { EmbedField } from "discord.js";
+
+import { Util } from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { AudioSource } from "./audiosource";
-import { UrlStreamInfo } from ".";
-import { Util } from "../Util";
 
 export class GoogleDrive extends AudioSource {
   protected _lengthSeconds = 0;
@@ -17,6 +18,7 @@ export class GoogleDrive extends AudioSource {
     try{
       this._lengthSeconds = await Util.web.RetriveLengthSeconds((await this.fetch()).url);
     }
+    // eslint-disable-next-line no-empty
     catch{}
     return this;
   }
@@ -36,7 +38,7 @@ export class GoogleDrive extends AudioSource {
     }] as EmbedField[];
   }
 
-  npAdditional(){return ""};
+  npAdditional(){return "";}
 
   exportData():exportableCustom{
     return {
@@ -46,11 +48,11 @@ export class GoogleDrive extends AudioSource {
   }
 
   static validateUrl(url:string){
-    return Boolean(url.match(/^https?:\/\/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?$/));
+    return Boolean(url.match(/^https?:\/\/drive\.google\.com\/file\/d\/([^/?]+)(\/.+)?$/));
   }
 
   static getId(url:string){
-    const match = url.match(/^https?:\/\/drive\.google\.com\/file\/d\/(?<id>[^\/\?]+)(\/.+)?$/);
+    const match = url.match(/^https?:\/\/drive\.google\.com\/file\/d\/(?<id>[^/?]+)(\/.+)?$/);
     return match ? match.groups.id : null;
   }
 }

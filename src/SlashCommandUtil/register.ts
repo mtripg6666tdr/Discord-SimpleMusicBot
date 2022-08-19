@@ -1,9 +1,13 @@
 require("dotenv").config();
-import { REST, RouteLike } from "@discordjs/rest";
-import { SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "@discordjs/builders";
+import type { SlashCommandBooleanOption, SlashCommandIntegerOption, SlashCommandStringOption } from "@discordjs/builders";
+import type { RouteLike } from "@discordjs/rest";
+
+import { SlashCommandBuilder } from "@discordjs/builders";
+import { REST } from "@discordjs/rest";
+
 import { CommandsManager } from "../Commands";
 
-const rest = new REST({version: '9'}).setToken(process.env.TOKEN);
+const rest = new REST({version: "9"}).setToken(process.env.TOKEN);
 
 module.exports = function(route:RouteLike){
   const commandsInfo = [];
@@ -21,29 +25,29 @@ module.exports = function(route:RouteLike){
           option
             .setName(arg.name)
             .setDescription(arg.description)
-            .setRequired(arg.required)
+            .setRequired(arg.required);
           if(arg.choices && Object.keys(arg.choices).length > 0){
             Object.keys(arg.choices).forEach(key => (option as SlashCommandIntegerOption).addChoices([[key, arg.choices[key] as number]]));
           }
           return option;
         };
         switch(arg.type){
-          case "bool":
-            builder.addBooleanOption(addingOptionArgs);
-            break;
-          case "integer":
-            builder.addIntegerOption(addingOptionArgs);
-            break;
-          case "string":
-            builder.addStringOption(addingOptionArgs);
-            break;
+        case "bool":
+          builder.addBooleanOption(addingOptionArgs);
+          break;
+        case "integer":
+          builder.addIntegerOption(addingOptionArgs);
+          break;
+        case "string":
+          builder.addStringOption(addingOptionArgs);
+          break;
         }
       });
     }
     commandsInfo.push(builder.toJSON());
   }
 
-  (async()=>{
+  (async ()=>{
     try{
       console.log(await rest.put(route, {
         body: commandsInfo
@@ -54,4 +58,4 @@ module.exports = function(route:RouteLike){
       console.error(e);
     }
   })();
-}
+};

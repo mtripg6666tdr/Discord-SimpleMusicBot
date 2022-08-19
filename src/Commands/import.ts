@@ -1,9 +1,12 @@
-import * as discord from "discord.js";
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
-import { ResponseMessage } from "../Component/ResponseMessage";
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+import type { ResponseMessage } from "../Component/ResponseMessage";
+import type { YmxFormat } from "../Structure";
+import type * as discord from "discord.js";
+
+import { BaseCommand } from ".";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
-import { YmxFormat, YmxVersion } from "../Structure";
+import { YmxVersion } from "../Structure";
 import { Util } from "../Util";
 
 export default class Import extends BaseCommand {
@@ -16,7 +19,7 @@ export default class Import extends BaseCommand {
       category: "playlist",
       examples: "import https://discord.com/channels/...",
       usage: "インポート <インポート元のURL>",
-      argument:[{
+      argument: [{
         type: "string",
         name: "url",
         description: "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURL、もしくはキューの埋め込みが添付されたURLを指定できます。",
@@ -63,12 +66,12 @@ export default class Import extends BaseCommand {
             const lines = fields[i].value.split("\r\n");
             const tMatch = lines[0].match(/\[(?<title>.+)\]\((?<url>.+)\)/);
             await options.data[message.guild.id].Queue.AutoAddQueue(options.client, tMatch.groups.url, message.member, "unknown");
-            await smsg.edit(fields.length + "曲中" + (i+1) + "曲処理しました。");
+            await smsg.edit(fields.length + "曲中" + (i + 1) + "曲処理しました。");
             if(cancellation.Cancelled) break;
           }
           if(!cancellation.Cancelled){
             await smsg.edit("✅" + fields.length + "曲を処理しました");
-          }else {
+          }else{
             await smsg.edit("✅キャンセルされました");
           }
         }else if(attac && attac.name.endsWith(".ymx")){
@@ -80,14 +83,14 @@ export default class Import extends BaseCommand {
           const qs = raw.data;
           for(let i = 0; i < qs.length; i++){
             await options.data[message.guild.id].Queue.AutoAddQueue(options.client, qs[i].url, message.member, "unknown", false, false, null, null, qs[i]);
-            if(qs.length <= 10 || i % 10 == 9){
-              await smsg.edit(qs.length + "曲中" + (i+1) + "曲処理しました。");
+            if(qs.length <= 10 || i % 10 === 9){
+              await smsg.edit(qs.length + "曲中" + (i + 1) + "曲処理しました。");
             }
             if(cancellation.Cancelled) break;
           }
           if(!cancellation.Cancelled){
             await smsg.edit("✅" + qs.length + "曲を処理しました");
-          }else {
+          }else{
             await smsg.edit("✅キャンセルされました");
           }
         }else{

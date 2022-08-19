@@ -1,8 +1,11 @@
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/CommandMessage";
+
 import * as discord from "discord.js";
-import { CommandArgs, BaseCommand } from ".";
-import { CommandMessage } from "../Component/CommandMessage"
-import { getColor } from "../Util/color";
+
+import { BaseCommand } from ".";
 import { Util } from "../Util";
+import { getColor } from "../Util/color";
 
 export default class Thumbnail extends BaseCommand {
   constructor(){
@@ -27,7 +30,7 @@ export default class Thumbnail extends BaseCommand {
     options.updateBoundChannel(message);
     const embed = new discord.MessageEmbed();
     embed.setColor(getColor("THUMB"));
-    if(options.rawArgs && options.data[message.guild.id].SearchPanel && Object.keys(options.data[message.guild.id].SearchPanel.Opts).indexOf(options.rawArgs === "" ? "n" : options.rawArgs) >= 0){
+    if(options.rawArgs && options.data[message.guild.id].SearchPanel && Object.keys(options.data[message.guild.id].SearchPanel.Opts).includes(options.rawArgs === "" ? "n" : options.rawArgs)){
       const opt = options.data[message.guild.id].SearchPanel.Opts[Number(Util.string.NormalizeText(options.rawArgs))];
       embed.setImage(opt.thumbnail);
       embed.title = opt.title;
@@ -41,6 +44,6 @@ export default class Thumbnail extends BaseCommand {
       message.reply("✘検索結果が見つかりません").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    message.reply({embeds:[embed]}).catch(e => Util.logger.log(e, "error"));
+    message.reply({embeds: [embed]}).catch(e => Util.logger.log(e, "error"));
   }
 }

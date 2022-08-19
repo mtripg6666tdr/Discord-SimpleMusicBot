@@ -1,34 +1,42 @@
-import { Worker } from "worker_threads";
 import type * as ytsr from "ytsr";
-import * as path from "path";
-import { type exportableYouTube, YouTube } from ".";
 
-const worker = new Worker(path.join(__dirname, "./youtube.worker.js")).on("error", () => {});
+import * as path from "path";
+import { Worker } from "worker_threads";
+
+import { type exportableYouTube, YouTube } from "..";
+import Util from "../../Util";
+
+const worker = new Worker(path.join(__dirname, "./worker.js")).on("error", () => {});
 
 export type workerMessage = {id:number} & (
-  workerInitProcessMessage|workerSearchProcessMessage|workerInitSuccessMessage|workerSearchSuccessMessage|workerErrorMessage
+  workerInitProcessMessage|workerSearchProcessMessage|workerInitSuccessMessage|workerSearchSuccessMessage|workerErrorMessage|workerLoggingMessage
 );
 export type workerInitProcessMessage = {
   type:"init",
   url:string,
   prefetched:exportableYouTube,
-  forceCache:boolean
+  forceCache:boolean,
 };
 export type workerSearchProcessMessage = {
   type:"search",
   keyword:string,
-}
+};
 export type workerInitSuccessMessage = {
   type:"initOk",
-  data:YouTube
+  data:YouTube,
 };
 export type workerSearchSuccessMessage = {
   type:"searchOk",
-  data:ytsr.Result
-}
+  data:ytsr.Result,
+};
 export type workerErrorMessage = {
   type:"error",
-  data:any
+  data:any,
+};
+export type workerLoggingMessage = {
+  type:"log",
+  level:"log"|"error"|"warn",
+  data:string,
 };
 
 export function initYouTube(url:string, prefetched:exportableYouTube, forceCache?:boolean){
@@ -40,8 +48,15 @@ export function initYouTube(url:string, prefetched:exportableYouTube, forceCache
     } as workerInitProcessMessage);
     const resolveHandler = (data:workerMessage) => {
       if(data.id === id){
-        if(data.type === "error") reject(data.data);
-        else if(data.type === "initOk") resolve(Object.assign(new YouTube(), data.data));
+        if(data.type === "log"){
+          Util.logger.log(data.data, data.level);
+          return;
+        }
+        if(data.type === "error"){
+          reject(data.data);
+        }else if(data.type === "initOk"){
+          resolve(Object.assign(new YouTube(), data.data));
+        }
         worker.off("message", resolveHandler);
       }
     };
@@ -57,11 +72,14 @@ export function searchYouTube(keyword:string){
     } as workerSearchProcessMessage);
     const resolveHandler = (data:workerMessage) => {
       if(data.id === id){
-        if(data.type === "error") reject(data.data);
-        else if(data.type === "searchOk") resolve(data.data);
+        if(data.type === "error"){
+          reject(data.data);
+        }else if(data.type === "searchOk"){
+          resolve(data.data);
+        }
         worker.off("message", resolveHandler);
       }
     };
     worker.addListener("message", resolveHandler);
-  })
+  });
 }

@@ -1,20 +1,22 @@
 import * as fs from "fs";
 import * as path from "path";
-import CJSON, { CommentObject } from "comment-json";
+
+import CJSON from "comment-json";
 
 type ConfigJson = {
-  adminId: string, 
-  debug: boolean, 
-  maintenance: boolean, 
-  errorChannel: string, 
+  adminId: string,
+  debug: boolean,
+  maintenance: boolean,
+  errorChannel: string,
   proxy: string,
   prefix:string,
-}
+};
 
-const config = {
+const rawConfig = fs.readFileSync(path.join(__dirname, "../../config.json"), {encoding: "utf-8"});
+
+const config = Object.assign({
   prefix: ">",
-  ...(CJSON.parse(fs.readFileSync(path.join(__dirname, "../../config.json"), {encoding: "utf-8"})) as CommentObject)
-} as ConfigJson;
+}, CJSON.parse(rawConfig, null, true)) as unknown as ConfigJson;
 
 if(![
   config.adminId === null || typeof config.adminId === "string",
@@ -22,8 +24,7 @@ if(![
   config.errorChannel === null || typeof config.errorChannel === "string",
   typeof config.maintenance === "boolean",
   config.proxy === null || typeof config.proxy === "string",
-  typeof config.prefix === "string",
-  config.prefix === null || config.prefix.length === 1
+  (typeof config.prefix === "string" && config.prefix.length >= 1) || config.prefix === null,
 ].every(test => test)){
   throw new Error("Invalid config.json");
 }
