@@ -724,15 +724,19 @@ export class MusicBot extends LogEmitter {
    * @param message 更新元となるメッセージ
    */
   private updatePrefix(message:CommandMessage|discord.Message):void{
+    const data = this.data[message.guild.id];
+    const current = data.PersistentPref.Prefix;
     const pmatch = message.guild.members.resolve(this.client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
     if(pmatch){
-      if(this.data[message.guild.id].PersistentPref.Prefix !== pmatch.groups.prefix){
-        this.data[message.guild.id].PersistentPref.Prefix = Util.string.NormalizeText(pmatch.groups.prefix);
+      if(data.PersistentPref.Prefix !== pmatch.groups.prefix){
+        data.PersistentPref.Prefix = Util.string.NormalizeText(pmatch.groups.prefix);
       }
-    }else if(this.data[message.guild.id].PersistentPref.Prefix !== Util.config.prefix){
-      this.data[message.guild.id].PersistentPref.Prefix = Util.config.prefix;
+    }else if(data.PersistentPref.Prefix !== Util.config.prefix){
+      data.PersistentPref.Prefix = Util.config.prefix;
     }
-    this.Log(`Prefix was set to '${this.data[message.guild.id].PersistentPref.Prefix}' (${message.guild.id})`);
+    if(data.PersistentPref.Prefix !== current){
+      this.Log(`Prefix was set to '${this.data[message.guild.id].PersistentPref.Prefix}' (${message.guild.id})`);
+    }
   }
 
   /**
