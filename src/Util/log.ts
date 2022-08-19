@@ -14,10 +14,14 @@ class LogStore{
         fs.mkdirSync(path.join(__dirname, "../../logs"));
       }
       this.loggingStream = fs.createWriteStream(path.join(__dirname, `../../logs/log-${Date.now()}.txt`));
-      process.on("exit", () => {
-        this.loggingStream.write(Buffer.from("[Logger] detect process exiting, closing stream..."))
-        if(!this.loggingStream.destroyed) this.loggingStream.destroy()
-      });
+      const onExit = () => {
+        if(!this.loggingStream.destroyed){
+          this.loggingStream.write(Buffer.from("[Logger] detect process exiting, closing stream..."));
+          this.loggingStream.destroy();
+        }
+      };
+      process.on("exit", onExit);
+      process.on("SIGINT", onExit);
     }
   }
 
