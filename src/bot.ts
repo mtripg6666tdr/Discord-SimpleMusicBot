@@ -347,7 +347,7 @@ export class MusicBot extends LogEmitter {
           await interaction.channel.send("✅キャンセルしました");
           await interaction.deleteReply();
         }else{
-          const message = interaction.message;
+          const message = interaction.message as discord.Message;
           const responseMessage = ResponseMessage.createFromInteraction(interaction, message, panel.Msg.commandMessage);
           await this.playFromSearchPanelOptions(interaction.values, interaction.guild.id, responseMessage)
         }
