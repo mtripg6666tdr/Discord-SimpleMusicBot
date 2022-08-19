@@ -44,28 +44,15 @@ export class playDlStrategy extends Strategy<Cache<playDl, {}>, {}>{
       info: this.mapToExportable(url, info),
       relatedVideos: null as exportableYouTube[],
     };
-    if(forceUrl){
-      const format = info.format.filter(f => f.mimeType.startsWith("audio"));
-      if(format.length === 0) throw new Error("no format found!");
-      format.sort((fa, fb) => fb.bitrate - fa.bitrate);
-      return {
-        ...partialResult,
-        stream: {
-          type: "url",
-          url: format[0].url,
-        } as UrlStreamInfo
-      };
-    }
-    const source = await stream_from_info(info, {
-      quality: 2 /* highest */
-    });
+    const format = info.format.filter(f => f.mimeType.startsWith("audio"));
+    if(format.length === 0) throw new Error("no format found!");
+    format.sort((fa, fb) => fb.bitrate - fa.bitrate);
     return {
       ...partialResult,
       stream: {
-        type: "readable",
-        stream: source.stream,
-        streamType: source.type,
-      } as ReadableStreamInfo
+        type: "url",
+        url: format[0].url,
+      } as UrlStreamInfo
     };
   }
 
