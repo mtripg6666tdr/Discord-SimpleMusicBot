@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  testing:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -37,3 +37,6 @@ jobs:
       
       - name: Compile TypeScript
         run: npm run build
+
+      - name: Test
+        run: npm test
