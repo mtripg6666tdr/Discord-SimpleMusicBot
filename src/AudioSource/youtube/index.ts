@@ -41,7 +41,7 @@ export class YouTube extends AudioSource {
       this.importData(prefetched);
     }else{
       const { result, resolved } = await attemptGetInfoForStrategies(this.logger, url);
-      this.fallback = resolved === 0;
+      this.fallback = resolved !== 0;
       if(forceCache) this.cache = result.cache;
       this.importData(result.data);
     }
@@ -50,7 +50,7 @@ export class YouTube extends AudioSource {
 
   async fetch(forceUrl?:boolean):Promise<StreamInfo>{
     const { result, resolved } = await attemptFetchForStrategies(this.logger, this.Url, forceUrl, this.cache);
-    this.fallback = resolved === 0;
+    this.fallback = resolved !== 0;
     // store related videos
     this.relatedVideos = result.relatedVideos;
     this.importData(result.info);

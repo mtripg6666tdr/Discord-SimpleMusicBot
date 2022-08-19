@@ -9,7 +9,7 @@ import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 type youtubeDl = "youtubeDl";
 const youtubeDl:youtubeDl = "youtubeDl";
 
-export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>{
+export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>, YoutubeDlInfo>{
   last:number = 0;
 
   async getInfo(url:string){
@@ -36,7 +36,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>
     const t = Util.time.timer.start(`YouTube(Strategy${this.priority})#fetch`);
     let info = null as YoutubeDlInfo;
     try{
-      const availableCache = cache.type === youtubeDl && cache.data as YoutubeDlInfo;
+      const availableCache = cache?.type === youtubeDl && cache.data as YoutubeDlInfo;
       this.logger(`[AudioSource:youtube] ${availableCache ? "using cache without obtaining" : "obtaining info"}`);
       info = availableCache || JSON.parse(await this.getYouTubeDlInfo(url)) as YoutubeDlInfo;
     }
@@ -45,7 +45,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>
     }
     const partialResult = {
       info: this.mapToExportable(url, info),
-      relatedVideos: null as exportableYouTube[]
+      relatedVideos: null as exportableYouTube[],
     };
     if(info.is_live){
       const format = info.formats.filter(f => f.format_id === info.format_id);
@@ -58,6 +58,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>
           } as UrlStreamInfo
         };
       }
+      // don't use initpassthrough here
       const stream = new PassThrough({
         highWaterMark: 1024 * 512,
       });
@@ -80,6 +81,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>
       }
     }else{
       const format = info.formats.filter(f => f.format_note === "tiny");
+      if(format.length === 0) throw new Error("no format found!");
       format.sort((fa, fb) => fb.abr - fa.abr);
       return {
         ...partialResult,
@@ -97,7 +99,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>>
     }
   };
 
-  private mapToExportable(url:string, info:YoutubeDlInfo):exportableYouTube{
+  protected mapToExportable(url:string, info:YoutubeDlInfo):exportableYouTube{
     return {
       url: url,
       title: info.title,

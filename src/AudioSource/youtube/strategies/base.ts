@@ -1,5 +1,5 @@
 import type { exportableYouTube } from "..";
-import { StreamInfo } from "../../audiosource";
+import type { StreamInfo } from "../../audiosource";
 import { LoggerType, Util } from "../../../Util";
 
 export type Cache<T extends string, U> = {
@@ -7,7 +7,7 @@ export type Cache<T extends string, U> = {
   data:U,
 };
 
-export abstract class Strategy<T extends Cache<any, any>>{
+export abstract class Strategy<T extends Cache<any, U>, U>{
   public logger: LoggerType;
 
   constructor(protected priority:number){
@@ -28,4 +28,6 @@ export abstract class Strategy<T extends Cache<any, any>>{
   protected useLog(){
     this.logger("[AudioSource:youtube] using strategy #" + this.priority);
   }
+
+  protected abstract mapToExportable(url:string, info:U):exportableYouTube;
 }

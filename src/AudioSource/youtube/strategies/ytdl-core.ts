@@ -7,12 +7,13 @@ import { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 import { SecondaryUserAgent } from "../../../Util/ua";
 import { Readable } from "stream";
 import { createChunkedYTStream } from "../stream";
+
 const ua = SecondaryUserAgent;
 
 type ytdlCore = "ytdlCore";
 export const ytdlCore:ytdlCore = "ytdlCore";
 
-export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>>{
+export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, ytdl.videoInfo>{
   async getInfo(url:string){
     this.useLog();
     const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
@@ -37,7 +38,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>>{
     };
   }
 
-  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
+  async fetch(url:string, forceUrl:boolean = false, cache?: Cache<any, any>){
     this.useLog();
     const info = await (async () => {
       if(cache && cache.type === "ytdlCore"){
@@ -111,6 +112,9 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>>{
   }
 
   protected mapToExportable(url:string, info:ytdl.videoInfo){
+    if(!info.videoDetails.isLiveContent && !info.videoDetails.liveBroadcastDetails.isLiveNow && info.videoDetails.liveBroadcastDetails.startTimestamp && !info.videoDetails.liveBroadcastDetails.endTimestamp){
+      throw new Error("This video is still in upcoming");
+    }
     return {
       url,
       title: info.videoDetails.title,
