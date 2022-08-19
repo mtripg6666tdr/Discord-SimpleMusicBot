@@ -80,7 +80,7 @@
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot"
+    "url": "git+https://github.com/mtripg6666tdr/Discord-SimpleMusicBot.git"
   },
   "bugs": {
     "url": "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/issues"
