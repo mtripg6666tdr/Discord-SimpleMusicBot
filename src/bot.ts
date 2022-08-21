@@ -206,9 +206,12 @@ export class MusicBot extends LogEmitter {
       const command = CommandsManager.Instance.resolve(commandMessage.command);
       if(!command) return;
       // 送信可能か確認
-      if(!(await Util.djs.CheckSendable(message.channel as discord.TextChannel, message.guild.members.resolve(this.client.user)))){
+      if(!(await Util.eris.channel.checkSendable(message.channel as discord.TextChannel, this.client.user.id))){
         try{
-          await message.reply({
+          await this.client.createMessage(message.channel.id, {
+            messageReference: {
+              messageID: message.id,
+            },
             content: NotSendableMessage,
             allowedMentions: {
               repliedUser: false
@@ -221,16 +224,16 @@ export class MusicBot extends LogEmitter {
       }
       // コマンドの処理
       await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
-    }else if(this.data[message.guild.id] && this.data[message.guild.id].SearchPanel){
+    }else if(this.data[message.channel.guild.id] && this.data[message.channel.guild.id].SearchPanel){
       // searchコマンドのキャンセルを捕捉
       if(message.content === "キャンセル" || message.content === "cancel"){
-        const msgId = this.data[message.guild.id].SearchPanel.Msg;
+        const msgId = this.data[message.channel.guild.id].SearchPanel.Msg;
         if(msgId.userId !== message.author.id) return;
-        this.data[message.guild.id].SearchPanel = null;
-        await message.channel.send("✅キャンセルしました");
+        this.data[message.channel.guild.id].SearchPanel = null;
+        await this.client.createMessage(message.channel.id, "✅キャンセルしました");
         try{
-          const ch = await this.client.channels.fetch(msgId.chId);
-          const msg = await (ch as discord.TextChannel).messages.fetch(msgId.id);
+          const ch = this.client.getChannel(msgId.chId);
+          const msg = (ch as discord.TextChannel).messages.get(msgId.id);
           await msg.delete();
         }
         catch(e){
@@ -239,20 +242,25 @@ export class MusicBot extends LogEmitter {
       }
       // searchコマンドの選択を捕捉
       else if(Util.string.NormalizeText(message.content).match(/^([0-9]\s?)+$/)){
-        const panel = this.data[message.guild.id].SearchPanel;
+        const panel = this.data[message.channel.guild.id].SearchPanel;
         if(!panel) return;
         // メッセージ送信者が検索者と一致するかを確認
         if(message.author.id !== panel.Msg.userId) return;
         const nums = Util.string.NormalizeText(message.content).split(" ");
-        const responseMessage = await (await this.client.channels.fetch(panel.Msg.chId) as discord.TextChannel).messages.fetch(panel.Msg.id);
-        await this.playFromSearchPanelOptions(nums, message.guild.id, ResponseMessage.createFromMessage(responseMessage, panel.Msg.commandMessage));
+        const responseMessage = (this.client.getChannel(panel.Msg.chId) as discord.TextChannel).messages.get(panel.Msg.id);
+        await this.playFromSearchPanelOptions(nums, message.channel.guild.id, ResponseMessage.createFromMessage(responseMessage, panel.Msg.commandMessage));
       }
     }else if(
       this.cancellations.filter(c => !c.Cancelled).length > 0
       && (message.content === "キャンセル" || message.content === "cancel")
     ){
-      this.cancellations.forEach(c => c.GuildId === message.guild.id && c.Cancel());
-      await message.channel.send("処理中の処理をすべてキャンセルしています....")
+      this.cancellations.forEach(c => c.GuildId === (message.channel.client.getChannel(message.channel.id) as discord.TextChannel).guild.id && c.Cancel());
+      await this.client.createMessage(message.channel.id, {
+        messageReference: {
+          messageID: message.id,
+        },
+        content: "処理中の処理をすべてキャンセルしています....",
+      })
         .catch(e => this.Log(e, "error"));
     }
   }
@@ -260,28 +268,29 @@ export class MusicBot extends LogEmitter {
   private async onInteractionCreate(interaction:discord.Interaction){
     this.addOn.emit("interactionCreate", interaction);
     if(this.maintenance){
-      if(!Util.config.adminId || interaction.user.id !== Util.config.adminId) return;
+      if(!Util.config.adminId || (interaction as discord.CommandInteraction | discord.ComponentInteraction).user?.id !== Util.config.adminId) return;
     }
-    if(interaction.user.bot) return;
+    if((interaction as discord.CommandInteraction | discord.ComponentInteraction).user?.bot) return;
     // データ初期化
-    this.initData(interaction.guild.id, interaction.channel.id);
+    const channel = (interaction as discord.CommandInteraction | discord.ComponentInteraction).channel as discord.TextChannel;
+    this.initData(channel.guild.id, channel.id);
     // コマンドインタラクション
-    if(interaction.isCommand()){
+    if(Util.eris.interaction.interactionIsCommandInteraction(interaction)){
       this.Log("reveived command interaction");
-      if(!interaction.channel.isText()){
-        await interaction.reply("テキストチャンネルで実行してください");
+      if(!Util.eris.channel.channelIsTextChannel(interaction.channel)){
+        await interaction.createMessage("テキストチャンネルで実行してください");
         return;
       }
       // 送信可能か確認
-      if(!(await Util.djs.CheckSendable(interaction.channel as discord.TextChannel, interaction.guild.members.resolve(this.client.user)))){
-        await interaction.reply(NotSendableMessage);
+      if(!Util.eris.channel.checkSendable(interaction.channel, interaction.user.id)){
+        await interaction.createMessage(NotSendableMessage);
         return;
       }
       // コマンドを解決
-      const command = CommandsManager.Instance.resolve(interaction.commandName);
+      const command = CommandsManager.Instance.resolve(interaction.data.name);
       if(command){
         // 遅延リプライ
-        await interaction.deferReply();
+        await interaction.defer();
         // メッセージライクに解決してコマンドメッセージに
         const commandMessage = CommandMessage.createFromInteraction(interaction);
         // プレフィックス更新
@@ -289,73 +298,75 @@ export class MusicBot extends LogEmitter {
         // コマンドを実行
         await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
       }else{
-        await interaction.reply("おっと！なにかが間違ってしまったようです。\r\nコマンドが見つかりませんでした。 :sob:");
+        await interaction.editMessage("@original", "おっと！なにかが間違ってしまったようです。\r\nコマンドが見つかりませんでした。 :sob:");
       }
     // ボタンインタラクション
-    }else if(interaction.isButton()){
-      this.Log("received button interaction");
-      await interaction.deferUpdate();
-      if(interaction.customId === PageToggle.arrowLeft || interaction.customId === PageToggle.arrowRight){
-        const l = this.EmbedPageToggle.filter(t =>
-          t.Message.channelId === interaction.channel.id
-          && t.Message.id === interaction.message.id);
-        if(l.length >= 1){
-          // ページめくり
-          await l[0].FlipPage(
-            interaction.customId === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
-              interaction.customId === PageToggle.arrowRight ? (l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current) : 0
-            ,
-            interaction
-          );
+    }else if(Util.eris.interaction.interactionIsComponentInteraction(interaction)){
+      if(Util.eris.interaction.componentInteractionDataIsButtonData(interaction.data)){
+        this.Log("received button interaction");
+        await interaction.deferUpdate();
+        if(interaction.data.custom_id === PageToggle.arrowLeft || interaction.data.custom_id === PageToggle.arrowRight){
+          const l = this.EmbedPageToggle.filter(t =>
+            t.Message.channelId === interaction.channel.id
+            && t.Message.id === interaction.message.id);
+          if(l.length >= 1){
+            // ページめくり
+            await l[0].FlipPage(
+              interaction.data.custom_id === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
+                interaction.data.custom_id === PageToggle.arrowRight ? (l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current) : 0
+              ,
+              interaction
+            );
+          }else{
+            await interaction.editReply("失敗しました!");
+          }
         }else{
-          await interaction.editReply("失敗しました!");
+          const updateEffectPanel = () => {
+            const mes = interaction.message as discord.Message;
+            const { embed, messageActions } = Util.effects.getCurrentEffectPanel(interaction.user.avatarURL(), this.data[interaction.guild.id]);
+            mes.edit({
+              content: null,
+              embeds: [embed],
+              components: [messageActions]
+            });
+          };
+          switch(interaction.customId){
+          case Util.effects.EffectsCustomIds.Reload:
+            updateEffectPanel();
+            break;
+          case Util.effects.EffectsCustomIds.BassBoost:
+            this.data[interaction.guild.id].EffectPrefs.BassBoost = !this.data[interaction.guild.id].EffectPrefs.BassBoost;
+            updateEffectPanel();
+            break;
+          case Util.effects.EffectsCustomIds.Reverb:
+            this.data[interaction.guild.id].EffectPrefs.Reverb = !this.data[interaction.guild.id].EffectPrefs.Reverb;
+            updateEffectPanel();
+            break;
+          case Util.effects.EffectsCustomIds.LoudnessEqualization:
+            this.data[interaction.guild.id].EffectPrefs.LoudnessEqualization = !this.data[interaction.guild.id].EffectPrefs.LoudnessEqualization;
+            updateEffectPanel();
+            break;
+          }
         }
-      }else{
-        const updateEffectPanel = () => {
-          const mes = interaction.message as discord.Message;
-          const { embed, messageActions } = Util.effects.getCurrentEffectPanel(interaction.user.avatarURL(), this.data[interaction.guild.id]);
-          mes.edit({
-            content: null,
-            embeds: [embed],
-            components: [messageActions]
-          });
-        };
-        switch(interaction.customId){
-        case Util.effects.EffectsCustomIds.Reload:
-          updateEffectPanel();
-          break;
-        case Util.effects.EffectsCustomIds.BassBoost:
-          this.data[interaction.guild.id].EffectPrefs.BassBoost = !this.data[interaction.guild.id].EffectPrefs.BassBoost;
-          updateEffectPanel();
-          break;
-        case Util.effects.EffectsCustomIds.Reverb:
-          this.data[interaction.guild.id].EffectPrefs.Reverb = !this.data[interaction.guild.id].EffectPrefs.Reverb;
-          updateEffectPanel();
-          break;
-        case Util.effects.EffectsCustomIds.LoudnessEqualization:
-          this.data[interaction.guild.id].EffectPrefs.LoudnessEqualization = !this.data[interaction.guild.id].EffectPrefs.LoudnessEqualization;
-          updateEffectPanel();
-          break;
-        }
-      }
-    }else if(interaction.isSelectMenu()){
-      this.Log("received selectmenu interaction");
-      // 検索パネル取得
-      const panel = this.data[interaction.guild.id].SearchPanel;
-      // なければ返却
-      if(!panel) return;
-      // インタラクションしたユーザーを確認
-      if(interaction.user.id !== panel.Msg.userId) return;
-      await interaction.deferUpdate();
-      if(interaction.customId === "search"){
-        if(interaction.values.includes("cancel")){
-          this.data[interaction.guild.id].SearchPanel = null;
-          await interaction.channel.send("✅キャンセルしました");
-          await interaction.deleteReply();
-        }else{
-          const message = interaction.message as discord.Message;
-          const responseMessage = ResponseMessage.createFromInteraction(interaction, message, panel.Msg.commandMessage);
-          await this.playFromSearchPanelOptions(interaction.values, interaction.guild.id, responseMessage);
+      }else if(interaction.isSelectMenu()){
+        this.Log("received selectmenu interaction");
+        // 検索パネル取得
+        const panel = this.data[interaction.guild.id].SearchPanel;
+        // なければ返却
+        if(!panel) return;
+        // インタラクションしたユーザーを確認
+        if(interaction.user.id !== panel.Msg.userId) return;
+        await interaction.deferUpdate();
+        if(interaction.customId === "search"){
+          if(interaction.values.includes("cancel")){
+            this.data[interaction.guild.id].SearchPanel = null;
+            await interaction.channel.send("✅キャンセルしました");
+            await interaction.deleteReply();
+          }else{
+            const message = interaction.message as discord.Message;
+            const responseMessage = ResponseMessage.createFromInteraction(interaction, message, panel.Msg.commandMessage);
+            await this.playFromSearchPanelOptions(interaction.values, interaction.guild.id, responseMessage);
+          }
         }
       }
     }
