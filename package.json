@@ -9,17 +9,14 @@
     "node": ">=16.6.0"
   },
   "dependencies": {
-    "@discordjs/voice": "^0.11.0",
     "comment-json": "^4.2.3",
-    "discord.js": "^13.6.0",
-    "djs-command-resolver": "^1.0.2",
     "dotenv": "^16.0.1",
+    "eris": "^0.17.1",
     "follow-redirects": "^1.15.1",
     "genius-lyrics": "^4.4.0",
     "html-entities": "^2.3.3",
     "html-to-text": "^8.2.1",
     "https-proxy-agent": "^5.0.1",
-    "libsodium-wrappers": "^0.7.10",
     "m3u8stream": "^0.8.6",
     "miniget": "^4.2.2",
     "niconico-dl.js": "^1.1.3",
@@ -41,7 +38,6 @@
     "@types/html-to-text": "^8.1.0",
     "@types/mocha": "^9.1.1",
     "@types/node": "^16.11.51",
-    "@types/ws": "^8.5.3",
     "@typescript-eslint/eslint-plugin": "^5.33.1",
     "@typescript-eslint/parser": "^5.33.1",
     "discord-api-types": "^0.26.0",
@@ -57,7 +53,11 @@
   },
   "optionalDependencies": {
     "@discordjs/opus": "^0.8.0",
-    "ffmpeg-static": "^5.0.2"
+    "bufferutil": "^4.0.6",
+    "ffmpeg-static": "^5.0.2",
+    "pako": "^2.0.4",
+    "sodium-native": "^3.4.1",
+    "zlib-sync": "^0.1.7"
   },
   "scripts": {
     "test": "mocha",
