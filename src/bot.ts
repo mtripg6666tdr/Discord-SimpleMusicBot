@@ -2,8 +2,7 @@ import type { exportableCustom } from "./AudioSource";
 import type { CommandArgs } from "./Commands";
 import type { YmxFormat } from "./Structure";
 
-import * as voice from "@discordjs/voice";
-import * as discord from "discord.js";
+import * as discord from "eris";
 
 import { execSync } from "child_process";
 
@@ -25,14 +24,7 @@ import { NotSendableMessage } from "./definition";
  */
 export class MusicBot extends LogEmitter {
   // クライアントの初期化
-  private readonly client = new discord.Client({intents: [
-    // サーバーを認識する
-    discord.Intents.FLAGS.GUILDS,
-    // サーバーのメッセージを認識する
-    discord.Intents.FLAGS.GUILD_MESSAGES,
-    // サーバーのボイスチャンネルのステータスを確認する
-    discord.Intents.FLAGS.GUILD_VOICE_STATES,
-  ]});
+  private readonly client = null as discord.Client;
 
   private data:{[key:string]:GuildDataContainer} = {};
   private readonly instantiatedTime = null as Date;
@@ -64,8 +56,16 @@ export class MusicBot extends LogEmitter {
    */
   get InstantiatedTime(){return this.instantiatedTime;}
 
-  constructor(private readonly maintenance:boolean = false){
+  constructor(token:string, private readonly maintenance:boolean = false){
     super();
+    this.client = new discord.Client(token, {intents: [
+      // サーバーを認識する
+      "guilds",
+      // サーバーのメッセージを認識する
+      "guildMessages",
+      // サーバーのボイスチャンネルのステータスを確認する
+      "guildVoiceStates",
+    ]});
     this.SetTag("Main");
     this.instantiatedTime = new Date();
     const client = this.client;
@@ -90,29 +90,29 @@ export class MusicBot extends LogEmitter {
     ;
   }
 
-  private async onReady(client:discord.Client<true>){
+  private async onReady(client:discord.Client){
     this.addOn.emit("ready", client);
     this.Log("Socket connection is ready now");
     this.Log("Starting environment checking and preparation now");
 
     // Set activity as booting
     if(!this.maintenance){
-      client.user.setActivity({
-        type: "PLAYING",
+      client.editStatus({
+        type: 0 /* PLAYING */,
         name: "起動中..."
       });
     }else{
-      client.user.setActivity({
-        type: "PLAYING",
+      client.editStatus("dnd", {
+        type: 0 /* PLAYING */,
         name: "メンテナンス中..."
       });
-      client.user.setStatus("dnd");
     }
 
     // Recover queues
     if(Util.db.DatabaseAPI.CanOperate){
-      const queues = await Util.db.DatabaseAPI.GetQueueData([...client.guilds.cache.keys()]);
-      const speakingIds = await Util.db.DatabaseAPI.GetIsSpeaking([...client.guilds.cache.keys()]);
+      const joinedGUildIds = [...client.guilds.values()].map(guild => guild.id);
+      const queues = await Util.db.DatabaseAPI.GetQueueData(joinedGUildIds);
+      const speakingIds = await Util.db.DatabaseAPI.GetIsSpeaking(joinedGUildIds);
       const queueGuildids = Object.keys(queues);
       const speakingGuildids = Object.keys(speakingIds);
       for(let i = 0; i < queueGuildids.length; i++){
