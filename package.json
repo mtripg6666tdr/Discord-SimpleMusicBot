@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^17.0.3",
-    "@discordjs/builders": "^0.11.0",
+    "@discordjs/builders": "^1.1.0",
     "@discordjs/rest": "^1.0.1",
     "@mtripg6666tdr/commitlint-config": "^1.1.0",
     "@types/follow-redirects": "^1.14.1",
