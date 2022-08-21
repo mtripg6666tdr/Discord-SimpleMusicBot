@@ -123,7 +123,7 @@
       ],
       "pathGroups": [
         {
-          "pattern": "{eris}",
+          "pattern": "{eris,discord.js,@discordjs/**}",
           "group": "builtin",
           "position": "before"
         }
