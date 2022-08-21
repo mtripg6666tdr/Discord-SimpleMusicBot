@@ -9,6 +9,7 @@
     "esModuleInterop": true,
     "outDir": "dist/",
     "sourceMap": true,
+    
     "importHelpers": true,
   },
   "include": [

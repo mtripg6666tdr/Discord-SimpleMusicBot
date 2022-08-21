@@ -1,4 +1,4 @@
-require("dotenv").config();
+import "../dotenv";
 import type { RouteLike } from "@discordjs/rest";
 import type { APIApplicationCommand } from "discord-api-types";
 
