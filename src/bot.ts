@@ -98,12 +98,12 @@ export class MusicBot extends LogEmitter {
     // Set activity as booting
     if(!this.maintenance){
       client.editStatus({
-        type: 0 /* PLAYING */,
+        type: discord.Constants.ActivityTypes.GAME,
         name: "起動中..."
       });
     }else{
       client.editStatus("dnd", {
-        type: 0 /* PLAYING */,
+        type: discord.Constants.ActivityTypes.GAME,
         name: "メンテナンス中..."
       });
     }
@@ -137,12 +137,9 @@ export class MusicBot extends LogEmitter {
               await this.data[id].Queue.AutoAddQueue(client, queue.data[j].url, queue.data[j].addBy, "unknown", false, false, null, null, queue.data[j]);
             }
             if(vid !== "0"){
-              const vc = await client.channels.fetch(vid) as discord.VoiceChannel;
-              voice.joinVoiceChannel({
-                channelId: vc.id,
-                guildId: vc.guild.id,
-                // @ts-ignore
-                adapterCreator: vc.guild.voiceAdapterCreator
+              const vc = client.getChannel(vid) as discord.VoiceChannel;
+              this.data[id].connection = await vc.join({
+                selfDeaf: true,
               });
               await this.data[id].Player.Play();
             }
@@ -159,8 +156,8 @@ export class MusicBot extends LogEmitter {
 
     // Set activity
     if(!this.maintenance){
-      client.user.setActivity({
-        type: "LISTENING",
+      client.editStatus({
+        type: discord.Constants.ActivityTypes.LISTENING,
         name: "音楽"
       });
 
@@ -189,19 +186,18 @@ export class MusicBot extends LogEmitter {
       if(!Util.config.adminId || message.author.id !== Util.config.adminId) return;
     }
     // botのメッセやdm、およびnewsは無視
-    if(!this.isReadyFinished || message.author.bot || message.channel.type !== "GUILD_TEXT") return;
+    if(!this.isReadyFinished || message.author.bot || message.channel.type !== discord.Constants.ChannelTypes.GUILD_TEXT) return;
     // データ初期化
-    this.initData(message.guild.id, message.channel.id);
+    this.initData(message.guildID, message.channel.id);
     // プレフィックスの更新
     this.updatePrefix(message);
     if(message.content === `<@${this.client.user.id}>`){
       // メンションならば
-      await message.channel
-        .send("コマンドの一覧は、`/command`で確認できます。\r\nメッセージでコマンドを送信する場合のプレフィックスは`" + this.data[message.guild.id].PersistentPref.Prefix + "`です。")
+      await this.client.createMessage(message.channel.id, `コマンドの一覧は、\`/command\`で確認できます。\r\nメッセージでコマンドを送信する場合のプレフィックスは\`${this.data[message.guildID].PersistentPref.Prefix}\`です。`)
         .catch(e => this.Log(e, "error"));
       return;
     }
-    const prefix = this.data[message.guild.id].PersistentPref.Prefix;
+    const prefix = this.data[message.guildID].PersistentPref.Prefix;
     const messageContent = Util.string.NormalizeText(message.content);
     if(messageContent.startsWith(prefix) && messageContent.length > prefix.length){
       // コマンドメッセージを作成

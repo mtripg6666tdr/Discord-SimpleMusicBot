@@ -1,6 +1,6 @@
 import type { MusicBot } from "../bot";
 import type { SearchPanel } from "./SearchPanel";
-import type { Client } from "discord.js";
+import type { Client, VoiceConnection } from "eris";
 
 import { PlayManager } from "../Component/PlayManager";
 import { QueueManager } from "../Component/QueueManager";
@@ -53,6 +53,11 @@ export class GuildDataContainer {
    * 均等再生が有効
    */
   EquallyPlayback:boolean;
+
+  /**
+   * VCへの接続
+   */
+  connection:VoiceConnection;
 
   constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBot){
     this.SearchPanel = null;
