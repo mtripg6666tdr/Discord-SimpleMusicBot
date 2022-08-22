@@ -149,7 +149,7 @@ export class PlayManager extends ManagerBase {
         const embed = new Helper.MessageEmbedBuilder({
           title: ":cd:現在再生中:musical_note:",
           description:
-              "[" + this.CurrentAudioInfo.Title + "](" + this.CurrentAudioUrl + ") `"
+              `[${this.CurrentAudioInfo.Title}(${this.CurrentAudioUrl}) \``
             + (this.CurrentAudioInfo.ServiceIdentifer === "youtube" && (this.CurrentAudioInfo as YouTube).LiveStream ? "(ライブストリーム)" : _t === 0 ? "(不明)" : min + ":" + sec)
             + "`"
         });
