@@ -19,7 +19,7 @@ export default class Effect extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     try{
-      const {embed, messageActions } = getCurrentEffectPanel(message.author.avatarURL, options.data[message.guild.id]);
+      const {embed, messageActions } = getCurrentEffectPanel(message.member.avatarURL, options.data[message.guild.id]);
       const reply = await message.channel.createMessage({
         content: null,
         embeds: [embed.toEris()],

@@ -35,7 +35,7 @@ export default class News extends BaseCommand {
         Msg: {
           chId: message.channel.id,
           id: reply.id,
-          userId: message.author.id,
+          userId: message.member.id,
           userName: Util.eris.user.getDisplayName(message.member),
           commandMessage: message
         },
@@ -66,7 +66,7 @@ export default class News extends BaseCommand {
         .setDescription(desc)
         .setColor(getColor("SEARCH"))
         .setFooter({
-          icon_url: message.author.avatarURL,
+          icon_url: message.member.avatarURL,
           text: "ニュースのタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
         })
         .toEris()

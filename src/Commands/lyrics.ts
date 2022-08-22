@@ -52,7 +52,7 @@ export default class Lyrics extends BaseCommand {
       embeds[embeds.length - 1]
         .setFooter({
           text: Util.eris.user.getDisplayName(message.member),
-          icon_url: message.author.avatarURL
+          icon_url: message.member.avatarURL
         })
       ;
       msg.edit({

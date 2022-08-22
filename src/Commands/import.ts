@@ -35,7 +35,7 @@ export default class Import extends BaseCommand {
     }
     let force = false;
     let url = options.rawArgs;
-    if(options.args.length >= 2 && options.args[0] === "force" && message.author.id === "593758391395155978"){
+    if(options.args.length >= 2 && options.args[0] === "force" && message.member.id === "593758391395155978"){
       force = true;
       url = options.args[1];
     }

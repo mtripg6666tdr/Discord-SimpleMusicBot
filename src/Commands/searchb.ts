@@ -80,7 +80,7 @@ export default class Searchb extends BaseCommand {
           .setTitle(`"${options.rawArgs}"の検索結果✨`)
           .setDescription(desc)
           .setFooter({
-            icon_url: message.author.avatarURL,
+            icon_url: message.member.avatarURL,
             text: "楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
           })
           .toEris()

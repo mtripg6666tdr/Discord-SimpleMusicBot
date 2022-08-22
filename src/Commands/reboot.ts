@@ -16,7 +16,7 @@ export default class Reboot extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(message.author.id === (Util.config.adminId ?? "593758391395155978")){
+    if(message.member.id === (Util.config.adminId ?? "593758391395155978")){
       if(options.rawArgs === ""){
         message.channel.createMessage("再起動を実行します...お待ちください...");
         exec("npm run onlystart");

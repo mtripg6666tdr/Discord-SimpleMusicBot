@@ -56,7 +56,7 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(message.author.id === (Util.config.adminId ?? "593758391395155978") && (options.args.includes("log") || options.args.length === 0)){
+    if(message.member.id === (Util.config.adminId ?? "593758391395155978") && (options.args.includes("log") || options.args.length === 0)){
       // Process Logs
       embeds.push(
         new Helper.MessageEmbedBuilder()
