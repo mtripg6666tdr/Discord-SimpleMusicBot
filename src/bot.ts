@@ -91,7 +91,8 @@ export class MusicBot extends LogEmitter {
     ;
   }
 
-  private async onReady(client:discord.Client){
+  private async onReady(){
+    const client = this.client;
     this.addOn.emit("ready", client);
     this.Log("Socket connection is ready now");
     this.Log("Starting environment checking and preparation now");
