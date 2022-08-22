@@ -168,7 +168,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
       if(new Date().getTime() - this.last >= 1000 * 60 /*1sec*/ * 60 /*1min*/ * 60 /*1hour*/ * 3){
         await this.dlbinary(version);
       }
-      return this.execAsync("." + (process.platform === "win32" ? "\\" : "/") + "youtube-dl --skip-download --print-json \"" + url + "\"");
+      return await this.execAsync("." + (process.platform === "win32" ? "\\" : "/") + "youtube-dl --skip-download --print-json \"" + url + "\"");
     }
     catch(e){
       // eslint-disable-next-line @typescript-eslint/no-throw-literal

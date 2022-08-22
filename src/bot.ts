@@ -294,7 +294,7 @@ export class MusicBot extends LogEmitter {
         // 遅延リプライ
         await interaction.defer();
         // メッセージライクに解決してコマンドメッセージに
-        const commandMessage = await CommandMessage.createFromInteraction(interaction);
+        const commandMessage = CommandMessage.createFromInteraction(interaction);
         // プレフィックス更新
         this.updatePrefix(commandMessage);
         // コマンドを実行
@@ -771,7 +771,7 @@ export class MusicBot extends LogEmitter {
   private async playFromSearchPanelOptions(nums:string[], guildid:string, message:ResponseMessage){
     const t = Util.time.timer.start("MusicBot#playFromSearchPanelOptions");
     const panel = this.data[guildid].SearchPanel;
-    const member = await (await this.client.guilds.get(guildid)).members.get(panel.Msg.userId);
+    const member = this.client.guilds.get(guildid).members.get(panel.Msg.userId);
     const num = nums.shift();
     if(Object.keys(panel.Opts).includes(num)){
       await this.data[guildid].Queue.AutoAddQueue(this.client, panel.Opts[Number(num)].url, member, "unknown", false, message);
