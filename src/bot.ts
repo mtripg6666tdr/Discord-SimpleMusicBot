@@ -202,12 +202,12 @@ export class MusicBot extends LogEmitter {
     const messageContent = Util.string.NormalizeText(message.content);
     if(messageContent.startsWith(prefix) && messageContent.length > prefix.length){
       // コマンドメッセージを作成
-      const commandMessage = CommandMessage.createFromMessage(message, prefix.length);
+      const commandMessage = CommandMessage.createFromMessage(message as discord.Message<discord.TextChannel>, prefix.length);
       // コマンドを解決
       const command = CommandsManager.Instance.resolve(commandMessage.command);
       if(!command) return;
       // 送信可能か確認
-      if(!(await Util.eris.channel.checkSendable(message.channel as discord.TextChannel, this.client.user.id))){
+      if(!Util.eris.channel.checkSendable(message.channel as discord.TextChannel, this.client.user.id)){
         try{
           await this.client.createMessage(message.channel.id, {
             messageReference: {
@@ -294,7 +294,7 @@ export class MusicBot extends LogEmitter {
         // 遅延リプライ
         await interaction.defer();
         // メッセージライクに解決してコマンドメッセージに
-        const commandMessage = CommandMessage.createFromInteraction(interaction);
+        const commandMessage = await CommandMessage.createFromInteraction(interaction);
         // プレフィックス更新
         this.updatePrefix(commandMessage);
         // コマンドを実行
@@ -329,7 +329,7 @@ export class MusicBot extends LogEmitter {
             const { embed, messageActions } = Util.effects.getCurrentEffectPanel(interaction.user.avatarURL, this.data[(interaction.channel as discord.TextChannel).guild.id]);
             mes.edit({
               content: null,
-              embeds: [embed],
+              embeds: [embed.toEris()],
               components: [messageActions]
             });
           };
@@ -427,7 +427,7 @@ export class MusicBot extends LogEmitter {
    * @param debugLog デバッグログを出力するかどうか
    * @param debugLogStoreLength デバッグログの保存する数
    */
-  Run(token:string, debugLog:boolean = false, debugLogStoreLength?:number){
+  Run(debugLog:boolean = false, debugLogStoreLength?:number){
     this.client.connect().catch(e => this.Log(e, "error"));
     Util.logger.logStore.log = debugLog;
     if(debugLogStoreLength) Util.logger.logStore.maxLength = debugLogStoreLength;
@@ -703,7 +703,7 @@ export class MusicBot extends LogEmitter {
           .setDescription(`[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n${index}曲が追加されました`)
           .setThumbnail(playlist.artwork_url)
           .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-        await msg.edit({content: null, embeds: [embed]});
+        await msg.edit({content: null, embeds: [embed.toEris()]});
       }
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
       await server.Player.Play();
