@@ -40,7 +40,7 @@
     "@types/follow-redirects": "^1.14.1",
     "@types/html-to-text": "^8.1.0",
     "@types/mocha": "^9.1.1",
-    "@types/node": "^16.11.51",
+    "@types/node": "^16.11.52",
     "@types/ws": "^8.5.3",
     "@typescript-eslint/eslint-plugin": "^5.33.1",
     "@typescript-eslint/parser": "^5.33.1",
