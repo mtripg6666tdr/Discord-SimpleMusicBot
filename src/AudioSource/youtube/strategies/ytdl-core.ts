@@ -2,8 +2,6 @@ import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Cache } from "./base";
 import type { Readable } from "stream";
 
-import * as voice from "@discordjs/voice";
-
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 
@@ -110,7 +108,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
         stream: {
           type: "readable",
           stream: readable,
-          streamType: format.container === "webm" && format.audioCodec === "opus" ? voice.StreamType.WebmOpus : undefined
+          streamType: format.container === "webm" && format.audioCodec === "opus" ? "webm" : undefined
         } as ReadableStreamInfo
       };
     }
