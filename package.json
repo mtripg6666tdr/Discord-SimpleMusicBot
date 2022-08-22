@@ -6,7 +6,7 @@
   "main": "dist/lib.js",
   "types": "typings/lib.d.ts",
   "engines": {
-    "node": ">=16.6.0"
+    "node": ">=10.4.0"
   },
   "dependencies": {
     "@mtripg6666tdr/eris-command-resolver": "^0.0.6",
@@ -65,12 +65,11 @@
     "test": "mocha",
     "prepare": "husky install",
     "start": "npm run build && npm run onlystart",
-    "onlystart": "npx node dist/index.js",
+    "onlystart": "node dist/index.js",
     "build": "tsc",
     "lint": "eslint ./src",
-    "postinstall": "npx node util/preparelib.js",
+    "postinstall": "node util/preparelib.js",
     "cleanup": "rimraf dist/ typings/",
-    "checkvoiceenv": "node util/voiceenvcheck",
     "applyslashcommandguild": "npx node util/registercommands/guild",
     "applyslashcommandapplication": "npx node util/registercommands/application",
     "deleteslashcommandguild": "npx node util/deletecommands/guild",
