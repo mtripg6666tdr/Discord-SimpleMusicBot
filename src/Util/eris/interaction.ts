@@ -3,11 +3,8 @@ import type { CommandInteraction, ComponentInteraction, ComponentInteractionButt
 import { Constants } from "eris";
 
 export const interactionUtils = {
-  interactionIsCommandInteraction(interaction:Interaction):interaction is CommandInteraction{
-    return interaction.type === Constants.InteractionTypes.APPLICATION_COMMAND;
-  },
-  interactionIsComponentInteraction(interaction:Interaction):interaction is ComponentInteraction{
-    return interaction.type === Constants.InteractionTypes.MESSAGE_COMPONENT;
+  interactionIsCommandOrComponent(interaction:Interaction):interaction is CommandInteraction|ComponentInteraction{
+    return "channel" in interaction;
   },
   componentInteractionDataIsButtonData(data:ComponentInteractionButtonData|ComponentInteractionSelectMenuData):data is ComponentInteractionButtonData{
     return data.component_type === Constants.ComponentTypes.BUTTON;
