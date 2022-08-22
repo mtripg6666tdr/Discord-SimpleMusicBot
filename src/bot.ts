@@ -6,6 +6,7 @@ import * as discord from "eris";
 
 import { execSync } from "child_process";
 
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 import Soundcloud from "soundcloud.ts";
 import * as ytpl from "ytpl";
 
@@ -186,11 +187,11 @@ export class MusicBot extends LogEmitter {
       if(!Util.config.adminId || message.author.id !== Util.config.adminId) return;
     }
     // botのメッセやdm、およびnewsは無視
-    if(!this.isReadyFinished || message.author.bot || message.channel.type !== discord.Constants.ChannelTypes.GUILD_TEXT) return;
+    if(!this.isReadyFinished || message.author.bot || !(message.channel instanceof discord.TextChannel)) return;
     // データ初期化
     this.initData(message.guildID, message.channel.id);
     // プレフィックスの更新
-    this.updatePrefix(message);
+    this.updatePrefix(message as discord.Message<discord.TextChannel>);
     if(message.content === `<@${this.client.user.id}>`){
       // メンションならば
       await this.client.createMessage(message.channel.id, `コマンドの一覧は、\`/command\`で確認できます。\r\nメッセージでコマンドを送信する場合のプレフィックスは\`${this.data[message.guildID].PersistentPref.Prefix}\`です。`)
@@ -668,12 +669,12 @@ export class MusicBot extends LogEmitter {
       if(cancellation.Cancelled){
         await msg.edit("✅キャンセルされました。");
       }else{
-        const embed = new discord.MessageEmbed()
+        const embed = new Helper.MessageEmbedBuilder()
           .setTitle("✅プレイリストが処理されました")
           .setDescription(`[${result.title}](${result.url}) \`(${result.author.name})\` \r\n${index}曲が追加されました`)
           .setThumbnail(result.bestThumbnail.url)
           .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-        await msg.edit({content: null, embeds: []});
+        await msg.edit({content: null, embeds: [embed.toEris()]});
       }
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
       await server.Player.Play();
@@ -697,7 +698,7 @@ export class MusicBot extends LogEmitter {
       if(cancellation.Cancelled){
         await msg.edit("✅キャンセルされました。");
       }else{
-        const embed = new discord.MessageEmbed()
+        const embed = new Helper.MessageEmbedBuilder()
           .setTitle("✅プレイリストが処理されました")
           .setDescription(`[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n${index}曲が追加されました`)
           .setThumbnail(playlist.artwork_url)
@@ -731,7 +732,7 @@ export class MusicBot extends LogEmitter {
     // コマンドが送信されたチャンネルを後で利用します。
     if(
       !this.data[message.guild.id].Player.IsConnecting
-      || (message.member.voice.channel && message.member.voice.channel.members.has(this.client.user.id))
+      || (message.member.voiceState.channelID && (this.client.getChannel(message.member.voiceState.channelID) as discord.VoiceChannel).voiceMembers.has(this.client.user.id))
       || message.content.includes("join")
     ){
       if(message.content !== (this.data[message.guild.id]?.PersistentPref.Prefix || ">")) this.data[message.guild.id].boundTextChannel = message.channelId;
@@ -742,10 +743,12 @@ export class MusicBot extends LogEmitter {
    * プレフィックス更新します
    * @param message 更新元となるメッセージ
    */
-  private updatePrefix(message:CommandMessage|discord.Message):void{
-    const data = this.data[message.guild.id];
+  private updatePrefix(message:CommandMessage|discord.Message<discord.TextChannel>):void{
+    const guild = "guild" in message ? message.guild : message.channel.guild;
+    const data = this.data[guild.id];
     const current = data.PersistentPref.Prefix;
-    const pmatch = message.guild.members.resolve(this.client.user.id).displayName.match(/^\[(?<prefix>.)\]/);
+    const member = guild.members.get(this.client.user.id);
+    const pmatch = (member.nick || member.username).match(/^\[(?<prefix>.)\]/);
     if(pmatch){
       if(data.PersistentPref.Prefix !== pmatch.groups.prefix){
         data.PersistentPref.Prefix = Util.string.NormalizeText(pmatch.groups.prefix);
@@ -754,7 +757,7 @@ export class MusicBot extends LogEmitter {
       data.PersistentPref.Prefix = Util.config.prefix;
     }
     if(data.PersistentPref.Prefix !== current){
-      this.Log(`Prefix was set to '${this.data[message.guild.id].PersistentPref.Prefix}' (${message.guild.id})`);
+      this.Log(`Prefix was set to '${this.data[guild.id].PersistentPref.Prefix}' (${guild.id})`);
     }
   }
 
@@ -768,13 +771,13 @@ export class MusicBot extends LogEmitter {
   private async playFromSearchPanelOptions(nums:string[], guildid:string, message:ResponseMessage){
     const t = Util.time.timer.start("MusicBot#playFromSearchPanelOptions");
     const panel = this.data[guildid].SearchPanel;
-    const member = await (await this.client.guilds.fetch(guildid)).members.fetch(panel.Msg.userId);
+    const member = await (await this.client.guilds.get(guildid)).members.get(panel.Msg.userId);
     const num = nums.shift();
     if(Object.keys(panel.Opts).includes(num)){
       await this.data[guildid].Queue.AutoAddQueue(this.client, panel.Opts[Number(num)].url, member, "unknown", false, message);
       this.data[guildid].SearchPanel = null;
       // 現在の状態を確認してVCに接続中なら接続試行
-      if(member.voice.channel){
+      if(member.voiceState.channelID){
         await this.JoinVoiceChannel(message.command, false, false);
       }
       // 接続中なら再生を開始
