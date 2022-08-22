@@ -3,8 +3,6 @@ import type { CommandMessage } from "../Component/CommandMessage";
 import type { ResponseMessage } from "../Component/ResponseMessage";
 import type { SelectMenuOptions} from "eris";
 
-import { Message, TextChannel } from "eris";
-
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
