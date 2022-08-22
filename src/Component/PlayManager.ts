@@ -128,7 +128,7 @@ export class PlayManager extends ManagerBase {
       stream.stream.on("end", this.onStreamFinished.bind(this));
       this.Log(`Stream edges: ${["Raw", ...this.getCurrentStreams().map(e => e.constructor.name)].join(" -> ")} ->`);
       // wait for entering playing state
-      await new Promise<void>((resolve) => {
+      await new Promise<void>((resolve, reject) => {
         if(connection.current?.startTime) resolve();
         let count = 0;
         const ticker = setInterval(() => {
@@ -137,7 +137,7 @@ export class PlayManager extends ManagerBase {
             clearInterval(ticker);
             resolve();
           }else if(10 * 1000 <= 200 * count){
-            resolve();
+            reject();
           }
         }, 200);
       });
