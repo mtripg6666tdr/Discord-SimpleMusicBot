@@ -271,9 +271,9 @@ export class MusicBot extends LogEmitter {
     this.addOn.emit("interactionCreate", interaction);
     if(!Util.eris.interaction.interactionIsCommandOrComponent(interaction)) return;
     if(this.maintenance){
-      if(!Util.config.adminId || interaction.user?.id !== Util.config.adminId) return;
+      if(!Util.config.adminId || interaction.member?.id !== Util.config.adminId) return;
     }
-    if(interaction.user?.bot) return;
+    if(interaction.member?.bot) return;
     // データ初期化
     const channel = interaction.channel as discord.TextChannel;
     this.initData(channel.guild.id, channel.id);
@@ -285,7 +285,7 @@ export class MusicBot extends LogEmitter {
         return;
       }
       // 送信可能か確認
-      if(!Util.eris.channel.checkSendable(interaction.channel, interaction.user.id)){
+      if(!Util.eris.channel.checkSendable(interaction.channel, interaction.member.id)){
         await interaction.createMessage(NotSendableMessage);
         return;
       }
@@ -359,7 +359,7 @@ export class MusicBot extends LogEmitter {
         // なければ返却
         if(!panel) return;
         // インタラクションしたユーザーを確認
-        if(interaction.user.id !== panel.Msg.userId) return;
+        if(interaction.member.id !== panel.Msg.userId) return;
         await interaction.deferUpdate();
         if(interaction.data.custom_id === "search"){
           if(interaction.data.values.includes("cancel")){
@@ -572,10 +572,12 @@ export class MusicBot extends LogEmitter {
           selfDeaf: true,
         });
         connection
-          .on("debug", mes => Util.logger.log("[Main][Connection]" + mes, "debug"))
           .on("error", err => Util.logger.log("[Main][Connection]" + Util.general.StringifyObject(err), "error"))
           .on("pong", ping => this.data[message.guild.id].vcPing = ping)
         ;
+        if(Util.config.debug){
+          connection.on("debug", mes => Util.logger.log("[Main][Connection]" + mes, "debug"));
+        }
         this.data[targetVC.guild.id].connection = connection;
         Util.logger.log(`[Main/${message.guild.id}]Connected to ${message.member.voiceState.channelID}`);
         await msg.edit(`:+1:ボイスチャンネル:speaker:\`${targetVC.name}\`に接続しました!`);

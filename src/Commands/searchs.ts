@@ -50,7 +50,7 @@ export default class Searchs extends BaseCommand {
           Msg: {
             id: msg.id,
             chId: msg.channel.id,
-            userId: message.author.id,
+            userId: message.member.id,
             userName: Util.eris.user.getDisplayName(message.member),
             commandMessage: message
           },
@@ -83,7 +83,7 @@ export default class Searchs extends BaseCommand {
         const selectOpts = [] as SelectMenuOptions[];
         for(let i = 0; i < result.length; i++){
           const [min, sec] = Util.time.CalcMinSec(Math.floor(result[i].duration / 1000));
-          desc += "`" + index + ".` [" + result[i].title + "](" + result[i].permalink_url + ") " + min + ":" + sec + " - [" + result[i].user.username + "](" + result[i].user.permalink_url + ") \r\n\r\n";
+          desc += `\`${index}.\` [${result[i].title}](${result[i].permalink_url}) ${min}:${sec} - [${result[i].user.username}](${result[i].user.permalink_url}) \r\n\r\n`;
           options.data[message.guild.id].SearchPanel.Opts[index] = {
             url: result[i].permalink_url,
             title: result[i].title,
@@ -107,13 +107,13 @@ export default class Searchs extends BaseCommand {
           .setTitle("\"" + options.rawArgs + "\"の検索結果✨")
           .setDescription(desc)
           .setFooter({
-            icon_url: message.author.avatarURL,
+            icon_url: message.member.avatarURL,
             text: "楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。",
           })
           .toEris()
         ;
         await msg.edit({
-          content: null,
+          content: "",
           embeds: [embed],
           components: [
             new Helper.MessageActionRowBuilder()

@@ -42,7 +42,7 @@ export class PlayManager extends ManagerBase {
    *  VCに接続中かどうか
    */
   get IsConnecting():boolean{
-    return !!this.info.connection?.connecting;
+    return this.info.connection && (this.info.connection.connecting || this.info.connection.ready);
   }
 
   /**
@@ -86,7 +86,7 @@ export class PlayManager extends ManagerBase {
     /* eslint-disable no-irregular-whitespace */
     // 再生できる状態か確認
     const badCondition
-    /* なにかしら再生中でない  　　　 */ = !this.IsPlaying
+    /* なにかしら再生中でない  　　　 */ = this.IsPlaying
     /* キューが空　　　　　　　　　　 */ || this.info.Queue.Nothing
     /* 準備中　　　　　　　　　　　　 */ || this.preparing
     ;
@@ -115,6 +115,7 @@ export class PlayManager extends ManagerBase {
       const rawStream = await this.CurrentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
       const stream = this.ResolveStream(rawStream, time);
+      stream.stream.on("error", this.handleError.bind(this));
       this.errorReportChannel = mes.channel as TextChannel;
       const connection = this.info.connection;
       this.error = false;
@@ -124,6 +125,7 @@ export class PlayManager extends ManagerBase {
       connection.play(stream.stream, {
         format: stream.streamType
       });
+      stream.stream.on("end", this.onStreamFinished.bind(this));
       this.Log(`Stream edges: ${["Raw", ...this.getCurrentStreams().map(e => e.constructor.name)].join(" -> ")} ->`);
       // wait for entering playing state
       await new Promise<void>((resolve) => {
@@ -258,6 +260,9 @@ export class PlayManager extends ManagerBase {
     Util.logger.log("Error", "error");
     if(er){
       Util.logger.log(Util.general.StringifyObject(er), "error");
+      if(Util.config.debug){
+        console.error(er);
+      }
     }
     this.errorReportChannel.createMessage(":tired_face:曲の再生に失敗しました...。" + (this.errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
     this.onStreamFailed();
@@ -335,12 +340,13 @@ export class PlayManager extends ManagerBase {
     const passThrough = Util.general.InitPassThrough();
     const ffmpeg = new FFmpeg({args})
       .on("error", (e) => passThrough.emit("error", e));
-    const stream = ffmpeg
-      .on("error", (e) => passThrough.emit("error", e))
+    ffmpeg
       .pipe(passThrough)
       .on("close", () => ffmpeg.destroy())
     ;
-    return stream;
+    console.log(ffmpeg);
+    console.log(passThrough);
+    return passThrough;
   }
 
   private getCurrentStreams():Readable[]{

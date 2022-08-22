@@ -3,6 +3,7 @@ import * as path from "path";
 import { isMainThread } from "worker_threads";
 
 import * as config from "./config";
+import { StringifyObject } from "./general";
 
 type LogLevels = "log"|"warn"|"error"|"debug";
 export type LoggerType = (content:string, level?:LogLevels)=>void;
@@ -39,6 +40,9 @@ class LogStore {
       if(this.data.length > this.maxLength){
         this.data.shift();
       }
+    }
+    if(typeof log !== "string"){
+      log = StringifyObject(log);
     }
     if(this.loggingStream && !this.loggingStream.destroyed){
       this.loggingStream.write(Buffer.from(`${{

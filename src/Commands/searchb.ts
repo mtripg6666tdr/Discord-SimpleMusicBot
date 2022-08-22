@@ -36,7 +36,7 @@ export default class Searchb extends BaseCommand {
           Msg: {
             id: msg.id,
             chId: msg.channel.id,
-            userId: message.author.id,
+            userId: message.member.id,
             userName: Util.eris.user.getDisplayName(message.member),
             commandMessage: message
           },
@@ -53,7 +53,7 @@ export default class Searchb extends BaseCommand {
         const selectOpts = [] as SelectMenuOptions[];
         for(let i = 0; i < result.length; i++){
           const title = bestdori.allsonginfo[Number(result[i])].musicTitle[0];
-          desc += `\`${index}.\` [${bestdori.allsonginfo[Number(result[i])].musicTitle[0]}(${BestdoriApi.getAudioPage(Number(result[i]))}) - \`${bestdori.allbandinfo[bestdori.allsonginfo[Number(result[i])].bandId].bandName[0]}\` \r\n\r\n`;
+          desc += `\`${index}.\` [${bestdori.allsonginfo[Number(result[i])].musicTitle[0]}](${BestdoriApi.getAudioPage(Number(result[i]))}) - \`${bestdori.allbandinfo[bestdori.allsonginfo[Number(result[i])].bandId].bandName[0]}\` \r\n\r\n`;
           options.data[message.guild.id].SearchPanel.Opts[index] = {
             url: BestdoriApi.getAudioPage(Number(result[i])),
             title: title,
@@ -86,6 +86,7 @@ export default class Searchb extends BaseCommand {
           .toEris()
         ;
         await msg.edit({
+          content: "",
           embeds: [embed],
           components: [
             new Helper.MessageActionRowBuilder()

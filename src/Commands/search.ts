@@ -50,7 +50,7 @@ export default class Search extends BaseCommand {
         Msg: {
           id: msg.id,
           chId: msg.channel.id,
-          userId: message.author.id,
+          userId: message.member.id,
           userName: Util.eris.user.getDisplayName(message.member),
           commandMessage: message
         },
@@ -93,7 +93,7 @@ export default class Search extends BaseCommand {
           .setColor(getColor("SEARCH"))
           .setDescription(desc)
           .setFooter({
-            icon_url: message.author.avatarURL,
+            icon_url: message.member.avatarURL,
             text: "動画のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
           })
           .toEris()
