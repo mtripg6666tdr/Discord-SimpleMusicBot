@@ -1,5 +1,5 @@
 import type { exportableCustom, ReadableStreamInfo } from ".";
-import type { EmbedField } from "discord.js";
+import type { EmbedField } from "eris";
 
 import { convert as htmlToText } from "html-to-text";
 import NiconicoDL, { isValidURL } from "niconico-dl.js";

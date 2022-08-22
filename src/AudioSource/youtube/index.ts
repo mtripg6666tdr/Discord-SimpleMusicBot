@@ -2,7 +2,7 @@ import type { StreamInfo } from "..";
 import type { LoggerType } from "../../Util";
 import type { Cache } from "./strategies/base";
 import type { ytdlCoreStrategy } from "./strategies/ytdl-core";
-import type { EmbedField } from "discord.js";
+import type { EmbedField } from "eris";
 
 import * as ytdl from "ytdl-core";
 
