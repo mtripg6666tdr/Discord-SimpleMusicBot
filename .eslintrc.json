@@ -106,6 +106,7 @@
           "TSUnionType"
         ]
     }],
+    "@typescript-eslint/no-unnecessary-type-assertion": "warn",
 
     // other plugins
     "eslint-comments/no-unused-disable": "error",
