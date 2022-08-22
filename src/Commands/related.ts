@@ -1,10 +1,11 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+
 import { BaseCommand } from ".";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 export default class Related extends BaseCommand {
   constructor(){

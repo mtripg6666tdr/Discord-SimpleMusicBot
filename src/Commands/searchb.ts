@@ -1,13 +1,16 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { ResponseMessage } from "../Component/ResponseMessage";
+import type { SelectMenuOptions} from "eris";
+
+import { Message, TextChannel } from "eris";
+
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
 import { bestdori, BestdoriApi } from "../AudioSource";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
-import { Message, SelectMenuOptions, TextChannel } from "eris";
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 export default class Searchb extends BaseCommand {
   constructor(){

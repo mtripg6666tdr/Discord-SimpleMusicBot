@@ -1,12 +1,13 @@
 import type { CommandArgs } from ".";
 import type { YouTube } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
+import type { EmbedField } from "eris";
+
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
-import { EmbedField } from "eris";
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 export default class Searchq extends BaseCommand {
   constructor(){
