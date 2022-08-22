@@ -127,7 +127,7 @@
       ],
       "pathGroups": [
         {
-          "pattern": "{eris,discord.js,@discordjs/**}",
+          "pattern": "{eris,@mtripg6666tdr/eris-command-resolver}",
           "group": "builtin",
           "position": "before"
         }

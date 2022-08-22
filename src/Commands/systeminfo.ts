@@ -2,9 +2,9 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { EmbedOptions } from "eris";
 
-import * as os from "os";
-
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+
+import * as os from "os";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";

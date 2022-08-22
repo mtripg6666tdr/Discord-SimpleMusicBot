@@ -2,11 +2,11 @@ import type { exportableCustom } from "./AudioSource";
 import type { CommandArgs } from "./Commands";
 import type { YmxFormat } from "./Structure";
 
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 import * as discord from "eris";
 
 import { execSync } from "child_process";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 import Soundcloud from "soundcloud.ts";
 import * as ytpl from "ytpl";
 

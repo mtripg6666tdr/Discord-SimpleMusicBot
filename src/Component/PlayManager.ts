@@ -4,6 +4,7 @@ import type { Client, Message, TextChannel } from "eris";
 import type { Readable } from "stream";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+
 import { FFmpeg } from "prism-media";
 
 import { ManagerBase } from "../Structure";

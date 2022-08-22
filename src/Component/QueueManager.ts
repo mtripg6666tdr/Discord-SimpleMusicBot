@@ -4,9 +4,8 @@ import type { ResponseMessage } from "./ResponseMessage";
 import type { TaskCancellationManager } from "./TaskCancellationManager";
 import type { Client, Message, TextChannel } from "eris";
 
-import { Member } from "eris";
-
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { Member } from "eris";
 
 import * as AudioSource from "../AudioSource";
 import { ManagerBase } from "../Structure";

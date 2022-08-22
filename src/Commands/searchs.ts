@@ -6,6 +6,7 @@ import type { Message, SelectMenuOptions, TextChannel } from "eris";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+
 import Soundcloud from "soundcloud.ts";
 
 import { BaseCommand } from ".";
