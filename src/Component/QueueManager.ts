@@ -2,10 +2,11 @@ import type { exportableCustom } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { ResponseMessage } from "./ResponseMessage";
 import type { TaskCancellationManager } from "./TaskCancellationManager";
-import type { Client, Message, TextChannel } from "discord.js";
+import type { Client, Message, TextChannel } from "eris";
 
-import { GuildMember } from "discord.js";
-import { MessageEmbed } from "discord.js";
+import { Member } from "eris";
+
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import * as AudioSource from "../AudioSource";
 import { ManagerBase } from "../Structure";
@@ -125,7 +126,7 @@ export class QueueManager extends ManagerBase {
 
   async AddQueue(
     url:string,
-    addedBy:GuildMember|AddedBy,
+    addedBy:Member|AddedBy,
     method:"push"|"unshift" = "push",
     type:KnownAudioSourceIdentifer = "unknown",
     gotData:AudioSource.exportableCustom = null
@@ -143,8 +144,8 @@ export class QueueManager extends ManagerBase {
       }),
       AdditionalInfo: {
         AddedBy: {
-          userId: (addedBy && (addedBy instanceof GuildMember ? addedBy.id : (addedBy as AddedBy).userId)) ?? "0",
-          displayName: addedBy?.displayName ?? "不明"
+          userId: this.getUserIdFromMember(addedBy) ?? "0",
+          displayName: this.getDisplayNameFromMember(addedBy) ?? "不明"
         }
       }
     } as QueueContent;
@@ -181,7 +182,7 @@ export class QueueManager extends ManagerBase {
   async AutoAddQueue(
     client:Client,
     url:string,
-    addedBy:GuildMember|AddedBy|null|undefined,
+    addedBy:Member|AddedBy|null|undefined,
     type:KnownAudioSourceIdentifer,
     first:boolean = false,
     fromSearch:boolean|ResponseMessage = false,
@@ -192,23 +193,24 @@ export class QueueManager extends ManagerBase {
     this.Log("AutoAddQueue Called");
     const t = Util.time.timer.start("AutoAddQueue");
     let ch:TextChannel = null;
-    let msg:Message|ResponseMessage = null;
+    let msg:Message<TextChannel>|ResponseMessage = null;
     try{
       if(fromSearch && this.info.SearchPanel){
         // 検索パネルから
         this.Log("AutoAddQueue from search panel");
-        ch = await client.channels.fetch(this.info.SearchPanel.Msg.chId) as TextChannel;
+        ch = client.getChannel(this.info.SearchPanel.Msg.chId) as TextChannel;
         if(typeof fromSearch === "boolean"){
-          msg = await (ch as TextChannel).messages.fetch(this.info.SearchPanel.Msg.id);
+          msg = ch.messages.get(this.info.SearchPanel.Msg.id);
         }else{
           msg = fromSearch;
         }
-        const tembed = new MessageEmbed();
-        tembed.title = "お待ちください";
-        tembed.description = "情報を取得しています...";
+        const tembed = new Helper.MessageEmbedBuilder()
+          .setTitle("お待ちください")
+          .setDescription("情報を取得しています...")
+        ;
         await msg.edit({
           content: null,
-          embeds: [tembed],
+          embeds: [tembed.toEris()],
           allowedMentions: {
             repliedUser: false
           },
@@ -223,7 +225,7 @@ export class QueueManager extends ManagerBase {
         // まだないので生成
         this.Log("AutoAddQueue will make a message that will be used to report statuses");
         ch = channel;
-        msg = await channel.send("情報を取得しています。お待ちください...");
+        msg = await channel.createMessage("情報を取得しています。お待ちください...");
       }
       if(this.info.Queue.length > 999){
         // キュー上限
@@ -241,19 +243,19 @@ export class QueueManager extends ManagerBase {
         const index = info.index.toString();
         // ETAの計算
         const [ehour, emin, esec] = Util.time.CalcHourMinSec(this.getLengthSecondsTo(info.index) - _t - Math.floor(this.info.Player.CurrentTime / 1000));
-        const embed = new MessageEmbed()
+        const embed = new Helper.MessageEmbedBuilder()
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
           .setDescription("[" + info.BasicInfo.Title + "](" + info.BasicInfo.Url + ")")
           .addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as AudioSource.YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true)
-          .addField("リクエスト", addedBy?.displayName ?? "不明", true)
+          .addField("リクエスト", this.getDisplayNameFromMember(addedBy) ?? "不明", true)
           .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
           .addField("再生されるまでの予想時間", index === "0" ? "-" : ((ehour === "0" ? "" : ehour + ":") + emin + ":" + esec), true)
           .setThumbnail(info.BasicInfo.Thumnail);
         if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as AudioSource.YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
-        await msg.edit({content: null, embeds: [embed]});
+        await msg.edit({content: null, embeds: [embed.toEris()]});
       }
     }
     catch(e){
@@ -466,6 +468,14 @@ export class QueueManager extends ManagerBase {
       sorted.push(...addedByUsers.map(user => queueByAdded[user][i]).filter(q => !!q));
     }
     this._default = sorted;
+  }
+
+  private getDisplayNameFromMember(member:Member|AddedBy){
+    return member instanceof Member ? Util.eris.user.getDisplayName(member) : member.displayName;
+  }
+
+  private getUserIdFromMember(member:Member|AddedBy){
+    return member instanceof Member ? member.id : member.userId;
   }
 }
 

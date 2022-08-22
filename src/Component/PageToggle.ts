@@ -1,12 +1,12 @@
 import type { ResponseMessage } from "./ResponseMessage";
-import type { MessageComponentInteraction, MessageEmbed } from "discord.js";
+import type { ComponentInteraction, EmbedOptions } from "eris";
 
-import { MessageActionRow, MessageButton } from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 /**
  * 最終的にメッセージの埋め込みに解決されるデータ
  */
-type MessageEmbedsResolvable = MessageEmbed[]|((pagenum:number)=>MessageEmbed)|((pagenum:number)=>Promise<MessageEmbed>);
+type MessageEmbedsResolvable = EmbedOptions[]|((pagenum:number)=>EmbedOptions)|((pagenum:number)=>Promise<EmbedOptions>);
 
 /**
  * リアクションによってページめくりができるメッセージの管理を行います
@@ -18,7 +18,7 @@ export class PageToggle {
   }
 
   private _embeds:MessageEmbedsResolvable;
-  get Embeds(){
+  get embeds(){
     return this._embeds;
   }
 
@@ -29,7 +29,7 @@ export class PageToggle {
 
   private _total:number = -1;
   get Length(){
-    return this._embeds instanceof Array ? (this.Embeds as MessageEmbed[]).length : this._total === -1 ? NaN : this._total;
+    return Array.isArray(this._embeds) ? this._embeds.length : this._total === -1 ? NaN : this._total;
   }
 
   IsFreshNecessary = false;
@@ -54,17 +54,18 @@ export class PageToggle {
       content: n._message.content === "" ? null : n._message.content,
       embeds: n._message.embeds,
       components: [
-        new MessageActionRow()
+        new Helper.MessageActionRowBuilder()
           .addComponents(
-            new MessageButton()
+            new Helper.MessageButtonBuilder()
               .setCustomId(this.arrowLeft)
               .setLabel(this.arrowLeftEmoji)
               .setStyle("PRIMARY"),
-            new MessageButton()
+            new Helper.MessageButtonBuilder()
               .setCustomId(this.arrowRight)
               .setLabel(this.arrowRightEmoji)
               .setStyle("PRIMARY")
           )
+          .toEris()
       ]
     });
     return n;
@@ -88,23 +89,23 @@ export class PageToggle {
     });
   }
 
-  async FlipPage(page:number, interaction?:MessageComponentInteraction){
-    let embed = null as MessageEmbed;
+  async FlipPage(page:number, interaction?:ComponentInteraction){
+    let embed = null as EmbedOptions;
     this._current = page;
     if(this._embeds instanceof Array){
-      embed = (this._embeds as MessageEmbed[])[page];
+      embed = this._embeds[page];
     }else if(typeof this._embeds === "function"){
-      embed = await (this._embeds as any)(page);
+      embed = await this._embeds(page);
     }
     if(interaction){
-      await interaction.editReply({
+      await interaction.editOriginalMessage({
         content: this.Message.content === "" ? null : this.Message.content,
-        embeds: [embed]
+        embeds: [embed],
       });
     }else{
       await this.Message.edit({
         content: this.Message.content === "" ? null : this.Message.content,
-        embeds: [embed]
+        embeds: [embed],
       });
     }
   }
