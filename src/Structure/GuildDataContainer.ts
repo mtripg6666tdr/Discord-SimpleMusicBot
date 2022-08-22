@@ -59,6 +59,11 @@ export class GuildDataContainer {
    */
   connection:VoiceConnection;
 
+  /**
+   * VCのping
+   */
+  vcPing:number;
+
   constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBot){
     this.SearchPanel = null;
     this.Queue = new QueueManager();

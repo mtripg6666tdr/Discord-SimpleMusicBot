@@ -1,8 +1,6 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
-import type * as discord from "discord.js";
-
-import * as voice from "@discordjs/voice";
+import type { VoiceChannel } from "eris";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -28,8 +26,8 @@ export default class LeaveClean extends BaseCommand {
       message.reply("キューが空です").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const members = [...((await options.client.channels.resolve(voice.getVoiceConnection(message.guild.id).joinConfig.channelId).fetch()) as discord.VoiceChannel).members.keys()];
+    const members = (options.client.getChannel(options.data[message.guild.id].connection.channelID) as VoiceChannel).voiceMembers.map(member => member.id);
     const number = options.data[message.guild.id].Queue.RemoveIf(q => !members.includes(q.AdditionalInfo.AddedBy.userId)).length;
-    message.reply(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => Util.logger.log(e, "error"));
+    await message.reply(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => Util.logger.log(e, "error"));
   }
 }

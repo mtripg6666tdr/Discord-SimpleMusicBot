@@ -1,8 +1,6 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import { MessageAttachment } from "discord.js";
-
 import { FFmpeg } from "prism-media";
 import * as ytdl from "ytdl-core";
 
@@ -49,7 +47,7 @@ export default class Frame extends BaseCommand {
       else return NaN;
     }(options.rawArgs));
     if(options.rawArgs !== "" && vinfo.LiveStream){
-      await message.channel.send("ライブストリームでは時間指定できません");
+      await message.channel.createMessage("ライブストリームでは時間指定できません");
       return;
     }
     if(!vinfo.LiveStream && (isNaN(time) || time > vinfo.LengthSeconds)){
@@ -61,9 +59,9 @@ export default class Frame extends BaseCommand {
       const response = await message.reply(":camera_with_flash:取得中...");
       const {url, ua} = await vinfo.fetchVideo();
       const frame = await getFrame(url, time, ua);
-      const attachment = new MessageAttachment(frame).setName(`capture_${ytdl.getVideoID(vinfo.Url)}-${hour}${min}${sec}.png`);
-      await response.channel.send({
-        files: [attachment]
+      await response.channel.createMessage("", {
+        file: frame,
+        name: `capture_${ytdl.getVideoID(vinfo.Url)}-${hour}${min}${sec}.png`,
       });
       await response.edit({
         content: ":white_check_mark:完了!" + (vinfo.LiveStream ? "" : `(${hour}:${min}:${sec}時点)`),
@@ -71,7 +69,7 @@ export default class Frame extends BaseCommand {
     }
     catch(e){
       Util.logger.log(Util.general.StringifyObject(e), "error");
-      message.channel.send(":sob:失敗しました...").catch(er => Util.logger.log(er, "error"));
+      await message.channel.createMessage(":sob:失敗しました...").catch(er => Util.logger.log(er, "error"));
     }
   }
 }

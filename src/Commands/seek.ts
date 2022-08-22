@@ -53,7 +53,7 @@ export default class Seek extends BaseCommand {
       await response.edit(":white_check_mark:シークしました").catch(e => Util.logger.log(e, "error"));
     }
     catch(e){
-      await message.channel.send(":astonished:シークに失敗しました");
+      await message.channel.createMessage(":astonished:シークに失敗しました").catch(er => Util.logger.log(er, "error"));
     }
   }
 }

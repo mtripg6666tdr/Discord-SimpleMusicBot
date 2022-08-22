@@ -570,10 +570,14 @@ export class MusicBot extends LogEmitter {
         const connection = await targetVC.join({
           selfDeaf: true,
         });
-        connection.on("debug", (mes) => Util.logger.log("[Main][Connection]" + mes, "debug"));
+        connection
+          .on("debug", mes => Util.logger.log("[Main][Connection]" + mes, "debug"))
+          .on("error", err => Util.logger.log("[Main][Connection]" + Util.general.StringifyObject(err), "error"))
+          .on("pong", ping => this.data[message.guild.id].vcPing = ping)
+        ;
         this.data[targetVC.guild.id].connection = connection;
         Util.logger.log(`[Main/${message.guild.id}]Connected to ${message.member.voiceState.channelID}`);
-        await msg.edit(":+1:ボイスチャンネル:speaker:`" + targetVC.name + "`に接続しました!");
+        await msg.edit(`:+1:ボイスチャンネル:speaker:\`${targetVC.name}\`に接続しました!`);
         t.end();
         return true;
       }
@@ -595,12 +599,12 @@ export class MusicBot extends LogEmitter {
       }
     }else{
       // あらメッセージの送信者さんはボイチャ入ってないん…
-      await ((mes:string) => {
-        if(reply || replyOnFail) return message.reply(mes)
-          .catch(e => this.Log(e, "error"));
-        else return message.channel.createMessage(mes)
-          .catch(e => this.Log(e, "error"));
-      })("ボイスチャンネルに参加してからコマンドを送信してください:relieved:");
+      const msg = "ボイスチャンネルに参加してからコマンドを送信してください:relieved:";
+      if(reply || replyOnFail){
+        await message.reply(msg).catch(e => this.Log(e, "error"));
+      }else{
+        await message.channel.createMessage(msg).catch(e => this.Log(e, "error"));
+      }
       t.end();
       return false;
     }

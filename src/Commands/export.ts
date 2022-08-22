@@ -1,8 +1,6 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import * as discord from "discord.js";
-
 import { BaseCommand } from ".";
 import { YmxVersion } from "../Structure";
 import { Util } from "../Util";
@@ -25,9 +23,12 @@ export default class Export extends BaseCommand {
       return;
     }
     const qd = options.bot.exportQueue(message.guild.id);
-    message.reply({
+    await message.reply({
       content: "✅エクスポートしました",
-      files: [new discord.MessageAttachment(Buffer.from(qd), "exported_queue.ymx")]
+      files: [{
+        file: Buffer.from(qd),
+        name: "exported_queue.ymx",
+      }]
     })
       .then(msg => msg.edit(`✅エクスポートしました (バージョン: v${YmxVersion}互換)\r\nインポート時は、「${msg.url}」をimportコマンドの引数に指定してください`))
       .catch(e => Util.logger.log(e, "error"));

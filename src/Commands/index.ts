@@ -4,7 +4,7 @@ import type { TaskCancellationManager } from "../Component/TaskCancellationManag
 import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
 import type { categories } from "./commands";
-import type { Client } from "discord.js";
+import type { Client } from "eris";
 
 import * as fs from "fs";
 import * as path from "path";

@@ -2,7 +2,6 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { ResponseMessage } from "../Component/ResponseMessage";
 import type { YmxFormat } from "../Structure";
-import type * as discord from "discord.js";
 
 import { BaseCommand } from ".";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
@@ -52,14 +51,13 @@ export default class Import extends BaseCommand {
         }
         const msgId = ids[ids.length - 1];
         const chId = ids[ids.length - 2];
-        const ch = await options.client.channels.fetch(chId);
-        const msg = await (ch as discord.TextChannel).messages.fetch(msgId);
+        const msg = await options.client.getMessage(chId, msgId);
         if(msg.author.id !== options.client.user.id && !force){
           await smsg.edit("❌ボットのメッセージではありません");
           return;
         }
         const embed = msg.embeds.length > 0 ? msg.embeds[0] : null;
-        const attac = msg.attachments.size > 0 ? msg.attachments.first() : null;
+        const attac = msg.attachments.length > 0 ? msg.attachments[0] : null;
         if(embed && embed.title.endsWith("のキュー")){
           const fields = embed.fields;
           for(let i = 0; i < fields.length; i++){
@@ -74,7 +72,7 @@ export default class Import extends BaseCommand {
           }else{
             await smsg.edit("✅キャンセルされました");
           }
-        }else if(attac && attac.name.endsWith(".ymx")){
+        }else if(attac && attac.filename.endsWith(".ymx")){
           const raw = JSON.parse(await Util.web.DownloadText(attac.url)) as YmxFormat;
           if(raw.version !== YmxVersion){
             await smsg.edit("✘指定されたファイルはバージョンに互換性がないためインポートできません(現行:v" + YmxVersion + "; ファイル:v" + raw.version + ")");
@@ -106,7 +104,7 @@ export default class Import extends BaseCommand {
         options.cancellations.splice(options.cancellations.findIndex(c => c === cancellation), 1);
       }
     }else{
-      message.reply("❌Discordのメッセージへのリンクを指定してください").catch(e => Util.logger.log(e, "error"));
+      await message.reply("❌Discordのメッセージへのリンクを指定してください").catch(e => Util.logger.log(e, "error"));
     }
   }
 }
