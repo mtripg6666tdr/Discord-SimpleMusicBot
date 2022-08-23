@@ -3,6 +3,7 @@ import * as path from "path";
 import { isMainThread } from "worker_threads";
 
 import * as config from "./config";
+import { StringifyObject } from "./general";
 
 type LogLevels = "log"|"warn"|"error"|"debug";
 export type LoggerType = (content:string, level?:LogLevels)=>void;
@@ -58,11 +59,12 @@ class LogStore {
 export const logStore = new LogStore();
 
 export function log(content:string, level:LogLevels = "log"){
+  const text = StringifyObject(content);
   if(!logStore.log && level === "log") return;
-  if(content.length < 200){
-    console[level](content);
+  if(text.length < 200){
+    console[level](text);
   }else{
     console.warn("[Logger] truncated because content was too big; see logs directory to get complete logs (if not exists, make sure debug is set true in config.json)");
   }
-  logStore.addLog(level, content);
+  logStore.addLog(level, text);
 }
