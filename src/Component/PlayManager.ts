@@ -211,6 +211,7 @@ export class PlayManager extends ManagerBase {
     }
     if(typeof global.gc === "function"){
       global.gc();
+      this.Log("Called exposed gc");
     }
     return this;
   }
@@ -316,7 +317,7 @@ export class PlayManager extends ManagerBase {
       .on("error", (e) => passThrough.emit("error", e))
       .pipe(passThrough)
     ;
-    if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => this.Log(chunk.toString(), "debug"));
+    if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => this.Log("[FFmpeg]" + chunk.toString(), "debug"));
     return stream;
   }
 
@@ -337,7 +338,7 @@ export class PlayManager extends ManagerBase {
     ffmpeg
       .pipe(passThrough)
     ;
-    if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => this.Log(chunk.toString(), "debug"));
+    if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => this.Log("[FFmpeg]" + chunk.toString(), "debug"));
     console.log(ffmpeg);
     console.log(passThrough);
     return passThrough;
