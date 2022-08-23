@@ -61,7 +61,7 @@ class LogStore {
 
 export const logStore = new LogStore();
 
-export function log(content:string, level:LogLevels = "log"){
+export function log(content:any, level:LogLevels = "log"){
   const text = StringifyObject(content);
   if(!logStore.log && level === "log") return;
   if(text.length < 200){
