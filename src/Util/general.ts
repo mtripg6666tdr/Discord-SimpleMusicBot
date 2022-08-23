@@ -66,7 +66,14 @@ export function InitPassThrough():PassThrough{
   return stream;
 }
 
-export function waitForEnteringState(predicate:()=>boolean, timeout:number = 10 * 1000, rejectOnTimeout:boolean = true){
+export function waitForEnteringState(predicate:()=>boolean, timeout:number = 10 * 1000, options?:{
+  rejectOnTimeout:boolean,
+  timeStep:number,
+}){
+  const { rejectOnTimeout, timeStep } = Object.assign({
+    rejectOnTimeout: true,
+    timeStep: 50,
+  }, options);
   return new Promise<number>((resolve, reject) => {
     let count = 0;
     const startTime = Date.now();
@@ -80,7 +87,7 @@ export function waitForEnteringState(predicate:()=>boolean, timeout:number = 10 
       if(predicate()){
         clearInterval(ticker);
         resolve(Date.now() - startTime);
-      }else if(timeout <= 50 * count){
+      }else if(timeout <= timeStep * count){
         clearInterval(ticker);
         if(rejectOnTimeout){
           reject(`target predicate has not return true in time (${timeout}ms) and timed out`);
@@ -89,6 +96,6 @@ export function waitForEnteringState(predicate:()=>boolean, timeout:number = 10 
           resolve(Date.now() - startTime);
         }
       }
-    }, 50);
+    }, timeStep);
   });
 }
