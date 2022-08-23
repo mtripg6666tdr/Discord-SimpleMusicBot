@@ -57,12 +57,12 @@ export class GuildDataContainer {
   /**
    * VCへの接続
    */
-  connection:VoiceConnection;
+  Connection:VoiceConnection;
 
   /**
    * VCのping
    */
-  vcPing:number;
+  VcPing:number;
 
   constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBot){
     this.SearchPanel = null;

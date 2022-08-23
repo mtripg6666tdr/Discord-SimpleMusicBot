@@ -47,4 +47,4 @@ if(!Util.config.debug){
 }
 
 // ボット開始
-bot.Run(true, 40);
+bot.run(true, 40);

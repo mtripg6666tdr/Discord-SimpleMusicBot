@@ -13,7 +13,7 @@ export abstract class ManagerBase extends LogEmitter {
    * 親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
    * @param data 親のGuildVoiceInfo
    */
-  SetData(data:GuildDataContainer){
+  setBinding(data:GuildDataContainer){
     if(this.info) throw new Error("すでに設定されています");
     this.info = data;
     this.SetGuildId(this.info.GuildID);

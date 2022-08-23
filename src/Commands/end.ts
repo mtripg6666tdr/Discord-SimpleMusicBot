@@ -18,7 +18,7 @@ export default class End extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     const guild = options.data[message.guild.id];
-    if(!guild.Player.IsPlaying){
+    if(!guild.Player.isPlaying){
       message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -26,8 +26,8 @@ export default class End extends BaseCommand {
       message.reply("キューが空、もしくは一曲しかないため削除されませんでした。").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    guild.Queue.RemoveFrom2();
-    guild.Queue.QueueLoopEnabled = guild.Queue.OnceLoopEnabled = guild.Queue.LoopEnabled = false;
+    guild.Queue.RemoveFrom2nd();
+    guild.Queue.queueLoopEnabled = guild.Queue.onceLoopEnabled = guild.Queue.loopEnabled = false;
     message.reply("✅キューに残された曲を削除しました").catch(e => Util.logger.log(e, "error"));
   }
 }

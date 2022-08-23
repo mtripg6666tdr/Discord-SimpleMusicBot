@@ -31,7 +31,7 @@ export default class Frame extends BaseCommand {
     options.updateBoundChannel(message);
     const server = options.data[message.guild.id];
     // そもそも再生状態じゃないよ...
-    if(!server.Player.IsConnecting || !server.Player.IsPlaying){
+    if(!server.Player.isConnecting || !server.Player.isPlaying){
       await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -41,7 +41,7 @@ export default class Frame extends BaseCommand {
       return;
     }
     const time = (function(rawTime){
-      if(rawTime === "" || vinfo.LiveStream) return server.Player.CurrentTime / 1000;
+      if(rawTime === "" || vinfo.LiveStream) return server.Player.currentTime / 1000;
       else if(rawTime.match(/^(\d+:)*\d+(\.\d+)?$/)) return rawTime.split(":").map(n => Number(n))
         .reduce((prev, current) => prev * 60 + current);
       else return NaN;

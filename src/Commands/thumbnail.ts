@@ -37,7 +37,7 @@ export default class Thumbnail extends BaseCommand {
         .setTitle(opt.title)
         .setDescription("URL: " + opt.url)
       ;
-    }else if(!options.rawArgs && options.data[message.guild.id].Player.IsPlaying && options.data[message.guild.id].Queue.length >= 1){
+    }else if(!options.rawArgs && options.data[message.guild.id].Player.isPlaying && options.data[message.guild.id].Queue.length >= 1){
       const info = options.data[message.guild.id].Queue.get(0).BasicInfo;
       embed
         .setImage(info.Thumnail)

@@ -18,16 +18,16 @@ export default class LeaveClean extends BaseCommand {
 
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(!options.data[message.guild.id].Player.IsConnecting){
-      options.data[message.guild.id].Queue.RemoveAll();
+    if(!options.data[message.guild.id].Player.isConnecting){
+      options.data[message.guild.id].Queue.removeAll();
       message.reply("✅すべて削除しました").catch(e => Util.logger.log(e, "error"));
       return;
     }else if(options.data[message.guild.id].Queue.length === 0){
       message.reply("キューが空です").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const members = (options.client.getChannel(options.data[message.guild.id].connection.channelID) as VoiceChannel).voiceMembers.map(member => member.id);
-    const number = options.data[message.guild.id].Queue.RemoveIf(q => !members.includes(q.AdditionalInfo.AddedBy.userId)).length;
+    const members = (options.client.getChannel(options.data[message.guild.id].Connection.channelID) as VoiceChannel).voiceMembers.map(member => member.id);
+    const number = options.data[message.guild.id].Queue.removeIf(q => !members.includes(q.AdditionalInfo.AddedBy.userId)).length;
     await message.reply(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => Util.logger.log(e, "error"));
   }
 }

@@ -21,7 +21,7 @@ export default class Shuffle extends BaseCommand {
       message.reply("キューが空です。").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    options.data[message.guild.id].Queue.Shuffle();
+    options.data[message.guild.id].Queue.shuffle();
     message.reply(":twisted_rightwards_arrows:シャッフルしました✅").catch(e => Util.logger.log(e, "error"));
   }
 }

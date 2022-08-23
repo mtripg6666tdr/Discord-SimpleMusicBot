@@ -35,7 +35,7 @@ export default class Queue extends BaseCommand {
       return;
     }
     // 合計所要時間の計算
-    const totalLength = queue.LengthSeconds;
+    const totalLength = queue.lengthSeconds;
     let _page = options.rawArgs === "" ? 1 : Number(options.rawArgs);
     if(isNaN(_page)) _page = 1;
     if(queue.length > 0 && _page > Math.ceil(queue.length / 10)){
@@ -55,7 +55,7 @@ export default class Queue extends BaseCommand {
         const _t = Number(q.BasicInfo.LengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
         fields.push({
-          name: i !== 0 ? i.toString() : options.data[message.guild.id].Player.IsPlaying ? "現在再生中" : "再生待ち",
+          name: i !== 0 ? i.toString() : options.data[message.guild.id].Player.isPlaying ? "現在再生中" : "再生待ち",
           value: "[" + q.BasicInfo.Title + "](" + q.BasicInfo.Url + ") \r\n"
           + "長さ: `" + ((q.BasicInfo.ServiceIdentifer === "youtube" && (q.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : min + ":" + sec) + " ` \r\n"
           + "リクエスト: `" + q.AdditionalInfo.AddedBy.displayName + "` "
@@ -71,7 +71,7 @@ export default class Queue extends BaseCommand {
           name: options.client.user.username,
           icon_url: options.client.user.avatarURL,
         })
-        .setFooter({text: queue.length + "曲 | 合計:" + thour + ":" + tmin + ":" + tsec + " | トラックループ:" + (queue.LoopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.QueueLoopEnabled ? "⭕" : "❌") + " | 関連曲自動再生:" + (options.data[message.guild.id].AddRelative ? "⭕" : "❌") + " | 均等再生:" + (options.data[message.guild.id].EquallyPlayback ? "⭕" : "❌")})
+        .setFooter({text: queue.length + "曲 | 合計:" + thour + ":" + tmin + ":" + tsec + " | トラックループ:" + (queue.loopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.queueLoopEnabled ? "⭕" : "❌") + " | 関連曲自動再生:" + (options.data[message.guild.id].AddRelative ? "⭕" : "❌") + " | 均等再生:" + (options.data[message.guild.id].EquallyPlayback ? "⭕" : "❌")})
         .setThumbnail(message.guild.iconURL)
         .setColor(getColor("QUEUE"))
         .toEris()

@@ -24,8 +24,8 @@ export default class Rmall extends BaseCommand {
         return;
       }
     }
-    options.data[message.guild.id].Player.Disconnect();
-    options.data[message.guild.id].Queue.RemoveAll();
+    options.data[message.guild.id].Player.disconnect();
+    options.data[message.guild.id].Queue.removeAll();
     await message.reply("✅すべて削除しました").catch(e => Util.logger.log(e, "error"));
   }
 }

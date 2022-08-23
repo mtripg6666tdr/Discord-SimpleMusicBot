@@ -31,12 +31,12 @@ export default class Play extends BaseCommand {
       await message.reply("再生するコンテンツがありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const wasConnected = server.Player.IsConnecting;
+    const wasConnected = server.Player.isConnecting;
     // VCに入れない
     if(!(await options.JoinVoiceChannel(message, /* reply */ false, /* reply when failed */ true))) return;
     // 一時停止されてるね
-    if(options.rawArgs === "" && server.Player.IsPaused){
-      server.Player.Resume();
+    if(options.rawArgs === "" && server.Player.isPaused){
+      server.Player.resume();
       await message.reply(":arrow_forward: 再生を再開します。").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -62,12 +62,12 @@ export default class Play extends BaseCommand {
     // 添付ファイルを確認
     }else if(message.attachments.length >= 1){
       options.rawArgs = message.attachments[0].url;
-      await options.PlayFromURL(message, options.rawArgs, !server.Player.IsConnecting);
+      await options.PlayFromURL(message, options.rawArgs, !server.Player.isConnecting);
     // なにもないからキューから再生
     }else if(server.Queue.length >= 1){
-      if(!server.Player.IsPlaying && !server.Player.preparing){
+      if(!server.Player.isPlaying && !server.Player.preparing){
         await message.reply("再生します");
-        await server.Player.Play();
+        await server.Player.play();
       }else{
         await message.reply("すでに再生中です");
       }

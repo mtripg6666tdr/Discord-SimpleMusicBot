@@ -34,7 +34,7 @@ export default class Search extends BaseCommand {
     options.JoinVoiceChannel(message);
     if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){
       options.args.forEach(async u => {
-        await options.PlayFromURL(message, u, !options.data[message.guild.id].Player.IsConnecting);
+        await options.PlayFromURL(message, u, !options.data[message.guild.id].Player.isConnecting);
       });
       return;
     }

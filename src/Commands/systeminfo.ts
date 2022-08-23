@@ -38,7 +38,7 @@ export default class SystemInfo extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // Run default logger
-    options.bot.PeriodicLog();
+    options.bot.logGeneralInfo();
     await message.reply("実行します");
 
     const embeds = [] as EmbedOptions[];

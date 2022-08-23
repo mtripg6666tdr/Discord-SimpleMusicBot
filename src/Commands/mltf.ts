@@ -22,8 +22,8 @@ export default class Mltf extends BaseCommand {
       return;
     }
     const q = options.data[message.guild.id].Queue;
-    const to = options.data[message.guild.id].Player.IsPlaying ? 1 : 0;
-    q.Move(q.length - 1, to);
+    const to = options.data[message.guild.id].Player.isPlaying ? 1 : 0;
+    q.move(q.length - 1, to);
     const info = q.get(to);
     message.reply("✅`" + info.BasicInfo.Title + "`を一番最後からキューの先頭に移動しました").catch(e => Util.logger.log(e, "error"));
   }
