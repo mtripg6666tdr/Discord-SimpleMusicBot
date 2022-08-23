@@ -1,3 +1,7 @@
+# :warning: このブランチのバージョン(v1)は、現在サポートされていません。
+正常な動作をしない可能性があります。
+
+---
 # Discord-SimpleMusicBot
 Discord向け日本製シンプル音楽ボット。  
 YouTubeなどからの再生に対応。
