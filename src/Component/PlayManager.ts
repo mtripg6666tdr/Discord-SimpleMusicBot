@@ -311,11 +311,12 @@ export class PlayManager extends ManagerBase {
     const passThrough = Util.general.InitPassThrough();
     const ffmpeg = new FFmpeg({args});
     const stream = original
-      .on("error", (e) => passThrough.emit("error", e))
+      .on("error", (e) => ffmpeg.destroy(e))
       .pipe(ffmpeg)
+      .on("error", (e) => passThrough.destroy(e))
       .on("close", () => original.destroy())
-      .on("error", (e) => passThrough.emit("error", e))
       .pipe(passThrough)
+      .on("close", () => !ffmpeg.destroyed && ffmpeg.destroy())
     ;
     if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => this.Log("[FFmpeg]" + chunk.toString(), "debug"));
     return stream;
@@ -333,10 +334,11 @@ export class PlayManager extends ManagerBase {
       "-ac", "2",
     ];
     const passThrough = Util.general.InitPassThrough();
-    const ffmpeg = new FFmpeg({args})
-      .on("error", (e) => passThrough.emit("error", e));
+    const ffmpeg = new FFmpeg({args});
     ffmpeg
+      .on("error", (e) => passThrough.destroy(e))
       .pipe(passThrough)
+      .on("close", () => !ffmpeg.destroyed && ffmpeg.destroy())
     ;
     if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => this.Log("[FFmpeg]" + chunk.toString(), "debug"));
     console.log(ffmpeg);

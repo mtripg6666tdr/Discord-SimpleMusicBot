@@ -3,7 +3,6 @@ import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Cache } from "./base";
 
 import { exec } from "child_process";
-import { PassThrough } from "stream";
 
 import m3u8stream from "m3u8stream";
 
