@@ -97,6 +97,19 @@ export class MusicBot extends LogEmitter {
     this.Log("Socket connection is ready now");
     if(this.isReadyFinished) return;
 
+    client.on("error", er => {
+      Util.logger.log(er, "error");
+      console.error(er);
+      Util.logger.log("Attempt reconnecting");
+      client.connect()
+        .then(() => Util.logger.log("Reconnected!"))
+        .catch(_er => {
+          Util.logger.log(_er);
+          console.log(_er);
+          Util.logger.log("Reconnect attempt failed");
+        });
+    });
+
     this.Log("Starting environment checking and preparation now");
 
     // Set activity as booting
