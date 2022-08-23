@@ -95,6 +95,8 @@ export class MusicBot extends LogEmitter {
     const client = this.client;
     this.addOn.emit("ready", client);
     this.Log("Socket connection is ready now");
+    if(this.isReadyFinished) return;
+
     this.Log("Starting environment checking and preparation now");
 
     // Set activity as booting
