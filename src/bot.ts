@@ -342,12 +342,12 @@ export class MusicBot extends LogEmitter {
         }else{
           const updateEffectPanel = () => {
             const mes = interaction.message;
-            const { embed, messageActions } = Util.effects.getCurrentEffectPanel(interaction.user.avatarURL, this.data[(interaction.channel as discord.TextChannel).guild.id]);
+            const { embed, messageActions } = Util.effects.getCurrentEffectPanel(interaction.member.avatarURL, this.data[(interaction.channel as discord.TextChannel).guild.id]);
             mes.edit({
               content: "",
               embeds: [embed.toEris()],
               components: [messageActions]
-            });
+            }).catch(er => Util.logger.log(er, "error"));
           };
           switch(interaction.data.custom_id){
           case Util.effects.EffectsCustomIds.Reload:
