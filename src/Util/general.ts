@@ -57,6 +57,8 @@ export function InitPassThrough():PassThrough{
     highWaterMark: 1024 * 512
   });
   stream._destroy = () => {
+    // for debug purpose
+    console.trace(`[PassThrough] destroyed (id: ${id})`);
     log(`[PassThrough] destroyed (id: ${id})`, "debug");
     stream.destroyed = true;
     stream.emit("close", []);
