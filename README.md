@@ -317,7 +317,16 @@ Issueのほか、下記のサポートサーバーでも各種お問い合わせ
 ## サポート
 Discordにて、インストール等のサポート、および重要な更新のお知らせ等を行っています。  
 ボットを試すこともできますので、興味のある方はご参加ください。  
-[サポートサーバーへの参加はこちら](https://discord.gg/7DrAEXBMHe)
+[サポートサーバーへの参加はこちら](https://discord.gg/7DrAEXBMHe)  
+
+### サポートされているバージョン
+|バージョン|Node.js|discord.js|eris|サポート状況|サポート範囲|
+|:---------|-------|----------|----|:----------|:----------:|
+|            [v1](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v1)    |>=12.0.0|v12.x   |-|:x:サポート終了             |-|
+|            [v2](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v2)    |>=16.6.0|~v13.6.0|-|:white_check_mark:サポート中|依存関係の更新と重大なバグ等|
+|[v3-dev(master)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/master)|>=12 [^1]|-|@latest|:white_check_mark:サポート中|フルサポート|
+
+[^1]: スラッシュコマンドの登録にはv16以上が必須ですが、基本的にnpmから自動で取得されます。
 
 ## ライセンス
 GPLv3  
