@@ -27,7 +27,7 @@ export default class Play extends BaseCommand {
     options.updateBoundChannel(message);
     const server = options.data[message.guild.id];
     // キューが空だし引数もないし添付ファイルもない
-    if(server.Queue.length === 0 && options.rawArgs === "" && message.attachments.length === 0){
+    if(server.Queue.length === 0 && options.rawArgs === "" && message.attachments.length === 0 && !(message["_message"] && message["_message"].referencedMessage)){
       await message.reply("再生するコンテンツがありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -44,32 +44,55 @@ export default class Play extends BaseCommand {
     if(options.rawArgs !== ""){
       if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){
         for(let i = 0; i < options.args.length; i++){
-          options.rawArgs = options.args[i];
-          await options.PlayFromURL(message, options.rawArgs, i === 0 ? !wasConnected : false);
+          await options.PlayFromURL(message, options.args[i], i === 0 ? !wasConnected : false);
         }
       }else{
         const msg = await message.channel.createMessage("🔍検索中...");
-        const result = (await searchYouTube(options.rawArgs)).items.filter(it => it.type === "video");
+        const result = (await searchYouTube(options.rawArgs)).items.filter(it => it.type === "video") as ytsr.Video[];
         if(result.length === 0){
           await message.reply(":face_with_monocle:該当する動画が見つかりませんでした");
           await msg.delete();
           return;
         }
-        options.rawArgs = (result[0] as ytsr.Video).url;
-        await options.PlayFromURL(message, options.rawArgs, !wasConnected);
+        await options.PlayFromURL(message, result[0].url, !wasConnected);
         await msg.delete();
       }
     // 添付ファイルを確認
-    }else if(message.attachments.length >= 1){
-      options.rawArgs = message.attachments[0].url;
-      await options.PlayFromURL(message, options.rawArgs, !server.Player.isConnecting);
+    }else if(message.attachments.length > 0){
+      await options.PlayFromURL(message, message.attachments[0].url, !wasConnected);
+    // 返信先のメッセージを確認
+    }else if(message["_message"]?.referencedMessage){
+      const messageReference = message["_message"].referencedMessage;
+      const prefixLength = server.PersistentPref.Prefix.length;
+      // URLのみのメッセージか？
+      if(messageReference.content.startsWith("http://") || messageReference.content.startsWith("https://")){
+        await options.PlayFromURL(message, messageReference.content, !wasConnected);
+      // プレフィックス+URLのメッセージか？
+      }else if(messageReference.content.substring(prefixLength).startsWith("http://") || messageReference.content.substring(prefixLength).startsWith("https://")){
+        await options.PlayFromURL(message, messageReference.content.substring(prefixLength), !wasConnected);
+      // 添付ファイル付きか？
+      }else if(messageReference.attachments.length > 0){
+        await options.PlayFromURL(message, messageReference.attachments[0].url, !wasConnected);
+      // ボットのメッセージなら
+      }else if(messageReference.author.id === options.client.user.id){
+        const embed = messageReference.embeds[0];
+        // 曲関連のメッセージならそれをキューに追加
+        if(embed.color === Util.color.getColor("SONG_ADDED") || embed.color === Util.color.getColor("AUTO_NP") || embed.color === Util.color.getColor("NP")){
+          const url = embed.description.match(/^\[.+\]\((?<url>https?.+)\)/)?.groups.url;
+          await options.PlayFromURL(message, url, !wasConnected);
+        }else{
+          await message.reply(":face_with_raised_eyebrow:返信先のメッセージに再生できるコンテンツが見つかりません").catch(e => Util.logger.log(e, "error"));
+        }
+      }else{
+        await message.reply(":face_with_raised_eyebrow:返信先のメッセージに再生できるコンテンツが見つかりません").catch(e => Util.logger.log(e, "error"));
+      }
     // なにもないからキューから再生
     }else if(server.Queue.length >= 1){
       if(!server.Player.isPlaying && !server.Player.preparing){
-        await message.reply("再生します");
+        await message.reply("再生します").catch(e => Util.logger.log(e, "error"));
         await server.Player.play();
       }else{
-        await message.reply("すでに再生中です");
+        await message.reply("すでに再生中です").catch(e => Util.logger.log(e, "error"));
       }
     }else{
       await message.reply("✘キューが空です").catch(e => Util.logger.log(e, "error"));
