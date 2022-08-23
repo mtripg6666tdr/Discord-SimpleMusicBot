@@ -20,7 +20,8 @@
       "request": "launch",
       "name": "Launch Program (Main, on exposed GC)",
       "runtimeArgs": [
-        "--expose-gc"
+        "--expose-gc",
+        "--inspect=8889"
       ],
       "preLaunchTask": "Transpile TypeScript",
       "skipFiles": [

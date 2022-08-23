@@ -341,8 +341,6 @@ export class PlayManager extends ManagerBase {
       .on("close", () => !ffmpeg.destroyed && ffmpeg.destroy())
     ;
     if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => this.Log("[FFmpeg]" + chunk.toString(), "debug"));
-    console.log(ffmpeg);
-    console.log(passThrough);
     return passThrough;
   }
 
