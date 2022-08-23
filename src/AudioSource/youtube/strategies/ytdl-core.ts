@@ -121,7 +121,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
   }
 
   protected mapToExportable(url:string, info:ytdl.videoInfo){
-    if(!info.videoDetails.isLiveContent && !info.videoDetails.liveBroadcastDetails.isLiveNow && info.videoDetails.liveBroadcastDetails.startTimestamp && !info.videoDetails.liveBroadcastDetails.endTimestamp){
+    if(!info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails && !info.videoDetails.liveBroadcastDetails.isLiveNow && info.videoDetails.liveBroadcastDetails.startTimestamp && !info.videoDetails.liveBroadcastDetails.endTimestamp){
       throw new Error("This video is still in upcoming");
     }
     return {
