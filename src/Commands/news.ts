@@ -1,8 +1,8 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { MessageSelectOptionData } from "discord.js";
+import type { SelectMenuOptions } from "eris";
 
-import { MessageActionRow, MessageEmbed, MessageSelectMenu } from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import * as ytpl from "ytpl";
 
@@ -35,8 +35,8 @@ export default class News extends BaseCommand {
         Msg: {
           chId: message.channel.id,
           id: reply.id,
-          userId: message.author.id,
-          userName: message.member.displayName,
+          userId: message.member.id,
+          userName: Util.eris.user.getDisplayName(message.member),
           commandMessage: message
         },
         Opts: {}
@@ -45,7 +45,7 @@ export default class News extends BaseCommand {
         gl: "JP", hl: "ja", limit: 20
       });
       let desc = "";
-      const selectOpts = [] as MessageSelectOptionData[];
+      const selectOpts = [] as SelectMenuOptions[];
       for(let i = 0; i < result.length; i++){
         const vid = result[i];
         desc += `\`${i + 1}.\` [${vid.title}](${vid.url}) \`${vid.duration}\` - \`${vid.author.name}\` \r\n\r\n`;
@@ -61,37 +61,39 @@ export default class News extends BaseCommand {
           value: (i + 1).toString()
         });
       }
-      const embed = new MessageEmbed()
+      const embed = new Helper.MessageEmbedBuilder()
         .setTitle("ニューストピックス")
         .setDescription(desc)
         .setColor(getColor("SEARCH"))
         .setFooter({
-          iconURL: message.author.avatarURL(),
+          icon_url: message.member.avatarURL,
           text: "ニュースのタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
         })
+        .toEris()
       ;
       await reply.edit({
-        content: null,
+        content: "",
         embeds: [embed],
         components: [
-          new MessageActionRow()
+          new Helper.MessageActionRowBuilder()
             .addComponents(
-              new MessageSelectMenu()
+              new Helper.MessageSelectMenuBuilder()
                 .setCustomId("search")
                 .setPlaceholder("数字を送信するか、ここから選択...")
                 .setMinValues(1)
                 .setMaxValues(result.length)
-                .addOptions([...selectOpts, {
+                .addOptions(...selectOpts, {
                   label: "キャンセル",
                   value: "cancel"
-                }])
+                })
             )
+            .toEris()
         ]
       });
     }
     catch(e){
       Util.logger.log(JSON.stringify(e));
-      message.reply(":cry:エラーが発生しました");
+      await message.reply(":cry:エラーが発生しました").catch(er => Util.logger.log(er, "error"));
     }
   }
 }

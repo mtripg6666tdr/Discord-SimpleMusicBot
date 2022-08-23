@@ -1,7 +1,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import * as discord from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -19,8 +19,8 @@ export default class Help extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    const developer = await options.client.users.fetch("593758391395155978").catch(() => null);
-    const embed = new discord.MessageEmbed()
+    const developer = await options.client.getUserProfile("593758391395155978").catch(() => null);
+    const embed = new Helper.MessageEmbedBuilder()
       .setTitle(options.client.user.username + ":notes:")
       .setDescription(
         "高音質な音楽を再生して、Discordでのエクスペリエンスを最高にするため作られました:robot:\r\n"
@@ -41,7 +41,9 @@ export default class Help extends BaseCommand {
       + "・ニコニコ動画(動画ページURL指定)\r\n"
       + "・オーディオファイルへの直URL"
       )
-      .setColor(getColor("HELP"));
-    message.reply({embeds: [embed]}).catch(e => Util.logger.log(e, "error"));
+      .setColor(getColor("HELP"))
+      .toEris()
+    ;
+    await message.reply({embeds: [embed]}).catch(e => Util.logger.log(e, "error"));
   }
 }

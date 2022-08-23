@@ -1,7 +1,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import * as discord from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -22,14 +22,16 @@ export default class EquallyPlayback extends BaseCommand {
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].EquallyPlayback){
       options.data[message.guild.id].EquallyPlayback = false;
-      message.reply("❌均等再生をオフにしました").catch(e => Util.logger.log(e, "error"));
+      await message.reply("❌均等再生をオフにしました").catch(e => Util.logger.log(e, "error"));
     }else{
       options.data[message.guild.id].EquallyPlayback = true;
-      const embed = new discord.MessageEmbed()
+      const embed = new Helper.MessageEmbedBuilder()
         .setTitle("⭕均等再生をオンにしました")
         .setDescription("楽曲追加時に、楽曲を追加したユーザーごとにできるだけ均等になるようにする機能です。")
-        .setColor(getColor("EQUALLY"));
-      message.reply({embeds: [embed]});
+        .setColor(getColor("EQUALLY"))
+        .toEris()
+      ;
+      await message.reply({embeds: [embed]}).catch(er => Util.logger.log(er, "error"));
     }
   }
 }

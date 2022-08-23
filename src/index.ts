@@ -1,5 +1,4 @@
 import "./dotenv";
-import type { TextChannel } from "discord.js";
 
 import * as http from "http";
 
@@ -10,7 +9,7 @@ import { MusicBot } from "./bot";
 // =============
 Util.logger.log("[Entry]Discord-SimpleMusicBot by mtripg6666tdr");
 
-const bot = new MusicBot(Boolean(Util.config.maintenance));
+const bot = new MusicBot(process.env.TOKEN, Boolean(Util.config.maintenance));
 
 // Webサーバーのインスタンス化
 http.createServer((req, res) => {
@@ -18,9 +17,9 @@ http.createServer((req, res) => {
   const data = {
     status: 200,
     message: "Discord bot is active now",
-    client: bot.Client && bot.Client.user ? btoa(bot.Client.user.id) : null,
-    readyAt: bot.Client && bot.Client.readyAt ? btoa(bot.Client.readyAt.getTime().toString()) : null,
-    guilds: bot.Client && bot.Client.guilds && bot.Client.guilds.cache ? bot.Client.guilds.cache.size : null
+    client: bot.Client?.user ? Buffer.from(bot.Client?.user.id) : null,
+    readyAt: bot.Client?.uptime ? Buffer.from(bot.Client.uptime.toString()).toString("base64") : null,
+    guilds: bot.Client?.guilds.size || null,
   };
   Util.logger.log("[Server]Received a http request");
   res.end(JSON.stringify(data));
@@ -28,12 +27,12 @@ http.createServer((req, res) => {
 
 if(!Util.config.debug){
   // ハンドルされなかったエラーのハンドル
-  process.on("uncaughtException", (error)=>{
+  process.on("uncaughtException", async (error)=>{
     console.error(error);
     if(bot.Client && Util.config.errorChannel){
       try{
         const errorText = typeof error === "string" ? error : JSON.stringify(error);
-        (bot.Client.channels.resolve(Util.config.errorChannel) as TextChannel).send(errorText);
+        await bot.Client.createMessage(Util.config.errorChannel, errorText);
       }
       catch(e){
         console.error(e);
@@ -42,10 +41,10 @@ if(!Util.config.debug){
     }
   }).on("SIGINT", ()=>{
     if(bot.Client && Util.config.errorChannel){
-      (bot.Client.channels.resolve(Util.config.errorChannel) as TextChannel).send("Process terminated");
+      bot.Client.createMessage(Util.config.errorChannel, "Process terminated");
     }
   });
 }
 
 // ボット開始
-bot.Run(process.env.TOKEN, true, 40);
+bot.run(true, 40);

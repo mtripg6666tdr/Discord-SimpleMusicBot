@@ -2,7 +2,7 @@ import type { CommandArgs } from ".";
 import type { YouTube } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import * as discord from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -28,19 +28,16 @@ export default class NowPlaying extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
-    if(!options.data[message.guild.id].Player.IsPlaying){
+    if(!options.data[message.guild.id].Player.isPlaying){
       message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const _s = Math.floor(options.data[message.guild.id].Player.CurrentTime / 1000);
+    const _s = Math.floor(options.data[message.guild.id].Player.currentTime / 1000);
     const _t = Number(options.data[message.guild.id].Player.CurrentAudioInfo.LengthSeconds);
     const [min, sec] = Util.time.CalcMinSec(_s);
     const [tmin, tsec] = Util.time.CalcMinSec(_t);
     const info = options.data[message.guild.id].Player.CurrentAudioInfo;
-    const embed = new discord.MessageEmbed();
-    embed.setColor(getColor("NP"));
     let progressBar = "";
-    embed.title = "現在再生中の曲:musical_note:";
     if(_t > 0){
       const progress = Math.floor(_s / _t * 20);
       for(let i = 1; i < progress; i++){
@@ -51,13 +48,24 @@ export default class NowPlaying extends BaseCommand {
         progressBar += "=";
       }
     }
-    embed.description = "[" + info.Title + "](" + info.Url + ")\r\n" + progressBar + ((info.ServiceIdentifer === "youtube" && (info as YouTube).LiveStream) ? "(ライブストリーム)" : " `" + min + ":" + sec + "/" + (_t === 0 ? "(不明)" : tmin + ":" + tsec + "`"));
-    embed.setThumbnail(info.Thumnail);
-    embed.fields = info.toField(
-      !!((options.args[0] === "long" || options.args[0] === "l" || options.args[0] === "verbose" || options.args[0] === "true"))
-    );
-    embed.addField(":link:URL", info.Url);
+    const embed = new Helper.MessageEmbedBuilder()
+      .setColor(getColor("NP"))
+      .setTitle("現在再生中の曲:musical_note:")
+      .setDescription(
+        `[${info.Title}](${info.Url})\r\n${progressBar}${
+          (info.ServiceIdentifer === "youtube" && (info as YouTube).LiveStream) ? "(ライブストリーム)" : ` \`${min}:${sec}/${(_t === 0 ? "(不明)" : `${tmin}:${tsec}\``)}`
+        }`
+      )
+      .setThumbnail(info.Thumnail)
+      .setFields(
+        ...info.toField(
+          ["long", "l", "verbose", "l"].some(arg => options.args[0] === arg)
+        )
+      )
+      .addField(":link:URL", info.Url)
+      .toEris()
+    ;
 
-    message.reply({embeds: [embed]}).catch(e => Util.logger.log(e, "error"));
+    await message.reply({embeds: [embed]}).catch(e => Util.logger.log(e, "error"));
   }
 }

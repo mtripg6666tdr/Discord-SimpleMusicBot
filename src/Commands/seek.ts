@@ -27,7 +27,7 @@ export default class Seek extends BaseCommand {
     options.updateBoundChannel(message);
     const server = options.data[message.guild.id];
     // そもそも再生状態じゃないよ...
-    if(!server.Player.IsPlaying || server.Player.preparing){
+    if(!server.Player.isPlaying || server.Player.preparing){
       await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }else if(server.Player.CurrentAudioInfo.LengthSeconds === 0 || server.Player.CurrentAudioInfo.isUnseekable()){
@@ -48,12 +48,12 @@ export default class Seek extends BaseCommand {
     }
     try{
       const response = await message.reply(":rocket:シークしています...");
-      server.Player.Stop();
-      await server.Player.Play(time);
+      server.Player.stop();
+      await server.Player.play(time);
       await response.edit(":white_check_mark:シークしました").catch(e => Util.logger.log(e, "error"));
     }
     catch(e){
-      await message.channel.send(":astonished:シークに失敗しました");
+      await message.channel.createMessage(":astonished:シークに失敗しました").catch(er => Util.logger.log(er, "error"));
     }
   }
 }

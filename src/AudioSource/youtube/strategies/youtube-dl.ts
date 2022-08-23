@@ -3,7 +3,6 @@ import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Cache } from "./base";
 
 import { exec } from "child_process";
-import { PassThrough } from "stream";
 
 import m3u8stream from "m3u8stream";
 
@@ -14,6 +13,10 @@ type youtubeDl = "youtubeDl";
 const youtubeDl:youtubeDl = "youtubeDl";
 
 export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>, YoutubeDlInfo> {
+  get cacheType(){
+    return youtubeDl;
+  }
+  
   last:number = 0;
 
   async getInfo(url:string){
@@ -63,10 +66,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
         };
       }
       // don't use initpassthrough here
-      const stream = new PassThrough({
-        highWaterMark: 1024 * 512,
-      });
-      stream._destroy = () => stream.destroyed = true;
+      const stream = Util.general.InitPassThrough();
       const req = m3u8stream(format[0].url, {
         begin: Date.now(),
         parser: "m3u8",
@@ -168,7 +168,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
       if(new Date().getTime() - this.last >= 1000 * 60 /*1sec*/ * 60 /*1min*/ * 60 /*1hour*/ * 3){
         await this.dlbinary(version);
       }
-      return this.execAsync("." + (process.platform === "win32" ? "\\" : "/") + "youtube-dl --skip-download --print-json \"" + url + "\"");
+      return await this.execAsync("." + (process.platform === "win32" ? "\\" : "/") + "youtube-dl --skip-download --print-json \"" + url + "\"");
     }
     catch(e){
       // eslint-disable-next-line @typescript-eslint/no-throw-literal

@@ -2,10 +2,10 @@ import type { exportableCustom } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { ResponseMessage } from "./ResponseMessage";
 import type { TaskCancellationManager } from "./TaskCancellationManager";
-import type { Client, Message, TextChannel } from "discord.js";
+import type { Client, Message, TextChannel } from "eris";
 
-import { GuildMember } from "discord.js";
-import { MessageEmbed } from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { Member } from "eris";
 
 import * as AudioSource from "../AudioSource";
 import { ManagerBase } from "../Structure";
@@ -28,23 +28,23 @@ export class QueueManager extends ManagerBase {
   }
 
   // トラックループが有効か?
-  LoopEnabled:boolean = false;
+  loopEnabled:boolean = false;
   // キューループが有効か?
-  QueueLoopEnabled:boolean = false;
+  queueLoopEnabled:boolean = false;
   // ワンスループが有効か?
-  OnceLoopEnabled:boolean = false;
+  onceLoopEnabled:boolean = false;
   // キューの長さ
   get length():number{
     return this.default.length;
   }
 
-  get LengthSeconds():number{
+  get lengthSeconds():number{
     let totalLength = 0;
     this.default.forEach(q => totalLength += Number(q.BasicInfo.LengthSeconds));
     return totalLength;
   }
 
-  get Nothing():boolean{
+  get hasNothing():boolean{
     return this.length === 0;
   }
 
@@ -72,9 +72,9 @@ export class QueueManager extends ManagerBase {
     this.Log("QueueManager instantiated");
   }
 
-  SetData(data:GuildDataContainer){
+  setBinding(data:GuildDataContainer){
     this.Log("Set data of guild id " + data.GuildID);
-    super.SetData(data);
+    super.setBinding(data);
   }
 
   /**
@@ -123,9 +123,9 @@ export class QueueManager extends ManagerBase {
     return sec;
   }
 
-  async AddQueue(
+  async addQueue(
     url:string,
-    addedBy:GuildMember|AddedBy,
+    addedBy:Member|AddedBy,
     method:"push"|"unshift" = "push",
     type:KnownAudioSourceIdentifer = "unknown",
     gotData:AudioSource.exportableCustom = null
@@ -134,34 +134,38 @@ export class QueueManager extends ManagerBase {
     this.nowProcessing = true;
     this.Log("AddQueue called");
     const t = Util.time.timer.start("AddQueue");
-    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
-    const result = {
-      BasicInfo: await AudioSource.Resolve({
-        url, type,
-        knownData: gotData,
-        forceCache: this.length === 0 || method === "unshift" || this.LengthSeconds < 4 * 60 * 60 * 1000
-      }),
-      AdditionalInfo: {
-        AddedBy: {
-          userId: (addedBy && (addedBy instanceof GuildMember ? addedBy.id : (addedBy as AddedBy).userId)) ?? "0",
-          displayName: addedBy?.displayName ?? "不明"
+    try{
+      PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
+      const result = {
+        BasicInfo: await AudioSource.Resolve({
+          url, type,
+          knownData: gotData,
+          forceCache: this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000
+        }),
+        AdditionalInfo: {
+          AddedBy: {
+            userId: this.getUserIdFromMember(addedBy) ?? "0",
+            displayName: this.getDisplayNameFromMember(addedBy) ?? "不明"
+          }
         }
+      } as QueueContent;
+      if(result.BasicInfo){
+        this._default[method](result);
+        if(this.info.EquallyPlayback) this.sortWithAddedBy();
+        if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
+          this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+        }
+        t.end();
+        this.nowProcessing = false;
+        const index = this._default.findIndex(q => q === result);
+        this.Log("queue content added in position " + index);
+        return {...result, index};
       }
-    } as QueueContent;
-    if(result.BasicInfo){
-      this._default[method](result);
-      if(this.info.EquallyPlayback) this.SortWithAddedBy();
-      if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
-        this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
-      }
+    }
+    finally{
       t.end();
       this.nowProcessing = false;
-      const index = this._default.findIndex(q => q === result);
-      this.Log("queue content added in position " + index);
-      return {...result, index};
     }
-    t.end();
-    this.nowProcessing = false;
     throw new Error("Provided URL was not resolved as available service");
   }
 
@@ -178,10 +182,10 @@ export class QueueManager extends ManagerBase {
    * @param gotData すでにデータを取得していて新たにフェッチする必要がなくローカルでキューコンテンツをインスタンス化する場合はここにデータを指定します
    * @returns 成功した場合はtrue、それ以外の場合はfalse
    */
-  async AutoAddQueue(
+  async autoAddQueue(
     client:Client,
     url:string,
-    addedBy:GuildMember|AddedBy|null|undefined,
+    addedBy:Member|AddedBy|null|undefined,
     type:KnownAudioSourceIdentifer,
     first:boolean = false,
     fromSearch:boolean|ResponseMessage = false,
@@ -192,23 +196,24 @@ export class QueueManager extends ManagerBase {
     this.Log("AutoAddQueue Called");
     const t = Util.time.timer.start("AutoAddQueue");
     let ch:TextChannel = null;
-    let msg:Message|ResponseMessage = null;
+    let msg:Message<TextChannel>|ResponseMessage = null;
     try{
       if(fromSearch && this.info.SearchPanel){
         // 検索パネルから
         this.Log("AutoAddQueue from search panel");
-        ch = await client.channels.fetch(this.info.SearchPanel.Msg.chId) as TextChannel;
+        ch = client.getChannel(this.info.SearchPanel.Msg.chId) as TextChannel;
         if(typeof fromSearch === "boolean"){
-          msg = await (ch as TextChannel).messages.fetch(this.info.SearchPanel.Msg.id);
+          msg = ch.messages.get(this.info.SearchPanel.Msg.id);
         }else{
           msg = fromSearch;
         }
-        const tembed = new MessageEmbed();
-        tembed.title = "お待ちください";
-        tembed.description = "情報を取得しています...";
+        const tembed = new Helper.MessageEmbedBuilder()
+          .setTitle("お待ちください")
+          .setDescription("情報を取得しています...")
+        ;
         await msg.edit({
-          content: null,
-          embeds: [tembed],
+          content: "",
+          embeds: [tembed.toEris()],
           allowedMentions: {
             repliedUser: false
           },
@@ -223,7 +228,7 @@ export class QueueManager extends ManagerBase {
         // まだないので生成
         this.Log("AutoAddQueue will make a message that will be used to report statuses");
         ch = channel;
-        msg = await channel.send("情報を取得しています。お待ちください...");
+        msg = await channel.createMessage("情報を取得しています。お待ちください...");
       }
       if(this.info.Queue.length > 999){
         // キュー上限
@@ -231,7 +236,7 @@ export class QueueManager extends ManagerBase {
         // eslint-disable-next-line @typescript-eslint/no-throw-literal
         throw "キューの上限を超えています";
       }
-      const info = await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type, gotData ?? null);
+      const info = await this.info.Queue.addQueue(url, addedBy, first ? "unshift" : "push", type, gotData ?? null);
       this.Log("AutoAddQueue worked successfully");
       if(msg){
         // 曲の時間取得＆計算
@@ -240,20 +245,20 @@ export class QueueManager extends ManagerBase {
         // キュー内のオフセット取得
         const index = info.index.toString();
         // ETAの計算
-        const [ehour, emin, esec] = Util.time.CalcHourMinSec(this.getLengthSecondsTo(info.index) - _t - Math.floor(this.info.Player.CurrentTime / 1000));
-        const embed = new MessageEmbed()
+        const [ehour, emin, esec] = Util.time.CalcHourMinSec(this.getLengthSecondsTo(info.index) - _t - Math.floor(this.info.Player.currentTime / 1000));
+        const embed = new Helper.MessageEmbedBuilder()
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
           .setDescription("[" + info.BasicInfo.Title + "](" + info.BasicInfo.Url + ")")
           .addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as AudioSource.YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true)
-          .addField("リクエスト", addedBy?.displayName ?? "不明", true)
+          .addField("リクエスト", this.getDisplayNameFromMember(addedBy) ?? "不明", true)
           .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
           .addField("再生されるまでの予想時間", index === "0" ? "-" : ((ehour === "0" ? "" : ehour + ":") + emin + ":" + esec), true)
           .setThumbnail(info.BasicInfo.Thumnail);
         if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as AudioSource.YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
-        await msg.edit({content: null, embeds: [embed]});
+        await msg.edit({content: "", embeds: [embed.toEris()]});
       }
     }
     catch(e){
@@ -283,7 +288,7 @@ export class QueueManager extends ManagerBase {
    * @param exportableConsumer トラックをexportableCustomに処理する関数
    * @returns 追加に成功した楽曲数
    */
-  async ProcessPlaylist<T>(
+  async processPlaylist<T>(
     client:Client,
     msg:ResponseMessage,
     cancellation:TaskCancellationManager,
@@ -300,7 +305,7 @@ export class QueueManager extends ManagerBase {
       const item = playlist[i];
       if(!item) continue;
       const exportable = await exportableConsumer(item);
-      const _result = await this.AutoAddQueue(client, exportable.url, msg.command.member, identifer, first, false, null, null, exportable);
+      const _result = await this.autoAddQueue(client, exportable.url, msg.command.member, identifer, first, false, null, null, exportable);
       if(_result) index++;
       if(
         index % 50 === 0
@@ -318,19 +323,19 @@ export class QueueManager extends ManagerBase {
   /**
    * 次の曲に移動します
    */
-  async Next(){
+  async next(){
     this.Log("Next Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
-    this.OnceLoopEnabled = false;
+    this.onceLoopEnabled = false;
     this.info.Player.errorCount = 0;
     this.info.Player.errorUrl = "";
-    if(this.QueueLoopEnabled){
+    if(this.queueLoopEnabled){
       this.default.push(this.default[0]);
     }else if(this.info.AddRelative && this.info.Player.CurrentAudioInfo.ServiceIdentifer === "youtube"){
       const relatedVideos = (this.info.Player.CurrentAudioInfo as AudioSource.YouTube).relatedVideos;
       if(relatedVideos.length >= 1){
         const video = relatedVideos[0];
-        await this.info.Queue.AddQueue(video.url, null, "push", "youtube", video);
+        await this.info.Queue.addQueue(video.url, null, "push", "youtube", video);
       }
     }
     this._default.shift();
@@ -343,7 +348,7 @@ export class QueueManager extends ManagerBase {
    * 指定された位置のキューコンテンツを削除します
    * @param offset 位置
    */
-  RemoveAt(offset:number){
+  removeAt(offset:number){
     this.Log(`RemoveAt Called (offset:${offset})`);
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default.splice(offset, 1);
@@ -355,7 +360,7 @@ export class QueueManager extends ManagerBase {
   /**
    * すべてのキューコンテンツを消去します
    */
-  RemoveAll(){
+  removeAll(){
     this.Log("RemoveAll Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default = [];
@@ -367,7 +372,7 @@ export class QueueManager extends ManagerBase {
   /**
    * 最初のキューコンテンツだけ残し、残りのキューコンテンツを消去します
    */
-  RemoveFrom2(){
+  RemoveFrom2nd(){
     this.Log("RemoveFrom2 Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default = [this.default[0]];
@@ -379,11 +384,11 @@ export class QueueManager extends ManagerBase {
   /**
    * キューをシャッフルします
    */
-  Shuffle(){
+  shuffle(){
     this.Log("Shuffle Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(this._default.length === 0) return;
-    if(this.info.Player.IsPlaying || this.info.Player.preparing){
+    if(this.info.Player.isPlaying || this.info.Player.preparing){
       const first = this._default[0];
       this._default.shift();
       this._default.sort(() => Math.random() - 0.5);
@@ -401,11 +406,11 @@ export class QueueManager extends ManagerBase {
    * @param validator 条件を表す関数
    * @returns 削除されたオフセットの一覧
    */
-  RemoveIf(validator:(q:QueueContent)=>boolean):number[]{
+  removeIf(validator:(q:QueueContent)=>boolean):number[]{
     this.Log("RemoveIf Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(this._default.length === 0) return [];
-    const first = this.info.Player.IsPlaying ? 1 : 0;
+    const first = this.info.Player.isPlaying ? 1 : 0;
     const rmIndex = [] as number[];
     for(let i = first; i < this._default.length; i++){
       if(validator(this._default[i])){
@@ -413,7 +418,7 @@ export class QueueManager extends ManagerBase {
       }
     }
     rmIndex.sort((a, b)=>b - a);
-    rmIndex.forEach(n => this.RemoveAt(n));
+    rmIndex.forEach(n => this.removeAt(n));
     if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
       this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
     }
@@ -425,7 +430,7 @@ export class QueueManager extends ManagerBase {
    * @param from 移動元のインデックス
    * @param to 移動先のインデックス
    */
-  Move(from:number, to:number){
+  move(from:number, to:number){
     this.Log("Move Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(from < to){
@@ -447,7 +452,7 @@ export class QueueManager extends ManagerBase {
   /**
    * 追加者によってできるだけ交互になるようにソートします
    */
-  SortWithAddedBy(){
+  sortWithAddedBy(){
     // 追加者の一覧とマップを作成
     const addedByUsers = [] as string[];
     const queueByAdded = {} as {[key:string]:QueueContent[]};
@@ -466,6 +471,14 @@ export class QueueManager extends ManagerBase {
       sorted.push(...addedByUsers.map(user => queueByAdded[user][i]).filter(q => !!q));
     }
     this._default = sorted;
+  }
+
+  private getDisplayNameFromMember(member:Member|AddedBy){
+    return member instanceof Member ? Util.eris.user.getDisplayName(member) : member.displayName;
+  }
+
+  private getUserIdFromMember(member:Member|AddedBy){
+    return member instanceof Member ? member.id : member.userId;
   }
 }
 

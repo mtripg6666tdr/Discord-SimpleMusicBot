@@ -1,7 +1,6 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
-
-import * as voice from "@discordjs/voice";
+import type { VoiceChannel } from "eris";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -19,10 +18,10 @@ export default class Join extends BaseCommand {
 
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(message.member.voice.channel && message.member.voice.channel.members.has(options.client.user.id) && voice.getVoiceConnection(message.guild.id)){
+    if(message.member.voiceState.channelID && (options.client.getChannel(message.member.voiceState.channelID) as VoiceChannel).voiceMembers.has(options.client.user.id) && options.data[message.guild.id].Connection){
       message.reply("✘すでにボイスチャンネルに接続中です。").catch(e => Util.logger.log(e, "error"));
     }else{
-      options.JoinVoiceChannel(message, true);
+      await options.JoinVoiceChannel(message, /* reply result to user inside this method  */ true);
     }
   }
 }

@@ -2,8 +2,8 @@ import * as addOn from "./addon";
 import * as color from "./color";
 import * as config from "./config";
 import * as db from "./database";
-import * as djs from "./djs";
 import * as effects from "./effect";
+import { erisUtil as eris } from "./eris";
 import * as fs from "./fs";
 import * as general from "./general";
 import * as logger from "./log";
@@ -19,7 +19,6 @@ export const Util = {
   color,
   config,
   db,
-  djs,
   effects,
   fs,
   general,
@@ -31,6 +30,7 @@ export const Util = {
   time,
   ua,
   web,
-};
+  eris,
+} as const;
 export default Util;
 export type LoggerType = logger.LoggerType;

@@ -1,12 +1,12 @@
 import type * as ytsr from "ytsr";
 
 import * as path from "path";
-import { Worker } from "worker_threads";
+import { Worker, isMainThread } from "worker_threads";
 
 import { type exportableYouTube, YouTube } from "..";
 import Util from "../../Util";
 
-const worker = new Worker(path.join(__dirname, "./worker.js")).on("error", () => {});
+const worker = isMainThread && new Worker(path.join(__dirname, "./worker.js")).on("error", () => {});
 
 export type workerMessage = {id:number} & (
   workerInitProcessMessage|workerSearchProcessMessage|workerInitSuccessMessage|workerSearchSuccessMessage|workerErrorMessage|workerLoggingMessage

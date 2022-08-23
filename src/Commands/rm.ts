@@ -29,7 +29,7 @@ export default class Rm extends BaseCommand {
       message.reply("引数に消去する曲のオフセット(番号)を入力してください。").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    if(options.args.includes("0") && options.data[message.guild.id].Player.IsPlaying){
+    if(options.args.includes("0") && options.data[message.guild.id].Player.isPlaying){
       message.reply("現在再生中の楽曲を削除することはできません。");
       return;
     }
@@ -59,7 +59,7 @@ export default class Rm extends BaseCommand {
           if(match){
             const to = Number(match.groups.to);
             if(!isNaN(to)){
-              for(let i = (options.data[message.guild.id].Player.IsPlaying ? 1 : 0); i <= to; i++){
+              for(let i = (options.data[message.guild.id].Player.isPlaying ? 1 : 0); i <= to; i++){
                 addition.push(i);
               }
             }
@@ -74,7 +74,7 @@ export default class Rm extends BaseCommand {
     ));
     const title = dels.length === 1 ? q.get(dels[0]).BasicInfo.Title : null;
     for(let i = 0; i < dels.length; i++){
-      q.RemoveAt(Number(dels[i]));
+      q.removeAt(Number(dels[i]));
     }
     const resultStr = dels.sort((a, b)=>a - b).join(",");
     message.reply("🚮" + (resultStr.length > 100 ? "指定された" : resultStr + "番目の") + "曲" + (title ? ("(`" + title + "`)") : "") + "を削除しました").catch(e => Util.logger.log(e, "error"));

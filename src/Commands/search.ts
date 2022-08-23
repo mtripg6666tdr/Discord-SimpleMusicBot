@@ -1,8 +1,9 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
+import type { SelectMenuOptions } from "eris";
 import type * as ytsr from "ytsr";
 
-import * as discord from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
@@ -33,7 +34,7 @@ export default class Search extends BaseCommand {
     options.JoinVoiceChannel(message);
     if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){
       options.args.forEach(async u => {
-        await options.PlayFromURL(message, u, !options.data[message.guild.id].Player.IsConnecting);
+        await options.PlayFromURL(message, u, !options.data[message.guild.id].Player.isConnecting);
       });
       return;
     }
@@ -49,8 +50,8 @@ export default class Search extends BaseCommand {
         Msg: {
           id: msg.id,
           chId: msg.channel.id,
-          userId: message.author.id,
-          userName: message.member.displayName,
+          userId: message.member.id,
+          userName: Util.eris.user.getDisplayName(message.member),
           commandMessage: message
         },
         Opts: {}
@@ -61,12 +62,9 @@ export default class Search extends BaseCommand {
         const result = await searchYouTube(options.rawArgs);
         t.end();
         const u = Util.time.timer.start("Search(Command)->AfterYtsr");
-        const embed = new discord.MessageEmbed();
-        embed.setTitle("\"" + options.rawArgs + "\"の検索結果✨");
-        embed.setColor(getColor("SEARCH"));
         let desc = "";
         let index = 1;
-        const selectOpts = [] as discord.MessageSelectOptionData[];
+        const selectOpts = [] as SelectMenuOptions[];
         for(let i = 0; i < result.items.length; i++){
           if(result.items[i].type === "video"){
             const video = (result.items[i] as ytsr.Video);
@@ -90,29 +88,33 @@ export default class Search extends BaseCommand {
           await msg.edit(":pensive:見つかりませんでした。");
           return;
         }
-        embed
+        const embed = new Helper.MessageEmbedBuilder()
+          .setTitle("\"" + options.rawArgs + "\"の検索結果✨")
+          .setColor(getColor("SEARCH"))
           .setDescription(desc)
           .setFooter({
-            iconURL: message.author.avatarURL(),
+            icon_url: message.member.avatarURL,
             text: "動画のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
           })
+          .toEris()
         ;
         await msg.edit({
-          content: null,
+          content: "",
           embeds: [embed],
           components: [
-            new discord.MessageActionRow()
+            new Helper.MessageActionRowBuilder()
               .addComponents(
-                new discord.MessageSelectMenu()
+                new Helper.MessageSelectMenuBuilder()
                   .setCustomId("search")
                   .setPlaceholder("数字を送信するか、ここから選択...")
                   .setMinValues(1)
                   .setMaxValues(index - 1)
-                  .addOptions([...selectOpts, {
+                  .addOptions(...selectOpts, {
                     label: "キャンセル",
                     value: "cancel"
-                  }])
+                  })
               )
+              .toEris()
           ]
         });
         u.end();
@@ -124,7 +126,7 @@ export default class Search extends BaseCommand {
         else message.reply("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
       }
     }else{
-      message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));
+      await message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));
     }
   }
 }

@@ -17,11 +17,11 @@ export default class OnceLoop extends BaseCommand {
 
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(options.data[message.guild.id].Queue.OnceLoopEnabled){
-      options.data[message.guild.id].Queue.OnceLoopEnabled = false;
+    if(options.data[message.guild.id].Queue.onceLoopEnabled){
+      options.data[message.guild.id].Queue.onceLoopEnabled = false;
       message.reply(":repeat_one:ワンスループを無効にしました:x:").catch(e => Util.logger.log(e, "error"));
     }else{
-      options.data[message.guild.id].Queue.OnceLoopEnabled = true;
+      options.data[message.guild.id].Queue.onceLoopEnabled = true;
       message.reply(":repeat_one:ワンスループを有効にしました:o:").catch(e => Util.logger.log(e, "error"));
     }
   }

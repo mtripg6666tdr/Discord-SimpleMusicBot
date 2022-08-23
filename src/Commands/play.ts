@@ -27,16 +27,16 @@ export default class Play extends BaseCommand {
     options.updateBoundChannel(message);
     const server = options.data[message.guild.id];
     // キューが空だし引数もないし添付ファイルもない
-    if(server.Queue.length === 0 && options.rawArgs === "" && message.attachments.size === 0){
+    if(server.Queue.length === 0 && options.rawArgs === "" && message.attachments.length === 0){
       await message.reply("再生するコンテンツがありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const wasConnected = server.Player.IsConnecting;
+    const wasConnected = server.Player.isConnecting;
     // VCに入れない
     if(!(await options.JoinVoiceChannel(message, /* reply */ false, /* reply when failed */ true))) return;
     // 一時停止されてるね
-    if(options.rawArgs === "" && server.Player.IsPaused){
-      server.Player.Resume();
+    if(options.rawArgs === "" && server.Player.isPaused){
+      server.Player.resume();
       await message.reply(":arrow_forward: 再生を再開します。").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -48,7 +48,7 @@ export default class Play extends BaseCommand {
           await options.PlayFromURL(message, options.rawArgs, i === 0 ? !wasConnected : false);
         }
       }else{
-        const msg = await message.channel.send("🔍検索中...");
+        const msg = await message.channel.createMessage("🔍検索中...");
         const result = (await searchYouTube(options.rawArgs)).items.filter(it => it.type === "video");
         if(result.length === 0){
           await message.reply(":face_with_monocle:該当する動画が見つかりませんでした");
@@ -60,14 +60,14 @@ export default class Play extends BaseCommand {
         await msg.delete();
       }
     // 添付ファイルを確認
-    }else if(message.attachments.size >= 1){
-      options.rawArgs = message.attachments.first().url;
-      await options.PlayFromURL(message, options.rawArgs, !server.Player.IsConnecting);
+    }else if(message.attachments.length >= 1){
+      options.rawArgs = message.attachments[0].url;
+      await options.PlayFromURL(message, options.rawArgs, !server.Player.isConnecting);
     // なにもないからキューから再生
     }else if(server.Queue.length >= 1){
-      if(!server.Player.IsPlaying && !server.Player.preparing){
+      if(!server.Player.isPlaying && !server.Player.preparing){
         await message.reply("再生します");
-        await server.Player.Play();
+        await server.Player.play();
       }else{
         await message.reply("すでに再生中です");
       }

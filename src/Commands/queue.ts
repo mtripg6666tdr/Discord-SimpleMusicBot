@@ -2,7 +2,7 @@ import type { CommandArgs } from ".";
 import type { YouTube } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import * as discord from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
 import { PageToggle } from "../Component/PageToggle";
@@ -35,7 +35,7 @@ export default class Queue extends BaseCommand {
       return;
     }
     // 合計所要時間の計算
-    const totalLength = queue.LengthSeconds;
+    const totalLength = queue.lengthSeconds;
     let _page = options.rawArgs === "" ? 1 : Number(options.rawArgs);
     if(isNaN(_page)) _page = 1;
     if(queue.length > 0 && _page > Math.ceil(queue.length / 10)){
@@ -55,7 +55,7 @@ export default class Queue extends BaseCommand {
         const _t = Number(q.BasicInfo.LengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
         fields.push({
-          name: i !== 0 ? i.toString() : options.data[message.guild.id].Player.IsPlaying ? "現在再生中" : "再生待ち",
+          name: i !== 0 ? i.toString() : options.data[message.guild.id].Player.isPlaying ? "現在再生中" : "再生待ち",
           value: "[" + q.BasicInfo.Title + "](" + q.BasicInfo.Url + ") \r\n"
           + "長さ: `" + ((q.BasicInfo.ServiceIdentifer === "youtube" && (q.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : min + ":" + sec) + " ` \r\n"
           + "リクエスト: `" + q.AdditionalInfo.AddedBy.displayName + "` "
@@ -63,23 +63,25 @@ export default class Queue extends BaseCommand {
         });
       }
       const [thour, tmin, tsec] = Util.time.CalcHourMinSec(totalLength);
-      return new discord.MessageEmbed()
+      return new Helper.MessageEmbedBuilder()
         .setTitle(message.guild.name + "のキュー")
         .setDescription("`" + page + "ページ目(" + totalpage + "ページ中)`")
-        .addFields(fields)
+        .addFields(...fields)
         .setAuthor({
           name: options.client.user.username,
-          iconURL: options.client.user.avatarURL()
+          icon_url: options.client.user.avatarURL,
         })
-        .setFooter({text: queue.length + "曲 | 合計:" + thour + ":" + tmin + ":" + tsec + " | トラックループ:" + (queue.LoopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.QueueLoopEnabled ? "⭕" : "❌") + " | 関連曲自動再生:" + (options.data[message.guild.id].AddRelative ? "⭕" : "❌") + " | 均等再生:" + (options.data[message.guild.id].EquallyPlayback ? "⭕" : "❌")})
-        .setThumbnail(message.guild.iconURL())
-        .setColor(getColor("QUEUE"));
+        .setFooter({text: queue.length + "曲 | 合計:" + thour + ":" + tmin + ":" + tsec + " | トラックループ:" + (queue.loopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.queueLoopEnabled ? "⭕" : "❌") + " | 関連曲自動再生:" + (options.data[message.guild.id].AddRelative ? "⭕" : "❌") + " | 均等再生:" + (options.data[message.guild.id].EquallyPlayback ? "⭕" : "❌")})
+        .setThumbnail(message.guild.iconURL)
+        .setColor(getColor("QUEUE"))
+        .toEris()
+      ;
     };
 
     // 送信
-    await msg.edit({content: null, embeds: [getQueueEmbed(_page)]}).catch(e => Util.logger.log(e, "error"));
+    await msg.edit({content: "", embeds: [getQueueEmbed(_page)]}).catch(e => Util.logger.log(e, "error"));
     if(totalpage > 1){
-      options.EmbedPageToggle.push((await PageToggle.init(msg, (n) => getQueueEmbed(n + 1), totalpage, _page - 1)).SetFresh(true));
+      options.EmbedPageToggle.push((await PageToggle.init(msg, n => getQueueEmbed(n + 1), totalpage, _page - 1)).SetFresh(true));
     }
   }
 }

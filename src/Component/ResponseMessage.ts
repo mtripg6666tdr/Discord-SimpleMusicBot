@@ -1,1 +1,1 @@
-export { ResponseMessage } from "djs-command-resolver";
+export { ResponseMessage } from "@mtripg6666tdr/eris-command-resolver";

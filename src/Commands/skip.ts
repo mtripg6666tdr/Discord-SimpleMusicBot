@@ -19,7 +19,7 @@ export default class Skip extends BaseCommand {
     options.updateBoundChannel(message);
     const server = options.data[message.guild.id];
     // そもそも再生状態じゃないよ...
-    if(!server.Player.IsPlaying){
+    if(!server.Player.isPlaying){
       await message.reply("再生中ではありません").catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"));
       return;
     }else if(server.Player.preparing){
@@ -29,13 +29,13 @@ export default class Skip extends BaseCommand {
     try{
       const response = await message.reply(":ok: スキップしています");
       const title = server.Queue.get(0).BasicInfo.Title;
-      server.Player.Stop();
-      await server.Queue.Next();
-      await server.Player.Play();
+      server.Player.stop();
+      await server.Queue.next();
+      await server.Player.play();
       await response.edit(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => Util.logger.log(e, "error"));
     }
     catch(e){
-      await message.channel.send(":astonished:スキップに失敗しました").catch(er => Util.logger.log(er, "error"));
+      await message.channel.createMessage(":astonished:スキップに失敗しました").catch(er => Util.logger.log(er, "error"));
     }
   }
 }

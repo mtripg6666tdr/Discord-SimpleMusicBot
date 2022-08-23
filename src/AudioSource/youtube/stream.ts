@@ -21,7 +21,7 @@ export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoForm
       }});
       Util.logger.log(`[AudioSource:youtube]Stream #${(current + 1)} was created.`);
       nextStream
-        .on("error", er => stream.emit("error", er))
+        .on("error", er => !stream.destroyed ? stream.destroy(er) : stream.emit("error", er))
         .pipe(stream, {end: end === undefined});
       if(end !== undefined){
         nextStream.on("end", () => {

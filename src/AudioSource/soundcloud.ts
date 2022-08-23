@@ -1,5 +1,5 @@
 import type { ReadableStreamInfo } from ".";
-import type { EmbedField } from "discord.js";
+import type { EmbedField } from "eris";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 
 import SoundCloud from "soundcloud.ts";

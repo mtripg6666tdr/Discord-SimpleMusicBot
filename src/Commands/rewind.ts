@@ -17,10 +17,10 @@ export default class Rewind extends BaseCommand {
   
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
-    if(!options.data[message.guild.id].Player.IsPlaying){
+    if(!options.data[message.guild.id].Player.isPlaying){
       message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
     }else{
-      options.data[message.guild.id].Player.Rewind();
+      options.data[message.guild.id].Player.rewind();
       message.reply(":rewind:再生中の楽曲を頭出ししました:+1:").catch(e => Util.logger.log(e, "error"));
     }
   }

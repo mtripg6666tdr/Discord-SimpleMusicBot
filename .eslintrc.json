@@ -106,6 +106,10 @@
           "TSUnionType"
         ]
     }],
+    "@typescript-eslint/no-unnecessary-type-assertion": "warn",
+    "@typescript-eslint/require-await": "off",
+    "@typescript-eslint/return-await": ["warn", "in-try-catch"],
+    "@typescript-eslint/await-thenable": "warn",
 
     // other plugins
     "eslint-comments/no-unused-disable": "error",
@@ -123,7 +127,7 @@
       ],
       "pathGroups": [
         {
-          "pattern": "{discord.js,@discordjs/**}",
+          "pattern": "{eris,@mtripg6666tdr/eris-command-resolver}",
           "group": "builtin",
           "position": "before"
         }

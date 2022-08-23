@@ -1,7 +1,8 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
+import type { MessageEmbedBuilder } from "@mtripg6666tdr/eris-command-resolver";
 
-import * as discord from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -32,13 +33,13 @@ export default class Lyrics extends BaseCommand {
     const msg = await message.reply("🔍検索中...");
     try{
       const songInfo = await GetLyrics(options.rawArgs);
-      const embeds = [] as discord.MessageEmbed[];
+      const embeds = [] as MessageEmbedBuilder[];
       if(!songInfo.lyric) throw new Error("取得した歌詞が空でした");
       const chunkLength = Math.ceil(songInfo.lyric.length / 4000);
       for(let i = 0; i < chunkLength; i++){
         const partial = songInfo.lyric.substring(4000 * i, 4000 * (i + 1) - 1);
         embeds.push(
-          new discord.MessageEmbed()
+          new Helper.MessageEmbedBuilder()
             .setDescription(partial)
             .setColor(getColor("LYRIC"))
         );
@@ -49,13 +50,19 @@ export default class Lyrics extends BaseCommand {
         .setThumbnail(songInfo.artwork)
       ;
       embeds[embeds.length - 1]
-        .setFooter({text: message.member.displayName, iconURL: message.author.avatarURL()})
+        .setFooter({
+          text: Util.eris.user.getDisplayName(message.member),
+          icon_url: message.member.avatarURL
+        })
       ;
-      msg.edit({content: null, embeds});
+      msg.edit({
+        content: "",
+        embeds: embeds.map(embed => embed.toEris())
+      });
     }
     catch(e){
       Util.logger.log(e, "error");
-      msg.edit(":confounded:失敗しました。曲名を確認してもう一度試してみてください。").catch(er => Util.logger.log(er, "error"));
+      await msg.edit(":confounded:失敗しました。曲名を確認してもう一度試してみてください。").catch(er => Util.logger.log(er, "error"));
     }
   }
 }

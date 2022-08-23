@@ -19,10 +19,10 @@ export default class Effect extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     try{
-      const {embed, messageActions } = getCurrentEffectPanel(message.author.avatarURL(), options.data[message.guild.id]);
-      const reply = await message.channel.send({
-        content: null,
-        embeds: [embed],
+      const {embed, messageActions } = getCurrentEffectPanel(message.member.avatarURL, options.data[message.guild.id]);
+      const reply = await message.channel.createMessage({
+        content: "",
+        embeds: [embed.toEris()],
         components: [messageActions]
       });
       setTimeout(() => {
@@ -31,7 +31,7 @@ export default class Effect extends BaseCommand {
     }
     catch(e){
       Util.logger.log(JSON.stringify(e), "error");
-      message.reply(":cry:エラーが発生しました");
+      await message.reply(":cry:エラーが発生しました").catch(er => Util.logger.log(er, "error"));
     }
   }
 }

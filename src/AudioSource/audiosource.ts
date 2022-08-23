@@ -1,8 +1,14 @@
 import type * as Sources from ".";
 import type { exportableCustom } from "./custom";
-import type * as voice from "@discordjs/voice";
-import type { EmbedField } from "discord.js";
+import type { EmbedField } from "eris";
 import type { Readable } from "stream";
+
+type StreamType =
+| "dca"
+| "ogg"
+| "webm"
+| "pcm"
+;
 
 export abstract class AudioSource {
   // ソースのURL
@@ -51,5 +57,5 @@ export abstract class AudioSource {
 }
 
 export type StreamInfo = ReadableStreamInfo|UrlStreamInfo;
-export type ReadableStreamInfo = {type:"readable", stream:Readable, streamType?:voice.StreamType};
+export type ReadableStreamInfo = {type:"readable", stream:Readable, streamType?:StreamType};
 export type UrlStreamInfo = {type:"url", url:string, userAgent?:string};

@@ -1,8 +1,8 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
+import type { EmbedOptions } from "eris";
 
-import { generateDependencyReport } from "@discordjs/voice";
-import * as discord from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import * as os from "os";
 
@@ -38,39 +38,40 @@ export default class SystemInfo extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     options.updateBoundChannel(message);
     // Run default logger
-    options.bot.PeriodicLog();
+    options.bot.logGeneralInfo();
     await message.reply("実行します");
 
-    const embeds = [] as discord.MessageEmbed[];
+    const embeds = [] as EmbedOptions[];
 
     if(options.args.includes("basic") || options.args.length === 0){
       embeds.push(
-        new discord.MessageEmbed()
+        new Helper.MessageEmbedBuilder()
           .setTitle("Discord-SimpleMusicBot")
           .setDescription("Basic info")
           .addField("Version (commit hash)", `\`${options.bot.Version}\``, true)
           .addField("Managed embed toggles", `\`${options.EmbedPageToggle.length}\``, true)
           .addField("Guilds that have modified data", `\`${options.bot.QueueModifiedGuilds.length}\``, true)
-          .addField("Voice environment configuration", `\`\`\`\r\n${generateDependencyReport()}\r\n\`\`\``, true)
           .setColor(getColor("UPTIME"))
+          .toEris()
       );
     }
 
-    if(message.author.id === (Util.config.adminId ?? "593758391395155978") && (options.args.includes("log") || options.args.length === 0)){
+    if(message.member.id === (Util.config.adminId ?? "593758391395155978") && (options.args.includes("log") || options.args.length === 0)){
       // Process Logs
-      const logEmbed = new discord.MessageEmbed();
-      logEmbed.setColor(getColor("UPTIME"));
-      logEmbed.title = "Log";
-      logEmbed.description = "Last " + Util.logger.logStore.data.length + " bot logs\r\n```\r\n" + Util.logger.logStore.data.join("\r\n") + "\r\n```";
-      embeds.push(logEmbed);
+      embeds.push(
+        new Helper.MessageEmbedBuilder()
+          .setColor(getColor("UPTIME"))
+          .setTitle("Log")
+          .setDescription(`Last ${Util.logger.logStore.data.length}bot logs\r\n\`\`\`\r\n${Util.logger.logStore.data.join("\r\n")}\r\n\`\`\``)
+          .toEris()
+      );
     }
 
     if(options.args.includes("cpu") || options.args.length === 0){
       // Process CPU Info
-      const cpuInfoEmbed = new discord.MessageEmbed();
-      cpuInfoEmbed.setColor(getColor("UPTIME"));
+      const cpuInfoEmbed = new Helper.MessageEmbedBuilder();
+      cpuInfoEmbed.setColor(getColor("UPTIME")).setTitle("CPU Info");
       const cpus = os.cpus();
-      cpuInfoEmbed.title = "CPU Info";
       for(let i = 0; i < cpus.length; i++){
         const all = cpus[i].times.user + cpus[i].times.sys + cpus[i].times.nice + cpus[i].times.irq + cpus[i].times.idle;
         cpuInfoEmbed.addField(
@@ -83,35 +84,39 @@ export default class SystemInfo extends BaseCommand {
         + "Times(idle): `" + Math.round(cpus[i].times.idle / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.idle, all) + "%)`"
           , true);
       }
-      embeds.push(cpuInfoEmbed);
+      embeds.push(cpuInfoEmbed.toEris());
     }
 
     if(options.args.includes("mem") || options.args.length === 0){
       // Process Mem Info
-      const memInfoEmbed = new discord.MessageEmbed();
-      memInfoEmbed.setColor(getColor("UPTIME"));
       const memory = Util.system.GetMemInfo();
       const nMem = process.memoryUsage();
-      memInfoEmbed.title = "Memory Info";
-      memInfoEmbed.addField("Total Memory",
-        "Total: `" + memory.total + "MB`\r\n"
-        + "Used: `" + memory.used + "MB`\r\n"
-        + "Free: `" + memory.free + "MB`\r\n"
-        + "Usage: `" + memory.usage + "%`"
-        , true);
       const rss = Util.system.GetMBytes(nMem.rss);
       const ext = Util.system.GetMBytes(nMem.external);
-      memInfoEmbed.addField("Main Process Memory",
-        "RSS: `" + rss + "MB`\r\n"
-        + "Heap total: `" + Util.system.GetMBytes(nMem.heapTotal) + "MB`\r\n"
-        + "Heap used: `" + Util.system.GetMBytes(nMem.heapUsed) + "MB`\r\n"
-        + "Array buffers: `" + Util.system.GetMBytes(nMem.arrayBuffers) + "MB`\r\n"
-        + "External: `" + ext + "MB`\r\n"
-        + "Total: `" + Util.math.GetPercentage(rss + ext, memory.total) + "%`"
-        , true);
-      embeds.push(memInfoEmbed);
+      embeds.push(
+        new Helper.MessageEmbedBuilder()
+          .setColor(getColor("UPTIME"))
+          .setTitle("Memory Info")
+          .addField("Total Memory",
+            "Total: `" + memory.total + "MB`\r\n"
+            + "Used: `" + memory.used + "MB`\r\n"
+            + "Free: `" + memory.free + "MB`\r\n"
+            + "Usage: `" + memory.usage + "%`",
+            true
+          )
+          .addField("Main Process Memory",
+            "RSS: `" + rss + "MB`\r\n"
+            + "Heap total: `" + Util.system.GetMBytes(nMem.heapTotal) + "MB`\r\n"
+            + "Heap used: `" + Util.system.GetMBytes(nMem.heapUsed) + "MB`\r\n"
+            + "Array buffers: `" + Util.system.GetMBytes(nMem.arrayBuffers) + "MB`\r\n"
+            + "External: `" + ext + "MB`\r\n"
+            + "Total: `" + Util.math.GetPercentage(rss + ext, memory.total) + "%`",
+            true
+          )
+          .toEris()
+      );
     }
     
-    message.channel.send({embeds}).catch(e => Util.logger.log(e, "error"));
+    await message.channel.createMessage({embeds}).catch(e => Util.logger.log(e, "error"));
   }
 }

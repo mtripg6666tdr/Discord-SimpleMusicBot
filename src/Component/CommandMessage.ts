@@ -1,4 +1,4 @@
-import { CommandMessage as LibCommandMessage } from "djs-command-resolver";
+import { CommandMessage as LibCommandMessage } from "@mtripg6666tdr/eris-command-resolver";
 
 import { Util } from "../Util";
 

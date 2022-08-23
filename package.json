@@ -1,25 +1,23 @@
 {
   "name": "discord-music-bot",
-  "version": "2.0.0-dev",
+  "version": "3.0.0-dev",
   "description": "Simple Music Bot for Discord without any database",
   "private": true,
   "main": "dist/lib.js",
   "types": "typings/lib.d.ts",
   "engines": {
-    "node": ">=16.6.0"
+    "node": ">=10.4.0"
   },
   "dependencies": {
-    "@discordjs/voice": "^0.11.0",
+    "@mtripg6666tdr/eris-command-resolver": "^0.0.6",
     "comment-json": "^4.2.3",
-    "discord.js": "^13.6.0",
-    "djs-command-resolver": "^1.0.2",
     "dotenv": "^16.0.1",
+    "eris": "^0.17.1",
     "follow-redirects": "^1.15.1",
     "genius-lyrics": "^4.4.0",
     "html-entities": "^2.3.3",
     "html-to-text": "^8.2.1",
     "https-proxy-agent": "^5.0.1",
-    "libsodium-wrappers": "^0.7.10",
     "m3u8stream": "^0.8.6",
     "miniget": "^4.2.2",
     "niconico-dl.js": "^1.1.3",
@@ -57,18 +55,21 @@
   },
   "optionalDependencies": {
     "@discordjs/opus": "^0.8.0",
-    "ffmpeg-static": "^5.0.2"
+    "bufferutil": "^4.0.6",
+    "ffmpeg-static": "^5.0.2",
+    "pako": "^2.0.4",
+    "sodium-native": "^3.4.1",
+    "zlib-sync": "^0.1.7"
   },
   "scripts": {
     "test": "mocha",
     "prepare": "husky install",
     "start": "npm run build && npm run onlystart",
-    "onlystart": "npx node dist/index.js",
+    "onlystart": "node dist/index.js",
     "build": "tsc",
     "lint": "eslint ./src",
-    "postinstall": "npx node util/preparelib.js",
+    "postinstall": "node util/preparelib.js",
     "cleanup": "rimraf dist/ typings/",
-    "checkvoiceenv": "node util/voiceenvcheck",
     "applyslashcommandguild": "npx node util/registercommands/guild",
     "applyslashcommandapplication": "npx node util/registercommands/application",
     "deleteslashcommandguild": "npx node util/deletecommands/guild",

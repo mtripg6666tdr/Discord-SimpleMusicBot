@@ -1,8 +1,9 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { ResponseMessage } from "djs-command-resolver";
+import type { ResponseMessage } from "../Component/ResponseMessage";
+import type { SelectMenuOptions} from "eris";
 
-import * as discord from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
 import { bestdori, BestdoriApi } from "../AudioSource";
@@ -26,7 +27,7 @@ export default class Searchb extends BaseCommand {
       return;
     }
     if(options.rawArgs !== ""){
-      let msg = null as discord.Message|ResponseMessage;
+      let msg = null as ResponseMessage;
       let desc = "※最大20件まで表示されます\r\n\r\n";
       try{
         options.data[message.guild.id].SearchPanel = {} as any;
@@ -35,8 +36,8 @@ export default class Searchb extends BaseCommand {
           Msg: {
             id: msg.id,
             chId: msg.channel.id,
-            userId: message.author.id,
-            userName: message.member.displayName,
+            userId: message.member.id,
+            userName: Util.eris.user.getDisplayName(message.member),
             commandMessage: message
           },
           Opts: {}
@@ -48,14 +49,11 @@ export default class Searchb extends BaseCommand {
           const info = bestdori.allsonginfo[Number(k)];
           return (info.musicTitle[0] + bestdori.allbandinfo[info.bandId].bandName[0]).toLowerCase().includes(options.rawArgs.toLowerCase());
         });
-        const embed = new discord.MessageEmbed();
-        embed.setColor(getColor("SEARCH"));
-        embed.title = "\"" + options.rawArgs + "\"の検索結果✨";
         let index = 1;
-        const selectOpts = [] as discord.MessageSelectOptionData[];
+        const selectOpts = [] as SelectMenuOptions[];
         for(let i = 0; i < result.length; i++){
           const title = bestdori.allsonginfo[Number(result[i])].musicTitle[0];
-          desc += "`" + index + ".` [" + bestdori.allsonginfo[Number(result[i])].musicTitle[0] + "](" + BestdoriApi.getAudioPage(Number(result[i])) + ") - `" + bestdori.allbandinfo[bestdori.allsonginfo[Number(result[i])].bandId].bandName[0] + "` \r\n\r\n";
+          desc += `\`${index}.\` [${bestdori.allsonginfo[Number(result[i])].musicTitle[0]}](${BestdoriApi.getAudioPage(Number(result[i]))}) - \`${bestdori.allbandinfo[bestdori.allsonginfo[Number(result[i])].bandId].bandName[0]}\` \r\n\r\n`;
           options.data[message.guild.id].SearchPanel.Opts[index] = {
             url: BestdoriApi.getAudioPage(Number(result[i])),
             title: title,
@@ -63,7 +61,7 @@ export default class Searchb extends BaseCommand {
             thumbnail: BestdoriApi.getThumbnail(Number(result[i]), bestdori.allsonginfo[Number(result[i])].jacketImage[0])
           };
           selectOpts.push({
-            label: index + ". " + (title.length > 90 ? title.substr(0, 90) + "…" : title),
+            label: index + ". " + (title.length > 90 ? title.substring(0, 90) + "…" : title),
             description: "長さ: " + options.data[message.guild.id].SearchPanel.Opts[index].duration + ", バンド名: " + bestdori.allbandinfo[bestdori.allsonginfo[Number(result[i])].bandId].bandName[0],
             value: index.toString()
           });
@@ -77,26 +75,33 @@ export default class Searchb extends BaseCommand {
           await msg.edit(":pensive:見つかりませんでした。");
           return;
         }
-        embed.description = desc;
-        embed.footer = {
-          iconURL: message.author.avatarURL(),
-          text: "楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
-        };
+        const embed = new Helper.MessageEmbedBuilder()
+          .setColor(getColor("SEARCH"))
+          .setTitle(`"${options.rawArgs}"の検索結果✨`)
+          .setDescription(desc)
+          .setFooter({
+            icon_url: message.member.avatarURL,
+            text: "楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
+          })
+          .toEris()
+        ;
         await msg.edit({
+          content: "",
           embeds: [embed],
           components: [
-            new discord.MessageActionRow()
+            new Helper.MessageActionRowBuilder()
               .addComponents(
-                new discord.MessageSelectMenu()
+                new Helper.MessageSelectMenuBuilder()
                   .setCustomId("search")
                   .setPlaceholder("数字を送信するか、ここから選択...")
                   .setMinValues(1)
                   .setMaxValues(index - 1)
-                  .addOptions([...selectOpts, {
+                  .addOptions(...selectOpts, {
                     label: "キャンセル",
                     value: "cancel"
-                  }])
+                  })
               )
+              .toEris()
           ]
         });
       }

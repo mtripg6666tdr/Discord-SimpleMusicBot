@@ -1,11 +1,11 @@
-import type { Client, Interaction, Message } from "discord.js";
+import type { Client, Interaction, Message } from "eris";
 
 import * as fs from "fs";
 import * as path from "path";
 import { EventEmitter } from "stream";
 
 interface EventKeys {
-  ready: [client:Client<true>];
+  ready: [client:Client];
   messageCreate: [message: Message];
   interactionCreate: [interaction: Interaction];
 }

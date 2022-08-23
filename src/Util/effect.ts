@@ -1,6 +1,6 @@
 import type { GuildDataContainer } from "../Structure";
 
-import { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { getColor } from "./color";
 
@@ -25,7 +25,7 @@ export function getFFmpegEffectArgs(data:GuildDataContainer){
 }
 
 export function getCurrentEffectPanel(avatarUrl:string, data:GuildDataContainer){
-  const embed = new MessageEmbed()
+  const embed = new Helper.MessageEmbedBuilder()
     .setTitle(":cd:エフェクトコントロールパネル:microphone:")
     .setDescription("オーディオエフェクトの設定/解除することができます。\r\n・表示は古い情報であることがありますが、エフェクトを操作したとき、更新ボタンを押したときに更新されます。\r\n・エフェクトは次の曲から適用されます\r\n現在の曲に適用したい場合は、`頭出し`コマンドを使用してください\r\n")
     .addField("Bass Boost", data.EffectPrefs.BassBoost ? "⭕" : "❌", true)
@@ -33,30 +33,32 @@ export function getCurrentEffectPanel(avatarUrl:string, data:GuildDataContainer)
     .addField("Loudness Eq", data.EffectPrefs.LoudnessEqualization ? "⭕" : "❌", true)
     .setColor(getColor("EFFECT"))
     .setFooter({
-      iconURL: avatarUrl,
+      icon_url: avatarUrl,
       text: "エフェクトを選択してボタンを押してください"
     })
   ;
-  const messageActions = new MessageActionRow()
-    .addComponents([
-      new MessageButton()
+  const messageActions = new Helper.MessageActionRowBuilder()
+    .addComponents(
+      new Helper.MessageButtonBuilder()
         .setCustomId("reload")
         .setStyle("PRIMARY")
         .setEmoji("🔁")
         .setLabel("更新"),
-      new MessageButton()
+      new Helper.MessageButtonBuilder()
         .setCustomId("bass_boost")
         .setStyle(data.EffectPrefs.BassBoost ? "SUCCESS" : "SECONDARY")
         .setLabel("Bass Boost"),
-      new MessageButton()
+      new Helper.MessageButtonBuilder()
         .setCustomId("reverb")
         .setStyle(data.EffectPrefs.Reverb ? "SUCCESS" : "SECONDARY")
         .setLabel("Reverb"),
-      new MessageButton()
+      new Helper.MessageButtonBuilder()
         .setCustomId("loudness_eq")
         .setStyle(data.EffectPrefs.LoudnessEqualization ? "SUCCESS" : "SECONDARY")
         .setLabel("Loudness Eq")
-    ]);
+    )
+    .toEris()
+  ;
   
   return { embed, messageActions };
 }

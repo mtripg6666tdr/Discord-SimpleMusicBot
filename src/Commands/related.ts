@@ -1,7 +1,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import * as discord from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -25,10 +25,12 @@ export default class Related extends BaseCommand {
       message.reply("❌関連曲自動再生をオフにしました").catch(e => Util.logger.log(e, "error"));
     }else{
       options.data[message.guild.id].AddRelative = true;
-      const embed = new discord.MessageEmbed()
+      const embed = new Helper.MessageEmbedBuilder()
         .setTitle("⭕関連曲自動再生をオンにしました")
         .setDescription("YouTubeからの楽曲再生終了時に、関連曲をキューの末尾に自動追加する機能です。\r\n※YouTube以外のソースからの再生時、ループ有効時には追加されません")
-        .setColor(getColor("RELATIVE_SETUP"));
+        .setColor(getColor("RELATIVE_SETUP"))
+        .toEris()
+      ;
       message.reply({embeds: [embed]});
     }
   }

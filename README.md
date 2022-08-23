@@ -1,5 +1,6 @@
 # Discord-SimpleMusicBot 
-[![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/mtripg6666tdr/Discord-SimpleMusicBot/discord.js)](https://github.com/discordjs/discord.js)
+![GitHub package.json dynamic](https://img.shields.io/github/package-json/version/mtripg6666tdr/Discord-SimpleMusicBot)
+[![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/mtripg6666tdr/Discord-SimpleMusicBot/eris)](https://github.com/abalabahaha/eris)
 [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/testing.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/testing.yml)
 [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml)
 ![GitHub repo size](https://img.shields.io/github/repo-size/mtripg6666tdr/Discord-SimpleMusicBot)
@@ -62,20 +63,8 @@ YouTubeなどからの再生に対応。
 [コマンドの一覧はこちらからご覧になれます](docs/commands.md)
 
 ## 実行環境の準備
-- Node.js v16がサポートされている環境  
+- Node.js v10以上v16以下がサポートされている環境  
   - ほとんどのデバイスがサポートされています  
-  - nodeは[npmのnode](https://npmjs.com/package/node)から自動で取得されるので、バージョンに制約はありませんが、最新のLTSを使用することをお勧めします。  
-  - npmのnodeがサポートされていない環境では、`npm install`した際にその旨のエラーが発生します。その場合、以下を実行したうえで、別途Node.js v16をインストールして実行できるようにしておいてください。  
-    ```bash
-    npm uninstall node # nodeを依存パッケージから消す
-    ```
-    - このあと更新する際には、以下のように、ワークスペースをリセットしたうえでプルしてもういちどnodeを消す必要があります。
-    ```bash
-    git restore . # ワークスペースリセット
-    git pull
-    npm uninstall node # 上に同じ
-    npm install
-    ```
   - [npmのffmpeg](https://www.npmjs.com/package/ffmpeg-static)が利用できない場合は、`npm install`したときに、その旨の表示がされます。
     - その場合は、自分で別途ffmpegをインストールする必要があります。
     - 最新版でも入れておきましょう
