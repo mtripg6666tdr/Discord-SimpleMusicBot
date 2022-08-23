@@ -18,6 +18,10 @@ type ytdlCore = "ytdlCore";
 export const ytdlCore:ytdlCore = "ytdlCore";
 
 export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, ytdl.videoInfo> {
+  get cacheType(){
+    return ytdlCore;
+  }
+
   async getInfo(url:string){
     this.useLog();
     const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);

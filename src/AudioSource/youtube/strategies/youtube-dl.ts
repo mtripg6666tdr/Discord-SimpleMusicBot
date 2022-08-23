@@ -14,6 +14,10 @@ type youtubeDl = "youtubeDl";
 const youtubeDl:youtubeDl = "youtubeDl";
 
 export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>, YoutubeDlInfo> {
+  get cacheType(){
+    return youtubeDl;
+  }
+
   last:number = 0;
 
   async getInfo(url:string){

@@ -10,6 +10,8 @@ export type Cache<T extends string, U> = {
 };
 
 export abstract class Strategy<T extends Cache<any, U>, U> {
+  abstract get cacheType():string;
+  
   public logger: LoggerType;
 
   constructor(protected priority:number){
