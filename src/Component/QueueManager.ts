@@ -134,34 +134,38 @@ export class QueueManager extends ManagerBase {
     this.nowProcessing = true;
     this.Log("AddQueue called");
     const t = Util.time.timer.start("AddQueue");
-    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
-    const result = {
-      BasicInfo: await AudioSource.Resolve({
-        url, type,
-        knownData: gotData,
-        forceCache: this.length === 0 || method === "unshift" || this.LengthSeconds < 4 * 60 * 60 * 1000
-      }),
-      AdditionalInfo: {
-        AddedBy: {
-          userId: this.getUserIdFromMember(addedBy) ?? "0",
-          displayName: this.getDisplayNameFromMember(addedBy) ?? "不明"
+    try{
+      PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
+      const result = {
+        BasicInfo: await AudioSource.Resolve({
+          url, type,
+          knownData: gotData,
+          forceCache: this.length === 0 || method === "unshift" || this.LengthSeconds < 4 * 60 * 60 * 1000
+        }),
+        AdditionalInfo: {
+          AddedBy: {
+            userId: this.getUserIdFromMember(addedBy) ?? "0",
+            displayName: this.getDisplayNameFromMember(addedBy) ?? "不明"
+          }
         }
+      } as QueueContent;
+      if(result.BasicInfo){
+        this._default[method](result);
+        if(this.info.EquallyPlayback) this.SortWithAddedBy();
+        if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
+          this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+        }
+        t.end();
+        this.nowProcessing = false;
+        const index = this._default.findIndex(q => q === result);
+        this.Log("queue content added in position " + index);
+        return {...result, index};
       }
-    } as QueueContent;
-    if(result.BasicInfo){
-      this._default[method](result);
-      if(this.info.EquallyPlayback) this.SortWithAddedBy();
-      if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
-        this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
-      }
+    }
+    finally{
       t.end();
       this.nowProcessing = false;
-      const index = this._default.findIndex(q => q === result);
-      this.Log("queue content added in position " + index);
-      return {...result, index};
     }
-    t.end();
-    this.nowProcessing = false;
     throw new Error("Provided URL was not resolved as available service");
   }
 

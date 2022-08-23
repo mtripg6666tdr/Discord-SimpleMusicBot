@@ -14,6 +14,10 @@ type youtubeDl = "youtubeDl";
 const youtubeDl:youtubeDl = "youtubeDl";
 
 export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>, YoutubeDlInfo> {
+  get cacheType(){
+    return youtubeDl;
+  }
+  
   last:number = 0;
 
   async getInfo(url:string){
@@ -63,10 +67,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
         };
       }
       // don't use initpassthrough here
-      const stream = new PassThrough({
-        highWaterMark: 1024 * 512,
-      });
-      stream._destroy = () => stream.destroyed = true;
+      const stream = Util.general.InitPassThrough();
       const req = m3u8stream(format[0].url, {
         begin: Date.now(),
         parser: "m3u8",

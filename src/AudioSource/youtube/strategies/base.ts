@@ -11,6 +11,7 @@ export type Cache<T extends string, U> = {
 
 export abstract class Strategy<T extends Cache<any, U>, U> {
   public logger: LoggerType;
+  abstract get cacheType():string;
 
   constructor(protected priority:number){
     this.logger = Util.logger.log.bind(Util.logger);

@@ -12,6 +12,10 @@ type playDl = "playDl";
 const playDl:playDl = "playDl";
 
 export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> {
+  get cacheType(){
+    return playDl;
+  }
+
   async getInfo(url:string){
     this.useLog();
     const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#getInfo`);

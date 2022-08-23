@@ -16,6 +16,10 @@ type ytdlCore = "ytdlCore";
 export const ytdlCore:ytdlCore = "ytdlCore";
 
 export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, ytdl.videoInfo> {
+  get cacheType(){
+    return ytdlCore;
+  }
+
   async getInfo(url:string){
     this.useLog();
     const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
@@ -115,7 +119,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
   }
 
   protected mapToExportable(url:string, info:ytdl.videoInfo){
-    if(!info.videoDetails.isLiveContent && !info.videoDetails.liveBroadcastDetails.isLiveNow && info.videoDetails.liveBroadcastDetails.startTimestamp && !info.videoDetails.liveBroadcastDetails.endTimestamp){
+    if(!info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails && !info.videoDetails.liveBroadcastDetails.isLiveNow && info.videoDetails.liveBroadcastDetails.startTimestamp && !info.videoDetails.liveBroadcastDetails.endTimestamp){
       throw new Error("This video is still in upcoming");
     }
     return {
@@ -126,7 +130,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
       channel: info.videoDetails.ownerChannelName,
       channelUrl: info.videoDetails.author.channel_url,
       thumbnail: info.videoDetails.thumbnails[0].url,
-      isLive: info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails?.isLiveNow,
+      isLive: !!(info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails?.isLiveNow),
     };
   }
 }

@@ -128,19 +128,7 @@ export class PlayManager extends ManagerBase {
       stream.stream.on("end", this.onStreamFinished.bind(this));
       this.Log(`Stream edges: ${["Raw", ...this.getCurrentStreams().map(e => e.constructor.name)].join(" -> ")} ->`);
       // wait for entering playing state
-      await new Promise<void>((resolve, reject) => {
-        if(connection.current?.startTime) resolve();
-        let count = 0;
-        const ticker = setInterval(() => {
-          count++;
-          if(connection.current?.startTime){
-            clearInterval(ticker);
-            resolve();
-          }else if(10 * 1000 <= 200 * count){
-            reject("playback has not started in time and timed out");
-          }
-        }, 50);
-      });
+      await Util.general.waitForEnteringState(() => this.info.connection.playing);
       this.preparing = false;
       u.end();
       this.Log("Play started successfully");
@@ -220,6 +208,9 @@ export class PlayManager extends ManagerBase {
       connection.disconnect();
     }else{
       this.Log("Disconnect called but no connection", "warn");
+    }
+    if(typeof global.gc === "function"){
+      global.gc();
     }
     return this;
   }
@@ -324,9 +315,8 @@ export class PlayManager extends ManagerBase {
       .on("close", () => original.destroy())
       .on("error", (e) => passThrough.emit("error", e))
       .pipe(passThrough)
-      .on("close", () => ffmpeg.destroy())
     ;
-    if(Util.config.debug) ffmpeg.on("data", chunk => this.Log(chunk.toString(), "debug"));
+    if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => this.Log(chunk.toString(), "debug"));
     return stream;
   }
 
@@ -346,9 +336,8 @@ export class PlayManager extends ManagerBase {
       .on("error", (e) => passThrough.emit("error", e));
     ffmpeg
       .pipe(passThrough)
-      .on("close", () => ffmpeg.destroy())
     ;
-    if(Util.config.debug) ffmpeg.on("data", chunk => this.Log(chunk.toString(), "debug"));
+    if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => this.Log(chunk.toString(), "debug"));
     console.log(ffmpeg);
     console.log(passThrough);
     return passThrough;
@@ -360,7 +349,10 @@ export class PlayManager extends ManagerBase {
   }
 
   private async onStreamFinished(){
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await Util.general.waitForEnteringState(() => !this.info.connection.playing).catch(() => {
+      this.Log("Stream has not ended in time and will force stream into destroying", "warn");
+      this.Stop();
+    });
     // ストリームが終了したら時間を確認しつつ次の曲へ移行
     this.Log("Stream finished");
     // 再生が終わったら
