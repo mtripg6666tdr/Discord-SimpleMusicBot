@@ -131,7 +131,7 @@ export class PlayManager extends ManagerBase {
       // QueueContentからストリーム情報を取得
       const rawStream = await this.CurrentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
-      const { stream, volume } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.info), this.seek, false, this.volume);
+      const { stream, volume } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.info), this.seek, this.volume !== 100, this.volume / 100);
       this._volumeTransformer = volume;
       this.errorReportChannel = mes.channel as TextChannel;
       const connection = this.info.Connection;
