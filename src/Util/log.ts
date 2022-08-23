@@ -5,7 +5,7 @@ import { isMainThread } from "worker_threads";
 import * as config from "./config";
 import { StringifyObject } from "./general";
 
-type LogLevels = "log"|"warn"|"error"|"debug";
+export type LogLevels = "log"|"warn"|"error"|"debug";
 export type LoggerType = (content:string, level?:LogLevels)=>void;
 
 class LogStore {

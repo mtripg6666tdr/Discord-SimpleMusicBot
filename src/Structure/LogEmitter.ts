@@ -1,3 +1,5 @@
+import type { LogLevels } from "../Util/log";
+
 import { Util } from "../Util";
 
 export abstract class LogEmitter {
@@ -23,7 +25,7 @@ export abstract class LogEmitter {
    * ログを出力します
    * @param message メッセージ
    */
-  Log(message:string, level?:"log"|"warn"|"error"){
+  Log(message:string, level?:LogLevels){
     if(this.tag === "") throw new Error("Tag has not been specified");
     Util.logger.log(`[${this.tag}${this.guildId !== "" ? `/${this.guildId}` : ""}]${message}`, level);
   }

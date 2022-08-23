@@ -21,7 +21,7 @@ export default class Effect extends BaseCommand {
     try{
       const {embed, messageActions } = getCurrentEffectPanel(message.member.avatarURL, options.data[message.guild.id]);
       const reply = await message.channel.createMessage({
-        content: null,
+        content: "",
         embeds: [embed.toEris()],
         components: [messageActions]
       });

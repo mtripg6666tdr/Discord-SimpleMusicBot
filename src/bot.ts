@@ -329,7 +329,7 @@ export class MusicBot extends LogEmitter {
             const mes = interaction.message;
             const { embed, messageActions } = Util.effects.getCurrentEffectPanel(interaction.user.avatarURL, this.data[(interaction.channel as discord.TextChannel).guild.id]);
             mes.edit({
-              content: null,
+              content: "",
               embeds: [embed.toEris()],
               components: [messageActions]
             });
@@ -572,7 +572,10 @@ export class MusicBot extends LogEmitter {
           selfDeaf: true,
         });
         connection
-          .on("error", err => Util.logger.log("[Main][Connection]" + Util.general.StringifyObject(err), "error"))
+          .on("error", err => {
+            Util.logger.log("[Main][Connection]" + Util.general.StringifyObject(err), "error");
+            this.data[targetVC.guild.id].Player.handleError(err);
+          })
           .on("pong", ping => this.data[message.guild.id].vcPing = ping)
         ;
         if(Util.config.debug){
@@ -681,7 +684,7 @@ export class MusicBot extends LogEmitter {
           .setDescription(`[${result.title}](${result.url}) \`(${result.author.name})\` \r\n${index}曲が追加されました`)
           .setThumbnail(result.bestThumbnail.url)
           .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-        await msg.edit({content: null, embeds: [embed.toEris()]});
+        await msg.edit({content: "", embeds: [embed.toEris()]});
       }
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
       await server.Player.Play();
@@ -710,7 +713,7 @@ export class MusicBot extends LogEmitter {
           .setDescription(`[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n${index}曲が追加されました`)
           .setThumbnail(playlist.artwork_url)
           .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-        await msg.edit({content: null, embeds: [embed.toEris()]});
+        await msg.edit({content: "", embeds: [embed.toEris()]});
       }
       this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
       await server.Player.Play();

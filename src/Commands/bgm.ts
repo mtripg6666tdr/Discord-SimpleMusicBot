@@ -71,7 +71,7 @@ export default class Bgm extends BaseCommand {
         })
       ;
       await reply.edit({
-        content: null,
+        content: "",
         embeds: [embed.toEris()],
         components: [
           new Helper.MessageActionRowBuilder()

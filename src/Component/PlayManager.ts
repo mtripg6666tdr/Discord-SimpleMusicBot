@@ -137,9 +137,9 @@ export class PlayManager extends ManagerBase {
             clearInterval(ticker);
             resolve();
           }else if(10 * 1000 <= 200 * count){
-            reject();
+            reject("playback has not started in time and timed out");
           }
-        }, 200);
+        }, 50);
       });
       this.preparing = false;
       u.end();
@@ -151,7 +151,7 @@ export class PlayManager extends ManagerBase {
         const embed = new Helper.MessageEmbedBuilder({
           title: ":cd:現在再生中:musical_note:",
           description:
-              `[${this.CurrentAudioInfo.Title}(${this.CurrentAudioUrl}) \``
+              `[${this.CurrentAudioInfo.Title}](${this.CurrentAudioUrl}) \``
             + (this.CurrentAudioInfo.ServiceIdentifer === "youtube" && (this.CurrentAudioInfo as YouTube).LiveStream ? "(ライブストリーム)" : _t === 0 ? "(不明)" : min + ":" + sec)
             + "`"
         });
@@ -173,7 +173,7 @@ export class PlayManager extends ManagerBase {
         if(this.CurrentAudioInfo.ServiceIdentifer === "youtube" && (this.CurrentAudioInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
-        mes.edit({content: null, embeds: [embed.toEris()]}).catch(e => Util.logger.log(e, "error"));
+        mes.edit({content: "", embeds: [embed.toEris()]}).catch(e => Util.logger.log(e, "error"));
       }
     }
     catch(e){
@@ -190,7 +190,7 @@ export class PlayManager extends ManagerBase {
         // eslint-disable-next-line no-empty
       } catch{}
       if(this.info.boundTextChannel && ch && mes){
-        mes.edit(":tired_face:曲の再生に失敗しました...。" + (this.errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
+        mes.edit(`:tired_face:曲の再生に失敗しました...。(${Util.general.StringifyObject(e)})` + (this.errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
         this.onStreamFailed();
       }
     }
@@ -290,6 +290,7 @@ export class PlayManager extends ManagerBase {
         ...effects
       ]);
       stream.streamType = "ogg";
+      this.Log("Stream pre-transformation: URL --(ffmpeg)--> Raw");
     }else if(time > 0 || effects.length >= 1){
       // シークが必要ならFFmpegを通す
       stream.stream = this.CreateFFmpegReadableFromReadable(rawStream.stream, [
@@ -297,9 +298,11 @@ export class PlayManager extends ManagerBase {
         "-ss", time.toString()
       ]);
       stream.streamType = "ogg";
+      this.Log("Stream pre-transformation: Readable --(ffmpeg)--> Raw (seek and/or effect)");
     }else{
       // ストリームなら変換しない
       stream = rawStream;
+      this.Log("Stream pre-transformation: Readable --> Raw");
     }
     return stream;
   }
@@ -323,6 +326,7 @@ export class PlayManager extends ManagerBase {
       .pipe(passThrough)
       .on("close", () => ffmpeg.destroy())
     ;
+    if(Util.config.debug) ffmpeg.on("data", chunk => this.Log(chunk.toString(), "debug"));
     return stream;
   }
 
@@ -344,6 +348,7 @@ export class PlayManager extends ManagerBase {
       .pipe(passThrough)
       .on("close", () => ffmpeg.destroy())
     ;
+    if(Util.config.debug) ffmpeg.on("data", chunk => this.Log(chunk.toString(), "debug"));
     console.log(ffmpeg);
     console.log(passThrough);
     return passThrough;
@@ -355,6 +360,7 @@ export class PlayManager extends ManagerBase {
   }
 
   private async onStreamFinished(){
+    await new Promise(resolve => setTimeout(resolve, 500));
     // ストリームが終了したら時間を確認しつつ次の曲へ移行
     this.Log("Stream finished");
     // 再生が終わったら

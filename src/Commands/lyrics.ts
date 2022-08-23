@@ -56,7 +56,7 @@ export default class Lyrics extends BaseCommand {
         })
       ;
       msg.edit({
-        content: null,
+        content: "",
         embeds: embeds.map(embed => embed.toEris())
       });
     }

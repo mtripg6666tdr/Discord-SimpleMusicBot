@@ -99,7 +99,7 @@ export default class Search extends BaseCommand {
           .toEris()
         ;
         await msg.edit({
-          content: null,
+          content: "",
           embeds: [embed],
           components: [
             new Helper.MessageActionRowBuilder()

@@ -55,7 +55,7 @@ export default class Frame extends BaseCommand {
       return;
     }
     try{
-      const [hour, min, sec] = Util.time.CalcHourMinSec(time);
+      const [hour, min, sec] = Util.time.CalcHourMinSec(Math.round(time * 100) / 100);
       const response = await message.reply(":camera_with_flash:取得中...");
       const {url, ua} = await vinfo.fetchVideo();
       const frame = await getFrame(url, time, ua);

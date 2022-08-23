@@ -208,7 +208,7 @@ export class QueueManager extends ManagerBase {
           .setDescription("情報を取得しています...")
         ;
         await msg.edit({
-          content: null,
+          content: "",
           embeds: [tembed.toEris()],
           allowedMentions: {
             repliedUser: false
@@ -254,7 +254,7 @@ export class QueueManager extends ManagerBase {
         if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as AudioSource.YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
-        await msg.edit({content: null, embeds: [embed.toEris()]});
+        await msg.edit({content: "", embeds: [embed.toEris()]});
       }
     }
     catch(e){

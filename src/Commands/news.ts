@@ -72,7 +72,7 @@ export default class News extends BaseCommand {
         .toEris()
       ;
       await reply.edit({
-        content: null,
+        content: "",
         embeds: [embed],
         components: [
           new Helper.MessageActionRowBuilder()
