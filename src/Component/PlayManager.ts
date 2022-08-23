@@ -1,6 +1,7 @@
 import type { AudioSource, YouTube } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { Client, Message, TextChannel } from "eris";
+import type { VolumeTransformer } from "prism-media";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
@@ -19,6 +20,8 @@ export class PlayManager extends ManagerBase {
   private readonly retryLimit = 3;
   private seek = 0;
   private errorReportChannel = null as TextChannel;
+  private _volume = 1;
+  private _volumeTransformer = null as VolumeTransformer;
   error = false;
   errorCount = 0;
   errorUrl = "";
@@ -61,7 +64,14 @@ export class PlayManager extends ManagerBase {
   /**
    * クライアント
    */
-  get client(){return this._client;}
+  get client(){
+    return this._client;
+  }
+
+  get volume(){
+    return this._volume;
+  }
+
   // コンストラクタ
   constructor(private readonly _client:Client){
     super();
@@ -75,6 +85,15 @@ export class PlayManager extends ManagerBase {
   setBinding(data:GuildDataContainer){
     this.Log("Set data of guild id " + data.GuildID);
     super.setBinding(data);
+  }
+
+  setVolume(val:number){
+    this._volume = val;
+    if(this._volumeTransformer){
+      this._volumeTransformer.setVolume(val);
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -112,7 +131,8 @@ export class PlayManager extends ManagerBase {
       // QueueContentからストリーム情報を取得
       const rawStream = await this.CurrentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
-      const { stream } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.info), this.seek, false, 1);
+      const { stream, volume } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.info), this.seek, false, this.volume);
+      this._volumeTransformer = volume;
       this.errorReportChannel = mes.channel as TextChannel;
       const connection = this.info.Connection;
       this.error = false;
