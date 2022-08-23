@@ -9,7 +9,7 @@
     "node": ">=10.4.0"
   },
   "dependencies": {
-    "@mtripg6666tdr/eris-command-resolver": "^0.0.6",
+    "@mtripg6666tdr/eris-command-resolver": "^0.0.7",
     "comment-json": "^4.2.3",
     "dotenv": "^16.0.1",
     "eris": "^0.17.1",
