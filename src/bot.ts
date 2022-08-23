@@ -300,7 +300,7 @@ export class MusicBot extends LogEmitter {
         return;
       }
       // 送信可能か確認
-      if(!Util.eris.channel.checkSendable(interaction.channel, interaction.member.id)){
+      if(!Util.eris.channel.checkSendable(interaction.channel, this.client.user.id)){
         await interaction.createMessage(NotSendableMessage);
         return;
       }
@@ -309,14 +309,14 @@ export class MusicBot extends LogEmitter {
       if(command){
         // 遅延リプライ
         await interaction.defer();
-        // メッセージライクに解決してコマンドメッセージに
+        // メッセージライクに解決してコマンドメッセージに 
         const commandMessage = CommandMessage.createFromInteraction(interaction);
         // プレフィックス更新
         this.updatePrefix(commandMessage);
         // コマンドを実行
         await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.options, commandMessage.rawOptions));
       }else{
-        await interaction.editMessage("@original", "おっと！なにかが間違ってしまったようです。\r\nコマンドが見つかりませんでした。 :sob:");
+        await interaction.createMessage("おっと！なにかが間違ってしまったようです。\r\nコマンドが見つかりませんでした。 :sob:");
       }
     // ボタンインタラクション
     }else if(interaction instanceof discord.ComponentInteraction){
