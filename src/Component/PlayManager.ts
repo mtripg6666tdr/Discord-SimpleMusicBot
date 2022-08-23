@@ -115,7 +115,6 @@ export class PlayManager extends ManagerBase {
       const rawStream = await this.CurrentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
       const stream = this.resolveStream(rawStream, time);
-      stream.stream.on("error", this.handleError.bind(this));
       this.errorReportChannel = mes.channel as TextChannel;
       const connection = this.info.Connection;
       this.error = false;
