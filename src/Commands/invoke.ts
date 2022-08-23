@@ -2,6 +2,7 @@ import type { CommandArgs } from ".";
 
 import { CommandsManager, BaseCommand } from ".";
 import { CommandMessage } from "../Component/CommandMessage";
+import Util from "../Util";
 
 export default class Invoke extends BaseCommand {
   constructor(){
@@ -32,9 +33,12 @@ export default class Invoke extends BaseCommand {
     if(ci){
       options.args = commandInfo.options;
       options.rawArgs = commandInfo.rawOptions;
-      await ci.run(message, options);
+      await ci.run(message, options).catch(er => Util.logger.log(er));
+      if(!message["isMessage"] && !message["_interactionReplied"]){
+        await message.reply("実行しました").catch(er => Util.logger.log(er));
+      }
     }else{
-      await message.reply("コマンドが見つかりませんでした");
+      await message.reply("コマンドが見つかりませんでした").catch(er => Util.logger.log(er));
     }
   }
 }

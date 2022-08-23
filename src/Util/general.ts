@@ -31,17 +31,18 @@ export function btoa(txt:string){
  * @returns 文字列。JSON、またはその他の文字列、および空の文字列の場合があります
  */
 export function StringifyObject(obj:any):string{
-  if(typeof obj === "string") return obj;
-  if(obj["message"]) return obj.message;
-  try{
-    return JSON.stringify(obj);
-  }
-  catch{
+  if(typeof obj === "string"){
+    return obj;
+  }else if(obj instanceof Error){
+    return `${obj.name}: ${obj.message}\n${obj.stack || "no stacks"}`;
+  }else if(obj["message"]){
+    return obj.message;
+  }else{
     try{
-      return Object.prototype.toString.call(obj);
+      return JSON.stringify(obj);
     }
     catch{
-      return "";
+      return Object.prototype.toString.call(obj);
     }
   }
 }
