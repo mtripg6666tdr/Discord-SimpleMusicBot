@@ -1,20 +1,30 @@
 import type { ReadableStreamInfo, StreamInfo } from "../../AudioSource";
 
-import { opus, VolumeTransformer } from "prism-media";
+import { VolumeTransformer } from "prism-media";
 
 import Util from "../../Util";
+import { InitPassThrough } from "../../Util/general";
 import { transformThroughFFmpeg } from "./ffmpeg";
 
 export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[], seek:number, volumeTransform:boolean, initialVolume:number):{stream:ReadableStreamInfo, volume:VolumeTransformer}{
   const effectArgs = effects.join(" ");
-  if(streamInfo.type === "readable" && streamInfo.streamType && (streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && seek <= 0 && !effectArgs && !volumeTransform){
+  volumeTransform = true;
+  if(streamInfo.type === "url"){
+    streamInfo = {
+      type: "readable",
+      stream: Util.web.DownloadAsReadable(streamInfo.url, {
+        maxReconnects: 10
+      })
+    };
+  }
+  if(streamInfo.streamType && (streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && seek <= 0 && !effectArgs && !volumeTransform){
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType}) --> `);
     return {
       stream: streamInfo,
       volume: null,
     };
   }else if(!volumeTransform){
-    Util.logger.log(`[StreamResolver] stream edges: raw(${(streamInfo.type === "readable" && streamInfo.streamType) || "unknown"}) --(FFmpeg)-->`);
+    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)-->`);
     return {
       stream: {
         type: "readable",
@@ -26,28 +36,23 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
   }else{
     Util.logger.log(`[StreamResolver] stream edges: raw(${(streamInfo.type === "readable" && streamInfo.streamType) || "unknown"}) --(FFmpeg) --> PCM --(VolumeTransformer)--> PCM --(Encoder)-->`);
     const ffmpegPCM = transformThroughFFmpeg(streamInfo, effectArgs, seek, "pcm");
+    const passThrough = InitPassThrough();
     const volumeTransformer = new VolumeTransformer({
       type: "s16le",
       volume: initialVolume,
-    });
-    const opusEncoder = new opus.Encoder({
-      frameSize: 960,
-      channels: 2,
-      rate: 48000,
-    });
+      highWaterMark: 0,
+    } as any);
     ffmpegPCM
-      .on("error", er => volumeTransformer.destroyed ? volumeTransformer.destroy(er) : volumeTransformer.emit("error", er))
+      .on("error", e => !passThrough.destroyed ? passThrough.destroy(e) : passThrough.emit("error", e))
+      .pipe(passThrough)
+      .on("error", e => !volumeTransformer.destroyed ? volumeTransformer.destroy(e) : volumeTransformer.emit("error", e))
       .pipe(volumeTransformer)
-      .on("close", () => !ffmpegPCM.destroyed && ffmpegPCM.destroy())
-      .on("error", er => opusEncoder.destroyed ? opusEncoder.destroy(er) : opusEncoder.emit("error", er))
-      .pipe(opusEncoder)
-      .on("close", () => !opusEncoder.destroyed && opusEncoder.destroy())
     ;
     return {
       stream: {
         type: "readable",
-        stream: opusEncoder,
-        streamType: "opusPackets" as any,
+        stream: volumeTransformer,
+        streamType: "pcm",
       },
       volume: volumeTransformer,
     };

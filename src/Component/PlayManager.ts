@@ -20,7 +20,7 @@ export class PlayManager extends ManagerBase {
   private readonly retryLimit = 3;
   private seek = 0;
   private errorReportChannel = null as TextChannel;
-  private _volume = 1;
+  private _volume = 100;
   private _volumeTransformer = null as VolumeTransformer;
   error = false;
   errorCount = 0;
@@ -90,7 +90,7 @@ export class PlayManager extends ManagerBase {
   setVolume(val:number){
     this._volume = val;
     if(this._volumeTransformer){
-      this._volumeTransformer.setVolume(val);
+      this._volumeTransformer.setVolume(val / 100);
       return true;
     }
     return false;
@@ -277,6 +277,7 @@ export class PlayManager extends ManagerBase {
   }
 
   private async onStreamFinished(){
+    this.Log("onStreamFinished called");
     await Util.general.waitForEnteringState(() => !this.info.Connection.playing).catch(() => {
       this.Log("Stream has not ended in time and will force stream into destroying", "warn");
       this.stop();
@@ -314,8 +315,7 @@ export class PlayManager extends ManagerBase {
   }
 
   private async onStreamFailed(){
-    if(this.info.Queue.loopEnabled) this.info.Queue.loopEnabled = false;
-    if(this.info.Queue.length === 1 && this.info.Queue.queueLoopEnabled) this.info.Queue.queueLoopEnabled = false;
+    this.Log("onStreamFailed called");
     if(this.errorUrl === this.CurrentAudioInfo.Url){
       this.errorCount++;
     }else{
@@ -327,6 +327,8 @@ export class PlayManager extends ManagerBase {
     this.error = this.preparing = false;
     this.stop();
     if(this.errorCount >= this.retryLimit){
+      if(this.info.Queue.loopEnabled) this.info.Queue.loopEnabled = false;
+      if(this.info.Queue.length === 1 && this.info.Queue.queueLoopEnabled) this.info.Queue.queueLoopEnabled = false;
       await this.info.Queue.next();
     }
     this.play();

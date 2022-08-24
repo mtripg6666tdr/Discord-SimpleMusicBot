@@ -2,6 +2,7 @@ import type { StreamInfo } from "../../AudioSource";
 
 import { FFmpeg } from "prism-media";
 
+import Util from "../../Util";
 import { DefaultUserAgent, FFmpegDefaultArgs } from "../../definition";
 
 export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string, seek:number, output:"ogg"|"pcm"){
@@ -19,10 +20,10 @@ export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string, s
   ];
   const ffmpeg = new FFmpeg({
     args: [
-      ...FFmpegDefaultArgs,
       ...ffmpegUserAgentArgs,
       ...ffmpegSeekArgs,
       "-i", readable.type === "readable" ? "-" : readable.url,
+      ...FFmpegDefaultArgs,
       "-vn",
       ...outputArgs,
       "-ar", "48000",
@@ -30,11 +31,11 @@ export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string, s
       ...effectArgs
     ]
   });
+  if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log("[FFmpeg]" + chunk.toString(), "debug"));
   if(readable.type === "readable"){
     readable.stream
       .on("error", e => ffmpeg.destroyed ? ffmpeg.destroy(e) : ffmpeg.emit("error", e))
       .pipe(ffmpeg)
-      .on("close", () => !ffmpeg.destroyed && ffmpeg.destroy())
     ;
   }
   return ffmpeg;

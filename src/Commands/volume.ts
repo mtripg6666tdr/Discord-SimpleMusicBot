@@ -32,7 +32,7 @@ export default class Volume extends BaseCommand {
       return;
     }
     const result = options.data[message.guild.id].Player.setVolume(newval);
-    await message.channel.createMessage(`:loud_sound:音量を**${newval}**に変更しました。${result ? "\r\n次の曲から適用されます。現在再生中の曲に設定を適用するには、`頭出し`コマンドなどを使用してください。" : ""}`)
+    await message.channel.createMessage(`:loud_sound:音量を**${newval}**に変更しました。\r\n${!result ? "次の曲から適用されます。現在再生中の曲に設定を適用するには、`頭出し`コマンドなどを使用してください。" : "反映されるまでに多少時間がかかることがあります。"}`)
       .catch(e => Util.logger.log(e, "error"));
   }
 }
