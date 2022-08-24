@@ -25,7 +25,7 @@ export default class Help extends BaseCommand {
       .setDescription(
         "高音質な音楽を再生して、Discordでのエクスペリエンスを最高にするため作られました:robot:\r\n"
       + "利用可能なコマンドを確認するには、`" + options.data[message.guild.id].PersistentPref.Prefix + "command`を使用してください。")
-      .addField("開発者", `[${(developer || {}).username || "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`)
+      .addField("開発者", `[${developer?.user.username || "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`)
       .addField("バージョン", "`" + options.bot.Version + "`")
       .addField("レポジトリ/ソースコード", "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot")
       .addField("サポートサーバー", "https://discord.gg/7DrAEXBMHe")
