@@ -17,7 +17,7 @@ http.createServer((req, res) => {
   const data = {
     status: 200,
     message: "Discord bot is active now",
-    client: bot.Client?.user ? Buffer.from(bot.Client?.user.id) : null,
+    client: bot.Client?.user ? Buffer.from(bot.Client?.user.id).toString("base64") : null,
     readyAt: bot.Client?.uptime ? Buffer.from(bot.Client.uptime.toString()).toString("base64") : null,
     guilds: bot.Client?.guilds.size || null,
   };
