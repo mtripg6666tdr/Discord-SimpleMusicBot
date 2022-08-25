@@ -20,15 +20,16 @@ export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string[],
     "-f", "s16le",
   ];
   const args = [
+    ...FFmpegDefaultArgs,
     ...ffmpegUserAgentArgs,
     ...ffmpegSeekArgs,
     "-i", readable.type === "readable" ? "-" : readable.url,
-    ...FFmpegDefaultArgs,
+    ...effectArgs,
     "-vn",
     ...outputArgs,
     "-ar", "48000",
     "-ac", "2",
-    ...effectArgs,
+    "-b:a", "128k",
   ];
   const ffmpeg = new FFmpeg({args});
   if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log("[FFmpeg]" + chunk.toString(), "debug"));

@@ -129,21 +129,34 @@ export class PlayManager extends ManagerBase {
       // QueueContentからストリーム情報を取得
       const rawStream = await this.CurrentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
-      const stream = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.info), this.seek, this.volume !== 100);
-      //this._volumeTransformer = volume;
+      const { stream, streamType } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.info), this.seek, this.volume !== 100);
+      // ストリームがまだ利用できない場合待機
+      let errorWhileWaiting = null as Error;
+      stream.once("error", e => errorWhileWaiting = e || new Error("An error occurred in stream"));
+      const getStreamReadable = () => !(stream.readableEnded || stream.destroyed || errorWhileWaiting) && stream.readableLength > 0;
+      if(!getStreamReadable()){
+        this.Log("Stream has not been readable yet. Waiting...");
+        await Util.general.waitForEnteringState(getStreamReadable, 10 * 1000, {
+          rejectOnTimeout: true,
+        });
+      }
+      if(errorWhileWaiting){
+        throw errorWhileWaiting;
+      }
+      // 各種準備
       this.errorReportChannel = mes.channel as TextChannel;
       const connection = this.info.Connection;
       this.error = false;
       t.end();
       // 再生
       const u = Util.time.timer.start("PlayManager#Play->EnterPlayingState");
-      connection.play(stream.stream, {
-        format: stream.streamType,
+      connection.play(stream, {
+        format: streamType,
         inlineVolume: this.volume !== 100,
       });
       // setup volume
       this.setVolume(this.volume);
-      stream.stream.on("end", this.onStreamFinished.bind(this));
+      stream.on("end", this.onStreamFinished.bind(this));
       // wait for entering playing state
       await Util.general.waitForEnteringState(() => this.info.Connection.playing);
       this.preparing = false;
