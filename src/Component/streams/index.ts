@@ -55,9 +55,9 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     const ffmpegPCM = transformThroughFFmpeg(streamInfo, effectArgs, seek, "pcm");
     const passThrough = InitPassThrough();
     ffmpegPCM
-      .on("error", e => !passThrough.destroyed ? passThrough.destroy(e) : passThrough.emit("error", e))
+      .on("error", e => destroyStream(passThrough, e))
       .pipe(passThrough)
-      .on("close", () => !ffmpegPCM.destroyed && ffmpegPCM.destroy())
+      .on("close", () => destroyStream(ffmpegPCM))
     ;
     return {
       type: "readable",
