@@ -13,7 +13,7 @@ export const EffectsCustomIds = {
 
 export function getFFmpegEffectArgs(data:GuildDataContainer){
   const effect = [];
-  if(data.EffectPrefs.BassBoost) effect.push("firequalizer=gain_entry='entry(80,6)'");
+  if(data.EffectPrefs.BassBoost) effect.push("firequalizer=gain_entry='entry(75,2)'");
   if(data.EffectPrefs.Reverb) effect.push("aecho=1.0:0.7:20:0.5");
   if(data.EffectPrefs.LoudnessEqualization) effect.push("loudnorm");
   

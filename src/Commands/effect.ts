@@ -11,7 +11,7 @@ export default class Effect extends BaseCommand {
       name: "エフェクト",
       alias: ["effect", "音声エフェクト", "音声効果", "効果"],
       description: "エフェクトコントロールパネルを表示します",
-      unlist: true,
+      unlist: false,
       category: "player",
     });
   }

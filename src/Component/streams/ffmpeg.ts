@@ -6,7 +6,7 @@ import { destroyStream } from ".";
 import Util from "../../Util";
 import { DefaultUserAgent, FFmpegDefaultArgs } from "../../definition";
 
-export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string, seek:number, output:"ogg"|"pcm"){
+export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string[], seek:number, output:"ogg"|"pcm"){
   const ffmpegUserAgentArgs = readable.type === "url" ? [
     "-user_agent", readable.userAgent || DefaultUserAgent
   ] : [];
@@ -19,19 +19,18 @@ export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string, s
   ] : [
     "-f", "s16le",
   ];
-  const ffmpeg = new FFmpeg({
-    args: [
-      ...ffmpegUserAgentArgs,
-      ...ffmpegSeekArgs,
-      "-i", readable.type === "readable" ? "-" : readable.url,
-      ...FFmpegDefaultArgs,
-      "-vn",
-      ...outputArgs,
-      "-ar", "48000",
-      "-ac", "2",
-      ...effectArgs
-    ]
-  });
+  const args = [
+    ...ffmpegUserAgentArgs,
+    ...ffmpegSeekArgs,
+    "-i", readable.type === "readable" ? "-" : readable.url,
+    ...FFmpegDefaultArgs,
+    "-vn",
+    ...outputArgs,
+    "-ar", "48000",
+    "-ac", "2",
+    ...effectArgs,
+  ];
+  const ffmpeg = new FFmpeg({args});
   if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log("[FFmpeg]" + chunk.toString(), "debug"));
   if(readable.type === "readable"){
     readable.stream

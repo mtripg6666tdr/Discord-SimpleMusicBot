@@ -27,8 +27,8 @@ Refer at: https://github.com/discordjs/discord.js/blob/13baf75cae395353f0528804f
  * @returns if volume transform is required, this will return a stream info that represents Ogg/Webm Opus, otherwise return a stream info represents PCM Opus.
  */
 export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[], seek:number, volumeTransform:boolean):ReadableStreamInfo{
-  const effectArgs = effects.join(" ");
-  if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && seek <= 0 && !effectArgs && !volumeTransform){
+  const effectEnabled = effects.length !== 0;
+  if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && seek <= 0 && !effectEnabled && !volumeTransform){
     // 1. effect is off, volume is off, stream is webm or ogg
     // Webm/Ogg --(Demuxer)--> Opus
     //                1
@@ -43,10 +43,10 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Ogg/Opus (cost: 3)`);
     return {
       type: "readable",
-      stream: transformThroughFFmpeg(streamInfo, effectArgs, seek, "ogg"),
+      stream: transformThroughFFmpeg(streamInfo, effects, seek, "ogg"),
       streamType: "ogg",
     };
-  }else if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && !effectArgs){
+  }else if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && !effectEnabled){
     // 3. volume is on and stream is webm or ogg
     // Webm/Ogg --(Demuxer)--> Opus --(Decoder)--> PCM --(VolumeTransformer)--> PCM --(Encoder)--> Opus
     //                1                  1.5                    0.5                      1.5
@@ -83,7 +83,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     //              2                     0.5                      1.5
     // Total: 5
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM (cost: 5)`);
-    const ffmpegPCM = transformThroughFFmpeg(streamInfo, effectArgs, seek, "pcm");
+    const ffmpegPCM = transformThroughFFmpeg(streamInfo, effects, seek, "pcm");
     const passThrough = InitPassThrough();
     ffmpegPCM
       .on("error", e => destroyStream(passThrough, e))
