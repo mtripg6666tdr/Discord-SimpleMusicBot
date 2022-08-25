@@ -73,7 +73,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
         parser: "m3u8",
         requestOptions: {
           headers: {
-            "User-Agent": format[0].http_headers["User-Agent"]
+            "User-Agent": format[0].http_headers["User-Agent"],
           }
         }
       });

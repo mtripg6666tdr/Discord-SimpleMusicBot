@@ -143,7 +143,7 @@ export class PlayManager extends ManagerBase {
       const getStreamReadable = () => !(stream.readableEnded || stream.destroyed || errorWhileWaiting) && stream.readableLength > 0;
       if(!getStreamReadable()){
         this.Log("Stream has not been readable yet. Waiting...", "debug");
-        await Util.general.waitForEnteringState(getStreamReadable, 10 * 1000, {
+        await Util.general.waitForEnteringState(getStreamReadable, 20 * 1000, {
           rejectOnTimeout: true,
         });
       }
