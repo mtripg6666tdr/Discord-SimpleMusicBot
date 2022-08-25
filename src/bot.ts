@@ -565,13 +565,23 @@ export class MusicBot extends LogEmitter {
     const t = Util.time.timer.start("MusicBot#Join");
     if(message.member.voiceState.channelID){
       const targetVC = this.client.getChannel(message.member.voiceState.channelID) as discord.VoiceChannel;
-      // すでにVC入ってるよ～
+      // すでにそのにVC入ってるよ～
       if(targetVC.voiceMembers.has(this.client.user.id)){
-        const connection = this.data[message.guild.id].Connection;
-        if(connection){
+        if(this.data[message.guild.id].Connection){
           t.end();
           return true;
         }
+      // すでになにかしらのVCに参加している場合
+      }else if(this.data[message.guild.id].Connection && !message.member.permissions.has("voiceMoveMembers")){
+        const failedMsg = ":warning:既にほかのボイスチャンネルに接続中です。この操作を実行する権限がありません。";
+        if(reply || replyOnFail){
+          await message.reply(failedMsg)
+            .catch(er => this.Log(er, "error"));
+        }else{
+          await message.channel.createMessage(failedMsg)
+            .catch(er => this.Log(er, "error"));
+        }
+        return false;
       }
 
       // 入ってないね～参加しよう
