@@ -2,9 +2,9 @@ import type { StreamInfo } from "../../AudioSource";
 
 import { FFmpeg } from "prism-media";
 
+import { destroyStream } from ".";
 import Util from "../../Util";
 import { DefaultUserAgent, FFmpegDefaultArgs } from "../../definition";
-import { destroyStream } from ".";
 
 export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string, seek:number, output:"ogg"|"pcm"){
   const ffmpegUserAgentArgs = readable.type === "url" ? [
