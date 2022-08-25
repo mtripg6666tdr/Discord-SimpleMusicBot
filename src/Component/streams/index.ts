@@ -7,15 +7,40 @@ import Util from "../../Util";
 import { InitPassThrough } from "../../Util/general";
 import { transformThroughFFmpeg } from "./ffmpeg";
 
+/*
+Convertion cost:
+  FFmpeg:2
+  OggDemuxer: 1
+  WebmDemuxer: 1
+  opusDecoder: 1.5
+  opusEncoder: 1.5
+  VolumeTransfomer: 0.5
+Refer at: https://github.com/discordjs/discord.js/blob/13baf75cae395353f0528804ff0d71468f21daa9/packages/voice/src/audio/TransformerGraph.ts
+*/
+
+/**
+ * Resolve various streams into playable stream
+ * @param streamInfo raw stream info object
+ * @param effects effect params to pass to ffmpeg
+ * @param seek position to seek to if any. if not set 0.
+ * @param volumeTransform whether volume transform is required
+ * @returns if volume transform is required, this will return a stream info that represents Ogg/Webm Opus, otherwise return a stream info represents PCM Opus.
+ */
 export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[], seek:number, volumeTransform:boolean):ReadableStreamInfo{
   const effectArgs = effects.join(" ");
   if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && seek <= 0 && !effectArgs && !volumeTransform){
     // 1. effect is off, volume is off, stream is webm or ogg
-    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType}) (no convertion)`);
+    // Webm/Ogg --(Demuxer)--> Opus
+    //                1
+    // Total: 1
+    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType}) (no convertion/cost: 1)`);
     return streamInfo.type === "url" ? convertUrlStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
   }else if(!volumeTransform){
     // 2. volume is off and stream is any
-    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Ogg/Opus`);
+    // Unknown --(FFmpeg)--> Ogg/Opus --(Demuxer)--> Opus
+    //               2                      1
+    // Total: 3
+    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Ogg/Opus (cost: 3)`);
     return {
       type: "readable",
       stream: transformThroughFFmpeg(streamInfo, effectArgs, seek, "ogg"),
@@ -23,7 +48,10 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     };
   }else if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && !effectArgs){
     // 3. volume is on and stream is webm or ogg
-    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(Demuxer)--(Decoder) --> PCM`);
+    // Webm/Ogg --(Demuxer)--> Opus --(Decoder)--> PCM --(VolumeTransformer)--> PCM --(Encoder)--> Opus
+    //                1                  1.5                    0.5                      1.5
+    // Total: 4.5
+    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(Demuxer)--(Decoder) --> PCM (cost: 4.5)`);
     const rawStream = streamInfo.type === "url" ? convertUrlStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
     const opts = {} as TransformOptions;
     const demuxer = streamInfo.streamType === "webm" ? new opus.WebmDemuxer(opts) : new opus.OggDemuxer(opts);
@@ -51,7 +79,10 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     };
   }else{
     // 4. volume is on and stream is unknown
-    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM`);
+    // Unknown --(FFmpeg)--> PCM --(VolumeTransformer)--> PCM --(Encoder)--> Opus
+    //              2                     0.5                      1.5
+    // Total: 5
+    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM (cost: 5)`);
     const ffmpegPCM = transformThroughFFmpeg(streamInfo, effectArgs, seek, "pcm");
     const passThrough = InitPassThrough();
     ffmpegPCM
