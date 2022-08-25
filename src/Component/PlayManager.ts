@@ -1,7 +1,6 @@
 import type { AudioSource, YouTube } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { Client, Message, TextChannel } from "eris";
-import type { VolumeTransformer } from "prism-media";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
@@ -21,7 +20,6 @@ export class PlayManager extends ManagerBase {
   private seek = 0;
   private errorReportChannel = null as TextChannel;
   private _volume = 100;
-  private _volumeTransformer = null as VolumeTransformer;
   error = false;
   errorCount = 0;
   errorUrl = "";
@@ -89,8 +87,8 @@ export class PlayManager extends ManagerBase {
 
   setVolume(val:number){
     this._volume = val;
-    if(this._volumeTransformer){
-      this._volumeTransformer.setVolume(val / 100);
+    if((this.info.Connection?.piper as any)?.["volume"]){
+      this.info.Connection.setVolume(val / 100);
       return true;
     }
     return false;
@@ -131,8 +129,8 @@ export class PlayManager extends ManagerBase {
       // QueueContentからストリーム情報を取得
       const rawStream = await this.CurrentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
-      const { stream, volume } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.info), this.seek, this.volume !== 100, this.volume / 100);
-      this._volumeTransformer = volume;
+      const stream = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.info), this.seek, this.volume !== 100);
+      //this._volumeTransformer = volume;
       this.errorReportChannel = mes.channel as TextChannel;
       const connection = this.info.Connection;
       this.error = false;
@@ -140,8 +138,11 @@ export class PlayManager extends ManagerBase {
       // 再生
       const u = Util.time.timer.start("PlayManager#Play->EnterPlayingState");
       connection.play(stream.stream, {
-        format: stream.streamType
+        format: stream.streamType,
+        inlineVolume: this.volume !== 100,
       });
+      // setup volume
+      this.setVolume(this.volume);
       stream.stream.on("end", this.onStreamFinished.bind(this));
       // wait for entering playing state
       await Util.general.waitForEnteringState(() => this.info.Connection.playing);

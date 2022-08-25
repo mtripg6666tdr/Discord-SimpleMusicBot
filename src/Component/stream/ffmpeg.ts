@@ -36,6 +36,7 @@ export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string, s
     readable.stream
       .on("error", e => ffmpeg.destroyed ? ffmpeg.destroy(e) : ffmpeg.emit("error", e))
       .pipe(ffmpeg)
+      .on("close", () => !readable.stream.destroyed && readable.stream.destroy())
     ;
   }
   return ffmpeg;
