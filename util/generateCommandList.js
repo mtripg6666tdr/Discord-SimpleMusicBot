@@ -5,12 +5,12 @@ const { CommandsManager } = require("../dist/Commands");
 const { categories, categoriesList } = require("../dist/Commands/commands");
 
 /**
- * @type { import("../src/Commands").CommandInterface[] }
+ * @type { import("../src/Commands").BaseCommand[] }
  */
 const commands = new CommandsManager().commands.filter(
   /**
    * 
-   * @param { import("../src/Commands").CommandInterface } c 
+   * @param { import("../src/Commands").BaseCommand } c 
    * @returns { boolean }
    */
   c => !c.unlist
@@ -34,7 +34,7 @@ categoriesList.forEach(category => {
   addLine(`- [${categories[category]}](#${categories[category]})`);
 })
 /**
- * @type { {[key in keyof typeof categories]:import("../src/Commands").CommandInterface[] } }
+ * @type { {[key in keyof typeof categories]:import("../src/Commands").BaseCommand[] } }
  */
 // @ts-ignore
 const categorized = {};
@@ -49,21 +49,20 @@ categoriesList.forEach(category => {
   addLine(`## ${categories[category]}`);
   categorized[category].forEach(
     /**
-     * @type { (command:import("../src/Commands").CommandInterface)=>void }
+     * @type { (command:import("../src/Commands").BaseCommand)=>void }
      */
     command => {
       addLine(`### \`${command.name}\`コマンド`);
       addLine(command.description + "  ");
-      addLine(`#### エイリアス`);
-      addLine("`" + command.alias.join("`, `") + "`");
+      addLine(`- エイリアス`);
+      addLine("  - `" + command.alias.join("`\r\n  - `") + "`");
       if(command.usage){
-        addLine("#### 使い方");
-        addLine(command.usage);
+        addLine("- 使い方: `" + command.usage + "`");
       }
       if(command.examples){
-        addLine("#### 使用例");
-        addLine(command.examples);
+        addLine("- 使用例: `" + command.examples + "`");
       }
+      addLine("---");
     }
   )
   addLine("");
