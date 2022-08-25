@@ -10,7 +10,7 @@ export default class Seek extends BaseCommand {
       name: "シーク",
       alias: ["seek"],
       description: "楽曲をシークします。",
-      unlist: true,
+      unlist: false,
       category: "player",
       examples: "シーク 0:30",
       usage: "検索 <時間(秒数または時間:分:秒の形式で)>",
