@@ -70,8 +70,8 @@ export function InitPassThrough(opts:TransformOptions = {}):PassThrough{
 }
 
 export function waitForEnteringState(predicate:()=>boolean, timeout:number = 10 * 1000, options?:{
-  rejectOnTimeout:boolean,
-  timeStep:number,
+  rejectOnTimeout?:boolean,
+  timeStep?:number,
 }){
   const { rejectOnTimeout, timeStep } = Object.assign({
     rejectOnTimeout: true,

@@ -41,9 +41,16 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     //               2                      1
     // Total: 3
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Ogg/Opus (cost: 3)`);
+    const ffmpeg = transformThroughFFmpeg(streamInfo, effects, seek, "ogg");
+    const passThrough = InitPassThrough();
+    ffmpeg
+      .on("error", e => destroyStream(passThrough, e))
+      .pipe(passThrough)
+      .on("close", () => destroyStream(ffmpeg))
+    ;
     return {
       type: "readable",
-      stream: transformThroughFFmpeg(streamInfo, effects, seek, "ogg"),
+      stream: passThrough,
       streamType: "ogg",
     };
   }else if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && !effectEnabled){
