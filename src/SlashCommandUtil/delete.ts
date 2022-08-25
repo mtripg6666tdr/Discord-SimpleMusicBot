@@ -1,10 +1,10 @@
 import "../dotenv";
 import type { RouteLike } from "@discordjs/rest";
-import type { APIApplicationCommand } from "discord-api-types";
+import type { APIApplicationCommand } from "discord-api-types/v10";
 
 import { REST } from "@discordjs/rest";
 
-const rest = new REST({version: "9"}).setToken(process.env.TOKEN);
+const rest = new REST({version: "10"}).setToken(process.env.TOKEN);
 
 module.exports = function(route:RouteLike){
   (async ()=>{
