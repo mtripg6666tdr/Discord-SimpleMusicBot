@@ -6,7 +6,7 @@ import * as https from "https";
 
 import * as miniget from "miniget";
 
-import { InitPassThrough } from "./general";
+import Util from ".";
 import { DefaultUserAgent } from "./ua";
 
 /**
@@ -81,17 +81,15 @@ export function RetriveHttpStatusCode(url:string, headers?:{[key:string]:string}
  * @param url URL
  * @returns Readableストリーム
  */
-export function DownloadAsReadable(url:string):Readable{
-  const stream = InitPassThrough();
-  const req = miniget.default(url, {
-    maxReconnects: 6,
+export function DownloadAsReadable(url:string, options:miniget.Options = {}):Readable{
+  return miniget.default(url, {
+    maxReconnects: 10,
     maxRetries: 3,
     backoff: { inc: 500, max: 10000 },
-  });
-  req.on("error", (e)=>{
-    stream.emit("error", e);
-  }).pipe(stream);
-  return stream;
+    ...options,
+  })
+    .on("reconnect", () => Util.logger.log("Miniget is now trying to re-send a request due to failing"))
+  ;
 }
 
 /**

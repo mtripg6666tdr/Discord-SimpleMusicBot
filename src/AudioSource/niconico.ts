@@ -1,5 +1,6 @@
 import type { exportableCustom, ReadableStreamInfo } from ".";
 import type { EmbedField } from "eris";
+import type { Readable } from "stream";
 
 import { convert as htmlToText } from "html-to-text";
 import NiconicoDL, { isValidURL } from "niconico-dl.js";
@@ -40,9 +41,12 @@ export class NicoNicoS extends AudioSource {
 
   async fetch():Promise<ReadableStreamInfo>{
     const stream = Util.general.InitPassThrough();
-    (await this.nico.download())
-      .on("error", e => stream.emit("error", e))
-      .pipe(stream);
+    const source = await this.nico.download() as Readable;
+    source
+      .on("error", e => !stream.destroyed ? stream.destroy(e) : stream.emit("error", e))
+      .pipe(stream)
+      .on("close", () => !source.destroyed && source.destroy?.())
+    ;
     return {
       type: "readable", stream
     };

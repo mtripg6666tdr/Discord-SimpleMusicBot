@@ -1,17 +1,15 @@
-import type { AudioSource, ReadableStreamInfo, StreamInfo, YouTube } from "../AudioSource";
+import type { AudioSource, YouTube } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { Client, Message, TextChannel } from "eris";
-import type { Readable } from "stream";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
-
-import { FFmpeg } from "prism-media";
 
 import { ManagerBase } from "../Structure";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
 import { getFFmpegEffectArgs } from "../Util/effect";
-import { DefaultUserAgent, FallBackNotice, FFmpegDefaultArgs } from "../definition";
+import { FallBackNotice } from "../definition";
+import { resolveStreamToPlayable } from "./streams";
 
 /**
  * サーバーごとの再生を管理するマネージャー。
@@ -21,6 +19,7 @@ export class PlayManager extends ManagerBase {
   private readonly retryLimit = 3;
   private seek = 0;
   private errorReportChannel = null as TextChannel;
+  private _volume = 100;
   error = false;
   errorCount = 0;
   errorUrl = "";
@@ -63,7 +62,14 @@ export class PlayManager extends ManagerBase {
   /**
    * クライアント
    */
-  get client(){return this._client;}
+  get client(){
+    return this._client;
+  }
+
+  get volume(){
+    return this._volume;
+  }
+
   // コンストラクタ
   constructor(private readonly _client:Client){
     super();
@@ -77,6 +83,15 @@ export class PlayManager extends ManagerBase {
   setBinding(data:GuildDataContainer){
     this.Log("Set data of guild id " + data.GuildID);
     super.setBinding(data);
+  }
+
+  setVolume(val:number){
+    this._volume = val;
+    if((this.info.Connection?.piper as any)?.["volume"]){
+      this.info.Connection.setVolume(val / 100);
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -114,7 +129,8 @@ export class PlayManager extends ManagerBase {
       // QueueContentからストリーム情報を取得
       const rawStream = await this.CurrentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
-      const stream = this.resolveStream(rawStream, time);
+      const stream = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.info), this.seek, this.volume !== 100);
+      //this._volumeTransformer = volume;
       this.errorReportChannel = mes.channel as TextChannel;
       const connection = this.info.Connection;
       this.error = false;
@@ -122,10 +138,12 @@ export class PlayManager extends ManagerBase {
       // 再生
       const u = Util.time.timer.start("PlayManager#Play->EnterPlayingState");
       connection.play(stream.stream, {
-        format: stream.streamType
+        format: stream.streamType,
+        inlineVolume: this.volume !== 100,
       });
+      // setup volume
+      this.setVolume(this.volume);
       stream.stream.on("end", this.onStreamFinished.bind(this));
-      this.Log(`Stream edges: ${["Raw", ...this.getCurrentStreams().map(e => e.constructor.name)].join(" -> ")} ->`);
       // wait for entering playing state
       await Util.general.waitForEnteringState(() => this.info.Connection.playing);
       this.preparing = false;
@@ -259,97 +277,9 @@ export class PlayManager extends ManagerBase {
     this.onStreamFailed();
   }
 
-  private resolveStream(rawStream:StreamInfo, time:number):ReadableStreamInfo{
-    let stream = {
-      type: "readable",
-      stream: null,
-      streamType: null,
-    } as ReadableStreamInfo;
-    const effects = getFFmpegEffectArgs(this.info);
-    this.Log(`Effect: ${effects.join(" ") || "none"}`);
-    if(rawStream.type === "url"){
-      // URLならFFmpegにわたしてOggOpusに変換
-      stream.stream = this.createReadableFromUrl(rawStream.url, time > 0 ? [
-        // additional args before input
-        "-ss", time.toString(),
-        "-user_agent", rawStream.userAgent ?? DefaultUserAgent,
-      ] : [
-        "-user_agent", rawStream.userAgent ?? DefaultUserAgent,
-      ],
-      [
-        // additional args after input
-        ...effects
-      ]);
-      stream.streamType = "ogg";
-      this.Log("Stream pre-transformation: URL --(ffmpeg)--> Raw");
-    }else if(time > 0 || effects.length >= 1){
-      // シークが必要ならFFmpegを通す
-      stream.stream = this.createFFmpegReadableFromReadable(rawStream.stream, [
-        ...effects,
-        "-ss", time.toString()
-      ]);
-      stream.streamType = "ogg";
-      this.Log("Stream pre-transformation: Readable --(ffmpeg)--> Raw (seek and/or effect)");
-    }else{
-      // ストリームなら変換しない
-      stream = rawStream;
-      this.Log("Stream pre-transformation: Readable --> Raw");
-    }
-    return stream;
-  }
-
-  private createFFmpegReadableFromReadable(original:Readable, additionalArgs:string[]){
-    const args = [
-      ...FFmpegDefaultArgs,
-      "-acodec", "libopus",
-      "-f", "opus",
-      "-ar", "48000",
-      "-ac", "2",
-      ...additionalArgs
-    ];
-    const passThrough = Util.general.InitPassThrough();
-    const ffmpeg = new FFmpeg({args});
-    const stream = original
-      .on("error", (e) => ffmpeg.destroy(e))
-      .pipe(ffmpeg)
-      .on("error", (e) => passThrough.destroy(e))
-      .on("close", () => original.destroy())
-      .pipe(passThrough)
-      .on("close", () => !ffmpeg.destroyed && ffmpeg.destroy())
-    ;
-    if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => this.Log("[FFmpeg]" + chunk.toString(), "debug"));
-    return stream;
-  }
-
-  private createReadableFromUrl(url:string, beforeAdditionalArgs:string[] = [], afterAdditionalArgs:string[] = []):Readable{
-    const args = [
-      ...FFmpegDefaultArgs,
-      ...beforeAdditionalArgs,
-      "-i", url,
-      ...afterAdditionalArgs,
-      "-acodec", "libopus",
-      "-f", "opus",
-      "-ar", "48000",
-      "-ac", "2",
-    ];
-    const passThrough = Util.general.InitPassThrough();
-    const ffmpeg = new FFmpeg({args});
-    ffmpeg
-      .on("error", (e) => passThrough.destroy(e))
-      .pipe(passThrough)
-      .on("close", () => !ffmpeg.destroyed && ffmpeg.destroy())
-    ;
-    if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => this.Log("[FFmpeg]" + chunk.toString(), "debug"));
-    return passThrough;
-  }
-
-  private getCurrentStreams():Readable[]{
-    // @ts-ignore
-    return this.info.Connection.piper["streams"];
-  }
-
   private async onStreamFinished(){
-    await Util.general.waitForEnteringState(() => !this.info.Connection.playing).catch(() => {
+    this.Log("onStreamFinished called");
+    await Util.general.waitForEnteringState(() => !this.info.Connection.playing, 20 * 1000).catch(() => {
       this.Log("Stream has not ended in time and will force stream into destroying", "warn");
       this.stop();
     });
@@ -386,8 +316,7 @@ export class PlayManager extends ManagerBase {
   }
 
   private async onStreamFailed(){
-    if(this.info.Queue.loopEnabled) this.info.Queue.loopEnabled = false;
-    if(this.info.Queue.length === 1 && this.info.Queue.queueLoopEnabled) this.info.Queue.queueLoopEnabled = false;
+    this.Log("onStreamFailed called");
     if(this.errorUrl === this.CurrentAudioInfo.Url){
       this.errorCount++;
     }else{
@@ -399,6 +328,8 @@ export class PlayManager extends ManagerBase {
     this.error = this.preparing = false;
     this.stop();
     if(this.errorCount >= this.retryLimit){
+      if(this.info.Queue.loopEnabled) this.info.Queue.loopEnabled = false;
+      if(this.info.Queue.length === 1 && this.info.Queue.queueLoopEnabled) this.info.Queue.queueLoopEnabled = false;
       await this.info.Queue.next();
     }
     this.play();

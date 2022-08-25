@@ -62,6 +62,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
           stream: {
             type: "url",
             url: format[0].url,
+            userAgent: format[0].http_headers["User-Agent"]
           } as UrlStreamInfo
         };
       }
@@ -70,11 +71,16 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
       const req = m3u8stream(format[0].url, {
         begin: Date.now(),
         parser: "m3u8",
+        requestOptions: {
+          headers: {
+            "User-Agent": format[0].http_headers["User-Agent"]
+          }
+        }
       });
       req
-        .on("error", e => stream.emit("error", e))
+        .on("error", e => !stream.destroyed ? stream.destroy(e) : stream.emit("error", e))
         .pipe(stream)
-        .on("error", e => stream.emit("error", e))
+        .on("close", () => !req.destroyed && req.destroy())
       ;
       return {
         ...partialResult,
@@ -91,7 +97,9 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
         ...partialResult,
         stream: {
           type: "url",
-          url: format[0].url
+          url: format[0].url,
+          streamType: format[0].ext === "webm" && format[0].acodec === "opus" ? "webm" : undefined,
+          userAgent: format[0].http_headers["User-Agent"],
         } as UrlStreamInfo
       };
     }

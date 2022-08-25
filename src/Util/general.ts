@@ -1,3 +1,5 @@
+import type { TransformOptions } from "stream";
+
 import { PassThrough } from "stream";
 
 import { log } from "./log";
@@ -51,12 +53,12 @@ export function StringifyObject(obj:any):string{
  * 空のPassThroughを生成します
  * @returns PassThrough
  */
-export function InitPassThrough():PassThrough{
+export function InitPassThrough(opts:TransformOptions = {}):PassThrough{
   const id = Date.now();
   log(`[PassThrough] initialized (id: ${id})`, "debug");
-  const stream = new PassThrough({
+  const stream = new PassThrough(Object.assign(opts, {
     highWaterMark: 1024 * 512
-  });
+  }));
   stream._destroy = () => {
     // for debug purpose
     console.trace(`[PassThrough] destroyed (id: ${id})`);
