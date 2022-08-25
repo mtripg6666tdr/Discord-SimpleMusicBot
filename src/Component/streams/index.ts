@@ -11,7 +11,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
   const effectArgs = effects.join(" ");
   if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && seek <= 0 && !effectArgs && !volumeTransform){
     // 1. effect is off, volume is off, stream is webm or ogg
-    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType}) --> Ogg/Opus`);
+    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType}) (no convertion)`);
     return streamInfo.type === "url" ? convertUrlStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
   }else if(!volumeTransform){
     // 2. volume is off and stream is any
