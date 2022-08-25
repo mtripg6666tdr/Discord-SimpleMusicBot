@@ -15,5 +15,8 @@ export default class BulkDelete extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
+    options.client.getMessages(message.channel.id, {
+      limit: 50
+    });
   }
 }
