@@ -98,14 +98,21 @@ export class PlayManager extends ManagerBase {
    *  再生します
    */
   async play(time:number = 0):Promise<PlayManager>{
-    /* eslint-disable no-irregular-whitespace */
+    /* eslint-disable operator-linebreak */
+    /* eslint-disable @typescript-eslint/indent */
     // 再生できる状態か確認
-    const badCondition
-    /* なにかしら再生中でない  　　　 */ = this.isPlaying
-    /* キューが空　　　　　　　　　　 */ || this.info.Queue.hasNothing
-    /* 準備中　　　　　　　　　　　　 */ || this.preparing
+    const badCondition =
+      // 接続していない
+        !this.isConnecting
+      // なにかしら再生中
+      || this.isPlaying
+      // キューが空
+      || this.info.Queue.hasNothing
+      // 準備中
+      || this.preparing
     ;
-    /* eslint-enable no-irregular-whitespace */
+    /* eslint-enable operator-linebreak */
+    /* eslint-enable @typescript-eslint/indent */
     if(badCondition){
       this.Log("Play called but operated nothing", "warn");
       return this;
@@ -135,7 +142,7 @@ export class PlayManager extends ManagerBase {
       stream.once("error", e => errorWhileWaiting = e || new Error("An error occurred in stream"));
       const getStreamReadable = () => !(stream.readableEnded || stream.destroyed || errorWhileWaiting) && stream.readableLength > 0;
       if(!getStreamReadable()){
-        this.Log("Stream has not been readable yet. Waiting...");
+        this.Log("Stream has not been readable yet. Waiting...", "debug");
         await Util.general.waitForEnteringState(getStreamReadable, 10 * 1000, {
           rejectOnTimeout: true,
         });
@@ -236,6 +243,7 @@ export class PlayManager extends ManagerBase {
       const connection = this.info.Connection;
       this.Log("Disconnected from " + connection.channelID);
       connection.disconnect();
+      this.info.Connection = null;
     }else{
       this.Log("Disconnect called but no connection", "warn");
     }
