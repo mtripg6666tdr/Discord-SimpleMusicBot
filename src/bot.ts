@@ -90,7 +90,8 @@ export class MusicBot extends LogEmitter {
       .on("ready", this.onReady.bind(this))
       .on("messageCreate", this.onMessageCreate.bind(this))
       .on("interactionCreate", this.onInteractionCreate.bind(this))
-      .on("voiceStateUpdate", this.onVoiceStateUpdate.bind(this))
+      .on("voiceChannelJoin", this.onVoiceChannelJoin.bind(this))
+      .on("voiceChannelLeave", this.onVoiceChannelLeave.bind(this))
     ;
   }
 
@@ -394,36 +395,34 @@ export class MusicBot extends LogEmitter {
     }
   }
 
-  private async onVoiceStateUpdate(oldState:discord.VoiceState, newState:discord.VoiceState){
-    if(newState.id !== this.client.user.id) return;
-    if(oldState.channelID !== newState.channelID){
-      const guild = this.data[(this.client.getChannel(newState.channelID) as discord.TextChannel).guild.id];
-      if(!guild) return;
-      if(!newState.channelID){
-        // サーバー側の切断
-        if(!guild.Player.isConnecting) return;
-        guild.Player.disconnect();
-        const bound = this.client.getChannel(guild.boundTextChannel);
-        if(!bound) return;
-        await this.client.createMessage(bound.id, ":postbox: 正常に切断しました").catch(e => this.Log(e));
-      }else if(!oldState.channelID && (newState.suppress || newState.mute)){
-        // VC参加
-        const voiceChannel = this.client.getChannel(newState.channelID) as discord.VoiceChannel;
-        voiceChannel.guild.editVoiceState({
-          channelID: newState.channelID,
-          suppress: false,
-        }).catch(() => {
-          voiceChannel.guild.members.get(this.client.user.id)
-            .edit({
-              mute: false
-            })
-            .catch(async () => {
-              this.client.createMessage(guild.boundTextChannel, ":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。")
-                .catch(e => this.Log(e));
-            });
+  private async onVoiceChannelJoin(member:discord.Member, newChannel:discord.TextVoiceChannel){
+    if(member.id !== this.client.user.id) return;
+    // VC参加
+    const voiceChannel = this.client.getChannel(newChannel.id) as discord.VoiceChannel;
+    voiceChannel.guild.editVoiceState({
+      channelID: newChannel.id,
+      suppress: false,
+    }).catch(() => {
+      voiceChannel.guild.members.get(this.client.user.id)
+        .edit({
+          mute: false
+        })
+        .catch(async () => {
+          this.client.createMessage(this.data[newChannel.guild.id].boundTextChannel, ":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。")
+            .catch(e => this.Log(e));
         });
-      }
-    }
+    });
+  }
+
+  private async onVoiceChannelLeave(member:discord.Member, oldChannel:discord.TextVoiceChannel){
+    if(member.id !== this.client.user.id) return;
+    // サーバー側の切断
+    const guild = this.data[oldChannel.guild.id];
+    if(!guild.Connection) return;
+    guild.Player.disconnect();
+    const bound = this.client.getChannel(guild.boundTextChannel);
+    if(!bound) return;
+    await this.client.createMessage(bound.id, ":postbox: 正常に切断しました").catch(e => this.Log(e));
   }
 
   /**
