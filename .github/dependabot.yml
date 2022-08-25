@@ -1,5 +1,6 @@
 version: 2
 updates:
+  # master branch
   - package-ecosystem: npm
     directory: "/"
     schedule:
@@ -16,10 +17,10 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
-      - dependency-name: "discord.js"
       - dependency-name: "discord-api-types"
       - dependency-name: "@discordjs/builders"
 
+  # v2 branch
   - package-ecosystem: npm
     directory: "/"
     schedule:
@@ -30,6 +31,7 @@ updates:
       prefix: "Update:"
     target-branch: "v2"
     labels:
+      - "dependencies"
       - "target:v2"
     allow:
       - dependency-type: "direct"
