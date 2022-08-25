@@ -59,14 +59,17 @@ export class MusicBot extends LogEmitter {
 
   constructor(token:string, private readonly maintenance:boolean = false){
     super();
-    this.client = new discord.Client(token, {intents: [
-      // サーバーを認識する
-      "guilds",
-      // サーバーのメッセージを認識する
-      "guildMessages",
-      // サーバーのボイスチャンネルのステータスを確認する
-      "guildVoiceStates",
-    ]});
+    this.client = new discord.Client(token, {
+      intents: [
+        // サーバーを認識する
+        "guilds",
+        // サーバーのメッセージを認識する
+        "guildMessages",
+        // サーバーのボイスチャンネルのステータスを確認する
+        "guildVoiceStates"
+      ],
+      restMode: true,
+    });
     this.SetTag("Main");
     this.instantiatedTime = new Date();
     const client = this.client;
