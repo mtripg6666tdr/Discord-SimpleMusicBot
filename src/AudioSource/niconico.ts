@@ -40,9 +40,11 @@ export class NicoNicoS extends AudioSource {
 
   async fetch():Promise<ReadableStreamInfo>{
     const stream = Util.general.InitPassThrough();
-    (await this.nico.download())
-      .on("error", e => stream.emit("error", e))
-      .pipe(stream);
+    const source = await this.nico.download();
+    source
+      .on("error", e => !stream.destroyed ? stream.destroy(e) : stream.emit("error", e))
+      .pipe(stream)
+    ;
     return {
       type: "readable", stream
     };

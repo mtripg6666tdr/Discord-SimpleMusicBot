@@ -4,6 +4,7 @@ import { FFmpeg } from "prism-media";
 
 import Util from "../../Util";
 import { DefaultUserAgent, FFmpegDefaultArgs } from "../../definition";
+import { destroyStream } from ".";
 
 export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string, seek:number, output:"ogg"|"pcm"){
   const ffmpegUserAgentArgs = readable.type === "url" ? [
@@ -34,9 +35,9 @@ export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string, s
   if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log("[FFmpeg]" + chunk.toString(), "debug"));
   if(readable.type === "readable"){
     readable.stream
-      .on("error", e => ffmpeg.destroyed ? ffmpeg.destroy(e) : ffmpeg.emit("error", e))
+      .on("error", e => destroyStream(ffmpeg, e))
       .pipe(ffmpeg)
-      .on("close", () => !readable.stream.destroyed && readable.stream.destroy())
+      .on("close", () => destroyStream(readable.stream))
     ;
   }
   return ffmpeg;

@@ -58,4 +58,4 @@ export abstract class AudioSource {
 
 export type StreamInfo = ReadableStreamInfo|UrlStreamInfo;
 export type ReadableStreamInfo = {type:"readable", stream:Readable, streamType?:StreamType};
-export type UrlStreamInfo = {type:"url", url:string, userAgent?:string};
+export type UrlStreamInfo = {type:"url", url:string, streamType?:StreamType, userAgent?:string};

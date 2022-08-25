@@ -9,7 +9,7 @@ import { Util } from "../Util";
 import { getColor } from "../Util/color";
 import { getFFmpegEffectArgs } from "../Util/effect";
 import { FallBackNotice } from "../definition";
-import { resolveStreamToPlayable } from "./stream";
+import { resolveStreamToPlayable } from "./streams";
 
 /**
  * サーバーごとの再生を管理するマネージャー。
@@ -279,7 +279,7 @@ export class PlayManager extends ManagerBase {
 
   private async onStreamFinished(){
     this.Log("onStreamFinished called");
-    await Util.general.waitForEnteringState(() => !this.info.Connection.playing).catch(() => {
+    await Util.general.waitForEnteringState(() => !this.info.Connection.playing, 20 * 1000).catch(() => {
       this.Log("Stream has not ended in time and will force stream into destroying", "warn");
       this.stop();
     });
