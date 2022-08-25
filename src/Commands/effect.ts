@@ -20,7 +20,7 @@ export default class Effect extends BaseCommand {
     options.updateBoundChannel(message);
     try{
       const {embed, messageActions } = getCurrentEffectPanel(message.member.avatarURL, options.data[message.guild.id]);
-      const reply = await message.channel.createMessage({
+      const reply = await message.reply({
         content: "",
         embeds: [embed.toEris()],
         components: [messageActions]
@@ -31,7 +31,7 @@ export default class Effect extends BaseCommand {
     }
     catch(e){
       Util.logger.log(JSON.stringify(e), "error");
-      await message.reply(":cry:エラーが発生しました").catch(er => Util.logger.log(er, "error"));
+      message.reply(":cry:エラーが発生しました").catch(er => Util.logger.log(er, "error"));
     }
   }
 }
