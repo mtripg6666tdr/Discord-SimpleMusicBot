@@ -3,7 +3,7 @@ import type { exportableCustom } from "./custom";
 import type { EmbedField } from "eris";
 import type { Readable } from "stream";
 
-type StreamType =
+export type StreamType =
 | "dca"
 | "ogg"
 | "webm"
@@ -57,5 +57,14 @@ export abstract class AudioSource {
 }
 
 export type StreamInfo = ReadableStreamInfo|UrlStreamInfo;
-export type ReadableStreamInfo = {type:"readable", stream:Readable, streamType?:StreamType};
-export type UrlStreamInfo = {type:"url", url:string, streamType?:StreamType, userAgent?:string};
+export type ReadableStreamInfo = {
+  type:"readable",
+  stream:Readable,
+  streamType?:StreamType,
+};
+export type UrlStreamInfo = {
+  type:"url",
+  url:string,
+  streamType?:StreamType,
+  userAgent?:string,
+};

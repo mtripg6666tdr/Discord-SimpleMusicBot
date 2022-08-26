@@ -1,4 +1,4 @@
-import type { ReadableStreamInfo, StreamInfo, UrlStreamInfo } from "../../AudioSource";
+import type { StreamInfo, StreamType, UrlStreamInfo } from "../../AudioSource";
 import type { Readable, TransformOptions } from "stream";
 
 import { opus } from "prism-media";
@@ -6,6 +6,15 @@ import { opus } from "prism-media";
 import Util from "../../Util";
 import { InitPassThrough } from "../../Util/general";
 import { transformThroughFFmpeg } from "./ffmpeg";
+
+type PlayableStreamInfo = PartialPlayableStream & {
+  cost:number,
+};
+
+type PartialPlayableStream = {
+  stream:Readable,
+  streamType:StreamType,
+};
 
 /*
 Convertion cost:
@@ -26,7 +35,7 @@ Refer at: https://github.com/discordjs/discord.js/blob/13baf75cae395353f0528804f
  * @param volumeTransform whether volume transform is required
  * @returns if volume transform is required, this will return a stream info that represents Ogg/Webm Opus, otherwise return a stream info represents PCM Opus.
  */
-export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[], seek:number, volumeTransform:boolean):ReadableStreamInfo{
+export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[], seek:number, volumeTransform:boolean):PlayableStreamInfo{
   const effectEnabled = effects.length !== 0;
   if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && seek <= 0 && !effectEnabled && !volumeTransform){
     // 1. effect is off, volume is off, stream is webm or ogg
@@ -34,7 +43,12 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     //                1
     // Total: 1
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType}) (no convertion/cost: 1)`);
-    return streamInfo.type === "url" ? convertUrlStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
+    const info = streamInfo.type === "url" ? convertUrlStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
+    return {
+      stream: info.stream,
+      streamType: info.streamType,
+      cost: 1,
+    };
   }else if(!volumeTransform){
     // 2. volume is off and stream is any
     // Unknown --(FFmpeg)--> Ogg/Opus --(Demuxer)--> Opus
@@ -49,9 +63,9 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       .on("close", () => destroyStream(ffmpeg))
     ;
     return {
-      type: "readable",
       stream: passThrough,
       streamType: "ogg",
+      cost: 3,
     };
   }else if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && !effectEnabled){
     // 3. volume is on and stream is webm or ogg
@@ -80,9 +94,9 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       .on("close", () => destroyStream(decoder))
     ;
     return {
-      type: "readable",
       stream: passThrough,
-      streamType: "pcm"
+      streamType: "pcm",
+      cost: 4.5,
     };
   }else{
     // 4. volume is on and stream is unknown
@@ -98,16 +112,15 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       .on("close", () => destroyStream(ffmpegPCM))
     ;
     return {
-      type: "readable",
       stream: passThrough,
       streamType: "pcm",
+      cost: 5,
     };
   }
 }
 
-function convertUrlStreamInfoToReadableStreamInfo(streamInfo:UrlStreamInfo):ReadableStreamInfo{
+function convertUrlStreamInfoToReadableStreamInfo(streamInfo:UrlStreamInfo):PartialPlayableStream{
   return {
-    type: "readable",
     stream: Util.web.DownloadAsReadable(streamInfo.url, streamInfo.userAgent ? {
       headers: {
         "User-Agent": streamInfo.userAgent

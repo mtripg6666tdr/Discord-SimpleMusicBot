@@ -58,6 +58,13 @@ export abstract class MusicBotBase extends LogEmitter {
     return Object.keys(this.data).length;
   }
 
+  get totalTransformingCost(){
+    return Object.keys(this.data)
+      .map(id => this.data[id].player.cost)
+      .reduce((prev, current) => prev + current, 0)
+    ;
+  }
+
   constructor(protected readonly maintenance:boolean = false){
     super();
     this.SetTag("Main");

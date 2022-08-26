@@ -51,6 +51,7 @@ export default class SystemInfo extends BaseCommand {
           .addField("Version (commit hash)", `\`${options.bot.version}\``, true)
           .addField("Managed embed toggles", `\`${options.embedPageToggle.length}\``, true)
           .addField("Guilds that have modified data", `\`${options.bot.queueModifiedGuilds.length}\``, true)
+          .addField("Current total transforming costs", `\`${options.bot.totalTransformingCost}\``)
           .setColor(getColor("UPTIME"))
           .toEris()
       );
