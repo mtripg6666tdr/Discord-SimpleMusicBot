@@ -6,7 +6,7 @@ import * as ytdl from "ytdl-core";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
-import { FFmpegDefaultArgs } from "../definition";
+import { FFmpegDefaultNetworkArgs } from "../definition";
 
 export default class Frame extends BaseCommand {
   constructor(){
@@ -77,7 +77,7 @@ export default class Frame extends BaseCommand {
 function getFrame(url:string, time:number, ua:string){
   return new Promise<Buffer>((resolve, reject) => {
     const args = [
-      ...FFmpegDefaultArgs,
+      ...FFmpegDefaultNetworkArgs,
       "-user_agent", ua,
       "-ss", time.toString(),
       "-i", url,

@@ -4,10 +4,11 @@ import { FFmpeg } from "prism-media";
 
 import { destroyStream } from ".";
 import Util from "../../Util";
-import { DefaultUserAgent, FFmpegDefaultArgs } from "../../definition";
+import { DefaultUserAgent, FFmpegDefaultNetworkArgs } from "../../definition";
 
 export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string[], seek:number, output:"ogg"|"pcm"){
-  const ffmpegUserAgentArgs = readable.type === "url" ? [
+  const ffmpegNetworkArgs = readable.type === "url" ? [
+    ...FFmpegDefaultNetworkArgs,
     "-user_agent", readable.userAgent || DefaultUserAgent
   ] : [];
   const ffmpegSeekArgs = seek > 0 ? [
@@ -20,8 +21,8 @@ export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string[],
     "-f", "s16le",
   ];
   const args = [
-    ...FFmpegDefaultArgs,
-    ...ffmpegUserAgentArgs,
+    "-analyzeduration", "0",
+    ...ffmpegNetworkArgs,
     ...ffmpegSeekArgs,
     "-i", readable.type === "readable" ? "-" : readable.url,
     ...effectArgs,
@@ -29,7 +30,7 @@ export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string[],
     ...outputArgs,
     "-ar", "48000",
     "-ac", "2",
-    "-b:a", "128k",
+    "-vbr", "on",
   ];
   Util.logger.log("[FFmpeg] Passing arguments: " + args.map(arg => arg.startsWith("http") ? "<URL>" : arg).join(" "));
   const ffmpeg = new FFmpeg({args});
