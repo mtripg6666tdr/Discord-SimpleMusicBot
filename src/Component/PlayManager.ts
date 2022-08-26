@@ -24,6 +24,7 @@ export class PlayManager extends ManagerBase {
   private _errorUrl = "";
   private _preparing = false;
   private _currentAudioInfo = null as AudioSource;
+  private _cost = 0;
 
   get preparing(){
     return this._preparing;
@@ -40,6 +41,10 @@ export class PlayManager extends ManagerBase {
   get currentAudioUrl():string{
     if(this.currentAudioInfo) return this.currentAudioInfo.Url;
     else return "";
+  }
+
+  get cost(){
+    return this._cost;
   }
 
   /**
@@ -148,7 +153,7 @@ export class PlayManager extends ManagerBase {
       // QueueContentからストリーム情報を取得
       const rawStream = await this.currentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
-      const { stream, streamType } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.server), this._seek, this.volume !== 100);
+      const { stream, streamType, cost } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.server), this._seek, this.volume !== 100);
       // ストリームがまだ利用できない場合待機
       let errorWhileWaiting = null as Error;
       stream.once("error", e => errorWhileWaiting = e || new Error("An error occurred in stream"));
@@ -164,6 +169,7 @@ export class PlayManager extends ManagerBase {
       }
       // 各種準備
       this._errorReportChannel = mes.channel as TextChannel;
+      this._cost = cost;
       const connection = this.server.connection;
       t.end();
       // 再生
