@@ -3,60 +3,27 @@ import type { YmxFormat } from "./Structure";
 
 import * as discord from "eris";
 
-import { execSync } from "child_process";
-
 import { CommandsManager } from "./Commands";
 import { CommandMessage } from "./Component/CommandMessage";
 import { PageToggle } from "./Component/PageToggle";
 import { ResponseMessage } from "./Component/ResponseMessage";
-import { GuildDataContainer, YmxVersion, LogEmitter } from "./Structure";
+import { YmxVersion } from "./Structure";
 import { Util } from "./Util";
+import { MusicBotBase } from "./botBase";
 import { NotSendableMessage } from "./definition";
 
 /**
  * 音楽ボットの本体
  */
-export class MusicBot extends LogEmitter {
+export class MusicBot extends MusicBotBase {
   // クライアントの初期化
-  private readonly _client = null as discord.Client;
+  protected readonly _client = null as discord.Client;
+  private readonly _addOn = new Util.addOn.AddOn();
+  private _isReadyFinished = false;
 
-  private data:{[key:string]:GuildDataContainer} = {};
-  private readonly _instantiatedTime = null as Date;
-  private readonly versionInfo = "Could not get info" as string;
-  private readonly embedPageToggle:PageToggle[] = [] as PageToggle[];
-  private isReadyFinished = false;
-  private _queueModifiedGuilds = [] as string[];
-  private readonly addOn = new Util.addOn.AddOn();
-  /**
-   * ページトグル
-   */
-  get toggles(){return this.embedPageToggle;}
-  /**
-   * クライアント
-   */
-  get client(){return this._client;}
-  /**
-   * キューが変更されたサーバーの保存
-   */
-  get queueModifiedGuilds(){return this._queueModifiedGuilds;}
-  /**
-   * バージョン情報  
-   * (リポジトリの最終コミットのハッシュ値)
-   */
-  get version(){return this.versionInfo;}
-  /**
-   * 初期化された時刻
-   */
-  get instantiatedTime(){
-    return this._instantiatedTime;
-  }
+  constructor(token:string, protected readonly maintenance:boolean = false){
+    super(maintenance);
 
-  get databaseCount(){
-    return Object.keys(this.data).length;
-  }
-
-  constructor(token:string, private readonly maintenance:boolean = false){
-    super();
     this._client = new discord.Client(token, {
       intents: [
         // サーバーを認識する
@@ -68,23 +35,8 @@ export class MusicBot extends LogEmitter {
       ],
       restMode: true,
     });
-    this.SetTag("Main");
-    this._instantiatedTime = new Date();
-    const client = this._client;
-    this.Log("bot is instantiated");
-    if(maintenance){
-      this.Log("bot is now maintainance mode");
-    }
-    try{
-      this.versionInfo = execSync("git log -n 1 --pretty=format:%h").toString()
-        .trim();
-      this.Log(`Version: ${this.versionInfo}`);
-    }
-    catch{
-      this.Log("Something went wrong when obtaining version", "warn");
-    }
 
-    client
+    this.client
       .on("ready", this.onReady.bind(this))
       .on("messageCreate", this.onMessageCreate.bind(this))
       .on("interactionCreate", this.onInteractionCreate.bind(this))
@@ -95,9 +47,9 @@ export class MusicBot extends LogEmitter {
 
   private async onReady(){
     const client = this._client;
-    this.addOn.emit("ready", client);
+    this._addOn.emit("ready", client);
     this.Log("Socket connection is ready now");
-    if(this.isReadyFinished) return;
+    if(this._isReadyFinished) return;
 
     client.on("error", er => {
       Util.logger.log(er, "error");
@@ -184,7 +136,7 @@ export class MusicBot extends LogEmitter {
       const tick = ()=>{
         this.logGeneralInfo();
         setTimeout(tick, 4 * 60 * 1000);
-        PageToggle.Organize(this.embedPageToggle, 5);
+        PageToggle.Organize(this._embedPageToggle, 5);
         this.backupData();
       };
       setTimeout(tick, 1 * 60 * 1000);
@@ -195,17 +147,17 @@ export class MusicBot extends LogEmitter {
     CommandsManager.Instance.Check();
 
     // Finish initializing
-    this.isReadyFinished = true;
+    this._isReadyFinished = true;
     this.Log("Bot is ready now");
   }
 
   private async onMessageCreate(message:discord.Message){
-    this.addOn.emit("messageCreate", message);
+    this._addOn.emit("messageCreate", message);
     if(this.maintenance){
       if(!Util.config.adminId || message.author.id !== Util.config.adminId) return;
     }
     // botのメッセやdm、およびnewsは無視
-    if(!this.isReadyFinished || message.author.bot || !(message.channel instanceof discord.TextChannel)) return;
+    if(!this._isReadyFinished || message.author.bot || !(message.channel instanceof discord.TextChannel)) return;
     // データ初期化
     const server = this.initData(message.guildID, message.channel.id);
     // プレフィックスの更新
@@ -288,7 +240,7 @@ export class MusicBot extends LogEmitter {
   }
 
   private async onInteractionCreate(interaction:discord.Interaction){
-    this.addOn.emit("interactionCreate", interaction);
+    this._addOn.emit("interactionCreate", interaction);
     if(!Util.eris.interaction.interactionIsCommandOrComponent(interaction)) return;
     if(this.maintenance){
       if(!Util.config.adminId || interaction.member?.id !== Util.config.adminId) return;
@@ -330,7 +282,7 @@ export class MusicBot extends LogEmitter {
         this.Log("received button interaction");
         await interaction.deferUpdate();
         if(interaction.data.custom_id === PageToggle.arrowLeft || interaction.data.custom_id === PageToggle.arrowRight){
-          const l = this.embedPageToggle.filter(t =>
+          const l = this._embedPageToggle.filter(t =>
             t.Message.channelId === interaction.channel.id
             && t.Message.id === interaction.message.id);
           if(l.length >= 1){
@@ -427,20 +379,6 @@ export class MusicBot extends LogEmitter {
   }
 
   /**
-   *  定期ログを実行します
-   */
-  logGeneralInfo(){
-    const _d = Object.values(this.data);
-    const memory = Util.system.GetMemInfo();
-    Util.logger.log(`[Main]Participating: ${this._client.guilds.size}, Registered: ${Object.keys(this.data).length} Connecting: ${_d.filter(info => info.player.isPlaying).length} Paused: ${_d.filter(__d => __d.player.isPaused).length}`);
-    Util.logger.log(`[System]Free:${Math.floor(memory.free)}MB; Total:${Math.floor(memory.total)}MB; Usage:${memory.usage}%`);
-    const nMem = process.memoryUsage();
-    const rss = Util.system.GetMBytes(nMem.rss);
-    const ext = Util.system.GetMBytes(nMem.external);
-    Util.logger.log(`[Main]Memory RSS: ${rss}MB, Heap total: ${Util.system.GetMBytes(nMem.heapTotal)}MB, Total: ${Util.math.GetPercentage(rss + ext, memory.total)}% (use systeminfo command for more info)`);
-  }
-
-  /**
    * Botを開始します。
    * @param debugLog デバッグログを出力するかどうか
    * @param debugLogStoreLength デバッグログの保存する数
@@ -452,73 +390,6 @@ export class MusicBot extends LogEmitter {
   }
 
   /**
-   * 接続ステータスやキューを含む全データをサーバーにバックアップします
-   */
-  async backupData(){
-    if(Util.db.DatabaseAPI.CanOperate){
-      const t = Util.time.timer.start("MusicBot#BackupData");
-      try{
-        this.backupStatus();
-        // キューの送信
-        const queue = [] as {guildid:string, queue:string}[];
-        const guilds = this._queueModifiedGuilds;
-        guilds.forEach(id => {
-          queue.push({
-            guildid: id,
-            queue: this.data[id].exportQueue()
-          });
-        });
-        if(queue.length > 0){
-          await Util.db.DatabaseAPI.SetQueueData(queue);
-        }
-        this._queueModifiedGuilds = [];
-      }
-      catch(e){
-        this.Log(e, "warn");
-      }
-      t.end();
-    }
-  }
-
-  /**
-   * 接続ステータス等をサーバーにバックアップします
-   */
-  backupStatus(){
-    const t = Util.time.timer.start("MusicBot#BackupStatus");
-    try{
-      // 参加ステータスの送信
-      const speaking = [] as {guildid:string, value:string}[];
-      Object.keys(this.data).forEach(id => {
-        speaking.push({
-          guildid: id,
-          // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
-          value: this.data[id].exportStatus()
-        });
-      });
-      Util.db.DatabaseAPI.SetIsSpeaking(speaking);
-    }
-    catch(e){
-      this.Log(e, "warn");
-    }
-    t.end();
-  }
-
-  /**
-   * 必要に応じてサーバーデータを初期化します
-   */
-  private initData(guildid:string, channelid:string){
-    const prev = this.data[guildid];
-    if(!prev){
-      const server = this.data[guildid] = new GuildDataContainer(this.client, guildid, channelid, this);
-      server.player.setBinding(this.data[guildid]);
-      server.queue.setBinding(this.data[guildid]);
-      return server;
-    }else{
-      return prev;
-    }
-  }
-
-  /**
    * コマンドを実行する際にランナーに渡す引数を生成します
    * @param options コマンドのパース済み引数
    * @param optiont コマンドの生の引数
@@ -526,7 +397,7 @@ export class MusicBot extends LogEmitter {
    */
   private createCommandRunnerArgs(guildId:string, options:string[], optiont:string):CommandArgs{
     return {
-      embedPageToggle: this.embedPageToggle,
+      embedPageToggle: this._embedPageToggle,
       args: options,
       bot: this,
       server: this.data[guildId],

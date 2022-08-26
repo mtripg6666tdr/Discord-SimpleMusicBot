@@ -1,11 +1,11 @@
-import type { exportableCustom} from "../AudioSource";
-import type { MusicBot } from "../bot";
+import type { exportableCustom } from "../AudioSource";
+import type { MusicBotBase } from "../botBase";
 import type { SearchPanel } from "./SearchPanel";
-import type { YmxFormat} from "./YmxFormat";
-import type { LockObj } from "@mtripg6666tdr/async-lock";
-import type { CommandMessage, ResponseMessage} from "@mtripg6666tdr/eris-command-resolver";
+import type { YmxFormat } from "./YmxFormat";
+import type { CommandMessage, ResponseMessage } from "@mtripg6666tdr/eris-command-resolver";
 import type { Client, Message, VoiceChannel, VoiceConnection } from "eris";
 
+import { LockObj } from "@mtripg6666tdr/async-lock";
 import { lock } from "@mtripg6666tdr/async-lock";
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 import { TextChannel } from "eris";
@@ -34,7 +34,7 @@ export class GuildDataContainer extends LogEmitter {
   /**
    * 検索窓の格納します
    */
-  searchPanel: SearchPanel;
+  searchPanel:SearchPanel;
   /**
    * キューマネジャ
    */
@@ -66,7 +66,7 @@ export class GuildDataContainer extends LogEmitter {
   /**
    * メインボット
    */
-  readonly bot:MusicBot;
+  readonly bot:MusicBotBase;
   /**
    * 関連動画自動追加が有効
    */
@@ -90,7 +90,7 @@ export class GuildDataContainer extends LogEmitter {
    */
   vcPing:number;
 
-  constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBot){
+  constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBotBase){
     super();
     this.searchPanel = null;
     this.queue = new QueueManager();
@@ -180,7 +180,7 @@ export class GuildDataContainer extends LogEmitter {
     this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
   }
 
-  private readonly joinVoiceChannelLocker:LockObj;
+  private readonly joinVoiceChannelLocker:LockObj = new LockObj();
   /**
    * ボイスチャンネルに接続します
    * @param message コマンドを表すメッセージ
