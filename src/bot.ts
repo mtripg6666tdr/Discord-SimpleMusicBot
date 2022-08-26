@@ -338,21 +338,23 @@ export class MusicBot extends MusicBotBase {
 
   private async onVoiceChannelJoin(member:discord.Member, newChannel:discord.TextVoiceChannel){
     if(member.id !== this._client.user.id) return;
-    // VC参加
-    const voiceChannel = this._client.getChannel(newChannel.id) as discord.VoiceChannel;
-    voiceChannel.guild.editVoiceState({
-      channelID: newChannel.id,
-      suppress: false,
-    }).catch(() => {
-      voiceChannel.guild.members.get(this._client.user.id)
-        .edit({
-          mute: false
-        })
-        .catch(async () => {
-          this._client.createMessage(this.data[newChannel.guild.id].boundTextChannel, ":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。")
-            .catch(e => this.Log(e));
-        });
-    });
+    if(member.voiceState.suppress || member.voiceState.mute){
+      // VC参加
+      const voiceChannel = this._client.getChannel(newChannel.id) as discord.VoiceChannel;
+      voiceChannel.guild.editVoiceState({
+        channelID: newChannel.id,
+        suppress: false,
+      }).catch(() => {
+        voiceChannel.guild.members.get(this._client.user.id)
+          .edit({
+            mute: false
+          })
+          .catch(async () => {
+            this._client.createMessage(this.data[newChannel.guild.id].boundTextChannel, ":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。")
+              .catch(e => this.Log(e));
+          });
+      });
+    }
   }
 
   private async onVoiceChannelLeave(member:discord.Member, oldChannel:discord.TextVoiceChannel){
