@@ -33,10 +33,10 @@ export default class NowPlaying extends BaseCommand {
       return;
     }
     const _s = Math.floor(options.server.player.currentTime / 1000);
-    const _t = Number(options.server.player.CurrentAudioInfo.LengthSeconds);
+    const _t = Number(options.server.player.currentAudioInfo.LengthSeconds);
     const [min, sec] = Util.time.CalcMinSec(_s);
     const [tmin, tsec] = Util.time.CalcMinSec(_t);
-    const info = options.server.player.CurrentAudioInfo;
+    const info = options.server.player.currentAudioInfo;
     let progressBar = "";
     if(_t > 0){
       const progress = Math.floor(_s / _t * 20);

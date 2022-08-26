@@ -25,7 +25,7 @@ export default class End extends BaseCommand {
       message.reply("キューが空、もしくは一曲しかないため削除されませんでした。").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    options.server.queue.RemoveFrom2nd();
+    options.server.queue.removeFrom2nd();
     options.server.queue.queueLoopEnabled = options.server.queue.onceLoopEnabled = options.server.queue.loopEnabled = false;
     message.reply("✅キューに残された曲を削除しました").catch(e => Util.logger.log(e, "error"));
   }

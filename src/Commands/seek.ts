@@ -30,7 +30,7 @@ export default class Seek extends BaseCommand {
     if(!server.player.isPlaying || server.player.preparing){
       await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
-    }else if(server.player.CurrentAudioInfo.LengthSeconds === 0 || server.player.CurrentAudioInfo.isUnseekable()){
+    }else if(server.player.currentAudioInfo.LengthSeconds === 0 || server.player.currentAudioInfo.isUnseekable()){
       await message.reply(":warning:シーク先に対応していない楽曲です").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -42,7 +42,7 @@ export default class Seek extends BaseCommand {
         return NaN;
       }
     }(options.rawArgs));
-    if(time > server.player.CurrentAudioInfo.LengthSeconds || isNaN(time)){
+    if(time > server.player.currentAudioInfo.LengthSeconds || isNaN(time)){
       await message.reply(":warning:シーク先の時間が正しくありません").catch(e => Util.logger.log(e, "error"));
       return;
     }

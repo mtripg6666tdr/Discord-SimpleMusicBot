@@ -35,7 +35,7 @@ export default class Frame extends BaseCommand {
       await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const vinfo = server.player.CurrentAudioInfo;
+    const vinfo = server.player.currentAudioInfo;
     if(!vinfo.isYouTube()){
       await message.reply(":warning:フレームのキャプチャ機能に非対応のソースです。").catch(e => Util.logger.log(e, "error"));
       return;

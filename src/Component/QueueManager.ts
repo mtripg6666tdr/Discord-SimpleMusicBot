@@ -21,31 +21,46 @@ export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"unknown
  * キューの追加および削除などの機能を提供します。
  */
 export class QueueManager extends ManagerBase {
-  // キューの本体
+  /**
+   * キューの本体
+   */
   private _default:QueueContent[] = [];
-  // キューの本体のゲッタープロパティ
-  private get default():QueueContent[]{
+  /**
+   * キューの本体のゲッタープロパティ
+   */
+  private get default():Readonly<QueueContent[]>{
     return this._default;
   }
 
-  // トラックループが有効か?
+  /**
+   * トラックループが有効か?
+   */
   loopEnabled:boolean = false;
-  // キューループが有効か?
+  /**
+   * キューループが有効か?
+   */
   queueLoopEnabled:boolean = false;
-  // ワンスループが有効か?
+  /**
+   * ワンスループが有効か?
+   */
   onceLoopEnabled:boolean = false;
-  // キューの長さ
+  /**
+   * キューの長さ（トラック数）
+   */
   get length():number{
     return this.default.length;
   }
 
+  /**
+   * きゅの長さ（時間秒）
+   */
   get lengthSeconds():number{
     let totalLength = 0;
-    this.default.forEach(q => totalLength += Number(q.BasicInfo.LengthSeconds));
+    this.default.forEach(q => totalLength += Number(q.basicInfo.LengthSeconds));
     return totalLength;
   }
 
-  get hasNothing():boolean{
+  get isEmpty():boolean{
     return this.length === 0;
   }
 
@@ -101,7 +116,7 @@ export class QueueManager extends ManagerBase {
     if(index < 0) throw new Error("Invalid argument: " + index);
     const target = Math.min(index, this.length);
     for(let i = 0; i <= target; i++){
-      sec += this.get(i).BasicInfo.LengthSeconds;
+      sec += this.get(i).basicInfo.LengthSeconds;
     }
     return sec;
   }
@@ -121,19 +136,19 @@ export class QueueManager extends ManagerBase {
       try{
         PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
         const result = {
-          BasicInfo: await AudioSource.Resolve({
+          basicInfo: await AudioSource.resolve({
             url, type,
             knownData: gotData,
             forceCache: this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000
           }),
-          AdditionalInfo: {
-            AddedBy: {
+          additionalInfo: {
+            addedBy: {
               userId: this.getUserIdFromMember(addedBy) ?? "0",
               displayName: this.getDisplayNameFromMember(addedBy) ?? "不明"
             }
           }
         } as QueueContent;
-        if(result.BasicInfo){
+        if(result.basicInfo){
           this._default[method](result);
           if(this.server.equallyPlayback) this.sortWithAddedBy();
           if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
@@ -223,7 +238,7 @@ export class QueueManager extends ManagerBase {
       this.Log("AutoAddQueue worked successfully");
       if(msg){
         // 曲の時間取得＆計算
-        const _t = Number(info.BasicInfo.LengthSeconds);
+        const _t = Number(info.basicInfo.LengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
         // キュー内のオフセット取得
         const index = info.index.toString();
@@ -232,13 +247,14 @@ export class QueueManager extends ManagerBase {
         const embed = new Helper.MessageEmbedBuilder()
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
-          .setDescription("[" + info.BasicInfo.Title + "](" + info.BasicInfo.Url + ")")
-          .addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as AudioSource.YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true)
+          .setDescription("[" + info.basicInfo.Title + "](" + info.basicInfo.Url + ")")
+          .addField("長さ", ((info.basicInfo.ServiceIdentifer === "youtube" && (info.basicInfo as AudioSource.YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true)
           .addField("リクエスト", this.getDisplayNameFromMember(addedBy) ?? "不明", true)
           .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
           .addField("再生されるまでの予想時間", index === "0" ? "-" : ((ehour === "0" ? "" : ehour + ":") + emin + ":" + esec), true)
-          .setThumbnail(info.BasicInfo.Thumnail);
-        if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as AudioSource.YouTube).IsFallbacked){
+          .setThumbnail(info.basicInfo.Thumnail)
+        ;
+        if(info.basicInfo.ServiceIdentifer === "youtube" && (info.basicInfo as AudioSource.YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
         await msg.edit({content: "", embeds: [embed.toEris()]});
@@ -310,12 +326,11 @@ export class QueueManager extends ManagerBase {
     this.Log("Next Called");
     PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
     this.onceLoopEnabled = false;
-    this.server.player.errorCount = 0;
-    this.server.player.errorUrl = "";
+    this.server.player.resetError();
     if(this.queueLoopEnabled){
-      this.default.push(this.default[0]);
-    }else if(this.server.AddRelative && this.server.player.CurrentAudioInfo.ServiceIdentifer === "youtube"){
-      const relatedVideos = (this.server.player.CurrentAudioInfo as AudioSource.YouTube).relatedVideos;
+      this._default.push(this.default[0]);
+    }else if(this.server.AddRelative && this.server.player.currentAudioInfo.ServiceIdentifer === "youtube"){
+      const relatedVideos = (this.server.player.currentAudioInfo as AudioSource.YouTube).relatedVideos;
       if(relatedVideos.length >= 1){
         const video = relatedVideos[0];
         await this.server.queue.addQueue(video.url, null, "push", "youtube", video);
@@ -355,7 +370,7 @@ export class QueueManager extends ManagerBase {
   /**
    * 最初のキューコンテンツだけ残し、残りのキューコンテンツを消去します
    */
-  RemoveFrom2nd(){
+  removeFrom2nd(){
     this.Log("RemoveFrom2 Called");
     PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
     this._default = [this.default[0]];
@@ -418,14 +433,14 @@ export class QueueManager extends ManagerBase {
     PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
     if(from < to){
       //要素追加
-      this.default.splice(to + 1, 0, this.default[from]);
+      this._default.splice(to + 1, 0, this.default[from]);
       //要素削除
-      this.default.splice(from, 1);
+      this._default.splice(from, 1);
     }else if(from > to){
       //要素追加
-      this.default.splice(to, 0, this.default[from]);
+      this._default.splice(to, 0, this.default[from]);
       //要素削除
-      this.default.splice(from + 1, 1);
+      this._default.splice(from + 1, 1);
     }
     if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
       this.server.bot.queueModifiedGuilds.push(this.server.guildID);
@@ -440,11 +455,11 @@ export class QueueManager extends ManagerBase {
     const addedByUsers = [] as string[];
     const queueByAdded = {} as {[key:string]:QueueContent[]};
     for(let i = 0; i < this._default.length; i++){
-      if(!addedByUsers.includes(this._default[i].AdditionalInfo.AddedBy.userId)){
-        addedByUsers.push(this._default[i].AdditionalInfo.AddedBy.userId);
-        queueByAdded[this._default[i].AdditionalInfo.AddedBy.userId] = [this._default[i]];
+      if(!addedByUsers.includes(this._default[i].additionalInfo.addedBy.userId)){
+        addedByUsers.push(this._default[i].additionalInfo.addedBy.userId);
+        queueByAdded[this._default[i].additionalInfo.addedBy.userId] = [this._default[i]];
       }else{
-        queueByAdded[this._default[i].AdditionalInfo.AddedBy.userId].push(this._default[i]);
+        queueByAdded[this._default[i].additionalInfo.addedBy.userId].push(this._default[i]);
       }
     }
     // ソートをもとにキューを再構築
@@ -472,11 +487,11 @@ type QueueContent = {
   /**
    * 曲自体のメタ情報
    */
-  BasicInfo:AudioSource.AudioSource,
+  basicInfo:AudioSource.AudioSource,
   /**
    * 曲の情報とは別の追加情報
    */
-  AdditionalInfo:AdditionalInfo,
+  additionalInfo:AdditionalInfo,
 };
 
 type AddedBy = {
@@ -497,5 +512,5 @@ type AdditionalInfo = {
   /**
    * 曲の追加者を示します
    */
-  AddedBy: AddedBy,
+  addedBy: AddedBy,
 };

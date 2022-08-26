@@ -17,19 +17,31 @@ import { resolveStreamToPlayable } from "./streams";
  */
 export class PlayManager extends ManagerBase {
   private readonly retryLimit = 3;
-  private seek = 0;
-  private errorReportChannel = null as TextChannel;
+  private _seek = 0;
+  private _errorReportChannel = null as TextChannel;
   private _volume = 100;
-  error = false;
-  errorCount = 0;
-  errorUrl = "";
-  preparing = false;
-  get CurrentAudioUrl():string{
-    if(this.CurrentAudioInfo) return this.CurrentAudioInfo.Url;
+  private _errorCount = 0;
+  private _errorUrl = "";
+  private _preparing = false;
+  private _currentAudioInfo = null as AudioSource;
+
+  get preparing(){
+    return this._preparing;
+  }
+
+  private set preparing(val:boolean){
+    this._preparing = val;
+  }
+
+  get currentAudioInfo():Readonly<AudioSource>{
+    return this._currentAudioInfo;
+  }
+
+  get currentAudioUrl():string{
+    if(this.currentAudioInfo) return this.currentAudioInfo.Url;
     else return "";
   }
 
-  CurrentAudioInfo:AudioSource;
   /**
    *  接続され、再生途中にあるか（たとえ一時停止されていても）
    */
@@ -56,7 +68,7 @@ export class PlayManager extends ManagerBase {
    * @remarks ミリ秒単位なので秒に直すには1000分の一する必要がある
    */
   get currentTime():number{
-    return this.isPlaying ? this.seek * 1000 + this.server.connection.current?.playTime : 0;
+    return this.isPlaying ? this._seek * 1000 + this.server.connection.current?.playTime : 0;
   }
 
   /**
@@ -107,7 +119,7 @@ export class PlayManager extends ManagerBase {
       // なにかしら再生中
       || this.isPlaying
       // キューが空
-      || this.server.queue.hasNothing
+      || this.server.queue.isEmpty
       // 準備中
       || this.preparing
     ;
@@ -121,22 +133,22 @@ export class PlayManager extends ManagerBase {
     this.preparing = true;
     let mes:Message = null;
     let ch:TextChannel = null;
-    this.CurrentAudioInfo = this.server.queue.get(0).BasicInfo;
+    this._currentAudioInfo = this.server.queue.get(0).basicInfo;
     if(this.server.boundTextChannel){
       ch = this.client.getChannel(this.server.boundTextChannel) as TextChannel;
-      const [min, sec] = Util.time.CalcMinSec(this.CurrentAudioInfo.LengthSeconds);
-      const isLive = this.CurrentAudioInfo.isYouTube() && this.CurrentAudioInfo.LiveStream;
-      mes = await ch.createMessage(`:hourglass_flowing_sand: \`${this.CurrentAudioInfo.Title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`);
+      const [min, sec] = Util.time.CalcMinSec(this.currentAudioInfo.LengthSeconds);
+      const isLive = this.currentAudioInfo.isYouTube() && this.currentAudioInfo.LiveStream;
+      mes = await ch.createMessage(`:hourglass_flowing_sand: \`${this.currentAudioInfo.Title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`);
     }
     try{
       // シーク位置を確認
-      if(this.CurrentAudioInfo.LengthSeconds <= time) time = 0;
-      this.seek = time;
+      if(this.currentAudioInfo.LengthSeconds <= time) time = 0;
+      this._seek = time;
       const t = Util.time.timer.start("PlayManager#Play->FetchAudioSource");
       // QueueContentからストリーム情報を取得
-      const rawStream = await this.CurrentAudioInfo.fetch(time > 0);
+      const rawStream = await this.currentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
-      const { stream, streamType } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.server), this.seek, this.volume !== 100);
+      const { stream, streamType } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.server), this._seek, this.volume !== 100);
       // ストリームがまだ利用できない場合待機
       let errorWhileWaiting = null as Error;
       stream.once("error", e => errorWhileWaiting = e || new Error("An error occurred in stream"));
@@ -151,9 +163,8 @@ export class PlayManager extends ManagerBase {
         throw errorWhileWaiting;
       }
       // 各種準備
-      this.errorReportChannel = mes.channel as TextChannel;
+      this._errorReportChannel = mes.channel as TextChannel;
       const connection = this.server.connection;
-      this.error = false;
       t.end();
       // 再生
       const u = Util.time.timer.start("PlayManager#Play->EnterPlayingState");
@@ -171,31 +182,31 @@ export class PlayManager extends ManagerBase {
       this.Log("Play started successfully");
       if(this.server.boundTextChannel && ch && mes){
         // 再生開始メッセージ
-        const _t = Number(this.CurrentAudioInfo.LengthSeconds);
+        const _t = Number(this.currentAudioInfo.LengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
         const embed = new Helper.MessageEmbedBuilder({
           title: ":cd:現在再生中:musical_note:",
           description:
-              `[${this.CurrentAudioInfo.Title}](${this.CurrentAudioUrl}) \``
-            + (this.CurrentAudioInfo.ServiceIdentifer === "youtube" && (this.CurrentAudioInfo as YouTube).LiveStream ? "(ライブストリーム)" : _t === 0 ? "(不明)" : min + ":" + sec)
+              `[${this.currentAudioInfo.Title}](${this.currentAudioUrl}) \``
+            + (this.currentAudioInfo.ServiceIdentifer === "youtube" && (this.currentAudioInfo as YouTube).LiveStream ? "(ライブストリーム)" : _t === 0 ? "(不明)" : min + ":" + sec)
             + "`"
         });
         embed.setColor(getColor("AUTO_NP"));
-        embed.addField("リクエスト", this.server.queue.get(0).AdditionalInfo.AddedBy.displayName, true);
+        embed.addField("リクエスト", this.server.queue.get(0).additionalInfo.addedBy.displayName, true);
         embed.addField("次の曲",
           // トラックループオンなら現在の曲
-          this.server.queue.loopEnabled ? this.server.queue.get(0).BasicInfo.Title :
+          this.server.queue.loopEnabled ? this.server.queue.get(0).basicInfo.Title :
           // (トラックループはオフ)長さが2以上ならオフセット1の曲
-            this.server.queue.length >= 2 ? this.server.queue.get(1).BasicInfo.Title :
+            this.server.queue.length >= 2 ? this.server.queue.get(1).basicInfo.Title :
             // (トラックループオフ,長さ1)キューループがオンなら現在の曲
-              this.server.queue.queueLoopEnabled ? this.server.queue.get(0).BasicInfo.Title :
+              this.server.queue.queueLoopEnabled ? this.server.queue.get(0).basicInfo.Title :
               // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
                 "次の曲がまだ登録されていません"
           , true);
-        const [qhour, qmin, qsec] = Util.time.CalcHourMinSec(this.server.queue.lengthSeconds - this.CurrentAudioInfo.LengthSeconds);
+        const [qhour, qmin, qsec] = Util.time.CalcHourMinSec(this.server.queue.lengthSeconds - this.currentAudioInfo.LengthSeconds);
         embed.addField("再生待ちの曲", this.server.queue.loopEnabled ? "ループします" : (this.server.queue.length - 1) + "曲(" + (qhour === "0" ? "" : qhour + ":") + qmin + ":" + qsec + ")", true);
-        embed.setThumbnail(this.CurrentAudioInfo.Thumnail);
-        if(this.CurrentAudioInfo.ServiceIdentifer === "youtube" && (this.CurrentAudioInfo as YouTube).IsFallbacked){
+        embed.setThumbnail(this.currentAudioInfo.Thumnail);
+        if(this.currentAudioInfo.ServiceIdentifer === "youtube" && (this.currentAudioInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
         mes.edit({content: "", embeds: [embed.toEris()]}).catch(e => Util.logger.log(e, "error"));
@@ -215,7 +226,7 @@ export class PlayManager extends ManagerBase {
         // eslint-disable-next-line no-empty
       } catch{}
       if(this.server.boundTextChannel && ch && mes){
-        mes.edit(`:tired_face:曲の再生に失敗しました...。(${Util.general.StringifyObject(e)})` + (this.errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
+        mes.edit(`:tired_face:曲の再生に失敗しました...。(${Util.general.StringifyObject(e)})` + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
         this.onStreamFailed();
       }
     }
@@ -294,8 +305,13 @@ export class PlayManager extends ManagerBase {
         console.error(er);
       }
     }
-    this.errorReportChannel.createMessage(":tired_face:曲の再生に失敗しました...。" + (this.errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
+    this._errorReportChannel.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
     this.onStreamFailed();
+  }
+
+  resetError(){
+    this._errorCount = 0;
+    this._errorUrl = "";
   }
 
   private async onStreamFinished(){
@@ -307,8 +323,8 @@ export class PlayManager extends ManagerBase {
     // ストリームが終了したら時間を確認しつつ次の曲へ移行
     this.Log("Stream finished");
     // 再生が終わったら
-    this.errorCount = 0;
-    this.errorUrl = "";
+    this._errorCount = 0;
+    this._errorUrl = "";
     if(this.server.queue.loopEnabled){
       // 曲ループオンならばもう一度再生
       this.play();
@@ -338,17 +354,17 @@ export class PlayManager extends ManagerBase {
 
   private async onStreamFailed(){
     this.Log("onStreamFailed called");
-    if(this.errorUrl === this.CurrentAudioInfo.Url){
-      this.errorCount++;
+    if(this._errorUrl === this.currentAudioInfo.Url){
+      this._errorCount++;
     }else{
-      this.errorCount = 1;
-      this.errorUrl = this.CurrentAudioInfo.Url;
-      if(this.CurrentAudioInfo.isYouTube()) this.CurrentAudioInfo.disableCache();
+      this._errorCount = 1;
+      this._errorUrl = this.currentAudioInfo.Url;
+      if(this.currentAudioInfo.isYouTube()) this.currentAudioInfo.disableCache();
     }
-    this.Log(`Play failed, (${this.errorCount}times)`, "warn");
-    this.error = this.preparing = false;
+    this.Log(`Play failed, (${this._errorCount}times)`, "warn");
+    this.preparing = false;
     this.stop();
-    if(this.errorCount >= this.retryLimit){
+    if(this._errorCount >= this.retryLimit){
       if(this.server.queue.loopEnabled) this.server.queue.loopEnabled = false;
       if(this.server.queue.length === 1 && this.server.queue.queueLoopEnabled) this.server.queue.queueLoopEnabled = false;
       await this.server.queue.next();

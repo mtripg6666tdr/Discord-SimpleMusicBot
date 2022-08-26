@@ -28,7 +28,7 @@ export default class Skip extends BaseCommand {
     }
     try{
       const response = await message.reply(":ok: スキップしています");
-      const title = server.queue.get(0).BasicInfo.Title;
+      const title = server.queue.get(0).basicInfo.Title;
       server.player.stop();
       await server.queue.next();
       await server.player.play();

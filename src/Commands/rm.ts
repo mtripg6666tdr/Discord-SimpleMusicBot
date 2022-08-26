@@ -72,7 +72,7 @@ export default class Rm extends BaseCommand {
       indexes.map(str => Number(str)).filter(n => !isNaN(n))
         .sort((a, b)=>b - a)
     ));
-    const title = dels.length === 1 ? q.get(dels[0]).BasicInfo.Title : null;
+    const title = dels.length === 1 ? q.get(dels[0]).basicInfo.Title : null;
     for(let i = 0; i < dels.length; i++){
       q.removeAt(Number(dels[i]));
     }

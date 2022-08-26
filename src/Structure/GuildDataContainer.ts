@@ -132,8 +132,8 @@ export class GuildDataContainer extends LogEmitter {
     return JSON.stringify({
       version: YmxVersion,
       data: this.queue.map(q => ({
-        ...(q.BasicInfo.exportData()),
-        addBy: q.AdditionalInfo.AddedBy
+        ...(q.basicInfo.exportData()),
+        addBy: q.additionalInfo.addedBy
       })),
     } as YmxFormat);
   }
