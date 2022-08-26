@@ -119,7 +119,7 @@ export class PlayManager extends ManagerBase {
       // なにかしら再生中
       || this.isPlaying
       // キューが空
-      || this.server.queue.hasNothing
+      || this.server.queue.isEmpty
       // 準備中
       || this.preparing
     ;

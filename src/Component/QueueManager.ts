@@ -21,31 +21,46 @@ export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"unknown
  * キューの追加および削除などの機能を提供します。
  */
 export class QueueManager extends ManagerBase {
-  // キューの本体
+  /**
+   * キューの本体
+   */
   private _default:QueueContent[] = [];
-  // キューの本体のゲッタープロパティ
-  private get default():QueueContent[]{
+  /**
+   * キューの本体のゲッタープロパティ
+   */
+  private get default():Readonly<QueueContent[]>{
     return this._default;
   }
 
-  // トラックループが有効か?
+  /**
+   * トラックループが有効か?
+   */
   loopEnabled:boolean = false;
-  // キューループが有効か?
+  /**
+   * キューループが有効か?
+   */
   queueLoopEnabled:boolean = false;
-  // ワンスループが有効か?
+  /**
+   * ワンスループが有効か?
+   */
   onceLoopEnabled:boolean = false;
-  // キューの長さ
+  /**
+   * キューの長さ（トラック数）
+   */
   get length():number{
     return this.default.length;
   }
 
+  /**
+   * きゅの長さ（時間秒）
+   */
   get lengthSeconds():number{
     let totalLength = 0;
     this.default.forEach(q => totalLength += Number(q.basicInfo.LengthSeconds));
     return totalLength;
   }
 
-  get hasNothing():boolean{
+  get isEmpty():boolean{
     return this.length === 0;
   }
 
@@ -121,7 +136,7 @@ export class QueueManager extends ManagerBase {
       try{
         PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
         const result = {
-          basicInfo: await AudioSource.Resolve({
+          basicInfo: await AudioSource.resolve({
             url, type,
             knownData: gotData,
             forceCache: this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000
@@ -237,7 +252,8 @@ export class QueueManager extends ManagerBase {
           .addField("リクエスト", this.getDisplayNameFromMember(addedBy) ?? "不明", true)
           .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
           .addField("再生されるまでの予想時間", index === "0" ? "-" : ((ehour === "0" ? "" : ehour + ":") + emin + ":" + esec), true)
-          .setThumbnail(info.basicInfo.Thumnail);
+          .setThumbnail(info.basicInfo.Thumnail)
+        ;
         if(info.basicInfo.ServiceIdentifer === "youtube" && (info.basicInfo as AudioSource.YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
@@ -312,7 +328,7 @@ export class QueueManager extends ManagerBase {
     this.onceLoopEnabled = false;
     this.server.player.resetError();
     if(this.queueLoopEnabled){
-      this.default.push(this.default[0]);
+      this._default.push(this.default[0]);
     }else if(this.server.AddRelative && this.server.player.currentAudioInfo.ServiceIdentifer === "youtube"){
       const relatedVideos = (this.server.player.currentAudioInfo as AudioSource.YouTube).relatedVideos;
       if(relatedVideos.length >= 1){
@@ -417,14 +433,14 @@ export class QueueManager extends ManagerBase {
     PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
     if(from < to){
       //要素追加
-      this.default.splice(to + 1, 0, this.default[from]);
+      this._default.splice(to + 1, 0, this.default[from]);
       //要素削除
-      this.default.splice(from, 1);
+      this._default.splice(from, 1);
     }else if(from > to){
       //要素追加
-      this.default.splice(to, 0, this.default[from]);
+      this._default.splice(to, 0, this.default[from]);
       //要素削除
-      this.default.splice(from + 1, 1);
+      this._default.splice(from + 1, 1);
     }
     if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
       this.server.bot.queueModifiedGuilds.push(this.server.guildID);
