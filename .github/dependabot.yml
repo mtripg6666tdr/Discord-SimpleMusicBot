@@ -17,8 +17,6 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
-      - dependency-name: "discord-api-types"
-      - dependency-name: "@discordjs/builders"
 
   # v2 branch
   - package-ecosystem: npm
