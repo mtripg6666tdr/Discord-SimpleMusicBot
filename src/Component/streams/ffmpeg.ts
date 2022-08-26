@@ -32,7 +32,7 @@ export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string[],
     "-ac", "2",
     "-vbr", "on",
   ];
-  Util.logger.log("[FFmpeg] Passing arguments: " + args.map(arg => arg.startsWith("http") ? "<URL>" : arg).join(" "));
+  Util.logger.log("[FFmpeg] Passing arguments: " + args.map(arg => arg.startsWith("http") ? "<URL>" : arg).join(" "), "debug");
   const ffmpeg = new FFmpeg({args});
   if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log("[FFmpeg]" + chunk.toString(), "debug"));
   if(readable.type === "readable"){
