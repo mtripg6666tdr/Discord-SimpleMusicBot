@@ -16,19 +16,18 @@ export default class Pause extends BaseCommand {
   }
   
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    const server = options.data[message.guild.id];
+    options.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
-    if(!server.Player.isPlaying){
+    if(!options.server.player.isPlaying){
       await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    if(server.Player.isPaused){
+    if(options.server.player.isPaused){
       await message.reply(":pause_button: すでに一時停止されています\r\n再生を再開するには`再生`コマンドを使用してください").catch(e => Util.logger.log(e, "error"));
       return;
     }
     // 停止しま～す
-    server.Player.pause();
+    options.server.player.pause();
     message.reply(":pause_button: 一時停止しました").catch(e => Util.logger.log(e, "error"));
   }
 }

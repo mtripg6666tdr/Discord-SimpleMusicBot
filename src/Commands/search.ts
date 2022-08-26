@@ -30,23 +30,23 @@ export default class Search extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    options.JoinVoiceChannel(message);
+    options.server.updateBoundChannel(message);
+    options.server.joinVoiceChannel(message);
     if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){
       options.args.forEach(async u => {
-        await options.PlayFromURL(message, u, !options.data[message.guild.id].Player.isConnecting);
+        await options.server.playFromURL(message, u, !options.server.player.isConnecting);
       });
       return;
     }
     const s = Util.time.timer.start("Search(Command)->BeforeYtsr");
-    if(options.data[message.guild.id].SearchPanel !== null){
+    if(options.server.searchPanel !== null){
       message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
     if(options.rawArgs !== ""){
-      options.data[message.guild.id].SearchPanel = {} as any;
+      options.server.searchPanel = {} as any;
       const msg = await message.reply("🔍検索中...");
-      options.data[message.guild.id].SearchPanel = {
+      options.server.searchPanel = {
         Msg: {
           id: msg.id,
           chId: msg.channel.id,
@@ -69,7 +69,7 @@ export default class Search extends BaseCommand {
           if(result.items[i].type === "video"){
             const video = (result.items[i] as ytsr.Video);
             desc += `\`${index}.\` [${video.title}](${video.url}) \`${video.duration}\` - \`${video.author.name}\` \r\n\r\n`;
-            options.data[message.guild.id].SearchPanel.Opts[index] = {
+            options.server.searchPanel.Opts[index] = {
               url: video.url,
               title: video.title,
               duration: video.duration,
@@ -84,7 +84,7 @@ export default class Search extends BaseCommand {
           }
         }
         if(index === 1){
-          options.data[message.guild.id].SearchPanel = null;
+          options.server.searchPanel = null;
           await msg.edit(":pensive:見つかりませんでした。");
           return;
         }
@@ -121,7 +121,7 @@ export default class Search extends BaseCommand {
       }
       catch(e){
         Util.logger.log(e, "error");
-        options.data[message.guild.id].SearchPanel = null;
+        options.server.searchPanel = null;
         if(msg) msg.edit("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
         else message.reply("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
       }

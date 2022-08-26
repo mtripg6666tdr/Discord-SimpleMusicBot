@@ -56,7 +56,7 @@ export class QueueManager extends ManagerBase {
   }
 
   setBinding(data:GuildDataContainer){
-    this.Log("Set data of guild id " + data.GuildID);
+    this.Log("Set data of guild id " + data.guildID);
     super.setBinding(data);
   }
 
@@ -119,7 +119,7 @@ export class QueueManager extends ManagerBase {
       this.Log("AddQueue called");
       const t = Util.time.timer.start("AddQueue");
       try{
-        PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
+        PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
         const result = {
           BasicInfo: await AudioSource.Resolve({
             url, type,
@@ -135,9 +135,9 @@ export class QueueManager extends ManagerBase {
         } as QueueContent;
         if(result.BasicInfo){
           this._default[method](result);
-          if(this.info.EquallyPlayback) this.sortWithAddedBy();
-          if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
-            this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+          if(this.server.equallyPlayback) this.sortWithAddedBy();
+          if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
+            this.server.bot.queueModifiedGuilds.push(this.server.guildID);
           }
           t.end();
           const index = this._default.findIndex(q => q === result);
@@ -181,12 +181,12 @@ export class QueueManager extends ManagerBase {
     let ch:TextChannel = null;
     let msg:Message<TextChannel>|ResponseMessage = null;
     try{
-      if(fromSearch && this.info.SearchPanel){
+      if(fromSearch && this.server.searchPanel){
         // 検索パネルから
         this.Log("AutoAddQueue from search panel");
-        ch = client.getChannel(this.info.SearchPanel.Msg.chId) as TextChannel;
+        ch = client.getChannel(this.server.searchPanel.Msg.chId) as TextChannel;
         if(typeof fromSearch === "boolean"){
-          msg = ch.messages.get(this.info.SearchPanel.Msg.id);
+          msg = ch.messages.get(this.server.searchPanel.Msg.id);
         }else{
           msg = fromSearch;
         }
@@ -213,13 +213,13 @@ export class QueueManager extends ManagerBase {
         ch = channel;
         msg = await channel.createMessage("情報を取得しています。お待ちください...");
       }
-      if(this.info.Queue.length > 999){
+      if(this.server.queue.length > 999){
         // キュー上限
         this.Log("AutoAddQueue failed due to too long queue", "warn");
         // eslint-disable-next-line @typescript-eslint/no-throw-literal
         throw "キューの上限を超えています";
       }
-      const info = await this.info.Queue.addQueue(url, addedBy, first ? "unshift" : "push", type, gotData ?? null);
+      const info = await this.server.queue.addQueue(url, addedBy, first ? "unshift" : "push", type, gotData ?? null);
       this.Log("AutoAddQueue worked successfully");
       if(msg){
         // 曲の時間取得＆計算
@@ -228,7 +228,7 @@ export class QueueManager extends ManagerBase {
         // キュー内のオフセット取得
         const index = info.index.toString();
         // ETAの計算
-        const [ehour, emin, esec] = Util.time.CalcHourMinSec(this.getLengthSecondsTo(info.index) - _t - Math.floor(this.info.Player.currentTime / 1000));
+        const [ehour, emin, esec] = Util.time.CalcHourMinSec(this.getLengthSecondsTo(info.index) - _t - Math.floor(this.server.player.currentTime / 1000));
         const embed = new Helper.MessageEmbedBuilder()
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
@@ -308,22 +308,22 @@ export class QueueManager extends ManagerBase {
    */
   async next(){
     this.Log("Next Called");
-    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
+    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
     this.onceLoopEnabled = false;
-    this.info.Player.errorCount = 0;
-    this.info.Player.errorUrl = "";
+    this.server.player.errorCount = 0;
+    this.server.player.errorUrl = "";
     if(this.queueLoopEnabled){
       this.default.push(this.default[0]);
-    }else if(this.info.AddRelative && this.info.Player.CurrentAudioInfo.ServiceIdentifer === "youtube"){
-      const relatedVideos = (this.info.Player.CurrentAudioInfo as AudioSource.YouTube).relatedVideos;
+    }else if(this.server.AddRelative && this.server.player.CurrentAudioInfo.ServiceIdentifer === "youtube"){
+      const relatedVideos = (this.server.player.CurrentAudioInfo as AudioSource.YouTube).relatedVideos;
       if(relatedVideos.length >= 1){
         const video = relatedVideos[0];
-        await this.info.Queue.addQueue(video.url, null, "push", "youtube", video);
+        await this.server.queue.addQueue(video.url, null, "push", "youtube", video);
       }
     }
     this._default.shift();
-    if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
-      this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+    if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
+      this.server.bot.queueModifiedGuilds.push(this.server.guildID);
     }
   }
 
@@ -333,10 +333,10 @@ export class QueueManager extends ManagerBase {
    */
   removeAt(offset:number){
     this.Log(`RemoveAt Called (offset:${offset})`);
-    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
+    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
     this._default.splice(offset, 1);
-    if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
-      this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+    if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
+      this.server.bot.queueModifiedGuilds.push(this.server.guildID);
     }
   }
 
@@ -345,10 +345,10 @@ export class QueueManager extends ManagerBase {
    */
   removeAll(){
     this.Log("RemoveAll Called");
-    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
+    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
     this._default = [];
-    if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
-      this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+    if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
+      this.server.bot.queueModifiedGuilds.push(this.server.guildID);
     }
   }
 
@@ -357,10 +357,10 @@ export class QueueManager extends ManagerBase {
    */
   RemoveFrom2nd(){
     this.Log("RemoveFrom2 Called");
-    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
+    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
     this._default = [this.default[0]];
-    if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
-      this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+    if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
+      this.server.bot.queueModifiedGuilds.push(this.server.guildID);
     }
   }
 
@@ -369,9 +369,9 @@ export class QueueManager extends ManagerBase {
    */
   shuffle(){
     this.Log("Shuffle Called");
-    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
+    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
     if(this._default.length === 0) return;
-    if(this.info.Player.isPlaying || this.info.Player.preparing){
+    if(this.server.player.isPlaying || this.server.player.preparing){
       const first = this._default[0];
       this._default.shift();
       this._default.sort(() => Math.random() - 0.5);
@@ -379,8 +379,8 @@ export class QueueManager extends ManagerBase {
     }else{
       this._default.sort(() => Math.random() - 0.5);
     }
-    if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
-      this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+    if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
+      this.server.bot.queueModifiedGuilds.push(this.server.guildID);
     }
   }
 
@@ -391,9 +391,9 @@ export class QueueManager extends ManagerBase {
    */
   removeIf(validator:(q:QueueContent)=>boolean):number[]{
     this.Log("RemoveIf Called");
-    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
+    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
     if(this._default.length === 0) return [];
-    const first = this.info.Player.isPlaying ? 1 : 0;
+    const first = this.server.player.isPlaying ? 1 : 0;
     const rmIndex = [] as number[];
     for(let i = first; i < this._default.length; i++){
       if(validator(this._default[i])){
@@ -402,8 +402,8 @@ export class QueueManager extends ManagerBase {
     }
     rmIndex.sort((a, b)=>b - a);
     rmIndex.forEach(n => this.removeAt(n));
-    if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
-      this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+    if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
+      this.server.bot.queueModifiedGuilds.push(this.server.guildID);
     }
     return rmIndex;
   }
@@ -415,7 +415,7 @@ export class QueueManager extends ManagerBase {
    */
   move(from:number, to:number){
     this.Log("Move Called");
-    PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
+    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
     if(from < to){
       //要素追加
       this.default.splice(to + 1, 0, this.default[from]);
@@ -427,8 +427,8 @@ export class QueueManager extends ManagerBase {
       //要素削除
       this.default.splice(from + 1, 1);
     }
-    if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
-      this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+    if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
+      this.server.bot.queueModifiedGuilds.push(this.server.guildID);
     }
   }
 

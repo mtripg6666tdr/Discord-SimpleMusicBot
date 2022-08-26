@@ -26,17 +26,17 @@ export default class NowPlaying extends BaseCommand {
   }
   
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
+    options.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
-    if(!options.data[message.guild.id].Player.isPlaying){
+    if(!options.server.player.isPlaying){
       message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const _s = Math.floor(options.data[message.guild.id].Player.currentTime / 1000);
-    const _t = Number(options.data[message.guild.id].Player.CurrentAudioInfo.LengthSeconds);
+    const _s = Math.floor(options.server.player.currentTime / 1000);
+    const _t = Number(options.server.player.CurrentAudioInfo.LengthSeconds);
     const [min, sec] = Util.time.CalcMinSec(_s);
     const [tmin, tsec] = Util.time.CalcMinSec(_t);
-    const info = options.data[message.guild.id].Player.CurrentAudioInfo;
+    const info = options.server.player.CurrentAudioInfo;
     let progressBar = "";
     if(_t > 0){
       const progress = Math.floor(_s / _t * 20);

@@ -27,9 +27,9 @@ export default class Queue extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
+    options.server.updateBoundChannel(message);
     const msg = await message.reply(":eyes: キューを確認しています。お待ちください...");
-    const queue = options.data[message.guild.id].Queue;
+    const queue = options.server.queue;
     if(queue.length === 0){
       msg.edit(":face_with_raised_eyebrow:キューは空です。").catch(e => Util.logger.log(e, "error"));
       return;
@@ -55,7 +55,7 @@ export default class Queue extends BaseCommand {
         const _t = Number(q.BasicInfo.LengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
         fields.push({
-          name: i !== 0 ? i.toString() : options.data[message.guild.id].Player.isPlaying ? "現在再生中" : "再生待ち",
+          name: i !== 0 ? i.toString() : options.server.player.isPlaying ? "現在再生中" : "再生待ち",
           value: "[" + q.BasicInfo.Title + "](" + q.BasicInfo.Url + ") \r\n"
           + "長さ: `" + ((q.BasicInfo.ServiceIdentifer === "youtube" && (q.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : min + ":" + sec) + " ` \r\n"
           + "リクエスト: `" + q.AdditionalInfo.AddedBy.displayName + "` "
@@ -71,7 +71,9 @@ export default class Queue extends BaseCommand {
           name: options.client.user.username,
           icon_url: options.client.user.avatarURL,
         })
-        .setFooter({text: queue.length + "曲 | 合計:" + thour + ":" + tmin + ":" + tsec + " | トラックループ:" + (queue.loopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.queueLoopEnabled ? "⭕" : "❌") + " | 関連曲自動再生:" + (options.data[message.guild.id].AddRelative ? "⭕" : "❌") + " | 均等再生:" + (options.data[message.guild.id].EquallyPlayback ? "⭕" : "❌")})
+        .setFooter({
+          text: `${queue.length}曲 | 合計:${thour}:${tmin}:${tsec} | トラックループ:${queue.loopEnabled ? "⭕" : "❌"} | キューループ:${queue.queueLoopEnabled ? "⭕" : "❌"} | 関連曲自動再生:${options.server.AddRelative ? "⭕" : "❌"} | 均等再生:${options.server.equallyPlayback ? "⭕" : "❌"}`
+        })
         .setThumbnail(message.guild.iconURL)
         .setColor(getColor("QUEUE"))
         .toEris()
@@ -81,7 +83,7 @@ export default class Queue extends BaseCommand {
     // 送信
     await msg.edit({content: "", embeds: [getQueueEmbed(_page)]}).catch(e => Util.logger.log(e, "error"));
     if(totalpage > 1){
-      options.EmbedPageToggle.push((await PageToggle.init(msg, n => getQueueEmbed(n + 1), totalpage, _page - 1)).SetFresh(true));
+      options.embedPageToggle.push((await PageToggle.init(msg, n => getQueueEmbed(n + 1), totalpage, _page - 1)).SetFresh(true));
     }
   }
 }

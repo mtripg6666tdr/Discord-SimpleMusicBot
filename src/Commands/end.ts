@@ -16,18 +16,17 @@ export default class End extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    const guild = options.data[message.guild.id];
-    if(!guild.Player.isPlaying){
+    options.server.updateBoundChannel(message);
+    if(!options.server.player.isPlaying){
       message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    if(guild.Queue.length <= 1){
+    if(options.server.queue.length <= 1){
       message.reply("キューが空、もしくは一曲しかないため削除されませんでした。").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    guild.Queue.RemoveFrom2nd();
-    guild.Queue.queueLoopEnabled = guild.Queue.onceLoopEnabled = guild.Queue.loopEnabled = false;
+    options.server.queue.RemoveFrom2nd();
+    options.server.queue.queueLoopEnabled = options.server.queue.onceLoopEnabled = options.server.queue.loopEnabled = false;
     message.reply("✅キューに残された曲を削除しました").catch(e => Util.logger.log(e, "error"));
   }
 }

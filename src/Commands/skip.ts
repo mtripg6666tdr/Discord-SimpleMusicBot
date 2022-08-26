@@ -16,22 +16,22 @@ export default class Skip extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    const server = options.data[message.guild.id];
+    options.server.updateBoundChannel(message);
+    const server = options.server;
     // そもそも再生状態じゃないよ...
-    if(!server.Player.isPlaying){
+    if(!server.player.isPlaying){
       await message.reply("再生中ではありません").catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"));
       return;
-    }else if(server.Player.preparing){
+    }else if(server.player.preparing){
       await message.reply("再生準備中です").catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"));
       return;
     }
     try{
       const response = await message.reply(":ok: スキップしています");
-      const title = server.Queue.get(0).BasicInfo.Title;
-      server.Player.stop();
-      await server.Queue.next();
-      await server.Player.play();
+      const title = server.queue.get(0).BasicInfo.Title;
+      server.player.stop();
+      await server.queue.next();
+      await server.player.play();
       await response.edit(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => Util.logger.log(e, "error"));
     }
     catch(e){

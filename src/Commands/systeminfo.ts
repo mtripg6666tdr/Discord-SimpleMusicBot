@@ -36,7 +36,7 @@ export default class SystemInfo extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
+    options.server.updateBoundChannel(message);
     // Run default logger
     options.bot.logGeneralInfo();
     await message.reply("実行します");
@@ -48,9 +48,9 @@ export default class SystemInfo extends BaseCommand {
         new Helper.MessageEmbedBuilder()
           .setTitle("Discord-SimpleMusicBot")
           .setDescription("Basic info")
-          .addField("Version (commit hash)", `\`${options.bot.Version}\``, true)
-          .addField("Managed embed toggles", `\`${options.EmbedPageToggle.length}\``, true)
-          .addField("Guilds that have modified data", `\`${options.bot.QueueModifiedGuilds.length}\``, true)
+          .addField("Version (commit hash)", `\`${options.bot.version}\``, true)
+          .addField("Managed embed toggles", `\`${options.embedPageToggle.length}\``, true)
+          .addField("Guilds that have modified data", `\`${options.bot.queueModifiedGuilds.length}\``, true)
           .setColor(getColor("UPTIME"))
           .toEris()
       );

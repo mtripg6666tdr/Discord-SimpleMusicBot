@@ -29,17 +29,17 @@ export default class Mv extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
+    options.server.updateBoundChannel(message);
     if(options.args.length !== 2){
       message.reply("✘引数は`移動したい曲の元のオフセット(番号) 移動先のオフセット(番号)`のように指定します。").catch(e => Util.logger.log(e, "error"));
       return;
-    }else if(options.args.includes("0") && options.data[message.guild.id].Player.isPlaying){
+    }else if(options.args.includes("0") && options.server.player.isPlaying){
       message.reply("✘音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const from = Number(options.args[0]);
     const to = Number(options.args[1]);
-    const q = options.data[message.guild.id].Queue;
+    const q = options.server.queue;
     if(
       from >= 0 && from <= q.length
       && to >= 0 && to <= q.length

@@ -28,7 +28,7 @@ export default class Import extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
+    options.server.updateBoundChannel(message);
     if(options.rawArgs === ""){
       message.reply("❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(e => Util.logger.log(e, "error"));
       return;
@@ -41,8 +41,8 @@ export default class Import extends BaseCommand {
     }
     if(url.startsWith("http://discord.com/channels/") || url.startsWith("https://discord.com/channels/")){
       let smsg = null as ResponseMessage;
-      const cancellation = new TaskCancellationManager(message.guild.id);
-      options.cancellations.push(cancellation);
+      const cancellation = new TaskCancellationManager();
+      options.server.bindCancellation(cancellation);
       try{
         smsg = await message.reply("🔍メッセージを取得しています...");
         const ids = url.split("/");
@@ -63,7 +63,7 @@ export default class Import extends BaseCommand {
           for(let i = 0; i < fields.length; i++){
             const lines = fields[i].value.split("\r\n");
             const tMatch = lines[0].match(/\[(?<title>.+)\]\((?<url>.+)\)/);
-            await options.data[message.guild.id].Queue.autoAddQueue(options.client, tMatch.groups.url, message.member, "unknown");
+            await options.server.queue.autoAddQueue(options.client, tMatch.groups.url, message.member, "unknown");
             await smsg.edit(fields.length + "曲中" + (i + 1) + "曲処理しました。");
             if(cancellation.Cancelled) break;
           }
@@ -80,7 +80,7 @@ export default class Import extends BaseCommand {
           }
           const qs = raw.data;
           for(let i = 0; i < qs.length; i++){
-            await options.data[message.guild.id].Queue.autoAddQueue(options.client, qs[i].url, message.member, "unknown", false, false, null, null, qs[i]);
+            await options.server.queue.autoAddQueue(options.client, qs[i].url, message.member, "unknown", false, false, null, null, qs[i]);
             if(qs.length <= 10 || i % 10 === 9){
               await smsg.edit(qs.length + "曲中" + (i + 1) + "曲処理しました。");
             }
@@ -101,7 +101,7 @@ export default class Import extends BaseCommand {
         smsg?.edit("😭失敗しました...");
       }
       finally{
-        options.cancellations.splice(options.cancellations.findIndex(c => c === cancellation), 1);
+        options.server.unbindCancellation(cancellation);
       }
     }else{
       await message.reply("❌Discordのメッセージへのリンクを指定してください").catch(e => Util.logger.log(e, "error"));

@@ -13,9 +13,9 @@ export const EffectsCustomIds = {
 
 export function getFFmpegEffectArgs(data:GuildDataContainer){
   const effect = [];
-  if(data.EffectPrefs.BassBoost) effect.push("firequalizer=gain_entry='entry(75,2)'");
-  if(data.EffectPrefs.Reverb) effect.push("aecho=1.0:0.7:20:0.5");
-  if(data.EffectPrefs.LoudnessEqualization) effect.push("loudnorm");
+  if(data.effectPrefs.BassBoost) effect.push("firequalizer=gain_entry='entry(75,2)'");
+  if(data.effectPrefs.Reverb) effect.push("aecho=1.0:0.7:20:0.5");
+  if(data.effectPrefs.LoudnessEqualization) effect.push("loudnorm");
   
   if(effect.length >= 1){
     return ["-af", effect.join(",")];
@@ -28,9 +28,9 @@ export function getCurrentEffectPanel(avatarUrl:string, data:GuildDataContainer)
   const embed = new Helper.MessageEmbedBuilder()
     .setTitle(":cd:エフェクトコントロールパネル:microphone:")
     .setDescription("オーディオエフェクトの設定/解除することができます。\r\n・表示は古い情報であることがありますが、エフェクトを操作したとき、更新ボタンを押したときに更新されます。\r\n・エフェクトは次の曲から適用されます\r\n現在の曲に適用したい場合は、`頭出し`コマンドを使用してください\r\n")
-    .addField("Bass Boost", data.EffectPrefs.BassBoost ? "⭕" : "❌", true)
-    .addField("Reverb", data.EffectPrefs.Reverb ? "⭕" : "❌", true)
-    .addField("Loudness Eq", data.EffectPrefs.LoudnessEqualization ? "⭕" : "❌", true)
+    .addField("Bass Boost", data.effectPrefs.BassBoost ? "⭕" : "❌", true)
+    .addField("Reverb", data.effectPrefs.Reverb ? "⭕" : "❌", true)
+    .addField("Loudness Eq", data.effectPrefs.LoudnessEqualization ? "⭕" : "❌", true)
     .setColor(getColor("EFFECT"))
     .setFooter({
       icon_url: avatarUrl,
@@ -46,15 +46,15 @@ export function getCurrentEffectPanel(avatarUrl:string, data:GuildDataContainer)
         .setLabel("更新"),
       new Helper.MessageButtonBuilder()
         .setCustomId("bass_boost")
-        .setStyle(data.EffectPrefs.BassBoost ? "SUCCESS" : "SECONDARY")
+        .setStyle(data.effectPrefs.BassBoost ? "SUCCESS" : "SECONDARY")
         .setLabel("Bass Boost"),
       new Helper.MessageButtonBuilder()
         .setCustomId("reverb")
-        .setStyle(data.EffectPrefs.Reverb ? "SUCCESS" : "SECONDARY")
+        .setStyle(data.effectPrefs.Reverb ? "SUCCESS" : "SECONDARY")
         .setLabel("Reverb"),
       new Helper.MessageButtonBuilder()
         .setCustomId("loudness_eq")
-        .setStyle(data.EffectPrefs.LoudnessEqualization ? "SUCCESS" : "SECONDARY")
+        .setStyle(data.effectPrefs.LoudnessEqualization ? "SUCCESS" : "SECONDARY")
         .setLabel("Loudness Eq")
     )
     .toEris()

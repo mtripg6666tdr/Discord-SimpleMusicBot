@@ -17,15 +17,15 @@ export default class Rmall extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
+    options.server.updateBoundChannel(message);
     if(!message.member.voiceState.channelID || ((options.client.getChannel(message.member.voiceState.channelID) as VoiceChannel).voiceMembers.has(options.client.user.id))){
       if(!message.member.permissions.has("manageGuild") && !message.member.permissions.has("manageChannels")){
         message.reply("この操作を実行する権限がありません。").catch(e => Util.logger.log(e, "error"));
         return;
       }
     }
-    options.data[message.guild.id].Player.disconnect();
-    options.data[message.guild.id].Queue.removeAll();
+    options.server.player.disconnect();
+    options.server.queue.removeAll();
     await message.reply("✅すべて削除しました").catch(e => Util.logger.log(e, "error"));
   }
 }

@@ -34,9 +34,9 @@ export default class Searchs extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    options.JoinVoiceChannel(message);
-    if(options.data[message.guild.id].SearchPanel !== null){
+    options.server.updateBoundChannel(message);
+    options.server.joinVoiceChannel(message);
+    if(options.server.searchPanel !== null){
       message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -44,9 +44,9 @@ export default class Searchs extends BaseCommand {
       let msg = null as Message<TextChannel>|ResponseMessage;
       let desc = "";
       try{
-        options.data[message.guild.id].SearchPanel = {} as any;
+        options.server.searchPanel = {} as any;
         msg = await message.reply("🔍検索中...");
-        options.data[message.guild.id].SearchPanel = {
+        options.server.searchPanel = {
           Msg: {
             id: msg.id,
             chId: msg.channel.id,
@@ -84,7 +84,7 @@ export default class Searchs extends BaseCommand {
         for(let i = 0; i < result.length; i++){
           const [min, sec] = Util.time.CalcMinSec(Math.floor(result[i].duration / 1000));
           desc += `\`${index}.\` [${result[i].title}](${result[i].permalink_url}) ${min}:${sec} - [${result[i].user.username}](${result[i].user.permalink_url}) \r\n\r\n`;
-          options.data[message.guild.id].SearchPanel.Opts[index] = {
+          options.server.searchPanel.Opts[index] = {
             url: result[i].permalink_url,
             title: result[i].title,
             duration: result[i].full_duration.toString(),
@@ -98,7 +98,7 @@ export default class Searchs extends BaseCommand {
           index++;
         }
         if(index === 1){
-          options.data[message.guild.id].SearchPanel = null;
+          options.server.searchPanel = null;
           await msg.edit(":pensive:見つかりませんでした。");
           return;
         }
@@ -134,7 +134,7 @@ export default class Searchs extends BaseCommand {
       }
       catch(e){
         Util.logger.log(e, "error");
-        options.data[message.guild.id].SearchPanel = null;
+        options.server.searchPanel = null;
         if(msg) msg.edit("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
         else message.reply("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
       }

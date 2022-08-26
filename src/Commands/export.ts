@@ -17,12 +17,12 @@ export default class Export extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    if(options.data[message.guild.id].Queue.length === 0){
+    options.server.updateBoundChannel(message);
+    if(options.server.queue.length === 0){
       message.reply("キューが空です。").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const qd = options.bot.exportQueue(message.guild.id);
+    const qd = options.server.exportQueue();
     await message.reply({
       content: "✅エクスポートしました",
       files: [{

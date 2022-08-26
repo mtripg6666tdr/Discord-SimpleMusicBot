@@ -16,8 +16,12 @@ export default class Cancel extends BaseCommand {
   }
   
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    options.cancellations.forEach(c => c.GuildId === message.guild.id && c.Cancel());
-    await message.reply("処理中の処理をすべてキャンセルしています....").catch(e => Util.logger.log(e, "error"));
+    options.server.updateBoundChannel(message);
+    const result = options.server.cancelAll();
+    if(result){
+      await message.reply("処理中の処理をすべてキャンセルしています....").catch(e => Util.logger.log(e, "error"));
+    }else{
+      await message.reply("キャンセルできる処理がありませんでした").catch(e => Util.logger.log(e, "error"));
+    }
   }
 }
