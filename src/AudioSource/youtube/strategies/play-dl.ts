@@ -12,6 +12,10 @@ type playDl = "playDl";
 const playDl:playDl = "playDl";
 
 export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> {
+  get cacheType(){
+    return playDl;
+  }
+
   async getInfo(url:string){
     this.useLog();
     const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#getInfo`);
@@ -48,16 +52,27 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
       info: this.mapToExportable(url, info),
       relatedVideos: null as exportableYouTube[],
     };
-    const format = info.format.filter(f => f.mimeType.startsWith("audio"));
-    if(format.length === 0) throw new Error("no format found!");
-    format.sort((fa, fb) => fb.bitrate - fa.bitrate);
-    return {
-      ...partialResult,
-      stream: {
-        type: "url",
-        url: format[0].url,
-      } as UrlStreamInfo
-    };
+    if(info.LiveStreamData.isLive){
+      return {
+        ...partialResult,
+        stream: {
+          type: "url",
+          url: info.LiveStreamData.hlsManifestUrl,
+        } as UrlStreamInfo
+      };
+    }else{
+      const format = info.format.filter(f => f.mimeType.startsWith("audio"));
+      if(format.length === 0) throw new Error("no format found!");
+      format.sort((fa, fb) => fb.bitrate - fa.bitrate);
+      return {
+        ...partialResult,
+        stream: {
+          type: "url",
+          url: format[0].url,
+          streamType: (format[0] as any)["container"] === "webm" && (format[0] as any)["codec"] === "opus" ? "webm" : undefined,
+        } as UrlStreamInfo
+      };
+    }
   }
 
   protected mapToExportable(url:string, info:InfoData):exportableYouTube{

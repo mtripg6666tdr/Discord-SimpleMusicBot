@@ -2,8 +2,6 @@ import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Cache } from "./base";
 import type { Readable } from "stream";
 
-import * as voice from "@discordjs/voice";
-
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 
@@ -18,6 +16,10 @@ type ytdlCore = "ytdlCore";
 export const ytdlCore:ytdlCore = "ytdlCore";
 
 export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, ytdl.videoInfo> {
+  get cacheType(){
+    return ytdlCore;
+  }
+
   async getInfo(url:string){
     this.useLog();
     const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
@@ -110,14 +112,14 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
         stream: {
           type: "readable",
           stream: readable,
-          streamType: format.container === "webm" && format.audioCodec === "opus" ? voice.StreamType.WebmOpus : undefined
+          streamType: format.container === "webm" && format.audioCodec === "opus" ? "webm" : undefined
         } as ReadableStreamInfo
       };
     }
   }
 
   protected mapToExportable(url:string, info:ytdl.videoInfo){
-    if(!info.videoDetails.isLiveContent && !info.videoDetails.liveBroadcastDetails.isLiveNow && info.videoDetails.liveBroadcastDetails.startTimestamp && !info.videoDetails.liveBroadcastDetails.endTimestamp){
+    if(!info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails && !info.videoDetails.liveBroadcastDetails.isLiveNow && info.videoDetails.liveBroadcastDetails.startTimestamp && !info.videoDetails.liveBroadcastDetails.endTimestamp){
       throw new Error("This video is still in upcoming");
     }
     return {
@@ -128,7 +130,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
       channel: info.videoDetails.ownerChannelName,
       channelUrl: info.videoDetails.author.channel_url,
       thumbnail: info.videoDetails.thumbnails[0].url,
-      isLive: info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails?.isLiveNow,
+      isLive: !!(info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails?.isLiveNow),
     };
   }
 }

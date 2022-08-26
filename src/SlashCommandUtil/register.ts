@@ -1,4 +1,4 @@
-require("dotenv").config();
+import "../dotenv";
 import type { SlashCommandBooleanOption, SlashCommandIntegerOption, SlashCommandStringOption } from "@discordjs/builders";
 import type { RouteLike } from "@discordjs/rest";
 
@@ -27,7 +27,10 @@ module.exports = function(route:RouteLike){
             .setDescription(arg.description)
             .setRequired(arg.required);
           if(arg.choices && Object.keys(arg.choices).length > 0){
-            Object.keys(arg.choices).forEach(key => (option as SlashCommandIntegerOption).addChoices([[key, arg.choices[key] as number]]));
+            Object.keys(arg.choices).forEach(key => (option as SlashCommandIntegerOption).addChoices({
+              name: key,
+              value: arg.choices[key] as number
+            }));
           }
           return option;
         };

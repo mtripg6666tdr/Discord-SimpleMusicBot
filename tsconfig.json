@@ -5,10 +5,12 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
+    "noImplicitOverride": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "outDir": "dist/",
     "sourceMap": true,
+    
     "importHelpers": true,
   },
   "include": [

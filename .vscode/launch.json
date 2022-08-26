@@ -4,7 +4,7 @@
   // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-      {
+    {
         "type": "node",
         "request": "launch",
         "name": "Launch Program (Main)",
@@ -14,6 +14,21 @@
         ],
         "program": "${workspaceFolder}\\dist\\index.js",
         "runtimeExecutable": "${workspaceFolder}\\node_modules\\.bin\\node"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Program (Main, on exposed GC)",
+      "runtimeArgs": [
+        "--expose-gc",
+        "--inspect=8889"
+      ],
+      "preLaunchTask": "Transpile TypeScript",
+      "skipFiles": [
+          "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}\\dist\\index.js",
+      "runtimeExecutable": "${workspaceFolder}\\node_modules\\.bin\\node"
     }
   ]
 }

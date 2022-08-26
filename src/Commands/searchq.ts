@@ -1,8 +1,9 @@
 import type { CommandArgs } from ".";
 import type { YouTube } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
+import type { EmbedField } from "eris";
 
-import * as discord from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -28,16 +29,16 @@ export default class Searchq extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    if(options.data[message.guild.id].Queue.length === 0){
+    options.server.updateBoundChannel(message);
+    if(options.server.queue.length === 0){
       message.reply("✘キューが空です").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    let qsresult = options.data[message.guild.id].Queue
-      .filter(c => c.BasicInfo.Title.toLowerCase().includes(options.rawArgs.toLowerCase()))
+    let qsresult = options.server.queue
+      .filter(c => c.basicInfo.Title.toLowerCase().includes(options.rawArgs.toLowerCase()))
       .concat(
-        options.data[message.guild.id].Queue
-          .filter(c => c.BasicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase()))
+        options.server.queue
+          .filter(c => c.basicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase()))
       );
     if(qsresult.length === 0){
       message.reply(":confused:見つかりませんでした").catch(e => Util.logger.log(e, "error"));
@@ -45,20 +46,24 @@ export default class Searchq extends BaseCommand {
     }
     if(qsresult.length > 20) qsresult = qsresult.slice(0, 20);
     const fields = qsresult.map(c => {
-      const index = options.data[message.guild.id].Queue.findIndex(d => d.BasicInfo.Title === c.BasicInfo.Title).toString();
-      const _t = c.BasicInfo.LengthSeconds;
+      const index = options.server.queue.findIndex(d => d.basicInfo.Title === c.basicInfo.Title).toString();
+      const _t = c.basicInfo.LengthSeconds;
       const [min, sec] = Util.time.CalcMinSec(_t);
       return {
         name: index === "0" ? "現在再生中/再生待ち" : index,
-        value: "[" + c.BasicInfo.Title + "](" + c.BasicInfo.Url + ")\r\nリクエスト: `" + c.AdditionalInfo.AddedBy.displayName + "` \r\n長さ: " + ((c.BasicInfo.ServiceIdentifer === "youtube" && (c.BasicInfo as YouTube).LiveStream) ? "(ライブストリーム)" : " `" + (_t === 0 ? "(不明)" : min + ":" + sec + "`")),
+        value: `[${c.basicInfo.Title}](${c.basicInfo.Url})\r\nリクエスト: \`${c.additionalInfo.addedBy.displayName}\` \r\n長さ: ${
+          (c.basicInfo.ServiceIdentifer === "youtube" && (c.basicInfo as YouTube).LiveStream) ? "(ライブストリーム)" : ` \`${_t === 0 ? "(不明)" : `${min}:${sec}`}\`)`
+        }`,
         inline: false
-      } as discord.EmbedField;
+      } as EmbedField;
     });
-    const embed = new discord.MessageEmbed();
-    embed.title = "\"" + options.rawArgs + "\"の検索結果✨";
-    embed.description = "キュー内での検索結果です。最大20件表示されます。";
-    embed.fields = fields;
-    embed.setColor(getColor("SEARCH"));
+    const embed = new Helper.MessageEmbedBuilder()
+      .setTitle(`"${options.rawArgs}"の検索結果✨`)
+      .setDescription("キュー内での検索結果です。最大20件表示されます。")
+      .setFields(...fields)
+      .setColor(getColor("SEARCH"))
+      .toEris()
+    ;
     message.reply({embeds: [embed]});
   }
 }

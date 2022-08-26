@@ -1,5 +1,6 @@
 # Discord-SimpleMusicBot 
-[![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/mtripg6666tdr/Discord-SimpleMusicBot/discord.js)](https://github.com/discordjs/discord.js)
+![GitHub package.json dynamic](https://img.shields.io/github/package-json/version/mtripg6666tdr/Discord-SimpleMusicBot)
+[![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/mtripg6666tdr/Discord-SimpleMusicBot/eris)](https://github.com/abalabahaha/eris)
 [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/testing.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/testing.yml)
 [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml)
 ![GitHub repo size](https://img.shields.io/github/repo-size/mtripg6666tdr/Discord-SimpleMusicBot)
@@ -62,25 +63,15 @@ YouTubeなどからの再生に対応。
 [コマンドの一覧はこちらからご覧になれます](docs/commands.md)
 
 ## 実行環境の準備
-- Node.js v16がサポートされている環境  
+- Node.js v12以上v16以下がサポートされている環境  
   - ほとんどのデバイスがサポートされています  
-  - nodeは[npmのnode](https://npmjs.com/package/node)から自動で取得されるので、バージョンに制約はありませんが、最新のLTSを使用することをお勧めします。  
-  - npmのnodeがサポートされていない環境では、`npm install`した際にその旨のエラーが発生します。その場合、以下を実行したうえで、別途Node.js v16をインストールして実行できるようにしておいてください。  
-    ```bash
-    npm uninstall node # nodeを依存パッケージから消す
-    ```
-    - このあと更新する際には、以下のように、ワークスペースをリセットしたうえでプルしてもういちどnodeを消す必要があります。
-    ```bash
-    git restore . # ワークスペースリセット
-    git pull
-    npm uninstall node # 上に同じ
-    npm install
-    ```
   - [npmのffmpeg](https://www.npmjs.com/package/ffmpeg-static)が利用できない場合は、`npm install`したときに、その旨の表示がされます。
     - その場合は、自分で別途ffmpegをインストールする必要があります。
     - 最新版でも入れておきましょう
   - Python2.xまたはPython3.xをインストールしておくことを推奨します。
     - `python --version`でバージョンが出ればインストールされています
+- ちなみに、デフォルトのmasterブランチと、v2ブランチとはサポートされているNode.jsのバージョンがかなり違うので、詳しくはブランチを切り替えるか下の方にある表を参照してください。
+- v2ブランチへの切り替え方法が分からないなどあればサポートへどうぞ
 
 ## インストール＆実行
 1. リポジトリをクローン
@@ -132,18 +123,22 @@ YouTubeなどからの再生に対応。
   こちらにはボットの設定情報などを記述します。
   任意指定の設定に関しては、**値をnullにしてください("null"ではなくnull)**
   `config.json.sample`がサンプルファイルとなっていますので、コピー＆リネームしてお使いください。
+  (カッコ内は、型です。)
   - adminId (string|null)  
-    管理人のユーザーのID (任意指定)
+    管理人のユーザーのID。設定しない場合は`null`
   - debug (boolean)  
-    デバッグ用の構成で起動するか
+    デバッグ用の構成で起動するか。
   - maintenance (boolean)  
-    メンテナンス用の構成で起動するか
+    メンテナンス用の構成で起動するか。
   - errorChannel (string|null)  
-    エラーレポートを送信するテキストチャンネルのID (任意指定)
+    エラーレポートを送信するテキストチャンネルのID。設定しない場合は`null`
   - proxy (string|null)  
-    プロキシを使用する場合はそのURL (任意指定)
+    プロキシを使用する場合はそのURL。設定しない場合は`null`
   - prefix (string|null)  
     指定する場合は一文字でデフォルトプレフィックスを指定してください。(任意指定)  
+    こちらは互換性のため、プロパティ自体が省略されていても動作するようになっています。
+  - webserver (boolean)  
+    ウェブサーバーを起動するか（任意指定）  
     こちらは互換性のため、プロパティ自体が省略されていても動作するようになっています。
   </details>
   
@@ -328,7 +323,16 @@ Issueのほか、下記のサポートサーバーでも各種お問い合わせ
 ## サポート
 Discordにて、インストール等のサポート、および重要な更新のお知らせ等を行っています。  
 ボットを試すこともできますので、興味のある方はご参加ください。  
-[サポートサーバーへの参加はこちら](https://discord.gg/7DrAEXBMHe)
+[サポートサーバーへの参加はこちら](https://discord.gg/7DrAEXBMHe)  
+
+### サポートされているバージョン
+|バージョン|Node.js|discord.js|eris|サポート状況|サポート範囲|
+|:---------|-------|----------|----|:----------|:----------:|
+|            [v1](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v1)    |>=12.0.0|v12.x   |-|:x:サポート終了             |-|
+|            [v2](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v2)    |>=16.6.0|~v13.6.0|-|:white_check_mark:サポート中|依存関係の更新と重大なバグ等|
+|[v3-dev(master)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/master)|>=12 [^1]|-|@latest|:white_check_mark:サポート中|フルサポート|
+
+[^1]: スラッシュコマンドの登録にはv16以上が必須ですが、基本的にnpmから自動で取得されます。
 
 ## ライセンス
 GPLv3  

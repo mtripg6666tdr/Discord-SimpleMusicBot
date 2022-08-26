@@ -2,7 +2,7 @@ import type { StreamInfo } from "..";
 import type { LoggerType } from "../../Util";
 import type { Cache } from "./strategies/base";
 import type { ytdlCoreStrategy } from "./strategies/ytdl-core";
-import type { EmbedField } from "discord.js";
+import type { EmbedField } from "eris";
 
 import * as ytdl from "ytdl-core";
 
@@ -83,7 +83,7 @@ export class YouTube extends AudioSource {
       inline: false
     }, {
       name: ":asterisk:概要",
-      value: this.Description.length > (verbose ? 4000 : 350) ? this.Description.substring(0, (verbose ? 4000 : 300)) + "..." : this.Description,
+      value: this.Description.length > (verbose ? 4000 : 350) ? this.Description.substring(0, verbose ? 4000 : 300) + "..." : this.Description,
       inline: false
     });
     return fields;

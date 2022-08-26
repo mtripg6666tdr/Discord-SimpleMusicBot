@@ -8,7 +8,7 @@ export default class Loop extends BaseCommand {
   constructor(){
     super({
       name: "ループ",
-      alias: ["トラックループ", "loop", "repeat", "trackloop", "trackrepeat"],
+      alias: ["トラックループ", "loop", "repeat", "lp", "trackloop", "trackrepeat"],
       description: "トラックごとのループを設定します。",
       unlist: false,
       category: "player",
@@ -16,12 +16,12 @@ export default class Loop extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    if(options.data[message.guild.id].Queue.LoopEnabled){
-      options.data[message.guild.id].Queue.LoopEnabled = false;
+    options.server.updateBoundChannel(message);
+    if(options.server.queue.loopEnabled){
+      options.server.queue.loopEnabled = false;
       message.reply(":repeat_one:トラックリピートを無効にしました:x:").catch(e => Util.logger.log(e, "error"));
     }else{
-      options.data[message.guild.id].Queue.LoopEnabled = true;
+      options.server.queue.loopEnabled = true;
       message.reply(":repeat_one:トラックリピートを有効にしました:o:").catch(e => Util.logger.log(e, "error"));
     }
   }

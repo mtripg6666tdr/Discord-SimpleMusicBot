@@ -1,5 +1,5 @@
 import type { UrlStreamInfo } from ".";
-import type { EmbedField } from "discord.js";
+import type { EmbedField } from "eris";
 
 import { Util } from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";

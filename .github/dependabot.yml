@@ -1,5 +1,6 @@
 version: 2
 updates:
+  # master branch
   - package-ecosystem: npm
     directory: "/"
     schedule:
@@ -13,9 +14,30 @@ updates:
       - dependency-type: "direct"
     ignore:
       - dependency-name: "node"
-        versions: ["^17.0.0", "^18.0.0"]
+        update-types: ["version-update:semver-major"]
       - dependency-name: "@types/node"
-        versions: ["^18.0.0"]
+        update-types: ["version-update:semver-major"]
+
+  # v2 branch
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    commit-message:
+      prefix: "Update:"
+    target-branch: "v2"
+    labels:
+      - "dependencies"
+      - "target:v2"
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
       - dependency-name: "discord.js"
       - dependency-name: "discord-api-types"
       - dependency-name: "@discordjs/builders"

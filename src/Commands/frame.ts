@@ -1,14 +1,13 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import { MessageAttachment } from "discord.js";
-
 import { FFmpeg } from "prism-media";
 import * as ytdl from "ytdl-core";
 
 import { BaseCommand } from ".";
+import { ytdlCore } from "../AudioSource/youtube/strategies/ytdl-core";
 import { Util } from "../Util";
-import { FFmpegDefaultArgs } from "../definition";
+import { FFmpegDefaultNetworkArgs } from "../definition";
 
 export default class Frame extends BaseCommand {
   constructor(){
@@ -30,26 +29,29 @@ export default class Frame extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    const server = options.data[message.guild.id];
+    options.server.updateBoundChannel(message);
+    const server = options.server;
     // そもそも再生状態じゃないよ...
-    if(!server.Player.IsConnecting || !server.Player.IsPlaying){
+    if(!server.player.isConnecting || !server.player.isPlaying){
       await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const vinfo = server.Player.CurrentAudioInfo;
+    const vinfo = server.player.currentAudioInfo;
     if(!vinfo.isYouTube()){
       await message.reply(":warning:フレームのキャプチャ機能に非対応のソースです。").catch(e => Util.logger.log(e, "error"));
       return;
+    }else if(vinfo["cache"].type !== ytdlCore){
+      await message.reply(":warning:フォールバックしているため、現在この機能を使用できません。").catch(e => Util.logger.log(e, "error"));
+      return;
     }
     const time = (function(rawTime){
-      if(rawTime === "" || vinfo.LiveStream) return server.Player.CurrentTime / 1000;
+      if(rawTime === "" || vinfo.LiveStream) return server.player.currentTime / 1000;
       else if(rawTime.match(/^(\d+:)*\d+(\.\d+)?$/)) return rawTime.split(":").map(n => Number(n))
         .reduce((prev, current) => prev * 60 + current);
       else return NaN;
     }(options.rawArgs));
     if(options.rawArgs !== "" && vinfo.LiveStream){
-      await message.channel.send("ライブストリームでは時間指定できません");
+      await message.channel.createMessage("ライブストリームでは時間指定できません");
       return;
     }
     if(!vinfo.LiveStream && (isNaN(time) || time > vinfo.LengthSeconds)){
@@ -57,13 +59,13 @@ export default class Frame extends BaseCommand {
       return;
     }
     try{
-      const [hour, min, sec] = Util.time.CalcHourMinSec(time);
+      const [hour, min, sec] = Util.time.CalcHourMinSec(Math.round(time * 100) / 100);
       const response = await message.reply(":camera_with_flash:取得中...");
       const {url, ua} = await vinfo.fetchVideo();
       const frame = await getFrame(url, time, ua);
-      const attachment = new MessageAttachment(frame).setName(`capture_${ytdl.getVideoID(vinfo.Url)}-${hour}${min}${sec}.png`);
-      await response.channel.send({
-        files: [attachment]
+      await response.channel.createMessage("", {
+        file: frame,
+        name: `capture_${ytdl.getVideoID(vinfo.Url)}-${hour}${min}${sec}.png`,
       });
       await response.edit({
         content: ":white_check_mark:完了!" + (vinfo.LiveStream ? "" : `(${hour}:${min}:${sec}時点)`),
@@ -71,7 +73,7 @@ export default class Frame extends BaseCommand {
     }
     catch(e){
       Util.logger.log(Util.general.StringifyObject(e), "error");
-      message.channel.send(":sob:失敗しました...").catch(er => Util.logger.log(er, "error"));
+      await message.channel.createMessage(":sob:失敗しました...").catch(er => Util.logger.log(er, "error"));
     }
   }
 }
@@ -79,7 +81,8 @@ export default class Frame extends BaseCommand {
 function getFrame(url:string, time:number, ua:string){
   return new Promise<Buffer>((resolve, reject) => {
     const args = [
-      ...FFmpegDefaultArgs,
+      "-analyzeduration", "0",
+      ...FFmpegDefaultNetworkArgs,
       "-user_agent", ua,
       "-ss", time.toString(),
       "-i", url,
@@ -87,6 +90,7 @@ function getFrame(url:string, time:number, ua:string){
       "-f", "image2pipe",
       "-vcodec", "png"
     ];
+    Util.logger.log(`[FFmpeg] Passing args: ${args.join(" ")}`, "debug");
     const bufs = [] as Buffer[];
     const ffmpeg = new FFmpeg({args})
       .on("error", (er) => {
@@ -101,5 +105,6 @@ function getFrame(url:string, time:number, ua:string){
         if(!ffmpeg.destroyed) ffmpeg.destroy();
       })
     ;
+    if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log(`[FFmpeg] ${chunk.toString()}`, "debug"));
   });
 }

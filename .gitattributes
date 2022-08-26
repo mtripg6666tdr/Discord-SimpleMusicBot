@@ -1,0 +1,2 @@
+.env.sample linguist-language=Shell
+config.json.sample linguist-language=jsonc

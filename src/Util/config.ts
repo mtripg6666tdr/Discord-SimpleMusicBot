@@ -10,12 +10,14 @@ type ConfigJson = {
   errorChannel: string,
   proxy: string,
   prefix:string,
+  webserver:boolean,
 };
 
 const rawConfig = fs.readFileSync(path.join(__dirname, "../../config.json"), {encoding: "utf-8"});
 
 const config = Object.assign({
   prefix: ">",
+  webserver: true,
 }, CJSON.parse(rawConfig, null, true)) as unknown as ConfigJson;
 
 if(![
@@ -25,8 +27,9 @@ if(![
   typeof config.maintenance === "boolean",
   config.proxy === null || typeof config.proxy === "string",
   (typeof config.prefix === "string" && config.prefix.length >= 1) || config.prefix === null,
+  typeof config.webserver === "boolean",
 ].every(test => test)){
   throw new Error("Invalid config.json");
 }
 
-export const { prefix, adminId, debug, errorChannel, maintenance, proxy } = config;
+export const { prefix, adminId, debug, errorChannel, maintenance, proxy, webserver } = config;

@@ -1,10 +1,11 @@
 import type { CommandArgs } from ".";
 import type { SoundCloudTrackCollection } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { ResponseMessage } from "djs-command-resolver";
+import type { ResponseMessage } from "../Component/ResponseMessage";
+import type { Message, SelectMenuOptions, TextChannel } from "eris";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 
-import * as discord from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import Soundcloud from "soundcloud.ts";
 
@@ -33,24 +34,24 @@ export default class Searchs extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    options.JoinVoiceChannel(message);
-    if(options.data[message.guild.id].SearchPanel !== null){
+    options.server.updateBoundChannel(message);
+    options.server.joinVoiceChannel(message);
+    if(options.server.searchPanel !== null){
       message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
     if(options.rawArgs !== ""){
-      let msg = null as discord.Message|ResponseMessage;
+      let msg = null as Message<TextChannel>|ResponseMessage;
       let desc = "";
       try{
-        options.data[message.guild.id].SearchPanel = {} as any;
+        options.server.searchPanel = {} as any;
         msg = await message.reply("🔍検索中...");
-        options.data[message.guild.id].SearchPanel = {
+        options.server.searchPanel = {
           Msg: {
             id: msg.id,
             chId: msg.channel.id,
-            userId: message.author.id,
-            userName: message.member.displayName,
+            userId: message.member.id,
+            userName: Util.eris.user.getDisplayName(message.member),
             commandMessage: message
           },
           Opts: {}
@@ -78,15 +79,12 @@ export default class Searchs extends BaseCommand {
           result = (await soundcloud.tracks.searchV2({q: options.rawArgs})).collection;
         }
         if(result.length > 12) result = result.splice(0, 11);
-        const embed = new discord.MessageEmbed();
-        embed.setColor(getColor("SEARCH"));
-        embed.title = "\"" + options.rawArgs + "\"の検索結果✨";
         let index = 1;
-        const selectOpts = [] as discord.MessageSelectOptionData[];
+        const selectOpts = [] as SelectMenuOptions[];
         for(let i = 0; i < result.length; i++){
           const [min, sec] = Util.time.CalcMinSec(Math.floor(result[i].duration / 1000));
-          desc += "`" + index + ".` [" + result[i].title + "](" + result[i].permalink_url + ") " + min + ":" + sec + " - [" + result[i].user.username + "](" + result[i].user.permalink_url + ") \r\n\r\n";
-          options.data[message.guild.id].SearchPanel.Opts[index] = {
+          desc += `\`${index}.\` [${result[i].title}](${result[i].permalink_url}) ${min}:${sec} - [${result[i].user.username}](${result[i].user.permalink_url}) \r\n\r\n`;
+          options.server.searchPanel.Opts[index] = {
             url: result[i].permalink_url,
             title: result[i].title,
             duration: result[i].full_duration.toString(),
@@ -100,42 +98,48 @@ export default class Searchs extends BaseCommand {
           index++;
         }
         if(index === 1){
-          options.data[message.guild.id].SearchPanel = null;
+          options.server.searchPanel = null;
           await msg.edit(":pensive:見つかりませんでした。");
           return;
         }
-        embed.description = desc;
-        embed.footer = {
-          iconURL: message.author.avatarURL(),
-          text: "楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
-        };
+        const embed = new Helper.MessageEmbedBuilder()
+          .setColor(getColor("SEARCH"))
+          .setTitle("\"" + options.rawArgs + "\"の検索結果✨")
+          .setDescription(desc)
+          .setFooter({
+            icon_url: message.member.avatarURL,
+            text: "楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。",
+          })
+          .toEris()
+        ;
         await msg.edit({
-          content: null,
+          content: "",
           embeds: [embed],
           components: [
-            new discord.MessageActionRow()
+            new Helper.MessageActionRowBuilder()
               .addComponents(
-                new discord.MessageSelectMenu()
+                new Helper.MessageSelectMenuBuilder()
                   .setCustomId("search")
                   .setPlaceholder("数字を送信するか、ここから選択...")
                   .setMinValues(1)
                   .setMaxValues(index - 1)
-                  .addOptions([...selectOpts, {
+                  .addOptions(...selectOpts, {
                     label: "キャンセル",
                     value: "cancel"
-                  }])
+                  })
               )
+              .toEris()
           ]
         });
       }
       catch(e){
         Util.logger.log(e, "error");
-        options.data[message.guild.id].SearchPanel = null;
+        options.server.searchPanel = null;
         if(msg) msg.edit("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
         else message.reply("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
       }
     }else{
-      message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));
+      await message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));
     }
   }
 }

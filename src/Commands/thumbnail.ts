@@ -1,7 +1,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import * as discord from "discord.js";
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -27,23 +27,29 @@ export default class Thumbnail extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    const embed = new discord.MessageEmbed();
+    options.server.updateBoundChannel(message);
+    const embed = new Helper.MessageEmbedBuilder();
     embed.setColor(getColor("THUMB"));
-    if(options.rawArgs && options.data[message.guild.id].SearchPanel && Object.keys(options.data[message.guild.id].SearchPanel.Opts).includes(options.rawArgs === "" ? "n" : options.rawArgs)){
-      const opt = options.data[message.guild.id].SearchPanel.Opts[Number(Util.string.NormalizeText(options.rawArgs))];
-      embed.setImage(opt.thumbnail);
-      embed.title = opt.title;
-      embed.description = "URL: " + opt.url;
-    }else if(!options.rawArgs && options.data[message.guild.id].Player.IsPlaying && options.data[message.guild.id].Queue.length >= 1){
-      const info = options.data[message.guild.id].Queue.get(0).BasicInfo;
-      embed.setImage(info.Thumnail);
-      embed.title = info.Title;
-      embed.description = "URL: " + info.Url;
+    if(options.rawArgs && options.server.searchPanel && Object.keys(options.server.searchPanel.Opts).includes(options.rawArgs === "" ? "n" : options.rawArgs)){
+      const opt = options.server.searchPanel.Opts[Number(Util.string.NormalizeText(options.rawArgs))];
+      embed
+        .setImage(opt.thumbnail)
+        .setTitle(opt.title)
+        .setDescription("URL: " + opt.url)
+      ;
+    }else if(!options.rawArgs && options.server.player.isPlaying && options.server.queue.length >= 1){
+      const info = options.server.queue.get(0).basicInfo;
+      embed
+        .setImage(info.Thumnail)
+        .setTitle(info.Title)
+        .setDescription("URL: " + info.Url)
+      ;
     }else{
       message.reply("✘検索結果が見つかりません").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    message.reply({embeds: [embed]}).catch(e => Util.logger.log(e, "error"));
+    await message.reply({
+      embeds: [embed.toEris()]
+    }).catch(e => Util.logger.log(e, "error"));
   }
 }

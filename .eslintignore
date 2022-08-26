@@ -1,2 +1,4 @@
-./util/*
-./test
+util
+!src/Util
+test/*
+dist/*
