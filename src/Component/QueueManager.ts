@@ -4,6 +4,7 @@ import type { ResponseMessage } from "./ResponseMessage";
 import type { TaskCancellationManager } from "./TaskCancellationManager";
 import type { Client, Message, TextChannel } from "eris";
 
+import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 import { Member } from "eris";
 
@@ -46,24 +47,6 @@ export class QueueManager extends ManagerBase {
 
   get hasNothing():boolean{
     return this.length === 0;
-  }
-
-  private processPending = [] as (()=>void)[];
-  private waitForProcess(){
-    return this.nowProcessing ? new Promise<void>((resolve) => this.processPending.push(resolve)) : Promise.resolve();
-  }
-
-  private _nowProcessing = false;
-  private get nowProcessing(){
-    return this._nowProcessing;
-  }
-
-  private set nowProcessing(val:boolean){
-    this._nowProcessing = val;
-    if(!val){
-      this.processPending.forEach(d => d());
-      this.processPending = [];
-    }
   }
 
   constructor(){
@@ -123,6 +106,8 @@ export class QueueManager extends ManagerBase {
     return sec;
   }
 
+  private readonly addQueueLocker = new LockObj();
+
   async addQueue(
     url:string,
     addedBy:Member|AddedBy,
@@ -130,43 +115,41 @@ export class QueueManager extends ManagerBase {
     type:KnownAudioSourceIdentifer = "unknown",
     gotData:AudioSource.exportableCustom = null
   ):Promise<QueueContent & {index:number}>{
-    await this.waitForProcess();
-    this.nowProcessing = true;
-    this.Log("AddQueue called");
-    const t = Util.time.timer.start("AddQueue");
-    try{
-      PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
-      const result = {
-        BasicInfo: await AudioSource.Resolve({
-          url, type,
-          knownData: gotData,
-          forceCache: this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000
-        }),
-        AdditionalInfo: {
-          AddedBy: {
-            userId: this.getUserIdFromMember(addedBy) ?? "0",
-            displayName: this.getDisplayNameFromMember(addedBy) ?? "不明"
+    return lock(this.addQueueLocker, async () => {
+      this.Log("AddQueue called");
+      const t = Util.time.timer.start("AddQueue");
+      try{
+        PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
+        const result = {
+          BasicInfo: await AudioSource.Resolve({
+            url, type,
+            knownData: gotData,
+            forceCache: this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000
+          }),
+          AdditionalInfo: {
+            AddedBy: {
+              userId: this.getUserIdFromMember(addedBy) ?? "0",
+              displayName: this.getDisplayNameFromMember(addedBy) ?? "不明"
+            }
           }
+        } as QueueContent;
+        if(result.BasicInfo){
+          this._default[method](result);
+          if(this.info.EquallyPlayback) this.sortWithAddedBy();
+          if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
+            this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
+          }
+          t.end();
+          const index = this._default.findIndex(q => q === result);
+          this.Log("queue content added in position " + index);
+          return {...result, index};
         }
-      } as QueueContent;
-      if(result.BasicInfo){
-        this._default[method](result);
-        if(this.info.EquallyPlayback) this.sortWithAddedBy();
-        if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
-          this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
-        }
-        t.end();
-        this.nowProcessing = false;
-        const index = this._default.findIndex(q => q === result);
-        this.Log("queue content added in position " + index);
-        return {...result, index};
       }
-    }
-    finally{
-      t.end();
-      this.nowProcessing = false;
-    }
-    throw new Error("Provided URL was not resolved as available service");
+      finally{
+        t.end();
+      }
+      throw new Error("Provided URL was not resolved as available service");
+    });
   }
 
   /**
