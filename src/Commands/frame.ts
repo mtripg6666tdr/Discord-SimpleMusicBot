@@ -5,6 +5,7 @@ import { FFmpeg } from "prism-media";
 import * as ytdl from "ytdl-core";
 
 import { BaseCommand } from ".";
+import { ytdlCore } from "../AudioSource/youtube/strategies/ytdl-core";
 import { Util } from "../Util";
 import { FFmpegDefaultNetworkArgs } from "../definition";
 
@@ -38,6 +39,9 @@ export default class Frame extends BaseCommand {
     const vinfo = server.player.currentAudioInfo;
     if(!vinfo.isYouTube()){
       await message.reply(":warning:フレームのキャプチャ機能に非対応のソースです。").catch(e => Util.logger.log(e, "error"));
+      return;
+    }else if(vinfo["cache"].type !== ytdlCore){
+      await message.reply(":warning:フォールバックしているため、現在この機能を使用できません。").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const time = (function(rawTime){
@@ -77,6 +81,7 @@ export default class Frame extends BaseCommand {
 function getFrame(url:string, time:number, ua:string){
   return new Promise<Buffer>((resolve, reject) => {
     const args = [
+      "-analyzeduration", "0",
       ...FFmpegDefaultNetworkArgs,
       "-user_agent", ua,
       "-ss", time.toString(),
@@ -85,6 +90,7 @@ function getFrame(url:string, time:number, ua:string){
       "-f", "image2pipe",
       "-vcodec", "png"
     ];
+    Util.logger.log(`[FFmpeg] Passing args: ${args.join(" ")}`, "debug");
     const bufs = [] as Buffer[];
     const ffmpeg = new FFmpeg({args})
       .on("error", (er) => {
@@ -99,5 +105,6 @@ function getFrame(url:string, time:number, ua:string){
         if(!ffmpeg.destroyed) ffmpeg.destroy();
       })
     ;
+    if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log(`[FFmpeg] ${chunk.toString()}`, "debug"));
   });
 }
