@@ -52,14 +52,14 @@ export default class Queue extends BaseCommand {
           break;
         }
         const q = queue.get(i);
-        const _t = Number(q.BasicInfo.LengthSeconds);
+        const _t = Number(q.basicInfo.LengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
         fields.push({
           name: i !== 0 ? i.toString() : options.server.player.isPlaying ? "現在再生中" : "再生待ち",
-          value: "[" + q.BasicInfo.Title + "](" + q.BasicInfo.Url + ") \r\n"
-          + "長さ: `" + ((q.BasicInfo.ServiceIdentifer === "youtube" && (q.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : min + ":" + sec) + " ` \r\n"
-          + "リクエスト: `" + q.AdditionalInfo.AddedBy.displayName + "` "
-          + q.BasicInfo.npAdditional()
+          value: "[" + q.basicInfo.Title + "](" + q.basicInfo.Url + ") \r\n"
+          + "長さ: `" + ((q.basicInfo.ServiceIdentifer === "youtube" && (q.basicInfo as YouTube).LiveStream) ? "ライブストリーム" : min + ":" + sec) + " ` \r\n"
+          + "リクエスト: `" + q.additionalInfo.addedBy.displayName + "` "
+          + q.basicInfo.npAdditional()
         });
       }
       const [thour, tmin, tsec] = Util.time.CalcHourMinSec(totalLength);

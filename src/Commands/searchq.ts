@@ -35,10 +35,10 @@ export default class Searchq extends BaseCommand {
       return;
     }
     let qsresult = options.server.queue
-      .filter(c => c.BasicInfo.Title.toLowerCase().includes(options.rawArgs.toLowerCase()))
+      .filter(c => c.basicInfo.Title.toLowerCase().includes(options.rawArgs.toLowerCase()))
       .concat(
         options.server.queue
-          .filter(c => c.BasicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase()))
+          .filter(c => c.basicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase()))
       );
     if(qsresult.length === 0){
       message.reply(":confused:見つかりませんでした").catch(e => Util.logger.log(e, "error"));
@@ -46,13 +46,13 @@ export default class Searchq extends BaseCommand {
     }
     if(qsresult.length > 20) qsresult = qsresult.slice(0, 20);
     const fields = qsresult.map(c => {
-      const index = options.server.queue.findIndex(d => d.BasicInfo.Title === c.BasicInfo.Title).toString();
-      const _t = c.BasicInfo.LengthSeconds;
+      const index = options.server.queue.findIndex(d => d.basicInfo.Title === c.basicInfo.Title).toString();
+      const _t = c.basicInfo.LengthSeconds;
       const [min, sec] = Util.time.CalcMinSec(_t);
       return {
         name: index === "0" ? "現在再生中/再生待ち" : index,
-        value: `[${c.BasicInfo.Title}](${c.BasicInfo.Url})\r\nリクエスト: \`${c.AdditionalInfo.AddedBy.displayName}\` \r\n長さ: ${
-          (c.BasicInfo.ServiceIdentifer === "youtube" && (c.BasicInfo as YouTube).LiveStream) ? "(ライブストリーム)" : ` \`${_t === 0 ? "(不明)" : `${min}:${sec}`}\`)`
+        value: `[${c.basicInfo.Title}](${c.basicInfo.Url})\r\nリクエスト: \`${c.additionalInfo.addedBy.displayName}\` \r\n長さ: ${
+          (c.basicInfo.ServiceIdentifer === "youtube" && (c.basicInfo as YouTube).LiveStream) ? "(ライブストリーム)" : ` \`${_t === 0 ? "(不明)" : `${min}:${sec}`}\`)`
         }`,
         inline: false
       } as EmbedField;

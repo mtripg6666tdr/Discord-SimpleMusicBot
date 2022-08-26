@@ -27,7 +27,7 @@ export default class LeaveClean extends BaseCommand {
       return;
     }
     const members = (options.client.getChannel(options.server.connection.channelID) as VoiceChannel).voiceMembers.map(member => member.id);
-    const number = options.server.queue.removeIf(q => !members.includes(q.AdditionalInfo.AddedBy.userId)).length;
+    const number = options.server.queue.removeIf(q => !members.includes(q.additionalInfo.addedBy.userId)).length;
     await message.reply(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => Util.logger.log(e, "error"));
   }
 }
