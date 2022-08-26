@@ -6,7 +6,7 @@
   "main": "dist/lib.js",
   "types": "typings/lib.d.ts",
   "engines": {
-    "node": ">=10.4.0"
+    "node": ">=12.4.0"
   },
   "dependencies": {
     "@mtripg6666tdr/eris-command-resolver": "^0.0.8",
