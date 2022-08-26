@@ -12,18 +12,22 @@ Util.logger.log("[Entry]Discord-SimpleMusicBot by mtripg6666tdr");
 const bot = new MusicBot(process.env.TOKEN, Boolean(Util.config.maintenance));
 
 // Webサーバーのインスタンス化
-http.createServer((req, res) => {
-  res.writeHead(200, { "Content-Type": "application/json" });
-  const data = {
-    status: 200,
-    message: "Discord bot is active now",
-    client: bot.client?.user ? Buffer.from(bot.client?.user.id).toString("base64") : null,
-    readyAt: bot.client?.uptime ? Buffer.from(bot.client.uptime.toString()).toString("base64") : null,
-    guilds: bot.client?.guilds.size || null,
-  };
-  Util.logger.log("[Server]Received a http request");
-  res.end(JSON.stringify(data));
-}).listen(8081);
+if(Util.config.webserver){
+  http.createServer((req, res) => {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    const data = {
+      status: 200,
+      message: "Discord bot is active now",
+      client: bot.client?.user ? Buffer.from(bot.client?.user.id).toString("base64") : null,
+      readyAt: bot.client?.uptime ? Buffer.from(bot.client.uptime.toString()).toString("base64") : null,
+      guilds: bot.client?.guilds.size || null,
+    };
+    Util.logger.log("[Server]Received a http request");
+    res.end(JSON.stringify(data));
+  }).listen(8081);
+}else{
+  Util.logger.log("[Entry] Skipping to start server");
+}
 
 if(!Util.config.debug){
   // ハンドルされなかったエラーのハンドル
