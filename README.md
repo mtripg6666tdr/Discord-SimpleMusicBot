@@ -199,14 +199,13 @@ bot.Run(/* token */);
 <details>
   <summary>開く</summary>
 
-バックアップにはまずバックアップ先のサーバーを作成する必要があります。  
-作成する場合、[Google Apps Script](https://script.google.com)を利用するか、任意の言語を使用してサーバーを作成することができます。
+バックアップには、まずバックアップ先のサーバーを作成する必要があります。  
 
-### Google Apps Scriptを使用する場合
-Google Apps Scriptを使用する場合、新規プロジェクトを作成し、[サンプルのGSファイル](util/exampleDbServer/gas/exampleDbServer.gs)の内容を`コード.gs`にペーストして、スクリプト内にある通り定数を設定して、Webアプリとしてデプロイしてください。  
-デプロイが完了したら、URLの[.env](.env)への登録を忘れずに。
+### サーバー作成に役立つ、バックアップサーバーのサンプル実装
+- [Google Apps Script](util/exampleDbServer/gas/exampleDbServer.gs)
+- [Node.js(ファイルベース)](util/exampleDbServer/node)
 
-### 自分でAPIサーバーを構築する場合
+### APIサーバーの仕様
 APIサーバーのエンドポイントはひとつで、クエリパラメーターもしくはリクエストボディのjsonデータによって動作を変えます。  
 APIサーバーは以下の仕様に沿うようにしてください。  
 #### **GET (type=j)**
