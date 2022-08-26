@@ -127,7 +127,7 @@
       ],
       "pathGroups": [
         {
-          "pattern": "{eris,@mtripg6666tdr/eris-command-resolver}",
+          "pattern": "{eris,@mtripg6666tdr/**}",
           "group": "builtin",
           "position": "before"
         }
