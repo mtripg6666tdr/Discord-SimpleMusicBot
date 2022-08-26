@@ -1,6 +1,5 @@
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { PageToggle } from "../Component/PageToggle";
-import type { TaskCancellationManager } from "../Component/TaskCancellationManager";
 import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
 import type { categories } from "./commands";
@@ -96,7 +95,7 @@ export interface CommandArgs {
   /**
    * ボットのサーバーデータ
    */
-  data:{[key:string]:GuildDataContainer};
+  server:GuildDataContainer;
   /**
    * コマンドの生の引数
    */
@@ -106,41 +105,19 @@ export interface CommandArgs {
    */
   args: string[];
   /**
-   * 紐づけチャンネルの更新関数
-   * @param message 更新に使うコマンドメッセージ
-   */
-  updateBoundChannel: (message:CommandMessage) => void;
-  /**
    * 生存しているPageToggleの配列
    */
-  EmbedPageToggle:PageToggle[];
+  embedPageToggle:PageToggle[];
   /**
    * ボットのクライアント
    */
   client:Client;
-  /**
-   * VC参加関数
-   * @param message 参加に使うメッセージ
-   * @param reply メッセージに返信するかどうか
-   */
-  JoinVoiceChannel: (message:CommandMessage, reply?:boolean, replyOnFail?:boolean) => Promise<boolean>;
-  /**
-   * URLからキューに追加する関数
-   * @param message 追加に使うメッセージ
-   * @param optiont URL
-   * @param first 最初に追加するかどうか
-   */
-  PlayFromURL: (message:CommandMessage, optiont:string, first:boolean) => Promise<void>;
   /**
    * サーバーデータの初期化関数
    * @param guildid サーバーID
    * @param channelid チャンネルID
    */
   initData: (guildid:string, channelid:string) => void;
-  /**
-   * キャンセルマネージャー
-   */
-  cancellations:TaskCancellationManager[];
 }
 
 /**

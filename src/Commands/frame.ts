@@ -28,20 +28,20 @@ export default class Frame extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    const server = options.data[message.guild.id];
+    options.server.updateBoundChannel(message);
+    const server = options.server;
     // そもそも再生状態じゃないよ...
-    if(!server.Player.isConnecting || !server.Player.isPlaying){
+    if(!server.player.isConnecting || !server.player.isPlaying){
       await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const vinfo = server.Player.CurrentAudioInfo;
+    const vinfo = server.player.CurrentAudioInfo;
     if(!vinfo.isYouTube()){
       await message.reply(":warning:フレームのキャプチャ機能に非対応のソースです。").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const time = (function(rawTime){
-      if(rawTime === "" || vinfo.LiveStream) return server.Player.currentTime / 1000;
+      if(rawTime === "" || vinfo.LiveStream) return server.player.currentTime / 1000;
       else if(rawTime.match(/^(\d+:)*\d+(\.\d+)?$/)) return rawTime.split(":").map(n => Number(n))
         .reduce((prev, current) => prev * 60 + current);
       else return NaN;

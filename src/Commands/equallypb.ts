@@ -19,12 +19,12 @@ export default class EquallyPlayback extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    if(options.data[message.guild.id].EquallyPlayback){
-      options.data[message.guild.id].EquallyPlayback = false;
+    options.server.updateBoundChannel(message);
+    if(options.server.equallyPlayback){
+      options.server.equallyPlayback = false;
       await message.reply("❌均等再生をオフにしました").catch(e => Util.logger.log(e, "error"));
     }else{
-      options.data[message.guild.id].EquallyPlayback = true;
+      options.server.equallyPlayback = true;
       const embed = new Helper.MessageEmbedBuilder()
         .setTitle("⭕均等再生をオンにしました")
         .setDescription("楽曲追加時に、楽曲を追加したユーザーごとにできるだけ均等になるようにする機能です。")

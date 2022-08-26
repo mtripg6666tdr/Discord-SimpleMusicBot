@@ -20,9 +20,9 @@ export default class Searchb extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    options.JoinVoiceChannel(message);
-    if(options.data[message.guild.id].SearchPanel !== null){
+    options.server.updateBoundChannel(message);
+    options.server.joinVoiceChannel(message);
+    if(options.server.searchPanel !== null){
       message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -30,9 +30,9 @@ export default class Searchb extends BaseCommand {
       let msg = null as ResponseMessage;
       let desc = "※最大20件まで表示されます\r\n\r\n";
       try{
-        options.data[message.guild.id].SearchPanel = {} as any;
+        options.server.searchPanel = {} as any;
         msg = await message.reply("準備中...");
-        options.data[message.guild.id].SearchPanel = {
+        options.server.searchPanel = {
           Msg: {
             id: msg.id,
             chId: msg.channel.id,
@@ -54,7 +54,7 @@ export default class Searchb extends BaseCommand {
         for(let i = 0; i < result.length; i++){
           const title = bestdori.allsonginfo[Number(result[i])].musicTitle[0];
           desc += `\`${index}.\` [${bestdori.allsonginfo[Number(result[i])].musicTitle[0]}](${BestdoriApi.getAudioPage(Number(result[i]))}) - \`${bestdori.allbandinfo[bestdori.allsonginfo[Number(result[i])].bandId].bandName[0]}\` \r\n\r\n`;
-          options.data[message.guild.id].SearchPanel.Opts[index] = {
+          options.server.searchPanel.Opts[index] = {
             url: BestdoriApi.getAudioPage(Number(result[i])),
             title: title,
             duration: "0",
@@ -62,7 +62,7 @@ export default class Searchb extends BaseCommand {
           };
           selectOpts.push({
             label: index + ". " + (title.length > 90 ? title.substring(0, 90) + "…" : title),
-            description: "長さ: " + options.data[message.guild.id].SearchPanel.Opts[index].duration + ", バンド名: " + bestdori.allbandinfo[bestdori.allsonginfo[Number(result[i])].bandId].bandName[0],
+            description: "長さ: " + options.server.searchPanel.Opts[index].duration + ", バンド名: " + bestdori.allbandinfo[bestdori.allsonginfo[Number(result[i])].bandId].bandName[0],
             value: index.toString()
           });
           index++;
@@ -71,7 +71,7 @@ export default class Searchb extends BaseCommand {
           }
         }
         if(index === 1){
-          options.data[message.guild.id].SearchPanel = null;
+          options.server.searchPanel = null;
           await msg.edit(":pensive:見つかりませんでした。");
           return;
         }
@@ -107,7 +107,7 @@ export default class Searchb extends BaseCommand {
       }
       catch(e){
         Util.logger.log(e);
-        options.data[message.guild.id].SearchPanel = null;
+        options.server.searchPanel = null;
         if(msg) msg.edit("失敗しました").catch(er => Util.logger.log(er, "error"));
         else message.reply("失敗しました").catch(er => Util.logger.log(er, "error"));
       }

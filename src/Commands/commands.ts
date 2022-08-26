@@ -69,29 +69,29 @@ export default class Commands extends BaseCommand {
         );
       }
       for(let i = 0; i < embed.length; i++){
-        embed[i].setTitle("コマンド一覧(" + embed[i].title + ")");
-        embed[i].setDescription("コマンドの一覧です。\r\n`" + (i + 1) + "ページ目(" + embed.length + "ページ中)`\r\nコマンドプレフィックスは、`" + options.data[message.guild.id].PersistentPref.Prefix + "`です。\r\n`!コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。");
-        embed[i].setColor(getColor("COMMAND"));
+        embed[i]
+          .setTitle("コマンド一覧(" + embed[i].title + ")")
+          .setDescription(`コマンドの一覧です。\r\n\`${i + 1}ページ目(${embed.length}ページ中)\`\r\nコマンドプレフィックスは、\`${options.server.persistentPref.Prefix}\`です。\r\n\`!コマンド 再生\`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。`)
+          .setColor(getColor("COMMAND"));
       }
       const msg = await message.reply({embeds: [embed[0].toEris()]});
       const toggle = await PageToggle.init(msg, embed.map(_panel => _panel.toEris()));
-      options.EmbedPageToggle.push(toggle);
+      options.embedPageToggle.push(toggle);
     }else{
       const ci = CommandsManager.Instance.resolve(options.rawArgs);
       if(ci && !ci.unlist){
-        const prefix = options.data[message.guild.id] ? options.data[message.guild.id].PersistentPref.Prefix : ">";
-        const embed
-          = new Helper.MessageEmbedBuilder()
-            .setTitle("コマンド `" + ci.name + "` の詳細")
-            .setDescription(ci.description)
-            .setColor(getColor("COMMAND"))
-            .addField("エイリアス", "`" + ci.alias.join("`, `") + "`")
+        const prefix = options.server ? options.server.persistentPref.Prefix : ">";
+        const embed = new Helper.MessageEmbedBuilder()
+          .setTitle(`コマンド \`${ci.name}\` の詳細`)
+          .setDescription(ci.description)
+          .setColor(getColor("COMMAND"))
+          .addField("エイリアス", `\`${ci.alias.join("`, `")}\``)
         ;
         if(ci.usage){
-          embed.addField("使い方", "`" + prefix + ci.usage + "` \r\n`<>` 内の引数は必須の引数、`[]`内の引数は任意の引数です。");
+          embed.addField("使い方", `\`${prefix}${ci.usage}\` \r\n\`<>\` 内の引数は必須の引数、\`[]\`内の引数は任意の引数です。`);
         }
         if(ci.examples){
-          embed.addField("使用例", "`" + prefix + ci.examples + "`");
+          embed.addField("使用例", `\`${prefix + ci.examples}\``);
         }
         await message.reply({embeds: [embed.toEris()]});
       }else{

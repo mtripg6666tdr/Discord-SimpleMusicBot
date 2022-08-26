@@ -18,9 +18,9 @@ export default class Volume extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
+    options.server.updateBoundChannel(message);
     if(options.rawArgs === ""){
-      await message.channel.createMessage(`:loud_sound:現在の音量は**${options.data[message.guild.id].Player.volume}**です(デフォルト:100)`)
+      await message.channel.createMessage(`:loud_sound:現在の音量は**${options.server.player.volume}**です(デフォルト:100)`)
         .catch(e => Util.logger.log(e, "error"))
       ;
       return;
@@ -31,7 +31,7 @@ export default class Volume extends BaseCommand {
         .catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const result = options.data[message.guild.id].Player.setVolume(newval);
+    const result = options.server.player.setVolume(newval);
     await message.channel.createMessage(`:loud_sound:音量を**${newval}**に変更しました。\r\n${!result ? "次の曲から適用されます。現在再生中の曲に設定を適用するには、`頭出し`コマンドなどを使用してください。" : ""}`)
       .catch(e => Util.logger.log(e, "error"));
   }

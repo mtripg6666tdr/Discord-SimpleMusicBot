@@ -24,16 +24,16 @@ export default class Rm extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
+    options.server.updateBoundChannel(message);
     if(options.args.length === 0){
       message.reply("引数に消去する曲のオフセット(番号)を入力してください。").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    if(options.args.includes("0") && options.data[message.guild.id].Player.isPlaying){
+    if(options.args.includes("0") && options.server.player.isPlaying){
       message.reply("現在再生中の楽曲を削除することはできません。");
       return;
     }
-    const q = options.data[message.guild.id].Queue;
+    const q = options.server.queue;
     const addition = [] as number[];
     options.args.forEach(o => {
       let match = o.match(/^(?<from>[0-9]+)-(?<to>[0-9]+)$/);
@@ -59,7 +59,7 @@ export default class Rm extends BaseCommand {
           if(match){
             const to = Number(match.groups.to);
             if(!isNaN(to)){
-              for(let i = (options.data[message.guild.id].Player.isPlaying ? 1 : 0); i <= to; i++){
+              for(let i = (options.server.player.isPlaying ? 1 : 0); i <= to; i++){
                 addition.push(i);
               }
             }

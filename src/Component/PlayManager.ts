@@ -34,21 +34,21 @@ export class PlayManager extends ManagerBase {
    *  接続され、再生途中にあるか（たとえ一時停止されていても）
    */
   get isPlaying():boolean{
-    return this.isConnecting && this.info.Connection.playing;
+    return this.isConnecting && this.server.connection.playing;
   }
 
   /**
    *  VCに接続中かどうか
    */
   get isConnecting():boolean{
-    return this.info.Connection && (this.info.Connection.connecting || this.info.Connection.ready);
+    return this.server.connection && (this.server.connection.connecting || this.server.connection.ready);
   }
 
   /**
    * 一時停止されているか
    */
   get isPaused():boolean{
-    return this.isConnecting && this.info.Connection.paused;
+    return this.isConnecting && this.server.connection.paused;
   }
 
   /**
@@ -56,7 +56,7 @@ export class PlayManager extends ManagerBase {
    * @remarks ミリ秒単位なので秒に直すには1000分の一する必要がある
    */
   get currentTime():number{
-    return this.isPlaying ? this.seek * 1000 + this.info.Connection.current?.playTime : 0;
+    return this.isPlaying ? this.seek * 1000 + this.server.connection.current?.playTime : 0;
   }
 
   /**
@@ -81,14 +81,14 @@ export class PlayManager extends ManagerBase {
    *  親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
    */
   setBinding(data:GuildDataContainer){
-    this.Log("Set data of guild id " + data.GuildID);
+    this.Log("Set data of guild id " + data.guildID);
     super.setBinding(data);
   }
 
   setVolume(val:number){
     this._volume = val;
-    if((this.info.Connection?.piper as any)?.["volume"]){
-      this.info.Connection.setVolume(val / 100);
+    if((this.server.connection?.piper as any)?.["volume"]){
+      this.server.connection.setVolume(val / 100);
       return true;
     }
     return false;
@@ -107,7 +107,7 @@ export class PlayManager extends ManagerBase {
       // なにかしら再生中
       || this.isPlaying
       // キューが空
-      || this.info.Queue.hasNothing
+      || this.server.queue.hasNothing
       // 準備中
       || this.preparing
     ;
@@ -121,9 +121,9 @@ export class PlayManager extends ManagerBase {
     this.preparing = true;
     let mes:Message = null;
     let ch:TextChannel = null;
-    this.CurrentAudioInfo = this.info.Queue.get(0).BasicInfo;
-    if(this.info.boundTextChannel){
-      ch = this.client.getChannel(this.info.boundTextChannel) as TextChannel;
+    this.CurrentAudioInfo = this.server.queue.get(0).BasicInfo;
+    if(this.server.boundTextChannel){
+      ch = this.client.getChannel(this.server.boundTextChannel) as TextChannel;
       const [min, sec] = Util.time.CalcMinSec(this.CurrentAudioInfo.LengthSeconds);
       const isLive = this.CurrentAudioInfo.isYouTube() && this.CurrentAudioInfo.LiveStream;
       mes = await ch.createMessage(`:hourglass_flowing_sand: \`${this.CurrentAudioInfo.Title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`);
@@ -136,7 +136,7 @@ export class PlayManager extends ManagerBase {
       // QueueContentからストリーム情報を取得
       const rawStream = await this.CurrentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
-      const { stream, streamType } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.info), this.seek, this.volume !== 100);
+      const { stream, streamType } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.server), this.seek, this.volume !== 100);
       // ストリームがまだ利用できない場合待機
       let errorWhileWaiting = null as Error;
       stream.once("error", e => errorWhileWaiting = e || new Error("An error occurred in stream"));
@@ -152,7 +152,7 @@ export class PlayManager extends ManagerBase {
       }
       // 各種準備
       this.errorReportChannel = mes.channel as TextChannel;
-      const connection = this.info.Connection;
+      const connection = this.server.connection;
       this.error = false;
       t.end();
       // 再生
@@ -165,11 +165,11 @@ export class PlayManager extends ManagerBase {
       this.setVolume(this.volume);
       stream.on("end", this.onStreamFinished.bind(this));
       // wait for entering playing state
-      await Util.general.waitForEnteringState(() => this.info.Connection.playing);
+      await Util.general.waitForEnteringState(() => this.server.connection.playing);
       this.preparing = false;
       u.end();
       this.Log("Play started successfully");
-      if(this.info.boundTextChannel && ch && mes){
+      if(this.server.boundTextChannel && ch && mes){
         // 再生開始メッセージ
         const _t = Number(this.CurrentAudioInfo.LengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
@@ -181,19 +181,19 @@ export class PlayManager extends ManagerBase {
             + "`"
         });
         embed.setColor(getColor("AUTO_NP"));
-        embed.addField("リクエスト", this.info.Queue.get(0).AdditionalInfo.AddedBy.displayName, true);
+        embed.addField("リクエスト", this.server.queue.get(0).AdditionalInfo.AddedBy.displayName, true);
         embed.addField("次の曲",
           // トラックループオンなら現在の曲
-          this.info.Queue.loopEnabled ? this.info.Queue.get(0).BasicInfo.Title :
+          this.server.queue.loopEnabled ? this.server.queue.get(0).BasicInfo.Title :
           // (トラックループはオフ)長さが2以上ならオフセット1の曲
-            this.info.Queue.length >= 2 ? this.info.Queue.get(1).BasicInfo.Title :
+            this.server.queue.length >= 2 ? this.server.queue.get(1).BasicInfo.Title :
             // (トラックループオフ,長さ1)キューループがオンなら現在の曲
-              this.info.Queue.queueLoopEnabled ? this.info.Queue.get(0).BasicInfo.Title :
+              this.server.queue.queueLoopEnabled ? this.server.queue.get(0).BasicInfo.Title :
               // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
                 "次の曲がまだ登録されていません"
           , true);
-        const [qhour, qmin, qsec] = Util.time.CalcHourMinSec(this.info.Queue.lengthSeconds - this.CurrentAudioInfo.LengthSeconds);
-        embed.addField("再生待ちの曲", this.info.Queue.loopEnabled ? "ループします" : (this.info.Queue.length - 1) + "曲(" + (qhour === "0" ? "" : qhour + ":") + qmin + ":" + qsec + ")", true);
+        const [qhour, qmin, qsec] = Util.time.CalcHourMinSec(this.server.queue.lengthSeconds - this.CurrentAudioInfo.LengthSeconds);
+        embed.addField("再生待ちの曲", this.server.queue.loopEnabled ? "ループします" : (this.server.queue.length - 1) + "曲(" + (qhour === "0" ? "" : qhour + ":") + qmin + ":" + qsec + ")", true);
         embed.setThumbnail(this.CurrentAudioInfo.Thumnail);
         if(this.CurrentAudioInfo.ServiceIdentifer === "youtube" && (this.CurrentAudioInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
@@ -214,7 +214,7 @@ export class PlayManager extends ManagerBase {
         }
         // eslint-disable-next-line no-empty
       } catch{}
-      if(this.info.boundTextChannel && ch && mes){
+      if(this.server.boundTextChannel && ch && mes){
         mes.edit(`:tired_face:曲の再生に失敗しました...。(${Util.general.StringifyObject(e)})` + (this.errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
         this.onStreamFailed();
       }
@@ -228,8 +228,8 @@ export class PlayManager extends ManagerBase {
   */
   stop():PlayManager{
     this.Log("Stop called");
-    this.info.Connection?.stopPlaying();
-    this.info.Bot.backupData();
+    this.server.connection?.stopPlaying();
+    this.server.bot.backupData();
     return this;
   }
 
@@ -240,10 +240,10 @@ export class PlayManager extends ManagerBase {
   disconnect():PlayManager{
     this.stop();
     if(this.isConnecting){
-      const connection = this.info.Connection;
+      const connection = this.server.connection;
       this.Log("Disconnected from " + connection.channelID);
       connection.disconnect();
-      this.info.Connection = null;
+      this.server.connection = null;
     }else{
       this.Log("Disconnect called but no connection", "warn");
     }
@@ -259,9 +259,9 @@ export class PlayManager extends ManagerBase {
    * @returns this
    */
   pause():PlayManager{
-    this.info.Bot.backupStatus();
+    this.server.bot.backupStatus();
     this.Log("Pause called");
-    this.info.Connection?.pause();
+    this.server.connection?.pause();
     return this;
   }
 
@@ -270,9 +270,9 @@ export class PlayManager extends ManagerBase {
    * @returns this
    */
   resume():PlayManager{
-    this.info.Bot.backupStatus();
+    this.server.bot.backupStatus();
     this.Log("Resume called");
-    this.info.Connection?.resume();
+    this.server.connection?.resume();
     return this;
   }
 
@@ -300,7 +300,7 @@ export class PlayManager extends ManagerBase {
 
   private async onStreamFinished(){
     this.Log("onStreamFinished called");
-    await Util.general.waitForEnteringState(() => !this.info.Connection.playing, 20 * 1000).catch(() => {
+    await Util.general.waitForEnteringState(() => !this.server.connection.playing, 20 * 1000).catch(() => {
       this.Log("Stream has not ended in time and will force stream into destroying", "warn");
       this.stop();
     });
@@ -309,24 +309,24 @@ export class PlayManager extends ManagerBase {
     // 再生が終わったら
     this.errorCount = 0;
     this.errorUrl = "";
-    if(this.info.Queue.loopEnabled){
+    if(this.server.queue.loopEnabled){
       // 曲ループオンならばもう一度再生
       this.play();
       return;
-    }else if(this.info.Queue.onceLoopEnabled){
+    }else if(this.server.queue.onceLoopEnabled){
       // ワンスループが有効ならもう一度同じものを再生
-      this.info.Queue.onceLoopEnabled = false;
+      this.server.queue.onceLoopEnabled = false;
       this.play();
       return;
     }else{
       // キュー整理
-      await this.info.Queue.next();
+      await this.server.queue.next();
     }
     // キューがなくなったら接続終了
-    if(this.info.Queue.length === 0){
+    if(this.server.queue.length === 0){
       this.Log("Queue empty");
-      if(this.info.boundTextChannel){
-        const ch = this.client.getChannel(this.info.boundTextChannel) as TextChannel;
+      if(this.server.boundTextChannel){
+        const ch = this.client.getChannel(this.server.boundTextChannel) as TextChannel;
         await ch.createMessage(":wave:キューが空になったため終了します").catch(e => Util.logger.log(e, "error"));
       }
       this.disconnect();
@@ -349,9 +349,9 @@ export class PlayManager extends ManagerBase {
     this.error = this.preparing = false;
     this.stop();
     if(this.errorCount >= this.retryLimit){
-      if(this.info.Queue.loopEnabled) this.info.Queue.loopEnabled = false;
-      if(this.info.Queue.length === 1 && this.info.Queue.queueLoopEnabled) this.info.Queue.queueLoopEnabled = false;
-      await this.info.Queue.next();
+      if(this.server.queue.loopEnabled) this.server.queue.loopEnabled = false;
+      if(this.server.queue.length === 1 && this.server.queue.queueLoopEnabled) this.server.queue.queueLoopEnabled = false;
+      await this.server.queue.next();
     }
     this.play();
   }

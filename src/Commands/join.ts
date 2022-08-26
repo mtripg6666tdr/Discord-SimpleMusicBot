@@ -17,11 +17,11 @@ export default class Join extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    if(message.member.voiceState.channelID && (options.client.getChannel(message.member.voiceState.channelID) as VoiceChannel).voiceMembers.has(options.client.user.id) && options.data[message.guild.id].Connection){
+    options.server.updateBoundChannel(message);
+    if(message.member.voiceState.channelID && (options.client.getChannel(message.member.voiceState.channelID) as VoiceChannel).voiceMembers.has(options.client.user.id) && options.server.connection){
       message.reply("✘すでにボイスチャンネルに接続中です。").catch(e => Util.logger.log(e, "error"));
     }else{
-      await options.JoinVoiceChannel(message, /* reply result to user inside this method  */ true);
+      await options.server.joinVoiceChannel(message, /* reply result to user inside this method  */ true);
     }
   }
 }

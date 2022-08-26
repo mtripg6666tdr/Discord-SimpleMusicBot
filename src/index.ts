@@ -17,9 +17,9 @@ http.createServer((req, res) => {
   const data = {
     status: 200,
     message: "Discord bot is active now",
-    client: bot.Client?.user ? Buffer.from(bot.Client?.user.id).toString("base64") : null,
-    readyAt: bot.Client?.uptime ? Buffer.from(bot.Client.uptime.toString()).toString("base64") : null,
-    guilds: bot.Client?.guilds.size || null,
+    client: bot.client?.user ? Buffer.from(bot.client?.user.id).toString("base64") : null,
+    readyAt: bot.client?.uptime ? Buffer.from(bot.client.uptime.toString()).toString("base64") : null,
+    guilds: bot.client?.guilds.size || null,
   };
   Util.logger.log("[Server]Received a http request");
   res.end(JSON.stringify(data));
@@ -29,10 +29,10 @@ if(!Util.config.debug){
   // ハンドルされなかったエラーのハンドル
   process.on("uncaughtException", async (error)=>{
     console.error(error);
-    if(bot.Client && Util.config.errorChannel){
+    if(bot.client && Util.config.errorChannel){
       try{
         const errorText = typeof error === "string" ? error : JSON.stringify(error);
-        await bot.Client.createMessage(Util.config.errorChannel, errorText);
+        await bot.client.createMessage(Util.config.errorChannel, errorText);
       }
       catch(e){
         console.error(e);
@@ -40,8 +40,8 @@ if(!Util.config.debug){
       }
     }
   }).on("SIGINT", ()=>{
-    if(bot.Client && Util.config.errorChannel){
-      bot.Client.createMessage(Util.config.errorChannel, "Process terminated");
+    if(bot.client && Util.config.errorChannel){
+      bot.client.createMessage(Util.config.errorChannel, "Process terminated");
     }
   });
 }

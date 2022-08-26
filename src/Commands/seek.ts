@@ -24,13 +24,13 @@ export default class Seek extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    const server = options.data[message.guild.id];
+    options.server.updateBoundChannel(message);
+    const server = options.server;
     // そもそも再生状態じゃないよ...
-    if(!server.Player.isPlaying || server.Player.preparing){
+    if(!server.player.isPlaying || server.player.preparing){
       await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
-    }else if(server.Player.CurrentAudioInfo.LengthSeconds === 0 || server.Player.CurrentAudioInfo.isUnseekable()){
+    }else if(server.player.CurrentAudioInfo.LengthSeconds === 0 || server.player.CurrentAudioInfo.isUnseekable()){
       await message.reply(":warning:シーク先に対応していない楽曲です").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -42,14 +42,14 @@ export default class Seek extends BaseCommand {
         return NaN;
       }
     }(options.rawArgs));
-    if(time > server.Player.CurrentAudioInfo.LengthSeconds || isNaN(time)){
+    if(time > server.player.CurrentAudioInfo.LengthSeconds || isNaN(time)){
       await message.reply(":warning:シーク先の時間が正しくありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     try{
       const response = await message.reply(":rocket:シークしています...");
-      server.Player.stop();
-      await server.Player.play(time);
+      server.player.stop();
+      await server.player.play(time);
       await response.edit(":white_check_mark:シークしました").catch(e => Util.logger.log(e, "error"));
     }
     catch(e){

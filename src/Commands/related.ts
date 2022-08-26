@@ -19,12 +19,12 @@ export default class Related extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    if(options.data[message.guild.id].AddRelative){
-      options.data[message.guild.id].AddRelative = false;
+    options.server.updateBoundChannel(message);
+    if(options.server.AddRelative){
+      options.server.AddRelative = false;
       message.reply("❌関連曲自動再生をオフにしました").catch(e => Util.logger.log(e, "error"));
     }else{
-      options.data[message.guild.id].AddRelative = true;
+      options.server.AddRelative = true;
       const embed = new Helper.MessageEmbedBuilder()
         .setTitle("⭕関連曲自動再生をオンにしました")
         .setDescription("YouTubeからの楽曲再生終了時に、関連曲をキューの末尾に自動追加する機能です。\r\n※YouTube以外のソースからの再生時、ループ有効時には追加されません")

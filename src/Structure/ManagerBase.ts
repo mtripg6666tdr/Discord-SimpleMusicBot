@@ -7,15 +7,15 @@ import { LogEmitter } from "../Structure";
  */
 export abstract class ManagerBase extends LogEmitter {
   // 親ノード
-  protected info:GuildDataContainer = null;
+  protected server:GuildDataContainer = null;
 
   /**
    * 親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
    * @param data 親のGuildVoiceInfo
    */
   setBinding(data:GuildDataContainer){
-    if(this.info) throw new Error("すでに設定されています");
-    this.info = data;
-    this.SetGuildId(this.info.GuildID);
+    if(this.server) throw new Error("すでに設定されています");
+    this.server = data;
+    this.SetGuildId(this.server.guildID);
   }
 }

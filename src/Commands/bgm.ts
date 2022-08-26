@@ -22,16 +22,16 @@ export default class Bgm extends BaseCommand {
   }
   
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    if(!(await options.JoinVoiceChannel(message, /* reply */ false, /* reply when failed */ true))) return;
+    options.server.updateBoundChannel(message);
+    if(!(await options.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true))) return;
     const url = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
-    if(options.data[message.guild.id].SearchPanel !== null){
+    if(options.server.searchPanel !== null){
       message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
     try{
       const reply = await message.reply("🔍確認中...");
-      options.data[message.guild.id].SearchPanel = {
+      options.server.searchPanel = {
         Msg: {
           chId: message.channel.id,
           id: reply.id,
@@ -49,7 +49,7 @@ export default class Bgm extends BaseCommand {
       for(let i = 0; i < result.length; i++){
         const vid = result[i];
         desc += `\`${i + 1}.\` [${vid.title}](${vid.url}) \`${vid.duration}\` - \`${vid.author.name}\` \r\n\r\n`;
-        options.data[message.guild.id].SearchPanel.Opts[i + 1] = {
+        options.server.searchPanel.Opts[i + 1] = {
           title: vid.title,
           url: vid.url,
           duration: vid.duration,

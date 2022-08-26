@@ -29,15 +29,15 @@ export default class Searchq extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    if(options.data[message.guild.id].Queue.length === 0){
+    options.server.updateBoundChannel(message);
+    if(options.server.queue.length === 0){
       message.reply("✘キューが空です").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    let qsresult = options.data[message.guild.id].Queue
+    let qsresult = options.server.queue
       .filter(c => c.BasicInfo.Title.toLowerCase().includes(options.rawArgs.toLowerCase()))
       .concat(
-        options.data[message.guild.id].Queue
+        options.server.queue
           .filter(c => c.BasicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase()))
       );
     if(qsresult.length === 0){
@@ -46,7 +46,7 @@ export default class Searchq extends BaseCommand {
     }
     if(qsresult.length > 20) qsresult = qsresult.slice(0, 20);
     const fields = qsresult.map(c => {
-      const index = options.data[message.guild.id].Queue.findIndex(d => d.BasicInfo.Title === c.BasicInfo.Title).toString();
+      const index = options.server.queue.findIndex(d => d.BasicInfo.Title === c.BasicInfo.Title).toString();
       const _t = c.BasicInfo.LengthSeconds;
       const [min, sec] = Util.time.CalcMinSec(_t);
       return {

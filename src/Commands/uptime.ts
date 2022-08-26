@@ -19,9 +19,9 @@ export default class Uptime extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
+    options.server.updateBoundChannel(message);
     const now = new Date();
-    const insta = Util.time.CalcTime(now.getTime() - options.bot.InstantiatedTime.getTime());
+    const insta = Util.time.CalcTime(now.getTime() - options.bot.instantiatedTime.getTime());
     const ready = Util.time.CalcTime(options.client.uptime);
     const embed = new Helper.MessageEmbedBuilder()
       .setColor(getColor("UPTIME"))
@@ -31,9 +31,9 @@ export default class Uptime extends BaseCommand {
       .addField("レイテンシ",
         `${now.getTime() - message.createdAt.getTime()}ミリ秒(ボット接続実測値)\r\n`
         + `${message.guild.shard.latency}ミリ秒(ボットWebSocket接続取得値)\r\n`
-        + `${(options.data[message.guild.id].Player.isConnecting && options.data[message.guild.id].VcPing) || "-"}ミリ秒(ボイスチャンネルUDP接続取得値)`
+        + `${(options.server.player.isConnecting && options.server.vcPing) || "-"}ミリ秒(ボイスチャンネルUDP接続取得値)`
       )
-      .addField("データベースに登録されたサーバー数", Object.keys(options.data).length + "サーバー")
+      .addField("データベースに登録されたサーバー数", options.bot.databaseCount + "サーバー")
       .toEris()
     ;
     message.reply({embeds: [embed]}).catch(e => Util.logger.log(e, "error"));

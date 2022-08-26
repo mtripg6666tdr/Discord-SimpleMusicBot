@@ -16,13 +16,13 @@ export default class Reset extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
+    options.server.updateBoundChannel(message);
     // VC接続中なら切断
-    if(options.data[message.guild.id].Player.isConnecting){
-      options.data[message.guild.id].Player.disconnect();
+    if(options.server.player.isConnecting){
+      options.server.player.disconnect();
     }
     // サーバープリファレンスをnullに
-    options.data[message.guild.id] = null;
+    options.server = null;
     // データ初期化
     options.initData(message.guild.id, message.channel.id);
     message.reply("✅サーバーの設定を初期化しました").catch(e => Util.logger.log(e, "error"));

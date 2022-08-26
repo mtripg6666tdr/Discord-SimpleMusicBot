@@ -16,13 +16,13 @@ export default class Mltf extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
-    if(options.data[message.guild.id].Queue.length <= 2){
+    options.server.updateBoundChannel(message);
+    if(options.server.queue.length <= 2){
       message.reply("キューに3曲以上追加されているときに使用できます。").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const q = options.data[message.guild.id].Queue;
-    const to = options.data[message.guild.id].Player.isPlaying ? 1 : 0;
+    const q = options.server.queue;
+    const to = options.server.player.isPlaying ? 1 : 0;
     q.move(q.length - 1, to);
     const info = q.get(to);
     message.reply("✅`" + info.BasicInfo.Title + "`を一番最後からキューの先頭に移動しました").catch(e => Util.logger.log(e, "error"));

@@ -27,18 +27,18 @@ export default class Thumbnail extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.updateBoundChannel(message);
+    options.server.updateBoundChannel(message);
     const embed = new Helper.MessageEmbedBuilder();
     embed.setColor(getColor("THUMB"));
-    if(options.rawArgs && options.data[message.guild.id].SearchPanel && Object.keys(options.data[message.guild.id].SearchPanel.Opts).includes(options.rawArgs === "" ? "n" : options.rawArgs)){
-      const opt = options.data[message.guild.id].SearchPanel.Opts[Number(Util.string.NormalizeText(options.rawArgs))];
+    if(options.rawArgs && options.server.searchPanel && Object.keys(options.server.searchPanel.Opts).includes(options.rawArgs === "" ? "n" : options.rawArgs)){
+      const opt = options.server.searchPanel.Opts[Number(Util.string.NormalizeText(options.rawArgs))];
       embed
         .setImage(opt.thumbnail)
         .setTitle(opt.title)
         .setDescription("URL: " + opt.url)
       ;
-    }else if(!options.rawArgs && options.data[message.guild.id].Player.isPlaying && options.data[message.guild.id].Queue.length >= 1){
-      const info = options.data[message.guild.id].Queue.get(0).BasicInfo;
+    }else if(!options.rawArgs && options.server.player.isPlaying && options.server.queue.length >= 1){
+      const info = options.server.queue.get(0).BasicInfo;
       embed
         .setImage(info.Thumnail)
         .setTitle(info.Title)
