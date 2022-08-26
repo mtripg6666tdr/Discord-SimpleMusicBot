@@ -22,7 +22,8 @@ export function DownloadText(url:string, headers?:{[key:string]:string}, request
       "http:": http
     })[durl.protocol].request({
       protocol: durl.protocol,
-      host: durl.host,
+      hostname: durl.hostname,
+      port: durl.port,
       path: durl.pathname + durl.search + durl.hash,
       method: requestBody ? "POST" : "GET",
       headers: headers ?? undefined
@@ -57,8 +58,9 @@ export function RetriveHttpStatusCode(url:string, headers?:{[key:string]:string}
       "http:": http
     })[durl.protocol].request({
       protocol: durl.protocol,
-      host: durl.hostname,
+      hostname: durl.hostname,
       path: durl.pathname,
+      port: durl.port,
       method: "HEAD",
       headers: {
         "User-Agent": DefaultUserAgent,

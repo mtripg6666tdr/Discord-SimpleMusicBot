@@ -42,6 +42,7 @@ export class MusicBot extends MusicBotBase {
       .on("interactionCreate", this.onInteractionCreate.bind(this))
       .on("voiceChannelJoin", this.onVoiceChannelJoin.bind(this))
       .on("voiceChannelLeave", this.onVoiceChannelLeave.bind(this))
+      .on("error", this.onError.bind(this))
     ;
   }
 
@@ -50,19 +51,6 @@ export class MusicBot extends MusicBotBase {
     this._addOn.emit("ready", client);
     this.Log("Socket connection is ready now");
     if(this._isReadyFinished) return;
-
-    client.on("error", er => {
-      Util.logger.log(er, "error");
-      console.error(er);
-      Util.logger.log("Attempt reconnecting");
-      client.connect()
-        .then(() => Util.logger.log("Reconnected!"))
-        .catch(_er => {
-          Util.logger.log(_er);
-          console.log(_er);
-          Util.logger.log("Reconnect attempt failed");
-        });
-    });
 
     this.Log("Starting environment checking and preparation now");
 
@@ -376,6 +364,20 @@ export class MusicBot extends MusicBotBase {
     const bound = this._client.getChannel(guild.boundTextChannel);
     if(!bound) return;
     await this._client.createMessage(bound.id, ":postbox: 正常に切断しました").catch(e => this.Log(e));
+  }
+
+  private async onError(er:Error){
+    Util.logger.log(er, "error");
+    console.error(er);
+    Util.logger.log("Attempt reconnecting");
+    this.client.connect()
+      .then(() => Util.logger.log("Reconnected!"))
+      .catch(_er => {
+        Util.logger.log(_er);
+        console.log(_er);
+        Util.logger.log("Reconnect attempt failed");
+      })
+    ;
   }
 
   /**

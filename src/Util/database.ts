@@ -1,4 +1,4 @@
-import { https } from "follow-redirects";
+import { http, https } from "follow-redirects";
 
 const MIME_JSON = "application/json";
 export abstract class DatabaseAPI {
@@ -86,7 +86,7 @@ export abstract class DatabaseAPI {
           return result.data as {[guildid:string]:string};
         }else return null;
       }
-      catch{
+      catch(e){
         return null;
       }
     }else{
@@ -106,7 +106,8 @@ export abstract class DatabaseAPI {
       const durl = new URL(url);
       const opt = {
         protocol: durl.protocol,
-        host: durl.host,
+        hostname: durl.hostname,
+        port: durl.port,
         path: durl.pathname + durl.search,
         method: method,
       } as {[key:string]:any};
@@ -115,17 +116,21 @@ export abstract class DatabaseAPI {
           "Content-Type": mimeType
         };
       }
-      const req = https.request(opt, (res) => {
+      const httpLibs = {
+        "http:": http,
+        "https:": https,
+      } as {[proto:string]:(typeof http|typeof https)};
+      const req = httpLibs[durl.protocol].request(opt, (res) => {
         const bufs = [] as Buffer[];
         res.on("data", chunk => bufs.push(chunk));
         res.on("end", ()=> {
           try{
             const parsed = JSON.parse(Buffer.concat(bufs).toString("utf-8")) as postResult;
-            Object.keys(parsed.data).forEach(k => parsed.data[k] = decodeURIComponent(parsed.data[k]));
+            if(parsed.data) Object.keys(parsed.data).forEach(k => parsed.data[k] = decodeURIComponent(parsed.data[k]));
             resolve(parsed);
           }
-          catch{
-            reject();
+          catch(e){
+            reject(e);
           }
         });
         res.on("error", ()=>reject());
