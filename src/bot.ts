@@ -2,7 +2,7 @@ import type { exportableCustom } from "./AudioSource";
 import type { CommandArgs } from "./Commands";
 import type { YmxFormat } from "./Structure";
 
-import { lock, LockObj } from "@mtripg6666tdr/async-lock";
+import { lock } from "@mtripg6666tdr/async-lock";
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 import * as discord from "eris";
 
@@ -555,7 +555,6 @@ export class MusicBot extends LogEmitter {
     };
   }
 
-  private readonly joinVoiceChannelLocker = new LockObj();
   /**
    * ボイスチャンネルに接続します
    * @param message コマンドを表すメッセージ
@@ -563,7 +562,7 @@ export class MusicBot extends LogEmitter {
    * @returns 成功した場合はtrue、それ以外の場合にはfalse
    */
   private async joinVoiceChannel(message:CommandMessage, reply:boolean = false, replyOnFail:boolean = false):Promise<boolean>{
-    return lock(this.joinVoiceChannelLocker, async () => {
+    return lock(this.data[message.guild.id].joinVoiceChannelLocker, async () => {
       const t = Util.time.timer.start("MusicBot#Join");
       if(message.member.voiceState.channelID){
         const targetVC = this.client.getChannel(message.member.voiceState.channelID) as discord.VoiceChannel;

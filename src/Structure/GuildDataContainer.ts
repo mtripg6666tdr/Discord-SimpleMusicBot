@@ -2,6 +2,8 @@ import type { MusicBot } from "../bot";
 import type { SearchPanel } from "./SearchPanel";
 import type { Client, VoiceConnection } from "eris";
 
+import { LockObj } from "@mtripg6666tdr/async-lock";
+
 import { PlayManager } from "../Component/PlayManager";
 import { QueueManager } from "../Component/QueueManager";
 
@@ -64,6 +66,11 @@ export class GuildDataContainer {
    */
   VcPing:number;
 
+  /**
+   * joinVoiceChannelのロッカー
+   */
+  joinVoiceChannelLocker:LockObj;
+
   constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBot){
     this.SearchPanel = null;
     this.Queue = new QueueManager();
@@ -77,6 +84,10 @@ export class GuildDataContainer {
     this.PersistentPref = {
       Prefix: ">"
     };
+    this.EquallyPlayback = false;
+    this.Connection = null;
+    this.VcPing = null;
+    this.joinVoiceChannelLocker = new LockObj();
   }
 }
 
