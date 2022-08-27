@@ -53,7 +53,7 @@ export default class BulkDelete extends BaseCommand {
         const msgs = allMsgs.filter(_msg => _msg.author.id === options.client.user.id && _msg.id !== reply.id);
         msgs.sort((a, b) => b.createdAt - a.createdAt);
         messages.push(...msgs);
-        before = msgs.at(-1).id;
+        before = allMsgs.at(-1).id;
         i++;
         await reply.edit(`:mag:取得中(${messages.length}件ヒット/取得した${i * 100}件中)...`);
       } while(messages.length < count && i <= 10);
