@@ -325,10 +325,12 @@ export class PlayManager extends ManagerBase {
 
   private async onStreamFinished(){
     this.Log("onStreamFinished called");
-    await Util.general.waitForEnteringState(() => !this.server.connection.playing, 20 * 1000).catch(() => {
-      this.Log("Stream has not ended in time and will force stream into destroying", "warn");
-      this.stop();
-    });
+    if(this.server.connection){
+      await Util.general.waitForEnteringState(() => !this.server.connection.playing, 20 * 1000).catch(() => {
+        this.Log("Stream has not ended in time and will force stream into destroying", "warn");
+        this.stop();
+      });
+    }
     // ストリームが終了したら時間を確認しつつ次の曲へ移行
     this.Log("Stream finished");
     // 再生が終わったら
