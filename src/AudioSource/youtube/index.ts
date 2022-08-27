@@ -72,7 +72,10 @@ export class YouTube extends AudioSource {
       isHLS: isLive
     } as ytdl.chooseFormatOptions);
     const { url } = format;
-    return {url, ua};
+    return {
+      url,
+      ua
+    };
   }
 
   toField(verbose:boolean = false){
