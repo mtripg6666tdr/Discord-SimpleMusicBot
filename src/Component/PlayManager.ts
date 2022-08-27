@@ -190,28 +190,31 @@ export class PlayManager extends ManagerBase {
         // 再生開始メッセージ
         const _t = Number(this.currentAudioInfo.LengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
-        const embed = new Helper.MessageEmbedBuilder({
-          title: ":cd:現在再生中:musical_note:",
-          description:
+        const [qhour, qmin, qsec] = Util.time.CalcHourMinSec(this.server.queue.lengthSeconds - this.currentAudioInfo.LengthSeconds);
+        /* eslint-disable @typescript-eslint/indent */
+        const embed = new Helper.MessageEmbedBuilder()
+          .setTitle(":cd:現在再生中:musical_note:")
+          .setDescription(
               `[${this.currentAudioInfo.Title}](${this.currentAudioUrl}) \``
             + (this.currentAudioInfo.ServiceIdentifer === "youtube" && (this.currentAudioInfo as YouTube).LiveStream ? "(ライブストリーム)" : _t === 0 ? "(不明)" : min + ":" + sec)
             + "`"
-        });
-        embed.setColor(getColor("AUTO_NP"));
-        embed.addField("リクエスト", this.server.queue.get(0).additionalInfo.addedBy.displayName, true);
-        embed.addField("次の曲",
-          // トラックループオンなら現在の曲
-          this.server.queue.loopEnabled ? this.server.queue.get(0).basicInfo.Title :
-          // (トラックループはオフ)長さが2以上ならオフセット1の曲
+          )
+          .setColor(getColor("AUTO_NP"))
+          .addField("リクエスト", this.server.queue.get(0).additionalInfo.addedBy.displayName, true)
+          .addField("次の曲",
+            // トラックループオンなら現在の曲
+            this.server.queue.loopEnabled ? this.server.queue.get(0).basicInfo.Title :
+            // (トラックループはオフ)長さが2以上ならオフセット1の曲
             this.server.queue.length >= 2 ? this.server.queue.get(1).basicInfo.Title :
             // (トラックループオフ,長さ1)キューループがオンなら現在の曲
-              this.server.queue.queueLoopEnabled ? this.server.queue.get(0).basicInfo.Title :
-              // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
-                "次の曲がまだ登録されていません"
-          , true);
-        const [qhour, qmin, qsec] = Util.time.CalcHourMinSec(this.server.queue.lengthSeconds - this.currentAudioInfo.LengthSeconds);
-        embed.addField("再生待ちの曲", this.server.queue.loopEnabled ? "ループします" : (this.server.queue.length - 1) + "曲(" + (qhour === "0" ? "" : qhour + ":") + qmin + ":" + qsec + ")", true);
-        embed.setThumbnail(this.currentAudioInfo.Thumnail);
+            this.server.queue.queueLoopEnabled ? this.server.queue.get(0).basicInfo.Title :
+            // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
+            "次の曲がまだ登録されていません", true
+          )
+          .addField("再生待ちの曲", this.server.queue.loopEnabled ? "ループします" : (this.server.queue.length - 1) + "曲(" + (qhour === "0" ? "" : qhour + ":") + qmin + ":" + qsec + ")", true)
+          .setThumbnail(this.currentAudioInfo.Thumnail)
+        ;
+        /* eslint-enable @typescript-eslint/indent */
         if(this.currentAudioInfo.ServiceIdentifer === "youtube" && (this.currentAudioInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
@@ -331,6 +334,7 @@ export class PlayManager extends ManagerBase {
     // 再生が終わったら
     this._errorCount = 0;
     this._errorUrl = "";
+    this._cost = 0;
     if(this.server.queue.loopEnabled){
       // 曲ループオンならばもう一度再生
       this.play();
@@ -360,6 +364,7 @@ export class PlayManager extends ManagerBase {
 
   private async onStreamFailed(){
     this.Log("onStreamFailed called");
+    this._cost = 0;
     if(this._errorUrl === this.currentAudioInfo.Url){
       this._errorCount++;
     }else{
