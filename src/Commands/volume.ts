@@ -9,10 +9,10 @@ export default class Volume extends BaseCommand {
     super({
       name: "ボリューム",
       alias: ["volume", "vol"],
-      description: "音量を調節します。20から200の間で指定します(デフォルト100)。何も引数を付けないと現在の音量を表示します。不安定になった場合には100に戻してください。",
+      description: "音量を調節します。1から200の間で指定します(デフォルト100)。何も引数を付けないと現在の音量を表示します。不安定になった場合には100に戻してください。",
       unlist: false,
       category: "voice",
-      examples: "volume <音量>",
+      examples: "volume [音量]",
       usage: "volume 120",
     });
   }
