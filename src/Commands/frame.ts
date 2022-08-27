@@ -40,7 +40,7 @@ export default class Frame extends BaseCommand {
     if(!vinfo.isYouTube()){
       await message.reply(":warning:フレームのキャプチャ機能に非対応のソースです。").catch(e => Util.logger.log(e, "error"));
       return;
-    }else if(vinfo["cache"].type !== ytdlCore){
+    }else if(vinfo["cache"] && vinfo["cache"].type !== ytdlCore){
       await message.reply(":warning:フォールバックしているため、現在この機能を使用できません。").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -61,7 +61,7 @@ export default class Frame extends BaseCommand {
     try{
       const [hour, min, sec] = Util.time.CalcHourMinSec(Math.round(time * 100) / 100);
       const response = await message.reply(":camera_with_flash:取得中...");
-      const {url, ua} = await vinfo.fetchVideo();
+      const { url, ua } = await vinfo.fetchVideo();
       const frame = await getFrame(url, time, ua);
       await response.channel.createMessage("", {
         file: frame,
@@ -92,7 +92,9 @@ function getFrame(url:string, time:number, ua:string){
     ];
     Util.logger.log(`[FFmpeg] Passing args: ${args.join(" ")}`, "debug");
     const bufs = [] as Buffer[];
-    const ffmpeg = new FFmpeg({args})
+    const ffmpeg = new FFmpeg({args});
+    if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log(`[FFmpeg] ${chunk.toString()}`, "debug"));
+    ffmpeg
       .on("error", (er) => {
         if(!ffmpeg.destroyed) ffmpeg.destroy();
         reject(er);
@@ -105,6 +107,5 @@ function getFrame(url:string, time:number, ua:string){
         if(!ffmpeg.destroyed) ffmpeg.destroy();
       })
     ;
-    if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log(`[FFmpeg] ${chunk.toString()}`, "debug"));
   });
 }
