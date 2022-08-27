@@ -20,6 +20,9 @@ export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string[],
   ] : [
     "-f", "s16le",
   ];
+  const bitrateArgs = effectArgs.length === 2 && effectArgs[1].includes("loudnorm") ? [] : [
+    "-vbr", "on",
+  ];
   const args = [
     "-analyzeduration", "0",
     ...ffmpegNetworkArgs,
@@ -30,7 +33,7 @@ export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string[],
     ...outputArgs,
     "-ar", "48000",
     "-ac", "2",
-    "-vbr", "on",
+    ...bitrateArgs,
   ];
   Util.logger.log("[FFmpeg] Passing arguments: " + args.map(arg => arg.startsWith("http") ? "<URL>" : arg).join(" "), "debug");
   const ffmpeg = new FFmpeg({args});
