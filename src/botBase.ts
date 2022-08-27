@@ -118,6 +118,7 @@ export abstract class MusicBotBase extends LogEmitter {
         });
         if(queue.length > 0){
           await Util.db.DatabaseAPI.SetQueueData(queue);
+        }else{
           Util.logger.log("[Backup] No modified queue found, skipping");
         }
         this._queueModifiedGuilds = [];
