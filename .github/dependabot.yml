@@ -12,6 +12,9 @@ updates:
     target-branch: "master"
     allow:
       - dependency-type: "direct"
+    labels:
+      - "dependencies"
+      - "javascript"
     ignore:
       - dependency-name: "node"
         update-types: ["version-update:semver-major"]
@@ -28,6 +31,10 @@ updates:
     commit-message:
       prefix: "Update(nodedb):"
     target-branch: "master"
+    labels:
+      - "dependencies"
+      - "github_actions"
+      - "scope:node-db"
     allow:
       - dependency-type: "direct"
   
@@ -41,6 +48,9 @@ updates:
     commit-message:
       prefix: "Update(actions):"
     target-branch: "master"
+    labels:
+      - "dependencies"
+      - "github_actions"
 
   # v2 branch
   - package-ecosystem: npm
@@ -55,6 +65,7 @@ updates:
     labels:
       - "dependencies"
       - "target:v2"
+      - "javascript"
     allow:
       - dependency-type: "direct"
     ignore:
