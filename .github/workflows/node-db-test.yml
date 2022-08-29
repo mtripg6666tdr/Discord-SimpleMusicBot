@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: 
+      - master
+    paths:
+      - "util/exampleDbServer/node/**/*"
+  pull_request:
+    paths:
+      - "util/exampleDbServer/node/**/*"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3.4.1
+        with:
+          node-version: '16.x'
+      
+      - name: Install dependencies
+        working-directory: "util/exampleDbServer/node"
+        run: npm ci
+
+      - name: Build server
+        working-directory: "util/exampleDbServer/node"
+        run: npm run build
