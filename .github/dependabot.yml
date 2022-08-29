@@ -25,7 +25,7 @@ updates:
       time: "09:00"
       timezone: "Asia/Tokyo"
     commit-message:
-      prefix: "Update(db/node):"
+      prefix: "Update(nodedb):"
     target-branch: "master"
     allow:
       - dependency-type: "direct"
