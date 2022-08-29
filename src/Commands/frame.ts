@@ -96,7 +96,7 @@ function getFrame(url:string, time:number, ua:string){
     if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log(`[FFmpeg] ${chunk.toString()}`, "debug"));
     ffmpeg
       .on("error", (er) => {
-        if(!ffmpeg.destroyed) ffmpeg.destroy();
+        if(!ffmpeg.destroyed) ffmpeg.destroy(er);
         reject(er);
       })
       .on("data", (chunks) => {
