@@ -265,6 +265,7 @@ export class PlayManager extends ManagerBase {
       connection.disconnect();
       this.server.connection = null;
     }else{
+      this.server.connection = null;
       this.Log("Disconnect called but no connection", "warn");
     }
     if(typeof global.gc === "function"){
