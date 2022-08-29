@@ -18,6 +18,18 @@ updates:
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
 
+  - package-ecosystem: npm
+    directory: "/util/exampleDbServer/node/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    commit-message:
+      prefix: "Update(nodedb):"
+    target-branch: "master"
+    allow:
+      - dependency-type: "direct"
+
   # v2 branch
   - package-ecosystem: npm
     directory: "/"
