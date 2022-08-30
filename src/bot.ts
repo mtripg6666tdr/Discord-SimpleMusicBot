@@ -255,7 +255,7 @@ export class MusicBot extends MusicBotBase {
         // 遅延リプライ
         await interaction.defer();
         // メッセージライクに解決してコマンドメッセージに 
-        const commandMessage = CommandMessage.createFromInteraction(interaction);
+        const commandMessage = CommandMessage.createFromInteraction(interaction) as CommandMessage;
         // プレフィックス更新
         server.updatePrefix(commandMessage);
         // コマンドを実行
