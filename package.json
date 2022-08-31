@@ -12,7 +12,7 @@
     "@mtripg6666tdr/async-lock": "^1.1.0",
     "@mtripg6666tdr/eris-command-resolver": "^1.0.0",
     "comment-json": "^4.2.3",
-    "dotenv": "^16.0.1",
+    "dotenv": "^16.0.2",
     "eris": "^0.17.1",
     "follow-redirects": "^1.15.1",
     "genius-lyrics": "^4.4.0",
