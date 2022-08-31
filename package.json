@@ -13,7 +13,7 @@
     "comment-json": "^4.2.3",
     "discord.js": "^13.6.0",
     "djs-command-resolver": "^1.0.2",
-    "dotenv": "^16.0.1",
+    "dotenv": "^16.0.2",
     "follow-redirects": "^1.15.1",
     "genius-lyrics": "^4.4.0",
     "html-entities": "^2.3.3",
