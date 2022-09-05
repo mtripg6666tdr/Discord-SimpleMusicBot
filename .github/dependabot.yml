@@ -33,7 +33,7 @@ updates:
     target-branch: "master"
     labels:
       - "dependencies"
-      - "github_actions"
+      - "javascript"
       - "scope:node-db"
     allow:
       - dependency-type: "direct"
