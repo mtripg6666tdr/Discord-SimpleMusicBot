@@ -12,7 +12,8 @@
   "plugins": [
     "@typescript-eslint",
     "import",
-    "node"
+    "node",
+    "license-header"
   ],
   "env": {
     "node": true
@@ -148,6 +149,7 @@
     "node/no-missing-import": "off",
     "node/no-missing-require": "off",
     "node/shebang": "error",
+    "license-header/header": ["warn", "./util/license.js"],
 
     // eslint rules
     "eol-last": ["error", "always"],
@@ -315,5 +317,13 @@
     "init-declarations": "off",
     "no-extra-semi": "off",
     "indent": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["./util/exampleDbServer/node/src/**/*.ts"],
+      "parserOptions": {
+        "project": "./util/exampleDbServer/node/tsconfig.json"
+      }
+    }
+  ]
 }

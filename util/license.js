@@ -15,5 +15,3 @@
  * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
  * If not, see <https://www.gnu.org/licenses/>.
  */
-
-export { ResponseMessage } from "@mtripg6666tdr/eris-command-resolver";

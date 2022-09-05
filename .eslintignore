@@ -1,4 +1,8 @@
-util
+util/*
+!util/exampleDbServer
+util/exampleDbServer/*
+!util/exampleDbServer/node
+util/exampleDbServer/node/dist
 !src/Util
 test/*
 dist/*
