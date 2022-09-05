@@ -159,8 +159,10 @@ export class GuildDataContainer extends LogEmitter {
    * @param cancellation キャンセルマネージャー
    */
   bindCancellation(cancellation:TaskCancellationManager){
-    if(this.cancellations.includes(cancellation)) return;
-    this.cancellations.push(cancellation);
+    if(!this.cancellations.includes(cancellation)){
+      this.cancellations.push(cancellation);
+    }
+    return cancellation;
   }
 
   /**
@@ -175,9 +177,13 @@ export class GuildDataContainer extends LogEmitter {
   /**
    * キャンセルマネージャーを破棄します
    * @param cancellation 破棄するキャンセルマネージャー
+   * @returns 成功したかどうか
    */
   unbindCancellation(cancellation:TaskCancellationManager){
-    this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
+    const index = this.cancellations.findIndex(c => c === cancellation);
+    if(index < 0) return false;
+    this.cancellations.splice(index, 1);
+    return true;
   }
 
   private readonly joinVoiceChannelLocker:LockObj = new LockObj();
@@ -309,8 +315,7 @@ export class GuildDataContainer extends LogEmitter {
         hl: "ja",
         limit: 999 - this.queue.length
       });
-      const cancellation = new TaskCancellationManager();
-      this.cancellations.push(cancellation);
+      const cancellation = this.bindCancellation(new TaskCancellationManager());
       const index = await this.queue.processPlaylist(
         this.bot.client,
         msg,
@@ -346,8 +351,7 @@ export class GuildDataContainer extends LogEmitter {
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const sc = new Soundcloud();
       const playlist = await sc.playlists.getV2(optiont);
-      const cancellation = new TaskCancellationManager();
-      this.cancellations.push(cancellation);
+      const cancellation = this.bindCancellation(new TaskCancellationManager());
       const index = await this.queue.processPlaylist(this.bot.client, msg, cancellation, first, "soundcloud", playlist.tracks, playlist.title, playlist.track_count, async (track) => {
         const item = await sc.tracks.getV2(track.id);
         return {

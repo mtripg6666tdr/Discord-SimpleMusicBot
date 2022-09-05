@@ -41,8 +41,7 @@ export default class Import extends BaseCommand {
     }
     if(url.startsWith("http://discord.com/channels/") || url.startsWith("https://discord.com/channels/")){
       let smsg = null as ResponseMessage;
-      const cancellation = new TaskCancellationManager();
-      options.server.bindCancellation(cancellation);
+      const cancellation = options.server.bindCancellation(new TaskCancellationManager());
       try{
         smsg = await message.reply("🔍メッセージを取得しています...");
         const ids = url.split("/");
