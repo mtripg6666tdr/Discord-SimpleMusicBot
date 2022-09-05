@@ -1,4 +1,3 @@
-// @ts-check
 require("dotenv").config();
 
 const CJSON = require("comment-json");
