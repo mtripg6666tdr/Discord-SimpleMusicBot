@@ -2,7 +2,7 @@
  * Copyright 2021-2022 mtripg6666tdr
  * 
  * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
- * (npm package name: discord-music-bot / repository url: https://github.com/mtripg6666tdr/Discord-SimpleMusicBot )
+ * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
  * 
  * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
  * under the terms of the GNU General Public License as published by the Free Software Foundation, 
