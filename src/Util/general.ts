@@ -28,7 +28,7 @@ import { log } from "./log";
  * @param length 補完後の長さ
  * @returns 保管された文字列
  */
-export function AddZero(str:string, length:number){
+export function padZero(str:string, length:number){
   if(str.length >= length) return str;
   return `${"0".repeat(length - str.length)}${str}`;
 }

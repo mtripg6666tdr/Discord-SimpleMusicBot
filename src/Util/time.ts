@@ -18,7 +18,7 @@
 
 import { performance } from "perf_hooks";
 
-import { AddZero } from "./general";
+import { padZero } from "./general";
 import { log } from "./log";
 
 /**
@@ -29,7 +29,7 @@ import { log } from "./log";
 export function CalcMinSec(_t:number){
   const sec = _t % 60;
   const min = (_t - sec) / 60;
-  return [AddZero(min.toString(), 2), AddZero(sec.toString(), 2)];
+  return [padZero(min.toString(), 2), padZero(sec.toString(), 2)];
 }
 
 /**
@@ -41,7 +41,7 @@ export function CalcHourMinSec(seconds:number){
   const sec = seconds % 60;
   const min = (seconds - sec) / 60 % 60;
   const hor = ((seconds - sec) / 60 - min) / 60;
-  return [hor.toString(), AddZero(min.toString(), 2), AddZero(sec.toString(), 2)];
+  return [hor.toString(), padZero(min.toString(), 2), padZero(sec.toString(), 2)];
 }
 
 // Returns hour, min, sec and millisec from total millisec
