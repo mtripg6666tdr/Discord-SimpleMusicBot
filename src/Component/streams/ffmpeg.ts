@@ -24,7 +24,7 @@ import { destroyStream } from ".";
 import Util from "../../Util";
 import { DefaultUserAgent, FFmpegDefaultNetworkArgs } from "../../definition";
 
-export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string[], seek:number, output:"ogg"|"pcm"){
+export function transformThroughFFmpeg(readable:StreamInfo, bitrate:number, effectArgs:string[], seek:number, output:"ogg"|"pcm"){
   const ffmpegNetworkArgs = readable.type === "url" ? [
     ...FFmpegDefaultNetworkArgs,
     "-user_agent", readable.userAgent || DefaultUserAgent
@@ -40,6 +40,7 @@ export function transformThroughFFmpeg(readable:StreamInfo, effectArgs:string[],
   ];
   const bitrateArgs = effectArgs.length === 2 && effectArgs[1].includes("loudnorm") ? [] : [
     "-vbr", "on",
+    "-b:a", bitrate.toString(),
   ];
   const args = [
     "-analyzeduration", "0",
