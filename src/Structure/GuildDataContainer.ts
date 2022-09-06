@@ -43,7 +43,10 @@ import { YmxVersion } from "./YmxFormat";
  * サーバーごとデータを保存するコンテナ
  */
 export class GuildDataContainer extends LogEmitter {
-  private readonly cancellations = [] as TaskCancellationManager[];
+  private readonly _cancellations = [] as TaskCancellationManager[];
+  private get cancellations():Readonly<GuildDataContainer["_cancellations"]>{
+    return this._cancellations;
+  }
   
   /**
    * 永続的設定を保存するコンテナ
@@ -178,7 +181,7 @@ export class GuildDataContainer extends LogEmitter {
    */
   bindCancellation(cancellation:TaskCancellationManager){
     if(!this.cancellations.includes(cancellation)){
-      this.cancellations.push(cancellation);
+      this._cancellations.push(cancellation);
     }
     return cancellation;
   }
@@ -200,7 +203,7 @@ export class GuildDataContainer extends LogEmitter {
   unbindCancellation(cancellation:TaskCancellationManager){
     const index = this.cancellations.findIndex(c => c === cancellation);
     if(index < 0) return false;
-    this.cancellations.splice(index, 1);
+    this._cancellations.splice(index, 1);
     return true;
   }
 
@@ -334,64 +337,72 @@ export class GuildDataContainer extends LogEmitter {
         limit: 999 - this.queue.length
       });
       const cancellation = this.bindCancellation(new TaskCancellationManager());
-      const index = await this.queue.processPlaylist(
-        this.bot.client,
-        msg,
-        cancellation,
-        first,
-        /* known source */ "youtube",
-        /* result */ result.items,
-        /* playlist name */ result.title,
-        /* tracks count */ result.estimatedItemCount,
-        /* consumer */ (c) => ({
-          url: c.url,
-          channel: c.author.name,
-          description: "プレイリストから指定のため詳細は表示されません",
-          isLive: c.isLive,
-          length: c.durationSec,
-          thumbnail: c.thumbnails[0].url,
-          title: c.title
-        } as exportableCustom)
-      );
-      if(cancellation.Cancelled){
-        await msg.edit("✅キャンセルされました。");
-      }else{
-        const embed = new Helper.MessageEmbedBuilder()
-          .setTitle("✅プレイリストが処理されました")
-          .setDescription(`[${result.title}](${result.url}) \`(${result.author.name})\` \r\n${index}曲が追加されました`)
-          .setThumbnail(result.bestThumbnail.url)
-          .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-        await msg.edit({content: "", embeds: [embed.toEris()]});
+      try{
+        const index = await this.queue.processPlaylist(
+          this.bot.client,
+          msg,
+          cancellation,
+          first,
+          /* known source */ "youtube",
+          /* result */ result.items,
+          /* playlist name */ result.title,
+          /* tracks count */ result.estimatedItemCount,
+          /* consumer */ (c) => ({
+            url: c.url,
+            channel: c.author.name,
+            description: "プレイリストから指定のため詳細は表示されません",
+            isLive: c.isLive,
+            length: c.durationSec,
+            thumbnail: c.thumbnails[0].url,
+            title: c.title
+          } as exportableCustom)
+        );
+        if(cancellation.Cancelled){
+          await msg.edit("✅キャンセルされました。");
+        }else{
+          const embed = new Helper.MessageEmbedBuilder()
+            .setTitle("✅プレイリストが処理されました")
+            .setDescription(`[${result.title}](${result.url}) \`(${result.author.name})\` \r\n${index}曲が追加されました`)
+            .setThumbnail(result.bestThumbnail.url)
+            .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
+          await msg.edit({content: "", embeds: [embed.toEris()]});
+        }
       }
-      this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
+      finally{
+        this.unbindCancellation(cancellation);
+      }
       await this.player.play();
     }else if(SoundCloudS.validatePlaylistUrl(optiont)){
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const sc = new Soundcloud();
       const playlist = await sc.playlists.getV2(optiont);
       const cancellation = this.bindCancellation(new TaskCancellationManager());
-      const index = await this.queue.processPlaylist(this.bot.client, msg, cancellation, first, "soundcloud", playlist.tracks, playlist.title, playlist.track_count, async (track) => {
-        const item = await sc.tracks.getV2(track.id);
-        return {
-          url: item.permalink_url,
-          title: item.title,
-          description: item.description,
-          length: Math.floor(item.duration / 1000),
-          author: item.user.username,
-          thumbnail: item.artwork_url
-        } as exportableCustom;
-      });
-      if(cancellation.Cancelled){
-        await msg.edit("✅キャンセルされました。");
-      }else{
-        const embed = new Helper.MessageEmbedBuilder()
-          .setTitle("✅プレイリストが処理されました")
-          .setDescription(`[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n${index}曲が追加されました`)
-          .setThumbnail(playlist.artwork_url)
-          .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-        await msg.edit({content: "", embeds: [embed.toEris()]});
+      try{
+        const index = await this.queue.processPlaylist(this.bot.client, msg, cancellation, first, "soundcloud", playlist.tracks, playlist.title, playlist.track_count, async (track) => {
+          const item = await sc.tracks.getV2(track.id);
+          return {
+            url: item.permalink_url,
+            title: item.title,
+            description: item.description,
+            length: Math.floor(item.duration / 1000),
+            author: item.user.username,
+            thumbnail: item.artwork_url
+          } as exportableCustom;
+        });
+        if(cancellation.Cancelled){
+          await msg.edit("✅キャンセルされました。");
+        }else{
+          const embed = new Helper.MessageEmbedBuilder()
+            .setTitle("✅プレイリストが処理されました")
+            .setDescription(`[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n${index}曲が追加されました`)
+            .setThumbnail(playlist.artwork_url)
+            .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
+          await msg.edit({content: "", embeds: [embed.toEris()]});
+        }
       }
-      this.cancellations.splice(this.cancellations.findIndex(c => c === cancellation), 1);
+      finally{
+        this.unbindCancellation(cancellation);
+      }
       await this.player.play();
     }else{
       try{
