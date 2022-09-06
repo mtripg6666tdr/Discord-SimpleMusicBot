@@ -118,7 +118,7 @@ export class GuildDataContainer extends LogEmitter {
     this.player = new PlayManager(client);
     this.boundTextChannel = boundchannelid;
     this.guildID = guildid;
-    this.SetTag(`[GuildDataContainer/${guildid}]`);
+    this.SetTag(`GuildDataContainer/${guildid}`);
     this.dataPath = ".data/" + guildid + ".preferences.json";
     this.bot = bot;
     this.AddRelative = false;
