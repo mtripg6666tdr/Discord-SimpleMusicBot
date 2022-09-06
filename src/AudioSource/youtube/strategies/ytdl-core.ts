@@ -152,3 +152,5 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
     };
   }
 }
+
+export default ytdlCoreStrategy;
