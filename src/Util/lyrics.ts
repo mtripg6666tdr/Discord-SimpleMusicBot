@@ -16,8 +16,6 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as https from "https";
-
 import Genius from "genius-lyrics";
 import { decode } from "html-entities";
 import { convert } from "html-to-text";
@@ -46,14 +44,19 @@ export async function GetLyrics(keyword:string):Promise<songInfo>{
       throw new Error("No lyric was found");
     }
     const url = items[0].link;
-    let lyric = await DownloadWithoutRuby(url);
+    let lyric = await DownloadText(url, {
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+      "Cookie": "lyric_ruby=off;",
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"
+    });
     let doc = "";
     [doc, lyric] = lyric.split("<div class=\"hiragana\" >");
-    [lyric ] = lyric.split("</div>");
-    lyric = lyric.replace(/<span class="rt rt_hidden">.+?<\/span>/g, "");
-    lyric = lyric.replace(/\n/g, "");
-    lyric = lyric.replace(/<br \/>/g, "<br>");
-    lyric = lyric.replace(/[\r\n]{2}/g, "<br>");
+    lyric = lyric.split("</div>")[0]
+      .replace(/<span class="rt rt_hidden">.+?<\/span>/g, "")
+      .replace(/\n/g, "")
+      .replace(/<br \/>/g, "<br>")
+      .replace(/[\r\n]{2}/g, "<br>")
+    ;
     lyric = convert(lyric);
     const match = doc.match(/<meta name="description" content="(?<artist>.+?)が歌う(?<title>.+)の歌詞ページ.+です。.+">/);
     const artwork = doc.match(/<img src="(?<url>.+?)" alt=".+? 歌詞" \/>/).groups?.url;
@@ -65,33 +68,6 @@ export async function GetLyrics(keyword:string):Promise<songInfo>{
       url: url
     };
   }
-}
-
-function DownloadWithoutRuby(url:string):Promise<string>{
-  return new Promise((resolve, reject)=>{
-    const durl = new URL(url);
-    const req = https.request({
-      protocol: durl.protocol,
-      host: durl.host,
-      path: durl.pathname,
-      method: "GET",
-      headers: {
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-        "Cookie": "lyric_ruby=off;",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"
-      }
-    }, res => {
-      let data = "";
-      res.on("data", (chunk)=>{
-        data += chunk;
-      });
-      res.on("end", ()=>{
-        resolve(data);
-      });
-      res.on("error", reject);
-    }).on("error", reject);
-    req.end();
-  });
 }
 
 type songInfo = {

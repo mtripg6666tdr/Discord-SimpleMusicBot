@@ -28,12 +28,9 @@ import { log } from "./log";
  * @param length 補完後の長さ
  * @returns 保管された文字列
  */
-export function AddZero(str:string, length:number){
+export function padZero(str:string, length:number){
   if(str.length >= length) return str;
-  while(str.length < length){
-    str = "0" + str;
-  }
-  return str;
+  return `${"0".repeat(length - str.length)}${str}`;
 }
 
 /**
@@ -82,7 +79,7 @@ export function InitPassThrough(opts:TransformOptions = {}):PassThrough{
     console.trace(`[PassThrough] destroyed (id: ${id})`);
     log(`[PassThrough] destroyed (id: ${id})`, "debug");
     stream.destroyed = true;
-    stream.emit("close", []);
+    stream.emit("close");
   };
   return stream;
 }

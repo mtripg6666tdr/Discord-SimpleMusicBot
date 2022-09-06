@@ -16,17 +16,18 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+const audioExtensions = [".mp3", ".wav", ".wma", ".mov", ".mp4", ".ogg"] as const;
+const videoExtensions = [".mov", ".mp4"] as const;
+
 /**
  * ローオーディオファイルのURLであるかどうかをURLの末尾の拡張子から判断します
  * @param str 検査対象のURL
  * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
  */
 export function isAvailableRawAudioURL(str:string){
-  const exts = [".mp3", ".wav", ".wma", ".mov", ".mp4", ".ogg"];
-  return exts.filter(ext => str.endsWith(ext)).length > 0;
+  return audioExtensions.some(ext => str.endsWith(ext));
 }
 
 export function isAvailableRawVideoURL(str:string){
-  const exts = [".mov", ".mp4"];
-  return exts.filter(ext => str.endsWith(ext)).length > 0;
+  return videoExtensions.some(ext => str.endsWith(ext));
 }

@@ -18,15 +18,18 @@
 
 import type { TextChannel } from "eris";
 
+const requirePermissions = [
+  "sendMessages",
+  "embedLinks",
+  "manageMessages",
+  "attachFiles",
+  "readMessageHistory",
+  "viewChannel",
+] as const;
+
 export const channelUtil = {
   checkSendable(channel:TextChannel, userId:string){
     const permissions = channel.permissionsOf(userId);
-    return permissions.has("sendMessages")
-      && permissions.has("embedLinks")
-      && permissions.has("manageMessages")
-      && permissions.has("attachFiles")
-      && permissions.has("readMessageHistory")
-      && permissions.has("viewChannel")
-    ;
+    return requirePermissions.every(permission => permissions.has(permission));
   },
 } as const;

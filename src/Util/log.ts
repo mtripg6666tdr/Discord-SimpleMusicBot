@@ -49,14 +49,17 @@ class LogStore {
 
   log:boolean = true;
   maxLength = 30;
-  data:string[] = [];
+  private readonly _data:string[] = [];
+  get data():Readonly<LogStore["_data"]>{
+    return this._data;
+  }
   
   // eslint-disable-next-line @typescript-eslint/no-shadow
   addLog(level:LogLevels, log:string){
     if(level !== "debug"){
-      this.data.push(`${level[0].toUpperCase()}:${log}`);
+      this._data.push(`${level[0].toUpperCase()}:${log}`);
       if(this.data.length > this.maxLength){
-        this.data.shift();
+        this._data.shift();
       }
     }
     if(typeof log !== "string"){
