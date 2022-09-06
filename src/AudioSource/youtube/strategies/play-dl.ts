@@ -107,3 +107,5 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
     };
   }
 }
+
+export default playDlStrategy;
