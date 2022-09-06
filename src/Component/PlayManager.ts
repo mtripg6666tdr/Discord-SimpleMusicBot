@@ -18,7 +18,7 @@
 
 import type { AudioSource, YouTube } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
-import type { Client, Message, TextChannel } from "eris";
+import type { Client, Message, TextChannel, VoiceChannel } from "eris";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
@@ -171,7 +171,9 @@ export class PlayManager extends ManagerBase {
       // QueueContentからストリーム情報を取得
       const rawStream = await this.currentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
-      const { stream, streamType, cost } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.server), this._seek, this.volume !== 100);
+      const connection = this.server.connection;
+      const channel = this.server.bot.client.getChannel(connection.channelID) as VoiceChannel;
+      const { stream, streamType, cost } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.server), this._seek, this.volume !== 100, channel.bitrate);
       // ストリームがまだ利用できない場合待機
       let errorWhileWaiting = null as Error;
       stream.once("error", e => errorWhileWaiting = e || new Error("An error occurred in stream"));
@@ -188,7 +190,6 @@ export class PlayManager extends ManagerBase {
       // 各種準備
       this._errorReportChannel = mes.channel as TextChannel;
       this._cost = cost;
-      const connection = this.server.connection;
       t.end();
       // 再生
       const u = Util.time.timer.start("PlayManager#Play->EnterPlayingState");
@@ -343,6 +344,7 @@ export class PlayManager extends ManagerBase {
   }
 
   private async onStreamFinished(){
+    if(!this.server.connection) return;
     this.Log("onStreamFinished called");
     if(this.server.connection){
       await Util.general.waitForEnteringState(() => !this.server.connection.playing, 20 * 1000).catch(() => {

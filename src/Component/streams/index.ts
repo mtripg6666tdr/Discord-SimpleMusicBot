@@ -53,7 +53,7 @@ Refer at: https://github.com/discordjs/discord.js/blob/13baf75cae395353f0528804f
  * @param volumeTransform whether volume transform is required
  * @returns if volume transform is required, this will return a stream info that represents Ogg/Webm Opus, otherwise return a stream info represents PCM Opus.
  */
-export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[], seek:number, volumeTransform:boolean):PlayableStreamInfo{
+export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[], seek:number, volumeTransform:boolean, bitrate:number):PlayableStreamInfo{
   const effectEnabled = effects.length !== 0;
   if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && seek <= 0 && !effectEnabled && !volumeTransform){
     // 1. effect is off, volume is off, stream is webm or ogg
@@ -73,7 +73,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     //               2                      1
     // Total: 3
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Ogg/Opus (cost: 3)`);
-    const ffmpeg = transformThroughFFmpeg(streamInfo, effects, seek, "ogg");
+    const ffmpeg = transformThroughFFmpeg(streamInfo, bitrate, effects, seek, "ogg");
     const passThrough = InitPassThrough();
     ffmpeg
       .on("error", e => destroyStream(passThrough, e))
@@ -122,7 +122,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     //              2                     0.5                      1.5
     // Total: 5
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM (cost: 5)`);
-    const ffmpegPCM = transformThroughFFmpeg(streamInfo, effects, seek, "pcm");
+    const ffmpegPCM = transformThroughFFmpeg(streamInfo, bitrate, effects, seek, "pcm");
     const passThrough = InitPassThrough();
     ffmpegPCM
       .on("error", e => destroyStream(passThrough, e))
