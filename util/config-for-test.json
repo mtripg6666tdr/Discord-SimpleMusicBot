@@ -1,0 +1,9 @@
+{
+  "adminId": null,
+  "debug": false,
+  "maintenance": false,
+  "errorChannel": null,
+  "proxy": null,
+  "prefix": ">",
+  "webserver": true
+}
