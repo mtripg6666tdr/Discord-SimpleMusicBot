@@ -18,16 +18,33 @@
 
 import type { LoggerType } from "../../../Util";
 import type { Strategy, Cache } from "./base";
+import type { playDlStrategy } from "./play-dl";
+import type { youtubeDlStrategy } from "./youtube-dl";
+import type { ytdlCoreStrategy } from "./ytdl-core";
 
-import { playDlStrategy } from "./play-dl";
-import { youtubeDlStrategy } from "./youtube-dl";
-import { ytdlCoreStrategy } from "./ytdl-core";
+import { Util } from "../../../Util";
 
-export const strategies = [
-  ytdlCoreStrategy,
-  playDlStrategy,
-  youtubeDlStrategy
-].map((Proto, i) => new Proto(i));
+type strategies =
+  | ytdlCoreStrategy
+  | youtubeDlStrategy
+  | playDlStrategy
+;
+
+export const strategies:strategies[] = [
+  "./ytdl-core",
+  "./play-dl",
+  "./youtube-dl",
+].map((path, i) => {
+  try{
+    const { default: Module } = require(path);
+    return new Module(i);
+  }
+  catch(e){
+    Util.logger.log(`[AudioSource:youtube] failed to load strategy#${i}`, "warn");
+    Util.logger.log(e, "error");
+    return null;
+  }
+}).filter(mod => !!mod);
 
 function setupLogger(logger: LoggerType){
   strategies.forEach(strategy => strategy.logger = logger);

@@ -203,6 +203,8 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
   }
 }
 
+export default youtubeDlStrategy;
+
 // QuickType of youtube-dl json
 export interface YoutubeDlInfo {
   id: string;
