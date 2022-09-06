@@ -46,19 +46,17 @@ export function DownloadText(url:string, headers?:{[key:string]:string}, request
       method: requestBody ? "POST" : "GET",
       headers: headers ?? undefined
     }, res => {
-      let data = "";
-      res.on("data", chunk =>{
-        data += chunk;
-      });
+      const bufs = [] as Buffer[];
+      res.on("data", chunk => bufs.push(chunk));
       res.on("end", ()=>{
-        resolve(data);
+        resolve(Buffer.concat(bufs).toString());
       });
       res.on("error", reject);
     }).on("error", (er) => {
       reject(er);
       if(!req.destroyed) req.destroy();
     });
-    req.end(requestBody ?? undefined);
+    req.end(requestBody || undefined);
   });
 }
 

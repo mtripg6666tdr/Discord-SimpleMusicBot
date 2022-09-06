@@ -64,7 +64,9 @@ export class AddOn extends EventEmitter {
   }
 
   constructor(){
-    super({captureRejections: false});
+    super({
+      captureRejections: false
+    });
     try{
       fs.readdirSync(path.join(__dirname, "../../addon/"), {withFileTypes: true})
         .filter(d => d.isFile())

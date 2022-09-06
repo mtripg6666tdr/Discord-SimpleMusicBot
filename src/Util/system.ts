@@ -30,12 +30,16 @@ type MemoryUsageInfo = {free:number, total:number, used:number, usage:number};
   * @returns メモリ使用情報
   */
 export function GetMemInfo():MemoryUsageInfo{
-  const memory = {} as MemoryUsageInfo;
-  memory.free = GetMBytes(os.freemem());
-  memory.total = GetMBytes(os.totalmem());
-  memory.used = memory.total - memory.free;
-  memory.usage = GetPercentage(memory.used, memory.total);
-  return memory;
+  const free = GetMBytes(os.freemem());
+  const total = GetMBytes(os.totalmem());
+  const used = total - free;
+  const usage = GetPercentage(used, total);
+  return {
+    free,
+    total,
+    used,
+    usage,
+  };
 }
 
 /**
