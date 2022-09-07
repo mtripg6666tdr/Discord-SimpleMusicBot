@@ -55,7 +55,7 @@ export class SoundCloudS extends AudioSource {
   async fetch():Promise<ReadableStreamInfo>{
     const sc = new SoundCloud();
     const source = await sc.util.streamTrack(this.Url) as Readable;
-    const stream = Util.general.InitPassThrough();
+    const stream = Util.general.createPassThrough();
     source
       .on("error", e => !stream.destroyed ? stream.destroy(e) : stream.emit("error", e))
       .pipe(stream)

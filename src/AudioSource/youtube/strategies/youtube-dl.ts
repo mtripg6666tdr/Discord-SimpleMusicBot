@@ -85,7 +85,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
         };
       }
       // don't use initpassthrough here
-      const stream = Util.general.InitPassThrough();
+      const stream = Util.general.createPassThrough();
       const req = m3u8stream(format[0].url, {
         begin: Date.now(),
         parser: "m3u8",
