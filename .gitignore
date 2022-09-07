@@ -17,4 +17,4 @@ node
 *.log
 addon
 config.json
-logs/*
+logs

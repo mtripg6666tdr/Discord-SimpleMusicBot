@@ -22,7 +22,7 @@ import type { Readable, TransformOptions } from "stream";
 import { opus } from "prism-media";
 
 import Util from "../../Util";
-import { InitPassThrough } from "../../Util/general";
+import { createPassThrough } from "../../Util/general";
 import { transformThroughFFmpeg } from "./ffmpeg";
 
 type PlayableStreamInfo = PartialPlayableStream & {
@@ -74,7 +74,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     // Total: 3
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Ogg/Opus (cost: 3)`);
     const ffmpeg = transformThroughFFmpeg(streamInfo, bitrate, effects, seek, "ogg");
-    const passThrough = InitPassThrough();
+    const passThrough = createPassThrough();
     ffmpeg
       .on("error", e => destroyStream(passThrough, e))
       .pipe(passThrough)
@@ -97,10 +97,12 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     const decoder = new opus.Decoder({
       rate: 48000,
       channels: 2,
-      frameSize: 960
+      frameSize: 960,
     });
-    const passThrough = InitPassThrough();
+    const passThrough = createPassThrough();
+    const normalizeThrough = createPassThrough();
     rawStream.stream
+      .pipe(normalizeThrough)
       .on("error", e => destroyStream(demuxer, e))
       .pipe(demuxer)
       .on("error", e => destroyStream(decoder, e))
@@ -123,7 +125,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     // Total: 5
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM (cost: 5)`);
     const ffmpegPCM = transformThroughFFmpeg(streamInfo, bitrate, effects, seek, "pcm");
-    const passThrough = InitPassThrough();
+    const passThrough = createPassThrough();
     ffmpegPCM
       .on("error", e => destroyStream(passThrough, e))
       .pipe(passThrough)
