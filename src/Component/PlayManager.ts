@@ -180,9 +180,7 @@ export class PlayManager extends ManagerBase {
       const getStreamReadable = () => !(stream.readableEnded || stream.destroyed || errorWhileWaiting) && stream.readableLength > 0;
       if(!getStreamReadable()){
         this.Log("Stream has not been readable yet. Waiting...", "debug");
-        await Util.general.waitForEnteringState(getStreamReadable, 20 * 1000, {
-          rejectOnTimeout: true,
-        });
+        await Util.general.waitForEnteringState(getStreamReadable, 20 * 1000);
       }
       if(errorWhileWaiting){
         throw errorWhileWaiting;
@@ -199,7 +197,7 @@ export class PlayManager extends ManagerBase {
       });
       // setup volume
       this.setVolume(this.volume);
-      stream.on("end", this.onStreamFinished.bind(this));
+      ((connection.piper as any)["_endStream"]).once("end", this.onStreamFinished.bind(this));
       // wait for entering playing state
       await Util.general.waitForEnteringState(() => this.server.connection.playing);
       this.preparing = false;
@@ -344,13 +342,14 @@ export class PlayManager extends ManagerBase {
   }
 
   private async onStreamFinished(){
-    if(!this.server.connection) return;
     this.Log("onStreamFinished called");
     if(this.server.connection){
-      await Util.general.waitForEnteringState(() => !this.server.connection.playing, 20 * 1000).catch(() => {
-        this.Log("Stream has not ended in time and will force stream into destroying", "warn");
-        this.stop();
-      });
+      await Util.general.waitForEnteringState(() => !this.server.connection || !this.server.connection.playing, 20 * 1000)
+        .catch(() => {
+          this.Log("Stream has not ended in time and will force stream into destroying", "warn");
+          this.stop();
+        })
+      ;
     }
     // ストリームが終了したら時間を確認しつつ次の曲へ移行
     this.Log("Stream finished");

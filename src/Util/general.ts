@@ -68,7 +68,7 @@ export function StringifyObject(obj:any):string{
  * 空のPassThroughを生成します
  * @returns PassThrough
  */
-export function InitPassThrough(opts:TransformOptions = {}):PassThrough{
+export function createPassThrough(opts:TransformOptions = {}):PassThrough{
   const id = Date.now();
   log(`[PassThrough] initialized (id: ${id})`, "debug");
   const stream = new PassThrough(Object.assign(opts, {
