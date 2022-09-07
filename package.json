@@ -71,7 +71,7 @@
     "build": "tsc",
     "lint": "eslint .",
     "postinstall": "node util/preparelib.js",
-    "cleanup": "rimraf dist/ typings/",
+    "cleanup": "rimraf dist/ typings/ logs/",
     "applyslashcommandguild": "npx node util/registercommands/guild",
     "applyslashcommandapplication": "npx node util/registercommands/application",
     "deleteslashcommandguild": "npx node util/deletecommands/guild",
