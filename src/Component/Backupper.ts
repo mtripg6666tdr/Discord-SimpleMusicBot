@@ -85,11 +85,11 @@ export class BackUpper extends LogEmitter {
         queue: JSON.stringify(this.data[id].exportQueue())
       }));
       if(queue.length > 0){
-        Util.logger.log("[Backup] Backing up modified queue...");
+        this.Log("[Backup] Backing up modified queue...");
         await this.backupQueueData(queue);
         this._queueModifiedGuilds = [];
       }else{
-        Util.logger.log("[Backup] No modified queue found, skipping");
+        this.Log("[Backup] No modified queue found, skipping");
       }
     }
     catch(e){
@@ -116,11 +116,11 @@ export class BackUpper extends LogEmitter {
         }
       });
       if(speaking.length > 0){
-        Util.logger.log("[Backup] Backing up modified status..");
+        this.Log("[Backup] Backing up modified status..");
         await this.backupStatusData(speaking);
         this._previousStatuses = currentStatuses;
       }else{
-        Util.logger.log("[Backup] No modified status found, skipping");
+        this.Log("[Backup] No modified status found, skipping");
       }
     }
     catch(e){
