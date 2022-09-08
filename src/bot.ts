@@ -108,6 +108,7 @@ export class MusicBot extends MusicBotBase {
           }
         }
       }
+      this._backupper.resetModifiedGuilds();
       this.Log("Finish recovery of queues and statuses.");
     }else{
       this.Log("Cannot perform recovery of queues and statuses. Check .env file to perform this. See README for more info", "warn");
@@ -121,13 +122,10 @@ export class MusicBot extends MusicBotBase {
       });
 
       // Set main tick
-      const tick = ()=>{
-        this.logGeneralInfo();
-        setTimeout(tick, 4 * 60 * 1000);
-        PageToggle.Organize(this._embedPageToggle, 5);
-        this.backupData();
-      };
-      setTimeout(tick, 1 * 60 * 1000);
+      setTimeout(() => {
+        this.maintenanceTick();
+        setInterval(this.maintenanceTick.bind(this), 1 * 60 * 1000);
+      }, 10 * 1000);
     }
     this.Log("Interval jobs set up successfully");
 

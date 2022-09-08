@@ -21,22 +21,27 @@ import type { LogLevels } from "../Util/log";
 import { Util } from "../Util";
 
 export abstract class LogEmitter {
-  private tag:string = "";
-  private guildId:string = "";
+  private _tag:string = "";
+  private _guildId:string = "";
+
+  get guildId(){
+    return this._guildId;
+  }
+
   /**
    * ログに使用するタグを設定します
    * @param tag タグ
    */
-  SetTag(tag:string){
-    this.tag = tag;
+  setTag(tag:string){
+    this._tag = tag;
   }
   
   /**
    * ログに使用するサーバーIDを設定します（存在する場合）
    * @param id id
    */
-  SetGuildId(id:string){
-    this.guildId = id;
+  setGuildId(id:string){
+    this._guildId = id;
   }
 
   /**
@@ -44,7 +49,7 @@ export abstract class LogEmitter {
    * @param message メッセージ
    */
   Log(message:string, level?:LogLevels){
-    if(this.tag === "") throw new Error("Tag has not been specified");
-    Util.logger.log(`[${this.tag}${this.guildId !== "" ? `/${this.guildId}` : ""}]${message}`, level);
+    if(this._tag === "") throw new Error("Tag has not been specified");
+    Util.logger.log(`[${this._tag}${this._guildId !== "" ? `/${this._guildId}` : ""}] ${message}`, level);
   }
 }

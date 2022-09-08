@@ -25,7 +25,7 @@ import { MusicBot } from "./bot";
 // =============
 // メインエントリ
 // =============
-Util.logger.log("[Entry]Discord-SimpleMusicBot by mtripg6666tdr");
+Util.logger.log("[Entry] Discord-SimpleMusicBot by mtripg6666tdr");
 
 const bot = new MusicBot(process.env.TOKEN, Boolean(Util.config.maintenance));
 

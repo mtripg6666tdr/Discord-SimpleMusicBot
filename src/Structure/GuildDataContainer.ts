@@ -22,7 +22,7 @@ import type { AudioEffect } from "./AudioEffect";
 import type { SearchPanel } from "./SearchPanel";
 import type { YmxFormat } from "./YmxFormat";
 import type { CommandMessage, ResponseMessage } from "@mtripg6666tdr/eris-command-resolver";
-import type { Client, Message, VoiceChannel, VoiceConnection } from "eris";
+import type { Message, VoiceChannel, VoiceConnection } from "eris";
 
 import { LockObj } from "@mtripg6666tdr/async-lock";
 import { lock } from "@mtripg6666tdr/async-lock";
@@ -78,10 +78,6 @@ export class GuildDataContainer extends LogEmitter {
   }
 
   /**
-   * サーバーID
-   */
-  readonly guildID:string;
-  /**
    * データパス
    */
   readonly dataPath:string;
@@ -112,14 +108,16 @@ export class GuildDataContainer extends LogEmitter {
    */
   vcPing:number;
 
-  constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBotBase){
+  constructor(guildid:string, boundchannelid:string, bot:MusicBotBase){
     super();
+    this.setTag("GuildDataContainer");
+    this.setGuildId(guildid);
     this.searchPanel = null;
     this.queue = new QueueManager();
+    this.queue.setBinding(this);
     this.player = new PlayManager();
+    this.player.setBinding(this);
     this.boundTextChannel = boundchannelid;
-    this.guildID = guildid;
-    this.SetTag(`GuildDataContainer/${guildid}`);
     this.dataPath = ".data/" + guildid + ".preferences.json";
     this.bot = bot;
     this.AddRelative = false;
@@ -263,15 +261,15 @@ export class GuildDataContainer extends LogEmitter {
     });
     connection
       .on("error", err => {
-        Util.logger.log("[Main][Connection]" + Util.general.StringifyObject(err), "error");
+        this.Log("[Connection] " + Util.general.StringifyObject(err), "error");
         this.player.handleError(err);
       })
       .on("pong", ping => this.vcPing = ping)
     ;
     if(Util.config.debug){
-      connection.on("debug", mes => Util.logger.log("[Main][Connection]" + mes, "debug"));
+      connection.on("debug", mes => this.Log("[Connection] " + mes, "debug"));
     }
-    Util.logger.log(`[Main/${this.guildID}]Connected to ${channelId}`);
+    this.Log(`Connected to ${channelId}`);
   }
 
   private readonly joinVoiceChannelLocker:LockObj = new LockObj();
@@ -479,7 +477,7 @@ export class GuildDataContainer extends LogEmitter {
    */
   updatePrefix(message:CommandMessage|Message<TextChannel>):void{
     const guild = "guild" in message ? message.guild : message.channel.guild;
-    const current = this.prefix;
+    const oldPrefix = this.prefix;
     const member = guild.members.get(this.bot.client.user.id);
     const pmatch = (member.nick || member.username).match(/^\[(?<prefix>.)\]/);
     if(pmatch){
@@ -489,8 +487,8 @@ export class GuildDataContainer extends LogEmitter {
     }else if(this.prefix !== Util.config.prefix){
       this.prefix = Util.config.prefix;
     }
-    if(this.prefix !== current){
-      this.Log(`Prefix was set to '${this.prefix}' (${guild.id})`);
+    if(this.prefix !== oldPrefix){
+      this.Log(`Prefix was set to '${this.prefix}'`);
     }
   }
 

@@ -18,12 +18,15 @@
 
 import { http, https } from "follow-redirects";
 
+import { timer } from "./time";
+
 const MIME_JSON = "application/json";
 export abstract class DatabaseAPI {
   private constructor(){}
 
   static async SetIsSpeaking(data:{guildid:string, value:string}[]){
     if(this.CanOperate){
+      const t = timer.start("SetIsSpeaking");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as {[key:string]:string};
       data.forEach(d => rawData[d.guildid] = d.value);
@@ -43,6 +46,9 @@ export abstract class DatabaseAPI {
       catch{
         return false;
       }
+      finally{
+        t.end();
+      }
     }else{
       return false;
     }
@@ -50,6 +56,7 @@ export abstract class DatabaseAPI {
 
   static async GetIsSpeaking(guildids:string[]){
     if(this.CanOperate){
+      const t = timer.start("GetIsSpeking");
       try{
         const result = await this.HttpRequest("GET", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
@@ -65,6 +72,9 @@ export abstract class DatabaseAPI {
       catch{
         return null;
       }
+      finally{
+        t.end();
+      }
     }else{
       return null;
     }
@@ -72,6 +82,7 @@ export abstract class DatabaseAPI {
 
   static async SetQueueData(data:{guildid:string, queue:string}[]){
     if(this.CanOperate){
+      const t = timer.start("SetQueueData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as {[guildid:string]:string};
       data.forEach(d => rawData[d.guildid] = encodeURIComponent(d.queue));
@@ -87,6 +98,9 @@ export abstract class DatabaseAPI {
       catch{
         return false;
       }
+      finally{
+        t.end();
+      }
     }else{
       return false;
     }
@@ -94,6 +108,7 @@ export abstract class DatabaseAPI {
 
   static async GetQueueData(guildids:string[]){
     if(this.CanOperate){
+      const t = timer.start("GetQueueData");
       try{
         const result = await this.HttpRequest("GET", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
@@ -106,6 +121,9 @@ export abstract class DatabaseAPI {
       }
       catch(e){
         return null;
+      }
+      finally{
+        t.end();
       }
     }else{
       return null;

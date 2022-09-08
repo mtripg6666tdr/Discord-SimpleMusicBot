@@ -85,12 +85,12 @@ export class QueueManager extends ManagerBase {
 
   constructor(){
     super();
-    this.SetTag("QueueManager");
+    this.setTag("QueueManager");
     this.Log("QueueManager instantiated");
   }
 
   setBinding(data:GuildDataContainer){
-    this.Log("Set data of guild id " + data.guildID);
+    this.Log("Set data of guild id " + data.guildId);
     super.setBinding(data);
   }
 
@@ -153,7 +153,7 @@ export class QueueManager extends ManagerBase {
       this.Log("AddQueue called");
       const t = Util.time.timer.start("AddQueue");
       try{
-        PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
+        PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildId);
         const result = {
           basicInfo: await AudioSource.resolve({
             url, type,
@@ -170,9 +170,7 @@ export class QueueManager extends ManagerBase {
         if(result.basicInfo){
           this._default[method](result);
           if(this.server.equallyPlayback) this.sortWithAddedBy();
-          if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
-            this.server.bot.queueModifiedGuilds.push(this.server.guildID);
-          }
+          this.server.bot.backupper.addModifiedGuilds(this.guildId);
           t.end();
           const index = this._default.findIndex(q => q === result);
           this.Log("queue content added in position " + index);
@@ -343,7 +341,7 @@ export class QueueManager extends ManagerBase {
    */
   async next(){
     this.Log("Next Called");
-    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
+    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildId);
     this.onceLoopEnabled = false;
     this.server.player.resetError();
     if(this.queueLoopEnabled){
@@ -356,9 +354,7 @@ export class QueueManager extends ManagerBase {
       }
     }
     this._default.shift();
-    if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
-      this.server.bot.queueModifiedGuilds.push(this.server.guildID);
-    }
+    this.server.bot.backupper.addModifiedGuilds(this.guildId);
   }
 
   /**
@@ -367,11 +363,9 @@ export class QueueManager extends ManagerBase {
    */
   removeAt(offset:number){
     this.Log(`RemoveAt Called (offset:${offset})`);
-    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
+    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildId);
     this._default.splice(offset, 1);
-    if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
-      this.server.bot.queueModifiedGuilds.push(this.server.guildID);
-    }
+    this.server.bot.backupper.addModifiedGuilds(this.guildId);
   }
 
   /**
@@ -379,11 +373,9 @@ export class QueueManager extends ManagerBase {
    */
   removeAll(){
     this.Log("RemoveAll Called");
-    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
+    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildId);
     this._default = [];
-    if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
-      this.server.bot.queueModifiedGuilds.push(this.server.guildID);
-    }
+    this.server.bot.backupper.addModifiedGuilds(this.guildId);
   }
 
   /**
@@ -391,11 +383,9 @@ export class QueueManager extends ManagerBase {
    */
   removeFrom2nd(){
     this.Log("RemoveFrom2 Called");
-    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
+    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildId);
     this._default = [this.default[0]];
-    if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
-      this.server.bot.queueModifiedGuilds.push(this.server.guildID);
-    }
+    this.server.bot.backupper.addModifiedGuilds(this.guildId);
   }
 
   /**
@@ -403,7 +393,7 @@ export class QueueManager extends ManagerBase {
    */
   shuffle(){
     this.Log("Shuffle Called");
-    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
+    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildId);
     if(this._default.length === 0) return;
     if(this.server.player.isPlaying || this.server.player.preparing){
       const first = this._default[0];
@@ -413,9 +403,7 @@ export class QueueManager extends ManagerBase {
     }else{
       this._default.sort(() => Math.random() - 0.5);
     }
-    if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
-      this.server.bot.queueModifiedGuilds.push(this.server.guildID);
-    }
+    this.server.bot.backupper.addModifiedGuilds(this.guildId);
   }
 
   /**
@@ -425,7 +413,7 @@ export class QueueManager extends ManagerBase {
    */
   removeIf(validator:(q:QueueContent)=>boolean):number[]{
     this.Log("RemoveIf Called");
-    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
+    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildId);
     if(this._default.length === 0) return [];
     const first = this.server.player.isPlaying ? 1 : 0;
     const rmIndex = [] as number[];
@@ -434,11 +422,9 @@ export class QueueManager extends ManagerBase {
         rmIndex.push(i);
       }
     }
-    rmIndex.sort((a, b)=>b - a);
+    rmIndex.sort((a, b) => b - a);
     rmIndex.forEach(n => this.removeAt(n));
-    if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
-      this.server.bot.queueModifiedGuilds.push(this.server.guildID);
-    }
+    this.server.bot.backupper.addModifiedGuilds(this.guildId);
     return rmIndex;
   }
 
@@ -449,7 +435,7 @@ export class QueueManager extends ManagerBase {
    */
   move(from:number, to:number){
     this.Log("Move Called");
-    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildID);
+    PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildId);
     if(from < to){
       //要素追加
       this._default.splice(to + 1, 0, this.default[from]);
@@ -461,9 +447,7 @@ export class QueueManager extends ManagerBase {
       //要素削除
       this._default.splice(from + 1, 1);
     }
-    if(!this.server.bot.queueModifiedGuilds.includes(this.server.guildID)){
-      this.server.bot.queueModifiedGuilds.push(this.server.guildID);
-    }
+    this.server.bot.backupper.addModifiedGuilds(this.guildId);
   }
 
   /**

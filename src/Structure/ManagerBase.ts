@@ -34,6 +34,6 @@ export abstract class ManagerBase extends LogEmitter {
   setBinding(data:GuildDataContainer){
     if(this.server) throw new Error("すでに設定されています");
     this.server = data;
-    this.SetGuildId(this.server.guildID);
+    this.setGuildId(this.server.guildId);
   }
 }

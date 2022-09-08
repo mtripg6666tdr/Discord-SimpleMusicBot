@@ -101,7 +101,7 @@ export class PlayManager extends ManagerBase {
   // コンストラクタ
   constructor(){
     super();
-    this.SetTag("PlayManager");
+    this.setTag("PlayManager");
     this.Log("Play Manager instantiated");
   }
 
@@ -109,7 +109,7 @@ export class PlayManager extends ManagerBase {
    *  親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
    */
   setBinding(data:GuildDataContainer){
-    this.Log("Set data of guild id " + data.guildID);
+    this.Log("Set data of guild id " + data.guildId);
     super.setBinding(data);
   }
 
@@ -260,7 +260,7 @@ export class PlayManager extends ManagerBase {
   stop():PlayManager{
     this.Log("Stop called");
     this.server.connection?.stopPlaying();
-    this.server.bot.backupData();
+    this.server.bot.backupper.backupData();
     return this;
   }
 
@@ -291,7 +291,7 @@ export class PlayManager extends ManagerBase {
    * @returns this
    */
   pause():PlayManager{
-    this.server.bot.backupStatus();
+    this.server.bot.backupper.backupStatus();
     this.Log("Pause called");
     this.server.connection?.pause();
     return this;
@@ -302,7 +302,7 @@ export class PlayManager extends ManagerBase {
    * @returns this
    */
   resume():PlayManager{
-    this.server.bot.backupStatus();
+    this.server.bot.backupper.backupStatus();
     this.Log("Resume called");
     this.server.connection?.resume();
     return this;

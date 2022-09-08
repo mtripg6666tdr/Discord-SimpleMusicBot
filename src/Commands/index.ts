@@ -162,7 +162,7 @@ export class CommandsManager extends LogEmitter {
 
   private constructor(){
     super();
-    this.SetTag("CommandsManager");
+    this.setTag("CommandsManager");
     this.Log("Initializing");
     this.commands = [];
     fs.readdirSync(__dirname, {withFileTypes: true})
