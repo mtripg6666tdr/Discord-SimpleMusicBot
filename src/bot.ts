@@ -90,26 +90,28 @@ export class MusicBot extends MusicBotBase {
       const joinedGUildIds = [...client.guilds.values()].map(guild => guild.id);
       const queues = await this.backupper.getQueueDataFromServer(joinedGUildIds);
       const speakingIds = await this.backupper.getStatusFromServer(joinedGUildIds);
-      const queueGuildIds = Object.keys(queues);
-      const speakingGuildIds = Object.keys(speakingIds);
-      for(let i = 0; i < queueGuildIds.length; i++){
-        const id = queueGuildIds[i];
-        const queue = JSON.parse(queues[id]) as YmxFormat;
-        const status = speakingIds[id];
-        if(speakingGuildIds.includes(id) && status.includes(":")){
-          try{
-            const parsedStatus = GuildDataContainer.parseStatus(status);
-            const server = this.initData(id, parsedStatus.boundChannelId);
-            await server.importQueue(queue);
-            server.importStatus(parsedStatus);
-          }
-          catch(e){
-            this.Log(e, "warn");
+      if(queues && speakingIds){
+        const queueGuildIds = Object.keys(queues);
+        const speakingGuildIds = Object.keys(speakingIds);
+        for(let i = 0; i < queueGuildIds.length; i++){
+          const id = queueGuildIds[i];
+          const queue = JSON.parse(queues[id]) as YmxFormat;
+          const status = speakingIds[id];
+          if(speakingGuildIds.includes(id) && status.includes(":")){
+            try{
+              const parsedStatus = GuildDataContainer.parseStatus(status);
+              const server = this.initData(id, parsedStatus.boundChannelId);
+              await server.importQueue(queue);
+              server.importStatus(parsedStatus);
+            }
+            catch(e){
+              this.Log(e, "warn");
+            }
           }
         }
+        this._backupper.resetModifiedGuilds();
+        this.Log("Finish recovery of queues and statuses.");
       }
-      this._backupper.resetModifiedGuilds();
-      this.Log("Finish recovery of queues and statuses.");
     }else{
       this.Log("Cannot perform recovery of queues and statuses. Check .env file to perform this. See README for more info", "warn");
     }
@@ -188,14 +190,7 @@ export class MusicBot extends MusicBotBase {
         if(msgId.userId !== message.author.id) return;
         this.data[message.channel.guild.id].searchPanel = null;
         await message.channel.createMessage("✅キャンセルしました");
-        try{
-          const ch = this._client.getChannel(msgId.chId);
-          const msg = (ch as discord.TextChannel).messages.get(msgId.id);
-          await msg.delete();
-        }
-        catch(e){
-          this.Log(e, "error");
-        }
+        await this._client.deleteMessage(msgId.chId, msgId.id).catch(e => this.Log(e, "error"));
       }
       // searchコマンドの選択を捕捉
       else if(Util.string.NormalizeText(message.content).match(/^([0-9]\s?)+$/)){
@@ -332,35 +327,43 @@ export class MusicBot extends MusicBotBase {
   }
 
   private async onVoiceChannelJoin(member:discord.Member, newChannel:discord.TextVoiceChannel){
-    if(member.id !== this._client.user.id) return;
-    if(member.voiceState.suppress || member.voiceState.mute){
-      // VC参加
-      const voiceChannel = this._client.getChannel(newChannel.id) as discord.VoiceChannel;
-      voiceChannel.guild.editVoiceState({
-        channelID: newChannel.id,
-        suppress: false,
-      }).catch(() => {
-        voiceChannel.guild.members.get(this._client.user.id)
-          .edit({
-            mute: false
-          })
-          .catch(async () => {
-            this._client.createMessage(this.data[newChannel.guild.id].boundTextChannel, ":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。")
-              .catch(e => this.Log(e));
-          });
-      });
+    if(member.id === this._client.user.id){
+      // ボットが参加した際
+      // ミュート状態/抑制状態なら自分で解除を試みる
+      if(member.voiceState.suppress || member.voiceState.mute){
+        // VC参加
+        const voiceChannel = this._client.getChannel(newChannel.id) as discord.VoiceChannel;
+        voiceChannel.guild.editVoiceState({
+          channelID: newChannel.id,
+          suppress: false,
+        }).catch(() => {
+          voiceChannel.guild.members.get(this._client.user.id)
+            .edit({
+              mute: false
+            })
+            .catch(() => {
+              this._client.createMessage(this.data[newChannel.guild.id].boundTextChannel, ":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。")
+                .catch(e => this.Log(e));
+            });
+        });
+      }
     }
   }
 
   private async onVoiceChannelLeave(member:discord.Member, oldChannel:discord.TextVoiceChannel){
-    if(member.id !== this._client.user.id) return;
-    // サーバー側の切断
-    const guild = this.data[oldChannel.guild.id];
-    if(!guild.connection) return;
-    guild.player.disconnect();
-    const bound = this._client.getChannel(guild.boundTextChannel);
-    if(!bound) return;
-    await this._client.createMessage(bound.id, ":postbox: 正常に切断しました").catch(e => this.Log(e));
+    const server = this.data[oldChannel.guild.id];
+    if(!server || !server.connection) return;
+    if(member.id === this._client.user.id){
+      // サーバー側からのボットの切断
+      server.player.disconnect();
+      const bound = this._client.getChannel(server.boundTextChannel);
+      if(!bound) return;
+      await this._client.createMessage(bound.id, ":postbox: 正常に切断しました").catch(e => this.Log(e));
+    }else if(oldChannel.voiceMembers.has(this._client.user.id) && oldChannel.voiceMembers.size === 1){
+      // 誰も聞いてる人がいない場合一時停止
+      server.player.pause();
+      await this._client.createMessage(server.boundTextChannel, ":pause_button:ボイスチャンネルから誰もいなくなったため一時停止しました").catch(e => this.Log(e));
+    }
   }
 
   private async onError(er:Error){

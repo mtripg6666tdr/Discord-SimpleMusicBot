@@ -48,8 +48,8 @@ export abstract class LogEmitter {
    * ログを出力します
    * @param message メッセージ
    */
-  Log(message:string, level?:LogLevels){
+  Log(message:any, level?:LogLevels){
     if(this._tag === "") throw new Error("Tag has not been specified");
-    Util.logger.log(`[${this._tag}${this._guildId !== "" ? `/${this._guildId}` : ""}] ${message}`, level);
+    Util.logger.log(`[${this._tag}${this._guildId !== "" ? `/${this._guildId}` : ""}] ${typeof message === "string" ? message : Util.general.StringifyObject(message)}`, level);
   }
 }

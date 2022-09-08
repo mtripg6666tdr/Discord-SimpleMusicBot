@@ -85,11 +85,14 @@ export class BackUpper extends LogEmitter {
         queue: JSON.stringify(this.data[id].exportQueue())
       }));
       if(queue.length > 0){
-        this.Log("[Backup] Backing up modified queue...");
-        await this.backupQueueData(queue);
-        this._queueModifiedGuilds = [];
+        this.Log("Backing up modified queue...");
+        if(await this.backupQueueData(queue)){
+          this._queueModifiedGuilds = [];
+        }else{
+          this.Log("Something went wrong while backing up queue", "warn");
+        }
       }else{
-        this.Log("[Backup] No modified queue found, skipping");
+        this.Log("No modified queue found, skipping");
       }
     }
     catch(e){
@@ -116,11 +119,14 @@ export class BackUpper extends LogEmitter {
         }
       });
       if(speaking.length > 0){
-        this.Log("[Backup] Backing up modified status..");
-        await this.backupStatusData(speaking);
-        this._previousStatuses = currentStatuses;
+        this.Log("Backing up modified status..");
+        if(await this.backupStatusData(speaking)){
+          this._previousStatuses = currentStatuses;
+        }else{
+          this.Log("Something went wrong while backing up statuses", "warn");
+        }
       }else{
-        this.Log("[Backup] No modified status found, skipping");
+        this.Log("No modified status found, skipping");
       }
     }
     catch(e){
@@ -146,7 +152,9 @@ export class BackUpper extends LogEmitter {
           return null;
         }
       }
-      catch{
+      catch(er){
+        this.Log(er, "error");
+        this.Log("Status restoring failed!", "warn");
         return null;
       }
       finally{
@@ -173,7 +181,9 @@ export class BackUpper extends LogEmitter {
           return result.data as {[guildid:string]:string};
         }else return null;
       }
-      catch(e){
+      catch(er){
+        this.Log(er, "error");
+        this.Log("Queue restoring failed!", "warn");
         return null;
       }
       finally{
@@ -206,7 +216,9 @@ export class BackUpper extends LogEmitter {
           return false;
         }
       }
-      catch{
+      catch(er){
+        this.Log(er, "error");
+        this.Log("Status backup failed!", "warn");
         return false;
       }
       finally{
@@ -235,7 +247,9 @@ export class BackUpper extends LogEmitter {
         } as requestBody, MIME_JSON);
         return result.status === 200;
       }
-      catch{
+      catch(er){
+        this.Log(er, "error");
+        this.Log("Queue backup failed!", "warn");
         return false;
       }
       finally{
@@ -271,21 +285,24 @@ export class BackUpper extends LogEmitter {
         "http:": http,
         "https:": https,
       } as {[proto:string]:(typeof http|typeof https)};
-      const req = httpLibs[durl.protocol].request(opt, (res) => {
-        const bufs = [] as Buffer[];
-        res.on("data", chunk => bufs.push(chunk));
-        res.on("end", ()=> {
-          try{
-            const parsed = JSON.parse(Buffer.concat(bufs).toString("utf-8")) as postResult;
-            if(parsed.data) Object.keys(parsed.data).forEach(k => parsed.data[k] = decodeURIComponent(parsed.data[k]));
-            resolve(parsed);
-          }
-          catch(e){
-            reject(e);
-          }
-        });
-        res.on("error", ()=>reject());
-      });
+      const req = httpLibs[durl.protocol]
+        .request(opt, (res) => {
+          const bufs = [] as Buffer[];
+          res.on("data", chunk => bufs.push(chunk));
+          res.on("end", ()=> {
+            try{
+              const parsed = JSON.parse(Buffer.concat(bufs).toString("utf-8")) as postResult;
+              if(parsed.data) Object.keys(parsed.data).forEach(k => parsed.data[k] = decodeURIComponent(parsed.data[k]));
+              resolve(parsed);
+            }
+            catch(e){
+              reject(e);
+            }
+          });
+          res.on("error", ()=>reject());
+        })
+        .on("error", reject)
+      ;
       if(method === "POST"){
         req.end(JSON.stringify(data));
       }else{
