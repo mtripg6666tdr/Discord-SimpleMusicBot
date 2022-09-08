@@ -86,10 +86,10 @@ export class MusicBot extends MusicBotBase {
     }
 
     // Recover queues
-    if(Util.db.DatabaseAPI.CanOperate){
+    if(this.backupper.backuppable){
       const joinedGUildIds = [...client.guilds.values()].map(guild => guild.id);
-      const queues = await Util.db.DatabaseAPI.GetQueueData(joinedGUildIds);
-      const speakingIds = await Util.db.DatabaseAPI.GetIsSpeaking(joinedGUildIds);
+      const queues = await this.backupper.getQueueDataFromServer(joinedGUildIds);
+      const speakingIds = await this.backupper.getStatusFromServer(joinedGUildIds);
       const queueGuildIds = Object.keys(queues);
       const speakingGuildIds = Object.keys(speakingIds);
       for(let i = 0; i < queueGuildIds.length; i++){
