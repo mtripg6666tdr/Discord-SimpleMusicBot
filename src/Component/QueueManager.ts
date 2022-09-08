@@ -18,6 +18,7 @@
 
 import type { exportableCustom } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
+import type { AddedBy, QueueContent } from "../Structure/QueueContent";
 import type { ResponseMessage } from "./ResponseMessage";
 import type { TaskCancellationManager } from "./TaskCancellationManager";
 import type { Client, Message, TextChannel } from "eris";
@@ -497,38 +498,3 @@ export class QueueManager extends ManagerBase {
     return member instanceof Member ? member.id : member.userId;
   }
 }
-
-/**
- * キューの内容を示します
- */
-type QueueContent = {
-  /**
-   * 曲自体のメタ情報
-   */
-  basicInfo:AudioSource.AudioSource,
-  /**
-   * 曲の情報とは別の追加情報
-   */
-  additionalInfo:AdditionalInfo,
-};
-
-type AddedBy = {
-  /**
-   * 曲の追加者の表示名。表示名は追加された時点での名前になります。
-   */
-  displayName:string,
-  /**
-   * 曲の追加者のユーザーID
-   */
-  userId:string,
-};
-
-/**
- * 曲の情報とは別の追加情報を示します。
- */
-type AdditionalInfo = {
-  /**
-   * 曲の追加者を示します
-   */
-  addedBy: AddedBy,
-};

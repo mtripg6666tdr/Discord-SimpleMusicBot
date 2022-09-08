@@ -31,10 +31,11 @@ import { Util } from "./Util";
 export abstract class MusicBotBase extends LogEmitter {
   // クライアントの初期化
   protected readonly abstract _client:discord.Client;
-  protected readonly _instantiatedTime = null as Date;
-  protected readonly _versionInfo = "Could not get info" as string;
-  protected readonly _embedPageToggle = [] as PageToggle[];
-  protected _queueModifiedGuilds = [] as string[];
+  protected readonly _instantiatedTime:Date = null;
+  protected readonly _versionInfo:string = "Could not get info";
+  protected readonly _embedPageToggle:PageToggle[] = [];
+  protected _queueModifiedGuilds:string[] = [];
+  protected readonly _previousStatuses:{[guildId:string]:string} = {};
   protected readonly data = {} as {[key:string]:GuildDataContainer};
   /**
    * ページトグル
@@ -126,20 +127,16 @@ export abstract class MusicBotBase extends LogEmitter {
       try{
         this.backupStatus();
         // キューの送信
-        const queue = [] as {guildid:string, queue:string}[];
-        const guilds = this._queueModifiedGuilds;
-        guilds.forEach(id => {
-          queue.push({
-            guildid: id,
-            queue: this.data[id].exportQueue()
-          });
-        });
+        const queue = this._queueModifiedGuilds.map(id => ({
+          guildid: id,
+          queue: JSON.stringify(this.data[id].exportQueue())
+        }));
         if(queue.length > 0){
           await Util.db.DatabaseAPI.SetQueueData(queue);
+          this._queueModifiedGuilds = [];
         }else{
           Util.logger.log("[Backup] No modified queue found, skipping");
         }
-        this._queueModifiedGuilds = [];
       }
       catch(e){
         this.Log(e, "warn");
@@ -157,11 +154,14 @@ export abstract class MusicBotBase extends LogEmitter {
       // 参加ステータスの送信
       const speaking = [] as {guildid:string, value:string}[];
       Object.keys(this.data).forEach(id => {
-        speaking.push({
-          guildid: id,
-          // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
-          value: this.data[id].exportStatus()
-        });
+        const currentStatus = this.data[id].exportStatus();
+        if(!this._previousStatuses[id] || this._previousStatuses[id] !== currentStatus){
+          speaking.push({
+            guildid: id,
+            // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
+            value: this.data[id].exportStatus()
+          });
+        }
       });
       Util.db.DatabaseAPI.SetIsSpeaking(speaking);
     }

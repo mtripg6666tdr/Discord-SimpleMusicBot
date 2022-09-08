@@ -40,11 +40,11 @@ export default class Export extends BaseCommand {
       message.reply("キューが空です。").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const qd = options.server.exportQueue();
+    const ymxFile = options.server.exportQueue();
     await message.reply({
       content: "✅エクスポートしました",
       files: [{
-        file: Buffer.from(qd),
+        file: Buffer.from(JSON.stringify(ymxFile)),
         name: "exported_queue.ymx",
       }]
     })

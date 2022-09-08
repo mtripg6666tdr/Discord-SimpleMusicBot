@@ -16,10 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { ExportableQueueContent } from "./QueueContent";
-
-export const YmxVersion = 2;
-export type YmxFormat = {
-  version:number,
-  data:ExportableQueueContent[],
+export type AudioEffect = {
+  BassBoost:boolean,
+  Reverb:boolean,
+  LoudnessEqualization:boolean,
 };

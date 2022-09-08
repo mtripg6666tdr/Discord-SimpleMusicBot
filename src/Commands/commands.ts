@@ -89,7 +89,7 @@ export default class Commands extends BaseCommand {
       for(let i = 0; i < embed.length; i++){
         embed[i]
           .setTitle("コマンド一覧(" + embed[i].title + ")")
-          .setDescription(`コマンドの一覧です。\r\n\`${i + 1}ページ目(${embed.length}ページ中)\`\r\nコマンドプレフィックスは、\`${options.server.persistentPref.Prefix}\`です。\r\n\`!コマンド 再生\`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。`)
+          .setDescription(`コマンドの一覧です。\r\n\`${i + 1}ページ目(${embed.length}ページ中)\`\r\nコマンドプレフィックスは、\`${options.server.prefix}\`です。\r\n\`!コマンド 再生\`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。`)
           .setColor(getColor("COMMAND"));
       }
       const msg = await message.reply({embeds: [embed[0].toEris()]});
@@ -98,7 +98,7 @@ export default class Commands extends BaseCommand {
     }else{
       const ci = CommandsManager.Instance.resolve(options.rawArgs);
       if(ci && !ci.unlist){
-        const prefix = options.server ? options.server.persistentPref.Prefix : ">";
+        const prefix = options.server ? options.server.prefix : ">";
         const embed = new Helper.MessageEmbedBuilder()
           .setTitle(`コマンド \`${ci.name}\` の詳細`)
           .setDescription(ci.description)
