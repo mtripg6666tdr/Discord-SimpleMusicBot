@@ -81,7 +81,7 @@ export default class Play extends BaseCommand {
     // 返信先のメッセージを確認
     }else if(message["_message"]?.referencedMessage){
       const messageReference = message["_message"].referencedMessage;
-      const prefixLength = server.persistentPref.Prefix.length;
+      const prefixLength = server.prefix.length;
       // URLのみのメッセージか？
       if(messageReference.content.startsWith("http://") || messageReference.content.startsWith("https://")){
         await options.server.playFromURL(message, messageReference.content, !wasConnected);

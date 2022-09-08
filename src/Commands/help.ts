@@ -48,7 +48,7 @@ export default class Help extends BaseCommand {
       .setTitle(options.client.user.username + ":notes:")
       .setDescription(
         "高音質な音楽を再生して、Discordでのエクスペリエンスを最高にするため作られました:robot:\r\n"
-      + "利用可能なコマンドを確認するには、`" + options.server.persistentPref.Prefix + "command`を使用してください。")
+      + "利用可能なコマンドを確認するには、`" + options.server.prefix + "command`を使用してください。")
       .addField("開発者", `[${developer || "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`)
       .addField("バージョン", "`" + options.bot.version + "`")
       .addField("レポジトリ/ソースコード", "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot")

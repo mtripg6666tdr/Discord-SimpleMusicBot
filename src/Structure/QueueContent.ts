@@ -16,10 +16,46 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { ExportableQueueContent } from "./QueueContent";
+import type { AudioSource, exportableCustom } from "../AudioSource";
 
-export const YmxVersion = 2;
-export type YmxFormat = {
-  version:number,
-  data:ExportableQueueContent[],
+/**
+ * キューの内容を示します
+ */
+export type QueueContent = {
+  /**
+   * 曲自体のメタ情報
+   */
+  basicInfo:AudioSource,
+  /**
+   * 曲の情報とは別の追加情報
+   */
+  additionalInfo:AdditionalInfo,
+};
+
+export type AddedBy = {
+  /**
+   * 曲の追加者の表示名。表示名は追加された時点での名前になります。
+   */
+  displayName:string,
+  /**
+   * 曲の追加者のユーザーID
+   */
+  userId:string,
+};
+
+/**
+ * 曲の情報とは別の追加情報を示します。
+ */
+export type AdditionalInfo = {
+  /**
+   * 曲の追加者を示します
+   */
+  addedBy: AddedBy,
+};
+
+/**
+ * エクスポート可能なキューのアイテムです
+ */
+export type ExportableQueueContent = exportableCustom & {
+  addBy: AddedBy,
 };

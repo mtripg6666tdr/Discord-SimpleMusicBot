@@ -18,10 +18,11 @@
 
 import type { exportableCustom } from "../AudioSource";
 import type { MusicBotBase } from "../botBase";
+import type { AudioEffect } from "./AudioEffect";
 import type { SearchPanel } from "./SearchPanel";
 import type { YmxFormat } from "./YmxFormat";
 import type { CommandMessage, ResponseMessage } from "@mtripg6666tdr/eris-command-resolver";
-import type { Client, Message, VoiceChannel, VoiceConnection } from "eris";
+import type { Message, VoiceChannel, VoiceConnection } from "eris";
 
 import { LockObj } from "@mtripg6666tdr/async-lock";
 import { lock } from "@mtripg6666tdr/async-lock";
@@ -49,9 +50,9 @@ export class GuildDataContainer extends LogEmitter {
   }
   
   /**
-   * 永続的設定を保存するコンテナ
+   * プレフィックス
    */
-  readonly persistentPref:PersistentPref;
+  prefix:string;
   /**
    * 検索窓の格納します
    */
@@ -76,10 +77,6 @@ export class GuildDataContainer extends LogEmitter {
     this._boundTextChannel = val;
   }
 
-  /**
-   * サーバーID
-   */
-  readonly guildID:string;
   /**
    * データパス
    */
@@ -111,21 +108,21 @@ export class GuildDataContainer extends LogEmitter {
    */
   vcPing:number;
 
-  constructor(client:Client, guildid:string, boundchannelid:string, bot:MusicBotBase){
+  constructor(guildid:string, boundchannelid:string, bot:MusicBotBase){
     super();
+    this.setTag("GuildDataContainer");
+    this.setGuildId(guildid);
     this.searchPanel = null;
     this.queue = new QueueManager();
-    this.player = new PlayManager(client);
+    this.queue.setBinding(this);
+    this.player = new PlayManager();
+    this.player.setBinding(this);
     this.boundTextChannel = boundchannelid;
-    this.guildID = guildid;
-    this.SetTag(`GuildDataContainer/${guildid}`);
     this.dataPath = ".data/" + guildid + ".preferences.json";
     this.bot = bot;
     this.AddRelative = false;
     this.effectPrefs = {BassBoost: false, Reverb: false, LoudnessEqualization: false};
-    this.persistentPref = {
-      Prefix: ">"
-    };
+    this.prefix = ">";
     this.equallyPlayback = false;
     this.connection = null;
     this.vcPing = null;
@@ -141,22 +138,39 @@ export class GuildDataContainer extends LogEmitter {
       || (message.member.voiceState.channelID && (this.bot.client.getChannel(message.member.voiceState.channelID) as VoiceChannel).voiceMembers.has(this.bot.client.user.id))
       || message.content.includes("join")
     ){
-      if(message.content !== (this.persistentPref.Prefix || ">")) this.boundTextChannel = message.channelId;
+      if(message.content !== this.prefix) this.boundTextChannel = message.channelId;
     }
   }
 
   /**
-   * キューをエクスポートしてテキストにします
-   * @returns テキスト化されたキュー
+   * キューをエクスポートしてYMX形式で出力します
+   * @returns YMX化されたキュー
    */
-  exportQueue():string{
-    return JSON.stringify({
+  exportQueue():YmxFormat{
+    return {
       version: YmxVersion,
       data: this.queue.map(q => ({
-        ...(q.basicInfo.exportData()),
+        ...q.basicInfo.exportData(),
         addBy: q.additionalInfo.addedBy
       })),
-    } as YmxFormat);
+    };
+  }
+
+  /**
+   * YMXからキューをインポートします。
+   * @param exportedQueue YMXデータ
+   * @returns 成功したかどうか
+   */
+  async importQueue(exportedQueue:YmxFormat){
+    if(exportedQueue.version === YmxVersion){
+      const { data } = exportedQueue;
+      for(let i = 0; i < data.length; i++){
+        const item = data[i];
+        await this.queue.autoAddQueue(this.bot.client, item.url, item.addBy, "unknown", false, false, null, null, item);
+      }
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -173,6 +187,36 @@ export class GuildDataContainer extends LogEmitter {
       this.AddRelative ? "1" : "0",
       this.equallyPlayback ? "1" : "0",
     ].join(":");
+  }
+
+  /**
+   * ステータスをオブジェクトからインポートします。
+   * @param param0 読み取り元のオブジェクト
+   */
+  importStatus({voiceChannelId, frozenStatusIds}:{voiceChannelId:string, frozenStatusIds:string[]}){
+    //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
+    [
+      this.queue.loopEnabled,
+      this.queue.queueLoopEnabled,
+      this.AddRelative,
+      this.equallyPlayback
+    ] = frozenStatusIds.map(b => b === "1");
+    if(voiceChannelId !== "0"){
+      this._joinVoiceChannel(voiceChannelId)
+        .then(() => this.player.play())
+        .catch(er => this.Log(er, "warn"))
+      ;
+    }
+  }
+
+  /**
+   * ステータスのテキストをパースしてオブジェクトにします。
+   * @param statusText パース元のステータスのテキスト
+   * @returns パースされたステータスオブジェクト
+   */
+  static parseStatus(statusText:string){
+    const [voiceChannelId, boundChannelId, ...frozenStatusIds] = statusText.split(":");
+    return {voiceChannelId, boundChannelId, frozenStatusIds};
   }
 
   /**
@@ -205,6 +249,27 @@ export class GuildDataContainer extends LogEmitter {
     if(index < 0) return false;
     this._cancellations.splice(index, 1);
     return true;
+  }
+
+  /**
+   * 指定されたボイスチャンネルに参加し、接続を保存し、適切なイベントハンドラを設定します。
+   * @param channelId 接続先のボイスチャンネルのID
+   */
+  private async _joinVoiceChannel(channelId:string){
+    const connection = this.connection = await this.bot.client.joinVoiceChannel(channelId, {
+      selfDeaf: true,
+    });
+    connection
+      .on("error", err => {
+        this.Log("[Connection] " + Util.general.StringifyObject(err), "error");
+        this.player.handleError(err);
+      })
+      .on("pong", ping => this.vcPing = ping)
+    ;
+    if(Util.config.debug){
+      connection.on("debug", mes => this.Log("[Connection] " + mes, "debug"));
+    }
+    this.Log(`Connected to ${channelId}`);
   }
 
   private readonly joinVoiceChannelLocker:LockObj = new LockObj();
@@ -244,26 +309,12 @@ export class GuildDataContainer extends LogEmitter {
             return message.reply(mes);
           }
           else{
-            return this.bot.client.createMessage(message.channel.id, mes);
+            return message.channel.createMessage(mes);
           }
         })(":electric_plug:接続中...");
         try{
           if(!targetVC.permissionsOf(this.bot.client.user.id).has("voiceConnect")) throw new Error("ボイスチャンネルに参加できません。権限を確認してください。");
-          const connection = await targetVC.join({
-            selfDeaf: true,
-          });
-          connection
-            .on("error", err => {
-              Util.logger.log("[Main][Connection]" + Util.general.StringifyObject(err), "error");
-              this.player.handleError(err);
-            })
-            .on("pong", ping => this.vcPing = ping)
-          ;
-          if(Util.config.debug){
-            connection.on("debug", mes => Util.logger.log("[Main][Connection]" + mes, "debug"));
-          }
-          this.connection = connection;
-          Util.logger.log(`[Main/${message.guild.id}]Connected to ${message.member.voiceState.channelID}`);
+          await this._joinVoiceChannel(targetVC.id);
           await msg.edit(`:+1:ボイスチャンネル:speaker:\`${targetVC.name}\`に接続しました!`);
           t.end();
           return true;
@@ -426,18 +477,18 @@ export class GuildDataContainer extends LogEmitter {
    */
   updatePrefix(message:CommandMessage|Message<TextChannel>):void{
     const guild = "guild" in message ? message.guild : message.channel.guild;
-    const current = this.persistentPref.Prefix;
+    const oldPrefix = this.prefix;
     const member = guild.members.get(this.bot.client.user.id);
     const pmatch = (member.nick || member.username).match(/^\[(?<prefix>.)\]/);
     if(pmatch){
-      if(this.persistentPref.Prefix !== pmatch.groups.prefix){
-        this.persistentPref.Prefix = Util.string.NormalizeText(pmatch.groups.prefix);
+      if(this.prefix !== pmatch.groups.prefix){
+        this.prefix = Util.string.NormalizeText(pmatch.groups.prefix);
       }
-    }else if(this.persistentPref.Prefix !== Util.config.prefix){
-      this.persistentPref.Prefix = Util.config.prefix;
+    }else if(this.prefix !== Util.config.prefix){
+      this.prefix = Util.config.prefix;
     }
-    if(this.persistentPref.Prefix !== current){
-      this.Log(`Prefix was set to '${this.persistentPref.Prefix}' (${guild.id})`);
+    if(this.prefix !== oldPrefix){
+      this.Log(`Prefix was set to '${this.prefix}'`);
     }
   }
 
@@ -472,13 +523,3 @@ export class GuildDataContainer extends LogEmitter {
     t.end();
   }
 }
-
-type PersistentPref = {
-  Prefix:string,
-};
-
-type AudioEffect = {
-  BassBoost:boolean,
-  Reverb:boolean,
-  LoudnessEqualization:boolean,
-};

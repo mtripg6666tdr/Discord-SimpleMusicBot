@@ -19,7 +19,6 @@
 import * as addOn from "./addon";
 import * as color from "./color";
 import * as config from "./config";
-import * as db from "./database";
 import * as effects from "./effect";
 import { erisUtil as eris } from "./eris";
 import * as fs from "./fs";
@@ -36,7 +35,6 @@ export const Util = {
   addOn,
   color,
   config,
-  db,
   effects,
   fs,
   general,

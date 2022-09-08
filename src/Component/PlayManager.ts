@@ -18,7 +18,7 @@
 
 import type { AudioSource, YouTube } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
-import type { Client, Message, TextChannel, VoiceChannel } from "eris";
+import type { Message, TextChannel, VoiceChannel } from "eris";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
@@ -94,21 +94,14 @@ export class PlayManager extends ManagerBase {
     return this.isPlaying ? this._seek * 1000 + this.server.connection.current?.playTime : 0;
   }
 
-  /**
-   * クライアント
-   */
-  get client(){
-    return this._client;
-  }
-
   get volume(){
     return this._volume;
   }
 
   // コンストラクタ
-  constructor(private readonly _client:Client){
+  constructor(){
     super();
-    this.SetTag("PlayManager");
+    this.setTag("PlayManager");
     this.Log("Play Manager instantiated");
   }
 
@@ -116,7 +109,7 @@ export class PlayManager extends ManagerBase {
    *  親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
    */
   setBinding(data:GuildDataContainer){
-    this.Log("Set data of guild id " + data.guildID);
+    this.Log("Set data of guild id " + data.guildId);
     super.setBinding(data);
   }
 
@@ -158,7 +151,7 @@ export class PlayManager extends ManagerBase {
     let ch:TextChannel = null;
     this._currentAudioInfo = this.server.queue.get(0).basicInfo;
     if(this.server.boundTextChannel){
-      ch = this.client.getChannel(this.server.boundTextChannel) as TextChannel;
+      ch = this.server.bot.client.getChannel(this.server.boundTextChannel) as TextChannel;
       const [min, sec] = Util.time.CalcMinSec(this.currentAudioInfo.LengthSeconds);
       const isLive = this.currentAudioInfo.isYouTube() && this.currentAudioInfo.LiveStream;
       mes = await ch.createMessage(`:hourglass_flowing_sand: \`${this.currentAudioInfo.Title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`);
@@ -267,7 +260,7 @@ export class PlayManager extends ManagerBase {
   stop():PlayManager{
     this.Log("Stop called");
     this.server.connection?.stopPlaying();
-    this.server.bot.backupData();
+    this.server.bot.backupper.backupData();
     return this;
   }
 
@@ -298,7 +291,7 @@ export class PlayManager extends ManagerBase {
    * @returns this
    */
   pause():PlayManager{
-    this.server.bot.backupStatus();
+    this.server.bot.backupper.backupStatus();
     this.Log("Pause called");
     this.server.connection?.pause();
     return this;
@@ -309,7 +302,7 @@ export class PlayManager extends ManagerBase {
    * @returns this
    */
   resume():PlayManager{
-    this.server.bot.backupStatus();
+    this.server.bot.backupper.backupStatus();
     this.Log("Resume called");
     this.server.connection?.resume();
     return this;
@@ -375,7 +368,7 @@ export class PlayManager extends ManagerBase {
     if(this.server.queue.length === 0){
       this.Log("Queue empty");
       if(this.server.boundTextChannel){
-        const ch = this.client.getChannel(this.server.boundTextChannel) as TextChannel;
+        const ch = this.server.bot.client.getChannel(this.server.boundTextChannel) as TextChannel;
         await ch.createMessage(":wave:キューが空になったため終了します").catch(e => Util.logger.log(e, "error"));
       }
       this.disconnect();

@@ -70,7 +70,7 @@ class _timerStore {
 
   end(key:string, logger?: (content:string) => void){
     if(this.timers[key]){
-      const conteet = "[TimeLogger]Elapsed " + (Math.floor((performance.now() - this.timers[key]) * 100) / 100) + "ms. (" + key + ")";
+      const conteet = "[TimeLogger] Elapsed " + (Math.floor((performance.now() - this.timers[key]) * 100) / 100) + "ms. (" + key + ")";
       if(logger) logger(conteet);
       else log(conteet);
       delete this.timers[key];

@@ -25,7 +25,7 @@ import { CommandsManager } from "./Commands";
 import { CommandMessage } from "./Component/CommandMessage";
 import { PageToggle } from "./Component/PageToggle";
 import { ResponseMessage } from "./Component/ResponseMessage";
-import { YmxVersion } from "./Structure";
+import { GuildDataContainer } from "./Structure";
 import { Util } from "./Util";
 import { MusicBotBase } from "./botBase";
 import { NotSendableMessage } from "./definition";
@@ -86,46 +86,29 @@ export class MusicBot extends MusicBotBase {
     }
 
     // Recover queues
-    if(Util.db.DatabaseAPI.CanOperate){
+    if(this.backupper.backuppable){
       const joinedGUildIds = [...client.guilds.values()].map(guild => guild.id);
-      const queues = await Util.db.DatabaseAPI.GetQueueData(joinedGUildIds);
-      const speakingIds = await Util.db.DatabaseAPI.GetIsSpeaking(joinedGUildIds);
-      const queueGuildids = Object.keys(queues);
-      const speakingGuildids = Object.keys(speakingIds);
-      for(let i = 0; i < queueGuildids.length; i++){
-        const id = queueGuildids[i];
+      const queues = await this.backupper.getQueueDataFromServer(joinedGUildIds);
+      const speakingIds = await this.backupper.getStatusFromServer(joinedGUildIds);
+      const queueGuildIds = Object.keys(queues);
+      const speakingGuildIds = Object.keys(speakingIds);
+      for(let i = 0; i < queueGuildIds.length; i++){
+        const id = queueGuildIds[i];
         const queue = JSON.parse(queues[id]) as YmxFormat;
-        if(
-          speakingGuildids.includes(id)
-          && queue.version === YmxVersion
-          && speakingIds[id].includes(":")
-        ){
-          //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
-          const [vid, cid, ..._bs] = speakingIds[id].split(":");
-          const [loop, qloop, related, equallypb] = _bs.map(b => b === "1");
-          this.initData(id, cid);
-          this.data[id]["_boundTextChannel"] = cid;
-          this.data[id].queue.loopEnabled = !!loop;
-          this.data[id].queue.queueLoopEnabled = !!qloop;
-          this.data[id].AddRelative = !!related;
-          this.data[id].equallyPlayback = !!equallypb;
+        const status = speakingIds[id];
+        if(speakingGuildIds.includes(id) && status.includes(":")){
           try{
-            for(let j = 0; j < queue.data.length; j++){
-              await this.data[id].queue.autoAddQueue(client, queue.data[j].url, queue.data[j].addBy, "unknown", false, false, null, null, queue.data[j]);
-            }
-            if(vid !== "0"){
-              const vc = client.getChannel(vid) as discord.VoiceChannel;
-              this.data[id].connection = await vc.join({
-                selfDeaf: true,
-              });
-              await this.data[id].player.play();
-            }
+            const parsedStatus = GuildDataContainer.parseStatus(status);
+            const server = this.initData(id, parsedStatus.boundChannelId);
+            await server.importQueue(queue);
+            server.importStatus(parsedStatus);
           }
           catch(e){
             this.Log(e, "warn");
           }
         }
       }
+      this._backupper.resetModifiedGuilds();
       this.Log("Finish recovery of queues and statuses.");
     }else{
       this.Log("Cannot perform recovery of queues and statuses. Check .env file to perform this. See README for more info", "warn");
@@ -139,13 +122,10 @@ export class MusicBot extends MusicBotBase {
       });
 
       // Set main tick
-      const tick = ()=>{
-        this.logGeneralInfo();
-        setTimeout(tick, 4 * 60 * 1000);
-        PageToggle.Organize(this._embedPageToggle, 5);
-        this.backupData();
-      };
-      setTimeout(tick, 1 * 60 * 1000);
+      setTimeout(() => {
+        this.maintenanceTick();
+        setInterval(this.maintenanceTick.bind(this), 1 * 60 * 1000);
+      }, 10 * 1000);
     }
     this.Log("Interval jobs set up successfully");
 
@@ -170,14 +150,11 @@ export class MusicBot extends MusicBotBase {
     server.updatePrefix(message as discord.Message<discord.TextChannel>);
     if(message.content === `<@${this._client.user.id}>`){
       // メンションならば
-      await this._client.createMessage(
-        message.channel.id,
-        `コマンドの一覧は、\`/command\`で確認できます。\r\nメッセージでコマンドを送信する場合のプレフィックスは\`${server.persistentPref.Prefix}\`です。`
-      )
+      await message.channel.createMessage(`コマンドの一覧は、\`/command\`で確認できます。\r\nメッセージでコマンドを送信する場合のプレフィックスは\`${server.prefix}\`です。`)
         .catch(e => this.Log(e, "error"));
       return;
     }
-    const prefix = server.persistentPref.Prefix;
+    const prefix = server.prefix;
     const messageContent = Util.string.NormalizeText(message.content);
     if(messageContent.startsWith(prefix) && messageContent.length > prefix.length){
       // コマンドメッセージを作成
@@ -188,7 +165,7 @@ export class MusicBot extends MusicBotBase {
       // 送信可能か確認
       if(!Util.eris.channel.checkSendable(message.channel as discord.TextChannel, this._client.user.id)){
         try{
-          await this._client.createMessage(message.channel.id, {
+          await message.channel.createMessage({
             messageReference: {
               messageID: message.id,
             },
@@ -210,7 +187,7 @@ export class MusicBot extends MusicBotBase {
         const msgId = this.data[message.channel.guild.id].searchPanel.Msg;
         if(msgId.userId !== message.author.id) return;
         this.data[message.channel.guild.id].searchPanel = null;
-        await this._client.createMessage(message.channel.id, "✅キャンセルしました");
+        await message.channel.createMessage("✅キャンセルしました");
         try{
           const ch = this._client.getChannel(msgId.chId);
           const msg = (ch as discord.TextChannel).messages.get(msgId.id);
@@ -342,7 +319,7 @@ export class MusicBot extends MusicBotBase {
         if(interaction.data.custom_id === "search"){
           if(interaction.data.values.includes("cancel")){
             this.data[interaction.channel.guild.id].searchPanel = null;
-            await this._client.createMessage(interaction.channel.id, "✅キャンセルしました");
+            await interaction.channel.createMessage("✅キャンセルしました");
             await interaction.deleteOriginalMessage();
           }else{
             const message = interaction.message;

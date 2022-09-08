@@ -16,9 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from "./LogEmitter"; // !order important
-export * from "./ManagerBase"; // !order important
-
+export * from "./LogEmitter";
+export * from "./ManagerBase";
 export * from "./GuildDataContainer";
 export * from "./SearchPanel";
 export * from "./YmxFormat";
