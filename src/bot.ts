@@ -20,7 +20,7 @@ import type { CommandArgs, YmxFormat } from "./Structure";
 
 import * as discord from "eris";
 
-import { CommandsManager } from "./Component/CommandManager";
+import { CommandManager } from "./Component/CommandManager";
 import { CommandMessage } from "./Component/CommandMessage";
 import { PageToggle } from "./Component/PageToggle";
 import { ResponseMessage } from "./Component/ResponseMessage";
@@ -131,7 +131,7 @@ export class MusicBot extends MusicBotBase {
     this.Log("Interval jobs set up successfully");
 
     // Command instance preparing
-    await CommandsManager.instance.sync(this.client);
+    await CommandManager.instance.sync(this.client);
 
     // Finish initializing
     this._isReadyFinished = true;
@@ -161,7 +161,7 @@ export class MusicBot extends MusicBotBase {
       // コマンドメッセージを作成
       const commandMessage = CommandMessage.createFromMessage(message as discord.Message<discord.TextChannel>, prefix.length);
       // コマンドを解決
-      const command = CommandsManager.instance.resolve(commandMessage.command);
+      const command = CommandManager.instance.resolve(commandMessage.command);
       if(!command) return;
       // 送信可能か確認
       if(!Util.eris.channel.checkSendable(message.channel as discord.TextChannel, this._client.user.id)){
@@ -239,7 +239,7 @@ export class MusicBot extends MusicBotBase {
         return;
       }
       // コマンドを解決
-      const command = CommandsManager.instance.resolve(interaction.data.name);
+      const command = CommandManager.instance.resolve(interaction.data.name);
       if(command){
         // 遅延リプライ
         await interaction.defer();

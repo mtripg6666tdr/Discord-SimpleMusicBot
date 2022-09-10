@@ -30,14 +30,14 @@ import { LogEmitter } from "../Structure";
 /**
  * コマンドマネージャー
  */
-export class CommandsManager extends LogEmitter {
-  private static _instance = null as CommandsManager;
+export class CommandManager extends LogEmitter {
+  private static _instance = null as CommandManager;
   /**
    * コマンドマネージャーの唯一のインスタンスを返します
    */
   static get instance(){
     if(this._instance) return this._instance;
-    else return this._instance = new CommandsManager();
+    else return this._instance = new CommandManager();
   }
 
   /**
@@ -93,35 +93,60 @@ export class CommandsManager extends LogEmitter {
       const index = registeredCommands.findIndex(reg => reg.name === this.getCommandName(target.alias));
       if(index < 0) return true;
       const registered = registeredCommands[index];
-      console.log(target);
-      console.log(registered);
-      return target.description !== registered.description
-        || target.argument.some(
+      return target.description.replace(/\r/g, "").replace(/\n/g, "") !== registered.description
+        || (target.argument || []).length !== (registered.options || []).length
+        || (target.argument && target.argument.some(
           (arg, i) =>
             !registered.options[i]
           || registered.options[i].name !== arg.name
           || registered.options[i].description !== arg.description
           || registered.options[i].type !== this.mapCommandOptionTypeToInteger(arg.type)
-          || (registered.options[i] as ApplicationCommandOptionsWithValue).required !== arg.required
-        )
+          || !!(registered.options[i] as ApplicationCommandOptionsWithValue).required !== arg.required
+        ))
       ;
     });
-    this.Log(`Detected ${commandsToEdit.length} commands that should be updated; updating`);
-    await client.bulkEditCommands(commandsToEdit.map(cmd => this.generateApplicationCommandsFromBaseCommand(cmd)));
-    this.Log("Updating success.");
+    if(commandsToEdit.length > 0){
+      this.Log(`Detected ${commandsToEdit.length} commands that should be updated; updating`);
+      this.Log(`These are ${commandsToEdit.map(command => command.name)}`);
+      await client.bulkEditCommands(commandsToEdit.map(cmd => this.generateApplicationCommandsFromBaseCommand(cmd)));
+      this.Log("Updating success.");
+    }else{
+      this.Log("Detected no command that should be updated");
+    }
     if(removeOutdated){
       const commandsToRemove = registeredCommands.filter(registered => {
         const index = this.commands.findIndex(command => registered.name === this.getCommandName(command.alias));
         return index < 0 || this.commands[index].unlist;
       });
-      this.Log(`Detected ${commandsToRemove.length} commands that should be removed; removing...`);
-      for(let i = 0; i < commandsToRemove.length; i++){
-        await client.deleteCommand(commandsToRemove[i].id);
+      if(commandsToRemove.length > 0){
+        this.Log(`Detected ${commandsToRemove.length} commands that should be removed; removing...`);
+        this.Log(`These are ${commandsToRemove.map(command => command.name)}`);
+        for(let i = 0; i < commandsToRemove.length; i++){
+          await client.deleteCommand(commandsToRemove[i].id);
+        }
+        this.Log("Removing success.");
+      }else{
+        this.Log("Detected no command that should be removed");
       }
-      this.Log("Removing success.");
-      console.log(commandsToEdit);
-      console.log(commandsToRemove);
     }
+  }
+
+  async removeAllApplicationCommand(client:Client){
+    this.Log("Removing all application commands");
+    const commands = await client.getCommands();
+    for(let i = 0; i < commands.length; i++){
+      await client.deleteCommand(commands[i].id);
+    }
+    this.Log("Successfully removed all application commands");
+  }
+
+  async removeAllGuildCommand(client:Client, guildId:string){
+    this.Log("Removing all guild commands of " + guildId);
+    const commands = await client.getGuildCommands(guildId);
+    for(let i = 0; i < commands.length; i++){
+      await client.deleteGuildCommand(guildId, commands[i].id);
+    }
+    this.Log("Successfully removed all guild commands");
   }
 
   private getCommandName(alias:readonly string[]){
@@ -140,23 +165,23 @@ export class CommandsManager extends LogEmitter {
   }
 
   private generateApplicationCommandsFromBaseCommand(command:BaseCommand):ApplicationCommandStructure{
-    const options = command.argument.map(arg => ({
+    const options = command.argument?.map(arg => ({
       type: this.mapCommandOptionTypeToInteger(arg.type),
       name: arg.name,
-      description: arg.description,
+      description: arg.description.replace(/\r/g, "").replace(/\n/g, ""),
       required: arg.required,
     } as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean));
-    if(options.length > 0){
+    if(options && options.length > 0){
       return {
         type: Constants.ApplicationCommandTypes.CHAT_INPUT,
-        name: command.name,
+        name: this.getCommandName(command.alias),
         description: command.description,
         options,
       };
     }else{
       return {
         type: Constants.ApplicationCommandTypes.CHAT_INPUT,
-        name: command.name,
+        name: this.getCommandName(command.alias),
         description: command.description,
       };
     }
