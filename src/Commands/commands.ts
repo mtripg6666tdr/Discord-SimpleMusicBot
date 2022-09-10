@@ -34,7 +34,9 @@ export const categories = {
   "utility": "ユーティリティ系",
   "bot": "ボット操作全般"
 };
+
 export const categoriesList = ["voice", "player", "playlist", "utility", "bot"];
+
 export default class Commands extends BaseCommand {
   constructor(){
     super({

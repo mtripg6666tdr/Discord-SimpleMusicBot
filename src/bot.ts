@@ -16,12 +16,11 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CommandArgs } from "./Commands";
-import type { YmxFormat } from "./Structure";
+import type { CommandArgs, YmxFormat } from "./Structure";
 
 import * as discord from "eris";
 
-import { CommandsManager } from "./Commands";
+import { CommandsManager } from "./Component/CommandManager";
 import { CommandMessage } from "./Component/CommandMessage";
 import { PageToggle } from "./Component/PageToggle";
 import { ResponseMessage } from "./Component/ResponseMessage";
