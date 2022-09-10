@@ -18,12 +18,12 @@
 
 import type { GuildDataContainer } from "./GuildDataContainer";
 
-import { LogEmitter } from "../Structure";
+import { LogEmitter } from ".";
 
 /**
  * すべてのマネージャークラスの基底クラスです
  */
-export abstract class ManagerBase extends LogEmitter {
+export abstract class ServerManagerBase extends LogEmitter {
   // 親ノード
   protected server:GuildDataContainer = null;
 

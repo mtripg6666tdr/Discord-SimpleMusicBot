@@ -28,7 +28,7 @@ import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 import { Member } from "eris";
 
 import * as AudioSource from "../AudioSource";
-import { ManagerBase } from "../Structure";
+import { ServerManagerBase } from "../Structure";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
 import { FallBackNotice } from "../definition";
@@ -39,7 +39,7 @@ export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"unknown
  * サーバーごとのキューを管理するマネージャー。
  * キューの追加および削除などの機能を提供します。
  */
-export class QueueManager extends ManagerBase {
+export class QueueManager extends ServerManagerBase {
   /**
    * キューの本体
    */
