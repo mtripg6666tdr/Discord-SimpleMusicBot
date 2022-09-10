@@ -18,7 +18,8 @@
 
 import type { CommandArgs } from ".";
 
-import { CommandsManager, BaseCommand } from ".";
+import { BaseCommand } from ".";
+import { CommandsManager } from "../Component/CommandManager";
 import { CommandMessage } from "../Component/CommandMessage";
 import Util from "../Util";
 

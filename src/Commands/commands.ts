@@ -23,7 +23,8 @@ import type { EmbedField} from "eris";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
-import { CommandsManager, BaseCommand } from ".";
+import { BaseCommand } from ".";
+import { CommandsManager } from "../Component/CommandManager";
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/color";
 
