@@ -26,22 +26,46 @@ export { CommandArgs } from "../Structure/Command";
  */
 export abstract class BaseCommand {
   abstract run(message:CommandMessage, options:CommandArgs):Promise<void>;
-  public readonly _name: string;
-  public get name(){return this._name;}
-  public readonly _alias: Readonly<string[]>;
-  public get alias(){return this._alias;}
-  public readonly _description: string = null;
-  public get description(){return this._description;}
-  public readonly _unlist: boolean;
-  public get unlist(){return this._unlist;}
-  public readonly _examples: string = null;
-  public get examples(){return this._examples;}
-  public readonly _usage: string = null;
-  public get usage(){return this._usage;}
-  public readonly _category:string = null;
-  public get category(){return this._category;}
-  public readonly _argument:Readonly<SlashCommandArgument[]> = null;
-  public get argument(){return this._argument;}
+  
+  protected readonly _name: string;
+  public get name(){
+    return this._name;
+  }
+
+  protected readonly _alias: Readonly<string[]>;
+  public get alias(){
+    return this._alias;
+  }
+
+  protected readonly _description: string = null;
+  public get description(){
+    return this._description;
+  }
+
+  protected readonly _unlist: boolean;
+  public get unlist(){
+    return this._unlist;
+  }
+
+  protected readonly _examples: string = null;
+  public get examples(){
+    return this._examples;
+  }
+
+  protected readonly _usage: string = null;
+  public get usage(){
+    return this._usage;
+  }
+
+  protected readonly _category:string = null;
+  public get category(){
+    return this._category;
+  }
+
+  protected readonly _argument:Readonly<SlashCommandArgument[]> = null;
+  public get argument(){
+    return this._argument;
+  }
 
   constructor(opts:ListCommandInitializeOptions|UnlistCommandInitializeOptions){
     this._name = opts.name;

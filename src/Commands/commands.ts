@@ -65,7 +65,7 @@ export default class Commands extends BaseCommand {
         // @ts-ignore
         return categories[label as any] as string;
       };
-      const rawcommands = CommandsManager.Instance.Commands.filter(ci => !ci.unlist);
+      const rawcommands = CommandsManager.instance.commands.filter(ci => !ci.unlist);
       const commands = {} as {[category:string]:BaseCommand[]};
       // Generate command list
       for(let i = 0; i < rawcommands.length; i++){
@@ -99,7 +99,7 @@ export default class Commands extends BaseCommand {
       const toggle = await PageToggle.init(msg, embed.map(_panel => _panel.toEris()));
       options.embedPageToggle.push(toggle);
     }else{
-      const ci = CommandsManager.Instance.resolve(options.rawArgs);
+      const ci = CommandsManager.instance.resolve(options.rawArgs);
       if(ci && !ci.unlist){
         const prefix = options.server ? options.server.prefix : ">";
         const embed = new Helper.MessageEmbedBuilder()

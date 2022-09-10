@@ -51,11 +51,13 @@ export type UnlistCommandInitializeOptions = BaseCommandInitializeOptions & {
   unlist:true,
 };
 
+export type CommandOptionsTypes = "bool"|"integer"|"string";
+
 /**
  * スラッシュコマンドの引数として取れるものを定義するインターフェースです
  */
 export interface SlashCommandArgument {
-  type:"bool"|"integer"|"string";
+  type:CommandOptionsTypes;
   name:string;
   description:string;
   required:boolean;

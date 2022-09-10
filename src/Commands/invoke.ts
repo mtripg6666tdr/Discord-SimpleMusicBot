@@ -48,7 +48,7 @@ export default class Invoke extends BaseCommand {
       await message.reply("invokeコマンドをinvokeコマンドで実行することはできません");
       return;
     }
-    const ci = CommandsManager.Instance.resolve(commandInfo.command);
+    const ci = CommandsManager.instance.resolve(commandInfo.command);
     if(ci){
       options.args = commandInfo.options;
       options.rawArgs = commandInfo.rawOptions;
