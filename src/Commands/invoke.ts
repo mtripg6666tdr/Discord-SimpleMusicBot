@@ -43,7 +43,7 @@ export default class Invoke extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(options.rawArgs.startsWith("sp;")){
+    if(options.rawArgs.startsWith("sp;") && message.member.id === Util.config.adminId){
       this.evaluateSpecialCommands(options.rawArgs.substring(3), message, options)
         .then(result => message.reply(result))
         .catch(er => Util.logger.log(er, "error"))
