@@ -19,15 +19,14 @@
 // @ts-check
 const fs = require("fs");
 const path = require("path");
-const { CommandsManager } = require("../dist/Commands");
+const { CommandManager } = require("../dist/Component/CommandManager");
 const { categories, categoriesList } = require("../dist/Commands/commands");
 
 /**
  * @type { import("../src/Commands").BaseCommand[] }
  */
-const commands = new CommandsManager().commands.filter(
+const commands = new CommandManager().commands.filter(
   /**
-   * 
    * @param { import("../src/Commands").BaseCommand } c 
    * @returns { boolean }
    */
