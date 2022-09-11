@@ -79,9 +79,9 @@ export abstract class BaseCommand {
   constructor(opts:ListCommandInitializeOptions|UnlistCommandInitializeOptions){
     this._name = opts.name;
     this._alias = opts.alias;
-    if(!this._unlist && !this.asciiName) throw new Error("Command has not ascii name");
     this._unlist = opts.unlist;
     if(!this._unlist){
+      if(!this.asciiName) throw new Error("Command has not ascii name");
       const { description, examples, usage, category, argument } = opts as ListCommandWithArgumentsInitializeOptions;
       this._description = description;
       this._examples = examples || null;
