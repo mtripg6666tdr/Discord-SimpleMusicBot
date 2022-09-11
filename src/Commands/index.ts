@@ -18,6 +18,11 @@
 
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { ListCommandInitializeOptions, UnlistCommandInitializeOptions, ListCommandWithArgumentsInitializeOptions, CommandArgs, SlashCommandArgument } from "../Structure/Command";
+import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString} from "eris";
+
+import { Constants } from "eris";
+
+import { CommandManager } from "../Component/CommandManager";
 
 export { CommandArgs } from "../Structure/Command";
 
@@ -67,9 +72,14 @@ export abstract class BaseCommand {
     return this._argument;
   }
 
+  get asciiName(){
+    return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
+  }
+
   constructor(opts:ListCommandInitializeOptions|UnlistCommandInitializeOptions){
     this._name = opts.name;
     this._alias = opts.alias;
+    if(!this._unlist && !this.asciiName) throw new Error("Command has not ascii name");
     this._unlist = opts.unlist;
     if(!this._unlist){
       const { description, examples, usage, category, argument } = opts as ListCommandWithArgumentsInitializeOptions;
@@ -78,6 +88,29 @@ export abstract class BaseCommand {
       this._usage = usage || null;
       this._category = category;
       this._argument = argument || null;
+    }
+  }
+
+  toApplicationCommandStructure(){
+    const options = this.argument?.map(arg => ({
+      type: CommandManager.mapCommandOptionTypeToInteger(arg.type),
+      name: arg.name,
+      description: arg.description.replace(/\r/g, "").replace(/\n/g, ""),
+      required: arg.required,
+    } as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean));
+    if(options && options.length > 0){
+      return {
+        type: Constants.ApplicationCommandTypes.CHAT_INPUT,
+        name: this.asciiName,
+        description: this.description,
+        options,
+      };
+    }else{
+      return {
+        type: Constants.ApplicationCommandTypes.CHAT_INPUT,
+        name: this.asciiName,
+        description: this.description,
+      };
     }
   }
 }

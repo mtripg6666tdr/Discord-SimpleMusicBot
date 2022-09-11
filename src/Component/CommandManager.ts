@@ -18,7 +18,7 @@
 
 import type { BaseCommand } from "../Commands";
 import type { CommandOptionsTypes} from "../Structure";
-import type { ApplicationCommandOptionsWithValue, Client, ApplicationCommandStructure, ApplicationCommandOptionsString, ApplicationCommandOptionsInteger, ApplicationCommandOptionsBoolean } from "eris";
+import type { ApplicationCommandOptionsWithValue, Client } from "eris";
 
 import { Constants } from "eris";
 
@@ -90,7 +90,7 @@ export class CommandManager extends LogEmitter {
     this.Log(`Successfully get ${registeredCommands.length} commands`);
     const commandsToEdit = this.commands.filter(target => {
       if(target.unlist) return false;
-      const index = registeredCommands.findIndex(reg => reg.name === this.getCommandName(target.alias));
+      const index = registeredCommands.findIndex(reg => reg.name === target.asciiName);
       if(index < 0) return true;
       const registered = registeredCommands[index];
       return target.description.replace(/\r/g, "").replace(/\n/g, "") !== registered.description
@@ -100,7 +100,7 @@ export class CommandManager extends LogEmitter {
             !registered.options[i]
           || registered.options[i].name !== arg.name
           || registered.options[i].description !== arg.description
-          || registered.options[i].type !== this.mapCommandOptionTypeToInteger(arg.type)
+          || registered.options[i].type !== CommandManager.mapCommandOptionTypeToInteger(arg.type)
           || !!(registered.options[i] as ApplicationCommandOptionsWithValue).required !== arg.required
         ))
       ;
@@ -108,14 +108,14 @@ export class CommandManager extends LogEmitter {
     if(commandsToEdit.length > 0){
       this.Log(`Detected ${commandsToEdit.length} commands that should be updated; updating`);
       this.Log(`These are ${commandsToEdit.map(command => command.name)}`);
-      await client.bulkEditCommands(commandsToEdit.map(cmd => this.generateApplicationCommandsFromBaseCommand(cmd)));
+      await client.bulkEditCommands(commandsToEdit.map(cmd => cmd.toApplicationCommandStructure()));
       this.Log("Updating success.");
     }else{
       this.Log("Detected no command that should be updated");
     }
     if(removeOutdated){
       const commandsToRemove = registeredCommands.filter(registered => {
-        const index = this.commands.findIndex(command => registered.name === this.getCommandName(command.alias));
+        const index = this.commands.findIndex(command => registered.name === command.asciiName);
         return index < 0 || this.commands[index].unlist;
       });
       if(commandsToRemove.length > 0){
@@ -149,11 +149,7 @@ export class CommandManager extends LogEmitter {
     this.Log("Successfully removed all guild commands");
   }
 
-  private getCommandName(alias:readonly string[]){
-    return alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
-  }
-
-  private mapCommandOptionTypeToInteger(type:CommandOptionsTypes){
+  static mapCommandOptionTypeToInteger(type:CommandOptionsTypes){
     switch(type){
       case "bool":
         return Constants.ApplicationCommandOptionTypes.BOOLEAN;
@@ -161,29 +157,6 @@ export class CommandManager extends LogEmitter {
         return Constants.ApplicationCommandOptionTypes.INTEGER;
       case "string":
         return Constants.ApplicationCommandOptionTypes.STRING;
-    }
-  }
-
-  private generateApplicationCommandsFromBaseCommand(command:BaseCommand):ApplicationCommandStructure{
-    const options = command.argument?.map(arg => ({
-      type: this.mapCommandOptionTypeToInteger(arg.type),
-      name: arg.name,
-      description: arg.description.replace(/\r/g, "").replace(/\n/g, ""),
-      required: arg.required,
-    } as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean));
-    if(options && options.length > 0){
-      return {
-        type: Constants.ApplicationCommandTypes.CHAT_INPUT,
-        name: this.getCommandName(command.alias),
-        description: command.description,
-        options,
-      };
-    }else{
-      return {
-        type: Constants.ApplicationCommandTypes.CHAT_INPUT,
-        name: this.getCommandName(command.alias),
-        description: command.description,
-      };
     }
   }
 }
