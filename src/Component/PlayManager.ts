@@ -191,7 +191,7 @@ export class PlayManager extends ServerManagerBase {
       });
       // setup volume
       this.setVolume(this.volume);
-      ((connection.piper as any)["_endStream"]).once("end", this.onStreamFinished.bind(this));
+      stream.on("end", this.onStreamFinished.bind(this));
       // wait for entering playing state
       await Util.general.waitForEnteringState(() => this.server.connection.playing);
       this.preparing = false;

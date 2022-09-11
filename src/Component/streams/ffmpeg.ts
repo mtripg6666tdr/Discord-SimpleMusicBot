@@ -22,6 +22,7 @@ import { FFmpeg } from "prism-media";
 
 import { destroyStream } from ".";
 import Util from "../../Util";
+import { createPassThrough } from "../../Util/general";
 import { DefaultUserAgent, FFmpegDefaultNetworkArgs } from "../../definition";
 
 export function transformThroughFFmpeg(readable:StreamInfo, bitrate:number, effectArgs:string[], seek:number, output:"ogg"|"pcm"){
@@ -58,10 +59,14 @@ export function transformThroughFFmpeg(readable:StreamInfo, bitrate:number, effe
   const ffmpeg = new FFmpeg({args});
   if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log("[FFmpeg]" + chunk.toString(), "debug"));
   if(readable.type === "readable"){
+    const normalizeThrough = createPassThrough();
     readable.stream
+      .on("error", e => destroyStream(normalizeThrough, e))
+      .pipe(normalizeThrough)
       .on("error", e => destroyStream(ffmpeg, e))
-      .pipe(ffmpeg)
       .on("close", () => destroyStream(readable.stream))
+      .pipe(ffmpeg)
+      .on("close", () => destroyStream(normalizeThrough))
     ;
   }
   return ffmpeg;
