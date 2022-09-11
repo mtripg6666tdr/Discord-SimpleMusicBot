@@ -108,7 +108,7 @@ export class CommandManager extends LogEmitter {
     if(commandsToEdit.length > 0){
       this.Log(`Detected ${commandsToEdit.length} commands that should be updated; updating`);
       this.Log(`These are ${commandsToEdit.map(command => command.name)}`);
-      await client.bulkEditCommands(commandsToEdit.map(cmd => cmd.toApplicationCommandStructure()));
+      await client.bulkEditCommands(this.commands.filter(cmd => !cmd.unlist).map(cmd => cmd.toApplicationCommandStructure()));
       this.Log("Updating success.");
     }else{
       this.Log("Detected no command that should be updated");
@@ -121,9 +121,7 @@ export class CommandManager extends LogEmitter {
       if(commandsToRemove.length > 0){
         this.Log(`Detected ${commandsToRemove.length} commands that should be removed; removing...`);
         this.Log(`These are ${commandsToRemove.map(command => command.name)}`);
-        for(let i = 0; i < commandsToRemove.length; i++){
-          await client.deleteCommand(commandsToRemove[i].id);
-        }
+        await client.bulkEditCommands([]);
         this.Log("Removing success.");
       }else{
         this.Log("Detected no command that should be removed");
@@ -133,19 +131,13 @@ export class CommandManager extends LogEmitter {
 
   async removeAllApplicationCommand(client:Client){
     this.Log("Removing all application commands");
-    const commands = await client.getCommands();
-    for(let i = 0; i < commands.length; i++){
-      await client.deleteCommand(commands[i].id);
-    }
+    await client.bulkEditCommands([]);
     this.Log("Successfully removed all application commands");
   }
 
   async removeAllGuildCommand(client:Client, guildId:string){
     this.Log("Removing all guild commands of " + guildId);
-    const commands = await client.getGuildCommands(guildId);
-    for(let i = 0; i < commands.length; i++){
-      await client.deleteGuildCommand(guildId, commands[i].id);
-    }
+    await client.bulkEditGuildCommands(guildId, []);
     this.Log("Successfully removed all guild commands");
   }
 

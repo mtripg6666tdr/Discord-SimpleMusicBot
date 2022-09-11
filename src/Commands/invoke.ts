@@ -75,10 +75,10 @@ export default class Invoke extends BaseCommand {
         break;
       case "removesca":
         CommandManager.instance.removeAllApplicationCommand(options.client);
-        return "実行しています...";
+        break;
       case "removescg":
         CommandManager.instance.removeAllGuildCommand(options.client, message.guild.id);
-        return "実行しています...";
+        break;
       default:
         return "特別コマンドが見つかりません。";
     }
