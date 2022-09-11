@@ -162,7 +162,7 @@ jobs:
           npm run generatecommandlist
       
       - name: Check if there are changes
-        run: git diff --exit-code
+        run: git diff -w --exit-code
 
   success-all-test:
     runs-on: ubuntu-latest
