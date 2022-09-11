@@ -17,7 +17,8 @@
  */
 
 export * from "./LogEmitter";
-export * from "./ManagerBase";
+export * from "./ServerManagerBase";
+export * from "./Command";
 export * from "./GuildDataContainer";
 export * from "./SearchPanel";
 export * from "./YmxFormat";

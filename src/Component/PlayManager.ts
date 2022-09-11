@@ -22,7 +22,7 @@ import type { Message, TextChannel, VoiceChannel } from "eris";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
-import { ManagerBase } from "../Structure";
+import { ServerManagerBase } from "../Structure";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
 import { getFFmpegEffectArgs } from "../Util/effect";
@@ -33,7 +33,7 @@ import { resolveStreamToPlayable } from "./streams";
  * サーバーごとの再生を管理するマネージャー。
  * 再生や一時停止などの処理を行います。
  */
-export class PlayManager extends ManagerBase {
+export class PlayManager extends ServerManagerBase {
   private readonly retryLimit = 3;
   private _seek = 0;
   private _errorReportChannel = null as TextChannel;

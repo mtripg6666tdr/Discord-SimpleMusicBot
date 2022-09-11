@@ -105,7 +105,8 @@
         "ignoredNodes": [
           "PropertyDefinition[decorators]",
           "TSUnionType"
-        ]
+        ],
+        "SwitchCase": 1
     }],
     "@typescript-eslint/no-unnecessary-type-assertion": "warn",
     "@typescript-eslint/require-await": "off",

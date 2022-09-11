@@ -23,7 +23,8 @@ import type { EmbedField} from "eris";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
-import { CommandsManager, BaseCommand } from ".";
+import { BaseCommand } from ".";
+import { CommandManager } from "../Component/CommandManager";
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/color";
 
@@ -34,7 +35,9 @@ export const categories = {
   "utility": "ユーティリティ系",
   "bot": "ボット操作全般"
 };
+
 export const categoriesList = ["voice", "player", "playlist", "utility", "bot"];
+
 export default class Commands extends BaseCommand {
   constructor(){
     super({
@@ -62,7 +65,7 @@ export default class Commands extends BaseCommand {
         // @ts-ignore
         return categories[label as any] as string;
       };
-      const rawcommands = CommandsManager.Instance.Commands.filter(ci => !ci.unlist);
+      const rawcommands = CommandManager.instance.commands.filter(ci => !ci.unlist);
       const commands = {} as {[category:string]:BaseCommand[]};
       // Generate command list
       for(let i = 0; i < rawcommands.length; i++){
@@ -96,7 +99,7 @@ export default class Commands extends BaseCommand {
       const toggle = await PageToggle.init(msg, embed.map(_panel => _panel.toEris()));
       options.embedPageToggle.push(toggle);
     }else{
-      const ci = CommandsManager.Instance.resolve(options.rawArgs);
+      const ci = CommandManager.instance.resolve(options.rawArgs);
       if(ci && !ci.unlist){
         const prefix = options.server ? options.server.prefix : ">";
         const embed = new Helper.MessageEmbedBuilder()

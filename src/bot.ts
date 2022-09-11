@@ -16,12 +16,11 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CommandArgs } from "./Commands";
-import type { YmxFormat } from "./Structure";
+import type { CommandArgs, YmxFormat } from "./Structure";
 
 import * as discord from "eris";
 
-import { CommandsManager } from "./Commands";
+import { CommandManager } from "./Component/CommandManager";
 import { CommandMessage } from "./Component/CommandMessage";
 import { PageToggle } from "./Component/PageToggle";
 import { ResponseMessage } from "./Component/ResponseMessage";
@@ -132,7 +131,7 @@ export class MusicBot extends MusicBotBase {
     this.Log("Interval jobs set up successfully");
 
     // Command instance preparing
-    CommandsManager.Instance.Check();
+    await CommandManager.instance.sync(this.client);
 
     // Finish initializing
     this._isReadyFinished = true;
@@ -162,7 +161,7 @@ export class MusicBot extends MusicBotBase {
       // コマンドメッセージを作成
       const commandMessage = CommandMessage.createFromMessage(message as discord.Message<discord.TextChannel>, prefix.length);
       // コマンドを解決
-      const command = CommandsManager.Instance.resolve(commandMessage.command);
+      const command = CommandManager.instance.resolve(commandMessage.command);
       if(!command) return;
       // 送信可能か確認
       if(!Util.eris.channel.checkSendable(message.channel as discord.TextChannel, this._client.user.id)){
@@ -240,7 +239,7 @@ export class MusicBot extends MusicBotBase {
         return;
       }
       // コマンドを解決
-      const command = CommandsManager.Instance.resolve(interaction.data.name);
+      const command = CommandManager.instance.resolve(interaction.data.name);
       if(command){
         // 遅延リプライ
         await interaction.defer();
@@ -285,21 +284,21 @@ export class MusicBot extends MusicBotBase {
             }).catch(er => Util.logger.log(er, "error"));
           };
           switch(interaction.data.custom_id){
-          case Util.effects.EffectsCustomIds.Reload:
-            updateEffectPanel();
-            break;
-          case Util.effects.EffectsCustomIds.BassBoost:
-            this.data[interaction.channel.guild.id].effectPrefs.BassBoost = !server.effectPrefs.BassBoost;
-            updateEffectPanel();
-            break;
-          case Util.effects.EffectsCustomIds.Reverb:
-            this.data[interaction.channel.guild.id].effectPrefs.Reverb = !server.effectPrefs.Reverb;
-            updateEffectPanel();
-            break;
-          case Util.effects.EffectsCustomIds.LoudnessEqualization:
-            this.data[interaction.channel.guild.id].effectPrefs.LoudnessEqualization = !server.effectPrefs.LoudnessEqualization;
-            updateEffectPanel();
-            break;
+            case Util.effects.EffectsCustomIds.Reload:
+              updateEffectPanel();
+              break;
+            case Util.effects.EffectsCustomIds.BassBoost:
+              this.data[interaction.channel.guild.id].effectPrefs.BassBoost = !server.effectPrefs.BassBoost;
+              updateEffectPanel();
+              break;
+            case Util.effects.EffectsCustomIds.Reverb:
+              this.data[interaction.channel.guild.id].effectPrefs.Reverb = !server.effectPrefs.Reverb;
+              updateEffectPanel();
+              break;
+            case Util.effects.EffectsCustomIds.LoudnessEqualization:
+              this.data[interaction.channel.guild.id].effectPrefs.LoudnessEqualization = !server.effectPrefs.LoudnessEqualization;
+              updateEffectPanel();
+              break;
           }
         }
       }else if(Util.eris.interaction.compoentnInteractionDataIsSelectMenuData(interaction.data)){

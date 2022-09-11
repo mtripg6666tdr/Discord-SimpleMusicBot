@@ -17,68 +17,69 @@
  */
 
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { PageToggle } from "../Component/PageToggle";
-import type { GuildDataContainer } from "../Structure";
-import type { MusicBot } from "../bot";
-import type { categories } from "./commands";
-import type { Client } from "eris";
+import type { ListCommandInitializeOptions, UnlistCommandInitializeOptions, ListCommandWithArgumentsInitializeOptions, CommandArgs, SlashCommandArgument } from "../Structure/Command";
+import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString} from "eris";
 
-import * as fs from "fs";
-import * as path from "path";
+import { Constants } from "eris";
 
-import { LogEmitter } from "../Structure";
+import { CommandManager } from "../Component/CommandManager";
 
-type BaseCommandInitializeOptions = {
-  name:string,
-  alias:Readonly<string[]>,
-};
-
-type ListCommandWithArgumentsInitializeOptions = BaseCommandInitializeOptions & {
-  description:string,
-  unlist:boolean,
-  examples:string,
-  usage:string,
-  category:keyof typeof categories,
-  argument:SlashCommandArgument[],
-};
-
-type ListCommandWithoutArgumentsInitializeOptions = BaseCommandInitializeOptions & {
-  description:string,
-  unlist:false,
-  category:keyof typeof categories,
-};
-
-type ListCommandInitializeOptions = ListCommandWithArgumentsInitializeOptions | ListCommandWithoutArgumentsInitializeOptions;
-
-type UnlistCommandInitializeOptions = BaseCommandInitializeOptions & {
-  unlist:true,
-};
+export { CommandArgs } from "../Structure/Command";
 
 /**
  * すべてのコマンドハンドラーの基底クラスです
  */
 export abstract class BaseCommand {
   abstract run(message:CommandMessage, options:CommandArgs):Promise<void>;
-  public readonly _name: string;
-  public get name(){return this._name;}
-  public readonly _alias: Readonly<string[]>;
-  public get alias(){return this._alias;}
-  public readonly _description: string = null;
-  public get description(){return this._description;}
-  public readonly _unlist: boolean;
-  public get unlist(){return this._unlist;}
-  public readonly _examples: string = null;
-  public get examples(){return this._examples;}
-  public readonly _usage: string = null;
-  public get usage(){return this._usage;}
-  public readonly _category:string = null;
-  public get category(){return this._category;}
-  public readonly _argument:Readonly<SlashCommandArgument[]> = null;
-  public get argument(){return this._argument;}
+  
+  protected readonly _name: string;
+  public get name(){
+    return this._name;
+  }
+
+  protected readonly _alias: Readonly<string[]>;
+  public get alias(){
+    return this._alias;
+  }
+
+  protected readonly _description: string = null;
+  public get description(){
+    return this._description;
+  }
+
+  protected readonly _unlist: boolean;
+  public get unlist(){
+    return this._unlist;
+  }
+
+  protected readonly _examples: string = null;
+  public get examples(){
+    return this._examples;
+  }
+
+  protected readonly _usage: string = null;
+  public get usage(){
+    return this._usage;
+  }
+
+  protected readonly _category:string = null;
+  public get category(){
+    return this._category;
+  }
+
+  protected readonly _argument:Readonly<SlashCommandArgument[]> = null;
+  public get argument(){
+    return this._argument;
+  }
+
+  get asciiName(){
+    return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
+  }
 
   constructor(opts:ListCommandInitializeOptions|UnlistCommandInitializeOptions){
     this._name = opts.name;
     this._alias = opts.alias;
+    if(!this._unlist && !this.asciiName) throw new Error("Command has not ascii name");
     this._unlist = opts.unlist;
     if(!this._unlist){
       const { description, examples, usage, category, argument } = opts as ListCommandWithArgumentsInitializeOptions;
@@ -89,116 +90,27 @@ export abstract class BaseCommand {
       this._argument = argument || null;
     }
   }
-}
 
-/**
- * スラッシュコマンドの引数として取れるものを定義するインターフェースです
- */
-export interface SlashCommandArgument {
-  type:"bool"|"integer"|"string";
-  name:string;
-  description:string;
-  required:boolean;
-  choices?:{[key:string]:string|number};
-}
-
-/**
- * コマンドのランナに渡される引数
- */
-export interface CommandArgs {
-  /**
-   * ボットのインスタンス
-   */
-  bot:MusicBot;
-  /**
-   * ボットのサーバーデータ
-   */
-  server:GuildDataContainer;
-  /**
-   * コマンドの生の引数
-   */
-  rawArgs: string;
-  /**
-   * コマンドのパース済み引数
-   */
-  args: string[];
-  /**
-   * 生存しているPageToggleの配列
-   */
-  embedPageToggle:PageToggle[];
-  /**
-   * ボットのクライアント
-   */
-  client:Client;
-  /**
-   * サーバーデータの初期化関数
-   * @param guildid サーバーID
-   * @param channelid チャンネルID
-   */
-  initData: (guildid:string, channelid:string) => void;
-}
-
-/**
- * コマンドマネージャー
- */
-export class CommandsManager extends LogEmitter {
-  private static _instance = null as CommandsManager;
-  /**
-   * コマンドマネージャーの唯一のインスタンスを返します
-   */
-  static get Instance(){
-    if(this._instance) return this._instance;
-    else return this._instance = new CommandsManager();
-  }
-
-  /**
-   * コマンドマネージャーの唯一のインスタンスを返します
-   */
-  get Commands(){
-    return this.commands;
-  }
-
-  private readonly commands = null as BaseCommand[];
-
-  private constructor(){
-    super();
-    this.setTag("CommandsManager");
-    this.Log("Initializing");
-    this.commands = [];
-    fs.readdirSync(__dirname, {withFileTypes: true})
-      .filter(d => d.isFile())
-      .map(d => d.name)
-      .filter(n => n.endsWith(".js") && n !== "index.js")
-      .map(n => n.slice(0, -3))
-      .forEach(n => {
-        // eslint-disable-next-line new-cap
-        const cp = new (require(path.join(__dirname, n)).default)() as BaseCommand;
-        this.commands.push(cp);
-        return cp;
-      });
-    this.Log("Initialized");
-  }
-
-  /**
-   * コマンド名でコマンドを解決します
-   * @param command コマンド名
-   * @returns 解決されたコマンド
-   */
-  resolve(command:string){
-    this.Log("Resolving command");
-    let result = null;
-    for(let i = 0; i < this.commands.length; i++){
-      if(this.commands[i].name === command || this.commands[i].alias.includes(command)){
-        result = this.commands[i];
-        break;
-      }
+  toApplicationCommandStructure(){
+    const options = this.argument?.map(arg => ({
+      type: CommandManager.mapCommandOptionTypeToInteger(arg.type),
+      name: arg.name,
+      description: arg.description.replace(/\r/g, "").replace(/\n/g, ""),
+      required: arg.required,
+    } as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean));
+    if(options && options.length > 0){
+      return {
+        type: Constants.ApplicationCommandTypes.CHAT_INPUT,
+        name: this.asciiName,
+        description: this.description,
+        options,
+      };
+    }else{
+      return {
+        type: Constants.ApplicationCommandTypes.CHAT_INPUT,
+        name: this.asciiName,
+        description: this.description,
+      };
     }
-    if(result) this.Log(`Command "${command}" was resolved successfully`);
-    else this.Log("Command not found");
-    return result;
-  }
-
-  Check(){
-    return true;
   }
 }

@@ -18,7 +18,8 @@
 
 import type { CommandArgs } from ".";
 
-import { CommandsManager, BaseCommand } from ".";
+import { BaseCommand } from ".";
+import { CommandManager } from "../Component/CommandManager";
 import { CommandMessage } from "../Component/CommandMessage";
 import Util from "../Util";
 
@@ -42,12 +43,19 @@ export default class Invoke extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    const commandInfo = CommandMessage.resolveCommandMessage("/" + options.rawArgs);
-    if(commandInfo.command === "invoke"){
-      await message.reply("invokeコマンドをinvokeコマンドで実行することはできません");
+    if(options.rawArgs.startsWith("sp;") && message.member.id === Util.config.adminId){
+      this.evaluateSpecialCommands(options.rawArgs.substring(3), message, options)
+        .then(result => message.reply(result))
+        .catch(er => Util.logger.log(er, "error"))
+      ;
       return;
     }
-    const ci = CommandsManager.Instance.resolve(commandInfo.command);
+    const commandInfo = CommandMessage.resolveCommandMessage(options.rawArgs, 0);
+    if(commandInfo.command === "invoke"){
+      await message.reply("invokeコマンドをinvokeコマンドで実行することはできません").catch(er => Util.logger.log(er, "error"));
+      return;
+    }
+    const ci = CommandManager.instance.resolve(commandInfo.command);
     if(ci){
       options.args = commandInfo.options;
       options.rawArgs = commandInfo.rawOptions;
@@ -58,5 +66,22 @@ export default class Invoke extends BaseCommand {
     }else{
       await message.reply("コマンドが見つかりませんでした").catch(er => Util.logger.log(er));
     }
+  }
+
+  private async evaluateSpecialCommands(specialCommand:string, message:CommandMessage, options:CommandArgs){
+    switch(specialCommand){
+      case "cleanupsc":
+        await CommandManager.instance.sync(options.client, true);
+        break;
+      case "removesca":
+        CommandManager.instance.removeAllApplicationCommand(options.client);
+        return "実行しています...";
+      case "removescg":
+        CommandManager.instance.removeAllGuildCommand(options.client, message.guild.id);
+        return "実行しています...";
+      default:
+        return "特別コマンドが見つかりません。";
+    }
+    return "完了しました";
   }
 }

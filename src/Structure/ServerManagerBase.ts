@@ -16,27 +16,24 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import "../dotenv";
-import type { RouteLike } from "@discordjs/rest";
-import type { APIApplicationCommand } from "discord-api-types/v10";
+import type { GuildDataContainer } from "./GuildDataContainer";
 
-import { REST } from "@discordjs/rest";
+import { LogEmitter } from ".";
 
-const rest = new REST({version: "10"}).setToken(process.env.TOKEN);
+/**
+ * すべてのマネージャークラスの基底クラスです
+ */
+export abstract class ServerManagerBase extends LogEmitter {
+  // 親ノード
+  protected server:GuildDataContainer = null;
 
-module.exports = function(route:RouteLike){
-  (async ()=>{
-    try{
-      let data = null as APIApplicationCommand[];
-      data = await rest.get(route) as typeof data;
-      await Promise.all(data.map(async (c, i) => {
-        await rest.delete(route + "/" + c.id as RouteLike);
-        console.log(c.name, "was deleted", "#" + i);
-      }));
-      process.exit(0);
-    }
-    catch(e){
-      console.error(e);
-    }
-  })();
-};
+  /**
+   * 親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
+   * @param data 親のGuildVoiceInfo
+   */
+  setBinding(data:GuildDataContainer){
+    if(this.server) throw new Error("すでに設定されています");
+    this.server = data;
+    this.setGuildId(this.server.guildId);
+  }
+}
