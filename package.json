@@ -50,7 +50,7 @@
     "mocha": "^10.0.0",
     "node": "^16.17.0",
     "rimraf": "^3.0.2",
-    "typescript": "^4.7.4"
+    "typescript": "^4.8.3"
   },
   "optionalDependencies": {
     "@discordjs/opus": "^0.8.0",
