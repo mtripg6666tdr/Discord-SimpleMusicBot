@@ -111,8 +111,8 @@ export class CommandManager extends LogEmitter {
       return index < 0;
     });
     if(commandsToEdit.length > 0 || commandsToAdd.length > 0){
-      this.Log(`Detected ${commandsToEdit.length} commands that should be updated; updating`);
-      this.Log(`These are ${commandsToEdit.map(command => command.name)}`);
+      this.Log(`Detected ${commandsToEdit.length + commandsToAdd.length} commands that should be updated; updating`);
+      this.Log(`These are ${[...commandsToEdit, ...commandsToAdd].map(command => command.name)}`);
       for(let i = 0; i < commandsToEdit.length; i++){
         const commandToRegister = commandsToEdit[i].toApplicationCommandStructure();
         const id = registeredCommands.find(cmd => cmd.name === commandToRegister.name).id;
