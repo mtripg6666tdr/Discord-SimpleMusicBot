@@ -91,7 +91,7 @@ export class CommandManager extends LogEmitter {
     const commandsToEdit = this.commands.filter(target => {
       if(target.unlist) return false;
       const index = registeredCommands.findIndex(reg => reg.name === target.asciiName);
-      if(index < 0) return true;
+      if(index < 0) return false;
       const registered = registeredCommands[index];
       return target.description.replace(/\r/g, "").replace(/\n/g, "") !== registered.description
         || (target.argument || []).length !== (registered.options || []).length
@@ -105,10 +105,23 @@ export class CommandManager extends LogEmitter {
         ))
       ;
     });
-    if(commandsToEdit.length > 0){
-      this.Log(`Detected ${commandsToEdit.length} commands that should be updated; updating`);
-      this.Log(`These are ${commandsToEdit.map(command => command.name)}`);
-      await client.bulkEditCommands(this.commands.filter(cmd => !cmd.unlist).map(cmd => cmd.toApplicationCommandStructure()));
+    const commandsToAdd = this.commands.filter(target => {
+      if(target.unlist) return false;
+      const index = registeredCommands.findIndex(reg => reg.name === target.asciiName);
+      return index < 0;
+    });
+    if(commandsToEdit.length > 0 || commandsToAdd.length > 0){
+      this.Log(`Detected ${commandsToEdit.length + commandsToAdd.length} commands that should be updated; updating`);
+      this.Log(`These are ${[...commandsToEdit, ...commandsToAdd].map(command => command.name)}`);
+      for(let i = 0; i < commandsToEdit.length; i++){
+        const commandToRegister = commandsToEdit[i].toApplicationCommandStructure();
+        const id = registeredCommands.find(cmd => cmd.name === commandToRegister.name).id;
+        await client.editCommand(id, commandToRegister);
+      }
+      for(let i = 0; i < commandsToAdd.length; i++){
+        const commandToRegister = commandsToAdd[i].toApplicationCommandStructure();
+        await client.createCommand(commandToRegister);
+      }
       this.Log("Updating success.");
     }else{
       this.Log("Detected no command that should be updated");
@@ -121,7 +134,7 @@ export class CommandManager extends LogEmitter {
       if(commandsToRemove.length > 0){
         this.Log(`Detected ${commandsToRemove.length} commands that should be removed; removing...`);
         this.Log(`These are ${commandsToRemove.map(command => command.name)}`);
-        await client.bulkEditCommands([]);
+        await client.bulkEditCommands(this.commands.filter(cmd => !cmd.unlist).map(cmd => cmd.toApplicationCommandStructure()));
         this.Log("Removing success.");
       }else{
         this.Log("Detected no command that should be removed");
