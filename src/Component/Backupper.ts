@@ -107,7 +107,7 @@ export class BackUpper extends LogEmitter {
     try{
       // 参加ステータスの送信
       const speaking = [] as {guildid:string, value:string}[];
-      const currentStatuses = {} as {[guildId:string]:string};
+      const currentStatuses = Object.assign({}, this._previousStatuses) as {[guildId:string]:string};
       Object.keys(this.data).forEach(id => {
         const currentStatus = this.data[id].exportStatus();
         if(!this._previousStatuses[id] || this._previousStatuses[id] !== currentStatus){
