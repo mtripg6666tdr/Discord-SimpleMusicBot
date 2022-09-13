@@ -92,6 +92,7 @@ export abstract class BaseCommand {
   }
 
   toApplicationCommandStructure(){
+    if(this.unlist) throw new Error("This command cannot be listed due to private command!");
     const options = this.argument?.map(arg => ({
       type: CommandManager.mapCommandOptionTypeToInteger(arg.type),
       name: arg.name,
