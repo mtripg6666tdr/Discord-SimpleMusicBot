@@ -184,18 +184,22 @@ export class PlayManager extends ServerManagerBase {
       t.end();
       // 再生
       const u = Util.time.timer.start("PlayManager#Play->EnterPlayingState");
-      connection.play(stream, {
-        format: streamType,
-        inlineVolume: this.volume !== 100,
-        voiceDataTimeout: 10 * 1000
-      });
-      // setup volume
-      this.setVolume(this.volume);
-      stream.on("end", this.onStreamFinished.bind(this));
-      // wait for entering playing state
-      await Util.general.waitForEnteringState(() => this.server.connection.playing);
-      this.preparing = false;
-      u.end();
+      try{
+        connection.play(stream, {
+          format: streamType,
+          inlineVolume: this.volume !== 100,
+          voiceDataTimeout: 10 * 1000
+        });
+        // setup volume
+        this.setVolume(this.volume);
+        stream.on("end", this.onStreamFinished.bind(this));
+        // wait for entering playing state
+        await Util.general.waitForEnteringState(() => this.server.connection.playing);
+        this.preparing = false;
+      }
+      finally{
+        u.end();
+      }
       this.Log("Play started successfully");
       if(this.server.boundTextChannel && ch && mes){
         // 再生開始メッセージ
@@ -245,7 +249,7 @@ export class PlayManager extends ServerManagerBase {
         }
         // eslint-disable-next-line no-empty
       } catch{}
-      if(this.server.boundTextChannel && ch && mes){
+      if(mes){
         mes.edit(`:tired_face:曲の再生に失敗しました...。(${Util.general.FilterContent(Util.general.StringifyObject(e))})` + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
         this.onStreamFailed();
       }

@@ -319,24 +319,28 @@ export class QueueManager extends ServerManagerBase {
     exportableConsumer:(track:T)=>Promise<exportableCustom>|exportableCustom
   ):Promise<number>{
     const t = Util.time.timer.start("ProcessPlaylist");
-    let index = 0;
-    for(let i = 0; i < totalCount; i++){
-      const item = playlist[i];
-      if(!item) continue;
-      const exportable = await exportableConsumer(item);
-      const _result = await this.autoAddQueue(client, exportable.url, msg.command.member, identifer, first, false, null, null, exportable);
-      if(_result) index++;
-      if(
-        index % 50 === 0
-        || (totalCount <= 50 && index % 10 === 0)
-        || totalCount <= 10
-      ){
-        await msg.edit(`:hourglass_flowing_sand:プレイリスト\`${title}\`を処理しています。お待ちください。${totalCount}曲中${index}曲処理済み。`);
+    try{
+      let index = 0;
+      for(let i = 0; i < totalCount; i++){
+        const item = playlist[i];
+        if(!item) continue;
+        const exportable = await exportableConsumer(item);
+        const _result = await this.autoAddQueue(client, exportable.url, msg.command.member, identifer, first, false, null, null, exportable);
+        if(_result) index++;
+        if(
+          index % 50 === 0
+          || (totalCount <= 50 && index % 10 === 0)
+          || totalCount <= 10
+        ){
+          await msg.edit(`:hourglass_flowing_sand:プレイリスト\`${title}\`を処理しています。お待ちください。${totalCount}曲中${index}曲処理済み。`);
+        }
+        if(cancellation.Cancelled) break;
       }
-      if(cancellation.Cancelled) break;
+      return index;
     }
-    t.end();
-    return index;
+    finally{
+      t.end();
+    }
   }
 
   /**
