@@ -56,7 +56,7 @@ export default class Volume extends BaseCommand {
       return;
     }
     const result = options.server.player.setVolume(newval);
-    await message.reply(`:loud_sound:音量を**${newval}**に変更しました。\r\n${!result ? "次の曲から適用されます。現在再生中の曲に設定を適用するには、`頭出し`コマンドなどを使用してください。" : ""}`)
+    await message.reply(`:loud_sound:音量を**${newval}**に変更しました。\r\n${options.server.player.isPlaying && !result ? "次の曲から適用されます。現在再生中の曲に設定を適用するには、`頭出し`コマンドなどを使用してください。" : ""}`)
       .catch(e => Util.logger.log(e, "error"));
   }
 }
