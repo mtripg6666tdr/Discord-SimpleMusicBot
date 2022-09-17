@@ -277,69 +277,70 @@ export class GuildDataContainer extends LogEmitter {
   async joinVoiceChannel(message:CommandMessage, reply:boolean = false, replyOnFail:boolean = false):Promise<boolean>{
     return lock(this.joinVoiceChannelLocker, async () => {
       const t = Util.time.timer.start("MusicBot#Join");
-      if(message.member.voiceState.channelID){
-        const targetVC = this.bot.client.getChannel(message.member.voiceState.channelID) as VoiceChannel;
-        // すでにそのにVC入ってるよ～
-        if(targetVC.voiceMembers.has(this.bot.client.user.id)){
-          if(this.connection){
-            t.end();
+      try{
+        if(message.member.voiceState.channelID){
+          const targetVC = this.bot.client.getChannel(message.member.voiceState.channelID) as VoiceChannel;
+          // すでにそのにVC入ってるよ～
+          if(targetVC.voiceMembers.has(this.bot.client.user.id)){
+            if(this.connection){
+              return true;
+            }
+          // すでになにかしらのVCに参加している場合
+          }else if(this.connection && !message.member.permissions.has("voiceMoveMembers")){
+            const failedMsg = ":warning:既にほかのボイスチャンネルに接続中です。この操作を実行する権限がありません。";
+            if(reply || replyOnFail){
+              await message.reply(failedMsg)
+                .catch(er => this.Log(er, "error"));
+            }else{
+              await message.channel.createMessage(failedMsg)
+                .catch(er => this.Log(er, "error"));
+            }
+            return false;
+          }
+
+          // 入ってないね～参加しよう
+          const msg = await ((mes:string) => {
+            if(reply){
+              return message.reply(mes);
+            }
+            else{
+              return message.channel.createMessage(mes);
+            }
+          })(":electric_plug:接続中...");
+          try{
+            if(!targetVC.permissionsOf(this.bot.client.user.id).has("voiceConnect")) throw new Error("ボイスチャンネルに参加できません。権限を確認してください。");
+            await this._joinVoiceChannel(targetVC.id);
+            await msg.edit(`:+1:ボイスチャンネル:speaker:\`${targetVC.name}\`に接続しました!`);
             return true;
           }
-        // すでになにかしらのVCに参加している場合
-        }else if(this.connection && !message.member.permissions.has("voiceMoveMembers")){
-          const failedMsg = ":warning:既にほかのボイスチャンネルに接続中です。この操作を実行する権限がありません。";
-          if(reply || replyOnFail){
-            await message.reply(failedMsg)
-              .catch(er => this.Log(er, "error"));
-          }else{
-            await message.channel.createMessage(failedMsg)
-              .catch(er => this.Log(er, "error"));
+          catch(e){
+            this.Log(e, "error");
+            const failedMsg = "😑接続に失敗しました…もう一度お試しください: " + Util.general.StringifyObject(e);
+            if(!reply && replyOnFail){
+              await msg.delete()
+                .catch(er => this.Log(er, "error"));
+              await message.reply(failedMsg)
+                .catch(er => this.Log(er, "error"));
+            }else{
+              await msg?.edit(failedMsg)
+                .catch(er => this.Log(er, "error"));
+            }
+            this.player.disconnect();
+            return false;
           }
-          return false;
-        }
-
-        // 入ってないね～参加しよう
-        const msg = await ((mes:string) => {
-          if(reply){
-            return message.reply(mes);
-          }
-          else{
-            return message.channel.createMessage(mes);
-          }
-        })(":electric_plug:接続中...");
-        try{
-          if(!targetVC.permissionsOf(this.bot.client.user.id).has("voiceConnect")) throw new Error("ボイスチャンネルに参加できません。権限を確認してください。");
-          await this._joinVoiceChannel(targetVC.id);
-          await msg.edit(`:+1:ボイスチャンネル:speaker:\`${targetVC.name}\`に接続しました!`);
-          t.end();
-          return true;
-        }
-        catch(e){
-          this.Log(e, "error");
-          const failedMsg = "😑接続に失敗しました…もう一度お試しください: " + Util.general.StringifyObject(e);
-          if(!reply && replyOnFail){
-            await msg.delete()
-              .catch(er => this.Log(er, "error"));
-            await message.reply(failedMsg)
-              .catch(er => this.Log(er, "error"));
-          }else{
-            await msg?.edit(failedMsg)
-              .catch(er => this.Log(er, "error"));
-          }
-          this.player.disconnect();
-          t.end();
-          return false;
-        }
-      }else{
-        // あらメッセージの送信者さんはボイチャ入ってないん…
-        const msg = "ボイスチャンネルに参加してからコマンドを送信してください:relieved:";
-        if(reply || replyOnFail){
-          await message.reply(msg).catch(e => this.Log(e, "error"));
         }else{
-          await message.channel.createMessage(msg).catch(e => this.Log(e, "error"));
+          // あらメッセージの送信者さんはボイチャ入ってないん…
+          const msg = "ボイスチャンネルに参加してからコマンドを送信してください:relieved:";
+          if(reply || replyOnFail){
+            await message.reply(msg).catch(e => this.Log(e, "error"));
+          }else{
+            await message.channel.createMessage(msg).catch(e => this.Log(e, "error"));
+          }
+          return false;
         }
+      }
+      finally{
         t.end();
-        return false;
       }
     });
   }
