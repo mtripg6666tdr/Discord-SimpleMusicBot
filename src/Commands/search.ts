@@ -51,12 +51,9 @@ export default class Search extends BaseCommand {
     options.server.updateBoundChannel(message);
     options.server.joinVoiceChannel(message);
     if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){
-      options.args.forEach(async u => {
-        await options.server.playFromURL(message, u, !options.server.player.isConnecting);
-      });
+      await Promise.all(options.args.map(u => options.server.playFromURL(message, u, !options.server.player.isConnecting)));
       return;
     }
-    const s = Util.time.timer.start("Search(Command)->BeforeYtsr");
     if(options.server.searchPanel !== null){
       message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
@@ -74,12 +71,8 @@ export default class Search extends BaseCommand {
         },
         Opts: {}
       };
-      s.end();
       try{
-        const t = Util.time.timer.start("Search(Command)->Ytsr");
         const result = await searchYouTube(options.rawArgs);
-        t.end();
-        const u = Util.time.timer.start("Search(Command)->AfterYtsr");
         let desc = "";
         let index = 1;
         const selectOpts = [] as SelectMenuOptions[];
@@ -135,7 +128,6 @@ export default class Search extends BaseCommand {
               .toEris()
           ]
         });
-        u.end();
       }
       catch(e){
         Util.logger.log(e, "error");
