@@ -90,7 +90,7 @@ export default class Frame extends BaseCommand {
       });
     }
     catch(e){
-      Util.logger.log(Util.general.StringifyObject(e), "error");
+      Util.logger.log(e, "error");
       await message.channel.createMessage(":sob:失敗しました...").catch(er => Util.logger.log(er, "error"));
     }
   }

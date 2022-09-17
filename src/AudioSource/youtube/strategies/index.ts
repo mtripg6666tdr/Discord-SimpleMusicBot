@@ -40,8 +40,8 @@ export const strategies:strategies[] = [
     return new Module(i);
   }
   catch(e){
-    Util.logger.log(`[AudioSource:youtube] failed to load strategy#${i}`, "warn");
     Util.logger.log(e, "error");
+    Util.logger.log(`[AudioSource:youtube] failed to load strategy#${i}`, "warn");
     return null;
   }
 }).filter(mod => !!mod);
@@ -64,8 +64,8 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(l
         };
       }
       catch(e){
-        logger(`[AudioSource:youtube] fetch in strategy#${checkedStrategy} failed: ${e}`, "error");
-        console.error(e);
+        logger(e, "error");
+        logger(`[AudioSource:youtube] fetch in strategy#${checkedStrategy} failed: ${e}`, "warn");
       }
     }
   }
@@ -79,8 +79,8 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(l
         };
       }
       catch(e){
-        logger(`[AudioSource:youtube] fetch in strategy#${i} failed: ${e}`, "error");
-        console.error(e);
+        logger(e, "error");
+        logger(`[AudioSource:youtube] fetch in strategy#${i} failed: ${e}`, "warn");
       }
     }
     logger((i + 1) === strategies.length ? "[AudioSource:youtube] All strategies failed" : "[AudioSource:youtube] Fallbacking to the next strategy", "warn");
@@ -99,8 +99,8 @@ export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>
       };
     }
     catch(e){
-      logger(`[AudioSource:youtube] getInfo in strategy#${i} failed: ${e}`, "error");
-      console.error(e);
+      logger(e, "error");
+      logger(`[AudioSource:youtube] getInfo in strategy#${i} failed: ${e}`, "warn");
       logger((i + 1) === strategies.length ? "[AudioSource:youtube] All strategies failed" : "[AudioSource:youtube] Fallbacking to the next strategy", "warn");
     }
   }

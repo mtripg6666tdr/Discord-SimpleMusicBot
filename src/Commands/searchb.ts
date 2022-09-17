@@ -124,10 +124,13 @@ export default class Searchb extends BaseCommand {
         });
       }
       catch(e){
-        Util.logger.log(e);
+        Util.logger.log(e, "error");
         options.server.searchPanel = null;
-        if(msg) msg.edit("失敗しました").catch(er => Util.logger.log(er, "error"));
-        else message.reply("失敗しました").catch(er => Util.logger.log(er, "error"));
+        if(msg){
+          await msg.edit("失敗しました").catch(er => Util.logger.log(er, "error"));
+        }else{
+          await message.reply("失敗しました").catch(er => Util.logger.log(er, "error"));
+        }
       }
     }else{
       message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));

@@ -53,6 +53,7 @@ export default class Skip extends BaseCommand {
       await response.edit(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => Util.logger.log(e, "error"));
     }
     catch(e){
+      Util.logger.log(e, "error");
       await message.channel.createMessage(":astonished:スキップに失敗しました").catch(er => Util.logger.log(er, "error"));
     }
   }

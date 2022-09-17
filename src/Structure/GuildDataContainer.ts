@@ -314,7 +314,7 @@ export class GuildDataContainer extends LogEmitter {
             return true;
           }
           catch(e){
-            this.Log(e, "error");
+            Util.logger.log(e, "error");
             const failedMsg = "😑接続に失敗しました…もう一度お試しください: " + Util.general.StringifyObject(e);
             if(!reply && replyOnFail){
               await msg.delete()
@@ -367,7 +367,8 @@ export class GuildDataContainer extends LogEmitter {
         return;
       }
       catch(e){
-        await smsg.edit(`✘追加できませんでした(${Util.general.StringifyObject(e)})`).catch(er => this.Log(er, "error"));
+        Util.logger.log(e, "error");
+        await smsg.edit(`✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`).catch(er => this.Log(er, "error"));
       }
     }else if(Util.fs.isAvailableRawAudioURL(optiont)){
       // オーディオファイルへの直リンク？
