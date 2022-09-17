@@ -78,10 +78,6 @@ export class GuildDataContainer extends LogEmitter {
   }
 
   /**
-   * データパス
-   */
-  readonly dataPath:string;
-  /**
    * メインボット
    */
   readonly bot:MusicBotBase;
@@ -118,7 +114,6 @@ export class GuildDataContainer extends LogEmitter {
     this.player = new PlayManager();
     this.player.setBinding(this);
     this.boundTextChannel = boundchannelid;
-    this.dataPath = ".data/" + guildid + ".preferences.json";
     this.bot = bot;
     this.AddRelative = false;
     this.effectPrefs = {BassBoost: false, Reverb: false, LoudnessEqualization: false};
