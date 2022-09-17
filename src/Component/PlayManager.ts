@@ -233,7 +233,7 @@ export class PlayManager extends ServerManagerBase {
       }
     }
     catch(e){
-      Util.logger.log(Util.general.StringifyObject(e), "error");
+      Util.logger.log(e, "error");
       try{
         const t = typeof e === "string" ? e : Util.general.StringifyObject(e);
         if(t.includes("429")){
@@ -246,7 +246,7 @@ export class PlayManager extends ServerManagerBase {
         // eslint-disable-next-line no-empty
       } catch{}
       if(this.server.boundTextChannel && ch && mes){
-        mes.edit(`:tired_face:曲の再生に失敗しました...。(${Util.general.StringifyObject(e)})` + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
+        mes.edit(`:tired_face:曲の再生に失敗しました...。(${Util.general.FilterContent(Util.general.StringifyObject(e))})` + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
         this.onStreamFailed();
       }
     }

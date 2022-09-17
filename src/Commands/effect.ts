@@ -48,7 +48,7 @@ export default class Effect extends BaseCommand {
       }, 5 * 60 * 1000);
     }
     catch(e){
-      Util.logger.log(JSON.stringify(e), "error");
+      Util.logger.log(e, "error");
       message.reply(":cry:エラーが発生しました").catch(er => Util.logger.log(er, "error"));
     }
   }

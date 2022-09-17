@@ -18,6 +18,7 @@
 
 import type { TransformOptions } from "stream";
 
+import * as path from "path";
 import { PassThrough } from "stream";
 
 import { log } from "./log";
@@ -62,6 +63,15 @@ export function StringifyObject(obj:any):string{
       return Object.prototype.toString.call(obj);
     }
   }
+}
+
+const projectRoot = path.join(__dirname, "../../").slice(0, -1);
+export function FilterContent(original:string){
+  let result = original;
+  while(result.includes(projectRoot)){
+    result = result.replace(projectRoot, "\\*\\*\\*");
+  }
+  return result.replace(/\\/g, "/");
 }
 
 /**

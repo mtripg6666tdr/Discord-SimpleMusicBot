@@ -74,9 +74,7 @@ export class QueueManager extends ServerManagerBase {
    * きゅの長さ（時間秒）
    */
   get lengthSeconds():number{
-    let totalLength = 0;
-    this.default.forEach(q => totalLength += Number(q.basicInfo.LengthSeconds));
-    return totalLength;
+    return this.default.reduce((prev, current) => prev + Number(current.basicInfo.LengthSeconds), 0);
   }
 
   get isEmpty():boolean{
@@ -171,7 +169,6 @@ export class QueueManager extends ServerManagerBase {
           this._default[method](result);
           if(this.server.equallyPlayback) this.sortWithAddedBy();
           this.server.bot.backupper.addModifiedGuilds(this.guildId);
-          t.end();
           const index = this._default.findIndex(q => q === result);
           this.Log("queue content added in position " + index);
           return {...result, index};
@@ -271,7 +268,7 @@ export class QueueManager extends ServerManagerBase {
           .addField("再生されるまでの予想時間", index === "0" ? "-" : ((ehour === "0" ? "" : ehour + ":") + emin + ":" + esec), true)
           .setThumbnail(info.basicInfo.Thumnail)
         ;
-        if(info.basicInfo.ServiceIdentifer === "youtube" && (info.basicInfo as AudioSource.YouTube).IsFallbacked){
+        if(info.basicInfo.isYouTube() && info.basicInfo.IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
         await msg.edit({content: "", embeds: [embed.toEris()]});
@@ -279,14 +276,20 @@ export class QueueManager extends ServerManagerBase {
     }
     catch(e){
       this.Log("AutoAddQueue failed");
-      this.Log(Util.general.StringifyObject(e), "error");
+      this.Log(e, "error");
       if(msg){
-        msg.edit({content: ":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")", embeds: null}).catch(er => Util.logger.log(er, "error"));
+        msg.edit({
+          content: `:weary: キューの追加に失敗しました。追加できませんでした。(${Util.general.FilterContent(Util.general.StringifyObject(e))})`,
+          embeds: null
+        })
+          .catch(er => Util.logger.log(er, "error"))
+        ;
       }
-      t.end();
       return false;
     }
-    t.end();
+    finally{
+      t.end();
+    }
     return true;
   }
 
@@ -328,7 +331,7 @@ export class QueueManager extends ServerManagerBase {
         || (totalCount <= 50 && index % 10 === 0)
         || totalCount <= 10
       ){
-        await msg.edit(":hourglass_flowing_sand:プレイリスト`" + title + "`を処理しています。お待ちください。" + totalCount + "曲中" + index + "曲処理済み。");
+        await msg.edit(`:hourglass_flowing_sand:プレイリスト\`${title}\`を処理しています。お待ちください。${totalCount}曲中${index}曲処理済み。`);
       }
       if(cancellation.Cancelled) break;
     }
@@ -396,8 +399,7 @@ export class QueueManager extends ServerManagerBase {
     PageToggle.Organize(this.server.bot.toggles, 5, this.server.guildId);
     if(this._default.length === 0) return;
     if(this.server.player.isPlaying || this.server.player.preparing){
-      const first = this._default[0];
-      this._default.shift();
+      const first = this._default.shift();
       this._default.sort(() => Math.random() - 0.5);
       this._default.unshift(first);
     }else{

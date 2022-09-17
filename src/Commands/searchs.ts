@@ -153,8 +153,11 @@ export default class Searchs extends BaseCommand {
       catch(e){
         Util.logger.log(e, "error");
         options.server.searchPanel = null;
-        if(msg) msg.edit("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
-        else message.reply("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
+        if(msg){
+          await msg.edit("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
+        }else{
+          await message.reply("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
+        }
       }
     }else{
       await message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));

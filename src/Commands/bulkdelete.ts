@@ -83,9 +83,8 @@ export default class BulkDelete extends BaseCommand {
     }
     catch(er){
       Util.logger.log(er, "error");
-      console.error(er);
       if(reply){
-        reply.edit("失敗しました...").catch(e => Util.logger.log(e, "error"));
+        await reply.edit("失敗しました...").catch(e => Util.logger.log(e, "error"));
       }
     }
   }
