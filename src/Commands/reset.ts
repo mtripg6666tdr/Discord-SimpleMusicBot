@@ -34,13 +34,16 @@ export default class Reset extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
+    if(!message.member.permissions.has("manageGuild")){
+      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
+      return;
+    }
     options.server.updateBoundChannel(message);
     // VC接続中なら切断
     if(options.server.player.isConnecting){
       options.server.player.disconnect();
     }
-    // サーバープリファレンスをnullに
-    options.server = null;
+    options.server.bot.resetData(message.guild.id);
     // データ初期化
     options.initData(message.guild.id, message.channel.id);
     message.reply("✅サーバーの設定を初期化しました").catch(e => Util.logger.log(e, "error"));

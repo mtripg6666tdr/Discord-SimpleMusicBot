@@ -71,7 +71,7 @@ export interface CommandArgs {
   /**
    * ボットのインスタンス
    */
-  bot:MusicBot;
+  bot:Readonly<MusicBot>;
   /**
    * ボットのサーバーデータ
    */
@@ -79,11 +79,11 @@ export interface CommandArgs {
   /**
    * コマンドの生の引数
    */
-  rawArgs: string;
+  rawArgs:Readonly<string>;
   /**
    * コマンドのパース済み引数
    */
-  args: string[];
+  args:readonly string[];
   /**
    * 生存しているPageToggleの配列
    */
@@ -91,7 +91,7 @@ export interface CommandArgs {
   /**
    * ボットのクライアント
    */
-  client:Client;
+  client:Readonly<Client>;
   /**
    * サーバーデータの初期化関数
    * @param guildid サーバーID

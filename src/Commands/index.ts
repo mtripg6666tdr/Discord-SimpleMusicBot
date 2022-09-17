@@ -30,7 +30,7 @@ export { CommandArgs } from "../Structure/Command";
  * すべてのコマンドハンドラーの基底クラスです
  */
 export abstract class BaseCommand {
-  abstract run(message:CommandMessage, options:CommandArgs):Promise<void>;
+  abstract run(message:CommandMessage, options:Readonly<CommandArgs>):Promise<void>;
   
   protected readonly _name: string;
   public get name(){
