@@ -175,7 +175,7 @@ bot.Run(/* token */);
   - このボットにアプリケーションレベルで登録されているコマンドを削除する場合  
     `invoke sp;removesca`  
   - このボットにサーバーレベルで登録されているコマンドを削除する場合  
-    `incoke sp;removescg`  
+    `invoke sp;removescg`  
 
 ## 使用する権限
 ボットの権限フラグの整数は`7465984`です。
