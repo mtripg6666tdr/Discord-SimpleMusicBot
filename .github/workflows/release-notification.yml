@@ -1,4 +1,4 @@
-name: Relese Notification
+name: Release Notification
 
 on:
   release:
