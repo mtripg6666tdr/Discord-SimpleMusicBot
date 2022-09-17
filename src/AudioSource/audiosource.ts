@@ -61,12 +61,7 @@ export abstract class AudioSource {
   abstract exportData():exportableCustom;
 
   isYouTube():this is Sources.YouTube{return this.ServiceIdentifer === "youtube";}
-  isStreamable():this is Sources.Streamable{return this.ServiceIdentifer === "streamable";}
   isSoundCloudS():this is Sources.SoundCloudS{return this.ServiceIdentifer === "soundcloud";}
-  isHibiki():this is Sources.Hibiki{return this.ServiceIdentifer === "hibiki";}
-  isGoogleDrive():this is Sources.GoogleDrive{return this.ServiceIdentifer === "goodledrive";}
-  isCustomStream():this is Sources.CustomStream{return this.ServiceIdentifer === "custom";}
-  isBestdoriS():this is Sources.BestdoriS{return this.ServiceIdentifer === "bestdori";}
   isNicoNicoS():this is Sources.NicoNicoS{return this.ServiceIdentifer === "niconico";}
 
   isUnseekable(){

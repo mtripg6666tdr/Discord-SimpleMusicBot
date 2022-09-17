@@ -17,7 +17,6 @@
  */
 
 import type { CommandArgs } from ".";
-import type { YouTube } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { EmbedField } from "eris";
 
@@ -52,17 +51,18 @@ export default class Searchq extends BaseCommand {
       message.reply("✘キューが空です").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    let qsresult = options.server.queue
-      .filter(c => c.basicInfo.Title.toLowerCase().includes(options.rawArgs.toLowerCase()))
-      .concat(
-        options.server.queue
-          .filter(c => c.basicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase()))
-      );
+    const qsresult = options.server.queue
+      .filter(c =>
+        c.basicInfo.Title.toLowerCase().includes(options.rawArgs.toLowerCase())
+        || c.basicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase())
+        || c.basicInfo.Description.toLowerCase().includes(options.rawArgs.toLowerCase())
+      )
+    ;
     if(qsresult.length === 0){
       message.reply(":confused:見つかりませんでした").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    if(qsresult.length > 20) qsresult = qsresult.slice(0, 20);
+    if(qsresult.length > 20) qsresult.splice(20);
     const fields = qsresult.map(c => {
       const index = options.server.queue.findIndex(d => d.basicInfo.Title === c.basicInfo.Title).toString();
       const _t = c.basicInfo.LengthSeconds;
@@ -70,7 +70,7 @@ export default class Searchq extends BaseCommand {
       return {
         name: index === "0" ? "現在再生中/再生待ち" : index,
         value: `[${c.basicInfo.Title}](${c.basicInfo.Url})\r\nリクエスト: \`${c.additionalInfo.addedBy.displayName}\` \r\n長さ: ${
-          (c.basicInfo.ServiceIdentifer === "youtube" && (c.basicInfo as YouTube).LiveStream) ? "(ライブストリーム)" : ` \`${_t === 0 ? "(不明)" : `${min}:${sec}`}\`)`
+          (c.basicInfo.isYouTube() && c.basicInfo.LiveStream) ? "(ライブストリーム)" : ` \`${_t === 0 ? "(不明)" : `${min}:${sec}`}\`)`
         }`,
         inline: false
       } as EmbedField;
