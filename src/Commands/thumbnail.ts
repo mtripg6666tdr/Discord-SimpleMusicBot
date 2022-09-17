@@ -48,7 +48,7 @@ export default class Thumbnail extends BaseCommand {
     options.server.updateBoundChannel(message);
     const embed = new Helper.MessageEmbedBuilder();
     embed.setColor(getColor("THUMB"));
-    if(options.rawArgs && options.server.searchPanel && Object.keys(options.server.searchPanel.Opts).includes(options.rawArgs === "" ? "n" : options.rawArgs)){
+    if(options.rawArgs && options.server.searchPanel && Object.keys(options.server.searchPanel.Opts).includes(options.rawArgs)){
       const opt = options.server.searchPanel.Opts[Number(Util.string.NormalizeText(options.rawArgs))];
       embed
         .setImage(opt.thumbnail)
