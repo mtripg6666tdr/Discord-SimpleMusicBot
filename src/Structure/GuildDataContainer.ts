@@ -315,7 +315,7 @@ export class GuildDataContainer extends LogEmitter {
           }
           catch(e){
             Util.logger.log(e, "error");
-            const failedMsg = "😑接続に失敗しました…もう一度お試しください: " + Util.general.StringifyObject(e);
+            const failedMsg = "😑接続に失敗しました…もう一度お試しください: " + Util.general.FilterContent(Util.general.StringifyObject(e));
             if(!reply && replyOnFail){
               await msg.delete()
                 .catch(er => this.Log(er, "error"));
