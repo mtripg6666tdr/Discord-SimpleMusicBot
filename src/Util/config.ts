@@ -20,34 +20,22 @@ import * as fs from "fs";
 import * as path from "path";
 
 import CJSON from "comment-json";
+import { z } from "zod";
 
-type ConfigJson = {
-  adminId: string,
-  debug: boolean,
-  maintenance: boolean,
-  errorChannel: string,
-  proxy: string,
-  prefix:string,
-  webserver:boolean,
-};
+/* eslint-disable newline-per-chained-call */
+const Config = z.object({
+  adminId: z.string().nullable(),
+  debug: z.boolean(),
+  errorChannel: z.string().min(1).nullable(),
+  maintenance: z.boolean(),
+  proxy: z.string().min(1).nullable(),
+  prefix: z.string().min(1).nullish().default(">"),
+  webserver: z.boolean().optional().default(true),
+});
+/* eslint-enable newline-per-chained-call */
 
 const rawConfig = fs.readFileSync(path.join(__dirname, "../../config.json"), {encoding: "utf-8"});
 
-const config = Object.assign({
-  prefix: ">",
-  webserver: true,
-}, CJSON.parse(rawConfig, null, true)) as unknown as ConfigJson;
+const config = Config.parse(CJSON.parse(rawConfig, null, true));
 
-if(![
-  config.adminId === null || typeof config.adminId === "string",
-  typeof config.debug === "boolean",
-  config.errorChannel === null || typeof config.errorChannel === "string",
-  typeof config.maintenance === "boolean",
-  config.proxy === null || typeof config.proxy === "string",
-  (typeof config.prefix === "string" && config.prefix.length >= 1) || config.prefix === null,
-  typeof config.webserver === "boolean",
-].every(test => test)){
-  throw new Error("Invalid config.json");
-}
-
-export const { prefix, adminId, debug, errorChannel, maintenance, proxy, webserver } = config;
+export = config;
