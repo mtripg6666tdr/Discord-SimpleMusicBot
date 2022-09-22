@@ -30,7 +30,8 @@ import Soundcloud from "soundcloud.ts";
 import { BaseCommand } from ".";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
-import { DefaultUserAgent } from "../definition";
+
+const { DefaultUserAgent } = Util.ua;
 
 export default class Searchs extends BaseCommand {
   constructor(){
