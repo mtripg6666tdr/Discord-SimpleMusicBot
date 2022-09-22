@@ -26,4 +26,3 @@ export const FFmpegDefaultNetworkArgs = [
   "-reconnect_on_http_error", "4xx,5xx",
   "-reconnect_delay_max", "30",
 ] as const;
-export * from "./Util/ua";

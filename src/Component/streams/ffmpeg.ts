@@ -23,7 +23,9 @@ import { FFmpeg } from "prism-media";
 import { destroyStream } from ".";
 import Util from "../../Util";
 import { createPassThrough } from "../../Util/general";
-import { DefaultUserAgent, FFmpegDefaultNetworkArgs } from "../../definition";
+import { FFmpegDefaultNetworkArgs } from "../../definition";
+
+const { DefaultUserAgent } = Util.ua;
 
 export function transformThroughFFmpeg(readable:StreamInfo, bitrate:number, effectArgs:string[], seek:number, output:"ogg"|"pcm"){
   const ffmpegNetworkArgs = readable.type === "url" ? [
