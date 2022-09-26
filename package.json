@@ -38,7 +38,7 @@
     "@types/follow-redirects": "^1.14.1",
     "@types/html-to-text": "^8.1.1",
     "@types/mocha": "^9.1.1",
-    "@types/node": "^16.11.59",
+    "@types/node": "^16.11.60",
     "@types/ws": "^8.5.3",
     "@typescript-eslint/eslint-plugin": "^5.38.0",
     "@typescript-eslint/parser": "^5.38.0",
