@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Setup Node.js
-        uses: actions/setup-node@v3.4.1
+        uses: actions/setup-node@v3.5.0
         with:
           node-version: '16.x'
 
@@ -56,7 +56,7 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Setup Node.js
-        uses: actions/setup-node@v3.4.1
+        uses: actions/setup-node@v3.5.0
         with:
           node-version: '16.x'
 
@@ -96,7 +96,7 @@ jobs:
         run: cp util/config-for-test.json config.json
       
       - name: Setup Node.js
-        uses: actions/setup-node@v3.4.1
+        uses: actions/setup-node@v3.5.0
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -133,7 +133,7 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Setup Node.js
-        uses: actions/setup-node@v3.4.1
+        uses: actions/setup-node@v3.5.0
         with:
           node-version: '16.x'
 
