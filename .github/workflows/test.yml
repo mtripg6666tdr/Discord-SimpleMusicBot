@@ -166,9 +166,14 @@ jobs:
 
   success-all-test:
     runs-on: ubuntu-latest
+    if: always()
     needs:
       - lint
       - test
       - docs
     steps:
       - run: echo "All done"
+        if: ${{ ! failure() }}
+
+      - run: exit 1
+        if: ${{ failure() }}
