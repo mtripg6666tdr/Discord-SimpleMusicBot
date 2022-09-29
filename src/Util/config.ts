@@ -24,11 +24,11 @@ import { z } from "zod";
 
 /* eslint-disable newline-per-chained-call */
 const Config = z.object({
-  adminId: z.string().nullable(),
+  adminId: z.string().regex(/^\d+$/, {message: "adminId is not a snowflake"}).nullable(),
   debug: z.boolean(),
-  errorChannel: z.string().min(1).nullable(),
+  errorChannel: z.string().min(1).regex(/^\d+$/, {message: "errorChannel is not a snowflake"}).nullable(),
   maintenance: z.boolean(),
-  proxy: z.string().min(1).nullable(),
+  proxy: z.string().url("proxy value must be resolvable as url").nullable(),
   prefix: z.string().min(1).nullish().default(">"),
   webserver: z.boolean().optional().default(true),
 });
