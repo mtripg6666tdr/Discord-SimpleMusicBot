@@ -25,6 +25,7 @@ import type { Client, Constants } from "eris";
 export type CustomPermission =
   | "inSameVC"
   | "noVcOrSame"
+  | "dj"
 ;
 
 type ErisPermission = keyof Constants["Permissions"];

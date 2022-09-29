@@ -122,7 +122,7 @@ export abstract class BaseCommand {
   }
 
   permissionsFor(member:Member, args:Readonly<CommandArgs>):boolean{
-    return this.permissions.length === 0 || this.permissions.every(permission => {
+    return this.permissions.length === 0 || member.permissions.has("manageChannels") || this.permissions.every(permission => {
       switch(permission){
         case "noVcOrSame":
           if(args.server.connection) return true;
@@ -130,6 +130,11 @@ export abstract class BaseCommand {
         case "inSameVC":
           return args.server.connection
             && (args.client.getChannel(args.server.connection.channelID) as VoiceChannel).voiceMembers.has(member.id);
+        case "dj": {
+          if(!args.server.connection) return false;
+          const members = (args.client.getChannel(args.server.connection.channelID) as VoiceChannel).voiceMembers;
+          return members.size <= 2 || member.roles.some(role => member.guild.roles.get(role).name === "DJ");
+        }
         default:
           return member.permissions.has(permission);
       }
