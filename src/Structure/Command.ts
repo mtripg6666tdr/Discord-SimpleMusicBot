@@ -20,11 +20,20 @@ import type { categories } from "../Commands/commands";
 import type { PageToggle } from "../Component/PageToggle";
 import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
-import type { Client } from "eris";
+import type { Client, Constants } from "eris";
+
+export type CustomPermission =
+  | "inSameVC"
+  | "noVcOrSame"
+;
+
+type ErisPermission = keyof Constants["Permissions"];
+export type CommandPermissions = ErisPermission|CustomPermission;
 
 export type BaseCommandInitializeOptions = {
   name:string,
   alias:Readonly<string[]>,
+  permissions: CommandPermissions[],
 };
 
 export type ListCommandWithArgumentsInitializeOptions = BaseCommandInitializeOptions & {

@@ -180,8 +180,14 @@ export class MusicBot extends MusicBotBase {
         catch{}
         return;
       }
+      const args = this.createCommandRunnerArgs(commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions);
+      // 権限確認
+      if(!command.permissionsFor(message.member, args)){
+        await commandMessage.reply(":warning:この操作を実行する権限がありません").catch(e => Util.logger.log(e));
+        return;
+      }
       // コマンドの処理
-      await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
+      await command.run(commandMessage, args);
     }else if(server.searchPanel){
       // searchコマンドのキャンセルを捕捉
       if(message.content === "キャンセル" || message.content === "cancel"){
@@ -247,8 +253,15 @@ export class MusicBot extends MusicBotBase {
         const commandMessage = CommandMessage.createFromInteraction(interaction) as CommandMessage;
         // プレフィックス更新
         server.updatePrefix(commandMessage);
+
+        const args = this.createCommandRunnerArgs(commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions);
+        // 権限確認
+        if(command.permissionsFor(interaction.member, args)){
+          await commandMessage.reply(":warning:この操作を実行する権限がありません").catch(e => Util.logger.log(e));
+          return;
+        }
         // コマンドを実行
-        await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
+        await command.run(commandMessage, args);
       }else{
         await interaction.createMessage("おっと！なにかが間違ってしまったようです。\r\nコマンドが見つかりませんでした。 :sob:");
       }

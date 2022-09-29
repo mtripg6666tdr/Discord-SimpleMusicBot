@@ -17,8 +17,8 @@
  */
 
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { ListCommandInitializeOptions, UnlistCommandInitializeOptions, ListCommandWithArgumentsInitializeOptions, CommandArgs, SlashCommandArgument } from "../Structure/Command";
-import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString} from "eris";
+import type { ListCommandInitializeOptions, UnlistCommandInitializeOptions, ListCommandWithArgumentsInitializeOptions, CommandArgs, SlashCommandArgument, CommandPermissions } from "../Structure/Command";
+import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, Member, VoiceChannel} from "eris";
 
 import { Constants } from "eris";
 
@@ -30,8 +30,6 @@ export { CommandArgs } from "../Structure/Command";
  * すべてのコマンドハンドラーの基底クラスです
  */
 export abstract class BaseCommand {
-  abstract run(message:CommandMessage, options:Readonly<CommandArgs>):Promise<void>;
-  
   protected readonly _name: string;
   public get name(){
     return this._name;
@@ -76,10 +74,16 @@ export abstract class BaseCommand {
     return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
   }
 
+  protected readonly _permissions:Readonly<CommandPermissions[]>;
+  public get permissions(){
+    return this._permissions;
+  }
+
   constructor(opts:ListCommandInitializeOptions|UnlistCommandInitializeOptions){
     this._name = opts.name;
     this._alias = opts.alias;
     this._unlist = opts.unlist;
+    this._permissions = opts.permissions;
     if(!this._unlist){
       if(!this.asciiName) throw new Error("Command has not ascii name");
       const { description, examples, usage, category, argument } = opts as ListCommandWithArgumentsInitializeOptions;
@@ -90,6 +94,8 @@ export abstract class BaseCommand {
       this._argument = argument || null;
     }
   }
+
+  abstract run(message:CommandMessage, options:Readonly<CommandArgs>):Promise<void>;
 
   toApplicationCommandStructure(){
     if(this.unlist) throw new Error("This command cannot be listed due to private command!");
@@ -113,5 +119,20 @@ export abstract class BaseCommand {
         description: this.description,
       };
     }
+  }
+
+  permissionsFor(member:Member, args:Readonly<CommandArgs>):boolean{
+    return this.permissions.length === 0 || this.permissions.every(permission => {
+      switch(permission){
+        case "noVcOrSame":
+          if(args.server.connection) return true;
+          return this.permissionsFor(member, args);
+        case "inSameVC":
+          return args.server.connection
+            && (args.client.getChannel(args.server.connection.channelID) as VoiceChannel).voiceMembers.has(member.id);
+        default:
+          return member.permissions.has(permission);
+      }
+    });
   }
 }
