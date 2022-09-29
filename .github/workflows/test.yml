@@ -123,7 +123,7 @@ jobs:
         run: npm test
 
       - name: Test to load scripts to Node.js
-        run: node -r ./dist/lib -e 'process.exit()'
+        run: node -r ./util/testLoad -e 'process.exit()'
         
   docs:
     runs-on: ubuntu-latest
@@ -166,9 +166,17 @@ jobs:
 
   success-all-test:
     runs-on: ubuntu-latest
+    if: always()
     needs:
       - lint
       - test
       - docs
     steps:
-      - run: echo "All done"
+      - uses: technote-space/workflow-conclusion-action@v2
+      - name: Check failure
+        if: env.WORKFLOW_CONCLUSION == 'failure'
+        run: exit 1
+      
+      - name: Success
+        run: echo "All done"
+        if: ${{ success() }}

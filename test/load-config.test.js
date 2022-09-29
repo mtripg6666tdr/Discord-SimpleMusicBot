@@ -26,13 +26,13 @@ const sampleJson = `
   "errorChannel": "987654", // エラーログを送信するテキストチャンネル、なければnull
   // エラーレポートを送るテキストチャンネルのID (任意)
 
-  "proxy": "example.com", // HTTPプロキシのアドレス、なければnull
+  "proxy": "https://example.com", // HTTPプロキシのアドレス、なければnull
 
   "prefix": "<" // デフォルトプレフィックス、一文字。省略されたりnullなら\`>\`
 }`;
 fs.writeFileSync(configPath, sampleJson, {encoding: "utf-8"});
 console.log("Successfully wrote the config for test");
-const configLoaderPath = "../dist/Util/config"
+const configLoaderPath = "../dist/Util/config";
 
 describe("Config", function() {
   describe("#Load", function(){
@@ -49,7 +49,7 @@ describe("Config", function() {
       ["debug", false],
       ["maintenance", true],
       ["errorChannel", "987654"],
-      ["proxy", "example.com"],
+      ["proxy", "https://example.com"],
       ["prefix", "<"],
     ];
 
@@ -61,7 +61,10 @@ describe("Config", function() {
   })
 });
 
-process.on("exit", () => {
+let hasExited = false;
+const onExit = () => {
+  if(hasExited) return;
+  hasExited = true;
   if(original){
     fs.writeFileSync(configPath, original, {encoding: "utf-8"});
     console.log("Config file was restored successfully");
@@ -69,4 +72,7 @@ process.on("exit", () => {
     fs.unlinkSync(configPath);
     console.log("Config file was removed successfully");
   }
-});
+};
+
+process.once("exit", onExit);
+process.once("uncaughtException", onExit);
