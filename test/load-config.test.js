@@ -26,7 +26,7 @@ const sampleJson = `
   "errorChannel": "987654", // エラーログを送信するテキストチャンネル、なければnull
   // エラーレポートを送るテキストチャンネルのID (任意)
 
-  "proxy": "http://example.com", // HTTPプロキシのアドレス、なければnull
+  "proxy": "https://example.com", // HTTPプロキシのアドレス、なければnull
 
   "prefix": "<" // デフォルトプレフィックス、一文字。省略されたりnullなら\`>\`
 }`;
@@ -49,7 +49,7 @@ describe("Config", function() {
       ["debug", false],
       ["maintenance", true],
       ["errorChannel", "987654"],
-      ["proxy", "example.com"],
+      ["proxy", "https://example.com"],
       ["prefix", "<"],
     ];
 
