@@ -67,7 +67,6 @@
     "onlystart": "node dist/index.js",
     "build": "rimraf dist/ typings/ && tsc",
     "lint": "eslint .",
-    "postinstall": "node util/preparelib.js",
     "cleanup": "rimraf dist/ typings/ logs/",
     "generatecommandlist": "node util/generateCommandList"
   },
