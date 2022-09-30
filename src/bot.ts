@@ -264,7 +264,7 @@ export class MusicBot extends MusicBotBase {
             && t.Message.id === interaction.message.id);
           if(l.length >= 1){
             // ページめくり
-            await l[0].FlipPage(
+            await l[0].flipPage(
               interaction.data.custom_id === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
                 interaction.data.custom_id === PageToggle.arrowRight ? (l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current) : 0
               ,
