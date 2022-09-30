@@ -101,7 +101,7 @@ export default class Queue extends BaseCommand {
     // 送信
     await msg.edit({content: "", embeds: [getQueueEmbed(_page)]}).catch(e => Util.logger.log(e, "error"));
     if(totalpage > 1){
-      options.embedPageToggle.push((await PageToggle.init(msg, n => getQueueEmbed(n + 1), totalpage, _page - 1)).SetFresh(true));
+      options.embedPageToggle.push((await PageToggle.init(msg, n => getQueueEmbed(n + 1), totalpage, _page - 1)).setFresh(true));
     }
   }
 }

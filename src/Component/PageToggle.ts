@@ -69,7 +69,7 @@ export class PageToggle {
       n._current = current;
     }
     await n._message.edit({
-      content: n._message.content === "" ? null : n._message.content,
+      content: n._message.content,
       embeds: n._message.embeds,
       components: [
         new Helper.MessageActionRowBuilder()
@@ -89,7 +89,7 @@ export class PageToggle {
     return n;
   }
 
-  static Organize(toggles:PageToggle[], min:number, forceRemovingUnfresh:string = null){
+  static organize(toggles:PageToggle[], min:number, forceRemovingUnfresh:string = null){
     const delIndex = [] as number[];
     for(let i = 0; i < toggles.length; i++){
       if(new Date().getTime() - toggles[i].Message.createdTimestamp >= min * 60 * 1000 || (forceRemovingUnfresh && toggles[i].IsFreshNecessary && toggles[i].Message.guild.id === forceRemovingUnfresh)){
@@ -107,7 +107,7 @@ export class PageToggle {
     });
   }
 
-  async FlipPage(page:number, interaction?:ComponentInteraction){
+  async flipPage(page:number, interaction?:ComponentInteraction){
     let embed = null as EmbedOptions;
     this._current = page;
     if(this._embeds instanceof Array){
@@ -128,7 +128,7 @@ export class PageToggle {
     }
   }
 
-  SetFresh(isFreshNecessary:boolean){
+  setFresh(isFreshNecessary:boolean){
     this.IsFreshNecessary = isFreshNecessary;
     return this;
   }

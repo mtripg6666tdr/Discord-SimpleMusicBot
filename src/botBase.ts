@@ -112,7 +112,7 @@ export abstract class MusicBotBase extends LogEmitter {
     this.maintenanceTickCount++;
     Util.logger.log(`[Tick] #${this.maintenanceTickCount}`, "debug");
     // ページトグルの整理
-    PageToggle.Organize(this._embedPageToggle, 5);
+    PageToggle.organize(this._embedPageToggle, 5);
     // 4分ごとに主要情報を出力
     if(this.maintenanceTickCount % 4 === 1) this.logGeneralInfo();
     if(this.maintenanceTickCount % 2 === 1) this._backupper.backupData();
