@@ -34,14 +34,18 @@ export default class Dc extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
+    if(!message.member.permissions.has("manageGuild") && !Util.eris.channel.sameVC(options)){
+      await message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
+      return;
+    }
     options.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.server.player.isConnecting){
-      message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
+      await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     // 停止しま～す
     options.server.player.disconnect();
-    message.reply(":postbox: 正常に切断しました").catch(e => Util.logger.log(e, "error"));
+    await message.reply(":postbox: 正常に切断しました").catch(e => Util.logger.log(e, "error"));
   }
 }
