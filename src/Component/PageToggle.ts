@@ -117,12 +117,12 @@ export class PageToggle {
     }
     if(interaction){
       await interaction.editOriginalMessage({
-        content: this.Message.content === "" ? null : this.Message.content,
+        content: this.Message.content,
         embeds: [embed],
       });
     }else{
       await this.Message.edit({
-        content: this.Message.content === "" ? null : this.Message.content,
+        content: this.Message.content,
         embeds: [embed],
       });
     }
