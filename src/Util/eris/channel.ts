@@ -16,7 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { TextChannel } from "eris";
+import type { CommandArgs } from "../../Commands";
+import type { TextChannel, VoiceChannel } from "eris";
 
 const requirePermissions = [
   "sendMessages",
@@ -31,5 +32,11 @@ export const channelUtil = {
   checkSendable(channel:TextChannel, userId:string){
     const permissions = channel.permissionsOf(userId);
     return requirePermissions.every(permission => permissions.has(permission));
+  },
+  sameVC(options:CommandArgs){
+    if(!options.server.connection) return false;
+    const voiceChannel = options.bot.client.getChannel(options.server.connection.channelID) as VoiceChannel;
+    if(!voiceChannel) return false;
+    return voiceChannel.voiceMembers.has(options.client.user.id);
   },
 } as const;
