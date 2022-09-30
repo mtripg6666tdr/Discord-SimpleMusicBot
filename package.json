@@ -1,6 +1,6 @@
 {
   "name": "discord-music-bot",
-  "version": "3.2.3",
+  "version": "3.2.4",
   "description": "Simple Music Bot for Discord without any database",
   "private": true,
   "main": "dist/lib.js",
