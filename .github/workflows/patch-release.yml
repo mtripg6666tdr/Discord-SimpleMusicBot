@@ -28,7 +28,7 @@ jobs:
         with:
           commit-message: "Bump: package version to ${{ steps.bump-version.outputs.VERSION }}"
           committer: GitHub <noreply@github.com>
-          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          author: github-actions <github-actions@github.com>
           signoff: false
           branch: "bump/package/${{ steps.bump-version.outputs.VERSION }}"
           labels: chore
