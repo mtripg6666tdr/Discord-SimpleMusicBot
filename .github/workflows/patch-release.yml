@@ -28,8 +28,8 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
           commit-message: "Bump: package version to ${{ steps.bump-version.outputs.VERSION }}"
-          committer: github-actions <github-actions@github.com>
-          author: github-actions <github-actions@github.com>
+          committer: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+          author: "github-actions <github-actions@github.com>"
           signoff: false
           branch: "bump/package/${{ steps.bump-version.outputs.VERSION }}"
           labels: chore
