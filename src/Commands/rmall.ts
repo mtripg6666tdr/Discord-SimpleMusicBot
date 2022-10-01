@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { VoiceChannel } from "eris";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -36,11 +35,9 @@ export default class Rmall extends BaseCommand {
 
   async run(message:CommandMessage, options:CommandArgs){
     options.server.updateBoundChannel(message);
-    if(!message.member.voiceState.channelID || ((options.client.getChannel(message.member.voiceState.channelID) as VoiceChannel).voiceMembers.has(options.client.user.id))){
-      if(!message.member.permissions.has("manageGuild") && !message.member.permissions.has("manageChannels")){
-        message.reply("この操作を実行する権限がありません。").catch(e => Util.logger.log(e, "error"));
-        return;
-      }
+    if(!Util.eris.channel.isOnlyListener(message.member, options) && !Util.eris.user.isDJ(message.member) && !Util.eris.user.isPrivileged(message.member)){
+      message.reply("この操作を実行する権限がありません。").catch(e => Util.logger.log(e, "error"));
+      return;
     }
     options.server.player.disconnect();
     options.server.queue.removeAll();
