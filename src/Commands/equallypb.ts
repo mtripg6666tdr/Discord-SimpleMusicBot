@@ -37,7 +37,7 @@ export default class EquallyPlayback extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.isOnlyListener(message.member, options) && Util.eris.user.isDJ(message.member, options)){
+    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.isOnlyListener(message.member, options) && !Util.eris.user.isDJ(message.member, options)){
       message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
