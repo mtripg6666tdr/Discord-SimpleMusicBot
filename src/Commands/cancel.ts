@@ -35,15 +35,15 @@ export default class Cancel extends BaseCommand {
   
   async run(message:CommandMessage, options:CommandArgs){
     if(!message.member.permissions.has("manageGuild") && !Util.eris.channel.sameVC(options)){
-      await message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
+      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     options.server.updateBoundChannel(message);
     const result = options.server.cancelAll();
     if(result){
-      await message.reply("処理中の処理をすべてキャンセルしています....").catch(e => Util.logger.log(e, "error"));
+      message.reply("処理中の処理をすべてキャンセルしています....").catch(e => Util.logger.log(e, "error"));
     }else{
-      await message.reply("キャンセルできる処理がありませんでした").catch(e => Util.logger.log(e, "error"));
+      message.reply("キャンセルできる処理がありませんでした").catch(e => Util.logger.log(e, "error"));
     }
   }
 }

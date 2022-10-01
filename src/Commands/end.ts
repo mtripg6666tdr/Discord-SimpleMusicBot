@@ -34,6 +34,10 @@ export default class End extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
+    if(Util.eris.channel.voiceMemberCount(options) > 1 && !Util.eris.user.isDJ(message.member)){
+      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
+      return;
+    }
     options.server.updateBoundChannel(message);
     if(!options.server.player.isPlaying){
       message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));

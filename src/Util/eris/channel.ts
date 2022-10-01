@@ -33,10 +33,16 @@ export const channelUtil = {
     const permissions = channel.permissionsOf(userId);
     return requirePermissions.every(permission => permissions.has(permission));
   },
-  sameVC(options:CommandArgs){
-    if(!options.server.connection) return false;
+  getVoiceMember(options:CommandArgs){
+    if(!options.server.connection) return null;
     const voiceChannel = options.bot.client.getChannel(options.server.connection.channelID) as VoiceChannel;
-    if(!voiceChannel) return false;
-    return voiceChannel.voiceMembers.has(options.client.user.id);
+    if(!voiceChannel) return null;
+    return voiceChannel.voiceMembers;
+  },
+  sameVC(options:CommandArgs){
+    return this.getVoiceMember(options)?.has(options.client.user.id) || false;
+  },
+  voiceMemberCount(options:CommandArgs){
+    return this.getVoiceMember(options)?.size || 0;
   },
 } as const;

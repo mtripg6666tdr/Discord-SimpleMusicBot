@@ -21,5 +21,8 @@ import type { Member } from "eris";
 export const userUtil = {
   getDisplayName(member:Member){
     return member.nick || member.username;
-  }
+  },
+  isDJ(member:Member){
+    return member.roles.some(roleId => member.guild.roles.get(roleId).name === "DJ");
+  },
 } as const;
