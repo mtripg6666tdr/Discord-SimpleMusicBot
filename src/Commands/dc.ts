@@ -34,7 +34,7 @@ export default class Dc extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!message.member.permissions.has("manageGuild") && !Util.eris.channel.sameVC(options)){
+    if(!message.member.permissions.has("manageGuild") && !Util.eris.channel.sameVC(message.member, options)){
       message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
       return;
     }

@@ -47,7 +47,7 @@ export default class Frame extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.channel.sameVC(options)){
+    if(!Util.eris.channel.sameVC(message.member, options)){
       message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
