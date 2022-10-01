@@ -40,6 +40,10 @@ export default class News extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
+    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.sameVC(message.member, options)){
+      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
+      return;
+    }
     options.server.updateBoundChannel(message);
     options.server.joinVoiceChannel(message);
     const url = "https://www.youtube.com/playlist?list=PL3ZQ5CpNulQk8-p0CWo9ufI81IdrGoyNZ";

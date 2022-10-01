@@ -16,7 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { TextChannel } from "eris";
+import type { CommandArgs } from "../../Commands";
+import type { Member, TextChannel, VoiceChannel } from "eris";
 
 const requirePermissions = [
   "sendMessages",
@@ -32,4 +33,22 @@ export const channelUtil = {
     const permissions = channel.permissionsOf(userId);
     return requirePermissions.every(permission => permissions.has(permission));
   },
+  getVoiceMember(options:CommandArgs){
+    if(!options.server.player.isConnecting) return null;
+    const voiceChannel = options.bot.client.getChannel(options.server.connection.channelID) as VoiceChannel;
+    if(!voiceChannel) return null;
+    return voiceChannel.voiceMembers;
+  },
+  sameVC(member:Member, options:CommandArgs){
+    return this.getVoiceMember(options)?.has(member.id) || false;
+  },
+  voiceMemberCount(options:CommandArgs){
+    return this.getVoiceMember(options)?.size || 0;
+  },
+  isOnlyListener(member:Member, options:CommandArgs){
+    const vcMember = this.getVoiceMember(options);
+    if(!vcMember) return false;
+    if(vcMember.size > 2) return false;
+    return vcMember.has(member.id);
+  }
 } as const;

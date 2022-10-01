@@ -37,10 +37,14 @@ export default class EquallyPlayback extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
+    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.isOnlyListener(message.member, options) && !Util.eris.user.isDJ(message.member, options)){
+      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
+      return;
+    }
     options.server.updateBoundChannel(message);
     if(options.server.equallyPlayback){
       options.server.equallyPlayback = false;
-      await message.reply("❌均等再生をオフにしました").catch(e => Util.logger.log(e, "error"));
+      message.reply("❌均等再生をオフにしました").catch(e => Util.logger.log(e, "error"));
     }else{
       options.server.equallyPlayback = true;
       const embed = new Helper.MessageEmbedBuilder()
@@ -49,7 +53,7 @@ export default class EquallyPlayback extends BaseCommand {
         .setColor(getColor("EQUALLY"))
         .toEris()
       ;
-      await message.reply({embeds: [embed]}).catch(er => Util.logger.log(er, "error"));
+      message.reply({embeds: [embed]}).catch(er => Util.logger.log(er, "error"));
     }
   }
 }

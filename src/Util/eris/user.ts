@@ -16,10 +16,21 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { CommandArgs } from "../../Commands";
 import type { Member } from "eris";
+
+import { channelUtil } from "./channel";
 
 export const userUtil = {
   getDisplayName(member:Member){
     return member.nick || member.username;
-  }
+  },
+  isDJ(member:Member, options:CommandArgs){
+    return channelUtil.sameVC(member, options) && member.roles.some(roleId => member.guild.roles.get(roleId).name === "DJ");
+  },
+  isPrivileged(member:Member){
+    return member.permissions.has("manageGuild")
+      || member.permissions.has("manageChannels")
+      || member.permissions.has("administrator");
+  },
 } as const;

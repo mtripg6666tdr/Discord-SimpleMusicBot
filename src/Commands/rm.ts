@@ -42,7 +42,6 @@ export default class Rm extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.server.updateBoundChannel(message);
     if(options.args.length === 0){
       message.reply("引数に消去する曲のオフセット(番号)を入力してください。").catch(e => Util.logger.log(e, "error"));
       return;
@@ -51,6 +50,7 @@ export default class Rm extends BaseCommand {
       message.reply("現在再生中の楽曲を削除することはできません。");
       return;
     }
+    options.server.updateBoundChannel(message);
     const q = options.server.queue;
     const addition = [] as number[];
     options.args.forEach(o => {
@@ -86,15 +86,38 @@ export default class Rm extends BaseCommand {
       }
     });
     const indexes = options.args.concat(addition.map(n => n.toString()));
-    const dels = Array.from(new Set(
-      indexes.map(str => Number(str)).filter(n => !isNaN(n))
-        .sort((a, b)=>b - a)
-    ));
-    const title = dels.length === 1 ? q.get(dels[0]).basicInfo.Title : null;
+    const dels = Array.from(
+      new Set(
+        indexes
+          .map(str => Number(str))
+          .filter(n => !isNaN(n))
+          .sort((a, b) => b - a)
+      )
+    );
+    const actualDeleted = [] as number[];
+    const failed = [] as number[];
     for(let i = 0; i < dels.length; i++){
-      q.removeAt(Number(dels[i]));
+      const item = q.get(dels[i]);
+      if(
+        Util.eris.user.isDJ(message.member, options)
+        || item.additionalInfo.addedBy.userId === message.member.id
+        || !Util.eris.channel.getVoiceMember(options).has(item.additionalInfo.addedBy.userId)
+        || Util.eris.channel.isOnlyListener(message.member, options)
+        || Util.eris.user.isPrivileged(message.member)
+      ){
+        q.removeAt(dels[i]);
+        actualDeleted.push(dels[i]);
+      }else{
+        failed.push(dels[i]);
+      }
     }
-    const resultStr = dels.sort((a, b)=>a - b).join(",");
-    message.reply("🚮" + (resultStr.length > 100 ? "指定された" : resultStr + "番目の") + "曲" + (title ? ("(`" + title + "`)") : "") + "を削除しました").catch(e => Util.logger.log(e, "error"));
+    if(actualDeleted.length > 0){
+      const title = actualDeleted.length === 1 ? q.get(actualDeleted[0]).basicInfo.Title : null;
+      const resultStr = actualDeleted.sort((a, b) => a - b).join(",");
+      const failedStr = failed.sort((a, b) => a - b).join(",");
+      message.reply(`🚮${resultStr.length > 100 ? "指定された" : `${resultStr}番目の`}曲${title ? ("(`" + title + "`)") : ""}を削除しました${failed.length > 0 ? `\r\n:warning:${failed.length > 100 ? "一部" : `${failedStr}番目`}の曲は権限がないため削除できませんでした。` : ""}`).catch(e => Util.logger.log(e, "error"));
+    }else{
+      message.reply("削除できませんでした。権限が不足している可能性があります。").catch(e => Util.logger.log(e, "error"));
+    }
   }
 }
