@@ -35,7 +35,7 @@ export default class Rmall extends BaseCommand {
 
   async run(message:CommandMessage, options:CommandArgs){
     options.server.updateBoundChannel(message);
-    if(!Util.eris.user.isPrivileged(message.member) && !Util.eris.channel.isOnlyListener(message.member, options) && !Util.eris.user.isDJ(message.member) && !Util.eris.user.isPrivileged(message.member)){
+    if(!Util.eris.user.isPrivileged(message.member) && !Util.eris.channel.isOnlyListener(message.member, options) && !Util.eris.user.isDJ(message.member, options) && !Util.eris.user.isPrivileged(message.member)){
       message.reply("この操作を実行する権限がありません。").catch(e => Util.logger.log(e, "error"));
       return;
     }

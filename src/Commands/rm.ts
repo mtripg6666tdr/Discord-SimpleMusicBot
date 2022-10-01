@@ -99,7 +99,7 @@ export default class Rm extends BaseCommand {
     for(let i = 0; i < dels.length; i++){
       const item = q.get(dels[i]);
       if(
-        Util.eris.user.isDJ(message.member)
+        Util.eris.user.isDJ(message.member, options)
         || item.additionalInfo.addedBy.userId === message.member.id
         || !Util.eris.channel.getVoiceMember(options).has(item.additionalInfo.addedBy.userId)
         || Util.eris.channel.isOnlyListener(message.member, options)

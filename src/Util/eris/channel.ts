@@ -39,8 +39,8 @@ export const channelUtil = {
     if(!voiceChannel) return null;
     return voiceChannel.voiceMembers;
   },
-  sameVC(memeber:Member, options:CommandArgs){
-    return this.getVoiceMember(options)?.has(memeber.id) || false;
+  sameVC(member:Member, options:CommandArgs){
+    return this.getVoiceMember(options)?.has(member.id) || false;
   },
   voiceMemberCount(options:CommandArgs){
     return this.getVoiceMember(options)?.size || 0;
