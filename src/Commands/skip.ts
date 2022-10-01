@@ -48,7 +48,7 @@ export default class Skip extends BaseCommand {
       const response = await message.reply(":ok: スキップしています");
       const item = server.queue.get(0);
       if(!Util.eris.user.isDJ(message.member) && item.additionalInfo.addedBy.userId !== message.member.id && !Util.eris.user.isPrivileged(message.member)){
-        message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
+        response.edit("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
         return;
       }
       const title = item.basicInfo.Title;
