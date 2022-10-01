@@ -37,7 +37,7 @@ export default class Related extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(options.server.player.isConnecting && !Util.eris.channel.sameVC(message.member, options)){
+    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.sameVC(message.member, options)){
       message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
