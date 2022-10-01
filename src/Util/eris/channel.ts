@@ -48,7 +48,7 @@ export const channelUtil = {
   isOnlyListener(member:Member, options:CommandArgs){
     const vcMember = this.getVoiceMember(options);
     if(!vcMember) return false;
-    if(vcMember.size > 1) return false;
+    if(vcMember.size > 2) return false;
     return vcMember.has(member.id);
   }
 } as const;
