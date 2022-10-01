@@ -25,4 +25,9 @@ export const userUtil = {
   isDJ(member:Member){
     return member.roles.some(roleId => member.guild.roles.get(roleId).name === "DJ");
   },
+  isPrivileged(member:Member){
+    return member.permissions.has("manageGuild")
+      || member.permissions.has("manageChannels")
+      || member.permissions.has("administrator");
+  },
 } as const;
