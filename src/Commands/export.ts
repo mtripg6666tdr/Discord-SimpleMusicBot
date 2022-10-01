@@ -41,7 +41,7 @@ export default class Export extends BaseCommand {
       return;
     }
     const ymxFile = options.server.exportQueue();
-    await message.reply({
+    message.reply({
       content: "✅エクスポートしました",
       files: [{
         file: Buffer.from(JSON.stringify(ymxFile)),

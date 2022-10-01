@@ -17,7 +17,7 @@
  */
 
 import type { CommandArgs } from "../../Commands";
-import type { TextChannel, VoiceChannel } from "eris";
+import type { Member, TextChannel, VoiceChannel } from "eris";
 
 const requirePermissions = [
   "sendMessages",
@@ -34,7 +34,7 @@ export const channelUtil = {
     return requirePermissions.every(permission => permissions.has(permission));
   },
   getVoiceMember(options:CommandArgs){
-    if(!options.server.connection) return null;
+    if(!options.server.player.isConnecting) return null;
     const voiceChannel = options.bot.client.getChannel(options.server.connection.channelID) as VoiceChannel;
     if(!voiceChannel) return null;
     return voiceChannel.voiceMembers;
@@ -45,4 +45,10 @@ export const channelUtil = {
   voiceMemberCount(options:CommandArgs){
     return this.getVoiceMember(options)?.size || 0;
   },
+  isOnlyListener(member:Member, options:CommandArgs){
+    const vcMember = this.getVoiceMember(options);
+    if(!vcMember) return false;
+    if(vcMember.size > 1) return false;
+    return vcMember.has(member.id);
+  }
 } as const;
