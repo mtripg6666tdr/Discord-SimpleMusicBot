@@ -149,5 +149,6 @@ export abstract class MusicBotBase extends LogEmitter {
 
   resetData(guildId:string){
     delete this.data[guildId];
+    this.backupper.addModifiedGuilds(guildId);
   }
 }
