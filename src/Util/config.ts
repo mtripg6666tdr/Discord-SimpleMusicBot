@@ -31,6 +31,13 @@ const Config = z.object({
   proxy: z.string().url("proxy value must be resolvable as url").nullable(),
   prefix: z.string().min(1).nullish().default(">"),
   webserver: z.boolean().optional().default(true),
+  bgm: z.record(z.string().regex(/^\d+$/, {message: "bgm object key is not a snowflake"}), z.object({
+    voiceChannelId: z.string().regex(/^\d+$/, {message: "channelId is not a snowflake"}),
+    allowEditQueue: z.boolean(),
+    enableQueueLoop: z.boolean(),
+    mode: z.union([z.literal("only"), z.literal("prior"), z.literal("normal")]),
+    notifyChannel: z.string().regex(/^\d+$/, {message: "notifyChannel is not a snowflake"}),
+  })).optional()
 });
 /* eslint-enable newline-per-chained-call */
 

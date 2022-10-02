@@ -43,11 +43,11 @@ export class QueueManager extends ServerManagerBase {
   /**
    * キューの本体
    */
-  private _default:QueueContent[] = [];
+  protected _default:QueueContent[] = [];
   /**
    * キューの本体のゲッタープロパティ
    */
-  private get default():Readonly<QueueContent[]>{
+  protected get default():Readonly<QueueContent[]>{
     return this._default;
   }
 
