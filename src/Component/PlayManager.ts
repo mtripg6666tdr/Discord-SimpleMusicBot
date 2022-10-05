@@ -125,7 +125,7 @@ export class PlayManager extends ServerManagerBase {
   /**
    *  再生します
    */
-  async play(time:number = 0):Promise<PlayManager>{
+  async play(time:number = 0, notify:boolean = true):Promise<PlayManager>{
     /* eslint-disable operator-linebreak */
     /* eslint-disable @typescript-eslint/indent */
     // 再生できる状態か確認
@@ -148,13 +148,14 @@ export class PlayManager extends ServerManagerBase {
     this.Log("Play called");
     this.preparing = true;
     let mes:Message = null;
-    let ch:TextChannel = null;
     this._currentAudioInfo = this.server.queue.get(0).basicInfo;
-    if(this.server.boundTextChannel){
-      ch = this.server.bot.client.getChannel(this.server.boundTextChannel) as TextChannel;
+    if(this.server.boundTextChannel && notify){
       const [min, sec] = Util.time.CalcMinSec(this.currentAudioInfo.LengthSeconds);
       const isLive = this.currentAudioInfo.isYouTube() && this.currentAudioInfo.LiveStream;
-      mes = await ch.createMessage(`:hourglass_flowing_sand: \`${this.currentAudioInfo.Title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`);
+      mes = await this.server.bot.client.createMessage(
+        this.server.boundTextChannel,
+        `:hourglass_flowing_sand: \`${this.currentAudioInfo.Title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`
+      );
     }
     try{
       // シーク位置を確認
@@ -201,7 +202,7 @@ export class PlayManager extends ServerManagerBase {
         u.end();
       }
       this.Log("Play started successfully");
-      if(this.server.boundTextChannel && ch && mes){
+      if(mes){
         // 再生開始メッセージ
         const _t = Number(this.currentAudioInfo.LengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
@@ -241,7 +242,7 @@ export class PlayManager extends ServerManagerBase {
       try{
         const t = typeof e === "string" ? e : Util.general.StringifyObject(e);
         if(t.includes("429")){
-          mes.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(er => Util.logger.log(er, "error"));
+          mes?.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(er => Util.logger.log(er, "error"));
           this.Log("Rate limit detected", "error");
           this.stop();
           this.preparing = false;
