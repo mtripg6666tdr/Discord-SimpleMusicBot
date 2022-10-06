@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { ReadableStreamInfo } from ".";
+import type { exportableCustom, ReadableStreamInfo } from ".";
 import type { EmbedField } from "eris";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 import type { Readable } from "stream";
@@ -105,11 +105,8 @@ export class SoundCloudS extends AudioSource {
   }
 }
 
-export type exportableSoundCloud = {
-  url:string,
-  title:string,
+export type exportableSoundCloud = exportableCustom & {
   description:string,
-  length:number,
   author:string,
   thumbnail:string,
 };

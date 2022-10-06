@@ -29,15 +29,21 @@ export class GoogleDrive extends AudioSource {
   protected readonly _serviceIdentifer = "googledrive";
   Thumnail:string = DefaultAudioThumbnailURL;
 
-  async init(url:string){
-    this.Title = "Googleドライブストリーム";
-    this.Url = url;
-    if(await Util.web.RetriveHttpStatusCode(this.Url) !== 200) throw new Error("URLがみつかりません");
-    try{
-      this._lengthSeconds = await Util.web.RetriveLengthSeconds((await this.fetch()).url);
+  async init(url:string, prefetched:exportableCustom){
+    if(prefetched){
+      this.Title = prefetched.title || "Googleドライブストリーム";
+      this.Url = prefetched.url;
+      this._lengthSeconds = prefetched.length;
+    }else{
+      this.Title = "Googleドライブストリーム";
+      this.Url = url;
+      if(await Util.web.RetriveHttpStatusCode(this.Url) !== 200) throw new Error("URLがみつかりません");
+      try{
+        this._lengthSeconds = await Util.web.RetriveLengthSeconds((await this.fetch()).url);
+      }
+      // eslint-disable-next-line no-empty
+      catch{}
     }
-    // eslint-disable-next-line no-empty
-    catch{}
     return this;
   }
 
@@ -62,6 +68,7 @@ export class GoogleDrive extends AudioSource {
     return {
       url: this.Url,
       length: this._lengthSeconds,
+      title: this.Title,
     };
   }
 
