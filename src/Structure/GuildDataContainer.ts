@@ -145,7 +145,7 @@ export class GuildDataContainer extends LogEmitter {
           title: "BGM",
           url: items[i],
           length: -1
-        });
+        }, /* preventCache */ true);
       }
       (this.queue as QueueManagerWithBGM).moveCurrentTracksToBGM();
     }
