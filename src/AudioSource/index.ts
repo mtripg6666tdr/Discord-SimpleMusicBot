@@ -23,6 +23,7 @@ export * from "./resolver";
 // concrete sources
 export * from "./bestdori";
 export * from "./custom";
+export * from "./fs";
 export * from "./googledrive";
 export * from "./niconico";
 export * from "./hibiki";

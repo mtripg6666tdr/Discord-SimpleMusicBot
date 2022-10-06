@@ -30,8 +30,8 @@ export class CustomStream extends AudioSource {
 
   async init(url:string, prefetched:exportableCustom){
     if(prefetched){
-      this.Title = prefetched.title;
-      this.Url = prefetched.url;
+      this.Title = prefetched.title || "カスタムストリーム";
+      this.Url = url;
       this._lengthSeconds = prefetched.length;
     }else{
       if(!Util.fs.isAvailableRawAudioURL(url)) throw new Error("正しいストリームではありません");

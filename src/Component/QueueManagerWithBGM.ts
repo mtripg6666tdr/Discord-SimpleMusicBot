@@ -16,10 +16,47 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { QueueContent } from "../Structure/QueueContent";
+import type { AddedBy, QueueContent } from "../Structure/QueueContent";
+import type { KnownAudioSourceIdentifer} from "./QueueManager";
+import type { Member } from "eris";
 
+import * as fs from "fs";
+import * as path from "path";
+
+import * as AudioSource from "../AudioSource";
 import { QueueManager } from "./QueueManager";
 
 export class QueueManagerWithBGM extends QueueManager {
   protected _bgmDefault:QueueContent[] = [];
+
+  moveCurrentTracksToBGM(){
+    this._bgmDefault = [...this._default];
+    this._default = [];
+  }
+
+  override async addQueue(
+    url:string,
+    addedBy:Member|AddedBy,
+    method:"push"|"unshift" = "push",
+    type:KnownAudioSourceIdentifer = "unknown",
+    gotData:AudioSource.exportableCustom = null,
+    preventCache:boolean = false,
+  ):Promise<QueueContent & {index:number}>{
+    if(!url.startsWith("http") && fs.existsSync(path.join(__dirname, "../../", url))){
+      const result = {
+        basicInfo: await (new AudioSource.FsStream().init(url)),
+        additionalInfo: {
+          addedBy: {
+            userId: this.getUserIdFromMember(addedBy) ?? "0",
+            displayName: this.getDisplayNameFromMember(addedBy) ?? "不明"
+          }
+        }
+      } as QueueContent;
+      this._default[method](result);
+      if(this.server.equallyPlayback) this.sortWithAddedBy();
+      const index = this._default.findIndex(q => q === result);
+      return {...result, index};
+    }
+    return super.addQueue(url, addedBy, method, type, gotData, preventCache);
+  }
 }

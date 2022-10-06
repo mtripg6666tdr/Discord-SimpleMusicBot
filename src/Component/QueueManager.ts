@@ -145,7 +145,8 @@ export class QueueManager extends ServerManagerBase {
     addedBy:Member|AddedBy,
     method:"push"|"unshift" = "push",
     type:KnownAudioSourceIdentifer = "unknown",
-    gotData:AudioSource.exportableCustom = null
+    gotData:AudioSource.exportableCustom = null,
+    preventCache:boolean = false,
   ):Promise<QueueContent & {index:number}>{
     return lock(this.addQueueLocker, async () => {
       this.Log("AddQueue called");
@@ -156,7 +157,7 @@ export class QueueManager extends ServerManagerBase {
           basicInfo: await AudioSource.resolve({
             url, type,
             knownData: gotData,
-            forceCache: this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000
+            forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000)
           }),
           additionalInfo: {
             addedBy: {
@@ -480,11 +481,11 @@ export class QueueManager extends ServerManagerBase {
     this._default = sorted;
   }
 
-  private getDisplayNameFromMember(member:Member|AddedBy){
+  protected getDisplayNameFromMember(member:Member|AddedBy){
     return member instanceof Member ? Util.eris.user.getDisplayName(member) : member.displayName;
   }
 
-  private getUserIdFromMember(member:Member|AddedBy){
+  protected getUserIdFromMember(member:Member|AddedBy){
     return member instanceof Member ? member.id : member.userId;
   }
 }

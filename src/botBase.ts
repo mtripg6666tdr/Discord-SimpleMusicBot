@@ -16,6 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { GuildBGMContainerType } from "./Util/config";
 import type * as discord from "eris";
 
 import { execSync } from "child_process";
@@ -137,10 +138,10 @@ export abstract class MusicBotBase extends LogEmitter {
   /**
    * 必要に応じてサーバーデータを初期化します
    */
-  protected initData(guildid:string, channelid:string){
+  protected initData(guildid:string, boundChannelid:string, bgmConfig?:GuildBGMContainerType){
     const prev = this.data[guildid];
     if(!prev){
-      const server = this.data[guildid] = new GuildDataContainer(guildid, channelid, this);
+      const server = this.data[guildid] = new GuildDataContainer(guildid, boundChannelid, this, bgmConfig);
       return server;
     }else{
       return prev;

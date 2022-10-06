@@ -16,53 +16,53 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { UrlStreamInfo } from ".";
-import type { exportableCustom } from "./custom";
+import type { exportableCustom } from ".";
+import type { ReadableStreamInfo } from "./audiosource";
 import type { EmbedField } from "eris";
+
+import * as fs from "fs";
+import * as path from "path";
 
 import { Util } from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { AudioSource } from "./audiosource";
 
-export class GoogleDrive extends AudioSource {
+export class FsStream extends AudioSource {
   protected _lengthSeconds = 0;
-  protected readonly _serviceIdentifer = "googledrive";
+  protected readonly _serviceIdentifer = "fs";
   Thumnail:string = DefaultAudioThumbnailURL;
 
-  async init(url:string, prefetched:exportableCustom){
-    if(prefetched){
-      this.Title = prefetched.title || "Googleドライブストリーム";
-      this.Url = url;
-      this._lengthSeconds = prefetched.length;
-    }else{
-      this.Title = "Googleドライブストリーム";
-      this.Url = url;
-      if(await Util.web.RetriveHttpStatusCode(this.Url) !== 200) throw new Error("URLがみつかりません");
-      try{
-        this._lengthSeconds = await Util.web.RetriveLengthSeconds((await this.fetch()).url);
-      }
-      // eslint-disable-next-line no-empty
-      catch{}
+  async init(url:string){
+    this.Url = url;
+    this.Title = "カスタムストリーム";
+    try{
+      this._lengthSeconds = await Util.web.RetriveLengthSeconds(url);
     }
+    // eslint-disable-next-line no-empty
+    catch{}
     return this;
   }
 
-  async fetch():Promise<UrlStreamInfo>{
-    const id = GoogleDrive.getId(this.Url);
+  async fetch():Promise<ReadableStreamInfo>{
     return {
-      type: "url",
-      url: "https://drive.google.com/uc?id=" + id,
+      type: "readable",
+      stream: fs.createReadStream(path.join(__dirname, "../../", this.Url))
     };
   }
 
   toField(){
     return [{
+      name: ":link:URL",
+      value: this.Url
+    }, {
       name: ":asterisk:詳細",
-      value: "Googleドライブにて共有されたファイル"
+      value: "カスタムストリーム"
     }] as EmbedField[];
   }
 
-  npAdditional(){return "";}
+  npAdditional(){
+    return "";
+  }
 
   exportData():exportableCustom{
     return {
@@ -70,14 +70,5 @@ export class GoogleDrive extends AudioSource {
       length: this._lengthSeconds,
       title: this.Title,
     };
-  }
-
-  static validateUrl(url:string){
-    return Boolean(url.match(/^https?:\/\/drive\.google\.com\/file\/d\/([^/?]+)(\/.+)?$/));
-  }
-
-  static getId(url:string){
-    const match = url.match(/^https?:\/\/drive\.google\.com\/file\/d\/(?<id>[^/?]+)(\/.+)?$/);
-    return match ? match.groups.id : null;
   }
 }

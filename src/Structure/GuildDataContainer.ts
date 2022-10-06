@@ -17,6 +17,7 @@
  */
 
 import type { exportableCustom } from "../AudioSource";
+import type { GuildBGMContainerType } from "../Util/config";
 import type { MusicBotBase } from "../botBase";
 import type { AudioEffect } from "./AudioEffect";
 import type { SearchPanel } from "./SearchPanel";
@@ -35,6 +36,7 @@ import * as ytpl from "ytpl";
 import { SoundCloudS } from "../AudioSource";
 import { PlayManager } from "../Component/PlayManager";
 import { QueueManager } from "../Component/QueueManager";
+import { QueueManagerWithBGM } from "../Component/QueueManagerWithBGM";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
 import Util from "../Util";
 import { LogEmitter } from "./LogEmitter";
@@ -104,12 +106,18 @@ export class GuildDataContainer extends LogEmitter {
    */
   vcPing:number;
 
-  constructor(guildid:string, boundchannelid:string, bot:MusicBotBase){
+  private readonly _bgmConfig:GuildBGMContainerType;
+  get bgmConfig():Readonly<GuildBGMContainerType>{
+    return this._bgmConfig;
+  }
+
+  constructor(guildid:string, boundchannelid:string, bot:MusicBotBase, bgmConfig?:GuildBGMContainerType){
     super();
     this.setTag("GuildDataContainer");
     this.setGuildId(guildid);
     this.searchPanel = null;
-    this.queue = new QueueManager();
+    this.queue = bgmConfig ? new QueueManagerWithBGM() : new QueueManager();
+    this._bgmConfig = bgmConfig;
     this.queue.setBinding(this);
     this.player = new PlayManager();
     this.player.setBinding(this);
@@ -121,6 +129,26 @@ export class GuildDataContainer extends LogEmitter {
     this.equallyPlayback = false;
     this.connection = null;
     this.vcPing = null;
+  }
+
+  /**
+   * BGM設定が存在する場合に、BGM設定を完了します
+   */
+  async initBgmTracks(){
+    if(this.bgmConfig){
+      const { items } = this.bgmConfig;
+      for(let i = 0; i < items.length; i++){
+        await (this.queue as QueueManagerWithBGM).addQueue(items[i], {
+          displayName: "システム",
+          userId: "0"
+        }, "push", "unknown", {
+          title: "BGM",
+          url: items[i],
+          length: -1
+        });
+      }
+      (this.queue as QueueManagerWithBGM).moveCurrentTracksToBGM();
+    }
   }
 
   /**
@@ -161,7 +189,7 @@ export class GuildDataContainer extends LogEmitter {
       const { data } = exportedQueue;
       for(let i = 0; i < data.length; i++){
         const item = data[i];
-        await this.queue.autoAddQueue(this.bot.client, item.url, item.addBy, "unknown", false, false, null, null, item);
+        await this.queue.addQueue(item.url, item.addBy, "push", "unknown", item);
       }
       return true;
     }

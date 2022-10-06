@@ -18,7 +18,7 @@
 
 import * as addOn from "./addon";
 import * as color from "./color";
-import * as config from "./config";
+import config from "./config";
 import * as effects from "./effect";
 import { erisUtil as eris } from "./eris";
 import * as fs from "./fs";

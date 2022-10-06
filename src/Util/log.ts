@@ -20,7 +20,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { isMainThread } from "worker_threads";
 
-import * as config from "./config";
+import config from "./config";
 import { StringifyObject } from "./general";
 
 export type LogLevels = "log"|"warn"|"error"|"debug";

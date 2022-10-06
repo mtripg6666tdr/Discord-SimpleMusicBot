@@ -84,6 +84,19 @@ export class MusicBot extends MusicBotBase {
       });
     }
 
+    // add bgm tracks
+    if(Util.config.bgm){
+      const guildIds = Object.keys(Util.config.bgm);
+      for(let i = 0; i < guildIds.length; i++){
+        if(!this.client.guilds.get(guildIds[i])) continue;
+        await this
+          .initData(guildIds[i], null, Util.config.bgm[guildIds[i]])
+          .initBgmTracks()
+        ;
+      }
+      console.log("a");
+    }
+
     // Recover queues
     if(this.backupper.backuppable){
       const joinedGUildIds = [...client.guilds.values()].map(guild => guild.id);
