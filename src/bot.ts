@@ -94,7 +94,6 @@ export class MusicBot extends MusicBotBase {
           .initBgmTracks()
         ;
       }
-      console.log("a");
     }
 
     // Recover queues
