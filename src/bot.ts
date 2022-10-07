@@ -177,6 +177,9 @@ export class MusicBot extends MusicBotBase {
       // コマンドを解決
       const command = CommandManager.instance.resolve(commandMessage.command);
       if(!command) return;
+      if(server.queue instanceof QueueManagerWithBGM && server.queue.isBGM && !server.bgmConfig.allowEditQueue && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"){
+        return;
+      }
       // 送信可能か確認
       if(!Util.eris.channel.checkSendable(message.channel as discord.TextChannel, this._client.user.id)){
         try{
@@ -255,6 +258,9 @@ export class MusicBot extends MusicBotBase {
       // コマンドを解決
       const command = CommandManager.instance.resolve(interaction.data.name);
       if(command){
+        if(server.queue instanceof QueueManagerWithBGM && server.queue.isBGM && !server.bgmConfig.allowEditQueue && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"){
+          return;
+        }
         // 遅延リプライ
         await interaction.defer();
         // メッセージライクに解決してコマンドメッセージに 

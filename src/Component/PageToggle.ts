@@ -99,7 +99,7 @@ export class PageToggle {
     delIndex.sort((a, b)=>b - a);
     delIndex.forEach(i => {
       toggles[i].Message.edit({
-        content: toggles[i].Message.content === "" ? null : toggles[i].Message.content,
+        content: toggles[i].Message.content,
         embeds: toggles[i].Message.embeds,
         components: []
       });

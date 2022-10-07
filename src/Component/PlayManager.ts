@@ -295,6 +295,7 @@ export class PlayManager extends ServerManagerBase {
       global.gc();
       this.Log("Called exposed gc");
     }
+    this.server.queue instanceof QueueManagerWithBGM && this.server.queue.setToPlayBgm(false);
     return this;
   }
 
@@ -385,7 +386,6 @@ export class PlayManager extends ServerManagerBase {
         await ch.createMessage(":wave:キューが空になったため終了します").catch(e => Util.logger.log(e, "error"));
       }
       this.disconnect();
-      this.server.queue instanceof QueueManagerWithBGM && this.server.queue.setToPlayBgm(false);
     // なくなってないなら再生開始！
     }else{
       this.play(0, this.server.queue instanceof QueueManagerWithBGM && this.server.queue.isBGM);
