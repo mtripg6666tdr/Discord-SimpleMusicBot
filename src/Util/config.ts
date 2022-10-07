@@ -26,7 +26,6 @@ const GuildBGMContainer = z.object({
   voiceChannelId: z.string().regex(/^\d+$/, {message: "channelId is not a snowflake"}),
   allowEditQueue: z.boolean(),
   enableQueueLoop: z.boolean(),
-  mode: z.union([z.literal("only"), z.literal("prior"), z.literal("normal")]),
   items: z.array(z.string()).nonempty({message: "items cannot be empty"}),
 });
 
