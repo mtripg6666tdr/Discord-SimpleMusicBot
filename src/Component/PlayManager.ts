@@ -27,6 +27,7 @@ import { Util } from "../Util";
 import { getColor } from "../Util/color";
 import { getFFmpegEffectArgs } from "../Util/effect";
 import { FallBackNotice } from "../definition";
+import { QueueManagerWithBGM } from "./QueueManagerWithBGM";
 import { resolveStreamToPlayable } from "./streams";
 
 /**
@@ -69,7 +70,7 @@ export class PlayManager extends ServerManagerBase {
    *  接続され、再生途中にあるか（たとえ一時停止されていても）
    */
   get isPlaying():boolean{
-    return this.isConnecting && this.server.connection.playing;
+    return this.isConnecting && this.server.connection.playing && !(this.server.queue as QueueManagerWithBGM).isBGM;
   }
 
   /**
@@ -125,7 +126,13 @@ export class PlayManager extends ServerManagerBase {
   /**
    *  再生します
    */
-  async play(time:number = 0, notify:boolean = true):Promise<PlayManager>{
+  async play(time:number = 0, bgm:boolean = false):Promise<PlayManager>{
+    if(this.server.queue instanceof QueueManagerWithBGM){
+      if(this.server.queue.isBGM && !bgm && this.server.connection?.playing){
+        this.stop();
+      }
+      this.server.queue.setToPlayBgm(bgm);
+    }
     /* eslint-disable operator-linebreak */
     /* eslint-disable @typescript-eslint/indent */
     // 再生できる状態か確認
@@ -135,7 +142,7 @@ export class PlayManager extends ServerManagerBase {
       // なにかしら再生中
       || this.isPlaying
       // キューが空
-      || this.server.queue.isEmpty
+      || (this.server.queue.isEmpty && (!bgm || (bgm && (this.server.queue as QueueManagerWithBGM).isBgmEmpty)))
       // 準備中
       || this.preparing
     ;
@@ -149,7 +156,7 @@ export class PlayManager extends ServerManagerBase {
     this.preparing = true;
     let mes:Message = null;
     this._currentAudioInfo = this.server.queue.get(0).basicInfo;
-    if(this.server.boundTextChannel && notify){
+    if(this.server.boundTextChannel && !bgm){
       const [min, sec] = Util.time.CalcMinSec(this.currentAudioInfo.LengthSeconds);
       const isLive = this.currentAudioInfo.isYouTube() && this.currentAudioInfo.LiveStream;
       mes = await this.server.bot.client.createMessage(
@@ -180,7 +187,7 @@ export class PlayManager extends ServerManagerBase {
         throw errorWhileWaiting;
       }
       // 各種準備
-      this._errorReportChannel = mes.channel as TextChannel;
+      this._errorReportChannel = mes?.channel as TextChannel;
       this._cost = cost;
       t.end();
       // 再生
@@ -331,7 +338,7 @@ export class PlayManager extends ServerManagerBase {
         console.error(er);
       }
     }
-    this._errorReportChannel.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
+    this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
     this.onStreamFailed();
   }
 
@@ -370,16 +377,18 @@ export class PlayManager extends ServerManagerBase {
       await this.server.queue.next();
     }
     // キューがなくなったら接続終了
-    if(this.server.queue.length === 0){
+    if(this.server.queue.isEmpty && (!(this.server.queue instanceof QueueManagerWithBGM) || this.server.queue.isBgmEmpty)){
       this.Log("Queue empty");
       if(this.server.boundTextChannel){
         const ch = this.server.bot.client.getChannel(this.server.boundTextChannel) as TextChannel;
+        if(!ch) return;
         await ch.createMessage(":wave:キューが空になったため終了します").catch(e => Util.logger.log(e, "error"));
       }
       this.disconnect();
+      this.server.queue instanceof QueueManagerWithBGM && this.server.queue.setToPlayBgm(false);
     // なくなってないなら再生開始！
     }else{
-      this.play();
+      this.play(0, this.server.queue instanceof QueueManagerWithBGM && this.server.queue.isBGM);
     }
   }
 

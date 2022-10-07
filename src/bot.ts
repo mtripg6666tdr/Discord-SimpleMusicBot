@@ -23,6 +23,7 @@ import * as discord from "eris";
 import { CommandManager } from "./Component/CommandManager";
 import { CommandMessage } from "./Component/CommandMessage";
 import { PageToggle } from "./Component/PageToggle";
+import { QueueManagerWithBGM } from "./Component/QueueManagerWithBGM";
 import { ResponseMessage } from "./Component/ResponseMessage";
 import { GuildDataContainer } from "./Structure";
 import { Util } from "./Util";
@@ -59,6 +60,7 @@ export class MusicBot extends MusicBotBase {
       .on("interactionCreate", this.onInteractionCreate.bind(this))
       .on("voiceChannelJoin", this.onVoiceChannelJoin.bind(this))
       .on("voiceChannelLeave", this.onVoiceChannelLeave.bind(this))
+      .on("voiceChannelSwitch", this.onVoiceChannelSwitch.bind(this))
       .on("error", this.onError.bind(this))
     ;
   }
@@ -90,7 +92,7 @@ export class MusicBot extends MusicBotBase {
       for(let i = 0; i < guildIds.length; i++){
         if(!this.client.guilds.get(guildIds[i])) continue;
         await this
-          .initData(guildIds[i], null, Util.config.bgm[guildIds[i]])
+          .initData(guildIds[i], "0", Util.config.bgm[guildIds[i]])
           .initBgmTracks()
         ;
       }
@@ -358,6 +360,12 @@ export class MusicBot extends MusicBotBase {
             });
         });
       }
+    }else if(this.data[member.guild.id]){
+      const server = this.data[member.guild.id];
+      if(!server.connection && server.queue instanceof QueueManagerWithBGM && newChannel.id === server.bgmConfig.voiceChannelId){
+        // BGMターゲット
+        server.playBgmTracks();
+      }
     }
   }
 
@@ -371,10 +379,19 @@ export class MusicBot extends MusicBotBase {
       if(!bound) return;
       await this._client.createMessage(bound.id, ":postbox: 正常に切断しました").catch(e => this.Log(e));
     }else if(oldChannel.voiceMembers.has(this._client.user.id) && oldChannel.voiceMembers.size === 1){
-      // 誰も聞いてる人がいない場合一時停止
-      server.player.pause();
-      await this._client.createMessage(server.boundTextChannel, ":pause_button:ボイスチャンネルから誰もいなくなったため一時停止しました").catch(e => this.Log(e));
+      if(server.queue instanceof QueueManagerWithBGM && server.queue.isBGM){
+        server.player.disconnect();
+      }else if(server.player.isPlaying){
+        // 誰も聞いてる人がいない場合一時停止
+        server.player.pause();
+        await this._client.createMessage(server.boundTextChannel, ":pause_button:ボイスチャンネルから誰もいなくなったため一時停止しました").catch(e => this.Log(e));
+      }
     }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async onVoiceChannelSwitch(member:discord.Member, newChannel:discord.TextVoiceChannel, oldChanne:discord.TextVoiceChannel){
+    this.onVoiceChannelJoin(member, newChannel);
   }
 
   private async onError(er:Error){

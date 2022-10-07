@@ -28,10 +28,38 @@ import { QueueManager } from "./QueueManager";
 
 export class QueueManagerWithBGM extends QueueManager {
   protected _bgmDefault:QueueContent[] = [];
+  protected _bgmInitial:QueueContent[] = [];
+
+  protected _isBGM:boolean = false;
+  get isBGM(){
+    return this._isBGM;
+  }
 
   moveCurrentTracksToBGM(){
     this._bgmDefault = [...this._default];
+    this._bgmInitial = [...this._default];
     this._default = [];
+    this.Log(`Moved ${this._bgmDefault.length} tracks to bgm queue, and the default queue is now empty`);
+  }
+
+  resetBgmTracks(){
+    this._bgmDefault = [...this._bgmInitial];
+  }
+
+  setToPlayBgm(val:boolean = true){
+    this._isBGM = val;
+  }
+
+  get bgmLength(){
+    return this._bgmDefault.length;
+  }
+
+  get isBgmEmpty(){
+    return this._bgmDefault.length === 0;
+  }
+
+  override get(index:number){
+    return this.isBGM ? this._bgmDefault[index] : super.get(index);
   }
 
   override async addQueue(
@@ -58,5 +86,17 @@ export class QueueManagerWithBGM extends QueueManager {
       return {...result, index};
     }
     return super.addQueue(url, addedBy, method, type, gotData, preventCache);
+  }
+
+  override async next(){
+    if(this.isBGM){
+      this.server.player.resetError();
+      if(this.server.bgmConfig.enableQueueLoop){
+        this._bgmDefault.push(this._bgmDefault[0]);
+      }
+      this._bgmDefault.shift();
+    }else{
+      return super.next();
+    }
   }
 }

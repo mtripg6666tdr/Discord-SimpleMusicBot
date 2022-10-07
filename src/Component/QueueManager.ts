@@ -71,7 +71,7 @@ export class QueueManager extends ServerManagerBase {
   }
 
   /**
-   * きゅの長さ（時間秒）
+   * キューの長さ（時間秒）
    */
   get lengthSeconds():number{
     return this.default.reduce((prev, current) => prev + Number(current.basicInfo.LengthSeconds), 0);
@@ -106,7 +106,7 @@ export class QueueManager extends ServerManagerBase {
    * @param predicate 条件を表す関数
    * @returns 条件に適合した要素の配列
    */
-  filter(predicate: (value: QueueContent, index: number, array: QueueContent[]) => unknown, thisArg?: any):QueueContent[]{
+  filter(predicate: (value: QueueContent, index: number, array: QueueContent[]) => unknown, thisArg?: any){
     return this.default.filter(predicate, thisArg);
   }
 
@@ -115,7 +115,7 @@ export class QueueManager extends ServerManagerBase {
    * @param predicate 条件
    * @returns インデックス
    */
-  findIndex(predicate: (value: QueueContent, index: number, obj: QueueContent[]) => unknown, thisArg?: any):number{
+  findIndex(predicate: (value: QueueContent, index: number, obj: QueueContent[]) => unknown, thisArg?: any){
     return this.default.findIndex(predicate, thisArg);
   }
 
@@ -418,7 +418,7 @@ export class QueueManager extends ServerManagerBase {
    * @param validator 条件を表す関数
    * @returns 削除されたオフセットの一覧
    */
-  removeIf(validator:(q:QueueContent)=>boolean):number[]{
+  removeIf(validator:(q:QueueContent)=>boolean){
     this.Log("RemoveIf Called");
     PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     if(this._default.length === 0) return [];

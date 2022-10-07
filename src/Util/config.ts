@@ -27,7 +27,6 @@ const GuildBGMContainer = z.object({
   allowEditQueue: z.boolean(),
   enableQueueLoop: z.boolean(),
   mode: z.union([z.literal("only"), z.literal("prior"), z.literal("normal")]),
-  notifyChannel: z.string().regex(/^\d+$/, {message: "notifyChannel is not a snowflake"}),
   items: z.array(z.string()).nonempty({message: "items cannot be empty"}),
 });
 

@@ -47,7 +47,7 @@ import { YmxVersion } from "./YmxFormat";
  */
 export class GuildDataContainer extends LogEmitter {
   private readonly _cancellations = [] as TaskCancellationManager[];
-  private get cancellations():Readonly<GuildDataContainer["_cancellations"]>{
+  private get cancellations():Readonly<TaskCancellationManager[]>{
     return this._cancellations;
   }
   
@@ -151,11 +151,26 @@ export class GuildDataContainer extends LogEmitter {
     }
   }
 
+  playBgmTracks(){
+    if(!this.bgmConfig) throw new Error("no bgm configuration found!");
+    if(!this.bgmConfig.enableQueueLoop){
+      (this.queue as QueueManagerWithBGM).resetBgmTracks();
+    }
+    return this._joinVoiceChannel(this.bgmConfig.voiceChannelId)
+      .then(() => this.player.play(0, /* BGM */ true))
+      .catch(er => this.Log(er, "error"))
+    ;
+  }
+
   /**
    * 状況に応じてバインドチャンネルを更新します
    * @param message 更新元となるメッセージ
    */
-  updateBoundChannel(message:CommandMessage){
+  updateBoundChannel(message:CommandMessage|string){
+    if(typeof message === "string"){
+      this.boundTextChannel = message;
+      return;
+    }
     if(
       !this.player.isConnecting
       || (message.member.voiceState.channelID && (this.bot.client.getChannel(message.member.voiceState.channelID) as VoiceChannel).voiceMembers.has(this.bot.client.user.id))
