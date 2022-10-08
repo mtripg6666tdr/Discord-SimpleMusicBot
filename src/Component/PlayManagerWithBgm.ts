@@ -61,7 +61,7 @@ export class PlayManagerWithBgm extends PlayManager {
     return result;
   }
 
-  protected override async onStreamFinished(){
+  override async onStreamFinished(){
     if(this.server.connection && this.server.connection.playing){
       await Util.general.waitForEnteringState(() => !this.server.connection || !this.server.connection.playing, 20 * 1000)
         .catch(() => {

@@ -285,6 +285,7 @@ export class GuildDataContainer extends LogEmitter {
         this.Log("[Connection] " + Util.general.StringifyObject(err), "error");
         this.player.handleError(err);
       })
+      .on("end", this.player.onStreamFinished.bind(this.player))
       .on("pong", ping => this.vcPing = ping)
     ;
     if(Util.config.debug){

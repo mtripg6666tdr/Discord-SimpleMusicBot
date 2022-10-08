@@ -180,7 +180,6 @@ export class PlayManager extends ServerManagerBase {
         });
         // setup volume
         this.setVolume(this.volume);
-        stream.on("end", this.onStreamFinished.bind(this));
         // wait for entering playing state
         await Util.general.waitForEnteringState(() => this.server.connection.playing);
         this.preparing = false;
@@ -267,7 +266,9 @@ export class PlayManager extends ServerManagerBase {
   */
   stop():PlayManager{
     this.Log("Stop called");
+    this.server.connection.removeAllListeners("end");
     this.server.connection?.stopPlaying();
+    this.server.connection.on("end", this.onStreamFinished.bind(this));
     this.server.bot.backupper.backupData();
     return this;
   }
@@ -343,7 +344,7 @@ export class PlayManager extends ServerManagerBase {
     this._errorUrl = "";
   }
 
-  protected async onStreamFinished(){
+  async onStreamFinished(){
     this.Log("onStreamFinished called");
     if(this.server.connection && this.server.connection.playing){
       await Util.general.waitForEnteringState(() => !this.server.connection || !this.server.connection.playing, 20 * 1000)
@@ -387,7 +388,7 @@ export class PlayManager extends ServerManagerBase {
     }
   }
 
-  protected async onStreamFailed(){
+  async onStreamFailed(){
     this.Log("onStreamFailed called");
     this._cost = 0;
     if(this._errorUrl === this.currentAudioInfo.Url){
