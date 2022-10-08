@@ -178,7 +178,25 @@ export class MusicBot extends MusicBotBase {
       // コマンドを解決
       const command = CommandManager.instance.resolve(commandMessage.command);
       if(!command) return;
-      if(server instanceof GuildDataContainerWithBgm && ((server.queue.isBGM && !server.bgmConfig.allowEditQueue) || server.bgmConfig.mode === "only") && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"){
+      if(
+        // BGM構成が存在するサーバー
+        server instanceof GuildDataContainerWithBgm
+        && (
+          (
+            // いまBGM再生中
+            server.queue.isBGM
+            && (
+              // キューの編集を許可していない、またはBGM優先モード
+              !server.bgmConfig.allowEditQueue || server.bgmConfig.mode === "prior"
+            )
+          )
+          // BGMが再生していなければ、BGMオンリーモードであれば
+          || server.bgmConfig.mode === "only"
+        )
+        // かつBGM構成で制限があるときに実行できないコマンドならば
+        && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"
+      ){
+        // 無視して返却
         return;
       }
       // 送信可能か確認
@@ -259,7 +277,25 @@ export class MusicBot extends MusicBotBase {
       // コマンドを解決
       const command = CommandManager.instance.resolve(interaction.data.name);
       if(command){
-        if(server instanceof GuildDataContainerWithBgm && ((server.queue.isBGM && !server.bgmConfig.allowEditQueue) || server.bgmConfig.mode === "only") && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"){
+        if(
+          // BGM構成が存在するサーバー
+          server instanceof GuildDataContainerWithBgm
+          && (
+            (
+              // いまBGM再生中
+              server.queue.isBGM
+              && (
+                // キューの編集を許可していない、またはBGM優先モード
+                !server.bgmConfig.allowEditQueue || server.bgmConfig.mode === "prior"
+              )
+            )
+            // BGMが再生していなければ、BGMオンリーモードであれば
+            || server.bgmConfig.mode === "only"
+          )
+          // かつBGM構成で制限があるときに実行できないコマンドならば
+          && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"
+        ){
+          // 無視して返却
           return;
         }
         // 遅延リプライ

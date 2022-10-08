@@ -43,6 +43,7 @@ export class PlayManager extends ServerManagerBase {
   protected _preparing = false;
   protected _currentAudioInfo = null as AudioSource;
   protected _cost = 0;
+  readonly onStreamFinishedBindThis:any = null;
 
   get preparing(){
     return this._preparing;
@@ -103,6 +104,7 @@ export class PlayManager extends ServerManagerBase {
     super();
     this.setTag("PlayManager");
     this.Log("Play Manager instantiated");
+    this.onStreamFinishedBindThis = this.onStreamFinished.bind(this);
   }
 
   /**
@@ -266,9 +268,9 @@ export class PlayManager extends ServerManagerBase {
   */
   stop():PlayManager{
     this.Log("Stop called");
-    this.server.connection.removeAllListeners("end");
+    this.server.connection.off("end", this.onStreamFinishedBindThis);
     this.server.connection?.stopPlaying();
-    this.server.connection.on("end", this.onStreamFinished.bind(this));
+    this.server.connection.on("end", this.onStreamFinishedBindThis);
     this.server.bot.backupper.backupData();
     return this;
   }

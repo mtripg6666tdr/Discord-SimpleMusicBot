@@ -277,17 +277,19 @@ export class GuildDataContainer extends LogEmitter {
    * @param channelId 接続先のボイスチャンネルのID
    */
   protected async _joinVoiceChannel(channelId:string){
-    const connection = this.connection = await this.bot.client.joinVoiceChannel(channelId, {
+    const connection = await this.bot.client.joinVoiceChannel(channelId, {
       selfDeaf: true,
     });
+    if(this.connection === connection) return;
     connection
       .on("error", err => {
         this.Log("[Connection] " + Util.general.StringifyObject(err), "error");
         this.player.handleError(err);
       })
-      .on("end", this.player.onStreamFinished.bind(this.player))
+      .on("end", this.player.onStreamFinishedBindThis)
       .on("pong", ping => this.vcPing = ping)
     ;
+    this.connection = connection;
     if(Util.config.debug){
       connection.on("debug", mes => this.Log("[Connection] " + mes, "debug"));
     }

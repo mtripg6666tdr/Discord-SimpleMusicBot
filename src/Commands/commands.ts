@@ -62,7 +62,7 @@ export default class Commands extends BaseCommand {
       // 引数がない場合は全コマンドの一覧を表示
       const embed = [] as MessageEmbedBuilder[];
       const getCategoryText = (label:string)=>{
-        // @ts-ignore
+        // @ts-expect-error
         return categories[label as any] as string;
       };
       const rawcommands = CommandManager.instance.commands.filter(ci => !ci.unlist);
