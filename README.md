@@ -49,7 +49,8 @@ YouTubeなどからの再生に対応。
 - 👍 Botに関するサポート(下記)
 
 ## ガイド
-URL
+ボットの設定方法、コマンドなどはこちらからご覧になれます。  
+- [ドキュメント](https://web.usamyon.moe/Discord-SimpleMusicBot/)
   
 ## 注意
 開発中のためバグが多々あります。  
