@@ -109,7 +109,7 @@ export class PlayManager extends ServerManagerBase {
   /**
    *  親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
    */
-  setBinding(data:GuildDataContainer){
+  override setBinding(data:GuildDataContainer){
     this.Log("Set data of guild id " + data.guildId);
     super.setBinding(data);
   }
@@ -126,28 +126,9 @@ export class PlayManager extends ServerManagerBase {
   /**
    *  再生します
    */
-  async play(time:number = 0, bgm:boolean = false):Promise<PlayManager>{
-    if(this.server instanceof GuildDataContainerWithBgm){
-      if(this.server.queue.isBGM && !bgm && this.server.connection?.playing){
-        this.stop();
-      }
-      this.server.queue.setToPlayBgm(bgm);
-    }
-    /* eslint-disable operator-linebreak */
-    /* eslint-disable @typescript-eslint/indent */
+  async play(time:number = 0):Promise<PlayManager>{
     // 再生できる状態か確認
-    const badCondition =
-      // 接続していない
-        !this.isConnecting
-      // なにかしら再生中
-      || this.isPlaying
-      // キューが空
-      || (this.server.queue.isEmpty && (!bgm || (bgm && (this.server as GuildDataContainerWithBgm).queue.isBgmEmpty)))
-      // 準備中
-      || this.preparing
-    ;
-    /* eslint-enable operator-linebreak */
-    /* eslint-enable @typescript-eslint/indent */
+    const badCondition = this.getIsBadCondition();
     if(badCondition){
       this.Log("Play called but operated nothing", "warn");
       return this;
@@ -156,7 +137,7 @@ export class PlayManager extends ServerManagerBase {
     this.preparing = true;
     let mes:Message = null;
     this._currentAudioInfo = this.server.queue.get(0).basicInfo;
-    if(this.server.boundTextChannel && !bgm){
+    if(this.getNoticeNeeded()){
       const [min, sec] = Util.time.CalcMinSec(this.currentAudioInfo.LengthSeconds);
       const isLive = this.currentAudioInfo.isYouTube() && this.currentAudioInfo.LiveStream;
       mes = await this.server.bot.client.createMessage(
@@ -265,6 +246,22 @@ export class PlayManager extends ServerManagerBase {
     return this;
   }
 
+  protected getIsBadCondition(){
+    // 再生できる状態か確認
+    return /* 接続していない */ !this.isConnecting
+      // なにかしら再生中
+      || this.isPlaying
+      // キューが空
+      || this.server.queue.isEmpty
+      // 準備中
+      || this.preparing
+    ;
+  }
+
+  protected getNoticeNeeded(){
+    return !!this.server.boundTextChannel;
+  }
+
   /** 
    * 停止します。切断するにはDisconnectを使用してください。
    * @returns this
@@ -348,7 +345,7 @@ export class PlayManager extends ServerManagerBase {
     this._errorUrl = "";
   }
 
-  private async onStreamFinished(){
+  protected async onStreamFinished(){
     this.Log("onStreamFinished called");
     if(this.server.connection){
       await Util.general.waitForEnteringState(() => !this.server.connection || !this.server.connection.playing, 20 * 1000)
@@ -366,12 +363,12 @@ export class PlayManager extends ServerManagerBase {
     this._cost = 0;
     if(this.server.queue.loopEnabled){
       // 曲ループオンならばもう一度再生
-      this.play();
+      this.playAfterFinished();
       return;
     }else if(this.server.queue.onceLoopEnabled){
       // ワンスループが有効ならもう一度同じものを再生
       this.server.queue.onceLoopEnabled = false;
-      this.play();
+      this.playAfterFinished();
       return;
     }else{
       // キュー整理
@@ -388,11 +385,15 @@ export class PlayManager extends ServerManagerBase {
       this.disconnect();
     // なくなってないなら再生開始！
     }else{
-      this.play(0, this.server instanceof GuildDataContainerWithBgm && this.server.queue.isBGM);
+      this.playAfterFinished();
     }
   }
 
-  private async onStreamFailed(){
+  protected playAfterFinished(time?:number){
+    this.play(time);
+  }
+
+  protected async onStreamFailed(){
     this.Log("onStreamFailed called");
     this._cost = 0;
     if(this._errorUrl === this.currentAudioInfo.Url){

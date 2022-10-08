@@ -40,7 +40,7 @@ export class MusicBot extends MusicBotBase {
   private readonly _addOn = new Util.addOn.AddOn();
   private _isReadyFinished = false;
 
-  constructor(token:string, protected readonly maintenance:boolean = false){
+  constructor(token:string, maintenance:boolean = false){
     super(maintenance);
 
     this._client = new discord.Client(token, {

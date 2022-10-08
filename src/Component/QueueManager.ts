@@ -87,7 +87,7 @@ export class QueueManager extends ServerManagerBase {
     this.Log("QueueManager instantiated");
   }
 
-  setBinding(data:GuildDataContainer){
+  override setBinding(data:GuildDataContainer){
     this.Log("Set data of guild id " + data.guildId);
     super.setBinding(data);
   }

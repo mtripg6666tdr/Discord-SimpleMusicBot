@@ -19,6 +19,7 @@
 import type { GuildBGMContainerType } from "../Util/config";
 import type { MusicBotBase } from "../botBase";
 
+import { PlayManagerWithBgm } from "../Component/PlayManagerWithBgm";
 import { QueueManagerWithBgm } from "../Component/QueueManagerWithBGM";
 import { GuildDataContainer } from "./GuildDataContainer";
 
@@ -28,9 +29,19 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
     return this._queue;
   }
 
+  protected override _player: PlayManagerWithBgm;
+  override get player(){
+    return this._player;
+  }
+
   protected _bgmConfig:GuildBGMContainerType;
   get bgmConfig():Readonly<GuildBGMContainerType>{
     return this._bgmConfig;
+  }
+
+  protected override initPlayManager(){
+    this._player = new PlayManagerWithBgm();
+    this._queue.setBinding(this);
   }
 
   protected override initQueueManager(){
