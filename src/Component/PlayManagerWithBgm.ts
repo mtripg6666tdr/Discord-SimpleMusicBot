@@ -23,6 +23,10 @@ export class PlayManagerWithBgm extends PlayManager {
   protected override server: GuildDataContainerWithBgm;
   private _bgm:boolean = false;
 
+  override get isPlaying():boolean{
+    return this.isConnecting && this.server.connection.playing && this.server.queue.isBGM;
+  }
+
   override async play(time?: number, bgm: boolean = false){
     if(this.server instanceof GuildDataContainerWithBgm){
       if(this.server.queue.isBGM && !bgm && this.server.connection?.playing){
@@ -40,7 +44,7 @@ export class PlayManagerWithBgm extends PlayManager {
       // なにかしら再生中
       || this.isPlaying
       // キューが空
-      || (this.server.queue.isEmpty && (!this._bgm || this.server.queue.isBgmEmpty))
+      || this.getQueueEmpty()
       // 準備中
       || this.preparing
     ;
@@ -48,6 +52,10 @@ export class PlayManagerWithBgm extends PlayManager {
 
   protected override getNoticeNeeded(){
     return this.server.boundTextChannel && !this._bgm;
+  }
+
+  protected override getQueueEmpty(){
+    return this.server.queue.isEmpty && (!this._bgm || this.server.queue.isBgmEmpty);
   }
 
   protected override playAfterFinished(time?: number){

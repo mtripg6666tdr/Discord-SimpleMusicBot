@@ -70,7 +70,7 @@ export class PlayManager extends ServerManagerBase {
    *  接続され、再生途中にあるか（たとえ一時停止されていても）
    */
   get isPlaying():boolean{
-    return this.isConnecting && this.server.connection.playing && (!(this.server instanceof GuildDataContainerWithBgm) || this.server.queue.isBGM);
+    return this.isConnecting && this.server.connection.playing;
   }
 
   /**
@@ -375,7 +375,7 @@ export class PlayManager extends ServerManagerBase {
       await this.server.queue.next();
     }
     // キューがなくなったら接続終了
-    if(this.server.queue.isEmpty && (!(this.server instanceof GuildDataContainerWithBgm) || this.server.queue.isBgmEmpty)){
+    if(this.getQueueEmpty()){
       this.Log("Queue empty");
       if(this.server.boundTextChannel){
         const ch = this.server.bot.client.getChannel(this.server.boundTextChannel) as TextChannel;
@@ -387,6 +387,10 @@ export class PlayManager extends ServerManagerBase {
     }else{
       this.playAfterFinished();
     }
+  }
+
+  protected getQueueEmpty(){
+    return this.server.queue.isEmpty;
   }
 
   protected playAfterFinished(time?:number){
