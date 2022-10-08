@@ -17,6 +17,7 @@
  */
 
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
+import Util from "../Util";
 import { PlayManager } from "./PlayManager";
 
 export class PlayManagerWithBgm extends PlayManager {
@@ -34,7 +35,7 @@ export class PlayManagerWithBgm extends PlayManager {
       }
       this.server.queue.setToPlayBgm(bgm);
     }
-    this._bgm = bgm;
+    if(!this.getIsBadCondition()) this._bgm = bgm;
     return super.play(time);
   }
 
@@ -44,7 +45,7 @@ export class PlayManagerWithBgm extends PlayManager {
       // なにかしら再生中
       || this.isPlaying
       // キューが空
-      || this.getQueueEmpty()
+      || this.server.queue.isEmpty && (!this._bgm || this.server.queue.isBgmEmpty)
       // 準備中
       || this.preparing
     ;
@@ -54,11 +55,35 @@ export class PlayManagerWithBgm extends PlayManager {
     return this.server.boundTextChannel && !this._bgm;
   }
 
-  protected override getQueueEmpty(){
-    return this.server.queue.isEmpty && (!this._bgm || this.server.queue.isBgmEmpty);
+  override disconnect(){
+    const result = super.disconnect();
+    this.server.queue.setToPlayBgm(false);
+    return result;
   }
 
-  protected override playAfterFinished(time?: number){
-    this.play(time, this.server.queue.isBGM);
+  protected override async onStreamFinished(){
+    if(this.server.connection && this.server.connection.play){
+      await Util.general.waitForEnteringState(() => !this.server.connection || !this.server.connection.playing, 20 * 1000)
+        .catch(() => {
+          this.Log("Stream has not ended in time and will force stream into destroying", "warn");
+          this.stop();
+        })
+      ;
+    }
+    // 再生が終わったら
+    this._errorCount = 0;
+    this._errorUrl = "";
+    this._cost = 0;
+    if(this._bgm){
+      this.server.queue.next();
+      if(this.server.queue.isBgmEmpty){
+        this.Log("Queue empty");
+        this.disconnect();
+      }else{
+        this.play(0, true);
+      }
+    }else{
+      return super.onStreamFinished();
+    }
   }
 }

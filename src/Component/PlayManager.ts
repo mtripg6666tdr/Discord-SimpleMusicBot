@@ -23,7 +23,6 @@ import type { Message, TextChannel, VoiceChannel } from "eris";
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { ServerManagerBase } from "../Structure";
-import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
 import { getFFmpegEffectArgs } from "../Util/effect";
@@ -35,15 +34,15 @@ import { resolveStreamToPlayable } from "./streams";
  * 再生や一時停止などの処理を行います。
  */
 export class PlayManager extends ServerManagerBase {
-  private readonly retryLimit = 3;
-  private _seek = 0;
-  private _errorReportChannel = null as TextChannel;
-  private _volume = 100;
-  private _errorCount = 0;
-  private _errorUrl = "";
-  private _preparing = false;
-  private _currentAudioInfo = null as AudioSource;
-  private _cost = 0;
+  protected readonly retryLimit = 3;
+  protected _seek = 0;
+  protected _errorReportChannel = null as TextChannel;
+  protected _volume = 100;
+  protected _errorCount = 0;
+  protected _errorUrl = "";
+  protected _preparing = false;
+  protected _currentAudioInfo = null as AudioSource;
+  protected _cost = 0;
 
   get preparing(){
     return this._preparing;
@@ -292,7 +291,6 @@ export class PlayManager extends ServerManagerBase {
       global.gc();
       this.Log("Called exposed gc");
     }
-    this.server instanceof GuildDataContainerWithBgm && this.server.queue.setToPlayBgm(false);
     return this;
   }
 
@@ -347,7 +345,7 @@ export class PlayManager extends ServerManagerBase {
 
   protected async onStreamFinished(){
     this.Log("onStreamFinished called");
-    if(this.server.connection){
+    if(this.server.connection && this.server.connection.playing){
       await Util.general.waitForEnteringState(() => !this.server.connection || !this.server.connection.playing, 20 * 1000)
         .catch(() => {
           this.Log("Stream has not ended in time and will force stream into destroying", "warn");
@@ -363,19 +361,19 @@ export class PlayManager extends ServerManagerBase {
     this._cost = 0;
     if(this.server.queue.loopEnabled){
       // 曲ループオンならばもう一度再生
-      this.playAfterFinished();
+      this.play();
       return;
     }else if(this.server.queue.onceLoopEnabled){
       // ワンスループが有効ならもう一度同じものを再生
       this.server.queue.onceLoopEnabled = false;
-      this.playAfterFinished();
+      this.play();
       return;
     }else{
       // キュー整理
       await this.server.queue.next();
     }
     // キューがなくなったら接続終了
-    if(this.getQueueEmpty()){
+    if(this.server.queue.isEmpty){
       this.Log("Queue empty");
       if(this.server.boundTextChannel){
         const ch = this.server.bot.client.getChannel(this.server.boundTextChannel) as TextChannel;
@@ -385,16 +383,8 @@ export class PlayManager extends ServerManagerBase {
       this.disconnect();
     // なくなってないなら再生開始！
     }else{
-      this.playAfterFinished();
+      this.play();
     }
-  }
-
-  protected getQueueEmpty(){
-    return this.server.queue.isEmpty;
-  }
-
-  protected playAfterFinished(time?:number){
-    this.play(time);
   }
 
   protected async onStreamFailed(){
