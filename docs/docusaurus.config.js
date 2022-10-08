@@ -53,7 +53,7 @@ const config = {
         title: 'Discord-SimpleMusicBot',
         logo: {
           alt: 'My Site Logo',
-          src: 'img/logo.svg',
+          src: 'img/icon.png',
         },
         items: [
           {
@@ -79,16 +79,20 @@ const config = {
         style: 'dark',
         links: [
           {
-            title: 'Docs',
+            title: 'ドキュメント',
             items: [
               {
-                label: 'Tutorial',
-                to: '/docs/intro',
+                label: 'ドキュメント',
+                to: '/docs/docs/welcome',
               },
+              {
+                label: 'ガイド',
+                to: '/docs/commands/overview'
+              }
             ],
           },
           {
-            title: 'Community',
+            title: 'コミュニティ',
             items: [
               {
                 label: 'Discord',
@@ -97,7 +101,7 @@ const config = {
             ],
           },
           {
-            title: 'Development',
+            title: '開発',
             items: [
               {
                 label: 'GitHub',
