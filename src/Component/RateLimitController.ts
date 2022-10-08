@@ -30,9 +30,6 @@ export class RateLimitController {
       if(sub < 10 * 1000) cnt10sec++;
       return sub < 60 * 1000;
     });
-    console.log(this.store[key]);
-    console.log(`IN 60 SEC: ${this.store[key].length}`);
-    console.log(`IN 10 SEC: ${cnt10sec}`);
     if(this.store[key].length > 15 || cnt10sec > 5){
       if(Date.now() - this.store[key][this.store[key].length - 1] < 2 * 1000){
         this.store[key].push(Date.now());
