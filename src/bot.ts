@@ -395,10 +395,10 @@ export class MusicBot extends MusicBotBase {
       }
     }
   }
-  
+
   private async onVoiceChannelSwitch(member:discord.Member, newChannel:discord.TextVoiceChannel, oldChannel:discord.TextVoiceChannel){
     this.onVoiceChannelJoin(member, newChannel);
-    this.onVoiceChannelLeave(member, oldChannel);
+    if(member.id !== this.client.user.id) this.onVoiceChannelLeave(member, oldChannel);
   }
 
   private async onError(er:Error){
