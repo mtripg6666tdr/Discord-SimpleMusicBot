@@ -1,0 +1,31 @@
+name: Deploy Documentation
+on:
+  workflow_dispatch:
+  
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3.5.0
+        with:
+          node-version: '16.x'
+      
+      - name: Install dependencies on root
+        run: npm ci
+      
+      - name: Install dependencies on docs
+        working-directory: "docs"
+        run: npm ci
+
+      - name: Update documentation
+        working-directory: "docs"
+        run: |
+          npm run build
+          npm run deploy
+        env:
+          GIT_USER: mtripg6666tdr
+          GIT_PASS: ${{ secrets.GH_PAT }}

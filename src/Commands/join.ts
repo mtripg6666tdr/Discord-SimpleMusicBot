@@ -31,6 +31,7 @@ export default class Join extends BaseCommand {
       description: "ボイスチャンネルに参加します",
       unlist: false,
       category: "voice",
+      permissionDescription: "なし",
     });
   }
 

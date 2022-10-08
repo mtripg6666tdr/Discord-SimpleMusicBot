@@ -42,7 +42,8 @@ export default class Mv extends BaseCommand {
         name: "to",
         description: "移動先のインデックス。キューに併記されているものです",
         required: true
-      }]
+      }],
+      permissionDescription: "DJロール",
     });
   }
 

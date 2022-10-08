@@ -6,3 +6,4 @@ util/exampleDbServer/node/dist
 !src/Util
 test/*
 dist/*
+docs

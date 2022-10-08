@@ -30,61 +30,28 @@ const commands = new CommandManager().commands.filter(
    * @param { import("../src/Commands").BaseCommand } c 
    * @returns { boolean }
    */
-  c => !c.unlist
+  c => !c.unlist || !!c.permissionDescription
 );
 
-let md = "";
-/**
- * @param {string} line 
- */
-const addLine = function(line){
-  md += line + "\r\n";
-};
-addLine("# 利用可能なコマンド一覧");
-addLine("本ボットで現在可能なコマンドの一覧です  ");
-addLine("エイリアスの中にある文字列で代用することもできます(テキストベースのコマンド使用のみ)  ");
-addLine("  ");
-addLine("コマンドとは別に超省略形も使用することができます  ");
-addLine("例: `!https://~`  ");
-addLine("# 目次");
-categoriesList.forEach(category => {
-  addLine(`- [${categories[category]}](#${categories[category]})`);
-})
-/**
- * @type { {[key in keyof typeof categories]:import("../src/Commands").BaseCommand[] } }
- */
-// @ts-ignore
-const categorized = {};
-commands.forEach(c => {
-  if(categorized[c.category])
-    categorized[c.category].push(c);
-  else
-    categorized[c.category] = [c];
-});
+for(let i = 0; i < commands.length; i++){
+  const cmd = commands[i];
+  fs.writeFileSync(path.join(__dirname, `../docs/docs/commands/commands/${cmd.asciiName}.md`), `---
+sidebar_label: ${cmd.name}
+---
+# \`${cmd.name}\`コマンド
+${cmd.description}
 
-categoriesList.forEach(category => {
-  addLine(`## ${categories[category]}`);
-  categorized[category].forEach(
-    /**
-     * @type { (command:import("../src/Commands").BaseCommand)=>void }
-     */
-    command => {
-      addLine(`### \`${command.name}\`コマンド`);
-      addLine(command.description + "  ");
-      addLine(`- エイリアス`);
-      addLine("  - `" + command.alias.join("`\r\n  - `") + "`");
-      if(command.usage){
-        addLine("- 使い方: `" + command.usage + "`");
-      }
-      if(command.examples){
-        addLine("- 使用例: `" + command.examples + "`");
-      }
-      addLine("---");
-    }
-  )
-  addLine("");
-});
-addLine(`(c) ${new Date().getFullYear()} mtripg6666tdr`);
+## エイリアス
+${cmd.alias.map(alias => `- ${alias}`).join("\r\n")}
 
-fs.writeFileSync(path.join(__dirname, "../docs/commands.md"), md, {encoding:"utf-8"});
+${cmd.usage ? `## 使い方\r\n\`\`\`\r\n${cmd.usage}\r\n\`\`\`\r\n` : ""}
+${cmd.examples ? `## 使用例\r\n\`\`\`\r\n${cmd.examples}\r\n\`\`\`\r\n` : ""}
+
+## 実行に必要な権限
+${cmd.permissionDescription}
+
+※管理者権限や、サーバーの管理権限を持つユーザーはこの権限を満たしていなくてもいつでもこのコマンドを実行できます。
+  \r\n`, {encoding: "utf-8"});
+}
+
 process.exit(0);

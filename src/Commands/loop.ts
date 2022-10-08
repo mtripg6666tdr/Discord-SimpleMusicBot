@@ -30,6 +30,7 @@ export default class Loop extends BaseCommand {
       description: "トラックごとのループを設定します。",
       unlist: false,
       category: "player",
+      permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはユーザーがDJロールを保持",
     });
   }
 

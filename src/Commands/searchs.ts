@@ -48,7 +48,8 @@ export default class Searchs extends BaseCommand {
         name: "keyword",
         description: "検索したい楽曲のキーワードまたはURL。",
         required: true
-      }]
+      }],
+      permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはユーザーと同じボイスチャンネルに接続している",
     });
   }
 

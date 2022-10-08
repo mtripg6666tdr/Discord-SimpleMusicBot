@@ -33,6 +33,7 @@ export default class Help extends BaseCommand {
       description: "ヘルプを表示します",
       unlist: false,
       category: "bot",
+      permissionDescription: "なし",
     });
   }
 

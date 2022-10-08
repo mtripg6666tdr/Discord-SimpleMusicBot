@@ -26,11 +26,12 @@ import { Util } from "../Util";
 export default class LeaveClean extends BaseCommand {
   constructor(){
     super({
-      name: "leaveclean",
-      alias: ["lc"],
+      name: "キューを整理",
+      alias: ["lc", "leaveclean"],
       description: "ボイスチャンネルから離脱した人がリクエストした曲をキューから削除して整理します",
       unlist: false,
       category: "playlist",
+      permissionDescription: "DJロール",
     });
   }
 

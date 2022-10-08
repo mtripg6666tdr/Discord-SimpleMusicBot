@@ -31,6 +31,7 @@ export default class Export extends BaseCommand {
       description: "キューの内容をインポートできるようエクスポートします。",
       unlist: false,
       category: "playlist",
+      permissionDescription: "なし",
     });
   }
 

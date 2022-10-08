@@ -44,6 +44,7 @@ export default class Search extends BaseCommand {
         description: "検索したい動画のキーワードまたはURL。",
         required: true
       }],
+      permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはユーザーと同じボイスチャンネルに接続している",
     });
   }
 

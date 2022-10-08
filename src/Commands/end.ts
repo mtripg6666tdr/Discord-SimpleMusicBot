@@ -30,6 +30,7 @@ export default class End extends BaseCommand {
       description: "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します",
       unlist: false,
       category: "playlist",
+      permissionDescription: "DJロール",
     });
   }
 

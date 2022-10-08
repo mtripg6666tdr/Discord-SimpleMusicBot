@@ -31,6 +31,7 @@ export default class Effect extends BaseCommand {
       description: "エフェクトコントロールパネルを表示します",
       unlist: false,
       category: "player",
+      permissionDescription: "なし",
     });
   }
 

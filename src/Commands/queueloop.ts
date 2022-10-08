@@ -30,6 +30,7 @@ export default class QueueLoop extends BaseCommand {
       description: "キュー内のループを設定します。",
       unlist: false,
       category: "player",
+      permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはユーザーと同じボイスチャンネルに接続している",
     });
   }
 

@@ -36,6 +36,7 @@ export default class News extends BaseCommand {
       description: "現在配信されているニューストピックスを閲覧・視聴できます。",
       unlist: false,
       category: "playlist",
+      permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはユーザーと同じボイスチャンネルに接続している",
     });
   }
 

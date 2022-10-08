@@ -53,7 +53,8 @@ export default class Commands extends BaseCommand {
         description: "詳細表示するするコマンド名",
         name: "command",
         required: false
-      }]
+      }],
+      permissionDescription: "なし",
     });
   }
 

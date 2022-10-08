@@ -30,6 +30,7 @@ export default class Rewind extends BaseCommand {
       description: "再生中の曲の頭出しを行います。",
       unlist: false,
       category: "player",
+      permissionDescription: "同じボイスチャンネルに接続",
     });
   }
   
