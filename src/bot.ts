@@ -23,8 +23,10 @@ import * as discord from "eris";
 import { CommandManager } from "./Component/CommandManager";
 import { CommandMessage } from "./Component/CommandMessage";
 import { PageToggle } from "./Component/PageToggle";
+import { QueueManagerWithBgm } from "./Component/QueueManagerWithBGM";
 import { ResponseMessage } from "./Component/ResponseMessage";
 import { GuildDataContainer } from "./Structure";
+import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";
 import { Util } from "./Util";
 import { MusicBotBase } from "./botBase";
 import { NotSendableMessage } from "./definition";
@@ -38,7 +40,7 @@ export class MusicBot extends MusicBotBase {
   private readonly _addOn = new Util.addOn.AddOn();
   private _isReadyFinished = false;
 
-  constructor(token:string, protected readonly maintenance:boolean = false){
+  constructor(token:string, maintenance:boolean = false){
     super(maintenance);
 
     this._client = new discord.Client(token, {
@@ -59,6 +61,7 @@ export class MusicBot extends MusicBotBase {
       .on("interactionCreate", this.onInteractionCreate.bind(this))
       .on("voiceChannelJoin", this.onVoiceChannelJoin.bind(this))
       .on("voiceChannelLeave", this.onVoiceChannelLeave.bind(this))
+      .on("voiceChannelSwitch", this.onVoiceChannelSwitch.bind(this))
       .on("error", this.onError.bind(this))
     ;
   }
@@ -82,6 +85,18 @@ export class MusicBot extends MusicBotBase {
         type: discord.Constants.ActivityTypes.GAME,
         name: "メンテナンス中..."
       });
+    }
+
+    // add bgm tracks
+    if(Util.config.bgm){
+      const guildIds = Object.keys(Util.config.bgm);
+      for(let i = 0; i < guildIds.length; i++){
+        if(!this.client.guilds.get(guildIds[i])) continue;
+        await this
+          .initDataWithBgm(guildIds[i], "0", Util.config.bgm[guildIds[i]])
+          .initBgmTracks()
+        ;
+      }
     }
 
     // Recover queues
@@ -163,6 +178,27 @@ export class MusicBot extends MusicBotBase {
       // コマンドを解決
       const command = CommandManager.instance.resolve(commandMessage.command);
       if(!command) return;
+      if(
+        // BGM構成が存在するサーバー
+        server instanceof GuildDataContainerWithBgm
+        && (
+          (
+            // いまBGM再生中
+            server.queue.isBGM
+            && (
+              // キューの編集を許可していない、またはBGM優先モード
+              !server.bgmConfig.allowEditQueue || server.bgmConfig.mode === "prior"
+            )
+          )
+          // BGMが再生していなければ、BGMオンリーモードであれば
+          || server.bgmConfig.mode === "only"
+        )
+        // かつBGM構成で制限があるときに実行できないコマンドならば
+        && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"
+      ){
+        // 無視して返却
+        return;
+      }
       // 送信可能か確認
       if(!Util.eris.channel.checkSendable(message.channel as discord.TextChannel, this._client.user.id)){
         try{
@@ -241,6 +277,27 @@ export class MusicBot extends MusicBotBase {
       // コマンドを解決
       const command = CommandManager.instance.resolve(interaction.data.name);
       if(command){
+        if(
+          // BGM構成が存在するサーバー
+          server instanceof GuildDataContainerWithBgm
+          && (
+            (
+              // いまBGM再生中
+              server.queue.isBGM
+              && (
+                // キューの編集を許可していない、またはBGM優先モード
+                !server.bgmConfig.allowEditQueue || server.bgmConfig.mode === "prior"
+              )
+            )
+            // BGMが再生していなければ、BGMオンリーモードであれば
+            || server.bgmConfig.mode === "only"
+          )
+          // かつBGM構成で制限があるときに実行できないコマンドならば
+          && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"
+        ){
+          // 無視して返却
+          return;
+        }
         // 遅延リプライ
         await interaction.defer();
         // メッセージライクに解決してコマンドメッセージに 
@@ -346,6 +403,23 @@ export class MusicBot extends MusicBotBase {
             });
         });
       }
+    }else if(this.data[member.guild.id]){
+      const server = this.data[member.guild.id];
+      if(
+        server instanceof GuildDataContainerWithBgm
+          && (
+            !server.connection
+              || (
+                server.bgmConfig.mode === "prior"
+                && server.connection.channelID !== server.bgmConfig.voiceChannelId
+              )
+          )
+          && newChannel.id === server.bgmConfig.voiceChannelId
+          && !server.queue.isBGM
+      ){
+        // BGMターゲット
+        server.playBgmTracks();
+      }
     }
   }
 
@@ -359,10 +433,19 @@ export class MusicBot extends MusicBotBase {
       if(!bound) return;
       await this._client.createMessage(bound.id, ":postbox: 正常に切断しました").catch(e => this.Log(e));
     }else if(oldChannel.voiceMembers.has(this._client.user.id) && oldChannel.voiceMembers.size === 1){
-      // 誰も聞いてる人がいない場合一時停止
-      server.player.pause();
-      await this._client.createMessage(server.boundTextChannel, ":pause_button:ボイスチャンネルから誰もいなくなったため一時停止しました").catch(e => this.Log(e));
+      if(server.queue instanceof QueueManagerWithBgm && server.queue.isBGM){
+        server.player.disconnect();
+      }else if(server.player.isPlaying){
+        // 誰も聞いてる人がいない場合一時停止
+        server.player.pause();
+        await this._client.createMessage(server.boundTextChannel, ":pause_button:ボイスチャンネルから誰もいなくなったため一時停止しました").catch(e => this.Log(e));
+      }
     }
+  }
+
+  private async onVoiceChannelSwitch(member:discord.Member, newChannel:discord.TextVoiceChannel, oldChannel:discord.TextVoiceChannel){
+    this.onVoiceChannelJoin(member, newChannel);
+    if(member.id !== this.client.user.id) this.onVoiceChannelLeave(member, oldChannel);
   }
 
   private async onError(er:Error){

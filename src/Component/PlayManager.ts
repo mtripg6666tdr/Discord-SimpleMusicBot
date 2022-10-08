@@ -34,15 +34,16 @@ import { resolveStreamToPlayable } from "./streams";
  * 再生や一時停止などの処理を行います。
  */
 export class PlayManager extends ServerManagerBase {
-  private readonly retryLimit = 3;
-  private _seek = 0;
-  private _errorReportChannel = null as TextChannel;
-  private _volume = 100;
-  private _errorCount = 0;
-  private _errorUrl = "";
-  private _preparing = false;
-  private _currentAudioInfo = null as AudioSource;
-  private _cost = 0;
+  protected readonly retryLimit = 3;
+  protected _seek = 0;
+  protected _errorReportChannel = null as TextChannel;
+  protected _volume = 100;
+  protected _errorCount = 0;
+  protected _errorUrl = "";
+  protected _preparing = false;
+  protected _currentAudioInfo = null as AudioSource;
+  protected _cost = 0;
+  readonly onStreamFinishedBindThis:any = null;
 
   get preparing(){
     return this._preparing;
@@ -103,12 +104,13 @@ export class PlayManager extends ServerManagerBase {
     super();
     this.setTag("PlayManager");
     this.Log("Play Manager instantiated");
+    this.onStreamFinishedBindThis = this.onStreamFinished.bind(this);
   }
 
   /**
    *  親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
    */
-  setBinding(data:GuildDataContainer){
+  override setBinding(data:GuildDataContainer){
     this.Log("Set data of guild id " + data.guildId);
     super.setBinding(data);
   }
@@ -126,21 +128,8 @@ export class PlayManager extends ServerManagerBase {
    *  再生します
    */
   async play(time:number = 0):Promise<PlayManager>{
-    /* eslint-disable operator-linebreak */
-    /* eslint-disable @typescript-eslint/indent */
     // 再生できる状態か確認
-    const badCondition =
-      // 接続していない
-        !this.isConnecting
-      // なにかしら再生中
-      || this.isPlaying
-      // キューが空
-      || this.server.queue.isEmpty
-      // 準備中
-      || this.preparing
-    ;
-    /* eslint-enable operator-linebreak */
-    /* eslint-enable @typescript-eslint/indent */
+    const badCondition = this.getIsBadCondition();
     if(badCondition){
       this.Log("Play called but operated nothing", "warn");
       return this;
@@ -148,13 +137,14 @@ export class PlayManager extends ServerManagerBase {
     this.Log("Play called");
     this.preparing = true;
     let mes:Message = null;
-    let ch:TextChannel = null;
     this._currentAudioInfo = this.server.queue.get(0).basicInfo;
-    if(this.server.boundTextChannel){
-      ch = this.server.bot.client.getChannel(this.server.boundTextChannel) as TextChannel;
+    if(this.getNoticeNeeded()){
       const [min, sec] = Util.time.CalcMinSec(this.currentAudioInfo.LengthSeconds);
       const isLive = this.currentAudioInfo.isYouTube() && this.currentAudioInfo.LiveStream;
-      mes = await ch.createMessage(`:hourglass_flowing_sand: \`${this.currentAudioInfo.Title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`);
+      mes = await this.server.bot.client.createMessage(
+        this.server.boundTextChannel,
+        `:hourglass_flowing_sand: \`${this.currentAudioInfo.Title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`
+      );
     }
     try{
       // シーク位置を確認
@@ -179,7 +169,7 @@ export class PlayManager extends ServerManagerBase {
         throw errorWhileWaiting;
       }
       // 各種準備
-      this._errorReportChannel = mes.channel as TextChannel;
+      this._errorReportChannel = mes?.channel as TextChannel;
       this._cost = cost;
       t.end();
       // 再生
@@ -192,7 +182,6 @@ export class PlayManager extends ServerManagerBase {
         });
         // setup volume
         this.setVolume(this.volume);
-        stream.on("end", this.onStreamFinished.bind(this));
         // wait for entering playing state
         await Util.general.waitForEnteringState(() => this.server.connection.playing);
         this.preparing = false;
@@ -201,7 +190,7 @@ export class PlayManager extends ServerManagerBase {
         u.end();
       }
       this.Log("Play started successfully");
-      if(this.server.boundTextChannel && ch && mes){
+      if(mes){
         // 再生開始メッセージ
         const _t = Number(this.currentAudioInfo.LengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
@@ -241,7 +230,7 @@ export class PlayManager extends ServerManagerBase {
       try{
         const t = typeof e === "string" ? e : Util.general.StringifyObject(e);
         if(t.includes("429")){
-          mes.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(er => Util.logger.log(er, "error"));
+          mes?.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。").catch(er => Util.logger.log(er, "error"));
           this.Log("Rate limit detected", "error");
           this.stop();
           this.preparing = false;
@@ -257,13 +246,31 @@ export class PlayManager extends ServerManagerBase {
     return this;
   }
 
+  protected getIsBadCondition(){
+    // 再生できる状態か確認
+    return /* 接続していない */ !this.isConnecting
+      // なにかしら再生中
+      || this.isPlaying
+      // キューが空
+      || this.server.queue.isEmpty
+      // 準備中
+      || this.preparing
+    ;
+  }
+
+  protected getNoticeNeeded(){
+    return !!this.server.boundTextChannel;
+  }
+
   /** 
    * 停止します。切断するにはDisconnectを使用してください。
    * @returns this
   */
   stop():PlayManager{
     this.Log("Stop called");
+    this.server.connection.off("end", this.onStreamFinishedBindThis);
     this.server.connection?.stopPlaying();
+    this.server.connection.on("end", this.onStreamFinishedBindThis);
     this.server.bot.backupper.backupData();
     return this;
   }
@@ -330,7 +337,7 @@ export class PlayManager extends ServerManagerBase {
         console.error(er);
       }
     }
-    this._errorReportChannel.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
+    this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
     this.onStreamFailed();
   }
 
@@ -339,9 +346,9 @@ export class PlayManager extends ServerManagerBase {
     this._errorUrl = "";
   }
 
-  private async onStreamFinished(){
+  async onStreamFinished(){
     this.Log("onStreamFinished called");
-    if(this.server.connection){
+    if(this.server.connection && this.server.connection.playing){
       await Util.general.waitForEnteringState(() => !this.server.connection || !this.server.connection.playing, 20 * 1000)
         .catch(() => {
           this.Log("Stream has not ended in time and will force stream into destroying", "warn");
@@ -369,10 +376,11 @@ export class PlayManager extends ServerManagerBase {
       await this.server.queue.next();
     }
     // キューがなくなったら接続終了
-    if(this.server.queue.length === 0){
+    if(this.server.queue.isEmpty){
       this.Log("Queue empty");
       if(this.server.boundTextChannel){
         const ch = this.server.bot.client.getChannel(this.server.boundTextChannel) as TextChannel;
+        if(!ch) return;
         await ch.createMessage(":wave:キューが空になったため終了します").catch(e => Util.logger.log(e, "error"));
       }
       this.disconnect();
@@ -382,7 +390,7 @@ export class PlayManager extends ServerManagerBase {
     }
   }
 
-  private async onStreamFailed(){
+  async onStreamFailed(){
     this.Log("onStreamFailed called");
     this._cost = 0;
     if(this._errorUrl === this.currentAudioInfo.Url){

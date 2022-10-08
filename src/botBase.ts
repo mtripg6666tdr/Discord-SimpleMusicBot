@@ -16,6 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { GuildBGMContainerType } from "./Util/config";
 import type * as discord from "eris";
 
 import { execSync } from "child_process";
@@ -24,6 +25,7 @@ import { BackUpper } from "./Component/Backupper";
 import { PageToggle } from "./Component/PageToggle";
 import { GuildDataContainer } from "./Structure";
 import { LogEmitter } from "./Structure";
+import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";
 import { Util } from "./Util";
 
 export type DataType = {[key:string]:GuildDataContainer};
@@ -137,14 +139,20 @@ export abstract class MusicBotBase extends LogEmitter {
   /**
    * 必要に応じてサーバーデータを初期化します
    */
-  protected initData(guildid:string, channelid:string){
+  protected initData(guildid:string, boundChannelId:string){
     const prev = this.data[guildid];
     if(!prev){
-      const server = this.data[guildid] = new GuildDataContainer(guildid, channelid, this);
+      const server = this.data[guildid] = new GuildDataContainer(guildid, boundChannelId, this);
       return server;
     }else{
       return prev;
     }
+  }
+
+  protected initDataWithBgm(guildid:string, boundChannelId:string, bgmConfig:GuildBGMContainerType){
+    if(this.data[guildid]) throw new Error("guild data was already set");
+    const server = this.data[guildid] = new GuildDataContainerWithBgm(guildid, boundChannelId, this, bgmConfig);
+    return server;
   }
 
   resetData(guildId:string){

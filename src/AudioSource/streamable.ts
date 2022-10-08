@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { UrlStreamInfo } from ".";
+import type { exportableCustom, UrlStreamInfo } from ".";
 import type { EmbedField } from "eris";
 
 import { Util } from "../Util";
@@ -78,11 +78,8 @@ export class Streamable extends AudioSource {
   }
 }
 
-export type exportableStreamable = {
-  url:string,
-  length:number,
+export type exportableStreamable = exportableCustom & {
   thumbnail:string,
-  title:string,
   streamUrl:string,
 };
 

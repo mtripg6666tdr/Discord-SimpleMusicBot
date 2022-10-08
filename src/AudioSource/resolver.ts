@@ -38,14 +38,14 @@ export async function resolve(info:AudioSourceBasicInfo){
     basicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.exportableYouTube, cache);
   }else if(type === "custom" || (type === "unknown" && Util.fs.isAvailableRawAudioURL(url))){
     // カスタムストリーム
-    basicInfo = await new AudioSource.CustomStream().init(url);
+    basicInfo = await new AudioSource.CustomStream().init(url, info.knownData);
   }else if(type === "soundcloud" || AudioSource.SoundCloudS.validateUrl(url)){
     // soundcloud
     basicInfo = await new AudioSource.SoundCloudS().init(url, gotData as AudioSource.exportableSoundCloud);
   }else if(type === "unknown"){
     // google drive
     if(AudioSource.GoogleDrive.validateUrl(url)){
-      basicInfo = await new AudioSource.GoogleDrive().init(url);
+      basicInfo = await new AudioSource.GoogleDrive().init(url, info.knownData);
     }else if(AudioSource.StreamableApi.getVideoId(url)){
       // Streamable
       basicInfo = await new AudioSource.Streamable().init(url, gotData as AudioSource.exportableStreamable);

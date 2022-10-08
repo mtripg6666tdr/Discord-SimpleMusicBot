@@ -110,7 +110,6 @@ export class NicoNicoS extends AudioSource {
 }
 
 export type exportableNicoNico = exportableCustom & {
-  title:string,
   description:string,
   author:string,
   thumbnail:string,

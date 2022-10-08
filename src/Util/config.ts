@@ -23,6 +23,15 @@ import CJSON from "comment-json";
 import { z } from "zod";
 
 /* eslint-disable newline-per-chained-call */
+const GuildBGMContainer = z.object({
+  voiceChannelId: z.string().regex(/^\d+$/, {message: "channelId is not a snowflake"}),
+  allowEditQueue: z.boolean(),
+  enableQueueLoop: z.boolean(),
+  items: z.array(z.string()).nonempty({message: "items cannot be empty"}),
+  volume: z.number().min(5).max(200),
+  mode: z.union([z.literal("only"), z.literal("prior"), z.literal("normal")]),
+});
+
 const Config = z.object({
   adminId: z.string().regex(/^\d+$/, {message: "adminId is not a snowflake"}).nullable(),
   debug: z.boolean(),
@@ -31,6 +40,7 @@ const Config = z.object({
   proxy: z.string().url("proxy value must be resolvable as url").nullable(),
   prefix: z.string().min(1).nullish().default(">"),
   webserver: z.boolean().optional().default(true),
+  bgm: z.record(z.string().regex(/^\d+$/, {message: "bgm object key is not a snowflake"}), GuildBGMContainer).optional(),
 });
 /* eslint-enable newline-per-chained-call */
 
@@ -38,4 +48,5 @@ const rawConfig = fs.readFileSync(path.join(__dirname, "../../config.json"), {en
 
 const config = Config.parse(CJSON.parse(rawConfig, null, true));
 
-export = config;
+export default config;
+export type GuildBGMContainerType = z.infer<typeof GuildBGMContainer>;

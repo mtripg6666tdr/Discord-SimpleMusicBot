@@ -77,6 +77,7 @@ export class Hibiki extends AudioSource {
     return {
       url: this.Url,
       length: this._lengthSeconds,
+      title: this.Title,
     };
   }
 }

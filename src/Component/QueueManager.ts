@@ -43,11 +43,11 @@ export class QueueManager extends ServerManagerBase {
   /**
    * キューの本体
    */
-  private _default:QueueContent[] = [];
+  protected _default:QueueContent[] = [];
   /**
    * キューの本体のゲッタープロパティ
    */
-  private get default():Readonly<QueueContent[]>{
+  protected get default():Readonly<QueueContent[]>{
     return this._default;
   }
 
@@ -71,7 +71,7 @@ export class QueueManager extends ServerManagerBase {
   }
 
   /**
-   * きゅの長さ（時間秒）
+   * キューの長さ（時間秒）
    */
   get lengthSeconds():number{
     return this.default.reduce((prev, current) => prev + Number(current.basicInfo.LengthSeconds), 0);
@@ -87,7 +87,7 @@ export class QueueManager extends ServerManagerBase {
     this.Log("QueueManager instantiated");
   }
 
-  setBinding(data:GuildDataContainer){
+  override setBinding(data:GuildDataContainer){
     this.Log("Set data of guild id " + data.guildId);
     super.setBinding(data);
   }
@@ -106,7 +106,7 @@ export class QueueManager extends ServerManagerBase {
    * @param predicate 条件を表す関数
    * @returns 条件に適合した要素の配列
    */
-  filter(predicate: (value: QueueContent, index: number, array: QueueContent[]) => unknown, thisArg?: any):QueueContent[]{
+  filter(predicate: (value: QueueContent, index: number, array: QueueContent[]) => unknown, thisArg?: any){
     return this.default.filter(predicate, thisArg);
   }
 
@@ -115,7 +115,7 @@ export class QueueManager extends ServerManagerBase {
    * @param predicate 条件
    * @returns インデックス
    */
-  findIndex(predicate: (value: QueueContent, index: number, obj: QueueContent[]) => unknown, thisArg?: any):number{
+  findIndex(predicate: (value: QueueContent, index: number, obj: QueueContent[]) => unknown, thisArg?: any){
     return this.default.findIndex(predicate, thisArg);
   }
 
@@ -145,7 +145,8 @@ export class QueueManager extends ServerManagerBase {
     addedBy:Member|AddedBy,
     method:"push"|"unshift" = "push",
     type:KnownAudioSourceIdentifer = "unknown",
-    gotData:AudioSource.exportableCustom = null
+    gotData:AudioSource.exportableCustom = null,
+    preventCache:boolean = false,
   ):Promise<QueueContent & {index:number}>{
     return lock(this.addQueueLocker, async () => {
       this.Log("AddQueue called");
@@ -156,7 +157,7 @@ export class QueueManager extends ServerManagerBase {
           basicInfo: await AudioSource.resolve({
             url, type,
             knownData: gotData,
-            forceCache: this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000
+            forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000)
           }),
           additionalInfo: {
             addedBy: {
@@ -417,7 +418,7 @@ export class QueueManager extends ServerManagerBase {
    * @param validator 条件を表す関数
    * @returns 削除されたオフセットの一覧
    */
-  removeIf(validator:(q:QueueContent)=>boolean):number[]{
+  removeIf(validator:(q:QueueContent)=>boolean){
     this.Log("RemoveIf Called");
     PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     if(this._default.length === 0) return [];
@@ -480,11 +481,11 @@ export class QueueManager extends ServerManagerBase {
     this._default = sorted;
   }
 
-  private getDisplayNameFromMember(member:Member|AddedBy){
+  protected getDisplayNameFromMember(member:Member|AddedBy){
     return member instanceof Member ? Util.eris.user.getDisplayName(member) : member.displayName;
   }
 
-  private getUserIdFromMember(member:Member|AddedBy){
+  protected getUserIdFromMember(member:Member|AddedBy){
     return member instanceof Member ? member.id : member.userId;
   }
 }

@@ -2,6 +2,7 @@
   "files.associations": {
     "config.json.sample": "jsonc",
     "config.json": "jsonc",
-    ".env.sample": "env"
+    ".env.sample": "env",
+    "config-with-bgm.json": "jsonc"
   }
 }

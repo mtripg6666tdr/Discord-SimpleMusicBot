@@ -42,7 +42,7 @@ describe("Config", function() {
   });
 
   describe("#CheckValues", function(){
-    const config = require(configLoaderPath);
+    const config = (mod => "default" in mod ? mod.default : mod)(require(configLoaderPath));
     /** @type {[string, string|boolean][]} */
     const tests = [
       ["adminId", "123456"],

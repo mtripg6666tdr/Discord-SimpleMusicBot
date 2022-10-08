@@ -1,0 +1,38 @@
+{
+  "adminId": "",
+  "debug": false,
+  "maintenance": false,
+  "errorChannel": "",
+  "proxy": "",
+  "prefix": ">",
+  "webserver": true,
+  // ここから上の設定は、config.json.sampleやREADMEを参考に作成してください。
+  "bgm": {
+    // サーバーID
+    "12345678946541687": {
+      // 参加するボイスチャンネルのID
+      "voiceChannelId": "1011276494166835241",
+      // 通常のキューの編集を許可するかどうか
+      "allowEditQueue": true,
+      // BGMの全体のループを有効にするかどうか。
+      "enableQueueLoop": true,
+      "items": [
+        // URLや
+        "https://～～～",
+        // ファイル名
+        "some-audio.mp3"
+        // を指定できます
+      ],
+      // 初期の音量設定
+      "volume": 100,
+      // モードはonly、prior、normalから選択してください。
+      "mode": "only"
+      // only: BGMだけ（通常のキューを無効化し、BGMを流すことしかしない
+      // prior: 優先 (BGMに移動する、そのあと逆方向への再移動はできない)
+      // normal: 双方向に対して同様の挙動をする
+    }
+  },
+  "二つ目以降のサーバーID": {
+    // ... 設定
+  }
+}

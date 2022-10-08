@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { UrlStreamInfo } from ".";
+import type { exportableCustom, UrlStreamInfo } from ".";
 import type { EmbedField } from "eris";
 
 import { Util } from "../Util";
@@ -98,14 +98,13 @@ export class BestdoriS extends AudioSource {
       length: this.LengthSeconds,
       lyricist: this.lyricist,
       composer: this.composer,
-      arranger: this.arranger
+      arranger: this.arranger,
+      title: this.Title,
     };
   }
 }
 
-export type exportableBestdori = {
-  url:string,
-  length:number,
+export type exportableBestdori = exportableCustom & {
   lyricist:string,
   composer:string,
   arranger:string,

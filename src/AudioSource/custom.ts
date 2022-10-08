@@ -28,15 +28,21 @@ export class CustomStream extends AudioSource {
   protected readonly _serviceIdentifer = "custom";
   Thumnail:string = DefaultAudioThumbnailURL;
 
-  async init(url:string){
-    if(!Util.fs.isAvailableRawAudioURL(url)) throw new Error("正しいストリームではありません");
-    this.Url = url;
-    this.Title = this.extractFilename() || "カスタムストリーム";
-    try{
-      this._lengthSeconds = await Util.web.RetriveLengthSeconds(url);
+  async init(url:string, prefetched:exportableCustom){
+    if(prefetched){
+      this.Title = prefetched.title || "カスタムストリーム";
+      this.Url = url;
+      this._lengthSeconds = prefetched.length;
+    }else{
+      if(!Util.fs.isAvailableRawAudioURL(url)) throw new Error("正しいストリームではありません");
+      this.Url = url;
+      this.Title = this.extractFilename() || "カスタムストリーム";
+      try{
+        this._lengthSeconds = await Util.web.RetriveLengthSeconds(url);
+      }
+      // eslint-disable-next-line no-empty
+      catch{}
     }
-    // eslint-disable-next-line no-empty
-    catch{}
     return this;
   }
 
@@ -62,7 +68,8 @@ export class CustomStream extends AudioSource {
   exportData():exportableCustom{
     return {
       url: this.Url,
-      length: this._lengthSeconds
+      length: this._lengthSeconds,
+      title: this.Title,
     };
   }
 
@@ -75,4 +82,5 @@ export class CustomStream extends AudioSource {
 export type exportableCustom = {
   url: string,
   length: number,
+  title:string,
 };

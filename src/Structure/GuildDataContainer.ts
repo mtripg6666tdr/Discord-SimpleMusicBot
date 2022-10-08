@@ -45,7 +45,7 @@ import { YmxVersion } from "./YmxFormat";
  */
 export class GuildDataContainer extends LogEmitter {
   private readonly _cancellations = [] as TaskCancellationManager[];
-  private get cancellations():Readonly<GuildDataContainer["_cancellations"]>{
+  private get cancellations():Readonly<TaskCancellationManager[]>{
     return this._cancellations;
   }
   
@@ -57,14 +57,22 @@ export class GuildDataContainer extends LogEmitter {
    * 検索窓の格納します
    */
   searchPanel:SearchPanel;
+  protected _queue:QueueManager;
   /**
    * キューマネジャ
    */
-  readonly queue:QueueManager;
+  get queue(){
+    return this._queue;
+  }
+
+  protected _player:PlayManager;
   /**
    * 再生マネジャ
    */
-  readonly player:PlayManager;
+  get player(){
+    return this._player;
+  }
+
   private _boundTextChannel:string;
   /**
    * 紐づけテキストチャンネル
@@ -108,12 +116,14 @@ export class GuildDataContainer extends LogEmitter {
     super();
     this.setTag("GuildDataContainer");
     this.setGuildId(guildid);
+    if(!guildid){
+      throw new Error("invalid guild id was given");
+    }
     this.searchPanel = null;
-    this.queue = new QueueManager();
-    this.queue.setBinding(this);
-    this.player = new PlayManager();
-    this.player.setBinding(this);
     this.boundTextChannel = boundchannelid;
+    if(!this.boundTextChannel){
+      throw new Error("invalid bound textchannel id was given");
+    }
     this.bot = bot;
     this.AddRelative = false;
     this.effectPrefs = {BassBoost: false, Reverb: false, LoudnessEqualization: false};
@@ -121,13 +131,29 @@ export class GuildDataContainer extends LogEmitter {
     this.equallyPlayback = false;
     this.connection = null;
     this.vcPing = null;
+    this.initPlayManager();
+    this.initQueueManager();
+  }
+
+  protected initPlayManager(){
+    this._player = new PlayManager();
+    this._player.setBinding(this);
+  }
+
+  protected initQueueManager(){
+    this._queue = new QueueManager();
+    this._queue.setBinding(this);
   }
 
   /**
    * 状況に応じてバインドチャンネルを更新します
    * @param message 更新元となるメッセージ
    */
-  updateBoundChannel(message:CommandMessage){
+  updateBoundChannel(message:CommandMessage|string){
+    if(typeof message === "string"){
+      this.boundTextChannel = message;
+      return;
+    }
     if(
       !this.player.isConnecting
       || (message.member.voiceState.channelID && (this.bot.client.getChannel(message.member.voiceState.channelID) as VoiceChannel).voiceMembers.has(this.bot.client.user.id))
@@ -161,7 +187,7 @@ export class GuildDataContainer extends LogEmitter {
       const { data } = exportedQueue;
       for(let i = 0; i < data.length; i++){
         const item = data[i];
-        await this.queue.autoAddQueue(this.bot.client, item.url, item.addBy, "unknown", false, false, null, null, item);
+        await this.queue.addQueue(item.url, item.addBy, "push", "unknown", item);
       }
       return true;
     }
@@ -250,17 +276,20 @@ export class GuildDataContainer extends LogEmitter {
    * 指定されたボイスチャンネルに参加し、接続を保存し、適切なイベントハンドラを設定します。
    * @param channelId 接続先のボイスチャンネルのID
    */
-  private async _joinVoiceChannel(channelId:string){
-    const connection = this.connection = await this.bot.client.joinVoiceChannel(channelId, {
+  protected async _joinVoiceChannel(channelId:string){
+    const connection = await this.bot.client.joinVoiceChannel(channelId, {
       selfDeaf: true,
     });
+    if(this.connection === connection) return;
     connection
       .on("error", err => {
         this.Log("[Connection] " + Util.general.StringifyObject(err), "error");
         this.player.handleError(err);
       })
+      .on("end", this.player.onStreamFinishedBindThis)
       .on("pong", ping => this.vcPing = ping)
     ;
+    this.connection = connection;
     if(Util.config.debug){
       connection.on("debug", mes => this.Log("[Connection] " + mes, "debug"));
     }
