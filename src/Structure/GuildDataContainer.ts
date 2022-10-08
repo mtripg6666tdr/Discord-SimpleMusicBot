@@ -218,12 +218,12 @@ export class GuildDataContainer extends LogEmitter {
   importStatus({voiceChannelId, frozenStatusIds}:{voiceChannelId:string, frozenStatusIds:string[]}){
     //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
     [
-      this.queue.loopEnabled,
-      this.queue.queueLoopEnabled,
-      this.AddRelative,
-      this.equallyPlayback,
+      this.queue.loopEnabled, // 0
+      this.queue.queueLoopEnabled, // 1
+      this.AddRelative, // 2
+      this.equallyPlayback, // 3
     ] = frozenStatusIds.map(b => b === "1");
-    this.player.setVolume(Number(frozenStatusIds[frozenStatusIds.length - 1]) || 100);
+    this.player.setVolume(Number(frozenStatusIds[4]) || 100);
     if(voiceChannelId !== "0"){
       this._joinVoiceChannel(voiceChannelId)
         .then(() => this.player.play())
