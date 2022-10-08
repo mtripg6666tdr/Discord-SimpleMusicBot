@@ -33,6 +33,7 @@ export default class Uptime extends BaseCommand {
       description: "ボットのアップタイムおよびping時間(レイテンシ)を表示します。",
       unlist: false,
       category: "utility",
+      permissionDescription: "なし",
     });
   }
 

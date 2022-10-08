@@ -33,6 +33,7 @@ export default class EquallyPlayback extends BaseCommand {
       description: "追加ユーザーごとにキュー内の楽曲を均等に再生します",
       unlist: false,
       category: "playlist",
+      permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはコマンドの実行者がDJロールを保持",
     });
   }
 

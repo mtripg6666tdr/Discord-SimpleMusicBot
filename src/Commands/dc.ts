@@ -30,6 +30,7 @@ export default class Dc extends BaseCommand {
       alias: ["終了", "dc", "disconnect", "leave", "quit"] as const,
       description: "ボイスチャンネルから切断します。",
       category: "voice",
+      permissionDescription: "同じボイスチャンネルに接続"
     });
   }
 

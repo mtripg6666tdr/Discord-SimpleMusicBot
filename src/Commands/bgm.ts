@@ -36,6 +36,7 @@ export default class Bgm extends BaseCommand {
       description: "開発者が勝手に作った勉強用・作業用BGMのプリセットプレイリストを表示し、聞きたいものを選択して再生することができます。",
       unlist: false,
       category: "playlist",
+      permissionDescription: "なし"
     });
   }
   

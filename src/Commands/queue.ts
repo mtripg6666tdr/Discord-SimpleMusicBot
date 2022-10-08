@@ -40,7 +40,8 @@ export default class Queue extends BaseCommand {
         name: "page",
         description: "表示するキューのページを指定することができます",
         required: false
-      }]
+      }],
+      permissionDescription: "なし",
     });
   }
 

@@ -49,7 +49,8 @@ export default class SystemInfo extends BaseCommand {
           "CPU": "cpu",
           "ログ(管理者のみ)": "log",
         }
-      }]
+      }],
+      permissionDescription: "なし",
     });
   }
 

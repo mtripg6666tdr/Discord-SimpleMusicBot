@@ -30,6 +30,7 @@ export default class Mltf extends BaseCommand {
       description: "キューの最後の曲をキューの先頭に移動します。",
       unlist: false,
       category: "playlist",
+      permissionDescription: "DJロール",
     });
   }
 

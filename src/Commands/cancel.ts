@@ -30,6 +30,7 @@ export default class Cancel extends BaseCommand {
       description: "実行中のキャンセル可能な処理がある場合それをすべて中止します。",
       unlist: false,
       category: "utility",
+      permissionDescription: "同じボイスチャンネルに接続"
     });
   }
   

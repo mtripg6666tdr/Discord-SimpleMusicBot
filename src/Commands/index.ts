@@ -76,18 +76,24 @@ export abstract class BaseCommand {
     return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
   }
 
+  protected readonly _permissionDescription:string = null;
+  public get permissionDescription(){
+    return this._permissionDescription;
+  }
+
   constructor(opts:ListCommandInitializeOptions|UnlistCommandInitializeOptions){
     this._name = opts.name;
     this._alias = opts.alias;
     this._unlist = opts.unlist;
     if(!this._unlist){
       if(!this.asciiName) throw new Error("Command has not ascii name");
-      const { description, examples, usage, category, argument } = opts as ListCommandWithArgumentsInitializeOptions;
+      const { description, examples, usage, category, argument, permissionDescription } = opts as ListCommandWithArgumentsInitializeOptions;
       this._description = description;
       this._examples = examples || null;
       this._usage = usage || null;
       this._category = category;
       this._argument = argument || null;
+      this._permissionDescription = permissionDescription || "なし";
     }
   }
 

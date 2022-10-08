@@ -37,7 +37,8 @@ export default class Volume extends BaseCommand {
         name: "volume",
         description: "変更先の音量。20~200までが指定できます。",
         required: false
-      }]
+      }],
+      permissionDescription: "同じボイスチャンネルに接続",
     });
   }
 

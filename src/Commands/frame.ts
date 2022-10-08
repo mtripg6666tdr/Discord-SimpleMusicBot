@@ -42,7 +42,8 @@ export default class Frame extends BaseCommand {
         name: "time",
         description: "指定された場合その時点でのフレームを取得します",
         required: false
-      }]
+      }],
+      permissionDescription: "同じボイスチャンネルに接続",
     });
   }
 

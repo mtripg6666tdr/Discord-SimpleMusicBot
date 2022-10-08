@@ -42,6 +42,7 @@ export default class Import extends BaseCommand {
         description: "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURL、もしくはキューの埋め込みが添付されたURLを指定できます。",
         required: true
       }],
+      permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはコマンドの実行者と同じボイスチャンネルにいる",
     });
   }
 

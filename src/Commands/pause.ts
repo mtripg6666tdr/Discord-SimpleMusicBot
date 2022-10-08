@@ -30,6 +30,7 @@ export default class Pause extends BaseCommand {
       description: "再生を一時停止します。",
       unlist: false,
       category: "player",
+      permissionDescription: "同じボイスチャンネルに接続",
     });
   }
   

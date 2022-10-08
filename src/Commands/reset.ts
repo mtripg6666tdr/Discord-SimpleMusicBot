@@ -30,6 +30,7 @@ export default class Reset extends BaseCommand {
       description: "サーバーのキュー、設定やデータを削除して初期化します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
       unlist: false,
       category: "utility",
+      permissionDescription: "サーバーの管理権限",
     });
   }
 

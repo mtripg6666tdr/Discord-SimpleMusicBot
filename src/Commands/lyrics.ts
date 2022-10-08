@@ -42,7 +42,8 @@ export default class Lyrics extends BaseCommand {
         name: "keyword",
         description: "楽曲を検索するキーワード",
         required: true
-      }]
+      }],
+      permissionDescription: "なし",
     });
   }
 

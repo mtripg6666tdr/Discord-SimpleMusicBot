@@ -41,7 +41,8 @@ export default class Searchq extends BaseCommand {
         name: "keyword",
         description: "検索したい楽曲のキーワード",
         required: true
-      }]
+      }],
+      permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはユーザーと同じボイスチャンネルに接続している",
     });
   }
 

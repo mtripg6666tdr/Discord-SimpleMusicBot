@@ -1,0 +1,8 @@
+{
+  "label": "バックアップ",
+  "position": 7,
+  "link": {
+    "type": "doc",
+    "id": "docs/backup/overview"
+  }
+}

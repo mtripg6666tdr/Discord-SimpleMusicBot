@@ -37,7 +37,8 @@ export default class Seek extends BaseCommand {
         name: "keyword",
         description: "シーク先の時間",
         required: true
-      }]
+      }],
+      permissionDescription: "同じボイスチャンネルに接続",
     });
   }
 

@@ -30,6 +30,7 @@ export default class Shuffle extends BaseCommand {
       description: "キューの内容をシャッフルします。",
       unlist: false,
       category: "playlist",
+      permissionDescription: "DJロール",
     });
   }
   

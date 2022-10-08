@@ -34,12 +34,14 @@ export type ListCommandWithArgumentsInitializeOptions = BaseCommandInitializeOpt
   usage:string,
   category:keyof typeof categories,
   argument:SlashCommandArgument[],
+  permissionDescription:string,
 };
 
 export type ListCommandWithoutArgumentsInitializeOptions = BaseCommandInitializeOptions & {
   description:string,
   unlist:false,
   category:keyof typeof categories,
+  permissionDescription:string,
 };
 
 export type ListCommandInitializeOptions =
