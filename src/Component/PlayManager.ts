@@ -23,11 +23,11 @@ import type { Message, TextChannel, VoiceChannel } from "eris";
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { ServerManagerBase } from "../Structure";
+import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
 import { getFFmpegEffectArgs } from "../Util/effect";
 import { FallBackNotice } from "../definition";
-import { QueueManagerWithBGM } from "./QueueManagerWithBGM";
 import { resolveStreamToPlayable } from "./streams";
 
 /**
@@ -70,7 +70,7 @@ export class PlayManager extends ServerManagerBase {
    *  接続され、再生途中にあるか（たとえ一時停止されていても）
    */
   get isPlaying():boolean{
-    return this.isConnecting && this.server.connection.playing && !(this.server.queue as QueueManagerWithBGM).isBGM;
+    return this.isConnecting && this.server.connection.playing && (!(this.server instanceof GuildDataContainerWithBgm) || this.server.queue.isBGM);
   }
 
   /**
@@ -127,7 +127,7 @@ export class PlayManager extends ServerManagerBase {
    *  再生します
    */
   async play(time:number = 0, bgm:boolean = false):Promise<PlayManager>{
-    if(this.server.queue instanceof QueueManagerWithBGM){
+    if(this.server instanceof GuildDataContainerWithBgm){
       if(this.server.queue.isBGM && !bgm && this.server.connection?.playing){
         this.stop();
       }
@@ -142,7 +142,7 @@ export class PlayManager extends ServerManagerBase {
       // なにかしら再生中
       || this.isPlaying
       // キューが空
-      || (this.server.queue.isEmpty && (!bgm || (bgm && (this.server.queue as QueueManagerWithBGM).isBgmEmpty)))
+      || (this.server.queue.isEmpty && (!bgm || (bgm && (this.server as GuildDataContainerWithBgm).queue.isBgmEmpty)))
       // 準備中
       || this.preparing
     ;
@@ -295,7 +295,7 @@ export class PlayManager extends ServerManagerBase {
       global.gc();
       this.Log("Called exposed gc");
     }
-    this.server.queue instanceof QueueManagerWithBGM && this.server.queue.setToPlayBgm(false);
+    this.server instanceof GuildDataContainerWithBgm && this.server.queue.setToPlayBgm(false);
     return this;
   }
 
@@ -378,7 +378,7 @@ export class PlayManager extends ServerManagerBase {
       await this.server.queue.next();
     }
     // キューがなくなったら接続終了
-    if(this.server.queue.isEmpty && (!(this.server.queue instanceof QueueManagerWithBGM) || this.server.queue.isBgmEmpty)){
+    if(this.server.queue.isEmpty && (!(this.server instanceof GuildDataContainerWithBgm) || this.server.queue.isBgmEmpty)){
       this.Log("Queue empty");
       if(this.server.boundTextChannel){
         const ch = this.server.bot.client.getChannel(this.server.boundTextChannel) as TextChannel;
@@ -388,7 +388,7 @@ export class PlayManager extends ServerManagerBase {
       this.disconnect();
     // なくなってないなら再生開始！
     }else{
-      this.play(0, this.server.queue instanceof QueueManagerWithBGM && this.server.queue.isBGM);
+      this.play(0, this.server instanceof GuildDataContainerWithBgm && this.server.queue.isBGM);
     }
   }
 

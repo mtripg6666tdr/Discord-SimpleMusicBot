@@ -16,8 +16,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 import type { AddedBy, QueueContent } from "../Structure/QueueContent";
-import type { KnownAudioSourceIdentifer} from "./QueueManager";
+import type { KnownAudioSourceIdentifer } from "./QueueManager";
 import type { Member } from "eris";
 
 import * as fs from "fs";
@@ -26,7 +27,8 @@ import * as path from "path";
 import * as AudioSource from "../AudioSource";
 import { QueueManager } from "./QueueManager";
 
-export class QueueManagerWithBGM extends QueueManager {
+export class QueueManagerWithBgm extends QueueManager {
+  protected override server: GuildDataContainerWithBgm;
   protected _bgmDefault:QueueContent[] = [];
   protected _bgmInitial:QueueContent[] = [];
 
@@ -56,6 +58,10 @@ export class QueueManagerWithBGM extends QueueManager {
 
   get isBgmEmpty(){
     return this._bgmDefault.length === 0;
+  }
+
+  override setBinding(data:GuildDataContainerWithBgm){
+    super.setBinding(data);
   }
 
   override get(index:number){

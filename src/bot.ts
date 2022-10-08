@@ -23,9 +23,10 @@ import * as discord from "eris";
 import { CommandManager } from "./Component/CommandManager";
 import { CommandMessage } from "./Component/CommandMessage";
 import { PageToggle } from "./Component/PageToggle";
-import { QueueManagerWithBGM } from "./Component/QueueManagerWithBGM";
+import { QueueManagerWithBgm } from "./Component/QueueManagerWithBGM";
 import { ResponseMessage } from "./Component/ResponseMessage";
 import { GuildDataContainer } from "./Structure";
+import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";
 import { Util } from "./Util";
 import { MusicBotBase } from "./botBase";
 import { NotSendableMessage } from "./definition";
@@ -92,7 +93,7 @@ export class MusicBot extends MusicBotBase {
       for(let i = 0; i < guildIds.length; i++){
         if(!this.client.guilds.get(guildIds[i])) continue;
         await this
-          .initData(guildIds[i], "0", Util.config.bgm[guildIds[i]])
+          .initDataWithBgm(guildIds[i], "0", Util.config.bgm[guildIds[i]])
           .initBgmTracks()
         ;
       }
@@ -177,7 +178,7 @@ export class MusicBot extends MusicBotBase {
       // コマンドを解決
       const command = CommandManager.instance.resolve(commandMessage.command);
       if(!command) return;
-      if(server.queue instanceof QueueManagerWithBGM && server.queue.isBGM && !server.bgmConfig.allowEditQueue && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"){
+      if(server instanceof GuildDataContainerWithBgm && server.queue.isBGM && !server.bgmConfig.allowEditQueue && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"){
         return;
       }
       // 送信可能か確認
@@ -258,7 +259,7 @@ export class MusicBot extends MusicBotBase {
       // コマンドを解決
       const command = CommandManager.instance.resolve(interaction.data.name);
       if(command){
-        if(server.queue instanceof QueueManagerWithBGM && server.queue.isBGM && !server.bgmConfig.allowEditQueue && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"){
+        if(server instanceof GuildDataContainerWithBgm && server.queue.isBGM && !server.bgmConfig.allowEditQueue && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"){
           return;
         }
         // 遅延リプライ
@@ -368,7 +369,7 @@ export class MusicBot extends MusicBotBase {
       }
     }else if(this.data[member.guild.id]){
       const server = this.data[member.guild.id];
-      if(!server.connection && server.queue instanceof QueueManagerWithBGM && newChannel.id === server.bgmConfig.voiceChannelId){
+      if(!server.connection && server instanceof GuildDataContainerWithBgm && newChannel.id === server.bgmConfig.voiceChannelId){
         // BGMターゲット
         server.playBgmTracks();
       }
@@ -385,7 +386,7 @@ export class MusicBot extends MusicBotBase {
       if(!bound) return;
       await this._client.createMessage(bound.id, ":postbox: 正常に切断しました").catch(e => this.Log(e));
     }else if(oldChannel.voiceMembers.has(this._client.user.id) && oldChannel.voiceMembers.size === 1){
-      if(server.queue instanceof QueueManagerWithBGM && server.queue.isBGM){
+      if(server.queue instanceof QueueManagerWithBgm && server.queue.isBGM){
         server.player.disconnect();
       }else if(server.player.isPlaying){
         // 誰も聞いてる人がいない場合一時停止

@@ -17,7 +17,6 @@
  */
 
 import type { exportableCustom } from "../AudioSource";
-import type { GuildBGMContainerType } from "../Util/config";
 import type { MusicBotBase } from "../botBase";
 import type { AudioEffect } from "./AudioEffect";
 import type { SearchPanel } from "./SearchPanel";
@@ -36,7 +35,6 @@ import * as ytpl from "ytpl";
 import { SoundCloudS } from "../AudioSource";
 import { PlayManager } from "../Component/PlayManager";
 import { QueueManager } from "../Component/QueueManager";
-import { QueueManagerWithBGM } from "../Component/QueueManagerWithBGM";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
 import Util from "../Util";
 import { LogEmitter } from "./LogEmitter";
@@ -59,14 +57,22 @@ export class GuildDataContainer extends LogEmitter {
    * 検索窓の格納します
    */
   searchPanel:SearchPanel;
+  protected _queue:QueueManager;
   /**
    * キューマネジャ
    */
-  readonly queue:QueueManager;
+  get queue(){
+    return this._queue;
+  }
+
+  protected _player:PlayManager;
   /**
    * 再生マネジャ
    */
-  readonly player:PlayManager;
+  get player(){
+    return this._player;
+  }
+
   private _boundTextChannel:string;
   /**
    * 紐づけテキストチャンネル
@@ -106,22 +112,18 @@ export class GuildDataContainer extends LogEmitter {
    */
   vcPing:number;
 
-  private readonly _bgmConfig:GuildBGMContainerType;
-  get bgmConfig():Readonly<GuildBGMContainerType>{
-    return this._bgmConfig;
-  }
-
-  constructor(guildid:string, boundchannelid:string, bot:MusicBotBase, bgmConfig?:GuildBGMContainerType){
+  constructor(guildid:string, boundchannelid:string, bot:MusicBotBase){
     super();
     this.setTag("GuildDataContainer");
     this.setGuildId(guildid);
+    if(!guildid){
+      throw new Error("invalid guild id was given");
+    }
     this.searchPanel = null;
-    this.queue = bgmConfig ? new QueueManagerWithBGM() : new QueueManager();
-    this._bgmConfig = bgmConfig;
-    this.queue.setBinding(this);
-    this.player = new PlayManager();
-    this.player.setBinding(this);
     this.boundTextChannel = boundchannelid;
+    if(!this.boundTextChannel){
+      throw new Error("invalid bound textchannel id was given");
+    }
     this.bot = bot;
     this.AddRelative = false;
     this.effectPrefs = {BassBoost: false, Reverb: false, LoudnessEqualization: false};
@@ -129,37 +131,18 @@ export class GuildDataContainer extends LogEmitter {
     this.equallyPlayback = false;
     this.connection = null;
     this.vcPing = null;
+    this.initPlayManager();
+    this.initQueueManager();
   }
 
-  /**
-   * BGM設定が存在する場合に、BGM設定を完了します
-   */
-  async initBgmTracks(){
-    if(this.bgmConfig){
-      const { items } = this.bgmConfig;
-      for(let i = 0; i < items.length; i++){
-        await (this.queue as QueueManagerWithBGM).addQueue(items[i], {
-          displayName: "システム",
-          userId: "0"
-        }, "push", "unknown", {
-          title: "BGM",
-          url: items[i],
-          length: -1
-        }, /* preventCache */ true);
-      }
-      (this.queue as QueueManagerWithBGM).moveCurrentTracksToBGM();
-    }
+  protected initPlayManager(){
+    this._player = new PlayManager();
+    this._player.setBinding(this);
   }
 
-  playBgmTracks(){
-    if(!this.bgmConfig) throw new Error("no bgm configuration found!");
-    if(!this.bgmConfig.enableQueueLoop){
-      (this.queue as QueueManagerWithBGM).resetBgmTracks();
-    }
-    return this._joinVoiceChannel(this.bgmConfig.voiceChannelId)
-      .then(() => this.player.play(0, /* BGM */ true))
-      .catch(er => this.Log(er, "error"))
-    ;
+  protected initQueueManager(){
+    this._queue = new QueueManager();
+    this._queue.setBinding(this);
   }
 
   /**
@@ -293,7 +276,7 @@ export class GuildDataContainer extends LogEmitter {
    * 指定されたボイスチャンネルに参加し、接続を保存し、適切なイベントハンドラを設定します。
    * @param channelId 接続先のボイスチャンネルのID
    */
-  private async _joinVoiceChannel(channelId:string){
+  protected async _joinVoiceChannel(channelId:string){
     const connection = this.connection = await this.bot.client.joinVoiceChannel(channelId, {
       selfDeaf: true,
     });
