@@ -41,7 +41,7 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
 
   protected override initPlayManager(){
     this._player = new PlayManagerWithBgm();
-    this._queue.setBinding(this);
+    this._player.setBinding(this);
   }
 
   protected override initQueueManager(){

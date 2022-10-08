@@ -35,17 +35,17 @@ export class PlayManagerWithBgm extends PlayManager {
       }
       this.server.queue.setToPlayBgm(bgm);
     }
-    if(!this.getIsBadCondition()) this._bgm = bgm;
+    if(!this.getIsBadCondition(bgm)) this._bgm = bgm;
     return super.play(time);
   }
 
-  protected override getIsBadCondition(){
+  protected override getIsBadCondition(bgm:boolean = this._bgm){
     // 接続していない
     return !this.isConnecting
       // なにかしら再生中
       || this.isPlaying
       // キューが空
-      || this.server.queue.isEmpty && (!this._bgm || this.server.queue.isBgmEmpty)
+      || this.server.queue.isEmpty && (!bgm || this.server.queue.isBgmEmpty)
       // 準備中
       || this.preparing
     ;

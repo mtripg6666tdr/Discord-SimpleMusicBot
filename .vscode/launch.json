@@ -12,10 +12,7 @@
         "skipFiles": [
             "<node_internals>/**"
         ],
-        "program": "${workspaceFolder}/dist/index.js",
-        "windows": {
-          "program": "${workspaceFolder}\\dist\\index.js",
-        }
+        "program": "${workspaceFolder}/dist/index.js"
     },
     {
       "type": "node",
@@ -29,10 +26,7 @@
       "skipFiles": [
           "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}\\dist\\index.js",
-      "windows": {
-        "program": "${workspaceFolder}/dist/index.js",
-      }
+      "program": "${workspaceFolder}/dist/index.js"
     }
   ]
 }
