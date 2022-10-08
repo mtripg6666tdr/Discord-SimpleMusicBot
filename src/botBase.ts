@@ -117,7 +117,7 @@ export abstract class MusicBotBase extends LogEmitter {
     PageToggle.organize(this._embedPageToggle, 5);
     // 4分ごとに主要情報を出力
     if(this.maintenanceTickCount % 4 === 1) this.logGeneralInfo();
-    if(this.maintenanceTickCount % 2 === 1) this._backupper.backupData();
+    if(this.maintenanceTickCount % 2 === 1) this._backupper.backup();
   }
 
   /**
