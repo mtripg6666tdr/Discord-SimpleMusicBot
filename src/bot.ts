@@ -369,7 +369,17 @@ export class MusicBot extends MusicBotBase {
       }
     }else if(this.data[member.guild.id]){
       const server = this.data[member.guild.id];
-      if(!server.connection && server instanceof GuildDataContainerWithBgm && newChannel.id === server.bgmConfig.voiceChannelId){
+      if(
+        server instanceof GuildDataContainerWithBgm
+          && (
+            !server.connection
+              || (
+                server.bgmConfig.mode === "prior"
+                && server.connection.channelID !== server.bgmConfig.voiceChannelId
+              )
+          )
+          && newChannel.id === server.bgmConfig.voiceChannelId
+      ){
         // BGMターゲット
         server.playBgmTracks();
       }

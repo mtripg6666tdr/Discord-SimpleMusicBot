@@ -22,14 +22,16 @@ import * as path from "path";
 import CJSON from "comment-json";
 import { z } from "zod";
 
+/* eslint-disable newline-per-chained-call */
 const GuildBGMContainer = z.object({
   voiceChannelId: z.string().regex(/^\d+$/, {message: "channelId is not a snowflake"}),
   allowEditQueue: z.boolean(),
   enableQueueLoop: z.boolean(),
   items: z.array(z.string()).nonempty({message: "items cannot be empty"}),
+  volume: z.number().min(5).max(200),
+  mode: z.union([z.literal("only"), z.literal("prior"), z.literal("normal")]),
 });
 
-/* eslint-disable newline-per-chained-call */
 const Config = z.object({
   adminId: z.string().regex(/^\d+$/, {message: "adminId is not a snowflake"}).nullable(),
   debug: z.boolean(),
