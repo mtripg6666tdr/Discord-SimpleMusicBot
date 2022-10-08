@@ -69,7 +69,7 @@ export class BackUpper extends LogEmitter {
   /**
    * 接続ステータスやキューを含む全データをサーバーにバックアップします
    */
-  backupData():Promise<any>|void{
+  backup():Promise<any>|void{
     if(this.backuppable){
       return this.backupQueue().then(() => this.backupStatus());
     }
@@ -86,7 +86,7 @@ export class BackUpper extends LogEmitter {
       }));
       if(queue.length > 0){
         this.Log("Backing up modified queue...");
-        if(await this.backupQueueData(queue)){
+        if(await this._backupQueueData(queue)){
           this._queueModifiedGuilds = [];
         }else{
           this.Log("Something went wrong while backing up queue", "warn");
@@ -120,7 +120,7 @@ export class BackUpper extends LogEmitter {
       });
       if(speaking.length > 0){
         this.Log("Backing up modified status..");
-        if(await this.backupStatusData(speaking)){
+        if(await this._backupStatusData(speaking)){
           this._previousStatuses = currentStatuses;
         }else{
           this.Log("Something went wrong while backing up statuses", "warn");
@@ -137,11 +137,11 @@ export class BackUpper extends LogEmitter {
   /**
    * ステータスデータをサーバーから取得する
    */
-  async getStatusFromServer(guildids:string[]){
+  async getStatusFromDbServer(guildids:string[]){
     if(this.backuppable){
       const t = Util.time.timer.start("GetIsSpeking");
       try{
-        const result = await this.requestHttp("GET", process.env.GAS_URL, {
+        const result = await this._requestHttp("GET", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
           guildid: guildids.join(","),
           type: "j"
@@ -168,11 +168,11 @@ export class BackUpper extends LogEmitter {
   /**
    * キューのデータをサーバーから取得する
    */
-  async getQueueDataFromServer(guildids:string[]){
+  async getQueueDataFromDbServer(guildids:string[]){
     if(this.backuppable){
       const t = Util.time.timer.start("GetQueueData");
       try{
-        const result = await this.requestHttp("GET", process.env.GAS_URL, {
+        const result = await this._requestHttp("GET", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
           guildid: guildids.join(","),
           type: "queue"
@@ -197,14 +197,14 @@ export class BackUpper extends LogEmitter {
   /**
    * ステータス情報をサーバーへバックアップする
    */
-  private async backupStatusData(data:{guildid:string, value:string}[]){
+  private async _backupStatusData(data:{guildid:string, value:string}[]){
     if(this.backuppable){
       const t = Util.time.timer.start("backupStatusData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as {[key:string]:string};
       data.forEach(d => rawData[d.guildid] = d.value);
       try{
-        const result = await this.requestHttp("POST", process.env.GAS_URL, {
+        const result = await this._requestHttp("POST", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
           guildid: ids,
           data: JSON.stringify(rawData),
@@ -232,14 +232,14 @@ export class BackUpper extends LogEmitter {
   /**
    * キューのデータをサーバーへバックアップする
    */
-  private async backupQueueData(data:{guildid:string, queue:string}[]){
+  private async _backupQueueData(data:{guildid:string, queue:string}[]){
     if(this.backuppable){
       const t = Util.time.timer.start("SetQueueData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as {[guildid:string]:string};
       data.forEach(d => rawData[d.guildid] = encodeURIComponent(d.queue));
       try{
-        const result = await this.requestHttp("POST", process.env.GAS_URL, {
+        const result = await this._requestHttp("POST", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
           guildid: ids,
           data: JSON.stringify(rawData),
@@ -263,7 +263,7 @@ export class BackUpper extends LogEmitter {
   /**
    * HTTPでデータをバックアップするユーティリティメソッド
    */
-  private async requestHttp(method:"GET"|"POST", url:string, data?:requestBody, mimeType?:string){
+  private async _requestHttp(method:"GET"|"POST", url:string, data?:requestBody, mimeType?:string){
     return new Promise<postResult>((resolve, reject) => {
       if(method === "GET"){
         url += "?" + (Object.keys(data) as (keyof requestBody)[]).map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k])).join("&");

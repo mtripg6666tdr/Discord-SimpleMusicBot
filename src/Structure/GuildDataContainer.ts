@@ -207,6 +207,7 @@ export class GuildDataContainer extends LogEmitter {
       this.queue.queueLoopEnabled ? "1" : "0",
       this.AddRelative ? "1" : "0",
       this.equallyPlayback ? "1" : "0",
+      this.player.volume,
     ].join(":");
   }
 
@@ -220,8 +221,9 @@ export class GuildDataContainer extends LogEmitter {
       this.queue.loopEnabled,
       this.queue.queueLoopEnabled,
       this.AddRelative,
-      this.equallyPlayback
+      this.equallyPlayback,
     ] = frozenStatusIds.map(b => b === "1");
+    this.player.setVolume(Number(frozenStatusIds[frozenStatusIds.length - 1]) || 100);
     if(voiceChannelId !== "0"){
       this._joinVoiceChannel(voiceChannelId)
         .then(() => this.player.play())

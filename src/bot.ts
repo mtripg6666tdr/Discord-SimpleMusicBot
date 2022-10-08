@@ -102,8 +102,8 @@ export class MusicBot extends MusicBotBase {
     // Recover queues
     if(this.backupper.backuppable){
       const joinedGUildIds = [...client.guilds.values()].map(guild => guild.id);
-      const queues = await this.backupper.getQueueDataFromServer(joinedGUildIds);
-      const speakingIds = await this.backupper.getStatusFromServer(joinedGUildIds);
+      const queues = await this.backupper.getQueueDataFromDbServer(joinedGUildIds);
+      const speakingIds = await this.backupper.getStatusFromDbServer(joinedGUildIds);
       if(queues && speakingIds){
         const queueGuildIds = Object.keys(queues);
         const speakingGuildIds = Object.keys(speakingIds);
