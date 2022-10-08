@@ -14,9 +14,6 @@ jobs:
         with:
           node-version: '16.x'
       
-      - name: Install dependencies on root
-        run: npm ci
-      
       - name: Install dependencies on docs
         working-directory: "docs"
         run: npm ci
@@ -24,6 +21,8 @@ jobs:
       - name: Update documentation
         working-directory: "docs"
         run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
           npm run build
           npm run deploy
         env:
