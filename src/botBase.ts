@@ -23,6 +23,7 @@ import { execSync } from "child_process";
 
 import { BackUpper } from "./Component/Backupper";
 import { PageToggle } from "./Component/PageToggle";
+import { RateLimitController } from "./Component/RateLimitController";
 import { GuildDataContainer } from "./Structure";
 import { LogEmitter } from "./Structure";
 import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";
@@ -40,6 +41,7 @@ export abstract class MusicBotBase extends LogEmitter {
   protected readonly _versionInfo:string = "Could not get info";
   protected readonly _embedPageToggle:PageToggle[] = [];
   protected readonly _backupper = new BackUpper(() => this.data);
+  protected readonly _rateLimitController = new RateLimitController();
   protected readonly data:DataType = {};
   private maintenanceTickCount = 0;
   /**
