@@ -29,37 +29,37 @@ interface EventKeys {
 }
 
 export class AddOn extends EventEmitter {
-  on<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any):this{
+  override on<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any):this{
     super.on(event, callback);
     return this;
   }
 
-  off<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
+  override off<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
     super.off(event, callback);
     return this;
   }
 
-  once<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
+  override once<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
     super.once(event, callback);
     return this;
   }
 
-  addListener<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
+  override addListener<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
     super.addListener(event, callback);
     return this;
   }
 
-  removeListener<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
+  override removeListener<T extends keyof EventKeys>(event:T, callback:(...args:EventKeys[T])=>any){
     super.removeListener(event, callback);
     return this;
   }
 
-  removeAllListeners<T extends keyof EventKeys>(event:T){
+  override removeAllListeners<T extends keyof EventKeys>(event:T){
     super.removeAllListeners(event);
     return this;
   }
 
-  emit<T extends keyof EventKeys>(event:T, ...args:EventKeys[T]){
+  override emit<T extends keyof EventKeys>(event:T, ...args:EventKeys[T]){
     return super.emit(event, args);
   }
 
