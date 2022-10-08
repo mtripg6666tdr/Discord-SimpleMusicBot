@@ -25,7 +25,7 @@ export class PlayManagerWithBgm extends PlayManager {
   private _bgm:boolean = false;
 
   override get isPlaying():boolean{
-    return this.isConnecting && this.server.connection.playing && this.server.queue.isBGM;
+    return this.isConnecting && this.server.connection.playing && !this.server.queue.isBGM;
   }
 
   override async play(time?: number, bgm: boolean = false){
@@ -62,7 +62,7 @@ export class PlayManagerWithBgm extends PlayManager {
   }
 
   protected override async onStreamFinished(){
-    if(this.server.connection && this.server.connection.play){
+    if(this.server.connection && this.server.connection.playing){
       await Util.general.waitForEnteringState(() => !this.server.connection || !this.server.connection.playing, 20 * 1000)
         .catch(() => {
           this.Log("Stream has not ended in time and will force stream into destroying", "warn");

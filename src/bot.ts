@@ -178,7 +178,7 @@ export class MusicBot extends MusicBotBase {
       // コマンドを解決
       const command = CommandManager.instance.resolve(commandMessage.command);
       if(!command) return;
-      if(server instanceof GuildDataContainerWithBgm && server.queue.isBGM && !server.bgmConfig.allowEditQueue && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"){
+      if(server instanceof GuildDataContainerWithBgm && ((server.queue.isBGM && !server.bgmConfig.allowEditQueue) || server.bgmConfig.mode === "only") && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"){
         return;
       }
       // 送信可能か確認
@@ -259,7 +259,7 @@ export class MusicBot extends MusicBotBase {
       // コマンドを解決
       const command = CommandManager.instance.resolve(interaction.data.name);
       if(command){
-        if(server instanceof GuildDataContainerWithBgm && server.queue.isBGM && !server.bgmConfig.allowEditQueue && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"){
+        if(server instanceof GuildDataContainerWithBgm && ((server.queue.isBGM && !server.bgmConfig.allowEditQueue) || server.bgmConfig.mode === "only") && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"){
           return;
         }
         // 遅延リプライ
@@ -379,6 +379,7 @@ export class MusicBot extends MusicBotBase {
               )
           )
           && newChannel.id === server.bgmConfig.voiceChannelId
+          && !server.queue.isBGM
       ){
         // BGMターゲット
         server.playBgmTracks();
