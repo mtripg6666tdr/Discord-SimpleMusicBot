@@ -73,4 +73,3 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "discord.js"
       - dependency-name: "discord-api-types"
-      - dependency-name: "@discordjs/builders"
