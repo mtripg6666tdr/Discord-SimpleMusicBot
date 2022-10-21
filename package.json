@@ -54,7 +54,7 @@
   },
   "optionalDependencies": {
     "@discordjs/opus": "^0.8.0",
-    "bufferutil": "^4.0.6",
+    "bufferutil": "^4.0.7",
     "ffmpeg-static": "^5.1.0",
     "pako": "^2.0.4",
     "sodium-native": "^3.4.1",
