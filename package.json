@@ -56,7 +56,7 @@
     "@discordjs/opus": "^0.8.0",
     "bufferutil": "^4.0.7",
     "ffmpeg-static": "^5.1.0",
-    "pako": "^2.0.4",
+    "pako": "^2.1.0",
     "sodium-native": "^3.4.1",
     "zlib-sync": "^0.1.7"
   },
