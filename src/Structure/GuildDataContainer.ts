@@ -441,7 +441,8 @@ export class GuildDataContainer extends LogEmitter {
         }else{
           const embed = new Helper.MessageEmbedBuilder()
             .setTitle("✅プレイリストが処理されました")
-            .setDescription(`[${result.title}](${result.url}) \`(${result.author.name})\` \r\n${index}曲が追加されました`)
+            // \`(${result.author.name})\` author has been null lately
+            .setDescription(`[${result.title}](${result.url}) \r\n${index}曲が追加されました`)
             .setThumbnail(result.bestThumbnail.url)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({content: "", embeds: [embed.toEris()]});
