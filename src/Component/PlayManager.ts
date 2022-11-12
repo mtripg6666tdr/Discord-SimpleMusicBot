@@ -268,10 +268,12 @@ export class PlayManager extends ServerManagerBase {
   */
   stop():PlayManager{
     this.Log("Stop called");
-    this.server.connection.off("end", this.onStreamFinishedBindThis);
-    this.server.connection?.stopPlaying();
-    this.server.connection.on("end", this.onStreamFinishedBindThis);
-    this.server.bot.backupper.backup();
+    if(this.server.connection){
+      this.server.connection.off("end", this.onStreamFinishedBindThis);
+      this.server.connection.stopPlaying();
+      this.server.connection.on("end", this.onStreamFinishedBindThis);
+      this.server.bot.backupper.backup();
+    }
     return this;
   }
 
