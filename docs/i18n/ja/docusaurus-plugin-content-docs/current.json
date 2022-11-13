@@ -1,0 +1,18 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.docsSidebar.category.インストール＆実行": {
+    "message": "インストール＆実行",
+    "description": "The label for category インストール＆実行 in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.バックアップ": {
+    "message": "バックアップ",
+    "description": "The label for category バックアップ in sidebar docsSidebar"
+  },
+  "sidebar.commandsSidebar.category.コマンド一覧": {
+    "message": "コマンド一覧",
+    "description": "The label for category コマンド一覧 in sidebar commandsSidebar"
+  }
+}

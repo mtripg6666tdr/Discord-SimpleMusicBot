@@ -17,5 +17,7 @@ sidebar_position: 6
 |Speak|発言|ボイスチャンネルでオーディオを再生するのに必要|
 |Mute Members|メンバーをミュート|抑制されているボイスチャンネルでミュートを外すのに必要|
 
-なお、Discord Developer Portalで、ボットに対してMessage Content Intentを有効にしないと、メッセベースのコマンドを使用することはできません。
+:::info
+Discord Developer Portalで、ボットに対してMessage Content Intentを有効にしないと、メッセベースのコマンドや、その他の一部機能を使用することはできません。
 ![Message Content Intent](https://cdn.discordapp.com/attachments/1024683345625497601/1025018178146926733/unknown.png)
+:::

@@ -6,8 +6,10 @@
 本ボットの設定ファイルは、`.env`と`config.json`の2ファイルです。
 
 ## `.env`ファイル
-こちらには主にトークンなどの認証情報を記述します。
-`.env.sample`がサンプルファイルとなっていますので、コピー＆リネームしてお使いください。
+[サンプルファイル](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/.env.sample)
+
+こちらには主にトークンなどの認証情報を記述します。  
+`.env.sample`がサンプルファイルとなっていますので、コピー＆リネームしてお使いください。  
 - TOKEN  
   ボットのトークンです。Discord Developer Portalから取得してください。
 - CSE_KEY  
@@ -20,9 +22,23 @@
   サーバーの仕様等についてはあとのセクションを参照してください。
 
 ## `config.json`ファイル
-こちらにはボットの設定情報などを記述します。
-任意指定の設定に関しては、**値をnullにしてください("null"ではなくnull)**
-`config.json.sample`がサンプルファイルとなっていますので、コピー＆リネームしてお使いください。
+[サンプルファイル](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/config.json.sample)
+
+こちらにはボットの設定情報などを記述します。  
+
+:::caution
+
+任意指定の設定に関しては、**値をnullにしてください("null"ではなくnull)**  
+例：
+```json
+{
+  "proxy: null
+}
+```
+
+:::
+
+`config.json.sample`がサンプルファイルとなっていますので、コピー＆リネームしてお使いください。  
 (カッコ内は、型です。)
 - adminId (string|null)  
   管理人のユーザーのID。設定しない場合は`null`
@@ -43,3 +59,5 @@
 - bgm (object)  
   自動的にBGMを再生するように構成できます。設定方法については[こちらのファイル](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/util/config-with-bgm.json)を参考にしてください。
 
+
+設定が出来たら、トランスパイルして、実行してみましょう！次のページへ進みます。
