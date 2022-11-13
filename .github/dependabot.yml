@@ -52,6 +52,9 @@ updates:
       - "scope:docs"
     allow:
       - dependency-type: "direct"
+    ignore:
+      - dependency-name: "@mdx-js/react"
+        update-types: ["version-update:semver-major"]
   
   # actions
   - package-ecosystem: github-actions
