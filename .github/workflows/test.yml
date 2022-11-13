@@ -163,6 +163,12 @@ jobs:
       
       - name: Check if there are changes
         run: git diff -w --exit-code
+        
+      - name: Build documentation site
+        working-directory: "docs"
+        run: |
+          npm ci
+          npm run build
 
   success-all-test:
     runs-on: ubuntu-latest
