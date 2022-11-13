@@ -38,7 +38,7 @@ updates:
 
   # documentation site (master)
   - package-ecosystem: npm
-    directory: "docs/"
+    directory: "/docs/"
     schedule:
       interval: "daily"
       time: "09:00"
