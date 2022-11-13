@@ -53,7 +53,7 @@ const config = {
       navbar: {
         title: 'Discord-SimpleMusicBot',
         logo: {
-          alt: 'My Site Logo',
+          alt: 'Logo',
           src: 'img/icon.png',
         },
         items: [
@@ -67,7 +67,7 @@ const config = {
             type: 'doc',
             docId: 'commands/overview',
             position: 'left',
-            label: 'ガイド',
+            label: '機能ガイド',
           },
           {
             href: 'https://github.com/mtripg6666tdr/Discord-SimpleMusicBot',
@@ -87,7 +87,7 @@ const config = {
                 to: '/docs/docs/welcome',
               },
               {
-                label: 'ガイド',
+                label: '機能ガイド',
                 to: '/docs/commands/overview'
               }
             ],
