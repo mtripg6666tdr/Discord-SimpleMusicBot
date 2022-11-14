@@ -11,7 +11,7 @@ sidebar_position: 5
 - 操作の対象となる楽曲を追加したユーザー（一部のコマンドのみ。）
   - 例）自分で追加した楽曲に対しては、いつでも削除コマンドを使用できます。  
 
-各コマンドの権限については、[機能ガイド](../commands/overview.md)から確認いただけます。
+各コマンドの権限については、[機能ガイド>コマンド](../commands/commands/overview.md)からご確認いただけます。
 
 :::note
 各コマンドの権限の一覧は[こちら](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/issues/519#issuecomment-1264396918)を参照から確認できます。。
