@@ -13,7 +13,8 @@
     "@typescript-eslint",
     "import",
     "node",
-    "license-header"
+    "license-header",
+    "destructuring-import-spacing"
   ],
   "env": {
     "node": true
@@ -151,6 +152,7 @@
     "node/no-missing-require": "off",
     "node/shebang": "error",
     "license-header/header": ["warn", "./util/license.js"],
+    "destructuring-import-spacing/destructuring-import-spacing": "warn",
 
     // eslint rules
     "eol-last": ["error", "always"],
