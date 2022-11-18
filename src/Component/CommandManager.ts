@@ -17,7 +17,7 @@
  */
 
 import type { BaseCommand } from "../Commands";
-import type { CommandOptionsTypes} from "../Structure";
+import type { CommandOptionsTypes } from "../Structure";
 import type { ApplicationCommandOptionsWithValue, Client } from "eris";
 
 import { Constants } from "eris";
