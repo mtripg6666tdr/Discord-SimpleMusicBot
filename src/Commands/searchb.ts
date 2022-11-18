@@ -19,7 +19,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { ResponseMessage } from "../Component/ResponseMessage";
-import type { SelectMenuOptions} from "eris";
+import type { SelectMenuOptions } from "eris";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 

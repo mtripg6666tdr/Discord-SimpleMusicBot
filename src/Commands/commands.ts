@@ -19,7 +19,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { MessageEmbedBuilder } from "@mtripg6666tdr/eris-command-resolver";
-import type { EmbedField} from "eris";
+import type { EmbedField } from "eris";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
