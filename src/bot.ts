@@ -651,7 +651,7 @@ export class MusicBot extends LogEmitter {
       }else{
         const embed = new discord.MessageEmbed()
           .setTitle("✅プレイリストが処理されました")
-          .setDescription(`[${result.title}](${result.url}) \`(${result.author.name})\` \r\n${index}曲が追加されました`)
+          .setDescription(`[${result.title}](${result.url}) \r\n${index}曲が追加されました`)
           .setThumbnail(result.bestThumbnail.url)
           .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
         await msg.edit({content: null, embeds: [embed]});
