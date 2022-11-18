@@ -15,9 +15,6 @@ updates:
     labels:
       - "dependencies"
       - "javascript"
-    ignore:
-      - dependency-name: "@types/node"
-        update-types: ["version-update:semver-major"]
 
   # example db server (master)
   - package-ecosystem: npm
@@ -88,8 +85,6 @@ updates:
       - dependency-type: "direct"
     ignore:
       - dependency-name: "node"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
       - dependency-name: "discord.js"
       - dependency-name: "discord-api-types"
