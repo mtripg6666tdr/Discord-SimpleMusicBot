@@ -32,7 +32,7 @@
 例：
 ```json
 {
-  "proxy: null
+  "proxy": null
 }
 ```
 
