@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 6
 ---
 
 # コマンド使用時の権限
@@ -14,5 +14,5 @@ sidebar_position: 5
 各コマンドの権限については、[機能ガイド>コマンド](../commands/commands/overview.md)からご確認いただけます。
 
 :::note
-各コマンドの権限の一覧は[こちら](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/issues/519#issuecomment-1264396918)を参照から確認できます。。
+各コマンドの権限の一覧は[こちら](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/issues/519#issuecomment-1264396918)を参照から確認できます。
 :::
