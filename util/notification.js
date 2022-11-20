@@ -3,7 +3,11 @@ require("dotenv").config();
 const eris = require("eris");
 const miniget = require("miniget");
 /** @type {*} */
-const { TOKEN, CHANNEL_ID } = process.env;
+const { TOKEN, CHANNEL_ID, GITHUB_REF } = process.env;
+if(!GITHUB_REF.includes("v3")){
+  console.log("No notification needed");
+  process.exit(0);
+}
 const client = new eris.Client(TOKEN, {
   intents: ["guilds"]
 });
@@ -32,5 +36,6 @@ client.once("ready", async () => {
   client.disconnect({
     reconnect: false,
   });
+  console.log("Post successfully");
   process.exit(0);
 }).connect();
