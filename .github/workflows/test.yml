@@ -37,7 +37,7 @@ jobs:
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-${{ hashFiles('package-lock.json') }}
+          key: npm-16.x-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
 
       - name: Install dependencies
@@ -70,7 +70,7 @@ jobs:
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-${{ hashFiles('package-lock.json') }}
+          key: npm-16.x-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
 
       - name: Install dependencies
@@ -111,7 +111,7 @@ jobs:
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-${{ hashFiles('package-lock.json') }}
+          key: npm-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
 
       - name: Install dependencies
@@ -148,7 +148,7 @@ jobs:
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-${{ hashFiles('package-lock.json') }}
+          key: npm-16.x-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
 
       - name: Install dependencies
