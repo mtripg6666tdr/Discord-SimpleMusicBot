@@ -9,7 +9,7 @@
     "node": ">=16.6.0"
   },
   "dependencies": {
-    "@discordjs/voice": "^0.13.0",
+    "@discordjs/voice": "^0.14.0",
     "comment-json": "^4.2.3",
     "discord.js": "^13.6.0",
     "djs-command-resolver": "^1.0.2",
