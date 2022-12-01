@@ -11,7 +11,7 @@ COPY package.json ./
 COPY package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npm run build
+RUN npx tsc
 
 
 FROM base AS runner
