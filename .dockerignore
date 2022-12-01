@@ -1,0 +1,13 @@
+.git*
+.husky
+.vscode
+dist
+docs
+node_modules
+test
+util
+.env.sample
+.eslint*
+.replit
+config.json*
+README.md
