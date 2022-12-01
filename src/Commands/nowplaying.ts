@@ -31,7 +31,7 @@ export default class NowPlaying extends BaseCommand {
     super({
       name: "現在再生中",
       alias: ["今の曲", "np", "nowplaying"],
-      description: "現在再生中の曲の情報を表示します。 `l`を引数にするとより長く概要を表示します(可能な場合)。",
+      description: "現在再生中の曲の情報を表示します。 `l`(スラッシュコマンドの場合はTrue)を引数にするとより長く概要を表示します(可能な場合)",
       unlist: false,
       category: "player",
       argument: [{
@@ -78,7 +78,7 @@ export default class NowPlaying extends BaseCommand {
       .setThumbnail(info.Thumnail)
       .setFields(
         ...info.toField(
-          ["long", "l", "verbose", "l"].some(arg => options.args[0] === arg)
+          ["long", "l", "verbose", "l", "true"].some(arg => options.args[0] === arg)
         )
       )
       .addField(":link:URL", info.Url)
