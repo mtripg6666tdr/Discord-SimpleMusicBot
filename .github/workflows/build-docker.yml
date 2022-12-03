@@ -66,4 +66,4 @@ jobs:
         uses: ishworkh/docker-image-artifact-upload@v1
         with:
           image: ${{ steps.meta.outputs.tags }}
-          retention_days: "2"
+          retention_days: "7"
