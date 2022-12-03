@@ -1,4 +1,4 @@
-.git*
+.github
 .husky
 .vscode
 dist
@@ -8,6 +8,8 @@ test
 util
 .env.sample
 .eslint*
+.gitattributes
+.gitignore
 .replit
 config.json*
 README.md
