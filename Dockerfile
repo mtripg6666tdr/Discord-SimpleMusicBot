@@ -17,6 +17,7 @@ FROM base AS runner
 RUN apt-get install -y --no-install-recommends nscd git
 WORKDIR /app
 COPY package.json package-lock.json ./
+COPY .git ./.git
 RUN npm ci --omit=dev --ignore-scripts
 COPY --from=builder /app/dist /app/dist
 
