@@ -52,3 +52,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha,scope=docker
           cache-to: type=gha,mode=max,scope=docker
+          context: .
+          file: ./Dockerfile
