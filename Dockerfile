@@ -22,4 +22,4 @@ COPY package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts
 COPY --from=builder /app/dist /app/dist
 
-CMD ["node", "--enable-source-maps", "index.js"]
+CMD ["node", "--enable-source-maps", "dist/index.js"]
