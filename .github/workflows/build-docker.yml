@@ -61,3 +61,9 @@ jobs:
           cache-to: type=gha,mode=max,scope=docker
           context: .
           file: ./Dockerfile
+          
+      - name: Upload image as artifact
+        uses: ishworkh/docker-image-artifact-upload@v1
+        with:
+          image: ${{ steps.meta.outputs.tags }}
+          retention_days: "7"
