@@ -1,0 +1,15 @@
+.github
+.husky
+.vscode
+dist
+docs
+node_modules
+test
+util
+.env.sample
+.eslint*
+.gitattributes
+.gitignore
+.replit
+config.json*
+README.md
