@@ -18,7 +18,7 @@ RUN apt-get install -y --no-install-recommends nscd git
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY .git ./.git
-RUN npm ci --omit=dev --ignore-scripts
+RUN npm pkg delete scripts.prepare && npm ci --omit=dev
 COPY --from=builder /app/dist /app/dist
 
 CMD ["node", "--enable-source-maps", "dist/index.js"]
