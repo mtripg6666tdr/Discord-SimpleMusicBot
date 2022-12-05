@@ -10,11 +10,15 @@ updates:
     commit-message:
       prefix: "Update:"
     target-branch: "master"
-    allow:
-      - dependency-type: "direct"
     labels:
       - "dependencies"
       - "javascript"
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-name: "html-to-text"
+        update-types: ["version-update:semver-major"]
+  
 
   # example db server (master)
   - package-ecosystem: npm
