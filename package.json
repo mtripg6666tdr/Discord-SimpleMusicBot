@@ -17,7 +17,7 @@
     "follow-redirects": "^1.15.2",
     "genius-lyrics": "^4.4.0",
     "html-entities": "^2.3.3",
-    "html-to-text": "^9.0.1",
+    "html-to-text": "^9.0.2",
     "https-proxy-agent": "^5.0.1",
     "libsodium-wrappers": "^0.7.10",
     "m3u8stream": "^0.8.6",
