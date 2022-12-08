@@ -28,8 +28,8 @@ import { MusicBot } from "./bot";
 Util.logger.log("[Entry] Discord-SimpleMusicBot by mtripg6666tdr");
 Util.logger.log("[Entry] This application was originally built by mtripg6666tdr and is licensed under GPLv3 or later.");
 Util.logger.log("[Entry] There is no warranty for the work, both of the original and its forks.");
-Util.logger.log("[Entry] However if you found any bugs in the original please feel free to report it by creating an issue on GitHub.");
-Util.logger.log("[Entry] Thank you for using.");
+Util.logger.log("[Entry] However if you found any bugs in the original please feel free to report them by creating an issue on GitHub.");
+Util.logger.log("[Entry] Thank you for using this!");
 Util.logger.log(`[Entry] Node.js v${process.versions.node}`);
 
 const bot = new MusicBot(process.env.TOKEN, Boolean(Util.config.maintenance));
