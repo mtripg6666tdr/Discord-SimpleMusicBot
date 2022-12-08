@@ -26,7 +26,6 @@ import { MusicBot } from "./bot";
 // メインエントリ
 // =============
 Util.logger.log("[Entry] Discord-SimpleMusicBot by mtripg6666tdr");
-Util.logger.log("[Entry] Discord-SimpleMusicBot by mtripg6666tdr");
 Util.logger.log("[Entry] This application was originally built by mtripg6666tdr and is licensed under GPLv3 or later.");
 Util.logger.log("[Entry] There is no warranty for the work, both of the original and its forks.");
 Util.logger.log("[Entry] However if you found any bugs in the original please feel free to report it by creating an issue on GitHub.");
