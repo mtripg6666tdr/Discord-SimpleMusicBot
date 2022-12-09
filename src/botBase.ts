@@ -20,6 +20,8 @@ import type { GuildBGMContainerType } from "./Util/config";
 import type * as discord from "eris";
 
 import { execSync } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
 
 import { BackUpper } from "./Component/Backupper";
 import { PageToggle } from "./Component/PageToggle";
@@ -38,7 +40,7 @@ export abstract class MusicBotBase extends LogEmitter {
   // クライアントの初期化
   protected readonly abstract _client:discord.Client;
   protected readonly _instantiatedTime:Date = null;
-  protected readonly _versionInfo:string = "Could not get info";
+  protected readonly _versionInfo:string = null;
   protected readonly _embedPageToggle:PageToggle[] = [];
   protected readonly _backupper = new BackUpper(() => this.data);
   protected readonly _rateLimitController = new RateLimitController();
@@ -100,12 +102,24 @@ export abstract class MusicBotBase extends LogEmitter {
       this.Log("bot is now maintainance mode");
     }
     try{
-      this._versionInfo = execSync("git log -n 1 --pretty=format:%h").toString()
-        .trim();
+      if(fs.existsSync(path.join(__dirname, "../DOCKER_BUILD_IMAGE"))){
+        this._versionInfo = require("../package.json").version;
+      }
+      if(!this._versionInfo){
+        this._versionInfo = execSync("git log -n 1 --pretty=format:%h")
+          .toString()
+          .trim()
+        ;
+      }
       this.Log(`Version: ${this._versionInfo}`);
     }
     catch{
       this.Log("Something went wrong when obtaining version", "warn");
+    }
+    finally{
+      if(!this._versionInfo){
+        this._versionInfo = "Could not get version";
+      }
     }
   }
 
