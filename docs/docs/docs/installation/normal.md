@@ -25,7 +25,7 @@ sidebar_position: 1
 
 ### 推奨事項
 - Puthon2.xまたはPython3.xがインストールされていること。
-- Unix系の環境であれば、`nscd`がインストールされていること。
+- Unix系の環境であれば、`nscd`がインストールされ、サービスが稼働していること。
 
 :::note
 `nscd`は、`apt`でインストールできます
@@ -44,6 +44,15 @@ sidebar_position: 1
 git clone https://github.com/mtripg6666tdr/Discord-SimpleMusicBot.git
 # カレントディレクトリ移動
 cd Discord-SimpleMusicBot
+```
+masterブランチは開発用のブランチでもあり、未修正のバグが含まれている可能性があるため、最新のバージョンを指定することをお勧めします。
+例えば、v3.4.0を使用する場合、以下のようにします。
+```bash
+git reset --hard v3.4.0
+```
+
+以下のコマンドで、依存関係のパッケージをインストールします。
+```bash
 # 必須パッケージインストール
 npm install
 ```
@@ -76,7 +85,8 @@ npm run start
 本ボットを最新のソースコードに更新するには、以下のような操作を行ってください。
 ```bash
 # ソースコードの更新
-git pull
+git fetch
+git reset --hard <最新のバージョン>
 # 依存関係の更新
 npm install
 # トランスパイル
