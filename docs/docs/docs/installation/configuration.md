@@ -1,4 +1,4 @@
-# 2. Botのトークンなどの設定  
+# ボットの設定について  
 ボットの各種設定を`.env`、`config.json`に設定します。  
 詳しくは以下を参照してください。
 
@@ -59,5 +59,3 @@
 - bgm (object)  
   自動的にBGMを再生するように構成できます。設定方法については[こちらのファイル](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/util/config-with-bgm.json)を参考にしてください。
 
-
-設定が出来たら、トランスパイルして、実行してみましょう！次のページへ進みます。
