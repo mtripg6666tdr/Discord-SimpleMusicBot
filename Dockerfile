@@ -14,10 +14,9 @@ RUN npx tsc
 
 
 FROM base AS runner
-RUN apt-get install -y --no-install-recommends nscd git
+RUN apt-get install -y --no-install-recommends nscd
 WORKDIR /app
 COPY package.json package-lock.json ./
-COPY .git ./.git
 RUN npm pkg delete scripts.prepare && npm ci --omit=dev
 COPY --from=builder /app/dist /app/dist
 RUN /bin/bash -c 'echo DOCKER_BUILD_IMAGE>DOCKER_BUILD_IMAGE'
