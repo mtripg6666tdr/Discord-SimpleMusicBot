@@ -1,0 +1,8 @@
+{
+  "label": "ボットの各種機能",
+  "position": 5,
+  "link": {
+    "type": "doc",
+    "id": "docs/feature/overview"
+  }
+}
