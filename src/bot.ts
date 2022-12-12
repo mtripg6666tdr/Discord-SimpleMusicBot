@@ -160,7 +160,7 @@ export class MusicBot extends MusicBotBase {
     }
     // botのメッセやdm、およびnewsは無視
     if(!this._isReadyFinished || message.author.bot || !(message.channel instanceof discord.TextChannel)) return;
-    if(this._rateLimitController.hasRateLimited(message.member.id)) return;
+    if(this._rateLimitController.isRateLimited(message.member.id)) return;
     // データ初期化
     const server = this.initData(message.guildID, message.channel.id);
     // プレフィックスの更新
@@ -260,7 +260,7 @@ export class MusicBot extends MusicBotBase {
       if(!Util.config.adminId || interaction.member?.id !== Util.config.adminId) return;
     }
     if(interaction.member?.bot) return;
-    if(this._rateLimitController.hasRateLimited(interaction.member.id)) return;
+    if(this._rateLimitController.isRateLimited(interaction.member.id)) return;
     // データ初期化
     const channel = interaction.channel as discord.TextChannel;
     const server = this.initData(channel.guild.id, channel.id);

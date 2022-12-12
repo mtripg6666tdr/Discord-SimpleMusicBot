@@ -61,19 +61,22 @@ export function CalcTime(date:number):number[]{
 }
 
 class _timerStore {
-  private timers = {} as {[key:string]:number};
+  private readonly timers = new Map<string, number>();
 
   start(key:string){
-    this.timers[key] = performance.now();
+    this.timers.set(key, performance.now());
     return new TimerStopper(this, key);
   }
 
   end(key:string, logger?: (content:string) => void){
-    if(this.timers[key]){
-      const conteet = "[TimeLogger] Elapsed " + (Math.floor((performance.now() - this.timers[key]) * 100) / 100) + "ms. (" + key + ")";
-      if(logger) logger(conteet);
-      else log(conteet);
-      delete this.timers[key];
+    if(this.timers.get(key)){
+      const content = `[TimeLogger] Elapsed ${(Math.floor((performance.now() - this.timers.get(key)) * 100) / 100)}ms. (${key})`;
+      if(logger){
+        logger(content);
+      }else{
+        log(content);
+      }
+      this.timers.delete(key);
     }
   }
 }
