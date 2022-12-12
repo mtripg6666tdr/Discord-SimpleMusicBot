@@ -17,7 +17,7 @@
  */
 
 import type { StreamInfo, StreamType, UrlStreamInfo } from "../../AudioSource";
-import type { Readable, TransformOptions } from "stream";
+import type { Readable } from "stream";
 
 import { opus } from "prism-media";
 
@@ -92,8 +92,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     // Total: 4.5
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(Demuxer)--(Decoder) --> PCM (cost: 4.5)`);
     const rawStream = streamInfo.type === "url" ? convertUrlStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
-    const opts = {} as TransformOptions;
-    const demuxer = streamInfo.streamType === "webm" ? new opus.WebmDemuxer(opts) : new opus.OggDemuxer(opts);
+    const demuxer = streamInfo.streamType === "webm" ? new opus.WebmDemuxer() : new opus.OggDemuxer();
     const decoder = new opus.Decoder({
       rate: 48000,
       channels: 2,

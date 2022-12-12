@@ -82,7 +82,7 @@ export class BackUpper extends LogEmitter {
     try{
       const queue = this._queueModifiedGuilds.map(id => ({
         guildid: id,
-        queue: JSON.stringify(this.data[id].exportQueue())
+        queue: JSON.stringify(this.data.get(id).exportQueue())
       }));
       if(queue.length > 0){
         this.Log("Backing up modified queue...");
@@ -109,7 +109,7 @@ export class BackUpper extends LogEmitter {
       const speaking = [] as {guildid:string, value:string}[];
       const currentStatuses = Object.assign({}, this._previousStatuses) as {[guildId:string]:string};
       Object.keys(this.data).forEach(id => {
-        const currentStatus = this.data[id].exportStatus();
+        const currentStatus = this.data.get(id).exportStatus();
         if(!this._previousStatuses[id] || this._previousStatuses[id] !== currentStatus){
           speaking.push({
             guildid: id,

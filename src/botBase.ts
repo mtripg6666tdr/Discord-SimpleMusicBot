@@ -31,7 +31,7 @@ import { LogEmitter } from "./Structure";
 import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";
 import { Util } from "./Util";
 
-export type DataType = {[key:string]:GuildDataContainer};
+export type DataType = Map<string, GuildDataContainer>;
 
 /**
  * 音楽ボットの本体のうち、カスタムデータ構造を実装します
@@ -44,7 +44,7 @@ export abstract class MusicBotBase extends LogEmitter {
   protected readonly _embedPageToggle:PageToggle[] = [];
   protected readonly _backupper = new BackUpper(() => this.data);
   protected readonly _rateLimitController = new RateLimitController();
-  protected readonly data:DataType = {};
+  protected readonly data:DataType = new Map();
   private maintenanceTickCount = 0;
   /**
    * ページトグル
@@ -88,7 +88,7 @@ export abstract class MusicBotBase extends LogEmitter {
 
   get totalTransformingCost(){
     return Object.keys(this.data)
-      .map(id => this.data[id].player.cost)
+      .map(id => this.data.get(id).player.cost)
       .reduce((prev, current) => prev + current, 0)
     ;
   }
@@ -156,9 +156,10 @@ export abstract class MusicBotBase extends LogEmitter {
    * 必要に応じてサーバーデータを初期化します
    */
   protected initData(guildid:string, boundChannelId:string){
-    const prev = this.data[guildid];
+    const prev = this.data.get(guildid);
     if(!prev){
-      const server = this.data[guildid] = new GuildDataContainer(guildid, boundChannelId, this);
+      const server = new GuildDataContainer(guildid, boundChannelId, this);
+      this.data.set(guildid, server);
       return server;
     }else{
       return prev;
@@ -166,13 +167,14 @@ export abstract class MusicBotBase extends LogEmitter {
   }
 
   protected initDataWithBgm(guildid:string, boundChannelId:string, bgmConfig:GuildBGMContainerType){
-    if(this.data[guildid]) throw new Error("guild data was already set");
-    const server = this.data[guildid] = new GuildDataContainerWithBgm(guildid, boundChannelId, this, bgmConfig);
+    if(this.data.has(guildid)) throw new Error("guild data was already set");
+    const server = new GuildDataContainerWithBgm(guildid, boundChannelId, this, bgmConfig);
+    this.data.set(guildid, server);
     return server;
   }
 
   resetData(guildId:string){
-    delete this.data[guildId];
+    this.data.delete(guildId);
     this.backupper.addModifiedGuilds(guildId);
   }
 }

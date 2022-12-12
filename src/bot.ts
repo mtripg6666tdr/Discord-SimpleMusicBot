@@ -160,7 +160,7 @@ export class MusicBot extends MusicBotBase {
     }
     // botのメッセやdm、およびnewsは無視
     if(!this._isReadyFinished || message.author.bot || !(message.channel instanceof discord.TextChannel)) return;
-    if(this._rateLimitController.hasRateLimited(message.member.id)) return;
+    if(this._rateLimitController.isRateLimited(message.member.id)) return;
     // データ初期化
     const server = this.initData(message.guildID, message.channel.id);
     // プレフィックスの更新
@@ -222,9 +222,9 @@ export class MusicBot extends MusicBotBase {
     }else if(server.searchPanel){
       // searchコマンドのキャンセルを捕捉
       if(message.content === "キャンセル" || message.content === "cancel"){
-        const msgId = this.data[message.channel.guild.id].searchPanel.Msg;
+        const msgId = this.data.get(message.channel.guild.id).searchPanel.Msg;
         if(msgId.userId !== message.author.id) return;
-        this.data[message.channel.guild.id].searchPanel = null;
+        this.data.get(message.channel.guild.id).searchPanel = null;
         await message.channel.createMessage("✅キャンセルしました");
         await this._client.deleteMessage(msgId.chId, msgId.id).catch(e => this.Log(e, "error"));
       }
@@ -260,7 +260,7 @@ export class MusicBot extends MusicBotBase {
       if(!Util.config.adminId || interaction.member?.id !== Util.config.adminId) return;
     }
     if(interaction.member?.bot) return;
-    if(this._rateLimitController.hasRateLimited(interaction.member.id)) return;
+    if(this._rateLimitController.isRateLimited(interaction.member.id)) return;
     // データ初期化
     const channel = interaction.channel as discord.TextChannel;
     const server = this.initData(channel.guild.id, channel.id);
@@ -335,7 +335,7 @@ export class MusicBot extends MusicBotBase {
         }else{
           const updateEffectPanel = () => {
             const mes = interaction.message;
-            const { embed, messageActions } = Util.effects.getCurrentEffectPanel(interaction.member.avatarURL, this.data[(interaction.channel as discord.TextChannel).guild.id]);
+            const { embed, messageActions } = Util.effects.getCurrentEffectPanel(interaction.member.avatarURL, this.data.get((interaction.channel as discord.TextChannel).guild.id));
             mes.edit({
               content: "",
               embeds: [embed.toEris()],
@@ -347,15 +347,15 @@ export class MusicBot extends MusicBotBase {
               updateEffectPanel();
               break;
             case Util.effects.EffectsCustomIds.BassBoost:
-              this.data[interaction.channel.guild.id].effectPrefs.BassBoost = !server.effectPrefs.BassBoost;
+              this.data.get(interaction.channel.guild.id).effectPrefs.BassBoost = !server.effectPrefs.BassBoost;
               updateEffectPanel();
               break;
             case Util.effects.EffectsCustomIds.Reverb:
-              this.data[interaction.channel.guild.id].effectPrefs.Reverb = !server.effectPrefs.Reverb;
+              this.data.get(interaction.channel.guild.id).effectPrefs.Reverb = !server.effectPrefs.Reverb;
               updateEffectPanel();
               break;
             case Util.effects.EffectsCustomIds.LoudnessEqualization:
-              this.data[interaction.channel.guild.id].effectPrefs.LoudnessEqualization = !server.effectPrefs.LoudnessEqualization;
+              this.data.get(interaction.channel.guild.id).effectPrefs.LoudnessEqualization = !server.effectPrefs.LoudnessEqualization;
               updateEffectPanel();
               break;
           }
@@ -363,7 +363,7 @@ export class MusicBot extends MusicBotBase {
       }else if(Util.eris.interaction.compoentnInteractionDataIsSelectMenuData(interaction.data)){
         this.Log("received selectmenu interaction");
         // 検索パネル取得
-        const panel = this.data[interaction.channel.guild.id].searchPanel;
+        const panel = this.data.get(interaction.channel.guild.id).searchPanel;
         // なければ返却
         if(!panel) return;
         // インタラクションしたユーザーを確認
@@ -371,7 +371,7 @@ export class MusicBot extends MusicBotBase {
         await interaction.deferUpdate();
         if(interaction.data.custom_id === "search"){
           if(interaction.data.values.includes("cancel")){
-            this.data[interaction.channel.guild.id].searchPanel = null;
+            this.data.get(interaction.channel.guild.id).searchPanel = null;
             await interaction.channel.createMessage("✅キャンセルしました");
             await interaction.deleteOriginalMessage();
           }else{
@@ -400,13 +400,13 @@ export class MusicBot extends MusicBotBase {
               mute: false
             })
             .catch(() => {
-              this._client.createMessage(this.data[newChannel.guild.id].boundTextChannel, ":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。")
+              this._client.createMessage(this.data.get(newChannel.guild.id).boundTextChannel, ":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。")
                 .catch(e => this.Log(e));
             });
         });
       }
-    }else if(this.data[member.guild.id]){
-      const server = this.data[member.guild.id];
+    }else if(this.data.get(member.guild.id)){
+      const server = this.data.get(member.guild.id);
       if(
         server instanceof GuildDataContainerWithBgm
           && (
@@ -426,7 +426,7 @@ export class MusicBot extends MusicBotBase {
   }
 
   private async onVoiceChannelLeave(member:discord.Member, oldChannel:discord.TextVoiceChannel){
-    const server = this.data[oldChannel.guild.id];
+    const server = this.data.get(oldChannel.guild.id);
     if(!server || !server.connection) return;
     if(member.id === this._client.user.id){
       // サーバー側からのボットの切断
@@ -486,7 +486,7 @@ export class MusicBot extends MusicBotBase {
       embedPageToggle: this._embedPageToggle,
       args: options,
       bot: this,
-      server: this.data[guildId],
+      server: this.data.get(guildId),
       rawArgs: optiont,
       client: this._client,
       initData: this.initData.bind(this)

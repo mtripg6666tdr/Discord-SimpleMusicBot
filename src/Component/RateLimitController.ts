@@ -17,26 +17,27 @@
  */
 
 export class RateLimitController {
-  private store:{[key:string]:number[]} = {};
+  private readonly store = new Map<string, number[]>();
 
-  hasRateLimited(key:string){
-    if(!this.store[key]){
-      this.store[key] = [Date.now()];
+  isRateLimited(key:string){
+    if(!this.store.has(key)){
+      this.store.set(key, [Date.now()]);
       return false;
     }
     let cnt10sec = 0;
-    this.store[key] = this.store[key].filter(dt => {
+    const currentStore = this.store.get(key).filter(dt => {
       const sub = Date.now() - dt;
       if(sub < 10 * 1000) cnt10sec++;
       return sub < 60 * 1000;
     });
-    if(this.store[key].length > 15 || cnt10sec > 5){
-      if(Date.now() - this.store[key][this.store[key].length - 1] < 2 * 1000){
-        this.store[key].push(Date.now());
+    this.store.set(key, currentStore);
+    if(currentStore.length > 15 || cnt10sec > 5){
+      if(Date.now() - currentStore[currentStore.length - 1] < 2 * 1000){
+        currentStore.push(Date.now());
       }
       return true;
     }else{
-      this.store[key].push(Date.now());
+      currentStore.push(Date.now());
       return false;
     }
   }
