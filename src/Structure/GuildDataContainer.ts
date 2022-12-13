@@ -35,6 +35,7 @@ import * as ytpl from "ytpl";
 import { SoundCloudS } from "../AudioSource";
 import { PlayManager } from "../Component/PlayManager";
 import { QueueManager } from "../Component/QueueManager";
+import { SkipManager } from "../Component/SkipManager";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
 import Util from "../Util";
 import { LogEmitter } from "./LogEmitter";
@@ -111,6 +112,15 @@ export class GuildDataContainer extends LogEmitter {
    * VCのping
    */
   vcPing:number;
+
+  /**
+   * Skipマネージャ
+   */
+  protected _skipSession:SkipManager;
+
+  get skipSession(){
+    return this._skipSession;
+  }
 
   constructor(guildid:string, boundchannelid:string, bot:MusicBotBase){
     super();
@@ -550,5 +560,17 @@ export class GuildDataContainer extends LogEmitter {
       await this.queue.autoAddQueue(this.bot.client, panel.Opts[rest[i]].url, member, "unknown", false, false, message.channel as TextChannel);
     }
     t.end();
+  }
+
+  async createSkipSession(message:CommandMessage){
+    this._skipSession = new SkipManager();
+    this._skipSession.setBinding(this);
+    await this._skipSession.init(message);
+    const destroy = () => {
+      this._skipSession?.destroy();
+      this._skipSession = null;
+    };
+    this.queue.once("change", destroy);
+    this.player.once("disconnect", destroy);
   }
 }

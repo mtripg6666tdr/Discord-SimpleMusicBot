@@ -18,9 +18,11 @@
 
 import type { LogLevels } from "../Util/log";
 
+import { EventEmitter } from "stream";
+
 import { Util } from "../Util";
 
-export abstract class LogEmitter {
+export abstract class LogEmitter extends EventEmitter {
   private _tag:string = "";
   private _guildId:string = "";
 
