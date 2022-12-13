@@ -30,7 +30,7 @@ export default class Skip extends BaseCommand {
       description: "現在再生中の曲をスキップします。",
       unlist: false,
       category: "player",
-      permissionDescription: "削除対象の楽曲を追加した人、またはユーザーがDJロールを保持"
+      permissionDescription: "削除対象の楽曲を追加した人。要件を満たしていなければ投票を開始します"
     });
   }
 
@@ -46,12 +46,21 @@ export default class Skip extends BaseCommand {
       return;
     }
     try{
-      const response = await message.reply(":ok: スキップしています");
       const item = server.queue.get(0);
-      if(!Util.eris.user.isDJ(message.member, options) && item.additionalInfo.addedBy.userId !== message.member.id && !Util.eris.user.isPrivileged(message.member)){
-        response.edit("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
+      const members = Util.eris.channel.getVoiceMember(options);
+      if(!members.has(message.member.id)){
+        message.reply("この操作を実行する権限がありません");
         return;
       }
+      if(item.additionalInfo.addedBy.userId !== message.member.id && !Util.eris.user.isPrivileged(message.member) && members.size > 3){
+        if(!server.skipSession){
+          await server.createSkipSession(message);
+        }else{
+          message.reply(":red_circle: すでに開かれている投票パネルがあります");
+        }
+        return;
+      }
+      const response = await message.reply(":ok: スキップしています");
       const title = item.basicInfo.Title;
       server.player.stop();
       await server.queue.next();
@@ -60,7 +69,11 @@ export default class Skip extends BaseCommand {
     }
     catch(e){
       Util.logger.log(e, "error");
-      message.channel.createMessage(":astonished:スキップに失敗しました").catch(er => Util.logger.log(er, "error"));
+      if(message.response){
+        message.response.edit(":astonished:スキップに失敗しました").catch(er => Util.logger.log(er, "error"));
+      }else{
+        message.channel.createMessage(":astonished:スキップに失敗しました").catch(er => Util.logger.log(er, "error"));
+      }
     }
   }
 }

@@ -332,6 +332,20 @@ export class MusicBot extends MusicBotBase {
           }else{
             await interaction.editOriginalMessage("失敗しました!");
           }
+        }else if(interaction.data.custom_id.startsWith("skip_vote")){
+          const guildId = interaction.data.custom_id.substring("skip_vote_".length);
+          const result = this.data.get(guildId)?.skipSession?.vote(interaction.member);
+          if(result === "voted"){
+            interaction.createMessage({
+              content: "投票しました",
+              flags: discord.Constants.MessageFlags.EPHEMERAL,
+            });
+          }else if(result === "cancelled"){
+            interaction.createMessage({
+              content: "投票を取り消しました",
+              flags: discord.Constants.MessageFlags.EPHEMERAL,
+            });
+          }
         }else{
           const updateEffectPanel = () => {
             const mes = interaction.message;
@@ -405,8 +419,9 @@ export class MusicBot extends MusicBotBase {
             });
         });
       }
-    }else if(this.data.get(member.guild.id)){
+    }else if(this.data.has(member.guild.id)){
       const server = this.data.get(member.guild.id);
+      server.skipSession?.checkThreshold();
       if(
         server instanceof GuildDataContainerWithBgm
           && (
@@ -443,6 +458,7 @@ export class MusicBot extends MusicBotBase {
         await this._client.createMessage(server.boundTextChannel, ":pause_button:ボイスチャンネルから誰もいなくなったため一時停止しました").catch(e => this.Log(e));
       }
     }
+    server.skipSession?.checkThreshold();
   }
 
   private async onVoiceChannelSwitch(member:discord.Member, newChannel:discord.TextVoiceChannel, oldChannel:discord.TextVoiceChannel){

@@ -170,6 +170,8 @@ export class QueueManager extends ServerManagerBase {
           this._default[method](result);
           if(this.server.equallyPlayback) this.sortWithAddedBy();
           this.server.bot.backupper.addModifiedGuilds(this.guildId);
+          this.emit(method === "push" ? "changeWithoutCurrent" : "change");
+          this.emit("add", result);
           const index = this._default.findIndex(q => q === result);
           this.Log("queue content added in position " + index);
           return {...result, index};
@@ -363,6 +365,7 @@ export class QueueManager extends ServerManagerBase {
     }
     this._default.shift();
     this.server.bot.backupper.addModifiedGuilds(this.guildId);
+    this.emit("change");
   }
 
   /**
@@ -374,6 +377,7 @@ export class QueueManager extends ServerManagerBase {
     PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     this._default.splice(offset, 1);
     this.server.bot.backupper.addModifiedGuilds(this.guildId);
+    this.emit(offset === 0 ? "change" : "changeWithoutCurrent");
   }
 
   /**
@@ -384,6 +388,7 @@ export class QueueManager extends ServerManagerBase {
     PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     this._default = [];
     this.server.bot.backupper.addModifiedGuilds(this.guildId);
+    this.emit("change");
   }
 
   /**
@@ -394,6 +399,7 @@ export class QueueManager extends ServerManagerBase {
     PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     this._default = [this.default[0]];
     this.server.bot.backupper.addModifiedGuilds(this.guildId);
+    this.emit("changeWithoutCurrent");
   }
 
   /**
@@ -407,8 +413,10 @@ export class QueueManager extends ServerManagerBase {
       const first = this._default.shift();
       this._default.sort(() => Math.random() - 0.5);
       this._default.unshift(first);
+      this.emit("changeWithoutCurrent");
     }else{
       this._default.sort(() => Math.random() - 0.5);
+      this.emit("change");
     }
     this.server.bot.backupper.addModifiedGuilds(this.guildId);
   }
@@ -432,6 +440,7 @@ export class QueueManager extends ServerManagerBase {
     rmIndex.sort((a, b) => b - a);
     rmIndex.forEach(n => this.removeAt(n));
     this.server.bot.backupper.addModifiedGuilds(this.guildId);
+    this.emit(rmIndex.includes(0) ? "change" : "changeWithoutCurrent");
     return rmIndex;
   }
 
@@ -455,6 +464,7 @@ export class QueueManager extends ServerManagerBase {
       this._default.splice(from + 1, 1);
     }
     this.server.bot.backupper.addModifiedGuilds(this.guildId);
+    this.emit(from === 0 || to === 0 ? "change" : "changeWithoutCurrent");
   }
 
   /**
@@ -479,6 +489,8 @@ export class QueueManager extends ServerManagerBase {
       sorted.push(...addedByUsers.map(user => queueByAdded[user][i]).filter(q => !!q));
     }
     this._default = sorted;
+    this.server.bot.backupper.addModifiedGuilds(this.guildId);
+    this.emit("change");
   }
 
   protected getDisplayNameFromMember(member:Member|AddedBy){
@@ -488,4 +500,26 @@ export class QueueManager extends ServerManagerBase {
   protected getUserIdFromMember(member:Member|AddedBy){
     return member instanceof Member ? member.id : member.userId;
   }
+
+  override emit<T extends keyof QueueManagerEvents>(eventName:T, ...args:QueueManagerEvents[T]){
+    return super.emit(eventName, args);
+  }
+
+  override on<T extends keyof QueueManagerEvents>(eventName:T, listener: (...args:QueueManagerEvents[T]) => void){
+    return super.on(eventName, listener);
+  }
+
+  override once<T extends keyof QueueManagerEvents>(eventName:T, listener: (...args:QueueManagerEvents[T]) => void){
+    return super.on(eventName, listener);
+  }
+
+  override off<T extends keyof QueueManagerEvents>(eventName:T, listener: (...args:QueueManagerEvents[T]) => void){
+    return super.off(eventName, listener);
+  }
+}
+
+interface QueueManagerEvents {
+  change: [];
+  changeWithoutCurrent: [];
+  add: [content:QueueContent];
 }

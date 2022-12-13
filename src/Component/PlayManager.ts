@@ -18,6 +18,7 @@
 
 import type { AudioSource, YouTube } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
+import type { MessageEmbedBuilder } from "@mtripg6666tdr/eris-command-resolver";
 import type { Message, TextChannel, VoiceChannel } from "eris";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
@@ -128,6 +129,7 @@ export class PlayManager extends ServerManagerBase {
    *  再生します
    */
   async play(time:number = 0):Promise<PlayManager>{
+    this.emit("playCalled", time);
     // 再生できる状態か確認
     const badCondition = this.getIsBadCondition();
     if(badCondition){
@@ -135,6 +137,7 @@ export class PlayManager extends ServerManagerBase {
       return this;
     }
     this.Log("Play called");
+    this.emit("playPreparing", time);
     this.preparing = true;
     let mes:Message = null;
     this._currentAudioInfo = this.server.queue.get(0).basicInfo;
@@ -185,6 +188,7 @@ export class PlayManager extends ServerManagerBase {
         // wait for entering playing state
         await Util.general.waitForEnteringState(() => this.server.connection.playing);
         this.preparing = false;
+        this.emit("playStarted");
       }
       finally{
         u.end();
@@ -222,6 +226,7 @@ export class PlayManager extends ServerManagerBase {
         if(this.currentAudioInfo.ServiceIdentifer === "youtube" && (this.currentAudioInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
+        this.emit("playStartUIPrepared", embed);
         mes.edit({content: "", embeds: [embed.toEris()]}).catch(e => Util.logger.log(e, "error"));
       }
     }
@@ -273,6 +278,7 @@ export class PlayManager extends ServerManagerBase {
       this.server.connection.stopPlaying();
       this.server.connection.on("end", this.onStreamFinishedBindThis);
       this.server.bot.backupper.backup();
+      this.emit("stop");
     }
     return this;
   }
@@ -288,6 +294,7 @@ export class PlayManager extends ServerManagerBase {
       this.Log("Disconnected from " + connection.channelID);
       connection.disconnect();
       this.server.connection = null;
+      this.emit("disconnect");
     }else{
       this.server.connection = null;
       this.Log("Disconnect called but no connection", "warn");
@@ -306,6 +313,7 @@ export class PlayManager extends ServerManagerBase {
   pause():PlayManager{
     this.server.bot.backupper.backupStatus();
     this.Log("Pause called");
+    this.emit("pause");
     this.server.connection?.pause();
     return this;
   }
@@ -317,6 +325,7 @@ export class PlayManager extends ServerManagerBase {
   resume():PlayManager{
     this.server.bot.backupper.backupStatus();
     this.Log("Resume called");
+    this.emit("resume");
     this.server.connection?.resume();
     return this;
   }
@@ -327,12 +336,14 @@ export class PlayManager extends ServerManagerBase {
    */
   rewind():PlayManager{
     this.Log("Rewind called");
+    this.emit("rewind");
     this.stop().play();
     return this;
   }
 
   handleError(er:any){
     Util.logger.log("Error", "error");
+    this.emit("error", er);
     if(er){
       Util.logger.log(Util.general.StringifyObject(er), "error");
       if(Util.config.debug){
@@ -360,6 +371,7 @@ export class PlayManager extends ServerManagerBase {
     }
     // ストリームが終了したら時間を確認しつつ次の曲へ移行
     this.Log("Stream finished");
+    this.emit("playCompleted");
     // 再生が終わったら
     this._errorCount = 0;
     this._errorUrl = "";
@@ -412,4 +424,35 @@ export class PlayManager extends ServerManagerBase {
     }
     this.play();
   }
+
+  override emit<T extends keyof PlayManagerEvents>(eventName:T, ...args:PlayManagerEvents[T]){
+    return super.emit(eventName, args);
+  }
+
+  override on<T extends keyof PlayManagerEvents>(eventName:T, listener: (...args:PlayManagerEvents[T]) => void){
+    return super.on(eventName, listener);
+  }
+
+  override once<T extends keyof PlayManagerEvents>(eventName:T, listener: (...args:PlayManagerEvents[T]) => void){
+    return super.on(eventName, listener);
+  }
+
+  override off<T extends keyof PlayManagerEvents>(eventName:T, listener: (...args:PlayManagerEvents[T]) => void){
+    return super.off(eventName, listener);
+  }
+}
+
+interface PlayManagerEvents {
+  volumeChanged: [volume:string];
+  playCalled: [seek:number];
+  playPreparing: [seek:number];
+  playStarted: [];
+  playStartUIPrepared: [message:MessageEmbedBuilder];
+  playCompleted: [];
+  stop: [];
+  disconnect: [];
+  pause: [];
+  resume: [];
+  rewind: [];
+  error: [error:Error];
 }
