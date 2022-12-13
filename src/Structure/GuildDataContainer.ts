@@ -17,6 +17,7 @@
  */
 
 import type { exportableCustom } from "../AudioSource";
+import type { exportableStatuses } from "../Component/backupper";
 import type { MusicBotBase } from "../botBase";
 import type { AudioEffect } from "./AudioEffect";
 import type { SearchPanel } from "./SearchPanel";
@@ -93,7 +94,7 @@ export class GuildDataContainer extends LogEmitter {
   /**
    * 関連動画自動追加が有効
    */
-  AddRelative:boolean;
+  addRelated:boolean;
   /**
    * オーディオエフェクトエフェクトの設定
    */
@@ -135,7 +136,7 @@ export class GuildDataContainer extends LogEmitter {
       throw new Error("invalid bound textchannel id was given");
     }
     this.bot = bot;
-    this.AddRelative = false;
+    this.addRelated = false;
     this.effectPrefs = {BassBoost: false, Reverb: false, LoudnessEqualization: false};
     this.prefix = ">";
     this.equallyPlayback = false;
@@ -215,7 +216,7 @@ export class GuildDataContainer extends LogEmitter {
       this.boundTextChannel,
       this.queue.loopEnabled ? "1" : "0",
       this.queue.queueLoopEnabled ? "1" : "0",
-      this.AddRelative ? "1" : "0",
+      this.addRelated ? "1" : "0",
       this.equallyPlayback ? "1" : "0",
       this.player.volume,
     ].join(":");
@@ -225,31 +226,19 @@ export class GuildDataContainer extends LogEmitter {
    * ステータスをオブジェクトからインポートします。
    * @param param0 読み取り元のオブジェクト
    */
-  importStatus({voiceChannelId, frozenStatusIds}:{voiceChannelId:string, frozenStatusIds:string[]}){
+  importStatus(statuses:exportableStatuses){
     //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
-    [
-      this.queue.loopEnabled, // 0
-      this.queue.queueLoopEnabled, // 1
-      this.AddRelative, // 2
-      this.equallyPlayback, // 3
-    ] = frozenStatusIds.map(b => b === "1");
-    this.player.setVolume(Number(frozenStatusIds[4]) || 100);
-    if(voiceChannelId !== "0"){
-      this._joinVoiceChannel(voiceChannelId)
+    this.queue.loopEnabled = statuses.loopEnabled;
+    this.queue.queueLoopEnabled = statuses.queueLoopEnabled;
+    this.addRelated = statuses.addRelatedSongs;
+    this.equallyPlayback = statuses.queueLoopEnabled;
+    this.player.setVolume(statuses.volume);
+    if(statuses.voiceChannelId !== "0"){
+      this._joinVoiceChannel(statuses.voiceChannelId)
         .then(() => this.player.play())
         .catch(er => this.Log(er, "warn"))
       ;
     }
-  }
-
-  /**
-   * ステータスのテキストをパースしてオブジェクトにします。
-   * @param statusText パース元のステータスのテキスト
-   * @returns パースされたステータスオブジェクト
-   */
-  static parseStatus(statusText:string){
-    const [voiceChannelId, boundChannelId, ...frozenStatusIds] = statusText.split(":");
-    return {voiceChannelId, boundChannelId, frozenStatusIds};
   }
 
   /**

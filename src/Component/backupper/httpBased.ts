@@ -16,16 +16,17 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { DataType } from "../botBase";
+import type { exportableStatuses } from ".";
+import type { YmxFormat } from "../../Structure";
 
 import { http, https } from "follow-redirects";
 
-import { LogEmitter } from "../Structure";
-import Util from "../Util";
+import { Backupper } from ".";
+import Util from "../../Util";
 
 const MIME_JSON = "application/json";
 
-export class BackUpper extends LogEmitter {
+export class HttpBackupper extends Backupper {
   private _queueModifiedGuilds:string[] = [];
   private _previousStatuses:{[guildId:string]:string} = {};
   private get data(){
@@ -33,37 +34,10 @@ export class BackUpper extends LogEmitter {
   }
 
   /**
-   * 変更済みとしてマークされたキューを持つサーバーの一覧を返します
-   */
-  get queueModifiedGuilds():Readonly<string[]>{
-    return this._queueModifiedGuilds;
-  }
-
-  /**
    * バックアップが実行可能な設定がされているかを示します。
    */
   get backuppable(){
     return !!(process.env.GAS_TOKEN && process.env.GAS_URL);
-  }
-
-  constructor(private readonly getData:(()=>DataType)){
-    super();
-    this.setTag("Backup");
-  }
-
-  /**
-   * 今変更済みキューがあるとしてマークされているサーバーをリセットして、すべてマークを解除します。
-   */
-  resetModifiedGuilds(){
-    this._queueModifiedGuilds = [];
-  }
-
-  /**
-   * 指定したサーバーIDのキューを、変更済みとしてマークします  
-   * マークされたサーバーのキューは、次回のティックにバックアップが試行されます
-   */
-  addModifiedGuilds(guildId:string){
-    if(!this._queueModifiedGuilds.includes(guildId)) this._queueModifiedGuilds.push(guildId);
   }
   
   /**
@@ -137,7 +111,7 @@ export class BackUpper extends LogEmitter {
   /**
    * ステータスデータをサーバーから取得する
    */
-  async getStatusFromDbServer(guildids:string[]){
+  async getStatusFromBackup(guildids:string[]){
     if(this.backuppable){
       const t = Util.time.timer.start("GetIsSpeking");
       try{
@@ -147,7 +121,31 @@ export class BackUpper extends LogEmitter {
           type: "j"
         } as requestBody, MIME_JSON);
         if(result.status === 200){
-          return result.data as {[guildid:string]:string};
+          const frozenGuildStatuses = result.data as {[guildid:string]:string};
+          const map = new Map<string, exportableStatuses>();
+          Object.keys(frozenGuildStatuses).forEach(key => {
+            const [
+              voiceChannelId,
+              boundChannelId,
+              loopEnabled,
+              queueLoopEnabled,
+              addRelatedSongs,
+              equallyPlayback,
+              volume,
+            ] = frozenGuildStatuses[key].split(":");
+            const numVolume = Number(volume) || 100;
+            const b = (v:string) => v === "1";
+            map.set(key, {
+              voiceChannelId,
+              boundChannelId,
+              loopEnabled: b(loopEnabled),
+              queueLoopEnabled: b(queueLoopEnabled),
+              addRelatedSongs: b(addRelatedSongs),
+              equallyPlayback: b(equallyPlayback),
+              volume: numVolume >= 1 && numVolume <= 200 ? numVolume : 100,
+            });
+          });
+          return map;
         }else{
           return null;
         }
@@ -168,7 +166,7 @@ export class BackUpper extends LogEmitter {
   /**
    * キューのデータをサーバーから取得する
    */
-  async getQueueDataFromDbServer(guildids:string[]){
+  async getQueueDataFromBackup(guildids:string[]){
     if(this.backuppable){
       const t = Util.time.timer.start("GetQueueData");
       try{
@@ -178,8 +176,19 @@ export class BackUpper extends LogEmitter {
           type: "queue"
         } as requestBody, MIME_JSON);
         if(result.status === 200){
-          return result.data as {[guildid:string]:string};
-        }else return null;
+          const frozenQueues = result.data as {[guildid:string]:string};
+          const res = new Map<string, YmxFormat>();
+          Object.keys(frozenQueues).forEach(key => {
+            try{
+              const ymx = JSON.parse(frozenQueues[key]);
+              res.set(key, ymx);
+            }
+            catch{ /* empty */ }
+          });
+          return res;
+        }else{
+          return null;
+        }
       }
       catch(er){
         this.Log(er, "error");

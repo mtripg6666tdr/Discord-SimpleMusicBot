@@ -35,7 +35,7 @@ export default class Volume extends BaseCommand {
       argument: [{
         type: "integer",
         name: "volume",
-        description: "変更先の音量。20~200までが指定できます。",
+        description: "変更先の音量。1~200までが指定できます。",
         required: false
       }],
       permissionDescription: "同じボイスチャンネルに接続",

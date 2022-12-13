@@ -43,11 +43,11 @@ export default class Related extends BaseCommand {
       return;
     }
     options.server.updateBoundChannel(message);
-    if(options.server.AddRelative){
-      options.server.AddRelative = false;
+    if(options.server.addRelated){
+      options.server.addRelated = false;
       message.reply("❌関連曲自動再生をオフにしました").catch(e => Util.logger.log(e, "error"));
     }else{
-      options.server.AddRelative = true;
+      options.server.addRelated = true;
       const embed = new Helper.MessageEmbedBuilder()
         .setTitle("⭕関連曲自動再生をオンにしました")
         .setDescription("YouTubeからの楽曲再生終了時に、関連曲をキューの末尾に自動追加する機能です。\r\n※YouTube以外のソースからの再生時、ループ有効時には追加されません")

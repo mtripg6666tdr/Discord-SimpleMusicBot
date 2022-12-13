@@ -169,7 +169,6 @@ export class QueueManager extends ServerManagerBase {
         if(result.basicInfo){
           this._default[method](result);
           if(this.server.equallyPlayback) this.sortWithAddedBy();
-          this.server.bot.backupper.addModifiedGuilds(this.guildId);
           this.emit(method === "push" ? "changeWithoutCurrent" : "change");
           this.emit("add", result);
           const index = this._default.findIndex(q => q === result);
@@ -356,7 +355,7 @@ export class QueueManager extends ServerManagerBase {
     this.server.player.resetError();
     if(this.queueLoopEnabled){
       this._default.push(this.default[0]);
-    }else if(this.server.AddRelative && this.server.player.currentAudioInfo.ServiceIdentifer === "youtube"){
+    }else if(this.server.addRelated && this.server.player.currentAudioInfo.ServiceIdentifer === "youtube"){
       const relatedVideos = (this.server.player.currentAudioInfo as AudioSource.YouTube).relatedVideos;
       if(relatedVideos.length >= 1){
         const video = relatedVideos[0];
@@ -364,7 +363,6 @@ export class QueueManager extends ServerManagerBase {
       }
     }
     this._default.shift();
-    this.server.bot.backupper.addModifiedGuilds(this.guildId);
     this.emit("change");
   }
 
@@ -376,7 +374,6 @@ export class QueueManager extends ServerManagerBase {
     this.Log(`RemoveAt Called (offset:${offset})`);
     PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     this._default.splice(offset, 1);
-    this.server.bot.backupper.addModifiedGuilds(this.guildId);
     this.emit(offset === 0 ? "change" : "changeWithoutCurrent");
   }
 
@@ -387,7 +384,6 @@ export class QueueManager extends ServerManagerBase {
     this.Log("RemoveAll Called");
     PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     this._default = [];
-    this.server.bot.backupper.addModifiedGuilds(this.guildId);
     this.emit("change");
   }
 
@@ -398,7 +394,6 @@ export class QueueManager extends ServerManagerBase {
     this.Log("RemoveFrom2 Called");
     PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     this._default = [this.default[0]];
-    this.server.bot.backupper.addModifiedGuilds(this.guildId);
     this.emit("changeWithoutCurrent");
   }
 
@@ -418,7 +413,6 @@ export class QueueManager extends ServerManagerBase {
       this._default.sort(() => Math.random() - 0.5);
       this.emit("change");
     }
-    this.server.bot.backupper.addModifiedGuilds(this.guildId);
   }
 
   /**
@@ -439,7 +433,6 @@ export class QueueManager extends ServerManagerBase {
     }
     rmIndex.sort((a, b) => b - a);
     rmIndex.forEach(n => this.removeAt(n));
-    this.server.bot.backupper.addModifiedGuilds(this.guildId);
     this.emit(rmIndex.includes(0) ? "change" : "changeWithoutCurrent");
     return rmIndex;
   }
@@ -463,7 +456,6 @@ export class QueueManager extends ServerManagerBase {
       //要素削除
       this._default.splice(from + 1, 1);
     }
-    this.server.bot.backupper.addModifiedGuilds(this.guildId);
     this.emit(from === 0 || to === 0 ? "change" : "changeWithoutCurrent");
   }
 
@@ -489,7 +481,6 @@ export class QueueManager extends ServerManagerBase {
       sorted.push(...addedByUsers.map(user => queueByAdded[user][i]).filter(q => !!q));
     }
     this._default = sorted;
-    this.server.bot.backupper.addModifiedGuilds(this.guildId);
     this.emit("change");
   }
 
