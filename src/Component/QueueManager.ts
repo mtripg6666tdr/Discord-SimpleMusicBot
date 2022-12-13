@@ -51,18 +51,45 @@ export class QueueManager extends ServerManagerBase {
     return this._default;
   }
 
+  protected _loopEnabled:boolean = false;
   /**
    * トラックループが有効か?
    */
-  loopEnabled:boolean = false;
+  get loopEnabled():boolean{
+    return this._loopEnabled;
+  }
+
+  set loopEnabled(value:boolean){
+    this._loopEnabled = value;
+    this.emit("settingsChanged");
+  }
+
+  protected _queueLoopEnabled:boolean = false;
   /**
    * キューループが有効か?
    */
-  queueLoopEnabled:boolean = false;
+  get queueLoopEnabled():boolean{
+    return this._queueLoopEnabled;
+  }
+
+  set queueLoopEnabled(value:boolean){
+    this._queueLoopEnabled = value;
+    this.emit("settingsChanged");
+  }
+
+  protected _onceLoopEnabled:boolean = false;
   /**
    * ワンスループが有効か?
    */
-  onceLoopEnabled:boolean = false;
+  get onceLoopEnabled():boolean{
+    return this._onceLoopEnabled;
+  }
+
+  set onceLoopEnabled(value:boolean){
+    this._onceLoopEnabled = value;
+    this.emit("settingsChanged");
+  }
+  
   /**
    * キューの長さ（トラック数）
    */
@@ -493,7 +520,7 @@ export class QueueManager extends ServerManagerBase {
   }
 
   override emit<T extends keyof QueueManagerEvents>(eventName:T, ...args:QueueManagerEvents[T]){
-    return super.emit(eventName, args);
+    return super.emit(eventName, ...args);
   }
 
   override on<T extends keyof QueueManagerEvents>(eventName:T, listener: (...args:QueueManagerEvents[T]) => void){
@@ -513,4 +540,5 @@ interface QueueManagerEvents {
   change: [];
   changeWithoutCurrent: [];
   add: [content:QueueContent];
+  settingsChanged: [];
 }

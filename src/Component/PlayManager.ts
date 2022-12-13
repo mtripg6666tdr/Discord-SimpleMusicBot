@@ -310,7 +310,6 @@ export class PlayManager extends ServerManagerBase {
    * @returns this
    */
   pause():PlayManager{
-    this.server.bot.backupper.backupStatus();
     this.Log("Pause called");
     this.emit("pause");
     this.server.connection?.pause();
@@ -322,7 +321,6 @@ export class PlayManager extends ServerManagerBase {
    * @returns this
    */
   resume():PlayManager{
-    this.server.bot.backupper.backupStatus();
     this.Log("Resume called");
     this.emit("resume");
     this.server.connection?.resume();
@@ -425,7 +423,8 @@ export class PlayManager extends ServerManagerBase {
   }
 
   override emit<T extends keyof PlayManagerEvents>(eventName:T, ...args:PlayManagerEvents[T]){
-    return super.emit(eventName, args);
+    super.emit("all", ...args);
+    return super.emit(eventName, ...args);
   }
 
   override on<T extends keyof PlayManagerEvents>(eventName:T, listener: (...args:PlayManagerEvents[T]) => void){
@@ -454,4 +453,5 @@ interface PlayManagerEvents {
   resume: [];
   rewind: [];
   error: [error:Error];
+  all: [...any[]];
 }

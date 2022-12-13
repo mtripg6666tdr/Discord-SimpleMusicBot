@@ -206,20 +206,20 @@ export class GuildDataContainer extends LogEmitter {
   }
 
   /**
-   * ステータスをエクスポートしてテキストにします
-   * @returns テキスト化されたステータス
+   * ステータスをエクスポートします
+   * @returns ステータスのオブジェクト
    */
-  exportStatus(){
+  exportStatus():exportableStatuses{
     // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
-    return [
-      this.player.isPlaying && !this.player.isPaused ? this.connection.channelID : "0",
-      this.boundTextChannel,
-      this.queue.loopEnabled ? "1" : "0",
-      this.queue.queueLoopEnabled ? "1" : "0",
-      this.addRelated ? "1" : "0",
-      this.equallyPlayback ? "1" : "0",
-      this.player.volume,
-    ].join(":");
+    return {
+      voiceChannelId: this.player.isPlaying && !this.player.isPaused ? this.connection.channelID : "0",
+      boundChannelId: this.boundTextChannel,
+      loopEnabled: this.queue.loopEnabled,
+      queueLoopEnabled: this.queue.queueLoopEnabled,
+      addRelatedSongs: this.addRelated,
+      equallyPlayback: this.equallyPlayback,
+      volume: this.player.volume,
+    };
   }
 
   /**

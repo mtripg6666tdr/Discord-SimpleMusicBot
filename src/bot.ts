@@ -99,7 +99,7 @@ export class MusicBot extends MusicBotBase {
     }
 
     // Recover queues
-    if(this.backupper.backuppable){
+    if(this.backupper){
       const joinedGuildIds = [...client.guilds.values()].map(guild => guild.id);
       const guildQueues = await this.backupper.getQueueDataFromBackup(joinedGuildIds);
       const guildStatuses = await this.backupper.getStatusFromBackup(joinedGuildIds);
@@ -416,6 +416,7 @@ export class MusicBot extends MusicBotBase {
                 .catch(e => this.Log(e));
             });
         });
+        this.emit("onBotVoiceChannelJoin", voiceChannel);
       }
     }else if(this.guildData.has(member.guild.id)){
       const server = this.guildData.get(member.guild.id);

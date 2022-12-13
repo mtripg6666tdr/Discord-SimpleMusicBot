@@ -32,15 +32,23 @@ export type exportableStatuses = {
 };
 
 export abstract class Backupper extends LogEmitter {
-  abstract get backuppable():boolean;
+  /**
+   * 初期化時に与えられたアクセサを使って、サーバーのデータを返します。
+   */
+  protected get data(){
+    return this.getData();
+  }
 
   constructor(protected readonly bot:MusicBotBase, protected readonly getData:(() => DataType)){
     super();
     this.setTag("Backup");
   }
-  abstract backup():Promise<void>|void;
-  abstract backupQueue():Promise<void>;
-  abstract backupStatus():Promise<void>;
+  /**
+   * バックアップ済みの接続ステータス等を取得します
+   */
   abstract getStatusFromBackup(guildids:string[]):Promise<Map<string, exportableStatuses>>;
+  /**
+   * バックアップ済みのキューのデータを取得します
+   */
   abstract getQueueDataFromBackup(guildids:string[]):Promise<Map<string, YmxFormat>>;
 }

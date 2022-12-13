@@ -30,22 +30,19 @@ const MIME_JSON = "application/json";
 export class HttpBackupper extends Backupper {
   private _queueModifiedGuilds:string[] = [];
   private _previousStatuses:{[guildId:string]:string} = {};
-  private get data(){
-    return this.getData();
-  }
 
   constructor(bot:MusicBotBase, getData:() => DataType){
     super(bot, getData);
     // ボットの準備完了直前に実行する
     this.bot.once("beforeReady", () => {
       // コンテナにイベントハンドラを設定する関数
-      const setContainerEvent = (container:GuildDataContainer) => (["add", "change", "changeWithoutCurrent"] as const).forEach(event => container.queue.on(event, () => this.addModifiedGuild(container.guildId)));
+      const setContainerEvent = (container:GuildDataContainer) => (["change", "changeWithoutCurrent"] as const).forEach(event => container.queue.on(event, () => this.addModifiedGuild(container.guildId)));
       // すでに登録されているコンテナにイベントハンドラを登録する
       this.data.forEach(setContainerEvent);
       // これから登録されるコンテナにイベントハンドラを登録する
       this.bot.on("guildDataAdded", setContainerEvent);
       // バックアップのタイマーをセット
-      this.bot.on("tick", () => this.backup());
+      this.bot.on("tick", (count) => count % 2 === 0 && this.backup());
     });
   }
 
@@ -57,26 +54,20 @@ export class HttpBackupper extends Backupper {
     if(!this._queueModifiedGuilds.includes(guildId)) this._queueModifiedGuilds.push(guildId);
   }
 
-  /**
-   * バックアップが実行可能な設定がされているかを示します。
-   */
-  get backuppable(){
+  static get backuppable(){
     return !!(process.env.GAS_TOKEN && process.env.GAS_URL);
   }
-  
-  /**
-   * 接続ステータスやキューを含む全データをサーバーにバックアップします
-   */
+
   backup():Promise<any>|void{
-    if(this.backuppable){
+    if(HttpBackupper.backuppable){
       return this.backupQueue().then(() => this.backupStatus());
     }
   }
 
   /**
-   * キューをサーバーにバックアップします
+   * キューをバックアップします
    */
-  async backupQueue(){
+  private async backupQueue(){
     try{
       const queue = this._queueModifiedGuilds.map(id => ({
         guildid: id,
@@ -99,15 +90,23 @@ export class HttpBackupper extends Backupper {
   }
 
   /**
-   * 接続ステータス等をサーバーにバックアップします
+   * 接続ステータス等をバックアップします
    */
-  async backupStatus(){
+  private async backupStatus(){
     try{
       // 参加ステータスの送信
       const speaking = [] as {guildid:string, value:string}[];
       const currentStatuses = Object.assign({}, this._previousStatuses) as {[guildId:string]:string};
       this.data.forEach(container => {
-        const currentStatus = container.exportStatus();
+        const currentStatus = ((status:exportableStatuses) => [
+          status.voiceChannelId,
+          status.boundChannelId,
+          status.loopEnabled ? "1" : "0",
+          status.queueLoopEnabled ? "1" : "0",
+          status.addRelatedSongs ? "1" : "0",
+          status.equallyPlayback ? "1" : "0",
+          status.volume,
+        ].join(":"))(container.exportStatus());
         if(!this._previousStatuses[container.guildId] || this._previousStatuses[container.guildId] !== currentStatus){
           speaking.push({
             guildid: container.guildId,
@@ -132,11 +131,8 @@ export class HttpBackupper extends Backupper {
     }
   }
 
-  /**
-   * ステータスデータをサーバーから取得する
-   */
   async getStatusFromBackup(guildids:string[]){
-    if(this.backuppable){
+    if(HttpBackupper.backuppable){
       const t = Util.time.timer.start("GetIsSpeking");
       try{
         const result = await this._requestHttp("GET", process.env.GAS_URL, {
@@ -187,11 +183,8 @@ export class HttpBackupper extends Backupper {
     }
   }
 
-  /**
-   * キューのデータをサーバーから取得する
-   */
   async getQueueDataFromBackup(guildids:string[]){
-    if(this.backuppable){
+    if(HttpBackupper.backuppable){
       const t = Util.time.timer.start("GetQueueData");
       try{
         const result = await this._requestHttp("GET", process.env.GAS_URL, {
@@ -231,7 +224,7 @@ export class HttpBackupper extends Backupper {
    * ステータス情報をサーバーへバックアップする
    */
   private async _backupStatusData(data:{guildid:string, value:string}[]){
-    if(this.backuppable){
+    if(HttpBackupper.backuppable){
       const t = Util.time.timer.start("backupStatusData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as {[key:string]:string};
@@ -266,7 +259,7 @@ export class HttpBackupper extends Backupper {
    * キューのデータをサーバーへバックアップする
    */
   private async _backupQueueData(data:{guildid:string, queue:string}[]){
-    if(this.backuppable){
+    if(HttpBackupper.backuppable){
       const t = Util.time.timer.start("SetQueueData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as {[guildid:string]:string};

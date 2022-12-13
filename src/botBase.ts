@@ -28,6 +28,7 @@ import * as path from "path";
 import { PageToggle } from "./Component/PageToggle";
 import { RateLimitController } from "./Component/RateLimitController";
 import { HttpBackupper } from "./Component/backupper/httpBased";
+import { MongoBackupper } from "./Component/backupper/mongodb";
 import { GuildDataContainer } from "./Structure";
 import { LogEmitter } from "./Structure";
 import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";
@@ -44,9 +45,9 @@ export abstract class MusicBotBase extends LogEmitter {
   protected readonly _instantiatedTime:Date = null;
   protected readonly _versionInfo:string = null;
   protected readonly _embedPageToggle:PageToggle[] = [];
-  protected readonly _backupper:Backupper = null;
   protected readonly _rateLimitController = new RateLimitController();
   protected readonly guildData:DataType = new Map();
+  protected _backupper:Backupper = null;
   private maintenanceTickCount = 0;
   /**
    * ページトグル
@@ -97,8 +98,7 @@ export abstract class MusicBotBase extends LogEmitter {
 
   constructor(protected readonly maintenance:boolean = false){
     super();
-    // TODO: automatically instantiate suitable backupper depending on environments
-    this._backupper = new HttpBackupper(this, () => this.guildData);
+    this.initializeBackupper();
     this.setTag("Main");
     this._instantiatedTime = new Date();
     this.Log("bot is instantiated");
@@ -124,6 +124,14 @@ export abstract class MusicBotBase extends LogEmitter {
       if(!this._versionInfo){
         this._versionInfo = "Could not get version";
       }
+    }
+  }
+
+  private initializeBackupper(){
+    if(HttpBackupper.backuppable){
+      this._backupper = new HttpBackupper(this, () => this.guildData);
+    }else if(MongoBackupper.backuppable){
+      this._backupper = new MongoBackupper(this, () => this.guildData);
     }
   }
 
@@ -185,7 +193,7 @@ export abstract class MusicBotBase extends LogEmitter {
   }
 
   override emit<T extends keyof BotBaseEvents>(eventName:T, ...args:BotBaseEvents[T]){
-    return super.emit(eventName, args);
+    return super.emit(eventName, ...args);
   }
 
   override on<T extends keyof BotBaseEvents>(eventName:T, listener: (...args:BotBaseEvents[T]) => void){
@@ -207,6 +215,7 @@ interface BotBaseEvents {
   onMessageCreate:[message:discord.Message];
   onInteractionCreate:[interaction:discord.Interaction];
   onCommandHandler:[command:BaseCommand, args:CommandArgs];
+  onBotVoiceChannelJoin:[channel:discord.VoiceChannel];
   guildDataAdded:[container:GuildDataContainer];
   guildDataRemoved:[guildId:string];
   tick:[count:number];
