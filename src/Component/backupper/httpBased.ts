@@ -17,7 +17,8 @@
  */
 
 import type { exportableStatuses } from ".";
-import type { YmxFormat } from "../../Structure";
+import type { GuildDataContainer, YmxFormat } from "../../Structure";
+import type { DataType, MusicBotBase } from "../../botBase";
 
 import { http, https } from "follow-redirects";
 
@@ -31,6 +32,29 @@ export class HttpBackupper extends Backupper {
   private _previousStatuses:{[guildId:string]:string} = {};
   private get data(){
     return this.getData();
+  }
+
+  constructor(bot:MusicBotBase, getData:() => DataType){
+    super(bot, getData);
+    // ボットの準備完了直前に実行する
+    this.bot.once("beforeReady", () => {
+      // コンテナにイベントハンドラを設定する関数
+      const setContainerEvent = (container:GuildDataContainer) => ["add", "change", "changeWithoutCurrent"].forEach(event => container.on(event, () => this.addModifiedGuild(container.guildId)));
+      // すでに登録されているコンテナにイベントハンドラを登録する
+      getData().forEach(setContainerEvent);
+      // これから登録されるコンテナにイベントハンドラを登録する
+      this.bot.on("guildDataAdded", setContainerEvent);
+      // バックアップのタイマーをセット
+      this.bot.on("tick", () => this.backup());
+    });
+  }
+
+  /**
+   * 指定したサーバーIDのキューを、変更済みとしてマークします  
+   * マークされたサーバーのキューは、次回のティックにバックアップが試行されます
+   */
+  addModifiedGuild(guildId:string){
+    if(!this._queueModifiedGuilds.includes(guildId)) this._queueModifiedGuilds.push(guildId);
   }
 
   /**
@@ -298,7 +322,7 @@ export class HttpBackupper extends Backupper {
         .request(opt, (res) => {
           const bufs = [] as Buffer[];
           res.on("data", chunk => bufs.push(chunk));
-          res.on("end", ()=> {
+          res.on("end", () => {
             try{
               const parsed = JSON.parse(Buffer.concat(bufs).toString("utf-8")) as postResult;
               if(parsed.data) Object.keys(parsed.data).forEach(k => parsed.data[k] = decodeURIComponent(parsed.data[k]));

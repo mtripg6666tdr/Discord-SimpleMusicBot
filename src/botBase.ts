@@ -98,7 +98,7 @@ export abstract class MusicBotBase extends LogEmitter {
   constructor(protected readonly maintenance:boolean = false){
     super();
     // TODO: automatically instantiate suitable backupper depending on environments
-    this._backupper = new HttpBackupper(() => this.guildData);
+    this._backupper = new HttpBackupper(this, () => this.guildData);
     this.setTag("Main");
     this._instantiatedTime = new Date();
     this.Log("bot is instantiated");
@@ -176,6 +176,7 @@ export abstract class MusicBotBase extends LogEmitter {
     if(this.guildData.has(guildid)) throw new Error("guild data was already set");
     const server = new GuildDataContainerWithBgm(guildid, boundChannelId, this, bgmConfig);
     this.guildData.set(guildid, server);
+    this.emit("guildDataAdded", server);
     return server;
   }
 
@@ -202,6 +203,7 @@ export abstract class MusicBotBase extends LogEmitter {
 }
 
 interface BotBaseEvents {
+  beforeReady:[];
   ready:[];
   onMessageCreate:[message:discord.Message];
   onInteractionCreate:[interaction:discord.Interaction];

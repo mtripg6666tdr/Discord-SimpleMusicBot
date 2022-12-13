@@ -17,7 +17,7 @@
  */
 
 import type { YmxFormat } from "../../Structure";
-import type { DataType } from "../../botBase";
+import type { DataType, MusicBotBase } from "../../botBase";
 
 import { LogEmitter } from "../../Structure";
 
@@ -34,7 +34,7 @@ export type exportableStatuses = {
 export abstract class Backupper extends LogEmitter {
   abstract get backuppable():boolean;
 
-  constructor(protected readonly getData:(() => DataType)){
+  constructor(protected readonly bot:MusicBotBase, protected readonly getData:(() => DataType)){
     super();
     this.setTag("Backup");
   }

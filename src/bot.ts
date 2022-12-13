@@ -143,6 +143,8 @@ export class MusicBot extends MusicBotBase {
     // Command instance preparing
     await CommandManager.instance.sync(this.client);
 
+    this.emit("beforeReady");
+
     // Finish initializing
     this._isReadyFinished = true;
     this.Log("Bot is ready now");
