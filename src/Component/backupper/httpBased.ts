@@ -90,7 +90,7 @@ export class HttpBackupper extends Backupper {
           this.Log("Something went wrong while backing up queue", "warn");
         }
       }else{
-        this.Log("No modified queue found, skipping");
+        this.Log("No modified queue found, skipping", "debug");
       }
     }
     catch(e){
@@ -124,7 +124,7 @@ export class HttpBackupper extends Backupper {
           this.Log("Something went wrong while backing up statuses", "warn");
         }
       }else{
-        this.Log("No modified status found, skipping");
+        this.Log("No modified status found, skipping", "debug");
       }
     }
     catch(e){
