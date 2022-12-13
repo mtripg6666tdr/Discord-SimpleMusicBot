@@ -85,11 +85,11 @@ export abstract class MusicBotBase extends LogEmitter {
   }
 
   get databaseCount(){
-    return Object.keys(this.guildData).length;
+    return this.guildData.size;
   }
 
   get totalTransformingCost(){
-    return Object.keys(this.guildData)
+    return [...this.guildData.keys()]
       .map(id => this.guildData.get(id).player.cost)
       .reduce((prev, current) => prev + current, 0)
     ;
@@ -138,7 +138,6 @@ export abstract class MusicBotBase extends LogEmitter {
     PageToggle.organize(this._embedPageToggle, 5);
     // 4分ごとに主要情報を出力
     if(this.maintenanceTickCount % 4 === 1) this.logGeneralInfo();
-    if(this.maintenanceTickCount % 2 === 1) this._backupper.backup();
   }
 
   /**
@@ -147,7 +146,7 @@ export abstract class MusicBotBase extends LogEmitter {
   logGeneralInfo(){
     const _d = Object.values(this.guildData);
     const memory = Util.system.GetMemInfo();
-    Util.logger.log(`[Tick] [Main] Participating: ${this._client.guilds.size}, Registered: ${Object.keys(this.guildData).length} Connecting: ${_d.filter(info => info.player.isPlaying).length} Paused: ${_d.filter(__d => __d.player.isPaused).length}`);
+    Util.logger.log(`[Tick] [Main] Participating: ${this._client.guilds.size}, Registered: ${this.guildData.size} Connecting: ${_d.filter(info => info.player.isPlaying).length} Paused: ${_d.filter(__d => __d.player.isPaused).length}`);
     Util.logger.log(`[Tick] [System] Free:${Math.floor(memory.free)}MB; Total:${Math.floor(memory.total)}MB; Usage:${memory.usage}%`);
     const nMem = process.memoryUsage();
     const rss = Util.system.GetMBytes(nMem.rss);

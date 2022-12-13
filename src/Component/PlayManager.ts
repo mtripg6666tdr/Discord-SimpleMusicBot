@@ -277,7 +277,6 @@ export class PlayManager extends ServerManagerBase {
       this.server.connection.off("end", this.onStreamFinishedBindThis);
       this.server.connection.stopPlaying();
       this.server.connection.on("end", this.onStreamFinishedBindThis);
-      this.server.bot.backupper.backup();
       this.emit("stop");
     }
     return this;

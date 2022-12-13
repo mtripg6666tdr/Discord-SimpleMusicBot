@@ -39,9 +39,9 @@ export class HttpBackupper extends Backupper {
     // ボットの準備完了直前に実行する
     this.bot.once("beforeReady", () => {
       // コンテナにイベントハンドラを設定する関数
-      const setContainerEvent = (container:GuildDataContainer) => ["add", "change", "changeWithoutCurrent"].forEach(event => container.on(event, () => this.addModifiedGuild(container.guildId)));
+      const setContainerEvent = (container:GuildDataContainer) => (["add", "change", "changeWithoutCurrent"] as const).forEach(event => container.queue.on(event, () => this.addModifiedGuild(container.guildId)));
       // すでに登録されているコンテナにイベントハンドラを登録する
-      getData().forEach(setContainerEvent);
+      this.data.forEach(setContainerEvent);
       // これから登録されるコンテナにイベントハンドラを登録する
       this.bot.on("guildDataAdded", setContainerEvent);
       // バックアップのタイマーをセット
@@ -106,14 +106,14 @@ export class HttpBackupper extends Backupper {
       // 参加ステータスの送信
       const speaking = [] as {guildid:string, value:string}[];
       const currentStatuses = Object.assign({}, this._previousStatuses) as {[guildId:string]:string};
-      Object.keys(this.data).forEach(id => {
-        const currentStatus = this.data.get(id).exportStatus();
-        if(!this._previousStatuses[id] || this._previousStatuses[id] !== currentStatus){
+      this.data.forEach(container => {
+        const currentStatus = container.exportStatus();
+        if(!this._previousStatuses[container.guildId] || this._previousStatuses[container.guildId] !== currentStatus){
           speaking.push({
-            guildid: id,
+            guildid: container.guildId,
             value: currentStatus,
           });
-          currentStatuses[id] = currentStatus;
+          currentStatuses[container.guildId] = currentStatus;
         }
       });
       if(speaking.length > 0){
