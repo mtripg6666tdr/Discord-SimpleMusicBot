@@ -25,8 +25,7 @@ import type { YmxFormat } from "./YmxFormat";
 import type { CommandMessage, ResponseMessage } from "@mtripg6666tdr/eris-command-resolver";
 import type { Message, VoiceChannel, VoiceConnection } from "eris";
 
-import { LockObj } from "@mtripg6666tdr/async-lock";
-import { lock } from "@mtripg6666tdr/async-lock";
+import { LockObj, lock } from "@mtripg6666tdr/async-lock";
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 import { TextChannel } from "eris";
 
@@ -231,7 +230,7 @@ export class GuildDataContainer extends LogEmitter {
     this.queue.loopEnabled = statuses.loopEnabled;
     this.queue.queueLoopEnabled = statuses.queueLoopEnabled;
     this.addRelated = statuses.addRelatedSongs;
-    this.equallyPlayback = statuses.queueLoopEnabled;
+    this.equallyPlayback = statuses.equallyPlayback;
     this.player.setVolume(statuses.volume);
     if(statuses.voiceChannelId !== "0"){
       this._joinVoiceChannel(statuses.voiceChannelId)
