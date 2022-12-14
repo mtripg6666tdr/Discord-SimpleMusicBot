@@ -40,8 +40,7 @@ export class CustomStream extends AudioSource {
       try{
         this._lengthSeconds = await Util.web.RetriveLengthSeconds(url);
       }
-      // eslint-disable-next-line no-empty
-      catch{}
+      catch{ /* empty */ }
     }
     return this;
   }

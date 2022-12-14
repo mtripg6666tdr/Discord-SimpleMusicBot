@@ -211,8 +211,7 @@ export class MusicBot extends MusicBotBase {
             }
           });
         }
-        // eslint-disable-next-line no-empty
-        catch{}
+        catch{ /* empty */ }
         return;
       }
       // コマンドの処理
