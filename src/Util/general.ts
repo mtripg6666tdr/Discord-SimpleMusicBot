@@ -66,6 +66,12 @@ export function StringifyObject(obj:any):string{
 }
 
 const projectRoot = path.join(__dirname, "../../").slice(0, -1);
+
+/**
+ * 与えられた文字列に、ファイルパスが含まれている場合、それを隠します。
+ * @param original 
+ * @returns 
+ */
 export function FilterContent(original:string){
   let result = original;
   while(result.includes(projectRoot)){
@@ -94,8 +100,21 @@ export function createPassThrough(opts:TransformOptions = {}):PassThrough{
   return stream;
 }
 
+/**
+ * 与えられた関数がtrueを返すまで待機します。
+ * @param predicate 待機完了かどうかを判定する関数
+ * @param timeout 待機時間の最大値（タイムアウト時間）。設定しない場合はInfinityとします。
+ * @param options 追加の設定
+ * @returns 
+ */
 export function waitForEnteringState(predicate:()=>boolean, timeout:number = 10 * 1000, options?:{
+  /**
+   * タイムアウトした際にエラーとするかどうかを表します。
+   */
   rejectOnTimeout?:boolean,
+  /**
+   * 与えられた判定関数を呼ぶ時間間隔をミリ秒単位で指定します。
+   */
   timeStep?:number,
 }){
   const { rejectOnTimeout, timeStep } = Object.assign({
@@ -126,4 +145,12 @@ export function waitForEnteringState(predicate:()=>boolean, timeout:number = 10 
       }
     }, timeStep);
   });
+}
+
+/**
+ * 指定された時間だけ非同期で待機します。
+ * @param time 待機時間（ミリ秒単位）
+ */
+export function wait(time:number){
+  return new Promise<void>(resolve => setTimeout(resolve, time));
 }

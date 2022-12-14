@@ -16,6 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { BaseCommand, CommandArgs } from "./Commands";
+import type { Backupper } from "./Component/backupper";
 import type { GuildBGMContainerType } from "./Util/config";
 import type * as discord from "eris";
 
@@ -23,9 +25,10 @@ import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 
-import { BackUpper } from "./Component/Backupper";
 import { PageToggle } from "./Component/PageToggle";
 import { RateLimitController } from "./Component/RateLimitController";
+import { HttpBackupper } from "./Component/backupper/httpBased";
+import { MongoBackupper } from "./Component/backupper/mongodb";
 import { GuildDataContainer } from "./Structure";
 import { LogEmitter } from "./Structure";
 import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";
@@ -42,9 +45,9 @@ export abstract class MusicBotBase extends LogEmitter {
   protected readonly _instantiatedTime:Date = null;
   protected readonly _versionInfo:string = null;
   protected readonly _embedPageToggle:PageToggle[] = [];
-  protected readonly _backupper = new BackUpper(() => this.data);
   protected readonly _rateLimitController = new RateLimitController();
-  protected readonly data:DataType = new Map();
+  protected readonly guildData:DataType = new Map();
+  protected _backupper:Backupper = null;
   private maintenanceTickCount = 0;
   /**
    * ページトグル
@@ -83,12 +86,12 @@ export abstract class MusicBotBase extends LogEmitter {
   }
 
   get databaseCount(){
-    return Object.keys(this.data).length;
+    return this.guildData.size;
   }
 
   get totalTransformingCost(){
-    return Object.keys(this.data)
-      .map(id => this.data.get(id).player.cost)
+    return [...this.guildData.keys()]
+      .map(id => this.guildData.get(id).player.cost)
       .reduce((prev, current) => prev + current, 0)
     ;
   }
@@ -121,6 +124,15 @@ export abstract class MusicBotBase extends LogEmitter {
         this._versionInfo = "Could not get version";
       }
     }
+    this.initializeBackupper();
+  }
+
+  private initializeBackupper(){
+    if(MongoBackupper.backuppable){
+      this._backupper = new MongoBackupper(this, () => this.guildData);
+    }else if(HttpBackupper.backuppable){
+      this._backupper = new HttpBackupper(this, () => this.guildData);
+    }
   }
 
   /**
@@ -129,20 +141,20 @@ export abstract class MusicBotBase extends LogEmitter {
   protected maintenanceTick(){
     this.maintenanceTickCount++;
     Util.logger.log(`[Tick] #${this.maintenanceTickCount}`, "debug");
+    this.emit("tick", this.maintenanceTickCount);
     // ページトグルの整理
     PageToggle.organize(this._embedPageToggle, 5);
     // 4分ごとに主要情報を出力
     if(this.maintenanceTickCount % 4 === 1) this.logGeneralInfo();
-    if(this.maintenanceTickCount % 2 === 1) this._backupper.backup();
   }
 
   /**
    *  定期ログを実行します
    */
   logGeneralInfo(){
-    const _d = Object.values(this.data);
+    const _d = Object.values(this.guildData);
     const memory = Util.system.GetMemInfo();
-    Util.logger.log(`[Tick] [Main] Participating: ${this._client.guilds.size}, Registered: ${Object.keys(this.data).length} Connecting: ${_d.filter(info => info.player.isPlaying).length} Paused: ${_d.filter(__d => __d.player.isPaused).length}`);
+    Util.logger.log(`[Tick] [Main] Participating: ${this._client.guilds.size}, Registered: ${this.guildData.size} Connecting: ${_d.filter(info => info.player.isPlaying).length} Paused: ${_d.filter(__d => __d.player.isPaused).length}`);
     Util.logger.log(`[Tick] [System] Free:${Math.floor(memory.free)}MB; Total:${Math.floor(memory.total)}MB; Usage:${memory.usage}%`);
     const nMem = process.memoryUsage();
     const rss = Util.system.GetMBytes(nMem.rss);
@@ -156,10 +168,11 @@ export abstract class MusicBotBase extends LogEmitter {
    * 必要に応じてサーバーデータを初期化します
    */
   protected initData(guildid:string, boundChannelId:string){
-    const prev = this.data.get(guildid);
+    const prev = this.guildData.get(guildid);
     if(!prev){
       const server = new GuildDataContainer(guildid, boundChannelId, this);
-      this.data.set(guildid, server);
+      this.guildData.set(guildid, server);
+      this.emit("guildDataAdded", server);
       return server;
     }else{
       return prev;
@@ -167,14 +180,43 @@ export abstract class MusicBotBase extends LogEmitter {
   }
 
   protected initDataWithBgm(guildid:string, boundChannelId:string, bgmConfig:GuildBGMContainerType){
-    if(this.data.has(guildid)) throw new Error("guild data was already set");
+    if(this.guildData.has(guildid)) throw new Error("guild data was already set");
     const server = new GuildDataContainerWithBgm(guildid, boundChannelId, this, bgmConfig);
-    this.data.set(guildid, server);
+    this.guildData.set(guildid, server);
+    this.emit("guildDataAdded", server);
     return server;
   }
 
   resetData(guildId:string){
-    this.data.delete(guildId);
-    this.backupper.addModifiedGuilds(guildId);
+    this.guildData.delete(guildId);
+    this.emit("guildDataRemoved", guildId);
   }
+
+  override emit<T extends keyof BotBaseEvents>(eventName:T, ...args:BotBaseEvents[T]){
+    return super.emit(eventName, ...args);
+  }
+
+  override on<T extends keyof BotBaseEvents>(eventName:T, listener: (...args:BotBaseEvents[T]) => void){
+    return super.on(eventName, listener);
+  }
+
+  override once<T extends keyof BotBaseEvents>(eventName:T, listener: (...args:BotBaseEvents[T]) => void){
+    return super.on(eventName, listener);
+  }
+
+  override off<T extends keyof BotBaseEvents>(eventName:T, listener: (...args:BotBaseEvents[T]) => void){
+    return super.off(eventName, listener);
+  }
+}
+
+interface BotBaseEvents {
+  beforeReady:[];
+  ready:[];
+  onMessageCreate:[message:discord.Message];
+  onInteractionCreate:[interaction:discord.Interaction];
+  onCommandHandler:[command:BaseCommand, args:CommandArgs];
+  onBotVoiceChannelJoin:[channel:discord.VoiceChannel];
+  guildDataAdded:[container:GuildDataContainer];
+  guildDataRemoved:[guildId:string];
+  tick:[count:number];
 }

@@ -60,7 +60,7 @@ export class AddOn extends EventEmitter {
   }
 
   override emit<T extends keyof EventKeys>(event:T, ...args:EventKeys[T]){
-    return super.emit(event, args);
+    return super.emit(event, ...args);
   }
 
   constructor(){

@@ -4,5 +4,6 @@
     "config.json": "jsonc",
     ".env.sample": "env",
     "config-with-bgm.json": "jsonc"
-  }
+  },
+  "files.insertFinalNewline": true
 }

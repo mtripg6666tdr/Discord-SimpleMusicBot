@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CommandArgs, YmxFormat } from "./Structure";
+import type { CommandArgs } from "./Structure";
 
 import * as discord from "eris";
 
@@ -25,7 +25,6 @@ import { CommandMessage } from "./Component/CommandMessage";
 import { PageToggle } from "./Component/PageToggle";
 import { QueueManagerWithBgm } from "./Component/QueueManagerWithBGM";
 import { ResponseMessage } from "./Component/ResponseMessage";
-import { GuildDataContainer } from "./Structure";
 import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";
 import { Util } from "./Util";
 import { MusicBotBase } from "./botBase";
@@ -100,30 +99,26 @@ export class MusicBot extends MusicBotBase {
     }
 
     // Recover queues
-    if(this.backupper.backuppable){
-      const joinedGUildIds = [...client.guilds.values()].map(guild => guild.id);
-      const queues = await this.backupper.getQueueDataFromDbServer(joinedGUildIds);
-      const speakingIds = await this.backupper.getStatusFromDbServer(joinedGUildIds);
-      if(queues && speakingIds){
-        const queueGuildIds = Object.keys(queues);
-        const speakingGuildIds = Object.keys(speakingIds);
-        for(let i = 0; i < queueGuildIds.length; i++){
-          const id = queueGuildIds[i];
-          const queue = JSON.parse(queues[id]) as YmxFormat;
-          const status = speakingIds[id];
-          if(speakingGuildIds.includes(id) && status.includes(":")){
+    if(this.backupper){
+      const joinedGuildIds = [...client.guilds.values()].map(guild => guild.id);
+      const guildQueues = await this.backupper.getQueueDataFromBackup(joinedGuildIds);
+      const guildStatuses = await this.backupper.getStatusFromBackup(joinedGuildIds);
+      if(guildQueues && guildStatuses){
+        const guildQueueIds = [...guildQueues.keys()];
+        const guildStatusIds = [...guildStatuses.keys()];
+        for(let i = 0; i < guildQueueIds.length; i++){
+          const id = guildQueueIds[i];
+          if(guildStatusIds.includes(id)){
             try{
-              const parsedStatus = GuildDataContainer.parseStatus(status);
-              const server = this.initData(id, parsedStatus.boundChannelId);
-              await server.importQueue(queue);
-              server.importStatus(parsedStatus);
+              const server = this.initData(id, guildStatuses.get(id).boundChannelId);
+              await server.importQueue(guildQueues.get(id));
+              server.importStatus(guildStatuses.get(id));
             }
             catch(e){
               this.Log(e, "warn");
             }
           }
         }
-        this._backupper.resetModifiedGuilds();
         this.Log("Finish recovery of queues and statuses.");
       }
     }else{
@@ -148,9 +143,12 @@ export class MusicBot extends MusicBotBase {
     // Command instance preparing
     await CommandManager.instance.sync(this.client);
 
+    this.emit("beforeReady");
+
     // Finish initializing
     this._isReadyFinished = true;
     this.Log("Bot is ready now");
+    this.emit("ready");
   }
 
   private async onMessageCreate(message:discord.Message){
@@ -222,9 +220,9 @@ export class MusicBot extends MusicBotBase {
     }else if(server.searchPanel){
       // searchコマンドのキャンセルを捕捉
       if(message.content === "キャンセル" || message.content === "cancel"){
-        const msgId = this.data.get(message.channel.guild.id).searchPanel.Msg;
+        const msgId = this.guildData.get(message.channel.guild.id).searchPanel.Msg;
         if(msgId.userId !== message.author.id) return;
-        this.data.get(message.channel.guild.id).searchPanel = null;
+        this.guildData.get(message.channel.guild.id).searchPanel = null;
         await message.channel.createMessage("✅キャンセルしました");
         await this._client.deleteMessage(msgId.chId, msgId.id).catch(e => this.Log(e, "error"));
       }
@@ -334,7 +332,7 @@ export class MusicBot extends MusicBotBase {
           }
         }else if(interaction.data.custom_id.startsWith("skip_vote")){
           const guildId = interaction.data.custom_id.substring("skip_vote_".length);
-          const result = this.data.get(guildId)?.skipSession?.vote(interaction.member);
+          const result = this.guildData.get(guildId)?.skipSession?.vote(interaction.member);
           if(result === "voted"){
             interaction.createMessage({
               content: "投票しました",
@@ -349,7 +347,7 @@ export class MusicBot extends MusicBotBase {
         }else{
           const updateEffectPanel = () => {
             const mes = interaction.message;
-            const { embed, messageActions } = Util.effects.getCurrentEffectPanel(interaction.member.avatarURL, this.data.get((interaction.channel as discord.TextChannel).guild.id));
+            const { embed, messageActions } = Util.effects.getCurrentEffectPanel(interaction.member.avatarURL, this.guildData.get((interaction.channel as discord.TextChannel).guild.id));
             mes.edit({
               content: "",
               embeds: [embed.toEris()],
@@ -361,15 +359,15 @@ export class MusicBot extends MusicBotBase {
               updateEffectPanel();
               break;
             case Util.effects.EffectsCustomIds.BassBoost:
-              this.data.get(interaction.channel.guild.id).effectPrefs.BassBoost = !server.effectPrefs.BassBoost;
+              this.guildData.get(interaction.channel.guild.id).effectPrefs.BassBoost = !server.effectPrefs.BassBoost;
               updateEffectPanel();
               break;
             case Util.effects.EffectsCustomIds.Reverb:
-              this.data.get(interaction.channel.guild.id).effectPrefs.Reverb = !server.effectPrefs.Reverb;
+              this.guildData.get(interaction.channel.guild.id).effectPrefs.Reverb = !server.effectPrefs.Reverb;
               updateEffectPanel();
               break;
             case Util.effects.EffectsCustomIds.LoudnessEqualization:
-              this.data.get(interaction.channel.guild.id).effectPrefs.LoudnessEqualization = !server.effectPrefs.LoudnessEqualization;
+              this.guildData.get(interaction.channel.guild.id).effectPrefs.LoudnessEqualization = !server.effectPrefs.LoudnessEqualization;
               updateEffectPanel();
               break;
           }
@@ -377,7 +375,7 @@ export class MusicBot extends MusicBotBase {
       }else if(Util.eris.interaction.compoentnInteractionDataIsSelectMenuData(interaction.data)){
         this.Log("received selectmenu interaction");
         // 検索パネル取得
-        const panel = this.data.get(interaction.channel.guild.id).searchPanel;
+        const panel = this.guildData.get(interaction.channel.guild.id).searchPanel;
         // なければ返却
         if(!panel) return;
         // インタラクションしたユーザーを確認
@@ -385,7 +383,7 @@ export class MusicBot extends MusicBotBase {
         await interaction.deferUpdate();
         if(interaction.data.custom_id === "search"){
           if(interaction.data.values.includes("cancel")){
-            this.data.get(interaction.channel.guild.id).searchPanel = null;
+            this.guildData.get(interaction.channel.guild.id).searchPanel = null;
             await interaction.channel.createMessage("✅キャンセルしました");
             await interaction.deleteOriginalMessage();
           }else{
@@ -414,13 +412,14 @@ export class MusicBot extends MusicBotBase {
               mute: false
             })
             .catch(() => {
-              this._client.createMessage(this.data.get(newChannel.guild.id).boundTextChannel, ":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。")
+              this._client.createMessage(this.guildData.get(newChannel.guild.id).boundTextChannel, ":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。")
                 .catch(e => this.Log(e));
             });
         });
+        this.emit("onBotVoiceChannelJoin", voiceChannel);
       }
-    }else if(this.data.has(member.guild.id)){
-      const server = this.data.get(member.guild.id);
+    }else if(this.guildData.has(member.guild.id)){
+      const server = this.guildData.get(member.guild.id);
       server.skipSession?.checkThreshold();
       if(
         server instanceof GuildDataContainerWithBgm
@@ -441,7 +440,7 @@ export class MusicBot extends MusicBotBase {
   }
 
   private async onVoiceChannelLeave(member:discord.Member, oldChannel:discord.TextVoiceChannel){
-    const server = this.data.get(oldChannel.guild.id);
+    const server = this.guildData.get(oldChannel.guild.id);
     if(!server || !server.connection) return;
     if(member.id === this._client.user.id){
       // サーバー側からのボットの切断
@@ -468,13 +467,12 @@ export class MusicBot extends MusicBotBase {
 
   private async onError(er:Error){
     Util.logger.log(er, "error");
-    console.error(er);
-    Util.logger.log("Attempt reconnecting");
+    this.Log("Attempt reconnecting after waiting for a while...");
+    await Util.general.wait(3000);
     this.client.connect()
       .then(() => Util.logger.log("Reconnected!"))
       .catch(_er => {
-        Util.logger.log(_er);
-        console.log(_er);
+        this.Log(_er);
         Util.logger.log("Reconnect attempt failed");
       })
     ;
@@ -502,7 +500,7 @@ export class MusicBot extends MusicBotBase {
       embedPageToggle: this._embedPageToggle,
       args: options,
       bot: this,
-      server: this.data.get(guildId),
+      server: this.guildData.get(guildId),
       rawArgs: optiont,
       client: this._client,
       initData: this.initData.bind(this)

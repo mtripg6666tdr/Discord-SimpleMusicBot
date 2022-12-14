@@ -8,12 +8,16 @@
     "noImplicitOverride": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "outDir": "dist/",
     "sourceMap": true,
-    
+    "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
+    "outDir": "dist/",
   },
   "include": [
     "./src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "test",
   ]
 }

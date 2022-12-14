@@ -16,69 +16,61 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { DataType } from "../botBase";
+import type { exportableStatuses } from ".";
+import type { GuildDataContainer, YmxFormat } from "../../Structure";
+import type { DataType, MusicBotBase } from "../../botBase";
 
 import { http, https } from "follow-redirects";
 
-import { LogEmitter } from "../Structure";
-import Util from "../Util";
+import { Backupper } from ".";
+import Util from "../../Util";
 
 const MIME_JSON = "application/json";
 
-export class BackUpper extends LogEmitter {
+export class HttpBackupper extends Backupper {
   private _queueModifiedGuilds:string[] = [];
   private _previousStatuses:{[guildId:string]:string} = {};
-  private get data(){
-    return this.getData();
-  }
 
-  /**
-   * 変更済みとしてマークされたキューを持つサーバーの一覧を返します
-   */
-  get queueModifiedGuilds():Readonly<string[]>{
-    return this._queueModifiedGuilds;
-  }
-
-  /**
-   * バックアップが実行可能な設定がされているかを示します。
-   */
-  get backuppable(){
-    return !!(process.env.GAS_TOKEN && process.env.GAS_URL);
-  }
-
-  constructor(private readonly getData:(()=>DataType)){
-    super();
-    this.setTag("Backup");
-  }
-
-  /**
-   * 今変更済みキューがあるとしてマークされているサーバーをリセットして、すべてマークを解除します。
-   */
-  resetModifiedGuilds(){
-    this._queueModifiedGuilds = [];
+  constructor(bot:MusicBotBase, getData:() => DataType){
+    super(bot, getData);
+    this.Log("Initializing http based backup server adapter...");
+    // ボットの準備完了直前に実行する
+    this.bot.once("beforeReady", () => {
+      // コンテナにイベントハンドラを設定する関数
+      const setContainerEvent = (container:GuildDataContainer) => (["change", "changeWithoutCurrent"] as const).forEach(event => container.queue.on(event, () => this.addModifiedGuild(container.guildId)));
+      // すでに登録されているコンテナにイベントハンドラを登録する
+      this.data.forEach(setContainerEvent);
+      // これから登録されるコンテナにイベントハンドラを登録する
+      this.bot.on("guildDataAdded", setContainerEvent);
+      // バックアップのタイマーをセット
+      this.bot.on("tick", (count) => count % 2 === 0 && this.backup());
+      
+      this.Log("Hook was set up successfully");
+    });
   }
 
   /**
    * 指定したサーバーIDのキューを、変更済みとしてマークします  
    * マークされたサーバーのキューは、次回のティックにバックアップが試行されます
    */
-  addModifiedGuilds(guildId:string){
+  addModifiedGuild(guildId:string){
     if(!this._queueModifiedGuilds.includes(guildId)) this._queueModifiedGuilds.push(guildId);
   }
-  
-  /**
-   * 接続ステータスやキューを含む全データをサーバーにバックアップします
-   */
+
+  static get backuppable(){
+    return !!(process.env.GAS_TOKEN && process.env.GAS_URL);
+  }
+
   backup():Promise<any>|void{
-    if(this.backuppable){
+    if(HttpBackupper.backuppable){
       return this.backupQueue().then(() => this.backupStatus());
     }
   }
 
   /**
-   * キューをサーバーにバックアップします
+   * キューをバックアップします
    */
-  async backupQueue(){
+  private async backupQueue(){
     try{
       const queue = this._queueModifiedGuilds.map(id => ({
         guildid: id,
@@ -92,7 +84,7 @@ export class BackUpper extends LogEmitter {
           this.Log("Something went wrong while backing up queue", "warn");
         }
       }else{
-        this.Log("No modified queue found, skipping");
+        this.Log("No modified queue found, skipping", "debug");
       }
     }
     catch(e){
@@ -101,21 +93,29 @@ export class BackUpper extends LogEmitter {
   }
 
   /**
-   * 接続ステータス等をサーバーにバックアップします
+   * 接続ステータス等をバックアップします
    */
-  async backupStatus(){
+  private async backupStatus(){
     try{
       // 参加ステータスの送信
       const speaking = [] as {guildid:string, value:string}[];
       const currentStatuses = Object.assign({}, this._previousStatuses) as {[guildId:string]:string};
-      Object.keys(this.data).forEach(id => {
-        const currentStatus = this.data.get(id).exportStatus();
-        if(!this._previousStatuses[id] || this._previousStatuses[id] !== currentStatus){
+      this.data.forEach(container => {
+        const currentStatus = ((status:exportableStatuses) => [
+          status.voiceChannelId,
+          status.boundChannelId,
+          status.loopEnabled ? "1" : "0",
+          status.queueLoopEnabled ? "1" : "0",
+          status.addRelatedSongs ? "1" : "0",
+          status.equallyPlayback ? "1" : "0",
+          status.volume,
+        ].join(":"))(container.exportStatus());
+        if(!this._previousStatuses[container.guildId] || this._previousStatuses[container.guildId] !== currentStatus){
           speaking.push({
-            guildid: id,
+            guildid: container.guildId,
             value: currentStatus,
           });
-          currentStatuses[id] = currentStatus;
+          currentStatuses[container.guildId] = currentStatus;
         }
       });
       if(speaking.length > 0){
@@ -126,7 +126,7 @@ export class BackUpper extends LogEmitter {
           this.Log("Something went wrong while backing up statuses", "warn");
         }
       }else{
-        this.Log("No modified status found, skipping");
+        this.Log("No modified status found, skipping", "debug");
       }
     }
     catch(e){
@@ -134,11 +134,8 @@ export class BackUpper extends LogEmitter {
     }
   }
 
-  /**
-   * ステータスデータをサーバーから取得する
-   */
-  async getStatusFromDbServer(guildids:string[]){
-    if(this.backuppable){
+  async getStatusFromBackup(guildids:string[]){
+    if(HttpBackupper.backuppable){
       const t = Util.time.timer.start("GetIsSpeking");
       try{
         const result = await this._requestHttp("GET", process.env.GAS_URL, {
@@ -147,7 +144,31 @@ export class BackUpper extends LogEmitter {
           type: "j"
         } as requestBody, MIME_JSON);
         if(result.status === 200){
-          return result.data as {[guildid:string]:string};
+          const frozenGuildStatuses = result.data as {[guildid:string]:string};
+          const map = new Map<string, exportableStatuses>();
+          Object.keys(frozenGuildStatuses).forEach(key => {
+            const [
+              voiceChannelId,
+              boundChannelId,
+              loopEnabled,
+              queueLoopEnabled,
+              addRelatedSongs,
+              equallyPlayback,
+              volume,
+            ] = frozenGuildStatuses[key].split(":");
+            const numVolume = Number(volume) || 100;
+            const b = (v:string) => v === "1";
+            map.set(key, {
+              voiceChannelId,
+              boundChannelId,
+              loopEnabled: b(loopEnabled),
+              queueLoopEnabled: b(queueLoopEnabled),
+              addRelatedSongs: b(addRelatedSongs),
+              equallyPlayback: b(equallyPlayback),
+              volume: numVolume >= 1 && numVolume <= 200 ? numVolume : 100,
+            });
+          });
+          return map;
         }else{
           return null;
         }
@@ -165,11 +186,8 @@ export class BackUpper extends LogEmitter {
     }
   }
 
-  /**
-   * キューのデータをサーバーから取得する
-   */
-  async getQueueDataFromDbServer(guildids:string[]){
-    if(this.backuppable){
+  async getQueueDataFromBackup(guildids:string[]){
+    if(HttpBackupper.backuppable){
       const t = Util.time.timer.start("GetQueueData");
       try{
         const result = await this._requestHttp("GET", process.env.GAS_URL, {
@@ -178,8 +196,19 @@ export class BackUpper extends LogEmitter {
           type: "queue"
         } as requestBody, MIME_JSON);
         if(result.status === 200){
-          return result.data as {[guildid:string]:string};
-        }else return null;
+          const frozenQueues = result.data as {[guildid:string]:string};
+          const res = new Map<string, YmxFormat>();
+          Object.keys(frozenQueues).forEach(key => {
+            try{
+              const ymx = JSON.parse(frozenQueues[key]);
+              res.set(key, ymx);
+            }
+            catch{ /* empty */ }
+          });
+          return res;
+        }else{
+          return null;
+        }
       }
       catch(er){
         this.Log(er, "error");
@@ -198,7 +227,7 @@ export class BackUpper extends LogEmitter {
    * ステータス情報をサーバーへバックアップする
    */
   private async _backupStatusData(data:{guildid:string, value:string}[]){
-    if(this.backuppable){
+    if(HttpBackupper.backuppable){
       const t = Util.time.timer.start("backupStatusData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as {[key:string]:string};
@@ -233,7 +262,7 @@ export class BackUpper extends LogEmitter {
    * キューのデータをサーバーへバックアップする
    */
   private async _backupQueueData(data:{guildid:string, queue:string}[]){
-    if(this.backuppable){
+    if(HttpBackupper.backuppable){
       const t = Util.time.timer.start("SetQueueData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as {[guildid:string]:string};
@@ -278,7 +307,8 @@ export class BackUpper extends LogEmitter {
       } as {[key:string]:any};
       if(mimeType){
         opt.headers = {
-          "Content-Type": mimeType
+          "Content-Type": mimeType,
+          "User-Agent": `mtripg6666tdr/Discord-SimpleMusicBot#${this.bot.version || "unknown"} http based backup server adapter`
         };
       }
       const httpLibs = {
@@ -289,7 +319,7 @@ export class BackUpper extends LogEmitter {
         .request(opt, (res) => {
           const bufs = [] as Buffer[];
           res.on("data", chunk => bufs.push(chunk));
-          res.on("end", ()=> {
+          res.on("end", () => {
             try{
               const parsed = JSON.parse(Buffer.concat(bufs).toString("utf-8")) as postResult;
               if(parsed.data) Object.keys(parsed.data).forEach(k => parsed.data[k] = decodeURIComponent(parsed.data[k]));
