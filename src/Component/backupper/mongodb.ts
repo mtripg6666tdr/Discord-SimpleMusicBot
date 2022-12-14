@@ -44,9 +44,13 @@ export class MongoBackupper extends Backupper {
 
   constructor(bot:MusicBotBase, getData: () => DataType){
     super(bot, getData);
-    this.client = new MongoClient(process.env.GAS_URL);
+    this.Log("Initializing Mongo DB backup scheduler...");
+    this.client = new MongoClient(process.env.GAS_URL, {
+      appName: `mtripg6666tdr/Discord-SimpleMusicBot#${this.bot.version || "unknown"} MondoDB backup server adapter`,
+    });
     this.client.connect()
       .then(() => {
+        this.Log("Database connection ready");
         const db = this.client.db(process.env.GAS_TOKEN || "discord_music_bot_backup");
         this.collections = {
           status: db.collection<Collectionate<exportableStatuses>>("Status"),
@@ -55,19 +59,29 @@ export class MongoBackupper extends Backupper {
         this.dbConnectionReady = true;
       })
       .catch(e => {
+        this.Log(e, "error");
+        this.Log("Database connection failed", "warn");
         this.dbError = e;
       })
     ;
     this.bot.on("beforeReady", () => {
-      const backupStatusDebounce = debounce(5000, (guildId:string) => this.backupStatus(guildId));
+      const backupStatusDebounceFunctions = Object.create(null);
+      const backupStatusFuncFactory = (guildId:string) => {
+        return backupStatusDebounceFunctions[guildId] || (backupStatusDebounceFunctions[guildId] = debounce(5000, () => this.backupStatus(guildId)));
+      };
+      const backupQueueDebounceFunctions = Object.create(null);
+      const backupQueueFuncFactory = (guildId:string) => {
+        return backupQueueDebounceFunctions[guildId] || (backupQueueDebounceFunctions[guildId] = debounce(5000, () => this.backupQueue(guildId)));
+      };
       const setContainerEvent = (container:GuildDataContainer) => {
-        (["change", "changeWithoutCurrent"] as const).forEach(eventName => container.queue.on(eventName, debounce(5000, () => this.backupQueue(container.guildId))));
-        container.queue.on("settingsChanged", () => backupStatusDebounce(container.guildId));
-        container.player.on("all", () => backupStatusDebounce(container.guildId));
+        (["change", "changeWithoutCurrent"] as const).forEach(eventName => container.queue.on(eventName, backupQueueFuncFactory(container.guildId)));
+        container.queue.on("settingsChanged", backupStatusFuncFactory(container.guildId));
+        container.player.on("all", backupStatusFuncFactory(container.guildId));
       };
       this.data.forEach(setContainerEvent);
       this.bot.on("guildDataAdded", setContainerEvent);
-      this.bot.on("onBotVoiceChannelJoin", (channel) => backupStatusDebounce(channel.guild.id));
+      this.bot.on("onBotVoiceChannelJoin", (channel) => backupStatusFuncFactory(channel.guild.id)());
+      this.Log("Hook was set up successfully");
     });
   }
 
@@ -75,7 +89,7 @@ export class MongoBackupper extends Backupper {
     if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
     try{
       this.Log(`Backing up status...(${guildId})`);
-      const status = this.data.get(guildId);
+      const status = this.data.get(guildId).exportStatus();
       await this.collections.status.updateOne({guildId}, {
         "$set": {
           guildId,
@@ -94,7 +108,7 @@ export class MongoBackupper extends Backupper {
   backupQueue(guildId:string){
     if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
     try{
-      const queue = this.data.get(guildId);
+      const queue = this.data.get(guildId).exportQueue();
       this.Log(`Backing up queue...(${guildId})`);
       this.collections.queue.updateOne({guildId}, {
         "$set": {

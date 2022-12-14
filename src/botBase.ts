@@ -98,7 +98,6 @@ export abstract class MusicBotBase extends LogEmitter {
 
   constructor(protected readonly maintenance:boolean = false){
     super();
-    this.initializeBackupper();
     this.setTag("Main");
     this._instantiatedTime = new Date();
     this.Log("bot is instantiated");
@@ -125,13 +124,14 @@ export abstract class MusicBotBase extends LogEmitter {
         this._versionInfo = "Could not get version";
       }
     }
+    this.initializeBackupper();
   }
 
   private initializeBackupper(){
-    if(HttpBackupper.backuppable){
-      this._backupper = new HttpBackupper(this, () => this.guildData);
-    }else if(MongoBackupper.backuppable){
+    if(MongoBackupper.backuppable){
       this._backupper = new MongoBackupper(this, () => this.guildData);
+    }else if(HttpBackupper.backuppable){
+      this._backupper = new HttpBackupper(this, () => this.guildData);
     }
   }
 

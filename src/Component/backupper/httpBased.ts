@@ -33,6 +33,7 @@ export class HttpBackupper extends Backupper {
 
   constructor(bot:MusicBotBase, getData:() => DataType){
     super(bot, getData);
+    this.Log("Initializing http based backup scheduler...");
     // ボットの準備完了直前に実行する
     this.bot.once("beforeReady", () => {
       // コンテナにイベントハンドラを設定する関数
@@ -43,6 +44,8 @@ export class HttpBackupper extends Backupper {
       this.bot.on("guildDataAdded", setContainerEvent);
       // バックアップのタイマーをセット
       this.bot.on("tick", (count) => count % 2 === 0 && this.backup());
+      
+      this.Log("Hook was set up successfully");
     });
   }
 
@@ -304,7 +307,8 @@ export class HttpBackupper extends Backupper {
       } as {[key:string]:any};
       if(mimeType){
         opt.headers = {
-          "Content-Type": mimeType
+          "Content-Type": mimeType,
+          "User-Agent": `mtripg6666tdr/Discord-SimpleMusicBot#${this.bot.version || "unknown"} http based backup server adapter`
         };
       }
       const httpLibs = {
