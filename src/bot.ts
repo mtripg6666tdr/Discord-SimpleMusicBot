@@ -52,6 +52,7 @@ export class MusicBot extends MusicBotBase {
         "guildVoiceStates"
       ],
       restMode: true,
+      compress: true,
     });
 
     this.client
