@@ -41,8 +41,7 @@ export class GoogleDrive extends AudioSource {
       try{
         this._lengthSeconds = await Util.web.RetriveLengthSeconds((await this.fetch()).url);
       }
-      // eslint-disable-next-line no-empty
-      catch{}
+      catch{ /* empty */ }
     }
     return this;
   }

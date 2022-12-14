@@ -241,8 +241,7 @@ export class PlayManager extends ServerManagerBase {
           this.preparing = false;
           return this;
         }
-        // eslint-disable-next-line no-empty
-      } catch{}
+      } catch{ /* empty */ }
       if(mes){
         mes.edit(`:tired_face:曲の再生に失敗しました...。(${Util.general.FilterContent(Util.general.StringifyObject(e))})` + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
         this.onStreamFailed();

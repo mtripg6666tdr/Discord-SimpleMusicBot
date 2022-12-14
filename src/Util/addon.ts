@@ -76,11 +76,9 @@ export class AddOn extends EventEmitter {
           try{
             d(this);
           }
-          // eslint-disable-next-line no-empty
-          catch{}
+          catch{ /* empty */ }
         });
     }
-    // eslint-disable-next-line no-empty
-    catch{}
+    catch{ /* empty */ }
   }
 }
