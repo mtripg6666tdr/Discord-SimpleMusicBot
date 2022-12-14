@@ -467,13 +467,12 @@ export class MusicBot extends MusicBotBase {
 
   private async onError(er:Error){
     Util.logger.log(er, "error");
-    console.error(er);
-    Util.logger.log("Attempt reconnecting");
+    this.Log("Attempt reconnecting after waiting for a while...");
+    await Util.general.wait(3000);
     this.client.connect()
       .then(() => Util.logger.log("Reconnected!"))
       .catch(_er => {
-        Util.logger.log(_er);
-        console.log(_er);
+        this.Log(_er);
         Util.logger.log("Reconnect attempt failed");
       })
     ;
