@@ -44,7 +44,7 @@ export class MongoBackupper extends Backupper {
 
   constructor(bot:MusicBotBase, getData: () => DataType){
     super(bot, getData);
-    this.Log("Initializing Mongo DB backup scheduler...");
+    this.Log("Initializing Mongo DB backup server adapter...");
     this.client = new MongoClient(process.env.GAS_URL, {
       appName: `mtripg6666tdr/Discord-SimpleMusicBot#${this.bot.version || "unknown"} MondoDB backup server adapter`,
     });

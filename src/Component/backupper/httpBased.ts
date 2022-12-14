@@ -33,7 +33,7 @@ export class HttpBackupper extends Backupper {
 
   constructor(bot:MusicBotBase, getData:() => DataType){
     super(bot, getData);
-    this.Log("Initializing http based backup scheduler...");
+    this.Log("Initializing http based backup server adapter...");
     // ボットの準備完了直前に実行する
     this.bot.once("beforeReady", () => {
       // コンテナにイベントハンドラを設定する関数
