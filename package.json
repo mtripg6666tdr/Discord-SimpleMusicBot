@@ -15,7 +15,7 @@
     "djs-command-resolver": "^1.0.2",
     "dotenv": "^16.0.3",
     "follow-redirects": "^1.15.2",
-    "genius-lyrics": "^4.4.0",
+    "genius-lyrics": "^4.4.1",
     "html-entities": "^2.3.3",
     "html-to-text": "^9.0.3",
     "https-proxy-agent": "^5.0.1",
