@@ -229,32 +229,27 @@ export class QueueManager extends ServerManagerBase {
     addedBy:Member|AddedBy|null|undefined,
     type:KnownAudioSourceIdentifer,
     first:boolean = false,
-    fromSearch:boolean|ResponseMessage = false,
+    fromSearch:false|ResponseMessage = false,
     channel:TextChannel = null,
     message:ResponseMessage = null,
     gotData:AudioSource.exportableCustom = null
   ):Promise<boolean>{
     this.Log("AutoAddQueue Called");
     const t = Util.time.timer.start("AutoAddQueue");
-    let ch:TextChannel = null;
     let msg:Message<TextChannel>|ResponseMessage = null;
     try{
-      if(fromSearch && this.server.searchPanel){
+      if(fromSearch){
         // 検索パネルから
         this.Log("AutoAddQueue from search panel");
-        ch = client.getChannel(this.server.searchPanel.Msg.chId) as TextChannel;
-        if(typeof fromSearch === "boolean"){
-          msg = ch.messages.get(this.server.searchPanel.Msg.id);
-        }else{
-          msg = fromSearch;
-        }
-        const tembed = new Helper.MessageEmbedBuilder()
-          .setTitle("お待ちください")
-          .setDescription("情報を取得しています...")
-        ;
+        msg = fromSearch;
         await msg.edit({
           content: "",
-          embeds: [tembed.toEris()],
+          embeds: [
+            new Helper.MessageEmbedBuilder()
+              .setTitle("お待ちください")
+              .setDescription("情報を取得しています...")
+              .toEris()
+          ],
           allowedMentions: {
             repliedUser: false
           },
@@ -263,12 +258,10 @@ export class QueueManager extends ServerManagerBase {
       }else if(message){
         // すでに処理中メッセージがある
         this.Log("AutoAddQueue will report statuses to the specified message");
-        ch = message.channel as TextChannel;
         msg = message;
       }else if(channel){
         // まだないので生成
         this.Log("AutoAddQueue will make a message that will be used to report statuses");
-        ch = channel;
         msg = await channel.createMessage("情報を取得しています。お待ちください...");
       }
       if(this.server.queue.length > 999){

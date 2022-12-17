@@ -17,12 +17,12 @@
  */
 
 import type { exportableCustom } from "../AudioSource";
+import type { CommandMessage } from "../Component/CommandMessage";
+import type { SearchPanel } from "../Component/SearchPanel";
 import type { exportableStatuses } from "../Component/backupper";
 import type { MusicBotBase } from "../botBase";
 import type { AudioEffect } from "./AudioEffect";
-import type { SearchPanel } from "./SearchPanel";
 import type { YmxFormat } from "./YmxFormat";
-import type { CommandMessage, ResponseMessage } from "@mtripg6666tdr/eris-command-resolver";
 import type { Message, VoiceChannel, VoiceConnection } from "eris";
 
 import { LockObj, lock } from "@mtripg6666tdr/async-lock";
@@ -57,7 +57,10 @@ export class GuildDataContainer extends LogEmitter {
   /**
    * 検索窓の格納します
    */
-  searchPanel:SearchPanel;
+  searchPanels:Map<string, SearchPanel>;
+
+  /* マネージャー系 */
+
   protected _queue:QueueManager;
   /**
    * キューマネジャ
@@ -73,6 +76,17 @@ export class GuildDataContainer extends LogEmitter {
   get player(){
     return this._player;
   }
+
+  /**
+   * Skipマネージャ
+   */
+  protected _skipSession:SkipManager;
+
+  get skipSession(){
+    return this._skipSession;
+  }
+
+  /* マネージャー系ここまで */
 
   private _boundTextChannel:string;
   /**
@@ -113,15 +127,6 @@ export class GuildDataContainer extends LogEmitter {
    */
   vcPing:number;
 
-  /**
-   * Skipマネージャ
-   */
-  protected _skipSession:SkipManager;
-
-  get skipSession(){
-    return this._skipSession;
-  }
-
   constructor(guildid:string, boundchannelid:string, bot:MusicBotBase){
     super();
     this.setTag("GuildDataContainer");
@@ -129,14 +134,18 @@ export class GuildDataContainer extends LogEmitter {
     if(!guildid){
       throw new Error("invalid guild id was given");
     }
-    this.searchPanel = null;
+    this.searchPanels = new Map<string, SearchPanel>();
     this.boundTextChannel = boundchannelid;
     if(!this.boundTextChannel){
       throw new Error("invalid bound textchannel id was given");
     }
     this.bot = bot;
     this.addRelated = false;
-    this.effectPrefs = {BassBoost: false, Reverb: false, LoudnessEqualization: false};
+    this.effectPrefs = {
+      BassBoost: false,
+      Reverb: false,
+      LoudnessEqualization: false,
+    };
     this.prefix = ">";
     this.equallyPlayback = false;
     this.connection = null;
@@ -300,7 +309,7 @@ export class GuildDataContainer extends LogEmitter {
   /**
    * ボイスチャンネルに接続します
    * @param message コマンドを表すメッセージ
-   * @param reply 応答が必要な際に、コマンドに対して返信で応じるか新しいメッセージとして応答するか。(デフォルトではfalse)
+   * @param reply 応答が必要な際に、コマンドに対して返信で応じるか新しいメッセージとして応答するか。(trueで返信で応じ、falseで新規メッセージを作成します。デフォルトではfalse)
    * @returns 成功した場合はtrue、それ以外の場合にはfalse
    */
   async joinVoiceChannel(message:CommandMessage, reply:boolean = false, replyOnFail:boolean = false):Promise<boolean>{
@@ -522,32 +531,30 @@ export class GuildDataContainer extends LogEmitter {
   /**
    * 検索パネルのオプション番号を表すインデックス番号から再生します
    * @param nums インデックス番号の配列
-   * @param guildid サーバーID
-   * @param member 検索者のメンバー
-   * @param message 検索パネルが添付されたメッセージ自体を指す応答メッセージ
+   * @param message 
    */
-  async playFromSearchPanelOptions(nums:string[], guildid:string, message:ResponseMessage){
-    const t = Util.time.timer.start("MusicBot#playFromSearchPanelOptions");
-    const panel = this.searchPanel;
-    const member = this.bot.client.guilds.get(guildid).members.get(panel.Msg.userId);
-    const num = nums.shift();
-    if(Object.keys(panel.Opts).includes(num)){
-      await this.queue.autoAddQueue(this.bot.client, panel.Opts[Number(num)].url, member, "unknown", false, message);
-      this.searchPanel = null;
-      // 現在の状態を確認してVCに接続中なら接続試行
-      if(member.voiceState.channelID){
-        await this.joinVoiceChannel(message.command, false, false);
-      }
-      // 接続中なら再生を開始
-      if(this.player.isConnecting && !this.player.isPlaying){
-        this.player.play();
-      }
+  async playFromSearchPanelOptions(nums:string[], panel:SearchPanel){
+    const includingNums = panel.filterOnlyIncludes(nums.map(n => Number(n)).filter(n => !isNaN(n)));
+    const {
+      urls: items,
+      responseMessage,
+    } = panel.decideItems(includingNums);
+    const [first, ...rest] = items;
+    // いっこめをしょり
+    await this.queue.autoAddQueue(this.bot.client, first, panel.commandMessage.member, "unknown", false, responseMessage);
+    this.searchPanels.delete(panel.commandMessage.member.id);
+    // 現在の状態を確認してVCに接続中なら接続試行
+    if(panel.commandMessage.member.voiceState.channelID){
+      await this.joinVoiceChannel(panel.commandMessage, false, false);
     }
-    const rest = nums.filter(n => Object.keys(panel.Opts).includes(n)).map(n => Number(n));
+    // 接続中なら再生を開始
+    if(this.player.isConnecting && !this.player.isPlaying){
+      this.player.play();
+    }
+    // 二個目以上を処理
     for(let i = 0; i < rest.length; i++){
-      await this.queue.autoAddQueue(this.bot.client, panel.Opts[rest[i]].url, member, "unknown", false, false, message.channel as TextChannel);
+      await this.queue.autoAddQueue(this.bot.client, rest[i], panel.commandMessage.member, "unknown", false, false, panel.commandMessage.channel as TextChannel);
     }
-    t.end();
   }
 
   async createSkipSession(message:CommandMessage){

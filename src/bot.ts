@@ -24,7 +24,6 @@ import { CommandManager } from "./Component/CommandManager";
 import { CommandMessage } from "./Component/CommandMessage";
 import { PageToggle } from "./Component/PageToggle";
 import { QueueManagerWithBgm } from "./Component/QueueManagerWithBGM";
-import { ResponseMessage } from "./Component/ResponseMessage";
 import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";
 import { Util } from "./Util";
 import { MusicBotBase } from "./botBase";
@@ -217,26 +216,18 @@ export class MusicBot extends MusicBotBase {
       }
       // コマンドの処理
       await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
-    }else if(server.searchPanel){
+    }else if(server.searchPanels.has(message.member.id)){
       // searchコマンドのキャンセルを捕捉
+      const panel = server.searchPanels.get(message.member.id);
+      const content = Util.string.NormalizeText(message.content);
       if(message.content === "キャンセル" || message.content === "cancel"){
-        const msgId = this.guildData.get(message.channel.guild.id).searchPanel.Msg;
-        if(msgId.userId !== message.author.id) return;
-        this.guildData.get(message.channel.guild.id).searchPanel = null;
-        await message.channel.createMessage("✅キャンセルしました");
-        await this._client.deleteMessage(msgId.chId, msgId.id).catch(e => this.Log(e, "error"));
+        panel.destroy();
       }
       // searchコマンドの選択を捕捉
-      else if(Util.string.NormalizeText(message.content).match(/^([0-9]\s?)+$/)){
-        const panel = server.searchPanel;
-        if(!panel) return;
+      else if(content.match(/^([0-9]\s?)+$/)){
         // メッセージ送信者が検索者と一致するかを確認
-        if(message.author.id !== panel.Msg.userId) return;
-        const nums = Util.string.NormalizeText(message.content).split(" ");
-        const optsKey = Object.keys(panel.Opts);
-        if(nums.some(num => !optsKey.includes(num))) return;
-        const responseMessage = (this._client.getChannel(panel.Msg.chId) as discord.TextChannel).messages.get(panel.Msg.id);
-        await server.playFromSearchPanelOptions(nums, message.channel.guild.id, ResponseMessage.createFromMessage(responseMessage, panel.Msg.commandMessage));
+        const nums = content.split(" ");
+        await server.playFromSearchPanelOptions(nums, panel);
       }
     }else if(message.content === "キャンセル" || message.content === "cancel"){
       const result = server.cancelAll();
@@ -372,24 +363,18 @@ export class MusicBot extends MusicBotBase {
               break;
           }
         }
-      }else if(Util.eris.interaction.compoentnInteractionDataIsSelectMenuData(interaction.data)){
+      }else if(Util.eris.interaction.componentInteractionDataIsSelectMenuData(interaction.data)){
         this.Log("received selectmenu interaction");
         // 検索パネル取得
-        const panel = this.guildData.get(interaction.channel.guild.id).searchPanel;
+        const panel = this.guildData.get(interaction.channel.guild.id).searchPanels.get(interaction.member.id);
         // なければ返却
         if(!panel) return;
-        // インタラクションしたユーザーを確認
-        if(interaction.member.id !== panel.Msg.userId) return;
         await interaction.deferUpdate();
         if(interaction.data.custom_id === "search"){
           if(interaction.data.values.includes("cancel")){
-            this.guildData.get(interaction.channel.guild.id).searchPanel = null;
-            await interaction.channel.createMessage("✅キャンセルしました");
-            await interaction.deleteOriginalMessage();
+            await panel.destroy();
           }else{
-            const message = interaction.message;
-            const responseMessage = ResponseMessage.createFromInteraction(interaction, message, panel.Msg.commandMessage);
-            await server.playFromSearchPanelOptions(interaction.data.values, interaction.channel.guild.id, responseMessage);
+            await server.playFromSearchPanelOptions(interaction.data.values, panel);
           }
         }
       }
