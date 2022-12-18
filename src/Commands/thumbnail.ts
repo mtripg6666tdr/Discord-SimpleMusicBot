@@ -29,7 +29,7 @@ export default class Thumbnail extends BaseCommand {
   constructor(){
     super({
       name: "サムネイル",
-      alias: ["thumbnail", "t"],
+      alias: ["サムネ", "thumbnail", "thumb", "t"],
       description: "現在再生中のサムネイルを表示します。検索パネルが開いていて検索パネル中の番号が指定された場合にはその曲のサムネイルを表示します。",
       unlist: false,
       category: "player",
