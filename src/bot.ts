@@ -75,7 +75,7 @@ export class MusicBot extends MusicBotBase {
 
     // Set activity as booting
     if(!this.maintenance){
-      client.editStatus("invisible", {
+      client.editStatus({
         type: discord.Constants.ActivityTypes.GAME,
         name: "起動中..."
       });
