@@ -20,5 +20,4 @@ export * from "./LogEmitter";
 export * from "./ServerManagerBase";
 export * from "./Command";
 export * from "./GuildDataContainer";
-export * from "./SearchPanel";
 export * from "./YmxFormat";
