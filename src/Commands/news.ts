@@ -22,7 +22,6 @@ import type { CommandMessage } from "../Component/CommandMessage";
 import * as ytpl from "ytpl";
 
 import { BaseCommand } from ".";
-import { SearchPanel } from "../Component/SearchPanel";
 import { Util } from "../Util";
 
 export default class News extends BaseCommand {
@@ -49,7 +48,8 @@ export default class News extends BaseCommand {
       message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const searchPanel = new SearchPanel(message, "ニューストピックス", true);
+    const searchPanel = options.server.createSearchPanel(message, "ニューストピックス", true);
+    if(!searchPanel) return;
     const result = await searchPanel.consumeSearchResult(ytpl.default(url, {
       gl: "JP", hl: "ja", limit: 20
     }), ({items}) => items.map(item => ({

@@ -23,7 +23,6 @@ import type * as ytsr from "ytsr";
 
 import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
-import { SearchPanel } from "../Component/SearchPanel";
 import { Util } from "../Util";
 
 export abstract class SearchBase<T> extends BaseCommand {
@@ -43,7 +42,8 @@ export abstract class SearchBase<T> extends BaseCommand {
       return;
     }
     if(options.rawArgs !== ""){
-      const searchPanel = new SearchPanel(message, options.rawArgs);
+      const searchPanel = options.server.createSearchPanel(message, options.rawArgs);
+      if(!searchPanel) return;
       const result = await searchPanel.consumeSearchResult(this.searchContent(options.rawArgs), this.consumer);
       if(result){
         options.server.bindSearchPanel(searchPanel);

@@ -18,7 +18,6 @@
 
 import type { exportableCustom } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { SearchPanel } from "../Component/SearchPanel";
 import type { exportableStatuses } from "../Component/backupper";
 import type { MusicBotBase } from "../botBase";
 import type { AudioEffect } from "./AudioEffect";
@@ -35,6 +34,7 @@ import * as ytpl from "ytpl";
 import { SoundCloudS } from "../AudioSource";
 import { PlayManager } from "../Component/PlayManager";
 import { QueueManager } from "../Component/QueueManager";
+import { SearchPanel } from "../Component/SearchPanel";
 import { SkipManager } from "../Component/SkipManager";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
 import Util from "../Util";
@@ -540,6 +540,14 @@ export class GuildDataContainer extends LogEmitter {
     };
     this.queue.once("change", destroy);
     this.player.once("disconnect", destroy);
+  }
+
+  createSearchPanel(_commandMessage:CommandMessage, query:string, isRawTitle:boolean = false){
+    if(this._searchPanels.size >= 3){
+      _commandMessage.reply(":cry:すでに開いている検索パネルが上限を超えています").catch(er => this.Log(er, "error"));
+      return null;
+    }
+    return new SearchPanel(_commandMessage, query, isRawTitle);
   }
 
   getSearchPanel(userId:string){

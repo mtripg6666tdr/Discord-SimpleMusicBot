@@ -22,7 +22,6 @@ import type { CommandMessage } from "../Component/CommandMessage";
 import * as ytpl from "ytpl";
 
 import { BaseCommand } from ".";
-import { SearchPanel } from "../Component/SearchPanel";
 import { Util } from "../Util";
 
 export default class Bgm extends BaseCommand {
@@ -45,7 +44,8 @@ export default class Bgm extends BaseCommand {
       message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const searchPanel = new SearchPanel(message, "プリセットBGM一覧", true);
+    const searchPanel = options.server.createSearchPanel(message, "プリセットBGM一覧", true);
+    if(!searchPanel) return;
     const result = await searchPanel.consumeSearchResult(ytpl.default(url, {
       gl: "JP", hl: "ja"
     }), ({items}) => items.map(item => ({
