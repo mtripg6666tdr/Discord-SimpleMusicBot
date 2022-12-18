@@ -440,17 +440,27 @@ export class MusicBot extends MusicBotBase {
     if(!server || !server.connection) return;
     if(member.id === this._client.user.id){
       // サーバー側からのボットの切断
+      this.Log(`forced to disconnect from VC (${server.connection?.channelID})`);
       server.player.disconnect();
       const bound = this._client.getChannel(server.boundTextChannel);
       if(!bound) return;
-      await this._client.createMessage(bound.id, ":postbox: 正常に切断しました").catch(e => this.Log(e));
+      await this._client.createMessage(bound.id, ":postbox: 正常に切断しました").catch(e => this.Log(e, "error"));
     }else if(oldChannel.voiceMembers.has(this._client.user.id) && oldChannel.voiceMembers.size === 1){
       if(server.queue instanceof QueueManagerWithBgm && server.queue.isBGM){
         server.player.disconnect();
       }else if(server.player.isPlaying){
         // 誰も聞いてる人がいない場合一時停止
-        server.player.pause();
-        await this._client.createMessage(server.boundTextChannel, ":pause_button:ボイスチャンネルから誰もいなくなったため一時停止しました").catch(e => this.Log(e));
+        if(server.player.currentAudioInfo.LengthSeconds > 0 && server.player.currentAudioInfo.LengthSeconds - (server.player.currentTime / 1000) < 10){
+          this.Log(`audio left less than 10sec; automatically disconnected from VC (${server.connection?.channelID})`);
+          server.player.disconnect();
+          if(!server.queue.onceLoopEnabled && !server.queue.loopEnabled) server.queue.next();
+          const bound = this._client.getChannel(server.boundTextChannel);
+          if(!bound) return;
+          await this._client.createMessage(bound.id, ":postbox: 正常に切断しました").catch(e => this.Log(e, "error"));
+        }else{
+          server.player.pause();
+          await this._client.createMessage(server.boundTextChannel, ":pause_button:ボイスチャンネルから誰もいなくなったため一時停止しました").catch(e => this.Log(e));
+        }
       }
     }
     server.skipSession?.checkThreshold();
