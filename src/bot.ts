@@ -453,6 +453,7 @@ export class MusicBot extends MusicBotBase {
         if(server.player.currentAudioInfo.LengthSeconds > 0 && server.player.currentAudioInfo.LengthSeconds - (server.player.currentTime / 1000) < 10){
           this.Log(`audio left less than 10sec; automatically disconnected from VC (${server.connection?.channelID})`);
           server.player.disconnect();
+          if(!server.queue.onceLoopEnabled && !server.queue.loopEnabled) server.queue.next();
           const bound = this._client.getChannel(server.boundTextChannel);
           if(!bound) return;
           await this._client.createMessage(bound.id, ":postbox: 正常に切断しました").catch(e => this.Log(e, "error"));
