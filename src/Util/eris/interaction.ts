@@ -27,7 +27,7 @@ export const interactionUtils = {
   componentInteractionDataIsButtonData(data:ComponentInteractionButtonData|ComponentInteractionSelectMenuData):data is ComponentInteractionButtonData{
     return data.component_type === Constants.ComponentTypes.BUTTON;
   },
-  compoentnInteractionDataIsSelectMenuData(data:ComponentInteractionButtonData|ComponentInteractionSelectMenuData):data is ComponentInteractionSelectMenuData{
+  componentInteractionDataIsSelectMenuData(data:ComponentInteractionButtonData|ComponentInteractionSelectMenuData):data is ComponentInteractionSelectMenuData{
     return data.component_type === Constants.ComponentTypes.SELECT_MENU;
   },
 } as const;

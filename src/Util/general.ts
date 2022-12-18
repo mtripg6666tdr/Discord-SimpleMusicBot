@@ -75,9 +75,9 @@ const projectRoot = path.join(__dirname, "../../").slice(0, -1);
 export function FilterContent(original:string){
   let result = original;
   while(result.includes(projectRoot)){
-    result = result.replace(projectRoot, "\\*\\*\\*");
+    result = result.replace(projectRoot, "***");
   }
-  return result.replace(/\\/g, "/");
+  return result.replace(/\\/g, "/").replace(/\*/g, "\\*");
 }
 
 /**

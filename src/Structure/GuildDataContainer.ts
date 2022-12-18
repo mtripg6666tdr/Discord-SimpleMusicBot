@@ -17,12 +17,12 @@
  */
 
 import type { exportableCustom } from "../AudioSource";
+import type { CommandMessage } from "../Component/CommandMessage";
+import type { SearchPanel } from "../Component/SearchPanel";
 import type { exportableStatuses } from "../Component/backupper";
 import type { MusicBotBase } from "../botBase";
 import type { AudioEffect } from "./AudioEffect";
-import type { SearchPanel } from "./SearchPanel";
 import type { YmxFormat } from "./YmxFormat";
-import type { CommandMessage, ResponseMessage } from "@mtripg6666tdr/eris-command-resolver";
 import type { Message, VoiceChannel, VoiceConnection } from "eris";
 
 import { LockObj, lock } from "@mtripg6666tdr/async-lock";
@@ -50,77 +50,52 @@ export class GuildDataContainer extends LogEmitter {
     return this._cancellations;
   }
   
-  /**
-   * プレフィックス
-   */
+  /** プレフィックス */
   prefix:string;
-  /**
-   * 検索窓の格納します
-   */
-  searchPanel:SearchPanel;
+
+  /** 検索窓の格納します */
+  protected _searchPanels:Map<string, SearchPanel>;
+
   protected _queue:QueueManager;
-  /**
-   * キューマネジャ
-   */
+  /** キューマネジャ */
   get queue(){
     return this._queue;
   }
 
   protected _player:PlayManager;
-  /**
-   * 再生マネジャ
-   */
+  /** 再生マネジャ */
   get player(){
     return this._player;
   }
 
+  protected _skipSession:SkipManager;
+  /** Skipマネージャ */
+  get skipSession(){
+    return this._skipSession;
+  }
+
   private _boundTextChannel:string;
-  /**
-   * 紐づけテキストチャンネル
-   */
+  /** 紐づけテキストチャンネルを取得します */
   get boundTextChannel(){
     return this._boundTextChannel;
   }
-  
+  /** 紐づけテキストチャンネルを設定します */
   private set boundTextChannel(val:string){
     this._boundTextChannel = val;
   }
 
-  /**
-   * メインボット
-   */
+  /** メインボット */
   readonly bot:MusicBotBase;
-  /**
-   * 関連動画自動追加が有効
-   */
-  addRelated:boolean;
-  /**
-   * オーディオエフェクトエフェクトの設定
-   */
+  /** オーディオエフェクトエフェクトの設定 */
   readonly effectPrefs:AudioEffect;
-  /**
-   * 均等再生が有効
-   */
+  /** 関連動画自動追加が有効 */
+  addRelated:boolean;
+  /** 均等再生が有効 */
   equallyPlayback:boolean;
-
-  /**
-   * VCへの接続
-   */
+  /** VCへの接続 */
   connection:VoiceConnection;
-
-  /**
-   * VCのping
-   */
+  /** VCのping */
   vcPing:number;
-
-  /**
-   * Skipマネージャ
-   */
-  protected _skipSession:SkipManager;
-
-  get skipSession(){
-    return this._skipSession;
-  }
 
   constructor(guildid:string, boundchannelid:string, bot:MusicBotBase){
     super();
@@ -129,14 +104,18 @@ export class GuildDataContainer extends LogEmitter {
     if(!guildid){
       throw new Error("invalid guild id was given");
     }
-    this.searchPanel = null;
+    this._searchPanels = new Map<string, SearchPanel>();
     this.boundTextChannel = boundchannelid;
     if(!this.boundTextChannel){
       throw new Error("invalid bound textchannel id was given");
     }
     this.bot = bot;
     this.addRelated = false;
-    this.effectPrefs = {BassBoost: false, Reverb: false, LoudnessEqualization: false};
+    this.effectPrefs = {
+      BassBoost: false,
+      Reverb: false,
+      LoudnessEqualization: false,
+    };
     this.prefix = ">";
     this.equallyPlayback = false;
     this.connection = null;
@@ -300,7 +279,7 @@ export class GuildDataContainer extends LogEmitter {
   /**
    * ボイスチャンネルに接続します
    * @param message コマンドを表すメッセージ
-   * @param reply 応答が必要な際に、コマンドに対して返信で応じるか新しいメッセージとして応答するか。(デフォルトではfalse)
+   * @param reply 応答が必要な際に、コマンドに対して返信で応じるか新しいメッセージとして応答するか。(trueで返信で応じ、falseで新規メッセージを作成します。デフォルトではfalse)
    * @returns 成功した場合はtrue、それ以外の場合にはfalse
    */
   async joinVoiceChannel(message:CommandMessage, reply:boolean = false, replyOnFail:boolean = false):Promise<boolean>{
@@ -522,34 +501,35 @@ export class GuildDataContainer extends LogEmitter {
   /**
    * 検索パネルのオプション番号を表すインデックス番号から再生します
    * @param nums インデックス番号の配列
-   * @param guildid サーバーID
-   * @param member 検索者のメンバー
-   * @param message 検索パネルが添付されたメッセージ自体を指す応答メッセージ
+   * @param message 
    */
-  async playFromSearchPanelOptions(nums:string[], guildid:string, message:ResponseMessage){
-    const t = Util.time.timer.start("MusicBot#playFromSearchPanelOptions");
-    const panel = this.searchPanel;
-    const member = this.bot.client.guilds.get(guildid).members.get(panel.Msg.userId);
-    const num = nums.shift();
-    if(Object.keys(panel.Opts).includes(num)){
-      await this.queue.autoAddQueue(this.bot.client, panel.Opts[Number(num)].url, member, "unknown", false, message);
-      this.searchPanel = null;
-      // 現在の状態を確認してVCに接続中なら接続試行
-      if(member.voiceState.channelID){
-        await this.joinVoiceChannel(message.command, false, false);
-      }
-      // 接続中なら再生を開始
-      if(this.player.isConnecting && !this.player.isPlaying){
-        this.player.play();
-      }
+  async playFromSearchPanelOptions(nums:string[], panel:SearchPanel){
+    const includingNums = panel.filterOnlyIncludes(nums.map(n => Number(n)).filter(n => !isNaN(n)));
+    const {
+      urls: items,
+      responseMessage,
+    } = panel.decideItems(includingNums);
+    const [first, ...rest] = items;
+    // いっこめをしょり
+    await this.queue.autoAddQueue(this.bot.client, first, panel.commandMessage.member, "unknown", false, responseMessage);
+    // 現在の状態を確認してVCに接続中なら接続試行
+    if(panel.commandMessage.member.voiceState.channelID){
+      await this.joinVoiceChannel(panel.commandMessage, false, false);
     }
-    const rest = nums.filter(n => Object.keys(panel.Opts).includes(n)).map(n => Number(n));
+    // 接続中なら再生を開始
+    if(this.player.isConnecting && !this.player.isPlaying){
+      this.player.play();
+    }
+    // 二個目以上を処理
     for(let i = 0; i < rest.length; i++){
-      await this.queue.autoAddQueue(this.bot.client, panel.Opts[rest[i]].url, member, "unknown", false, false, message.channel as TextChannel);
+      await this.queue.autoAddQueue(this.bot.client, rest[i], panel.commandMessage.member, "unknown", false, false, panel.commandMessage.channel as TextChannel);
     }
-    t.end();
   }
 
+  /**
+   * 指定されたコマンドメッセージをもとに、スキップ投票を作成します
+   * @param message ベースとなるコマンドメッセージ
+   */
   async createSkipSession(message:CommandMessage){
     this._skipSession = new SkipManager();
     this._skipSession.setBinding(this);
@@ -560,5 +540,20 @@ export class GuildDataContainer extends LogEmitter {
     };
     this.queue.once("change", destroy);
     this.player.once("disconnect", destroy);
+  }
+
+  getSearchPanel(userId:string){
+    return this._searchPanels.get(userId);
+  }
+
+  hasSearchPanel(userId:string){
+    return this._searchPanels.has(userId);
+  }
+
+  bindSearchPanel(panel:SearchPanel){
+    this._searchPanels.set(panel.commandMessage.member.id, panel);
+    panel.once("destroy", () => {
+      this._searchPanels.delete(panel.commandMessage.member.id);
+    });
   }
 }

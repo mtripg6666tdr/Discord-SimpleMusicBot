@@ -18,17 +18,52 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { SelectMenuOptions } from "eris";
+import type { SongInfo } from "../Component/SearchPanel";
 import type * as ytsr from "ytsr";
-
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
+import { SearchPanel } from "../Component/SearchPanel";
 import { Util } from "../Util";
-import { getColor } from "../Util/color";
 
-export default class Search extends BaseCommand {
+export abstract class SearchBase<T> extends BaseCommand {
+  async run(message:CommandMessage, options:CommandArgs){
+    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.sameVC(message.member, options)){
+      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
+      return;
+    }
+    options.server.updateBoundChannel(message);
+    options.server.joinVoiceChannel(message);
+    if(this.urlCheck(options.rawArgs)){
+      await Promise.all(options.args.map(u => options.server.playFromURL(message, u, !options.server.player.isConnecting)));
+      return;
+    }
+    if(options.server.getSearchPanel(message.member.id)){
+      message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
+      return;
+    }
+    if(options.rawArgs !== ""){
+      const searchPanel = new SearchPanel(message, options.rawArgs);
+      const result = await searchPanel.consumeSearchResult(this.searchContent(options.rawArgs), this.consumer);
+      if(result){
+        options.server.bindSearchPanel(searchPanel);
+      }
+    }else{
+      await message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));
+    }
+  }
+
+  protected abstract searchContent(query:string):Promise<T|{result:T, transformedQuery:string}>;
+
+  protected abstract consumer(result:T):SongInfo[];
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected urlCheck(query:string){
+    return false;
+  }
+}
+
+export default class Search extends SearchBase<ytsr.Result> {
   constructor(){
     super({
       name: "検索",
@@ -48,103 +83,22 @@ export default class Search extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.sameVC(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
-    options.server.updateBoundChannel(message);
-    options.server.joinVoiceChannel(message);
-    if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){
-      await Promise.all(options.args.map(u => options.server.playFromURL(message, u, !options.server.player.isConnecting)));
-      return;
-    }
-    if(options.server.searchPanel !== null){
-      message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
-    if(options.rawArgs !== ""){
-      options.server.searchPanel = {} as any;
-      const msg = await message.reply("🔍検索中...");
-      options.server.searchPanel = {
-        Msg: {
-          id: msg.id,
-          chId: msg.channel.id,
-          userId: message.member.id,
-          userName: Util.eris.user.getDisplayName(message.member),
-          commandMessage: message
-        },
-        Opts: {}
-      };
-      try{
-        const result = await searchYouTube(options.rawArgs);
-        let desc = "";
-        let index = 1;
-        const selectOpts = [] as SelectMenuOptions[];
-        for(let i = 0; i < result.items.length; i++){
-          if(result.items[i].type === "video"){
-            const video = (result.items[i] as ytsr.Video);
-            desc += `\`${index}.\` [${video.title}](${video.url}) \`${video.duration}\` - \`${video.author.name}\` \r\n\r\n`;
-            options.server.searchPanel.Opts[index] = {
-              url: video.url,
-              title: video.title,
-              duration: video.duration,
-              thumbnail: video.bestThumbnail.url
-            };
-            selectOpts.push({
-              label: index + ". " + (video.title.length > 90 ? video.title.substring(0, 90) + "…" : video.title),
-              description: `長さ: ${video.duration}, チャンネル名: ${video.author.name}`,
-              value: index.toString()
-            });
-            index++;
-          }
-        }
-        if(index === 1){
-          options.server.searchPanel = null;
-          await msg.edit(":pensive:見つかりませんでした。");
-          return;
-        }
-        const embed = new Helper.MessageEmbedBuilder()
-          .setTitle("\"" + options.rawArgs + "\"の検索結果✨")
-          .setColor(getColor("SEARCH"))
-          .setDescription(desc)
-          .setFooter({
-            icon_url: message.member.avatarURL,
-            text: "動画のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
-          })
-          .toEris()
-        ;
-        await msg.edit({
-          content: "",
-          embeds: [embed],
-          components: [
-            new Helper.MessageActionRowBuilder()
-              .addComponents(
-                new Helper.MessageSelectMenuBuilder()
-                  .setCustomId("search")
-                  .setPlaceholder("数字を送信するか、ここから選択...")
-                  .setMinValues(1)
-                  .setMaxValues(index - 1)
-                  .addOptions(...selectOpts, {
-                    label: "キャンセル",
-                    value: "cancel"
-                  })
-              )
-              .toEris()
-          ]
-        });
-      }
-      catch(e){
-        Util.logger.log(e, "error");
-        options.server.searchPanel = null;
-        if(msg){
-          msg.edit("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
-        }else{
-          message.reply("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
-        }
-      }
-    }else{
-      await message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));
-    }
+  protected override searchContent(query:string){
+    return searchYouTube(query);
+  }
+
+  protected override consumer({items}:ytsr.Result){
+    return items.map(item => item.type !== "video" ? null : {
+      url: item.url,
+      title: item.title,
+      duration: item.duration,
+      thumbnail: item.bestThumbnail.url,
+      author: item.author.name,
+      description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`
+    }).filter(n => n);
+  }
+
+  protected override urlCheck(query: string){
+    return query.startsWith("http://") || query.startsWith("https://");
   }
 }
