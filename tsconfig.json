@@ -12,6 +12,7 @@
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "outDir": "dist/",
+    "skipLibCheck": true
   },
   "include": [
     "./src/**/*.ts"

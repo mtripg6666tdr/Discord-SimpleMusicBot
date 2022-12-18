@@ -142,12 +142,12 @@ export abstract class BestdoriApi {
   }
 
   static async getDetailedInfo(id:number){
-    const apiUrl = "https://bestdori.com/api/songs/" + id.toString() + ".json";
+    const apiUrl = `https://bestdori.com/api/songs/${id.toString()}.json`;
     return JSON.parse(await Util.web.DownloadText(apiUrl)) as BestdoriDetailedSongInfo;
   }
 
   static getThumbnail(id:number, jacketimage:string){
-    return "https://bestdori.com/assets/jp/musicjacket/musicjacket" + (Math.ceil(id / 10) * 10) + "_rip/assets-star-forassetbundle-startapp-musicjacket-musicjacket" + Math.ceil(id / 10) * 10 + "-" + jacketimage + "-jacket.png";
+    return `https://bestdori.com/assets/jp/musicjacket/musicjacket${Math.ceil(id / 10) * 10}_rip/assets-star-forassetbundle-startapp-musicjacket-musicjacket${Math.ceil(id / 10) * 10}-${jacketimage}-jacket.png`;
   }
 }
 

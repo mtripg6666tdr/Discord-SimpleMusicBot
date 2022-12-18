@@ -16,24 +16,19 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CommandArgs } from ".";
 import type { SoundCloudTrackCollection } from "../AudioSource";
-import type { CommandMessage } from "../Component/CommandMessage";
-import type { ResponseMessage } from "../Component/ResponseMessage";
-import type { Message, SelectMenuOptions, TextChannel } from "eris";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
-
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import Soundcloud from "soundcloud.ts";
 
-import { BaseCommand } from ".";
 import { Util } from "../Util";
-import { getColor } from "../Util/color";
+import { SearchBase } from "./search";
 
 const { DefaultUserAgent } = Util.ua;
 
-export default class Searchs extends BaseCommand {
+export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
+  private readonly soundcloud = new Soundcloud();
+
   constructor(){
     super({
       name: "サウンドクラウドを検索",
@@ -53,120 +48,47 @@ export default class Searchs extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.sameVC(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
-    options.server.updateBoundChannel(message);
-    options.server.joinVoiceChannel(message);
-    if(options.server.searchPanel !== null){
-      message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
-    if(options.rawArgs !== ""){
-      let msg = null as Message<TextChannel>|ResponseMessage;
-      let desc = "";
-      try{
-        options.server.searchPanel = {} as any;
-        msg = await message.reply("🔍検索中...");
-        options.server.searchPanel = {
-          Msg: {
-            id: msg.id,
-            chId: msg.channel.id,
-            userId: message.member.id,
-            userName: Util.eris.user.getDisplayName(message.member),
-            commandMessage: message
-          },
-          Opts: {}
-        };
-        const soundcloud = new Soundcloud();
-        let result:SoundcloudTrackV2[] = [];
-        if(options.rawArgs.match(/^https:\/\/soundcloud.com\/[^/]+$/)){
-          // ユーザーの楽曲検索
-          const user = (await soundcloud.users.getV2(options.rawArgs));
-          options.rawArgs = user.username;
-          let nextUrl = "";
-          let rawResult = (await soundcloud.api.getV2("users/" + user.id + "/tracks") as SoundCloudTrackCollection);
-          result.push(...rawResult.collection);
-          nextUrl = rawResult.next_href + "&client_id=" + await soundcloud.api.getClientID();
-          while(nextUrl && result.length < 10){
-            const data = await Util.web.DownloadText(nextUrl, {
-              "User-Agent": DefaultUserAgent
-            });
-            rawResult = JSON.parse(data) as SoundCloudTrackCollection;
-            result.push(...rawResult.collection);
-            nextUrl = rawResult.next_href ? rawResult.next_href + "&client_id=" + await soundcloud.api.getClientID() : rawResult.next_href;
-          }
-        }else{
-          // 楽曲検索
-          result = (await soundcloud.tracks.searchV2({q: options.rawArgs})).collection;
-        }
-        if(result.length > 12) result = result.splice(0, 11);
-        let index = 1;
-        const selectOpts = [] as SelectMenuOptions[];
-        for(let i = 0; i < result.length; i++){
-          const [min, sec] = Util.time.CalcMinSec(Math.floor(result[i].duration / 1000));
-          desc += `\`${index}.\` [${result[i].title}](${result[i].permalink_url}) ${min}:${sec} - [${result[i].user.username}](${result[i].user.permalink_url}) \r\n\r\n`;
-          options.server.searchPanel.Opts[index] = {
-            url: result[i].permalink_url,
-            title: result[i].title,
-            duration: result[i].full_duration.toString(),
-            thumbnail: result[i].artwork_url
-          };
-          selectOpts.push({
-            label: index + ". " + (result[i].title.length > 90 ? result[i].title.substr(0, 90) + "…" : result[i].title),
-            description: "長さ: " + min + ":" + sec + ", ユーザー: " + result[i].user.username,
-            value: index.toString()
-          });
-          index++;
-        }
-        if(index === 1){
-          options.server.searchPanel = null;
-          await msg.edit(":pensive:見つかりませんでした。");
-          return;
-        }
-        const embed = new Helper.MessageEmbedBuilder()
-          .setColor(getColor("SEARCH"))
-          .setTitle("\"" + options.rawArgs + "\"の検索結果✨")
-          .setDescription(desc)
-          .setFooter({
-            icon_url: message.member.avatarURL,
-            text: "楽曲のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。",
-          })
-          .toEris()
-        ;
-        await msg.edit({
-          content: "",
-          embeds: [embed],
-          components: [
-            new Helper.MessageActionRowBuilder()
-              .addComponents(
-                new Helper.MessageSelectMenuBuilder()
-                  .setCustomId("search")
-                  .setPlaceholder("数字を送信するか、ここから選択...")
-                  .setMinValues(1)
-                  .setMaxValues(index - 1)
-                  .addOptions(...selectOpts, {
-                    label: "キャンセル",
-                    value: "cancel"
-                  })
-              )
-              .toEris()
-          ]
+  protected override async searchContent(query: string){
+    let result:SoundcloudTrackV2[] = [];
+    let transformedQuery = query;
+    if(query.match(/^https:\/\/soundcloud.com\/[^/]+$/)){
+      // ユーザーの楽曲検索
+      const user = (await this.soundcloud.users.getV2(query));
+      transformedQuery = user.username;
+      let nextUrl = "";
+      let rawResult = (await this.soundcloud.api.getV2("users/" + user.id + "/tracks") as SoundCloudTrackCollection);
+      result.push(...rawResult.collection);
+      nextUrl = rawResult.next_href + "&client_id=" + await this.soundcloud.api.getClientID();
+      while(nextUrl && result.length < 10){
+        const data = await Util.web.DownloadText(nextUrl, {
+          "User-Agent": DefaultUserAgent
         });
-      }
-      catch(e){
-        Util.logger.log(e, "error");
-        options.server.searchPanel = null;
-        if(msg){
-          await msg.edit("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
-        }else{
-          await message.reply("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
-        }
+        rawResult = JSON.parse(data) as SoundCloudTrackCollection;
+        result.push(...rawResult.collection);
+        nextUrl = rawResult.next_href ? rawResult.next_href + "&client_id=" + await this.soundcloud.api.getClientID() : rawResult.next_href;
       }
     }else{
-      await message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));
+      // 楽曲検索
+      result = (await this.soundcloud.tracks.searchV2({q: query})).collection;
     }
+    if(result.length > 12) result = result.splice(0, 11);
+    return {
+      result,
+      transformedQuery,
+    };
+  }
+
+  protected override consumer(result: SoundcloudTrackV2[]){
+    return result.map(item => {
+      const [min, sec] = Util.time.CalcMinSec(Math.floor(item.duration / 1000));
+      return {
+        url: item.permalink_url,
+        title: item.title,
+        duration: item.full_duration.toString(),
+        thumbnail: item.artwork_url,
+        author: item.user.username,
+        description: `長さ: ${min}:${sec}, ユーザー: ${item.user.username}`,
+      };
+    });
   }
 }

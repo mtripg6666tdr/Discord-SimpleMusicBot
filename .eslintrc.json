@@ -28,9 +28,6 @@
       "ignoreProperties": true
     }],
     "@typescript-eslint/comma-spacing": "warn",
-    "@typescript-eslint/lines-between-class-members": ["warn", "always", {
-        "exceptAfterSingleLine": true
-    }],
     "@typescript-eslint/consistent-type-imports": ["warn", { 
       "prefer": "type-imports" 
     }],
@@ -94,6 +91,16 @@
     "@typescript-eslint/no-meaningless-void-operator": ["error", {
       "checkNever": false
     }],
+    "@typescript-eslint/indent": ["warn", 2, {
+      "ignoredNodes": [
+        "PropertyDefinition[decorators]",
+        "TSUnionType"
+      ],
+      "SwitchCase": 1
+    }],
+    "@typescript-eslint/no-unnecessary-type-assertion": "warn",
+    "@typescript-eslint/return-await": ["warn", "in-try-catch"],
+    "@typescript-eslint/await-thenable": "warn",
 
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/ban-ts-comment": "off",
@@ -102,17 +109,8 @@
     "@typescript-eslint/prefer-for-of": "off",
     "@typescript-eslint/no-confusing-void-expression": "off",
     "@typescript-eslint/no-unsafe-return": "off",
-    "@typescript-eslint/indent": ["warn", 2, {
-        "ignoredNodes": [
-          "PropertyDefinition[decorators]",
-          "TSUnionType"
-        ],
-        "SwitchCase": 1
-    }],
-    "@typescript-eslint/no-unnecessary-type-assertion": "warn",
+    "@typescript-eslint/lines-between-class-members": "off",
     "@typescript-eslint/require-await": "off",
-    "@typescript-eslint/return-await": ["warn", "in-try-catch"],
-    "@typescript-eslint/await-thenable": "warn",
 
     // other plugins
     "eslint-comments/no-unused-disable": "error",
@@ -275,9 +273,6 @@
     "unicode-bom": "warn",
     "wrap-iife": "error",
     "yield-star-spacing": "error",
-    "yoda": ["warn", "never", {
-      "exceptRange": true 
-    }],
 
     // disabled
     "brace-style": "off",
@@ -297,6 +292,7 @@
     "require-await": "off",
     "semi-style": "off",
     "spaced-comment": "off",
+    "yoda": "off",
 
     // superseded by @typescript-eslint
     "semi": "off",

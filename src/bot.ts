@@ -75,7 +75,7 @@ export class MusicBot extends MusicBotBase {
 
     // Set activity as booting
     if(!this.maintenance){
-      client.editStatus({
+      client.editStatus("invisible", {
         type: discord.Constants.ActivityTypes.GAME,
         name: "起動中..."
       });
@@ -216,9 +216,9 @@ export class MusicBot extends MusicBotBase {
       }
       // コマンドの処理
       await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
-    }else if(server.searchPanels.has(message.member.id)){
+    }else if(server.hasSearchPanel(message.member.id)){
       // searchコマンドのキャンセルを捕捉
-      const panel = server.searchPanels.get(message.member.id);
+      const panel = server.getSearchPanel(message.member.id);
       const content = Util.string.NormalizeText(message.content);
       if(message.content === "キャンセル" || message.content === "cancel"){
         panel.destroy();
@@ -366,7 +366,7 @@ export class MusicBot extends MusicBotBase {
       }else if(Util.eris.interaction.componentInteractionDataIsSelectMenuData(interaction.data)){
         this.Log("received selectmenu interaction");
         // 検索パネル取得
-        const panel = this.guildData.get(interaction.channel.guild.id).searchPanels.get(interaction.member.id);
+        const panel = this.guildData.get(interaction.channel.guild.id).getSearchPanel(interaction.member.id);
         // なければ返却
         if(!panel) return;
         await interaction.deferUpdate();

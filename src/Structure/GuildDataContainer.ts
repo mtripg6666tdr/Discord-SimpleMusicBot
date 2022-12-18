@@ -50,81 +50,51 @@ export class GuildDataContainer extends LogEmitter {
     return this._cancellations;
   }
   
-  /**
-   * プレフィックス
-   */
+  /** プレフィックス */
   prefix:string;
-  /**
-   * 検索窓の格納します
-   */
-  searchPanels:Map<string, SearchPanel>;
 
-  /* マネージャー系 */
+  /** 検索窓の格納します */
+  protected _searchPanels:Map<string, SearchPanel>;
 
   protected _queue:QueueManager;
-  /**
-   * キューマネジャ
-   */
+  /** キューマネジャ */
   get queue(){
     return this._queue;
   }
 
   protected _player:PlayManager;
-  /**
-   * 再生マネジャ
-   */
+  /** 再生マネジャ */
   get player(){
     return this._player;
   }
 
-  /**
-   * Skipマネージャ
-   */
   protected _skipSession:SkipManager;
-
+  /** Skipマネージャ */
   get skipSession(){
     return this._skipSession;
   }
 
-  /* マネージャー系ここまで */
-
   private _boundTextChannel:string;
-  /**
-   * 紐づけテキストチャンネル
-   */
+  /** 紐づけテキストチャンネルを取得します */
   get boundTextChannel(){
     return this._boundTextChannel;
   }
-  
+  /** 紐づけテキストチャンネルを設定します */
   private set boundTextChannel(val:string){
     this._boundTextChannel = val;
   }
 
-  /**
-   * メインボット
-   */
+  /** メインボット */
   readonly bot:MusicBotBase;
-  /**
-   * 関連動画自動追加が有効
-   */
-  addRelated:boolean;
-  /**
-   * オーディオエフェクトエフェクトの設定
-   */
+  /** オーディオエフェクトエフェクトの設定 */
   readonly effectPrefs:AudioEffect;
-  /**
-   * 均等再生が有効
-   */
+  /** 関連動画自動追加が有効 */
+  addRelated:boolean;
+  /** 均等再生が有効 */
   equallyPlayback:boolean;
-
-  /**
-   * VCへの接続
-   */
+  /** VCへの接続 */
   connection:VoiceConnection;
-
-  /**
-   * VCのping
-   */
+  /** VCのping */
   vcPing:number;
 
   constructor(guildid:string, boundchannelid:string, bot:MusicBotBase){
@@ -134,7 +104,7 @@ export class GuildDataContainer extends LogEmitter {
     if(!guildid){
       throw new Error("invalid guild id was given");
     }
-    this.searchPanels = new Map<string, SearchPanel>();
+    this._searchPanels = new Map<string, SearchPanel>();
     this.boundTextChannel = boundchannelid;
     if(!this.boundTextChannel){
       throw new Error("invalid bound textchannel id was given");
@@ -542,7 +512,6 @@ export class GuildDataContainer extends LogEmitter {
     const [first, ...rest] = items;
     // いっこめをしょり
     await this.queue.autoAddQueue(this.bot.client, first, panel.commandMessage.member, "unknown", false, responseMessage);
-    this.searchPanels.delete(panel.commandMessage.member.id);
     // 現在の状態を確認してVCに接続中なら接続試行
     if(panel.commandMessage.member.voiceState.channelID){
       await this.joinVoiceChannel(panel.commandMessage, false, false);
@@ -557,6 +526,10 @@ export class GuildDataContainer extends LogEmitter {
     }
   }
 
+  /**
+   * 指定されたコマンドメッセージをもとに、スキップ投票を作成します
+   * @param message ベースとなるコマンドメッセージ
+   */
   async createSkipSession(message:CommandMessage){
     this._skipSession = new SkipManager();
     this._skipSession.setBinding(this);
@@ -567,5 +540,20 @@ export class GuildDataContainer extends LogEmitter {
     };
     this.queue.once("change", destroy);
     this.player.once("disconnect", destroy);
+  }
+
+  getSearchPanel(userId:string){
+    return this._searchPanels.get(userId);
+  }
+
+  hasSearchPanel(userId:string){
+    return this._searchPanels.has(userId);
+  }
+
+  bindSearchPanel(panel:SearchPanel){
+    this._searchPanels.set(panel.commandMessage.member.id, panel);
+    panel.once("destroy", () => {
+      this._searchPanels.delete(panel.commandMessage.member.id);
+    });
   }
 }
