@@ -357,7 +357,7 @@ export class GuildDataContainer extends LogEmitter {
    * メッセージからストリームを判定してキューに追加し、状況に応じて再生を開始します
    * @param first キューの先頭に追加するかどうか
    */
-  async playFromURL(message:CommandMessage, optiont:string, first:boolean = true){
+  async playFromURL(message:CommandMessage, optiont:string, first:boolean = true, cancellable:boolean = false){
     const t = Util.time.timer.start("MusicBot#PlayFromURL");
     setTimeout(() => message.suppressEmbeds(true).catch(e => this.Log(Util.general.StringifyObject(e), "warn")), 4000);
     if(optiont.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){
@@ -370,7 +370,7 @@ export class GuildDataContainer extends LogEmitter {
         const msg = await this.bot.client.getMessage(ch.id, ids[ids.length - 1]) as Message<TextChannel>;
         if(ch.guild.id !== msg.channel.guild.id) throw new Error("異なるサーバーのコンテンツは再生できません");
         if(msg.attachments.length <= 0 || !Util.fs.isAvailableRawAudioURL(msg.attachments[0]?.url)) throw new Error("添付ファイルが見つかりません");
-        await this.queue.autoAddQueue(this.bot.client, msg.attachments[0].url, message.member, "custom", first, false, message.channel as TextChannel, smsg);
+        await this.queue.autoAddQueue(msg.attachments[0].url, message.member, "custom", first, false, message.channel as TextChannel, smsg);
         await this.player.play();
         return;
       }
@@ -380,7 +380,7 @@ export class GuildDataContainer extends LogEmitter {
       }
     }else if(Util.fs.isAvailableRawAudioURL(optiont)){
       // オーディオファイルへの直リンク？
-      await this.queue.autoAddQueue(this.bot.client, optiont, message.member, "custom", first, false, message.channel as TextChannel);
+      await this.queue.autoAddQueue(optiont, message.member, "custom", first, false, message.channel as TextChannel);
       await this.player.play();
       return;
     }else if(!optiont.includes("v=") && !optiont.includes("/channel/") && ytpl.validateID(optiont)){
@@ -395,7 +395,6 @@ export class GuildDataContainer extends LogEmitter {
       const cancellation = this.bindCancellation(new TaskCancellationManager());
       try{
         const index = await this.queue.processPlaylist(
-          this.bot.client,
           msg,
           cancellation,
           first,
@@ -435,17 +434,26 @@ export class GuildDataContainer extends LogEmitter {
       const playlist = await sc.playlists.getV2(optiont);
       const cancellation = this.bindCancellation(new TaskCancellationManager());
       try{
-        const index = await this.queue.processPlaylist(this.bot.client, msg, cancellation, first, "soundcloud", playlist.tracks, playlist.title, playlist.track_count, async (track) => {
-          const item = await sc.tracks.getV2(track.id);
-          return {
-            url: item.permalink_url,
-            title: item.title,
-            description: item.description,
-            length: Math.floor(item.duration / 1000),
-            author: item.user.username,
-            thumbnail: item.artwork_url
-          } as exportableCustom;
-        });
+        const index = await this.queue.processPlaylist(
+          msg,
+          cancellation,
+          first,
+          "soundcloud",
+          playlist.tracks,
+          playlist.title,
+          playlist.track_count,
+          async (track) => {
+            const item = await sc.tracks.getV2(track.id);
+            return {
+              url: item.permalink_url,
+              title: item.title,
+              description: item.description,
+              length: Math.floor(item.duration / 1000),
+              author: item.user.username,
+              thumbnail: item.artwork_url
+            } as exportableCustom;
+          }
+        );
         if(cancellation.Cancelled){
           await msg.edit("✅キャンセルされました。");
         }else{
@@ -463,7 +471,7 @@ export class GuildDataContainer extends LogEmitter {
       await this.player.play();
     }else{
       try{
-        const success = await this.queue.autoAddQueue(this.bot.client, optiont, message.member, "unknown", first, false, message.channel as TextChannel, await message.reply("お待ちください..."));
+        const success = await this.queue.autoAddQueue(optiont, message.member, "unknown", first, false, message.channel as TextChannel, await message.reply("お待ちください..."), null, cancellable);
         if(success) this.player.play();
         return;
       }
@@ -511,7 +519,7 @@ export class GuildDataContainer extends LogEmitter {
     } = panel.decideItems(includingNums);
     const [first, ...rest] = items;
     // いっこめをしょり
-    await this.queue.autoAddQueue(this.bot.client, first, panel.commandMessage.member, "unknown", false, responseMessage);
+    await this.queue.autoAddQueue(first, panel.commandMessage.member, "unknown", false, responseMessage);
     // 現在の状態を確認してVCに接続中なら接続試行
     if(panel.commandMessage.member.voiceState.channelID){
       await this.joinVoiceChannel(panel.commandMessage, false, false);
@@ -522,7 +530,7 @@ export class GuildDataContainer extends LogEmitter {
     }
     // 二個目以上を処理
     for(let i = 0; i < rest.length; i++){
-      await this.queue.autoAddQueue(this.bot.client, rest[i], panel.commandMessage.member, "unknown", false, false, panel.commandMessage.channel as TextChannel);
+      await this.queue.autoAddQueue(rest[i], panel.commandMessage.member, "unknown", false, false, panel.commandMessage.channel as TextChannel);
     }
   }
 

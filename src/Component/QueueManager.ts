@@ -21,7 +21,7 @@ import type { GuildDataContainer } from "../Structure";
 import type { AddedBy, QueueContent } from "../Structure/QueueContent";
 import type { ResponseMessage } from "./ResponseMessage";
 import type { TaskCancellationManager } from "./TaskCancellationManager";
-import type { Client, Message, TextChannel } from "eris";
+import type { Message, TextChannel } from "eris";
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
@@ -212,7 +212,6 @@ export class QueueManager extends ServerManagerBase {
 
   /**
    * ユーザーへのインタラクションやキュー追加までを一括して行います
-   * @param client Botのクライアント
    * @param url 追加するソースのURL
    * @param addedBy 追加したユーザー
    * @param type 追加するURLのソースが判明している場合にはyoutubeまたはcustom、不明な場合はunknownを指定
@@ -221,10 +220,10 @@ export class QueueManager extends ServerManagerBase {
    * @param channel 検索パネルからのキュー追加でない場合に、ユーザーへのインタラクションメッセージを送信するチャンネル。送信しない場合はnull
    * @param message 各インタラクションを上書きするメッセージが既にある場合はここにメッセージを指定します。それ以外の場合はnull
    * @param gotData すでにデータを取得していて新たにフェッチする必要がなくローカルでキューコンテンツをインスタンス化する場合はここにデータを指定します
+   * @param cancellable キャンセルするためのボタンを表示する場合はtrue、それ以外の場合はfalse
    * @returns 成功した場合はtrue、それ以外の場合はfalse
    */
   async autoAddQueue(
-    client:Client,
     url:string,
     addedBy:Member|AddedBy|null|undefined,
     type:KnownAudioSourceIdentifer,
@@ -232,7 +231,8 @@ export class QueueManager extends ServerManagerBase {
     fromSearch:false|ResponseMessage = false,
     channel:TextChannel = null,
     message:ResponseMessage = null,
-    gotData:AudioSource.exportableCustom = null
+    gotData:AudioSource.exportableCustom = null,
+    cancellable:boolean = false,
   ):Promise<boolean>{
     this.Log("AutoAddQueue Called");
     const t = Util.time.timer.start("AutoAddQueue");
@@ -293,7 +293,35 @@ export class QueueManager extends ServerManagerBase {
         if(info.basicInfo.isYouTube() && info.basicInfo.IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
-        await msg.edit({content: "", embeds: [embed.toEris()]});
+        const lastReply = await msg.edit({
+          content: "",
+          embeds: [
+            embed.toEris()
+          ],
+          components: !first && cancellable ? [
+            new Helper.MessageActionRowBuilder()
+              .addComponents(
+                new Helper.MessageButtonBuilder()
+                  .setCustomId(`cancel-last-${this.getUserIdFromMember(addedBy)}`)
+                  .setLabel("キャンセル")
+                  .setStyle("DANGER")
+              )
+              .toEris()
+          ] : [],
+        });
+        if(!first && cancellable){
+          let componentDeleted = false;
+          (["change", "changeWithoutCurrent"] as const).forEach(event => this.once(event, () => {
+            if(!componentDeleted){
+              componentDeleted = true;
+              lastReply.edit({
+                content: "",
+                embeds: lastReply.embeds,
+                components: [],
+              });
+            }
+          }));
+        }
       }
     }
     catch(e){
@@ -330,7 +358,6 @@ export class QueueManager extends ServerManagerBase {
    * @returns 追加に成功した楽曲数
    */
   async processPlaylist<T>(
-    client:Client,
     msg:ResponseMessage,
     cancellation:TaskCancellationManager,
     first:boolean,
@@ -347,7 +374,7 @@ export class QueueManager extends ServerManagerBase {
         const item = playlist[i];
         if(!item) continue;
         const exportable = await exportableConsumer(item);
-        const _result = await this.autoAddQueue(client, exportable.url, msg.command.member, identifer, first, false, null, null, exportable);
+        const _result = await this.autoAddQueue(exportable.url, msg.command.member, identifer, first, false, null, null, exportable);
         if(_result) index++;
         if(
           index % 50 === 0
