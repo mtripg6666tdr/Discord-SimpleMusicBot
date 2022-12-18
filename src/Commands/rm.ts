@@ -97,6 +97,7 @@ export default class Rm extends BaseCommand {
     );
     const actualDeleted = [] as number[];
     const failed = [] as number[];
+    let firstItemTitle = null;
     for(let i = 0; i < dels.length; i++){
       const item = q.get(dels[i]);
       if(
@@ -108,12 +109,15 @@ export default class Rm extends BaseCommand {
       ){
         q.removeAt(dels[i]);
         actualDeleted.push(dels[i]);
+        if(actualDeleted.length === 1){
+          firstItemTitle = item.basicInfo.Title;
+        }
       }else{
         failed.push(dels[i]);
       }
     }
     if(actualDeleted.length > 0){
-      const title = actualDeleted.length === 1 ? q.get(actualDeleted[0]).basicInfo.Title : null;
+      const title = actualDeleted.length === 1 ? firstItemTitle : null;
       const resultStr = actualDeleted.sort((a, b) => a - b).join(",");
       const failedStr = failed.sort((a, b) => a - b).join(",");
       message.reply(`🚮${resultStr.length > 100 ? "指定された" : `${resultStr}番目の`}曲${title ? ("(`" + title + "`)") : ""}を削除しました${failed.length > 0 ? `\r\n:warning:${failed.length > 100 ? "一部" : `${failedStr}番目`}の曲は権限がないため削除できませんでした。` : ""}`).catch(e => Util.logger.log(e, "error"));
