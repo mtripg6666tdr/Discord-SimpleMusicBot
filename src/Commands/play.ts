@@ -73,7 +73,7 @@ export default class Play extends BaseCommand {
           await msg.delete();
           return;
         }
-        await options.server.playFromURL(message, result[0].url, !wasConnected);
+        await options.server.playFromURL(message, result[0].url, !wasConnected, options.server.queue.length >= 1);
         await msg.delete();
       }
     // 添付ファイルを確認

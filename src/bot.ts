@@ -322,8 +322,7 @@ export class MusicBot extends MusicBotBase {
             await interaction.editOriginalMessage("失敗しました!");
           }
         }else if(interaction.data.custom_id.startsWith("skip_vote")){
-          const guildId = interaction.data.custom_id.substring("skip_vote_".length);
-          const result = this.guildData.get(guildId)?.skipSession?.vote(interaction.member);
+          const result = server.skipSession?.vote(interaction.member);
           if(result === "voted"){
             interaction.createMessage({
               content: "投票しました",
@@ -334,6 +333,18 @@ export class MusicBot extends MusicBotBase {
               content: "投票を取り消しました",
               flags: discord.Constants.MessageFlags.EPHEMERAL,
             });
+          }
+        }else if(interaction.data.custom_id.startsWith("cancel-last-")){
+          const item = server.queue.get(server.queue.length - 1);
+          const userId = interaction.data.custom_id.substring("cancel-last-".length);
+          if(interaction.member.id === userId){
+            server.queue.removeAt(server.queue.length - 1);
+            interaction.createMessage(`🚮\`${item.basicInfo.Title}\`の追加を取り消しました`).catch(er => this.Log(er, "error"));
+            interaction.message.edit({
+              content: interaction.message.content,
+              embeds: interaction.message.embeds,
+              components: [],
+            }).catch(er => this.Log(er, "error"));
           }
         }else{
           const updateEffectPanel = () => {
