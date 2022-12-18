@@ -18,7 +18,8 @@ updates:
     ignore:
       - dependency-name: "html-to-text"
         update-types: ["version-update:semver-major"]
-  
+      - dependency-name: "pako",
+        update-types: ["version-update:semver-major"]
 
   # example db server (master)
   - package-ecosystem: npm
