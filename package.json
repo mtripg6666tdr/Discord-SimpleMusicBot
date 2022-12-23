@@ -21,7 +21,7 @@
     "https-proxy-agent": "^5.0.1",
     "m3u8stream": "^0.8.6",
     "miniget": "^4.2.2",
-    "mongodb": "^4.12.1",
+    "mongodb": "^4.13.0",
     "niconico-dl.js": "^1.1.3",
     "opusscript": "0.0.8",
     "play-dl": "^1.9.6",
