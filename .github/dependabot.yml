@@ -21,23 +21,6 @@ updates:
       - dependency-name: "pako"
         update-types: ["version-update:semver-major"]
 
-  # example db server (master)
-  - package-ecosystem: npm
-    directory: "/util/exampleDbServer/node/"
-    schedule:
-      interval: "daily"
-      time: "09:00"
-      timezone: "Asia/Tokyo"
-    commit-message:
-      prefix: "Update(nodedb):"
-    target-branch: "master"
-    labels:
-      - "dependencies"
-      - "javascript"
-      - "scope:node-db"
-    allow:
-      - dependency-type: "direct"
-
   # documentation site (master)
   - package-ecosystem: npm
     directory: "/docs/"
