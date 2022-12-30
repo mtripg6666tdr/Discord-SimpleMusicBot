@@ -1,5 +1,10 @@
+# :warning: このブランチのバージョン(v2.x)は、現在サポートされていません。
+機能追加・バグ修正は今後行われません。  
+
+> サポートが終了していても、何かご意見ご要望等、ございましたら、個別にお問い合わせください。
+> ※対応いたしかねる場合もあります。
+
 # Discord-SimpleMusicBot 
-[![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/mtripg6666tdr/Discord-SimpleMusicBot/discord.js)](https://github.com/discordjs/discord.js)
 [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/testing.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/testing.yml)
 [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml)
 ![GitHub repo size](https://img.shields.io/github/repo-size/mtripg6666tdr/Discord-SimpleMusicBot)
