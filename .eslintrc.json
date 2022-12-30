@@ -11,7 +11,6 @@
   },
   "plugins": [
     "@typescript-eslint",
-    "import",
     "node"
   ],
   "env": {
@@ -109,31 +108,6 @@
 
     // other plugins
     "eslint-comments/no-unused-disable": "error",
-    "import/order": [1, {
-      "groups": [
-        "type", 
-        "builtin", 
-        "external", 
-        [
-          "parent", 
-          "sibling", 
-          "index"
-        ],
-        "object"
-      ],
-      "pathGroups": [
-        {
-          "pattern": "{discord.js,@discordjs/**}",
-          "group": "builtin",
-          "position": "before"
-        }
-      ],
-      "pathGroupsExcludedImportTypes": ["builtin", "type"],
-      "alphabetize": {
-        "order": "asc"
-      },
-      "newlines-between": "always"
-    }],
     "node/exports-style": "error",
     "node/no-deprecated-api": "warn",
     "node/no-unpublished-bin": "error",
