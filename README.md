@@ -57,11 +57,11 @@ Discordにて、インストール等のサポート、および重要な更新�
 [サポートサーバーへの参加はこちら](https://discord.gg/7DrAEXBMHe)  
 
 ### サポートされているバージョン
-|バージョン|Node.js|discord.js|eris|サポート状況|サポート範囲|
-|:---------|-------|----------|----|:----------|:----------:|
-|            [v1](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v1)    |>=12.0.0|v12.x   |-|:x:サポート終了             |-|
-|            [v2](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v2)    |>=16.6.0|~v13.6.0|-|:white_check_mark:サポート中|依存関係の更新と重大なバグ等|
-|[v3(master)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/master)|>=12 |-|@latest|:white_check_mark:サポート中|フルサポート|
+|バージョン|Node.js|discord.js|eris|サポート状況|サポート範囲|サポート終了[予定]日|
+|:---------|-------|----------|----|:----------|:----------:|------------------:|
+|[v1](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v1)|>=12.0.0|v12.x   |-|:x:サポート終了|-|2021/08|
+|[v2](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v2)|>=16.6.0|~v13.6.0|-|:x:サポート終了|-|2022/12|
+|[v3(master)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/master)|>=12 |-|@latest|:white_check_mark:サポート中|フルサポート|未定|
 
 ## ライセンス
 GPLv3  
