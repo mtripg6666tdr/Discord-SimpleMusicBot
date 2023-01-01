@@ -181,7 +181,7 @@ export class PlayManager extends ServerManagerBase {
         connection.play(stream, {
           format: streamType,
           inlineVolume: this.volume !== 100,
-          voiceDataTimeout: 10 * 1000
+          voiceDataTimeout: 15 * 1000
         });
         // setup volume
         this.setVolume(this.volume);
