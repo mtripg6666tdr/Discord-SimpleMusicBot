@@ -11,6 +11,7 @@
   "dependencies": {
     "@mtripg6666tdr/async-lock": "^1.1.0",
     "@mtripg6666tdr/eris-command-resolver": "^1.0.0",
+    "@mtripg6666tdr/m3u8stream": "^0.8.6",
     "comment-json": "^4.2.3",
     "dotenv": "^16.0.3",
     "eris": "^0.17.1",

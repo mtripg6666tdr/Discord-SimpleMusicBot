@@ -25,7 +25,7 @@ import * as ytdl from "ytdl-core";
 
 import Util from "../../../Util";
 import { SecondaryUserAgent } from "../../../Util/ua";
-import { createChunkedYTStream } from "../stream";
+import { createChunkedYTStream, createRefreshableYTLiveStream } from "../stream";
 import { Strategy } from "./base";
 
 const ua = SecondaryUserAgent;
@@ -121,7 +121,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
     }else{
       let readable = null as Readable;
       if(info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow){
-        readable = ytdl.downloadFromInfo(info, {format, lang: "ja", dlChunkSize: 1 * 1024 * 1024});
+        readable = createRefreshableYTLiveStream(info, {format, lang: "ja"}, () => this.fetch(url, true).then(({stream}) => (stream as UrlStreamInfo).url));
       }else{
         readable = createChunkedYTStream(info, format, {lang: "ja"}, 1 * 1024 * 1024);
       }
