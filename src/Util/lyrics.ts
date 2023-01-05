@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import Genius from "genius-lyrics";
+import * as Genius from "genius-lyrics";
 import { decode } from "html-entities";
 import { convert } from "html-to-text";
 
