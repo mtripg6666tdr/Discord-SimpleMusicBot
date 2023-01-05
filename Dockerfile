@@ -21,4 +21,4 @@ RUN npm pkg delete scripts.prepare && npm ci --omit=dev
 COPY --from=builder /app/dist /app/dist
 RUN /bin/bash -c 'echo DOCKER_BUILD_IMAGE>DOCKER_BUILD_IMAGE'
 
-CMD ["/bin/bash", "-c", "service nscd start; node --enable-source-maps --dns-result-order=ipv4first dist/index.js"]
+CMD ["/bin/bash", "-c", "service nscd start; node --dns-result-order=ipv4first dist/index.js"]
