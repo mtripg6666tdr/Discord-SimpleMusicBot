@@ -70,7 +70,7 @@ export function createRefreshableYTLiveStream(info:ytdl.videoInfo, options:ytdl.
       }else{
         stream.updatePlaylist(await refresher());
       }
-    }, 60 * 1 * 1000);
+    }, 60 * 60 * 1000);
   });
   stream.once("close", () => {
     clearInterval(timeout);
