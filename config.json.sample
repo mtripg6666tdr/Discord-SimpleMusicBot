@@ -13,5 +13,7 @@
 
   "prefix": ">", // デフォルトプレフィックス、一文字。省略されたりnullなら`>`
 
-  "webserver": true // HTTPサーバーをたてるかどうか。trueにすると8081番で開かれます。
+  "webserver": true, // HTTPサーバーをたてるかどうか。trueにすると8081番で開かれます。
+
+  "noMessageContent": true
 }

@@ -92,7 +92,11 @@ export class SearchPanel extends EventEmitter {
             .setDescription(searchPanelDescription)
             .setFooter({
               icon_url: this._commandMessage.member.avatarURL,
-              text: "再生したい項目を選択して数字を送信するか、下から選択してください。キャンセルするにはキャンセルまたはcancelと入力します。また、サムネイルコマンドを使用してサムネイルを確認できます。",
+              text: (
+                Util.config.noMessageContent
+                  ? "再生したい項目を選択して数字を送信するか、下から選択してください。キャンセルするにはキャンセルまたはcancelと選択/入力します。また、サムネイルコマンドを使用してサムネイルを確認できます。" :
+                  "再生したい項目を、下から選択してください。キャンセルするには、下から\"キャンセル\"を選択してください。また、サムネイルコマンドを使用してサムネイルを確認することもできます。"
+              ),
             })
             .toEris(),
         ],
