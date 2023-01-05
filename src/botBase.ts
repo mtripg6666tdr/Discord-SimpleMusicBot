@@ -104,26 +104,37 @@ export abstract class MusicBotBase extends LogEmitter {
     if(maintenance){
       this.Log("bot is now maintainance mode");
     }
-    try{
-      if(fs.existsSync(path.join(__dirname, "../DOCKER_BUILD_IMAGE"))){
-        this._versionInfo = require("../package.json").version;
-      }
-      if(!this._versionInfo){
-        this._versionInfo = execSync("git log -n 1 --pretty=format:%h")
+    
+    const versionObtainStrategies = [
+      () => {
+        if(fs.existsSync(path.join(__dirname, "../DOCKER_BUILD_IMAGE"))){
+          return require("../package.json").version;
+        }
+      },
+      () => {
+        return execSync("git tag --points-at HEAD")
+          .toString()
+          .trim()
+        ;
+      },
+      () => {
+        return execSync("git log -n 1 --pretty=format:%h")
           .toString()
           .trim()
         ;
       }
-      this.Log(`Version: ${this._versionInfo}`);
-    }
-    catch{
-      this.Log("Something went wrong when obtaining version", "warn");
-    }
-    finally{
-      if(!this._versionInfo){
-        this._versionInfo = "Could not get version";
+    ];
+    for(let i = 0; i < versionObtainStrategies.length; i++){
+      try{
+        this._versionInfo = versionObtainStrategies[i]();
       }
+      catch{ /* empty */ }
+      if(this._versionInfo) break;
     }
+    if(!this._versionInfo){
+      this._versionInfo = "Could not get version";
+    }
+    this.Log(`Version: ${this._versionInfo}`);
     this.initializeBackupper();
   }
 
