@@ -52,6 +52,18 @@ export class MusicBot extends MusicBotBase {
       ],
       restMode: true,
       compress: true,
+      disableEvents: {
+        CHANNEL_PINS_UPDATE: true,
+        THREAD_CREATE: true,
+        THREAD_UPDATE: true,
+        THREAD_DELETE: true,
+        THREAD_LIST_SYNC: true,
+        THREAD_MEMBER_UPDATE: true,
+        THREAD_MEMBERS_UPDATE: true,
+        STAGE_INSTANCE_CREATE: true,
+        STAGE_INSTANCE_UPDATE: true,
+        STAGE_INSTANCE_DELETE: true,
+      }
     });
 
     this.client
