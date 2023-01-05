@@ -16,6 +16,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { Stream } from "@mtripg6666tdr/m3u8stream";
+import type { Readable } from "stream";
+
 import * as ytdl from "ytdl-core";
 
 import { Util } from "../../Util";
@@ -54,5 +57,24 @@ export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoForm
     pipeNextStream();
     Util.logger.log(`[AudioSource:youtube]Stream was created as partial stream. ${Math.ceil((contentLength + 1) / chunkSize)} streams will be created.`);
   }
+  return stream;
+}
+
+export function createRefreshableYTLiveStream(info:ytdl.videoInfo, options:ytdl.downloadOptions, refresher:() => Promise<string>){
+  const stream = ytdl.downloadFromInfo(info, options) as Readable & {updatePlaylist: Stream["updatePlaylist"]};
+  let timeout:NodeJS.Timeout = null;
+  stream.once("modified", () => {
+    timeout = setInterval(async () => {
+      if(stream.destroyed){
+        clearInterval(timeout);
+      }else{
+        stream.updatePlaylist(await refresher());
+      }
+    }, 60 * 1 * 1000);
+  });
+  stream.once("close", () => {
+    clearInterval(timeout);
+    console.log("set interavl cleared!");
+  });
   return stream;
 }

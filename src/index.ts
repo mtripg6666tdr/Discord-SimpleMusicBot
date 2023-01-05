@@ -17,6 +17,7 @@
  */
 
 import "./dotenv";
+import "./dangerouslyRequireOverride";
 
 import * as http from "http";
 
