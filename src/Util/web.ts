@@ -19,10 +19,9 @@
 import type { Readable } from "stream";
 
 import { spawn } from "child_process";
-import * as http from "http";
-import * as https from "https";
 
-import * as miniget from "miniget";
+import candyget from "candyget";
+import miniget from "miniget";
 
 import Util from ".";
 import { DefaultUserAgent } from "./ua";
@@ -33,31 +32,7 @@ import { DefaultUserAgent } from "./ua";
  * @returns ダウンロードされたテキストデータ
  */
 export function DownloadText(url:string, headers?:{[key:string]:string}, requestBody?:any):Promise<string>{
-  return new Promise((resolve, reject)=>{
-    const durl = new URL(url);
-    const req = ({
-      "https:": https,
-      "http:": http
-    })[durl.protocol].request({
-      protocol: durl.protocol,
-      hostname: durl.hostname,
-      port: durl.port,
-      path: durl.pathname + durl.search + durl.hash,
-      method: requestBody ? "POST" : "GET",
-      headers: headers ?? undefined
-    }, res => {
-      const bufs = [] as Buffer[];
-      res.on("data", chunk => bufs.push(chunk));
-      res.on("end", ()=>{
-        resolve(Buffer.concat(bufs).toString());
-      });
-      res.on("error", reject);
-    }).on("error", (er) => {
-      reject(er);
-      if(!req.destroyed) req.destroy();
-    });
-    req.end(requestBody || undefined);
-  });
+  return candyget.string(url, {headers}, requestBody).then(r => r.body);
 }
 
 /**
@@ -67,31 +42,12 @@ export function DownloadText(url:string, headers?:{[key:string]:string}, request
  * @returns ステータスコード
  */
 export function RetriveHttpStatusCode(url:string, headers?:{[key:string]:string}){
-  return new Promise<number>((resolve, reject) => {
-    const durl = new URL(url);
-    const req = ({
-      "https:": https,
-      "http:": http
-    })[durl.protocol].request({
-      protocol: durl.protocol,
-      hostname: durl.hostname,
-      path: durl.pathname,
-      port: durl.port,
-      method: "HEAD",
-      headers: {
-        "User-Agent": DefaultUserAgent,
-        ...(headers ?? {})
-      }
-    }, (res) => {
-      resolve(res.statusCode);
-    })
-      .on("error", (er) => {
-        reject(er);
-        if(!req.destroyed) req.destroy();
-      })
-      .end()
-    ;
-  });
+  return candyget("HEAD", url, "string", {
+    headers: {
+      "User-Agent": DefaultUserAgent,
+      ...headers,
+    },
+  }).then(r => r.statusCode);
 }
 
 /**
@@ -100,7 +56,7 @@ export function RetriveHttpStatusCode(url:string, headers?:{[key:string]:string}
  * @returns Readableストリーム
  */
 export function DownloadAsReadable(url:string, options:miniget.Options = {}):Readable{
-  return miniget.default(url, {
+  return miniget(url, {
     maxReconnects: 10,
     maxRetries: 3,
     backoff: { inc: 500, max: 10000 },
