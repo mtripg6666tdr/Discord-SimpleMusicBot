@@ -57,7 +57,13 @@
   ウェブサーバーを起動するか（任意指定）  
   こちらは互換性のため、プロパティ自体が省略されていても動作するようになっています。
 ### `bgm` (object)  
-  自動的にBGMを再生するように構成できます。設定方法については[こちらのファイル](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/util/config-with-bgm.json)を参考にしてください。
+  このプロパティを設定することで、自動的にBGMを再生するように構成できます。(任意指定)  
+  設定方法については[こちらのファイル](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/util/config-with-bgm.json)を参考にしてください。  
+  こちらは互換性のため、プロパティ自体が省略されていても動作するようになっています。
+### `noMessageContent` (boolean)
+  Message Content IntentがDiscord Developers Portalで無効になっている場合は、`true`に設定してください。(任意指定)  
+  デフォルトは`false`です。  
+  こちらは互換性のため、プロパティ自体が省略されていても動作するようになっています。
 
 ---
 

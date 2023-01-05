@@ -41,6 +41,7 @@ const Config = z.object({
   prefix: z.string().min(1).nullish().default(">"),
   webserver: z.boolean().optional().default(true),
   bgm: z.record(z.string().regex(/^\d+$/, {message: "bgm object key is not a snowflake"}), GuildBGMContainer).optional(),
+  noMessageContent: z.boolean().optional().default(false),
 });
 /* eslint-enable newline-per-chained-call */
 
