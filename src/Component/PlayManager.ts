@@ -403,7 +403,7 @@ export class PlayManager extends ServerManagerBase {
           ;
         }
         this.disconnect();
-      }, 10 /* 60*/ * 1000);
+      }, 10 * 60 * 1000);
       const playHandler = () => clearTimeout(timer);
       this.once("playCalled", playHandler);
     // なくなってないなら再生開始！
