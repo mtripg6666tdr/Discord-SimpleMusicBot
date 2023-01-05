@@ -181,7 +181,7 @@ export class PlayManager extends ServerManagerBase {
         connection.play(stream, {
           format: streamType,
           inlineVolume: this.volume !== 100,
-          voiceDataTimeout: 30 * 1000
+          voiceDataTimeout: 15 * 1000
         });
         // setup volume
         this.setVolume(this.volume);
@@ -389,11 +389,23 @@ export class PlayManager extends ServerManagerBase {
     if(this.server.queue.isEmpty){
       this.Log("Queue empty");
       if(this.server.boundTextChannel){
-        const ch = this.server.bot.client.getChannel(this.server.boundTextChannel) as TextChannel;
-        if(!ch) return;
-        await ch.createMessage(":wave:キューが空になったため終了します").catch(e => Util.logger.log(e, "error"));
+        await this.server.bot.client
+          .createMessage(this.server.boundTextChannel, ":upside_down: キューが空になりました")
+          .catch(e => Util.logger.log(e, "error"))
+        ;
       }
-      this.disconnect();
+      const timer = setTimeout(() => {
+        this.off("playCalled", playHandler);
+        if(!this.isPlaying && this.server.boundTextChannel){
+          this.server.bot.client
+            .createMessage(this.server.boundTextChannel, ":wave:キューが空になったため終了します")
+            .catch(e => Util.logger.log(e, "error"))
+          ;
+        }
+        this.disconnect();
+      }, 10 /* 60*/ * 1000);
+      const playHandler = () => clearTimeout(timer);
+      this.once("playCalled", playHandler);
     // なくなってないなら再生開始！
     }else{
       this.play();
