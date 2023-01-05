@@ -17,6 +17,13 @@
         "npm install"
       ],
       "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "group": "none",
+      "label": "Clean up compiled files",
+      "script": "cleanup",
+      "problemMatcher": []
     }
   ]
 }

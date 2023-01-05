@@ -9,6 +9,9 @@
         "request": "launch",
         "name": "Launch Program (Main)",
         "preLaunchTask": "Transpile TypeScript",
+        "runtimeArgs": [
+          "--enable-source-maps",
+        ],
         "skipFiles": [
             "<node_internals>/**"
         ],
@@ -19,8 +22,9 @@
       "request": "launch",
       "name": "Launch Program (Main, on exposed GC)",
       "runtimeArgs": [
+        "--enable-source-maps",
         "--expose-gc",
-        "--inspect=8889"
+        "--inspect=8889",
       ],
       "preLaunchTask": "Transpile TypeScript",
       "skipFiles": [
