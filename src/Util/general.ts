@@ -87,9 +87,9 @@ export function FilterContent(original:string){
 export function createPassThrough(opts:TransformOptions = {}):PassThrough{
   const id = Date.now();
   log(`[PassThrough] initialized (id: ${id})`, "debug");
-  const stream = new PassThrough(Object.assign(opts, {
+  const stream = new PassThrough(Object.assign({
     highWaterMark: 1024 * 512
-  }));
+  }, opts));
   stream._destroy = () => {
     // for debug purpose
     console.trace(`[PassThrough] destroyed (id: ${id})`);
