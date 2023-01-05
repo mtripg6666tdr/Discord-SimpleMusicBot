@@ -68,13 +68,16 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       cost: 1,
     };
   }else if(!volumeTransform){
-    // 2. volume is off and stream is any
+    // 2. volume is off and stream is unknown
     // Unknown --(FFmpeg)--> Ogg/Opus --(Demuxer)--> Opus
     //               2                      1
     // Total: 3
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Ogg/Opus (cost: 3)`);
     const ffmpeg = transformThroughFFmpeg(streamInfo, bitrate, effects, seek, "ogg");
-    const passThrough = createPassThrough();
+    const passThrough = createPassThrough({
+      // 2MB
+      highWaterMark: 2 * 1024 * 1024,
+    });
     ffmpeg
       .on("error", e => destroyStream(passThrough, e))
       .pipe(passThrough)
@@ -124,7 +127,10 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     // Total: 5
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM (cost: 5)`);
     const ffmpegPCM = transformThroughFFmpeg(streamInfo, bitrate, effects, seek, "pcm");
-    const passThrough = createPassThrough();
+    const passThrough = createPassThrough({
+      // 2MB
+      highWaterMark: 2 * 1024 * 1024,
+    });
     ffmpegPCM
       .on("error", e => destroyStream(passThrough, e))
       .pipe(passThrough)
