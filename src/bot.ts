@@ -462,16 +462,23 @@ export class MusicBot extends MusicBotBase {
         server.player.disconnect();
       }else if(server.player.isPlaying){
         // 誰も聞いてる人がいない場合一時停止
-        if(server.player.currentAudioInfo.LengthSeconds > 0 && server.player.currentAudioInfo.LengthSeconds - (server.player.currentTime / 1000) < 10){
+        if(server.player.currentAudioInfo.LengthSeconds > 60 && server.player.currentAudioInfo.LengthSeconds - (server.player.currentTime / 1000) < 10){
           this.Log(`audio left less than 10sec; automatically disconnected from VC (${server.connection?.channelID})`);
           server.player.disconnect();
           if(!server.queue.onceLoopEnabled && !server.queue.loopEnabled) server.queue.next();
-          const bound = this._client.getChannel(server.boundTextChannel);
-          if(!bound) return;
-          await this._client.createMessage(bound.id, ":postbox: 正常に切断しました").catch(e => this.Log(e, "error"));
+          await this._client.createMessage(server.boundTextChannel, ":postbox: 正常に切断しました").catch(e => this.Log(e, "error"));
         }else{
           server.player.pause();
-          await this._client.createMessage(server.boundTextChannel, ":pause_button:ボイスチャンネルから誰もいなくなったため一時停止しました").catch(e => this.Log(e));
+          await this._client.createMessage(server.boundTextChannel, ":pause_button:ボイスチャンネルから誰もいなくなったため一時停止しました。`再生`コマンドで再開できます。").catch(e => this.Log(e));
+          const timer = setTimeout(() => {
+            server.player.off("playCalled", playHandler);
+            if(server.player.isPaused){
+              this._client.createMessage(server.boundTextChannel, ":postbox: 長時間使用しなかったため、終了します").catch(e => this.Log(e, "error"));
+              server.player.disconnect();
+            }
+          }, 30 * 60 * 1000);
+          const playHandler = () => clearTimeout(timer);
+          server.player.once("playCalled", playHandler);
         }
       }
     }
