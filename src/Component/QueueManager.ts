@@ -99,9 +99,17 @@ export class QueueManager extends ServerManagerBase {
 
   /**
    * キューの長さ（時間秒）
+   * ライブストリームが含まれていた場合、NaNとなります
    */
   get lengthSeconds():number{
     return this.default.reduce((prev, current) => prev + Number(current.basicInfo.LengthSeconds), 0);
+  }
+
+  /**
+   * 現在取得できる限りのキューの長さ(時間秒)
+   */
+  get lengthSecondsActual():number{
+    return this.default.reduce((prev, current) => prev + Number(current.basicInfo.LengthSeconds || 0), 0);
   }
 
   get isEmpty():boolean{
@@ -279,15 +287,15 @@ export class QueueManager extends ServerManagerBase {
         // キュー内のオフセット取得
         const index = info.index.toString();
         // ETAの計算
-        const [ehour, emin, esec] = Util.time.CalcHourMinSec(this.getLengthSecondsTo(info.index) - _t - Math.floor(this.server.player.currentTime / 1000));
+        const timeFragments = Util.time.CalcHourMinSec(this.getLengthSecondsTo(info.index) - _t - Math.floor(this.server.player.currentTime / 1000));
         const embed = new Helper.MessageEmbedBuilder()
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
-          .setDescription("[" + info.basicInfo.Title + "](" + info.basicInfo.Url + ")")
+          .setDescription(`[${info.basicInfo.Title}](${info.basicInfo.Url})`)
           .addField("長さ", ((info.basicInfo.ServiceIdentifer === "youtube" && (info.basicInfo as AudioSource.YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true)
           .addField("リクエスト", this.getDisplayNameFromMember(addedBy) ?? "不明", true)
           .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
-          .addField("再生されるまでの予想時間", index === "0" ? "-" : ((ehour === "0" ? "" : ehour + ":") + emin + ":" + esec), true)
+          .addField("再生されるまでの予想時間", index === "0" ? "-" : Util.time.HourMinSecToString(timeFragments), true)
           .setThumbnail(info.basicInfo.Thumnail)
         ;
         if(info.basicInfo.isYouTube() && info.basicInfo.IsFallbacked){

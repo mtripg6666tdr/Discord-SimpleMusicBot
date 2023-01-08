@@ -130,7 +130,7 @@ export class YouTube extends AudioSource {
   private importData(exportable:exportableYouTube){
     this.Title = exportable.title;
     this.Description = exportable.description;
-    this._lengthSeconds = exportable.length;
+    this._lengthSeconds = exportable.isLive ? NaN : exportable.length;
     this.ChannelName = exportable.channel;
     this.ChannelUrl = exportable.channelUrl;
     this.Thumnail = exportable.thumbnail;

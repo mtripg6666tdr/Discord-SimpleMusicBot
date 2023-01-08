@@ -198,7 +198,7 @@ export class PlayManager extends ServerManagerBase {
         // 再生開始メッセージ
         const _t = Number(this.currentAudioInfo.LengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
-        const [qhour, qmin, qsec] = Util.time.CalcHourMinSec(this.server.queue.lengthSeconds - this.currentAudioInfo.LengthSeconds);
+        const timeFragments = Util.time.CalcHourMinSec(this.server.queue.lengthSecondsActual - (this.currentAudioInfo.LengthSeconds || 0));
         /* eslint-disable @typescript-eslint/indent */
         const embed = new Helper.MessageEmbedBuilder()
           .setTitle(":cd:現在再生中:musical_note:")
@@ -219,7 +219,7 @@ export class PlayManager extends ServerManagerBase {
             // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
             "次の曲がまだ登録されていません", true
           )
-          .addField("再生待ちの曲", this.server.queue.loopEnabled ? "ループします" : (this.server.queue.length - 1) + "曲(" + (qhour === "0" ? "" : qhour + ":") + qmin + ":" + qsec + ")", true)
+          .addField("再生待ちの曲", this.server.queue.loopEnabled ? "ループします" : (this.server.queue.length - 1) + "曲(" + Util.time.HourMinSecToString(timeFragments) + ")", true)
           .setThumbnail(this.currentAudioInfo.Thumnail)
         ;
         /* eslint-enable @typescript-eslint/indent */
