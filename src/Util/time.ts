@@ -44,6 +44,15 @@ export function CalcHourMinSec(seconds:number){
   return [hor.toString(), padZero(min.toString(), 2), padZero(sec.toString(), 2)];
 }
 
+/**
+ * [時間, ゼロ補完された分, ゼロ補完された秒]から表示するための時刻表示を作成します。
+ * @param param0 
+ * @returns 
+ */
+export function HourMinSecToString([hour, min, sec]:string[]){
+  return hour === "NaN" ? "不明" : `${hour === "0" ? "" : `${hour}:`}${min}:${sec}`;
+}
+
 // Returns hour, min, sec and millisec from total millisec
 /**
  * 合計時間(ミリ秒)から時間,分,秒,ミリ秒を計算します。

@@ -54,7 +54,7 @@ export default class Queue extends BaseCommand {
       return;
     }
     // 合計所要時間の計算
-    const totalLength = queue.lengthSeconds;
+    const totalLength = queue.lengthSecondsActual;
     let _page = options.rawArgs === "" ? 1 : Number(options.rawArgs);
     if(isNaN(_page)) _page = 1;
     if(queue.length > 0 && _page > Math.ceil(queue.length / 10)){
