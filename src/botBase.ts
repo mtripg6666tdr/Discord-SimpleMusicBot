@@ -163,9 +163,9 @@ export abstract class MusicBotBase extends LogEmitter {
    *  定期ログを実行します
    */
   logGeneralInfo(){
-    const _d = Object.values(this.guildData);
+    const guildDataArray = [...this.guildData.values()];
     const memory = Util.system.GetMemInfo();
-    Util.logger.log(`[Tick] [Main] Participating: ${this._client.guilds.size}, Registered: ${this.guildData.size} Connecting: ${_d.filter(info => info.player.isPlaying).length} Paused: ${_d.filter(__d => __d.player.isPaused).length}`);
+    Util.logger.log(`[Tick] [Main] Participating: ${this._client.guilds.size}, Registered: ${this.guildData.size} Connecting: ${guildDataArray.filter(d => d.player.isConnecting).length} Paused: ${guildDataArray.filter(d => d.player.isPaused).length}`);
     Util.logger.log(`[Tick] [System] Free:${Math.floor(memory.free)}MB; Total:${Math.floor(memory.total)}MB; Usage:${memory.usage}%`);
     const nMem = process.memoryUsage();
     const rss = Util.system.GetMBytes(nMem.rss);
