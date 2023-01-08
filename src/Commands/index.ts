@@ -99,12 +99,20 @@ export abstract class BaseCommand {
 
   toApplicationCommandStructure(){
     if(this.unlist) throw new Error("This command cannot be listed due to private command!");
-    const options = this.argument?.map(arg => ({
-      type: CommandManager.mapCommandOptionTypeToInteger(arg.type),
-      name: arg.name,
-      description: arg.description.replace(/\r/g, "").replace(/\n/g, ""),
-      required: arg.required,
-    } as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean));
+    const options = this.argument?.map(arg => {
+      const erisCommandStruct = {
+        type: CommandManager.mapCommandOptionTypeToInteger(arg.type),
+        name: arg.name,
+        description: arg.description.replace(/\r/g, "").replace(/\n/g, ""),
+        required: arg.required,
+        choices: !arg.choices ? undefined : Object.keys(arg.choices).map(name => ({
+          name,
+          value: arg.choices[name],
+        }))
+      };
+      if(!erisCommandStruct.choices) delete erisCommandStruct.choices;
+      return erisCommandStruct as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean;
+    });
     if(options && options.length > 0){
       return {
         type: Constants.ApplicationCommandTypes.CHAT_INPUT,
