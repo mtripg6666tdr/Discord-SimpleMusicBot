@@ -41,7 +41,7 @@ export default class SystemInfo extends BaseCommand {
       argument: [{
         type: "string",
         name: "content",
-        description: "memまたはcpuのどちらかを指定できます",
+        description: "basic,mem,cpuのどれかを指定できます",
         required: false,
         choices: {
           "基本情報": "basic",
@@ -67,7 +67,7 @@ export default class SystemInfo extends BaseCommand {
         new Helper.MessageEmbedBuilder()
           .setTitle("Discord-SimpleMusicBot")
           .setDescription("Basic info")
-          .addField("Version (commit hash)", `\`${options.bot.version}\``, true)
+          .addField("Version", `\`${options.bot.version}\``, true)
           .addField("Managed embed toggles", `\`${options.embedPageToggle.length}\``, true)
           .addField("Current total transforming costs", `\`${options.bot.totalTransformingCost}\``)
           .setColor(getColor("UPTIME"))
