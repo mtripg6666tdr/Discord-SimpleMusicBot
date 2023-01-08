@@ -90,8 +90,8 @@ export abstract class MusicBotBase extends LogEmitter {
   }
 
   get totalTransformingCost(){
-    return [...this.guildData.keys()]
-      .map(id => this.guildData.get(id).player.cost)
+    return [...this.guildData.values()]
+      .map(d => d.player.cost)
       .reduce((prev, current) => prev + current, 0)
     ;
   }
