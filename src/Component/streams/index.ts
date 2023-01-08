@@ -35,7 +35,7 @@ type PartialPlayableStream = {
 };
 
 /*
-Convertion cost:
+Conversion cost:
   FFmpeg:2
   OggDemuxer: 1
   WebmDemuxer: 1
@@ -60,7 +60,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     // Webm/Ogg --(Demuxer)--> Opus
     //                1
     // Total: 1
-    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType}) (no convertion/cost: 1)`);
+    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType}) (no conversion/cost: 1)`);
     const info = streamInfo.type === "url" ? convertUrlStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
     return {
       stream: info.stream,
