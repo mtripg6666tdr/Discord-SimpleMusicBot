@@ -118,6 +118,10 @@ const config = {
         darkTheme: darkCodeTheme,
       },
     }),
+
+  stylesheets: [
+    'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP&display=swap'
+  ]
 };
 
 module.exports = config;
