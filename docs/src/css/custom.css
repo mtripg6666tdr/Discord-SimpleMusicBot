@@ -36,3 +36,7 @@
 [data-theme='dark'] footer.footer--dark {
   --ifm-footer-background-color: #1f1d17;
 }
+
+* {
+  font-family: 'IBM Plex Sans JP';
+}
