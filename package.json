@@ -36,7 +36,7 @@
     "zod": "^3.20.2"
   },
   "devDependencies": {
-    "@commitlint/cli": "^17.4.0",
+    "@commitlint/cli": "^17.4.1",
     "@mtripg6666tdr/commitlint-config": "^1.1.0",
     "@types/follow-redirects": "^1.14.1",
     "@types/html-to-text": "^8.1.1",
