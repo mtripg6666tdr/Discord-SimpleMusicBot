@@ -14,5 +14,9 @@
   "sidebar.commandsSidebar.category.コマンド一覧": {
     "message": "コマンド一覧",
     "description": "The label for category コマンド一覧 in sidebar commandsSidebar"
+  },
+  "sidebar.docsSidebar.category.ボットの各種機能": {
+    "message": "ボットの各種機能",
+    "description": "The label for category ボットの各種機能 in sidebar docsSidebar"
   }
 }
