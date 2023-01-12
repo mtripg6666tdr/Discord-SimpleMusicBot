@@ -20,8 +20,8 @@ import type { UrlStreamInfo } from ".";
 import type { exportableCustom } from "./custom";
 import type { EmbedField } from "eris";
 
-import { Util } from "../Util";
 import { AudioSource } from "./audiosource";
+import { Util } from "../Util";
 
 export class Hibiki extends AudioSource {
   protected _lengthSeconds = 0;

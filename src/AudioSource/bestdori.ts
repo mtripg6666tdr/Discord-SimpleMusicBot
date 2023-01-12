@@ -19,8 +19,8 @@
 import type { exportableCustom, UrlStreamInfo } from ".";
 import type { EmbedField } from "eris";
 
-import { Util } from "../Util";
 import { AudioSource } from "./audiosource";
+import { Util } from "../Util";
 
 export class BestdoriS extends AudioSource {
   protected _lengthSeconds = 0;

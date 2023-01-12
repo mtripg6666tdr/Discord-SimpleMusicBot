@@ -20,8 +20,8 @@ import * as Genius from "genius-lyrics";
 import { decode } from "html-entities";
 import { convert } from "html-to-text";
 
-import { DefaultAudioThumbnailURL } from "../definition";
 import { DownloadText } from "./web";
+import { DefaultAudioThumbnailURL } from "../definition";
 
 export async function GetLyrics(keyword:string):Promise<songInfo>{
   try{

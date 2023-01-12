@@ -16,16 +16,16 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { Cache } from "./base";
 import type { exportableYouTube } from "..";
 import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
-import type { Cache } from "./base";
 
 import { exec } from "child_process";
 
 import m3u8stream from "m3u8stream";
 
-import { Util } from "../../../Util";
 import { Strategy } from "./base";
+import { Util } from "../../../Util";
 
 type youtubeDl = "youtubeDl";
 const youtubeDl:youtubeDl = "youtubeDl";

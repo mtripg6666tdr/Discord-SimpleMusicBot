@@ -21,8 +21,8 @@ import type { SoundcloudTrackV2 } from "soundcloud.ts";
 
 import Soundcloud from "soundcloud.ts";
 
-import { Util } from "../Util";
 import { SearchBase } from "./search";
+import { Util } from "../Util";
 
 const { DefaultUserAgent } = Util.ua;
 

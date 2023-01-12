@@ -23,8 +23,8 @@ import type { Readable } from "stream";
 
 import SoundCloud from "soundcloud.ts";
 
-import { Util } from "../Util";
 import { AudioSource } from "./audiosource";
+import { Util } from "../Util";
 
 export class SoundCloudS extends AudioSource {
   protected _lengthSeconds = 0;

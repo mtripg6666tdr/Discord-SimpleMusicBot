@@ -16,11 +16,11 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { LoggerType } from "../../../Util";
 import type { Strategy, Cache } from "./base";
 import type { playDlStrategy } from "./play-dl";
 import type { youtubeDlStrategy } from "./youtube-dl";
 import type { ytdlCoreStrategy } from "./ytdl-core";
+import type { LoggerType } from "../../../Util";
 
 import { Util } from "../../../Util";
 

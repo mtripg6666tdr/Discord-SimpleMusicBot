@@ -16,9 +16,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { PlayManager } from "./PlayManager";
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 import Util from "../Util";
-import { PlayManager } from "./PlayManager";
 
 export class PlayManagerWithBgm extends PlayManager {
   protected override server: GuildDataContainerWithBgm;

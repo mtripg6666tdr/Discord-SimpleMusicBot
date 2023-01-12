@@ -23,9 +23,9 @@ import type { EmbedField } from "eris";
 import * as fs from "fs";
 import * as path from "path";
 
+import { AudioSource } from "./audiosource";
 import { Util } from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
-import { AudioSource } from "./audiosource";
 
 export class FsStream extends AudioSource {
   protected _lengthSeconds = 0;
