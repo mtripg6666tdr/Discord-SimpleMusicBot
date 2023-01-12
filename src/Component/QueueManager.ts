@@ -16,23 +16,23 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { ResponseMessage } from "./ResponseMessage";
+import type { TaskCancellationManager } from "./TaskCancellationManager";
 import type { exportableCustom } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { AddedBy, QueueContent } from "../Structure/QueueContent";
-import type { ResponseMessage } from "./ResponseMessage";
-import type { TaskCancellationManager } from "./TaskCancellationManager";
 import type { Message, TextChannel } from "eris";
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 import { Member } from "eris";
 
+import { PageToggle } from "./PageToggle";
 import * as AudioSource from "../AudioSource";
 import { ServerManagerBase } from "../Structure";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
 import { FallBackNotice } from "../definition";
-import { PageToggle } from "./PageToggle";
 
 export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"unknown";
 /**

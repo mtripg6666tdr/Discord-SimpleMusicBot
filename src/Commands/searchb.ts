@@ -16,8 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { bestdori, BestdoriApi } from "../AudioSource";
 import { SearchBase } from "./search";
+import { bestdori, BestdoriApi } from "../AudioSource";
 
 export default class Searchb extends SearchBase<string[]> {
   constructor(){

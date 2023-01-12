@@ -21,9 +21,9 @@ import type { Readable } from "stream";
 
 import { opus } from "prism-media";
 
+import { transformThroughFFmpeg } from "./ffmpeg";
 import Util from "../../Util";
 import { createPassThrough } from "../../Util/general";
-import { transformThroughFFmpeg } from "./ffmpeg";
 
 type PlayableStreamInfo = PartialPlayableStream & {
   cost:number,

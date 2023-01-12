@@ -20,9 +20,9 @@ import type { UrlStreamInfo } from ".";
 import type { exportableCustom } from "./custom";
 import type { EmbedField } from "eris";
 
+import { AudioSource } from "./audiosource";
 import { Util } from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
-import { AudioSource } from "./audiosource";
 
 export class GoogleDrive extends AudioSource {
   protected _lengthSeconds = 0;

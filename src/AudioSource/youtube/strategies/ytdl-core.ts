@@ -16,17 +16,17 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Cache } from "./base";
+import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Readable } from "stream";
 
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 
+import { Strategy } from "./base";
 import Util from "../../../Util";
 import { SecondaryUserAgent } from "../../../Util/ua";
 import { createChunkedYTStream, createRefreshableYTLiveStream } from "../stream";
-import { Strategy } from "./base";
 
 const ua = SecondaryUserAgent;
 

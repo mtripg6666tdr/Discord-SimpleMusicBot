@@ -23,8 +23,8 @@ import type { Readable } from "stream";
 import { convert as htmlToText } from "html-to-text";
 import NiconicoDL, { isValidURL } from "niconico-dl.js";
 
-import { Util } from "../Util";
 import { AudioSource } from "./audiosource";
+import { Util } from "../Util";
 
 export class NicoNicoS extends AudioSource {
   protected _lengthSeconds = 0;

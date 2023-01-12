@@ -16,19 +16,19 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { StreamInfo } from "..";
-import type { LoggerType } from "../../Util";
 import type { Cache } from "./strategies/base";
 import type { ytdlCoreStrategy } from "./strategies/ytdl-core";
+import type { StreamInfo } from "..";
+import type { LoggerType } from "../../Util";
 import type { EmbedField } from "eris";
 
 import * as ytdl from "ytdl-core";
 
+import { attemptGetInfoForStrategies, attemptFetchForStrategies, strategies } from "./strategies";
+import { ytdlCore } from "./strategies/ytdl-core";
 import { Util } from "../../Util";
 import { SecondaryUserAgent } from "../../Util/ua";
 import { AudioSource } from "../audiosource";
-import { attemptGetInfoForStrategies, attemptFetchForStrategies, strategies } from "./strategies";
-import { ytdlCore } from "./strategies/ytdl-core";
 
 const ua = SecondaryUserAgent;
 

@@ -23,12 +23,12 @@ import type { Message, TextChannel, VoiceChannel } from "eris";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
+import { resolveStreamToPlayable } from "./streams";
 import { ServerManagerBase } from "../Structure";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
 import { getFFmpegEffectArgs } from "../Util/effect";
 import { FallBackNotice } from "../definition";
-import { resolveStreamToPlayable } from "./streams";
 
 /**
  * サーバーごとの再生を管理するマネージャー。

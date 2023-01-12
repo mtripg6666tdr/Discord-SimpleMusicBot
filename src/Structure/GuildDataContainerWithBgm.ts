@@ -19,9 +19,9 @@
 import type { GuildBGMContainerType } from "../Util/config";
 import type { MusicBotBase } from "../botBase";
 
+import { GuildDataContainer } from "./GuildDataContainer";
 import { PlayManagerWithBgm } from "../Component/PlayManagerWithBgm";
 import { QueueManagerWithBgm } from "../Component/QueueManagerWithBGM";
-import { GuildDataContainer } from "./GuildDataContainer";
 
 export class GuildDataContainerWithBgm extends GuildDataContainer {
   protected override _queue:QueueManagerWithBgm;

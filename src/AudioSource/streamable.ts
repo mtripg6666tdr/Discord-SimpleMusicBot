@@ -19,9 +19,9 @@
 import type { exportableCustom, UrlStreamInfo } from ".";
 import type { EmbedField } from "eris";
 
+import { AudioSource } from "./audiosource";
 import { Util } from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
-import { AudioSource } from "./audiosource";
 
 export class Streamable extends AudioSource {
   protected _lengthSeconds = 0;

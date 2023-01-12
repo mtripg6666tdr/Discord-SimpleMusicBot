@@ -16,9 +16,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { QueueContent } from "../Structure/QueueContent";
 import type { CommandMessage } from "./CommandMessage";
 import type { ResponseMessage } from "./ResponseMessage";
+import type { QueueContent } from "../Structure/QueueContent";
 import type { Member, VoiceChannel } from "eris";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
