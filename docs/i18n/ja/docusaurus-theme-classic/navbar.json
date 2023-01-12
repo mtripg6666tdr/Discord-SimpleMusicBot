@@ -7,12 +7,12 @@
     "message": "ドキュメント",
     "description": "Navbar item with label ドキュメント"
   },
-  "item.label.ガイド": {
-    "message": "ガイド",
-    "description": "Navbar item with label ガイド"
-  },
   "item.label.GitHub": {
     "message": "GitHub",
     "description": "Navbar item with label GitHub"
+  },
+  "item.label.機能ガイド": {
+    "message": "機能ガイド",
+    "description": "Navbar item with label 機能ガイド"
   }
 }
