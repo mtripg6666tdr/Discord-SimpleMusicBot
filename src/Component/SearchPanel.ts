@@ -94,7 +94,7 @@ export class SearchPanel extends EventEmitter {
               icon_url: this._commandMessage.member.avatarURL,
               text: (
                 Util.config.noMessageContent
-                  ? "再生したい項目を選択して数字を送信するか、下から選択してください。キャンセルするにはキャンセルまたはcancelと選択/入力します。また、サムネイルコマンドを使用してサムネイルを確認できます。" :
+                  ? "再生したい項目を選択して数字を送信するか、下から選択してください。キャンセルするには「キャンセル」または「cancel」と選択/入力します。また、サムネイルコマンドを使用してサムネイルを確認できます。" :
                   "再生したい項目を、下から選択してください。キャンセルするには、下から\"キャンセル\"を選択してください。また、サムネイルコマンドを使用してサムネイルを確認することもできます。"
               ),
             })
@@ -105,7 +105,11 @@ export class SearchPanel extends EventEmitter {
             .addComponents(
               new Helper.MessageSelectMenuBuilder()
                 .setCustomId("search")
-                .setPlaceholder("数字を選択するか、ここから選択...")
+                .setPlaceholder(
+                  Util.config.noMessageContent
+                    ? "ここから選択..." :
+                    "数字を直接送信するか、ここから選択..."
+                )
                 .setMinValues(1)
                 .setMaxValues(songResult.length - 1)
                 .addOptions(

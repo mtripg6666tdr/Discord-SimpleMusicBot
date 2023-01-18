@@ -26,6 +26,7 @@ import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 import { BaseCommand } from ".";
 import { CommandManager } from "../Component/CommandManager";
 import { PageToggle } from "../Component/PageToggle";
+import Util from "../Util";
 import { getColor } from "../Util/color";
 
 export const categories = {
@@ -93,7 +94,19 @@ export default class Commands extends BaseCommand {
       for(let i = 0; i < embed.length; i++){
         embed[i]
           .setTitle("コマンド一覧(" + embed[i].title + ")")
-          .setDescription(`コマンドの一覧です。\r\n\`${i + 1}ページ目(${embed.length}ページ中)\`\r\nコマンドプレフィックスは、\`${options.server.prefix}\`です。\r\n\`!コマンド 再生\`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。`)
+          .setDescription(
+            "コマンドの一覧です。\r\n"
+            + `\`${i + 1}ページ目(${embed.length}ページ中)\`\r\n`
+            + (
+              Util.config.noMessageContent
+                ? (
+                  "`/コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。"
+                ) : (
+                  `コマンドプレフィックスは、\`${options.server.prefix}\`です。\r\n\``
+                  + `\`${options.server.prefix}コマンド 再生\`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。`
+                )
+            )
+          )
           .setColor(getColor("COMMAND"));
       }
       const msg = await message.reply({embeds: [embed[0].toEris()]});
