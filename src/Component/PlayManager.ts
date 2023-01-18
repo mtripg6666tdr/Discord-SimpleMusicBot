@@ -396,6 +396,7 @@ export class PlayManager extends ServerManagerBase {
       }
       const timer = setTimeout(() => {
         this.off("playCalled", playHandler);
+        this.off("disconnect", playHandler);
         if(!this.isPlaying && this.server.boundTextChannel){
           this.server.bot.client
             .createMessage(this.server.boundTextChannel, ":wave:キューが空になったため終了します")
@@ -406,6 +407,7 @@ export class PlayManager extends ServerManagerBase {
       }, 10 * 60 * 1000);
       const playHandler = () => clearTimeout(timer);
       this.once("playCalled", playHandler);
+      this.once("disconnect", playHandler);
     // なくなってないなら再生開始！
     }else{
       this.play();
