@@ -16,7 +16,7 @@ jobs:
       
       - name: Bump package version
         id: bump-version
-        run: echo "::set-output name=VERSION::$(npm version patch --git-tag-version false)"
+        run: echo "VERSION=$(npm version patch --git-tag-version false)" >> $GITHUB_OUTPUT
         
       - name: Check updated version
         run: echo $VERSION
