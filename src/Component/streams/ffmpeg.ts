@@ -37,7 +37,7 @@ export function transformThroughFFmpeg(readable:StreamInfo, bitrate:number, effe
   ] : [];
   const outputArgs = output === "ogg" ? [
     "-acodec", "libopus",
-    "-f", "opus",
+    "-f", "webm",
   ] : [
     "-f", "s16le",
   ];

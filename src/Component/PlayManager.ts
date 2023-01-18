@@ -184,7 +184,7 @@ export class PlayManager extends ServerManagerBase {
         connection.play(stream, {
           format: streamType,
           inlineVolume: this.volume !== 100,
-          voiceDataTimeout: 15 * 1000
+          voiceDataTimeout: 30 * 1000
         });
         // setup volume
         this.setVolume(this.volume);
@@ -315,7 +315,6 @@ export class PlayManager extends ServerManagerBase {
           this._currentAudioStream.destroy();
         }
         this._currentAudioStream = null;
-        this._currentAudioInfo = null;
       }
     });
   }
@@ -435,7 +434,7 @@ export class PlayManager extends ServerManagerBase {
     this.Log("onStreamFailed called");
     this._cost = 0;
     this.destroyStream();
-    if(this._errorUrl === this.currentAudioInfo.Url){
+    if(this._errorUrl === this.currentAudioInfo?.Url){
       this._errorCount++;
     }else{
       this._errorCount = 1;
