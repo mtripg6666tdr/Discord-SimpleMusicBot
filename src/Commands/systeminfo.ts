@@ -76,12 +76,19 @@ export default class SystemInfo extends BaseCommand {
     }
 
     if(message.member.id === (Util.config.adminId ?? "593758391395155978") && (options.args.includes("log") || options.args.length === 0)){
+      let logs:string[] = [...Util.logger.logStore.data];
+      logs.reverse();
+      for(let i = 0; i < logs.length; i++){
+        if(logs.join("\r\n").length < 1950) break;
+        logs = logs.slice(0, -1);
+      }
+      logs.reverse();
       // Process Logs
       embeds.push(
         new Helper.MessageEmbedBuilder()
           .setColor(getColor("UPTIME"))
           .setTitle("Log")
-          .setDescription(`Last ${Util.logger.logStore.data.length}bot logs\r\n\`\`\`\r\n${Util.logger.logStore.data.join("\r\n")}\r\n\`\`\``)
+          .setDescription(`Last ${logs.length}bot logs\r\n\`\`\`\r\n${logs.join("\r\n")}\r\n\`\`\``)
           .toEris()
       );
     }
