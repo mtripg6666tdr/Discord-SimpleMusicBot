@@ -20,6 +20,7 @@ import type { AudioSource, YouTube } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { MessageEmbedBuilder } from "@mtripg6666tdr/eris-command-resolver";
 import type { Message, TextChannel, VoiceChannel } from "eris";
+import type { Readable } from "stream";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
@@ -37,12 +38,13 @@ import { FallBackNotice } from "../definition";
 export class PlayManager extends ServerManagerBase {
   protected readonly retryLimit = 3;
   protected _seek = 0;
-  protected _errorReportChannel = null as TextChannel;
+  protected _errorReportChannel:TextChannel = null;
   protected _volume = 100;
   protected _errorCount = 0;
   protected _errorUrl = "";
   protected _preparing = false;
-  protected _currentAudioInfo = null as AudioSource;
+  protected _currentAudioInfo:AudioSource = null;
+  protected _currentAudioStream:Readable = null;
   protected _cost = 0;
   readonly onStreamFinishedBindThis:any = null;
 
@@ -160,6 +162,7 @@ export class PlayManager extends ServerManagerBase {
       const connection = this.server.connection;
       const channel = this.server.bot.client.getChannel(connection.channelID) as VoiceChannel;
       const { stream, streamType, cost } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.server), this._seek, this.volume !== 100, channel.bitrate);
+      this._currentAudioStream = stream;
       // ストリームがまだ利用できない場合待機
       let errorWhileWaiting = null as Error;
       stream.once("error", e => errorWhileWaiting = e || new Error("An error occurred in stream"));
@@ -293,6 +296,7 @@ export class PlayManager extends ServerManagerBase {
       connection.disconnect();
       this.server.connection = null;
       this.emit("disconnect");
+      this.destroyStream();
     }else{
       this.server.connection = null;
       this.Log("Disconnect called but no connection", "warn");
@@ -302,6 +306,18 @@ export class PlayManager extends ServerManagerBase {
       this.Log("Called exposed gc");
     }
     return this;
+  }
+
+  destroyStream(){
+    setImmediate(() => {
+      if(this._currentAudioStream){
+        if(!this._currentAudioStream.destroyed){
+          this._currentAudioStream.destroy();
+        }
+        this._currentAudioStream = null;
+        this._currentAudioInfo = null;
+      }
+    });
   }
 
   /**
@@ -372,6 +388,7 @@ export class PlayManager extends ServerManagerBase {
     this._errorCount = 0;
     this._errorUrl = "";
     this._cost = 0;
+    this.destroyStream();
     if(this.server.queue.loopEnabled){
       // 曲ループオンならばもう一度再生
       this.play();
@@ -417,6 +434,7 @@ export class PlayManager extends ServerManagerBase {
   async onStreamFailed(){
     this.Log("onStreamFailed called");
     this._cost = 0;
+    this.destroyStream();
     if(this._errorUrl === this.currentAudioInfo.Url){
       this._errorCount++;
     }else{

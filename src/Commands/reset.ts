@@ -41,9 +41,7 @@ export default class Reset extends BaseCommand {
     }
     options.server.updateBoundChannel(message);
     // VC接続中なら切断
-    if(options.server.player.isConnecting){
-      options.server.player.disconnect();
-    }
+    options.server.player.disconnect();
     options.server.bot.resetData(message.guild.id);
     // データ初期化
     options.initData(message.guild.id, message.channel.id);
