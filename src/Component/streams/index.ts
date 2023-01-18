@@ -43,6 +43,10 @@ Conversion cost:
   opusEncoder: 1.5
   VolumeTransfomer: 0.5
 Refer at: https://github.com/discordjs/discord.js/blob/13baf75cae395353f0528804ff0d71468f21daa9/packages/voice/src/audio/TransformerGraph.ts
+
+Ogg might be naturally considered to be ok to be passed to eris's voice module as it is however from lots of experiments OggOpusTransformer of eris doesn't detect the end of the stream,
+so we decided to pass the strean if it is just Webm/Opus stream.
+(Besides above, PCMOpusTransformer seems to work fine.)
 */
 
 /**
@@ -55,21 +59,21 @@ Refer at: https://github.com/discordjs/discord.js/blob/13baf75cae395353f0528804f
  */
 export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[], seek:number, volumeTransform:boolean, bitrate:number):PlayableStreamInfo{
   const effectEnabled = effects.length !== 0;
-  if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && seek <= 0 && !effectEnabled && !volumeTransform){
-    // 1. effect is off, volume is off, stream is webm or ogg
-    // Webm/Ogg --(Demuxer)--> Opus
+  if(streamInfo.streamType === "webm" && seek <= 0 && !effectEnabled && !volumeTransform){
+    // 1. effect is off, volume is off, stream is webm
+    // Webm --(Demuxer)--> Opus
     //                1
     // Total: 1
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType}) (no conversion/cost: 1)`);
     const info = streamInfo.type === "url" ? convertUrlStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
     return {
       stream: info.stream,
-      streamType: info.streamType,
+      streamType: "webm",
       cost: 1,
     };
   }else if(!volumeTransform){
     // 2. volume is off and stream is unknown
-    // Unknown --(FFmpeg)--> Ogg/Opus --(Demuxer)--> Opus
+    // Unknown --(FFmpeg)--> Webm/Opus or Webm/Vorbis --(Demuxer)--> Opus
     //               2                      1
     // Total: 3
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Ogg/Opus (cost: 3)`);
@@ -85,7 +89,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     ;
     return {
       stream: passThrough,
-      streamType: "ogg",
+      streamType: "webm",
       cost: 3,
     };
   }else if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && !effectEnabled){
