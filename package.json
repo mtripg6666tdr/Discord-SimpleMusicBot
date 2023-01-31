@@ -52,7 +52,7 @@
     "husky": "^8.0.3",
     "mocha": "^10.2.0",
     "rimraf": "^3.0.2",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.5"
   },
   "optionalDependencies": {
     "@discordjs/opus": "^0.8.0",
