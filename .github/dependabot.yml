@@ -44,6 +44,10 @@ updates:
     ignore:
       - dependency-name: "@mdx-js/react"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+      update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
   
   # actions
   - package-ecosystem: github-actions
