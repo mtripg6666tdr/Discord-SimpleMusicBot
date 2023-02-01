@@ -46,16 +46,16 @@ jobs:
           images: ghcr.io/${{ github.actor }}/discord-music-bot
           flavor: latest=auto
           tags: |
-            type=sha
+            type=sha,enable=${{ github.event_name == 'release' }}
             type=sha,format=long
-            type=semver,pattern={{version}}
+            type=semver,pattern={{version}},enable=${{ github.event_name == 'release' }}
             type=raw,value=latest,enable=${{ github.event_name == 'release' }}
 
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name == 'release' }}
+          push: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch' }}
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha,scope=docker
           cache-to: type=gha,mode=max,scope=docker
