@@ -24,6 +24,8 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "rimraf"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "mongodb"
+        update-types: ["version-update:semver-major"]
 
   # documentation site (master)
   - package-ecosystem: npm
