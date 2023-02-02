@@ -63,7 +63,7 @@
     "pako": "^1.0.11",
     "play-dl": "^1.9.6",
     "sodium-native": "^3.4.1",
-    "zlib-sync": "^0.1.7"
+    "zlib-sync": "^0.1.8"
   },
   "scripts": {
     "test": "mocha",
