@@ -161,7 +161,7 @@ export class PlayManager extends ServerManagerBase {
       // 情報からストリームを作成
       const connection = this.server.connection;
       const channel = this.server.bot.client.getChannel(connection.channelID) as VoiceChannel;
-      const { stream, streamType, cost } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.server), this._seek, this.volume !== 100, channel.bitrate);
+      const { stream, streamType, cost, streams } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.server), this._seek, this.volume !== 100, channel.bitrate);
       this._currentAudioStream = stream;
       // ストリームがまだ利用できない場合待機
       let errorWhileWaiting = null as Error;
@@ -185,6 +185,33 @@ export class PlayManager extends ServerManagerBase {
           format: streamType,
           inlineVolume: this.volume !== 100,
           voiceDataTimeout: 30 * 1000
+        });
+        const logStream = require("fs").createWriteStream(require("path").join(__dirname, `../../logs/stream-${Date.now()}.csv`));
+        const log = (content:string) => {
+          logStream.write(content + "\r\n");
+          console.log("csv:" + content);
+        };
+        const getNow = () => {
+          // 2023/2/2 23:04:18
+          const now = new Date();
+          return `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`;
+        };
+        log("type,datetime,id,total,current,buf");
+        // @ts-expect-error 7053
+        ([...streams, ...connection.piper["streams"]] as Readable[]).forEach((readable, i) => {
+          if(!readable) return;
+          let total = 0;
+          readable
+            .on("data", chunk => {
+              // @ts-expect-error 7053
+              log(`data,${getNow()},${i},${total += chunk.length},${chunk.length},${connection.piper["_dataPackets"]?.length}`);
+            })
+            .on("close", () => {
+              log(`total,${getNow()},${i},${total}`);
+              logStream.destroy();
+            })
+            .on("error", er => log(`error,${new Date().toLocaleString()},${i},${er}`))
+          ;
         });
         // setup volume
         this.setVolume(this.volume);

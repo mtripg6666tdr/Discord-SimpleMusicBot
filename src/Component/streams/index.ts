@@ -27,6 +27,7 @@ import { createPassThrough } from "../../Util/general";
 
 type PlayableStreamInfo = PartialPlayableStream & {
   cost:number,
+  streams:Readable[],
 };
 
 type PartialPlayableStream = {
@@ -70,6 +71,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       stream: info.stream,
       streamType: "webm",
       cost: 1,
+      streams: [info.stream],
     };
   }else if(!volumeTransform){
     // 2. volume is off and stream is unknown
@@ -77,7 +79,11 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     //               2                      1
     // Total: 3
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Ogg/Opus (cost: 3)`);
-    const ffmpeg = transformThroughFFmpeg(streamInfo, bitrate, effects, seek, "ogg");
+    const info = streamInfo.type === "url" ? {
+      ...convertUrlStreamInfoToReadableStreamInfo(streamInfo),
+      type: "readable",
+    } as const : streamInfo;
+    const ffmpeg = transformThroughFFmpeg(info, bitrate, effects, seek, "ogg");
     const passThrough = createPassThrough({
       // 2MB
       highWaterMark: 2 * 1024 * 1024,
@@ -91,6 +97,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       stream: passThrough,
       streamType: "webm",
       cost: 3,
+      streams: [info.stream, ffmpeg, passThrough],
     };
   }else if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && !effectEnabled){
     // 3. volume is on and stream is webm or ogg
@@ -123,6 +130,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       stream: passThrough,
       streamType: "pcm",
       cost: 4.5,
+      streams: [rawStream.stream, normalizeThrough, demuxer, decoder, passThrough],
     };
   }else{
     // 4. volume is on and stream is unknown
@@ -144,6 +152,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       stream: passThrough,
       streamType: "pcm",
       cost: 5,
+      streams: [streamInfo.type === "readable" ? streamInfo.stream : undefined, ffmpegPCM, passThrough].filter(d => d),
     };
   }
 }
