@@ -27,7 +27,6 @@ import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 import { Member } from "eris";
 
-import { PageToggle } from "./PageToggle";
 import * as AudioSource from "../AudioSource";
 import { ServerManagerBase } from "../Structure";
 import { Util } from "../Util";
@@ -187,7 +186,6 @@ export class QueueManager extends ServerManagerBase {
       this.Log("AddQueue called");
       const t = Util.time.timer.start("AddQueue");
       try{
-        PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
         const result = {
           basicInfo: await AudioSource.resolve({
             url, type,
@@ -405,7 +403,6 @@ export class QueueManager extends ServerManagerBase {
    */
   async next(){
     this.Log("Next Called");
-    PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     this.onceLoopEnabled = false;
     this.server.player.resetError();
     if(this.queueLoopEnabled){
@@ -427,7 +424,6 @@ export class QueueManager extends ServerManagerBase {
    */
   removeAt(offset:number){
     this.Log(`RemoveAt Called (offset:${offset})`);
-    PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     this._default.splice(offset, 1);
     this.emit(offset === 0 ? "change" : "changeWithoutCurrent");
   }
@@ -437,7 +433,6 @@ export class QueueManager extends ServerManagerBase {
    */
   removeAll(){
     this.Log("RemoveAll Called");
-    PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     this._default = [];
     this.emit("change");
   }
@@ -447,7 +442,6 @@ export class QueueManager extends ServerManagerBase {
    */
   removeFrom2nd(){
     this.Log("RemoveFrom2 Called");
-    PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     this._default = [this.default[0]];
     this.emit("changeWithoutCurrent");
   }
@@ -457,7 +451,6 @@ export class QueueManager extends ServerManagerBase {
    */
   shuffle(){
     this.Log("Shuffle Called");
-    PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     if(this._default.length === 0) return;
     if(this.server.player.isPlaying || this.server.player.preparing){
       const first = this._default.shift();
@@ -477,7 +470,6 @@ export class QueueManager extends ServerManagerBase {
    */
   removeIf(validator:(q:QueueContent)=>boolean){
     this.Log("RemoveIf Called");
-    PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     if(this._default.length === 0) return [];
     const first = this.server.player.isPlaying ? 1 : 0;
     const rmIndex = [] as number[];
@@ -499,7 +491,6 @@ export class QueueManager extends ServerManagerBase {
    */
   move(from:number, to:number){
     this.Log("Move Called");
-    PageToggle.organize(this.server.bot.toggles, 5, this.server.guildId);
     if(from < to){
       //要素追加
       this._default.splice(to + 1, 0, this.default[from]);

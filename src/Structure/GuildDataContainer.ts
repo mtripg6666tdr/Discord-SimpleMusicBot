@@ -34,6 +34,7 @@ import * as ytpl from "ytpl";
 import { LogEmitter } from "./LogEmitter";
 import { YmxVersion } from "./YmxFormat";
 import { SoundCloudS } from "../AudioSource";
+import { PageToggle } from "../Component/PageToggle";
 import { PlayManager } from "../Component/PlayManager";
 import { QueueManager } from "../Component/QueueManager";
 import { SearchPanel } from "../Component/SearchPanel";
@@ -132,6 +133,9 @@ export class GuildDataContainer extends LogEmitter {
   protected initQueueManager(){
     this._queue = new QueueManager();
     this._queue.setBinding(this);
+    const pageToggleOrganizer = () => PageToggle.organize(this.bot.toggles, 5, this.guildId);
+    this._queue.on("change", pageToggleOrganizer);
+    this._queue.on("changeWithoutCurrent", pageToggleOrganizer);
   }
 
   /**
