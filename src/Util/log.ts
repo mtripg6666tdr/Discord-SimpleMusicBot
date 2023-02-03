@@ -89,7 +89,7 @@ export function log(content:any, level:LogLevels = "log"){
   if(text.length < 200){
     console[level](text);
   }else{
-    console.warn("[Logger] truncated because content was too big; see logs directory to get complete logs (if not exists, make sure debug is set true in config.json)");
+    console.warn("[Logger] truncated; see log file if in debug mode");
   }
   logStore.addLog(level, text);
 }
