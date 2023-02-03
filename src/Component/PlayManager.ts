@@ -175,9 +175,11 @@ export class PlayManager extends ServerManagerBase {
       logStream.write(content + "\r\n");
       this.csvLog.push(content);
     } : () => {};
+    let logStreams:Readable[] = [];
     log("type,datetime,id,total,current,buf");
     const setReadableCsvLog = (readable:Readable, i:number) => {
       if(!readable || !this.detailedLog) return;
+      logStreams.push(readable);
       this.Log(`ID:${i}=${readable.constructor.name}`);
       let total = 0;
       readable
@@ -188,8 +190,14 @@ export class PlayManager extends ServerManagerBase {
         })
         .on("close", () => {
           log(`total,${getNow()},${i},${total}`);
-          logStream.destroy();
-          this.Log("CSV log saved successfully");
+          const inx = logStreams.findIndex(s => s === readable);
+          if(inx >= 0){
+            logStreams = logStreams.splice(inx, 1);
+            if(logStreams.length === 0 && !logStream.destroyed){
+              logStream.destroy();
+              this.Log("CSV log saved successfully");
+            }
+          }
         })
         .on("error", er => log(`error,${new Date().toLocaleString()},${i},${er}`))
       ;
