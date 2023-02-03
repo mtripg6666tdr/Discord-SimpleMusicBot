@@ -43,7 +43,7 @@ export class PlayManager extends ServerManagerBase {
   protected readonly retryLimit = 3;
   protected _seek = 0;
   protected _errorReportChannel:TextChannel = null;
-  protected _volume = 120;
+  protected _volume = 100;
   protected _errorCount = 0;
   protected _errorUrl = "";
   protected _preparing = false;
@@ -51,7 +51,7 @@ export class PlayManager extends ServerManagerBase {
   protected _currentAudioStream:Readable = null;
   protected _cost = 0;
   csvLog:string[] = [];
-  detailedLog = true;
+  detailedLog = false;
   readonly onStreamFinishedBindThis:any = null;
 
   get preparing(){
