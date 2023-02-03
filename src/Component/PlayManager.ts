@@ -175,7 +175,7 @@ export class PlayManager extends ServerManagerBase {
       logStream.write(content + "\r\n");
       this.csvLog.push(content);
     } : () => {};
-    let logStreams:Readable[] = [];
+    const logStreams:Readable[] = [];
     log("type,datetime,id,total,current,buf");
     const setReadableCsvLog = (readable:Readable, i:number) => {
       if(!readable || !this.detailedLog) return;
@@ -192,7 +192,7 @@ export class PlayManager extends ServerManagerBase {
           log(`total,${getNow()},${i},${total}`);
           const inx = logStreams.findIndex(s => s === readable);
           if(inx >= 0){
-            logStreams = logStreams.splice(inx, 1);
+            logStreams.splice(inx, 1);
             if(logStreams.length === 0 && !logStream.destroyed){
               logStream.destroy();
               this.Log("CSV log saved successfully");
@@ -241,7 +241,9 @@ export class PlayManager extends ServerManagerBase {
           const volume = erisStreams.find(r => r.constructor.name === "VolumeTransformer");
           volume?.on("data", () => {
             if(volume.readableLength < 128 * 1024){
-              normalizer.resume();
+              normalizer.resumeOrigin();
+            }else{
+              normalizer.pauseOrigin();
             }
           });
         }

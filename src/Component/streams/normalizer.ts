@@ -27,17 +27,18 @@ export class Normalizer extends Readable {
     }, options));
 
     setImmediate(() => {
-      if(!this.inlineVolume){
-        this.on("data", () => {
-          if(this.readableLength < this.readableHighWaterMark){
-            this.origin.resume();
+      this.on("data", () => {
+        if(this.readableLength < this.readableHighWaterMark){
+          if(!this.inlineVolume){
+            this.resumeOrigin();
           }
-        });
-      }
+        }else{
+          this.pauseOrigin();
+        }
+      });
       this.origin.on("data", chunk => {
-        //console.log(chunk.length);
         if(!this.push(chunk)){
-          this.origin.pause();
+          this.pauseOrigin();
         }
       });
     });
