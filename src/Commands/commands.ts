@@ -109,8 +109,7 @@ export default class Commands extends BaseCommand {
           )
           .setColor(getColor("COMMAND"));
       }
-      const msg = await message.reply({embeds: [embed[0].toEris()]});
-      const toggle = await PageToggle.init(msg, embed.map(_panel => _panel.toEris()));
+      const toggle = await PageToggle.init(message, embed.map(_panel => _panel.toEris()));
       options.embedPageToggle.push(toggle);
     }else{
       const ci = CommandManager.instance.resolve(options.rawArgs);

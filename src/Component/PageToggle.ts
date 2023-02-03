@@ -19,7 +19,7 @@
 import type { ResponseMessage } from "./ResponseMessage";
 import type { ComponentInteraction, EmbedOptions } from "eris";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { CommandMessage, Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 /**
  * 最終的にメッセージの埋め込みに解決されるデータ
@@ -58,9 +58,9 @@ export class PageToggle {
   static arrowLeftEmoji = "◀";
   static arrowRight = "flip_page_next";
   static arrowLeft = "flip_page_prev";
-  static async init(msg:ResponseMessage, embeds:MessageEmbedsResolvable, total?:number, current?:number):Promise<PageToggle>{
+
+  static async init(msg:CommandMessage|ResponseMessage, embeds:MessageEmbedsResolvable, total?:number, current?:number):Promise<PageToggle>{
     const n = new PageToggle();
-    n._message = await msg.fetch();
     n._embeds = embeds;
     if(total){
       n._total = total;
@@ -68,9 +68,9 @@ export class PageToggle {
     if(current){
       n._current = current;
     }
-    await n._message.edit({
-      content: n._message.content,
-      embeds: n._message.embeds,
+    const apply:(CommandMessage["reply"]|ResponseMessage["edit"]) = msg instanceof CommandMessage ? msg.reply.bind(msg) : msg.edit.bind(msg);
+    n._message = await apply({
+      embeds: [await n.getEmbed(current || 0)],
       components: [
         new Helper.MessageActionRowBuilder()
           .addComponents(
@@ -108,13 +108,8 @@ export class PageToggle {
   }
 
   async flipPage(page:number, interaction?:ComponentInteraction){
-    let embed = null as EmbedOptions;
     this._current = page;
-    if(this._embeds instanceof Array){
-      embed = this._embeds[page];
-    }else if(typeof this._embeds === "function"){
-      embed = await this._embeds(page);
-    }
+    const embed = await this.getEmbed(page);
     if(interaction){
       await interaction.editOriginalMessage({
         content: this.Message.content,
@@ -126,6 +121,15 @@ export class PageToggle {
         embeds: [embed],
       });
     }
+  }
+
+  protected getEmbed(page:number){
+    if(Array.isArray(this._embeds)){
+      return this._embeds[page];
+    }else if(typeof this._embeds === "function"){
+      return this._embeds(page);
+    }
+    return null;
   }
 
   setFresh(isFreshNecessary:boolean){
