@@ -189,6 +189,7 @@ export class PlayManager extends ServerManagerBase {
         .on("close", () => {
           log(`total,${getNow()},${i},${total}`);
           logStream.destroy();
+          this.Log("CSV log saved successfully");
         })
         .on("error", er => log(`error,${new Date().toLocaleString()},${i},${er}`))
       ;
@@ -204,6 +205,7 @@ export class PlayManager extends ServerManagerBase {
       const rawStream = await this.currentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
       connection = this.server.connection;
+      if(!connection) return this;
       const channel = this.server.bot.client.getChannel(connection.channelID) as VoiceChannel;
       const { stream, streamType, cost, streams } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.server), this._seek, this.volume !== 100, channel.bitrate);
       this._currentAudioStream = stream;
