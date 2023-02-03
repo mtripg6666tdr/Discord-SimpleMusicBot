@@ -1,19 +1,27 @@
 {
-  "adminId": "", // 管理ユーザーのユーザーID (任意)、なければnull
+  // 管理ユーザーのユーザーID (任意)、なければnull
+  "adminId": "",
 
-  "debug": false, // デバッグ可能かどうか
+  // デバッグ可能かどうか
+  "debug": false,
   
-  "maintenance": false, // メンテナンス中かどうか
+  // メンテナンス中かどうか
   // ボットの操作を全封鎖するときのみ設定してください。
+  "maintenance": false,
 
-  "errorChannel": "", // エラーログを送信するテキストチャンネル、なければnull
-  // エラーレポートを送るテキストチャンネルのID (任意)
+  // エラーログを送信するテキストチャンネルのID、なければnull
+  "errorChannel": "",
 
-  "proxy": "", // HTTPプロキシのアドレス、なければnull
+  // HTTPプロキシのアドレス、なければnull
+  "proxy": "",
 
-  "prefix": ">", // デフォルトプレフィックス、一文字。省略されたりnullなら`>`
+  // デフォルトプレフィックス。複数文字も可。省略されたりnullなら`>`
+  "prefix": ">",
 
-  "webserver": true, // HTTPサーバーをたてるかどうか。trueにすると8081番で開かれます。
+  // HTTPサーバーをたてるかどうか。trueにすると8081番で開かれます。
+  "webserver": true,
 
+  // MessageContent IntentがDiscord Developers Portalでオフになっている場合はtrueにします。
+  // それ以外の場合はfalse
   "noMessageContent": true
 }
