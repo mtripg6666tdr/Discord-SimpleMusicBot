@@ -22,7 +22,6 @@ import { FFmpeg } from "prism-media";
 
 import { destroyStream } from ".";
 import Util from "../../Util";
-import { createPassThrough } from "../../Util/general";
 import { FFmpegDefaultNetworkArgs } from "../../definition";
 
 const { DefaultUserAgent } = Util.ua;
@@ -60,15 +59,12 @@ export function transformThroughFFmpeg(readable:StreamInfo, bitrate:number, effe
   Util.logger.log("[FFmpeg] Passing arguments: " + args.map(arg => arg.startsWith("http") ? "<URL>" : arg).join(" "), "debug");
   const ffmpeg = new FFmpeg({args});
   if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log("[FFmpeg]" + chunk.toString(), "debug"));
+  ffmpeg.process.once("exit", () => ffmpeg.emit("close"));
   if(readable.type === "readable"){
-    const normalizeThrough = createPassThrough();
     readable.stream
-      .on("error", e => destroyStream(normalizeThrough, e))
-      .pipe(normalizeThrough)
       .on("error", e => destroyStream(ffmpeg, e))
-      .on("close", () => destroyStream(readable.stream))
       .pipe(ffmpeg)
-      .process.on("exit", () => destroyStream(normalizeThrough))
+      .on("close", () => destroyStream(readable.stream))
     ;
   }
   return ffmpeg;

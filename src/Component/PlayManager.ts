@@ -20,11 +20,15 @@ import type { AudioSource, YouTube } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { MessageEmbedBuilder } from "@mtripg6666tdr/eris-command-resolver";
 import type { Message, TextChannel, VoiceChannel } from "eris";
-import type { Readable } from "stream";
+import type { Readable, Writable } from "stream";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
+import fs from "fs";
+import path from "path";
+
 import { resolveStreamToPlayable } from "./streams";
+import { Normalizer } from "./streams/normalizer";
 import { ServerManagerBase } from "../Structure";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
@@ -46,6 +50,8 @@ export class PlayManager extends ServerManagerBase {
   protected _currentAudioInfo:AudioSource = null;
   protected _currentAudioStream:Readable = null;
   protected _cost = 0;
+  csvLog:string[] = [];
+  detailedLog = !!process.env.DSL_ENABLE;
   readonly onStreamFinishedBindThis:any = null;
 
   get preparing(){
@@ -151,6 +157,58 @@ export class PlayManager extends ServerManagerBase {
         `:hourglass_flowing_sand: \`${this.currentAudioInfo.Title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`
       );
     }
+
+    // ログ関係モジュール
+    let connection = this.server.connection;
+    this.csvLog = [];
+    const filename = `stream-${Date.now()}.csv`;
+    if(this.detailedLog){
+      this.Log("CSV based detailed log enabled. Be careful of heavy memory usage.", "warn");
+      this.Log(`CSV filename will be ${filename}`);
+    }
+    const getNow = () => {
+      const now = new Date();
+      return `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`;
+    };
+    const logStream = this.detailedLog && fs.createWriteStream(path.join(__dirname, `../../logs/${filename}`));
+    const log = logStream ? (content:string) => {
+      logStream.write(content + "\r\n");
+      this.csvLog.push(content);
+    } : () => {};
+    const logStreams:Readable[] = [];
+    log("type,datetime,id,total,current,buf");
+    const setReadableCsvLog = (readable:Readable, i:number) => {
+      if(!readable || !this.detailedLog) return;
+      logStreams.push(readable);
+      this.Log(`ID:${i}=${readable.constructor.name} (highWaterMark:${readable.readableHighWaterMark})`);
+      let total = 0;
+      const onClose = () => {
+        readable.off("close", onClose);
+        readable.off("end", onClose);
+        log(`total,${getNow()},${i},${total}`);
+        const inx = logStreams.findIndex(s => s === readable);
+        if(inx >= 0){
+          logStreams.splice(inx, 1);
+          console.log(logStreams);
+          if(logStreams.length === 0 && !logStream.destroyed){
+            logStream.destroy();
+            this.Log("CSV log saved successfully");
+          }
+        }
+      };
+      readable
+        .on("data", chunk => {
+          // @ts-expect-error 7053
+          log(`flow,${getNow()},${i},${total += chunk.length},${chunk.length},${typeof connection === "object" && connection.piper["_dataPackets"]?.reduce((a, b) => a.length + b.length, 0) || ""}`);
+          log(`stock,${getNow()},${i},,${readable.readableLength},`);
+        })
+        .on("close", onClose)
+        .on("end", onClose)
+        .on("error", er => log(`error,${new Date().toLocaleString()},${i},${er}`))
+      ;
+    };
+    // ここまで
+
     try{
       // シーク位置を確認
       if(this.currentAudioInfo.LengthSeconds <= time) time = 0;
@@ -159,20 +217,14 @@ export class PlayManager extends ServerManagerBase {
       // QueueContentからストリーム情報を取得
       const rawStream = await this.currentAudioInfo.fetch(time > 0);
       // 情報からストリームを作成
-      const connection = this.server.connection;
+      connection = this.server.connection;
+      if(!connection) return this;
       const channel = this.server.bot.client.getChannel(connection.channelID) as VoiceChannel;
-      const { stream, streamType, cost } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.server), this._seek, this.volume !== 100, channel.bitrate);
+      const { stream, streamType, cost, streams } = resolveStreamToPlayable(rawStream, getFFmpegEffectArgs(this.server), this._seek, this.volume !== 100, channel.bitrate);
       this._currentAudioStream = stream;
-      // ストリームがまだ利用できない場合待機
-      let errorWhileWaiting = null as Error;
-      stream.once("error", e => errorWhileWaiting = e || new Error("An error occurred in stream"));
-      const getStreamReadable = () => !(stream.readableEnded || stream.destroyed || errorWhileWaiting) && stream.readableLength > 0;
-      if(!getStreamReadable()){
-        this.Log("Stream has not been readable yet. Waiting...", "debug");
-        await Util.general.waitForEnteringState(getStreamReadable, 20 * 1000);
-      }
-      if(errorWhileWaiting){
-        throw errorWhileWaiting;
+      if(this.detailedLog){
+        streams.forEach(setReadableCsvLog);
+        stream.pause();
       }
       // 各種準備
       this._errorReportChannel = mes?.channel as TextChannel;
@@ -180,12 +232,26 @@ export class PlayManager extends ServerManagerBase {
       t.end();
       // 再生
       const u = Util.time.timer.start("PlayManager#Play->EnterPlayingState");
+      const normalizer = new Normalizer(stream, this.volume !== 100);
       try{
-        connection.play(stream, {
+        connection.play(normalizer, {
           format: streamType,
           inlineVolume: this.volume !== 100,
           voiceDataTimeout: 30 * 1000
         });
+        if(this.detailedLog){
+          // @ts-expect-error 7053
+          const erisStreams = (connection.piper["streams"] as (Readable & Writable)[]);
+          erisStreams.forEach((readable, i) => setReadableCsvLog(readable, i + streams.length));
+          const volume = erisStreams.find(r => r.constructor.name === "VolumeTransformer");
+          volume?.on("data", () => {
+            if(volume.readableLength < 128 * 1024){
+              normalizer.resumeOrigin();
+            }else{
+              normalizer.pauseOrigin();
+            }
+          });
+        }
         // setup volume
         this.setVolume(this.volume);
         // wait for entering playing state
