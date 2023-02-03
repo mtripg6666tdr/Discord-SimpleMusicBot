@@ -143,13 +143,12 @@ export class MusicBot extends MusicBotBase {
         type: discord.Constants.ActivityTypes.LISTENING,
         name: "音楽"
       });
-
-      // Set main tick
-      setTimeout(() => {
-        this.maintenanceTick();
-        setInterval(this.maintenanceTick.bind(this), 1 * 60 * 1000);
-      }, 10 * 1000);
     }
+    // Set main tick
+    setTimeout(() => {
+      this.maintenanceTick();
+      setInterval(this.maintenanceTick.bind(this), 1 * 60 * 1000);
+    }, 10 * 1000);
     this.Log("Interval jobs set up successfully");
 
     // Command instance preparing
