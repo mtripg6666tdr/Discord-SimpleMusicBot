@@ -20,7 +20,7 @@ import type { exportableStatuses } from ".";
 import type { GuildDataContainer, YmxFormat } from "../../Structure";
 import type { DataType, MusicBotBase } from "../../botBase";
 
-import { http, https } from "follow-redirects";
+import candyget from "candyget";
 
 import { Backupper } from ".";
 import Util from "../../Util";
@@ -297,47 +297,20 @@ export class HttpBackupper extends Backupper {
       if(method === "GET"){
         url += "?" + (Object.keys(data) as (keyof requestBody)[]).map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k])).join("&");
       }
-      const durl = new URL(url);
-      const opt = {
-        protocol: durl.protocol,
-        hostname: durl.hostname,
-        port: durl.port,
-        path: durl.pathname + durl.search,
-        method: method,
-      } as {[key:string]:any};
-      if(mimeType){
-        opt.headers = {
+
+      candyget(method, url, "json", {
+        headers: {
           "Content-Type": mimeType,
           "User-Agent": `mtripg6666tdr/Discord-SimpleMusicBot#${this.bot.version || "unknown"} http based backup server adapter`
-        };
-      }
-      const httpLibs = {
-        "http:": http,
-        "https:": https,
-      } as {[proto:string]:(typeof http|typeof https)};
-      const req = httpLibs[durl.protocol]
-        .request(opt, (res) => {
-          const bufs = [] as Buffer[];
-          res.on("data", chunk => bufs.push(chunk));
-          res.on("end", () => {
-            try{
-              const parsed = JSON.parse(Buffer.concat(bufs).toString("utf-8")) as postResult;
-              if(parsed.data) Object.keys(parsed.data).forEach(k => parsed.data[k] = decodeURIComponent(parsed.data[k]));
-              resolve(parsed);
-            }
-            catch(e){
-              reject(e);
-            }
-          });
-          res.on("error", ()=>reject());
-        })
-        .on("error", reject)
-      ;
-      if(method === "POST"){
-        req.end(JSON.stringify(data));
-      }else{
-        req.end();
-      }
+        },
+        body: method === "POST" ? data : undefined,
+      }).then(result => {
+        if(typeof result.body === "string"){
+          reject(result.body);
+        }else{
+          resolve(result.body);
+        }
+      });
     });
   }
 }
