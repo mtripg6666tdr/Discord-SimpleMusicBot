@@ -454,9 +454,7 @@ export class MusicBot extends MusicBotBase {
       // サーバー側からのボットの切断
       this.Log(`forced to disconnect from VC (${server.connection?.channelID})`);
       server.player.disconnect();
-      const bound = this._client.getChannel(server.boundTextChannel);
-      if(!bound) return;
-      await this._client.createMessage(bound.id, ":postbox: 正常に切断しました").catch(e => this.Log(e, "error"));
+      await this._client.createMessage(server.boundTextChannel, ":postbox: 正常に切断しました").catch(e => this.Log(e, "error"));
     }else if(oldChannel.voiceMembers.has(this._client.user.id) && oldChannel.voiceMembers.size === 1){
       if(server.queue instanceof QueueManagerWithBgm && server.queue.isBGM){
         server.player.disconnect();
@@ -482,6 +480,9 @@ export class MusicBot extends MusicBotBase {
           server.player.once("playCalled", playHandler);
           server.player.once("disconnect", playHandler);
         }
+      }else if(server.player.finishTimeout){
+        server.player.disconnect();
+        await this._client.createMessage(server.boundTextChannel, ":postbox: 正常に切断しました").catch(e => this.Log(e, "error"));
       }
     }
     server.skipSession?.checkThreshold();

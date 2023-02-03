@@ -50,6 +50,7 @@ export class PlayManager extends ServerManagerBase {
   protected _currentAudioInfo:AudioSource = null;
   protected _currentAudioStream:Readable = null;
   protected _cost = 0;
+  protected _finishTimeout = false;
   csvLog:string[] = [];
   detailedLog = !!process.env.DSL_ENABLE;
   readonly onStreamFinishedBindThis:any = null;
@@ -106,6 +107,10 @@ export class PlayManager extends ServerManagerBase {
 
   get volume(){
     return this._volume;
+  }
+
+  get finishTimeout(){
+    return this._finishTimeout;
   }
 
   // コンストラクタ
@@ -479,6 +484,7 @@ export class PlayManager extends ServerManagerBase {
       const timer = setTimeout(() => {
         this.off("playCalled", playHandler);
         this.off("disconnect", playHandler);
+        this._finishTimeout = false;
         if(!this.isPlaying && this.server.boundTextChannel){
           this.server.bot.client
             .createMessage(this.server.boundTextChannel, ":wave:キューが空になったため終了します")
@@ -487,7 +493,11 @@ export class PlayManager extends ServerManagerBase {
         }
         this.disconnect();
       }, 10 * 60 * 1000);
-      const playHandler = () => clearTimeout(timer);
+      this._finishTimeout = true;
+      const playHandler = () => {
+        clearTimeout(timer);
+        this._finishTimeout = false;
+      };
       this.once("playCalled", playHandler);
       this.once("disconnect", playHandler);
     // なくなってないなら再生開始！
