@@ -78,15 +78,15 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     // Unknown --(FFmpeg)--> Webm/Opus or Webm/Vorbis --(Demuxer)--> Opus
     //               2                      1
     // Total: 3
-    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Ogg/Opus (cost: 3)`);
+    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Webm/Opus (cost: 3)`);
     const info = streamInfo.type === "url" ? {
       ...convertUrlStreamInfoToReadableStreamInfo(streamInfo),
       type: "readable",
     } as const : streamInfo;
     const ffmpeg = transformThroughFFmpeg(info, bitrate, effects, seek, "ogg");
     const passThrough = createPassThrough({
-      // 2MB
-      highWaterMark: 2 * 1024 * 1024,
+      // 1MB
+      highWaterMark: 1 * 1024 * 1024,
     });
     ffmpeg
       .on("error", e => destroyStream(passThrough, e))
@@ -113,9 +113,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       frameSize: 960,
     });
     const passThrough = createPassThrough();
-    const normalizeThrough = createPassThrough();
     rawStream.stream
-      .pipe(normalizeThrough)
       .on("error", e => destroyStream(demuxer, e))
       .pipe(demuxer)
       .on("error", e => destroyStream(decoder, e))
@@ -130,7 +128,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       stream: passThrough,
       streamType: "pcm",
       cost: 4.5,
-      streams: [rawStream.stream, normalizeThrough, demuxer, decoder, passThrough],
+      streams: [rawStream.stream, demuxer, decoder, passThrough],
     };
   }else{
     // 4. volume is on and stream is unknown
@@ -140,8 +138,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM (cost: 5)`);
     const ffmpegPCM = transformThroughFFmpeg(streamInfo, bitrate, effects, seek, "pcm");
     const passThrough = createPassThrough({
-      // 2MB
-      highWaterMark: 2 * 1024 * 1024,
+      highWaterMark: 1 * 1024 * 1024,
     });
     ffmpegPCM
       .on("error", e => destroyStream(passThrough, e))
