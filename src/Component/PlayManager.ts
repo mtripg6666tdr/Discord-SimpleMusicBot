@@ -182,24 +182,28 @@ export class PlayManager extends ServerManagerBase {
       logStreams.push(readable);
       this.Log(`ID:${i}=${readable.constructor.name} (highWaterMark:${readable.readableHighWaterMark})`);
       let total = 0;
+      const onClose = () => {
+        readable.off("close", onClose);
+        readable.off("end", onClose);
+        log(`total,${getNow()},${i},${total}`);
+        const inx = logStreams.findIndex(s => s === readable);
+        if(inx >= 0){
+          logStreams.splice(inx, 1);
+          console.log(logStreams);
+          if(logStreams.length === 0 && !logStream.destroyed){
+            logStream.destroy();
+            this.Log("CSV log saved successfully");
+          }
+        }
+      };
       readable
         .on("data", chunk => {
           // @ts-expect-error 7053
           log(`flow,${getNow()},${i},${total += chunk.length},${chunk.length},${typeof connection === "object" && connection.piper["_dataPackets"]?.reduce((a, b) => a.length + b.length, 0) || ""}`);
           log(`stock,${getNow()},${i},,${readable.readableLength},`);
         })
-        .on("close", () => {
-          log(`total,${getNow()},${i},${total}`);
-          const inx = logStreams.findIndex(s => s === readable);
-          if(inx >= 0){
-            logStreams.splice(inx, 1);
-            console.log(logStreams);
-            if(logStreams.length === 0 && !logStream.destroyed){
-              logStream.destroy();
-              this.Log("CSV log saved successfully");
-            }
-          }
-        })
+        .on("close", onClose)
+        .on("end", onClose)
         .on("error", er => log(`error,${new Date().toLocaleString()},${i},${er}`))
       ;
     };
