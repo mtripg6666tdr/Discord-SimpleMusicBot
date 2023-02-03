@@ -51,7 +51,7 @@ export class PlayManager extends ServerManagerBase {
   protected _currentAudioStream:Readable = null;
   protected _cost = 0;
   csvLog:string[] = [];
-  detailedLog = false;
+  detailedLog = !!process.env.DSL_ENABLE;
   readonly onStreamFinishedBindThis:any = null;
 
   get preparing(){
@@ -180,7 +180,7 @@ export class PlayManager extends ServerManagerBase {
     const setReadableCsvLog = (readable:Readable, i:number) => {
       if(!readable || !this.detailedLog) return;
       logStreams.push(readable);
-      this.Log(`ID:${i}=${readable.constructor.name}`);
+      this.Log(`ID:${i}=${readable.constructor.name} (highWaterMark:${readable.readableHighWaterMark})`);
       let total = 0;
       readable
         .on("data", chunk => {
@@ -193,6 +193,7 @@ export class PlayManager extends ServerManagerBase {
           const inx = logStreams.findIndex(s => s === readable);
           if(inx >= 0){
             logStreams.splice(inx, 1);
+            console.log(logStreams);
             if(logStreams.length === 0 && !logStream.destroyed){
               logStream.destroy();
               this.Log("CSV log saved successfully");
