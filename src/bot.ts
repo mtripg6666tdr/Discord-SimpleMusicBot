@@ -467,11 +467,12 @@ export class MusicBot extends MusicBotBase {
           server.player.disconnect();
           if(!server.queue.onceLoopEnabled && !server.queue.loopEnabled) server.queue.next();
           await this._client.createMessage(server.boundTextChannel, ":postbox: 正常に切断しました").catch(e => this.Log(e, "error"));
-        }else{
+        }else if(!server.player.isPaused){
           server.player.pause();
           await this._client.createMessage(server.boundTextChannel, ":pause_button:ボイスチャンネルから誰もいなくなったため一時停止しました。`再生`コマンドで再開できます。").catch(e => this.Log(e));
           const timer = setTimeout(() => {
             server.player.off("playCalled", playHandler);
+            server.player.off("disconnect", playHandler);
             if(server.player.isPaused){
               this._client.createMessage(server.boundTextChannel, ":postbox: 長時間使用しなかったため、終了します").catch(e => this.Log(e, "error"));
               server.player.disconnect();
@@ -479,6 +480,7 @@ export class MusicBot extends MusicBotBase {
           }, 30 * 60 * 1000);
           const playHandler = () => clearTimeout(timer);
           server.player.once("playCalled", playHandler);
+          server.player.once("disconnect", playHandler);
         }
       }
     }
