@@ -477,7 +477,7 @@ export class MusicBot extends MusicBotBase {
               this._client.createMessage(server.boundTextChannel, ":postbox: 長時間使用しなかったため、終了します").catch(e => this.Log(e, "error"));
               server.player.disconnect();
             }
-          }, 30 * 60 * 1000);
+          }, 10 * 60 * 1000);
           const playHandler = () => clearTimeout(timer);
           server.player.once("playCalled", playHandler);
           server.player.once("disconnect", playHandler);
