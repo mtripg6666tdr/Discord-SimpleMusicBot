@@ -78,9 +78,16 @@ export class Spotify extends AudioSource {
 
   protected extractBestItem(items:ytsr.Video[]){
     console.log("result", items);
+    const normalize = (text:string) => {
+      return text.toLowerCase()
+        .replace(/’/g, "'")
+        .replace(/\(.+\)/g, "")
+        .replace(/（.+）/g, "")
+        .trim();
+    };
     const includes = (text1:string, text2:string) => {
-      text1 = text1.toLowerCase().replace(/’/g, "'");
-      text2 = text2.toLowerCase().replace(/’/g, "'");
+      text1 = normalize(text1);
+      text2 = normalize(text2);
       return text1.includes(text2);
     };
     const validate = (item:ytsr.Video) => {
