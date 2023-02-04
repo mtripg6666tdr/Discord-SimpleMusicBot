@@ -431,14 +431,15 @@ export class MusicBot extends MusicBotBase {
       if(
         server instanceof GuildDataContainerWithBgm
           && (
-            !server.connection
-              || (
-                server.bgmConfig.mode === "prior"
-                && server.connection.channelID !== server.bgmConfig.voiceChannelId
+            newChannel.id === server.bgmConfig.voiceChannelId
+            && (
+              (
+                (!server.connection || (server.bgmConfig.mode === "prior" && server.connection.channelID !== server.bgmConfig.voiceChannelId))
+                && !server.queue.isBGM
               )
+              || server.player.finishTimeout
+            )
           )
-          && newChannel.id === server.bgmConfig.voiceChannelId
-          && !server.queue.isBGM
       ){
         // BGMターゲット
         server.playBgmTracks();
