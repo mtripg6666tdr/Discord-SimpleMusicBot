@@ -19,6 +19,8 @@
 import type { Readable } from "stream";
 
 import { spawn } from "child_process";
+import { Agent as HttpAgent } from "http";
+import { Agent as HttpsAgent } from "https";
 
 import candyget from "candyget";
 import miniget from "miniget";
@@ -50,6 +52,9 @@ export function RetriveHttpStatusCode(url:string, headers?:{[key:string]:string}
   }).then(r => r.statusCode);
 }
 
+const httpAgent = new HttpAgent({keepAlive: false});
+const httpsAgent = new HttpsAgent({keepAlive: false});
+
 /**
  * 指定されたURLからReadable Streamを生成します
  * @param url URL
@@ -60,6 +65,7 @@ export function DownloadAsReadable(url:string, options:miniget.Options = {}):Rea
     maxReconnects: 10,
     maxRetries: 3,
     backoff: { inc: 500, max: 10000 },
+    agent: url.startsWith("https:") ? httpsAgent : httpAgent,
     ...options,
   })
     .on("reconnect", () => Util.logger.log("Miniget is now trying to re-send a request due to failing"))
