@@ -304,13 +304,16 @@ export class HttpBackupper extends Backupper {
           "User-Agent": `mtripg6666tdr/Discord-SimpleMusicBot#${this.bot.version || "unknown"} http based backup server adapter`
         },
         body: method === "POST" ? data : undefined,
-      }).then(result => {
-        if(typeof result.body === "string"){
-          reject(result.body);
-        }else{
-          resolve(result.body);
-        }
-      });
+      })
+        .then(result => {
+          if(typeof result.body === "string"){
+            reject(result.body);
+          }else{
+            resolve(result.body);
+          }
+        })
+        .catch(reject)
+      ;
     });
   }
 }
