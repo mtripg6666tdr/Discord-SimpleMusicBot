@@ -310,7 +310,7 @@ export class HttpBackupper extends Backupper {
         }else{
           resolve(result.body);
         }
-      });
+      }).catch(reject);
     });
   }
 }
