@@ -310,6 +310,7 @@ export class PlayManager extends ServerManagerBase {
                 new Helper.MessageButtonBuilder()
                   .setCustomId("control_rewind")
                   .setEmoji("⏮️")
+                  .setLabel("頭出し")
                   .setStyle("SECONDARY"),
                 new Helper.MessageButtonBuilder()
                   .setCustomId("control_playpause")
@@ -319,6 +320,7 @@ export class PlayManager extends ServerManagerBase {
                 new Helper.MessageButtonBuilder()
                   .setCustomId("control_skip")
                   .setEmoji("⏭️")
+                  .setLabel("スキップ")
                   .setStyle("SECONDARY"),
                 new Helper.MessageButtonBuilder()
                   .setCustomId("control_onceloop")
