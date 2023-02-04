@@ -22,6 +22,7 @@ import type { CommandMessage } from "../Component/CommandMessage";
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
 
 import { BaseCommand } from ".";
+import { Spotify } from "../AudioSource";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
 
@@ -65,7 +66,8 @@ export default class Help extends BaseCommand {
         "・Googleドライブ(音声ファイルの限定公開リンクのURL指定)",
         "・ニコニコ動画(動画ページURL指定)",
         "・オーディオファイルへの直URL",
-      ].join("\r\n"))
+        Spotify.available ? "・Spotify(曲のURL、およびプレイリストのURL。曲を推測してYouTubeから再生します。)" : undefined,
+      ].filter(d => d).join("\r\n"))
       .setColor(getColor("HELP"))
       .toEris()
     ;
