@@ -332,12 +332,14 @@ export class PlayManager extends ServerManagerBase {
         const removeControls = () => {
           this.off("playCompleted", removeControls);
           this.off("error", removeControls);
+          this.off("stop", removeControls);
           mes.edit({
             components: []
           }).catch(er => this.Log(er, "error"));
         };
         this.once("playCompleted", removeControls);
         this.once("error", removeControls);
+        this.once("stop", removeControls);
       }
     }
     catch(e){

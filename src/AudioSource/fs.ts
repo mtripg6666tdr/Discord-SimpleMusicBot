@@ -51,9 +51,6 @@ export class FsStream extends AudioSource {
 
   toField(){
     return [{
-      name: ":link:URL",
-      value: this.Url
-    }, {
       name: ":asterisk:詳細",
       value: "カスタムストリーム"
     }] as EmbedField[];
