@@ -301,7 +301,43 @@ export class PlayManager extends ServerManagerBase {
           embed.addField(":warning:注意", FallBackNotice);
         }
         this.emit("playStartUIPrepared", embed);
-        mes.edit({content: "", embeds: [embed.toEris()]}).catch(e => Util.logger.log(e, "error"));
+        mes.edit({
+          content: "",
+          embeds: [embed.toEris()],
+          components: [
+            new Helper.MessageActionRowBuilder()
+              .addComponents(
+                new Helper.MessageButtonBuilder()
+                  .setCustomId("control_rewind")
+                  .setEmoji("⏮️")
+                  .setStyle("SECONDARY"),
+                new Helper.MessageButtonBuilder()
+                  .setCustomId("control_playpause")
+                  .setEmoji("⏯️")
+                  .setLabel("再生/一時停止")
+                  .setStyle("PRIMARY"),
+                new Helper.MessageButtonBuilder()
+                  .setCustomId("control_skip")
+                  .setEmoji("⏭️")
+                  .setStyle("SECONDARY"),
+                new Helper.MessageButtonBuilder()
+                  .setCustomId("control_onceloop")
+                  .setEmoji("🔂")
+                  .setLabel("ワンスループ")
+                  .setStyle("SECONDARY"),
+              )
+              .toEris()
+          ]
+        }).catch(e => Util.logger.log(e, "error"));
+        const removeControls = () => {
+          this.off("playCompleted", removeControls);
+          this.off("error", removeControls);
+          mes.edit({
+            components: []
+          }).catch(er => this.Log(er, "error"));
+        };
+        this.once("playCompleted", removeControls);
+        this.once("error", removeControls);
       }
     }
     catch(e){

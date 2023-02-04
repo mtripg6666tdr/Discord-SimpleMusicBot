@@ -357,6 +357,26 @@ export class MusicBot extends MusicBotBase {
               components: [],
             }).catch(er => this.Log(er, "error"));
           }
+        }else if(interaction.data.custom_id.startsWith("control_")){
+          let command:string = null;
+          switch(interaction.data.custom_id){
+            case "control_rewind":
+              command = "rewind";
+              break;
+            case "control_playpause":
+              command = server.player.isPaused ? "play" : "pause";
+              break;
+            case "control_skip":
+              command = "skip";
+              break;
+            case "control_onceloop":
+              command = "onceloop";
+              break;
+            default:
+              return;
+          }
+          const commandMessage = CommandMessage.createFromMessageWithParsed(interaction.message as discord.Message<discord.TextChannel>, "command", [], "");
+          CommandManager.instance.resolve(command)?.run(commandMessage, this.createCommandRunnerArgs(commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
         }else{
           const updateEffectPanel = () => {
             const mes = interaction.message;
