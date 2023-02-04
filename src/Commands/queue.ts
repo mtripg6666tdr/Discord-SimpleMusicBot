@@ -17,7 +17,6 @@
  */
 
 import type { CommandArgs } from ".";
-import type { YouTube } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
@@ -64,7 +63,7 @@ export default class Queue extends BaseCommand {
     // 合計ページ数割り出し
     const totalpage = Math.ceil(queue.length / 10);
     // ページのキューを割り出す
-    const getQueueEmbed = (page:number)=>{
+    const getQueueEmbed = (page:number) => {
       const fields:{name:string, value:string}[] = [];
       for(let i = 10 * (page - 1); i < 10 * page; i++){
         if(queue.length <= i){
@@ -75,16 +74,18 @@ export default class Queue extends BaseCommand {
         const [min, sec] = Util.time.CalcMinSec(_t);
         fields.push({
           name: i !== 0 ? i.toString() : options.server.player.isPlaying ? "現在再生中" : "再生待ち",
-          value: "[" + q.basicInfo.Title + "](" + q.basicInfo.Url + ") \r\n"
-          + "長さ: `" + ((q.basicInfo.ServiceIdentifer === "youtube" && (q.basicInfo as YouTube).LiveStream) ? "ライブストリーム" : min + ":" + sec) + " ` \r\n"
-          + "リクエスト: `" + q.additionalInfo.addedBy.displayName + "` "
-          + q.basicInfo.npAdditional()
+          value: [
+            `[${q.basicInfo.Title}](${q.basicInfo.Url}) \r\n`,
+            `長さ: \`${q.basicInfo.isYouTube() && q.basicInfo.LiveStream ? "ライブストリーム" : `${min}:${sec}`} \` \r\n`,
+            `リクエスト: \`${q.additionalInfo.addedBy.displayName}\` `,
+            q.basicInfo.npAdditional(),
+          ].join("\r\n")
         });
       }
       const [thour, tmin, tsec] = Util.time.CalcHourMinSec(totalLength);
       return new Helper.MessageEmbedBuilder()
-        .setTitle(message.guild.name + "のキュー")
-        .setDescription("`" + page + "ページ目(" + totalpage + "ページ中)`")
+        .setTitle(`${message.guild.name}のキュー`)
+        .setDescription(`\`${page}ページ目(${totalpage}ページ中)\``)
         .addFields(...fields)
         .setAuthor({
           name: options.client.user.username,
