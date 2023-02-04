@@ -16,11 +16,18 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { Message, TextChannel } from "eris";
+
 import { CommandMessage as LibCommandMessage } from "@mtripg6666tdr/eris-command-resolver";
 
 import { Util } from "../Util";
 
 export class CommandMessage extends LibCommandMessage {
+  // expose protected method
+  public static override createFromMessageWithParsed(message: Message<TextChannel>, command: string, options: string[], rawOptions: string): CommandMessage{
+    return super.createFromMessageWithParsed(message, command, options, rawOptions);
+  }
+
   protected static override parseCommand(content:string, prefixLength:number){
     const resolved = super.parseCommand(content, prefixLength, Util.string.NormalizeText);
     // 超省略形を捕捉
