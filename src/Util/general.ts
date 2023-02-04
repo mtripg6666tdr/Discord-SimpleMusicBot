@@ -77,6 +77,7 @@ export function FilterContent(original:string){
   while(result.includes(projectRoot)){
     result = result.replace(projectRoot, "***");
   }
+  result = result.replace(/https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+/g, "http:***");
   return result.replace(/\\/g, "/").replace(/\*/g, "\\*");
 }
 

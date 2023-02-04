@@ -391,15 +391,15 @@ export class GuildDataContainer extends LogEmitter {
       return;
     }else if(!rawArg.includes("v=") && !rawArg.includes("/channel/") && ytpl.validateID(rawArg)){
       //違うならYouTubeプレイリストの直リンクか？
-      const id = await ytpl.getPlaylistID(rawArg);
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
-      const result = await ytpl.default(id, {
-        gl: "JP",
-        hl: "ja",
-        limit: 999 - this.queue.length
-      });
       const cancellation = this.bindCancellation(new TaskCancellationManager());
       try{
+        const id = await ytpl.getPlaylistID(rawArg);
+        const result = await ytpl.default(id, {
+          gl: "JP",
+          hl: "ja",
+          limit: 999 - this.queue.length
+        });
         const index = await this.queue.processPlaylist(
           msg,
           cancellation,
@@ -429,6 +429,10 @@ export class GuildDataContainer extends LogEmitter {
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({content: "", embeds: [embed.toEris()]});
         }
+      }
+      catch(e){
+        Util.logger.log(e, "error");
+        await msg.edit(`✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`).catch(er => this.Log(er, "error"));
       }
       finally{
         this.unbindCancellation(cancellation);
@@ -471,16 +475,20 @@ export class GuildDataContainer extends LogEmitter {
           await msg.edit({content: "", embeds: [embed.toEris()]});
         }
       }
+      catch(e){
+        Util.logger.log(e, "error");
+        await msg.edit(`✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`).catch(er => this.Log(er, "error"));
+      }
       finally{
         this.unbindCancellation(cancellation);
       }
       await this.player.play();
     }else if(Spotify.validatePlaylistUrl(rawArg) && Spotify.available){
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
-      const playlist = await Spotify.client.getData(rawArg) as Playlist;
-      const tracks = playlist.trackList.reverse();
       const cancellation = this.bindCancellation(new TaskCancellationManager());
       try{
+        const playlist = await Spotify.client.getData(rawArg) as Playlist;
+        const tracks = playlist.trackList.reverse();
         const index = await this.queue.processPlaylist(
           msg,
           cancellation,
@@ -512,6 +520,10 @@ export class GuildDataContainer extends LogEmitter {
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({content: "", embeds: [embed.toEris()]});
         }
+      }
+      catch(e){
+        Util.logger.log(e, "error");
+        await msg.edit(`✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`).catch(er => this.Log(er, "error"));
       }
       finally{
         this.unbindCancellation(cancellation);
