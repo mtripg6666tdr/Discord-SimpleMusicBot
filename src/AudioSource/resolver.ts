@@ -42,7 +42,7 @@ export async function resolve(info:AudioSourceBasicInfo){
   }else if(type === "soundcloud" || AudioSource.SoundCloudS.validateUrl(url)){
     // soundcloud
     basicInfo = await new AudioSource.SoundCloudS().init(url, gotData as AudioSource.exportableSoundCloud);
-  }else if(type === "spotify" || AudioSource.Spotify.validateTrackUrl(url)){
+  }else if((type === "spotify" || AudioSource.Spotify.validateTrackUrl(url)) && AudioSource.Spotify.available){
     // spotify
     basicInfo = await new AudioSource.Spotify().init(url, gotData as AudioSource.exportableSpotify);
   }else if(type === "unknown"){

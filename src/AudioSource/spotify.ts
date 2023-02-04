@@ -22,7 +22,6 @@ import type { EmbedField } from "eris";
 import type ytsr from "ytsr";
 
 import candyget from "candyget";
-import spotifyUrlInfo from "spotify-url-info";
 
 import { AudioSource } from "./audiosource";
 import { searchYouTube } from "./youtube/spawner";
@@ -30,7 +29,17 @@ import { attemptFetchForStrategies } from "./youtube/strategies";
 import Util from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
 
-const client = spotifyUrlInfo((url, opts) => candyget(url, "string", opts).then(res => ({text: () => res.body})));
+const spotifyUrlInfo = (() => {
+  try{
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    return require("spotify-url-info") as typeof import("spotify-url-info");
+  }
+  catch{
+    return null;
+  }
+})();
+
+const client = spotifyUrlInfo?.((url, opts) => candyget(url, "string", opts).then(res => ({text: () => res.body})));
 
 export class Spotify extends AudioSource {
   protected readonly _serviceIdentifer = "spotify";
@@ -69,14 +78,21 @@ export class Spotify extends AudioSource {
 
   protected extractBestItem(items:ytsr.Video[]){
     console.log("result", items);
+    const includes = (text1:string, text2:string) => {
+      text1 = text1.toLowerCase().replace(/’/g, "'");
+      text2 = text2.toLowerCase().replace(/’/g, "'");
+      return text1.includes(text2);
+    };
     const validate = (item:ytsr.Video) => {
       return (
         // 関連のないタイトルを除外
-        item.title.toLowerCase().includes(this.Title.toLowerCase()) || this.Title.toLowerCase().includes(item.title.toLowerCase())
+        includes(item.title, this.Title.toLowerCase()) || includes(this.Title, item.title.toLowerCase())
       )
       // カバー曲を除外
-      && !item.title.toLowerCase().includes("cover")
-      && !item.title.includes("カバー");
+      && !includes(item.title, "cover")
+      && !includes(item.title, "カバー")
+      && !includes(item.title, "歌ってみた")
+      && !includes(item.title, "弾いてみた");
     };
     const validItems = items.filter(validate);
     console.log("valid", validItems);
@@ -85,15 +101,15 @@ export class Spotify extends AudioSource {
     console.log("official ch", filtered);
     if(filtered[0]) return filtered[0];
     // official item 
-    filtered = validItems.filter(item => item.title.toLowerCase().includes("official") || item.title.includes("公式"));
+    filtered = validItems.filter(item => includes(item.title, "official") || includes(item.title, "公式"));
     console.log("official item", filtered);
     if(filtered[0]) return filtered[0];
     // pv /mv
-    filtered = validItems.filter(item => item.title.toLowerCase().includes("pv") || item.title.toLowerCase().includes("mv"));
+    filtered = validItems.filter(item => includes(item.title, "pv") || includes(item.title, "mv"));
     console.log("PV/MV", filtered);
     if(filtered[0]) return filtered[0];
     // no live
-    filtered = validItems.filter(item => !item.title.toLowerCase().includes("live") && !item.title.toLowerCase().includes("ライブ"));
+    filtered = validItems.filter(item => !includes(item.title, "live") && !includes(item.title, "ライブ"));
     console.log("no live", filtered);
     if(filtered[0]) return filtered[0];
     // other
@@ -136,6 +152,10 @@ export class Spotify extends AudioSource {
 
   static get client(){
     return client;
+  }
+
+  static get available(){
+    return !!client;
   }
 }
 

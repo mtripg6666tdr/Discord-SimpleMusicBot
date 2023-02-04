@@ -475,7 +475,7 @@ export class GuildDataContainer extends LogEmitter {
         this.unbindCancellation(cancellation);
       }
       await this.player.play();
-    }else if(Spotify.validatePlaylistUrl(rawArg)){
+    }else if(Spotify.validatePlaylistUrl(rawArg) && Spotify.available){
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const playlist = await Spotify.client.getData(rawArg) as Playlist;
       const tracks = playlist.trackList.reverse();
