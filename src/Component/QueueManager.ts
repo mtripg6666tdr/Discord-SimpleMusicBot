@@ -33,7 +33,7 @@ import { Util } from "../Util";
 import { getColor } from "../Util/color";
 import { FallBackNotice } from "../definition";
 
-export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"unknown";
+export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"spotify"|"unknown";
 /**
  * サーバーごとのキューを管理するマネージャー。
  * キューの追加および削除などの機能を提供します。
@@ -298,6 +298,8 @@ export class QueueManager extends ServerManagerBase {
         ;
         if(info.basicInfo.isYouTube() && info.basicInfo.IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
+        }else if(info.basicInfo.isSpotify()){
+          embed.addField(":warning:注意", "Spotifyのタイトルは正しく再生されない場合があります");
         }
         const lastReply = await msg.edit({
           content: "",

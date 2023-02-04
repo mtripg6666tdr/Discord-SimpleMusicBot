@@ -60,9 +60,21 @@ export abstract class AudioSource {
   // データをエクスポート
   abstract exportData():exportableCustom;
 
-  isYouTube():this is Sources.YouTube{return this.ServiceIdentifer === "youtube";}
-  isSoundCloudS():this is Sources.SoundCloudS{return this.ServiceIdentifer === "soundcloud";}
-  isNicoNicoS():this is Sources.NicoNicoS{return this.ServiceIdentifer === "niconico";}
+  isYouTube(): this is Sources.YouTube{
+    return this.ServiceIdentifer === "youtube";
+  }
+
+  isSoundCloudS(): this is Sources.SoundCloudS{
+    return this.ServiceIdentifer === "soundcloud";
+  }
+  
+  isNicoNicoS(): this is Sources.NicoNicoS{
+    return this.ServiceIdentifer === "niconico";
+  }
+
+  isSpotify(): this is Sources.Spotify{
+    return this.ServiceIdentifer === "spotify";
+  }
 
   isUnseekable(){
     return this.isSoundCloudS() || this.isNicoNicoS();

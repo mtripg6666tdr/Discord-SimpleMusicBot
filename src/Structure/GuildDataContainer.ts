@@ -18,11 +18,12 @@
 
 import type { AudioEffect } from "./AudioEffect";
 import type { YmxFormat } from "./YmxFormat";
-import type { exportableCustom } from "../AudioSource";
+import type { exportableCustom, exportableSpotify } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { exportableStatuses } from "../Component/backupper";
 import type { MusicBotBase } from "../botBase";
 import type { Message, VoiceChannel, VoiceConnection } from "eris";
+import type { Playlist } from "spotify-url-info";
 
 import { LockObj, lock } from "@mtripg6666tdr/async-lock";
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
@@ -33,6 +34,7 @@ import * as ytpl from "ytpl";
 
 import { LogEmitter } from "./LogEmitter";
 import { YmxVersion } from "./YmxFormat";
+import { Spotify } from "../AudioSource";
 import { SoundCloudS } from "../AudioSource";
 import { PageToggle } from "../Component/PageToggle";
 import { PlayManager } from "../Component/PlayManager";
@@ -361,14 +363,14 @@ export class GuildDataContainer extends LogEmitter {
    * メッセージからストリームを判定してキューに追加し、状況に応じて再生を開始します
    * @param first キューの先頭に追加するかどうか
    */
-  async playFromURL(message:CommandMessage, optiont:string, first:boolean = true, cancellable:boolean = false){
+  async playFromURL(message:CommandMessage, rawArg:string, first:boolean = true, cancellable:boolean = false){
     const t = Util.time.timer.start("MusicBot#PlayFromURL");
     setTimeout(() => message.suppressEmbeds(true).catch(e => this.Log(Util.general.StringifyObject(e), "warn")), 4000);
-    if(optiont.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){
+    if(rawArg.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){
       // Discordメッセへのリンクならば
       const smsg = await message.reply("🔍メッセージを取得しています...");
       try{
-        const ids = optiont.split("/");
+        const ids = rawArg.split("/");
         const ch = this.bot.client.getChannel(ids[ids.length - 2]);
         if(!(ch instanceof TextChannel)) throw new Error("サーバーのテキストチャンネルではありません");
         const msg = await this.bot.client.getMessage(ch.id, ids[ids.length - 1]) as Message<TextChannel>;
@@ -382,14 +384,14 @@ export class GuildDataContainer extends LogEmitter {
         Util.logger.log(e, "error");
         await smsg.edit(`✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`).catch(er => this.Log(er, "error"));
       }
-    }else if(Util.fs.isAvailableRawAudioURL(optiont)){
+    }else if(Util.fs.isAvailableRawAudioURL(rawArg)){
       // オーディオファイルへの直リンク？
-      await this.queue.autoAddQueue(optiont, message.member, "custom", first, false, message.channel as TextChannel);
+      await this.queue.autoAddQueue(rawArg, message.member, "custom", first, false, message.channel as TextChannel);
       await this.player.play();
       return;
-    }else if(!optiont.includes("v=") && !optiont.includes("/channel/") && ytpl.validateID(optiont)){
+    }else if(!rawArg.includes("v=") && !rawArg.includes("/channel/") && ytpl.validateID(rawArg)){
       //違うならYouTubeプレイリストの直リンクか？
-      const id = await ytpl.getPlaylistID(optiont);
+      const id = await ytpl.getPlaylistID(rawArg);
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const result = await ytpl.default(id, {
         gl: "JP",
@@ -432,10 +434,10 @@ export class GuildDataContainer extends LogEmitter {
         this.unbindCancellation(cancellation);
       }
       await this.player.play();
-    }else if(SoundCloudS.validatePlaylistUrl(optiont)){
+    }else if(SoundCloudS.validatePlaylistUrl(rawArg)){
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const sc = new Soundcloud();
-      const playlist = await sc.playlists.getV2(optiont);
+      const playlist = await sc.playlists.getV2(rawArg);
       const cancellation = this.bindCancellation(new TaskCancellationManager());
       try{
         const index = await this.queue.processPlaylist(
@@ -473,9 +475,51 @@ export class GuildDataContainer extends LogEmitter {
         this.unbindCancellation(cancellation);
       }
       await this.player.play();
+    }else if(Spotify.validatePlaylistUrl(rawArg) && Spotify.available){
+      const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
+      const playlist = await Spotify.client.getData(rawArg) as Playlist;
+      const tracks = playlist.trackList.reverse();
+      const cancellation = this.bindCancellation(new TaskCancellationManager());
+      try{
+        const index = await this.queue.processPlaylist(
+          msg,
+          cancellation,
+          first,
+          "spotify",
+          tracks,
+          playlist.name,
+          tracks.length,
+          async (track) => {
+            return {
+              url: Spotify.getTrackUrl(track.uri),
+              title: track.title,
+              artist: track.subtitle,
+              length: Math.floor(track.duration / 1000),
+            } as exportableSpotify;
+          }
+        );
+        if(cancellation.Cancelled){
+          await msg.edit("✅キャンセルされました。");
+        }else{
+          const embed = new Helper.MessageEmbedBuilder()
+            .setTitle("✅プレイリストが処理されました")
+            .setDescription(`[${playlist.title}](${Spotify.getPlaylistUrl(playlist.uri)}) \`(${playlist.subtitle})\` \r\n${index}曲が追加されました`)
+            .setThumbnail(playlist.coverArt.sources[0].url)
+            .setFields({
+              name: ":warning:注意",
+              value: "Spotifyのタイトルは、正しく再生されない場合があります"
+            })
+            .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
+          await msg.edit({content: "", embeds: [embed.toEris()]});
+        }
+      }
+      finally{
+        this.unbindCancellation(cancellation);
+      }
+      await this.player.play();
     }else{
       try{
-        const success = await this.queue.autoAddQueue(optiont, message.member, "unknown", first, false, message.channel as TextChannel, await message.reply("お待ちください..."), null, cancellable);
+        const success = await this.queue.autoAddQueue(rawArg, message.member, "unknown", first, false, message.channel as TextChannel, await message.reply("お待ちください..."), null, cancellable);
         if(success) this.player.play();
         return;
       }

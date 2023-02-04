@@ -24,6 +24,7 @@
     "niconico-dl.js": "^1.1.3",
     "prism-media": "^1.3.4",
     "soundcloud.ts": "^0.4.9",
+    "spotify-url-info": "^3.2.3",
     "throttle-debounce": "^5.0.0",
     "tslib": "^2.5.0",
     "ytdl-core": "^4.11.2",
