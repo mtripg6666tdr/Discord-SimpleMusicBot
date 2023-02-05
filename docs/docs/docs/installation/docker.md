@@ -56,12 +56,10 @@ docker container run --mount type=bind,source="<config.jsonのパス>",target=/a
   コマンドの使用方法に関する詳細は[Dockerの公式ドキュメント](https://docs.docker.jp/engine/reference/commandline/container_stop.html)を参照してください。
 
 ## 更新
-ボットを更新するには、イメージを削除し、インスタンスを削除してから、[上の手順](#実行)にしたがって再度コンテナを作成します。
+ボットを更新するには、インスタンスを削除してから、[上の手順](#実行)にしたがって再度コンテナを作成します。
 ```bash
 # 稼働している場合は、停止します。
 docker container stop <インスタンスの名前>
 # インスタンスの削除
 docker container rm <インスタンスの名前>
-# イメージの削除
-docker image rm ghcr.io/mtripg6666tdr/discord-music-bot
 ```
