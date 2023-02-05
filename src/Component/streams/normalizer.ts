@@ -43,6 +43,7 @@ export class Normalizer extends Readable {
       });
     });
     this.origin.once("end", () => this.push(null));
+    this.origin.once("error", er => this.destroy(er));
 
     this.onDestroy = this.onDestroy.bind(this);
     this.once("close", this.onDestroy);
@@ -56,11 +57,15 @@ export class Normalizer extends Readable {
   }
 
   pauseOrigin(){
-    this.origin.pause();
+    if(!this.origin.destroyed){
+      this.origin.pause();
+    }
   }
 
   resumeOrigin(){
-    this.origin.resume();
+    if(!this.origin.destroyed){
+      this.origin.resume();
+    }
   }
 
   protected onDestroy(){
