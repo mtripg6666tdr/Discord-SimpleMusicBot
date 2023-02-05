@@ -33,6 +33,7 @@ export default class News extends BaseCommand {
       unlist: false,
       category: "playlist",
       permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはユーザーと同じボイスチャンネルに接続している",
+      shouldDefer: true,
     });
   }
 

@@ -44,6 +44,7 @@ export default class Lyrics extends BaseCommand {
         required: true
       }],
       permissionDescription: "なし",
+      shouldDefer: false,
     });
   }
 

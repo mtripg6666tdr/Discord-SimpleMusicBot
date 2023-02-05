@@ -56,6 +56,7 @@ export default class Commands extends BaseCommand {
         required: false
       }],
       permissionDescription: "なし",
+      shouldDefer: false,
     });
   }
 

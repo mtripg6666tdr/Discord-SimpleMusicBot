@@ -51,6 +51,7 @@ export default class SystemInfo extends BaseCommand {
         }
       }],
       permissionDescription: "なし",
+      shouldDefer: false,
     });
   }
 

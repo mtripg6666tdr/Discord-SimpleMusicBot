@@ -39,6 +39,7 @@ export default class Volume extends BaseCommand {
         required: false
       }],
       permissionDescription: "同じボイスチャンネルに接続",
+      shouldDefer: false,
     });
   }
 

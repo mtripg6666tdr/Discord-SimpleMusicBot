@@ -34,6 +34,7 @@ export default class Uptime extends BaseCommand {
       unlist: false,
       category: "utility",
       permissionDescription: "なし",
+      shouldDefer: false,
     });
   }
 

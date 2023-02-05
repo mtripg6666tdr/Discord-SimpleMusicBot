@@ -31,6 +31,7 @@ export default class Mltf extends BaseCommand {
       unlist: false,
       category: "playlist",
       permissionDescription: "DJロール",
+      shouldDefer: false,
     });
   }
 

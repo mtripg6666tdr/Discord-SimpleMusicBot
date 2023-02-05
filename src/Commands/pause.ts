@@ -31,6 +31,7 @@ export default class Pause extends BaseCommand {
       unlist: false,
       category: "player",
       permissionDescription: "同じボイスチャンネルに接続",
+      shouldDefer: false,
     });
   }
   

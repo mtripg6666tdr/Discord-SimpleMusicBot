@@ -32,22 +32,22 @@ export { CommandArgs } from "../Structure/Command";
 export abstract class BaseCommand {
   abstract run(message:CommandMessage, options:Readonly<CommandArgs>):Promise<void>;
   
-  protected readonly _name: string;
+  protected readonly _name:string;
   public get name(){
     return this._name;
   }
 
-  protected readonly _alias: Readonly<string[]>;
+  protected readonly _alias:Readonly<string[]>;
   public get alias(){
     return this._alias;
   }
 
-  protected readonly _description: string = null;
+  protected readonly _description:string = null;
   public get description(){
     return this._description;
   }
 
-  protected readonly _unlist: boolean;
+  protected readonly _unlist:boolean;
   public get unlist(){
     return this._unlist;
   }
@@ -65,6 +65,11 @@ export abstract class BaseCommand {
   protected readonly _category:string = null;
   public get category(){
     return this._category;
+  }
+
+  protected readonly _shouldDefer:boolean = false;
+  public get shouldDefer(){
+    return this._shouldDefer;
   }
 
   protected readonly _argument:Readonly<SlashCommandArgument[]> = null;
@@ -85,6 +90,7 @@ export abstract class BaseCommand {
     this._name = opts.name;
     this._alias = opts.alias;
     this._unlist = opts.unlist;
+    this._shouldDefer = opts.shouldDefer;
     if(!this._unlist){
       if(!this.asciiName) throw new Error("Command has not ascii name");
       const { description, examples, usage, category, argument, permissionDescription } = opts as ListCommandWithArgumentsInitializeOptions;

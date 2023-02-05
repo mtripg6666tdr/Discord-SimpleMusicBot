@@ -39,6 +39,7 @@ export default class Play extends BaseCommand {
         required: false
       }],
       permissionDescription: "なし",
+      shouldDefer: true,
     });
   }
 

@@ -31,6 +31,7 @@ export default class OnceLoop extends BaseCommand {
       unlist: false,
       category: "player",
       permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはユーザーと同じボイスチャンネルに接続している",
+      shouldDefer: false,
     });
   }
 

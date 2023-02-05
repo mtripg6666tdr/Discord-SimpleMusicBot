@@ -25,6 +25,7 @@ export default class Searchb extends SearchBase<string[]> {
       name: "searchb",
       alias: ["seb", "sb"],
       unlist: true,
+      shouldDefer: true,
     });
   }
 

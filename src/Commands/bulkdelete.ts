@@ -42,7 +42,8 @@ export default class BulkDelete extends BaseCommand {
           required: true,
         }
       ],
-      permissionDescription: "メッセージ管理権"
+      permissionDescription: "メッセージ管理権",
+      shouldDefer: false,
     });
   }
 

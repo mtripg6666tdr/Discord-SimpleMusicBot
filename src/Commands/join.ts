@@ -32,6 +32,7 @@ export default class Join extends BaseCommand {
       unlist: false,
       category: "voice",
       permissionDescription: "なし",
+      shouldDefer: false,
     });
   }
 

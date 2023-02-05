@@ -42,6 +42,7 @@ export default class Thumbnail extends BaseCommand {
         required: false
       }],
       permissionDescription: "なし",
+      shouldDefer: false,
     });
   }
 

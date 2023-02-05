@@ -44,6 +44,7 @@ export default class Frame extends BaseCommand {
         required: false
       }],
       permissionDescription: "同じボイスチャンネルに接続",
+      shouldDefer: false,
     });
   }
 

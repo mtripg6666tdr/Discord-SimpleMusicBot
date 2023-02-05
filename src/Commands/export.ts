@@ -32,6 +32,7 @@ export default class Export extends BaseCommand {
       unlist: false,
       category: "playlist",
       permissionDescription: "なし",
+      shouldDefer: false,
     });
   }
 

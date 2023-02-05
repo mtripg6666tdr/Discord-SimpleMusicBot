@@ -31,6 +31,7 @@ export default class Reset extends BaseCommand {
       unlist: false,
       category: "utility",
       permissionDescription: "サーバーの管理権限",
+      shouldDefer: false,
     });
   }
 
