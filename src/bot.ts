@@ -300,6 +300,9 @@ export class MusicBot extends MusicBotBase {
           // 無視して返却
           return;
         }
+        if(command.name === "再生"){
+          await interaction.defer();
+        }
         // メッセージライクに解決してコマンドメッセージに 
         const commandMessage = CommandMessage.createFromInteraction(interaction as discord.CommandInteraction<discord.GuildTextableWithThread>);
         // プレフィックス更新
