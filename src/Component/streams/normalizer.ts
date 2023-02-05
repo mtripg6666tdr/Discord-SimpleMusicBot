@@ -43,6 +43,11 @@ export class Normalizer extends Readable {
       });
     });
     this.origin.once("end", () => this.push(null));
+    this.origin.once("error", er => this.destroy(er));
+
+    this.onDestroy = this.onDestroy.bind(this);
+    this.once("close", this.onDestroy);
+    this.once("end", this.onDestroy);
   }
 
   override _read(){
@@ -52,10 +57,22 @@ export class Normalizer extends Readable {
   }
 
   pauseOrigin(){
-    this.origin.pause();
+    if(!this.origin.destroyed){
+      this.origin.pause();
+    }
   }
 
   resumeOrigin(){
-    this.origin.resume();
+    if(!this.origin.destroyed){
+      this.origin.resume();
+    }
+  }
+
+  protected onDestroy(){
+    this.off("close", this.onDestroy);
+    this.off("end", this.onDestroy);
+    if(!this.origin.destroyed){
+      this.origin.destroy();
+    }
   }
 }
