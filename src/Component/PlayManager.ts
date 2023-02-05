@@ -175,6 +175,9 @@ export class PlayManager extends ServerManagerBase {
       const now = new Date();
       return `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`;
     };
+    if(this.detailedLog && !fs.existsSync(path.join(__dirname, "../../logs"))){
+      fs.mkdirSync(path.join(__dirname, "../../logs"));
+    }
     const logStream = this.detailedLog && fs.createWriteStream(path.join(__dirname, `../../logs/${filename}`));
     const log = logStream ? (content:string) => {
       logStream.write(content + "\r\n");
