@@ -61,3 +61,4 @@ jobs:
           cache-to: type=gha,mode=max,scope=docker
           context: .
           file: ./Dockerfile
+          labels: ${{ steps.meta.outputs.labels }}
