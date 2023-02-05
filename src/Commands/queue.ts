@@ -75,8 +75,8 @@ export default class Queue extends BaseCommand {
         fields.push({
           name: i !== 0 ? i.toString() : options.server.player.isPlaying ? "現在再生中" : "再生待ち",
           value: [
-            `[${q.basicInfo.Title}](${q.basicInfo.Url}) \r\n`,
-            `長さ: \`${q.basicInfo.isYouTube() && q.basicInfo.LiveStream ? "ライブストリーム" : `${min}:${sec}`} \` \r\n`,
+            `[${q.basicInfo.Title}](${q.basicInfo.Url})`,
+            `長さ: \`${q.basicInfo.isYouTube() && q.basicInfo.LiveStream ? "ライブストリーム" : `${min}:${sec}`} \``,
             `リクエスト: \`${q.additionalInfo.addedBy.displayName}\` `,
             q.basicInfo.npAdditional(),
           ].join("\r\n")
