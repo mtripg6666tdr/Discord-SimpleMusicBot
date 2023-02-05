@@ -42,10 +42,20 @@ export default class OnceLoop extends BaseCommand {
     options.server.updateBoundChannel(message);
     if(options.server.queue.onceLoopEnabled){
       options.server.queue.onceLoopEnabled = false;
-      message.reply(":repeat_one:ワンスループを無効にしました:x:").catch(e => Util.logger.log(e, "error"));
+      message.reply({
+        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:ワンスループを無効にしました:x:`,
+        allowedMentions: {
+          users: false,
+        },
+      }).catch(e => Util.logger.log(e, "error"));
     }else{
       options.server.queue.onceLoopEnabled = true;
-      message.reply(":repeat_one:ワンスループを有効にしました:o:").catch(e => Util.logger.log(e, "error"));
+      message.reply({
+        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:ワンスループを無効にしました:x:`,
+        allowedMentions: {
+          users: false,
+        },
+      }).catch(e => Util.logger.log(e, "error"));
     }
   }
 }

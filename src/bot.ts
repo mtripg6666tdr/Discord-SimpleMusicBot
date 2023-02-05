@@ -300,10 +300,8 @@ export class MusicBot extends MusicBotBase {
           // 無視して返却
           return;
         }
-        // 遅延リプライ
-        await interaction.defer();
         // メッセージライクに解決してコマンドメッセージに 
-        const commandMessage = CommandMessage.createFromInteraction(interaction) as CommandMessage;
+        const commandMessage = CommandMessage.createFromInteraction(interaction as discord.CommandInteraction<discord.GuildTextableWithThread>);
         // プレフィックス更新
         server.updatePrefix(commandMessage);
         // コマンドを実行
@@ -375,8 +373,10 @@ export class MusicBot extends MusicBotBase {
             default:
               return;
           }
-          const commandMessage = CommandMessage.createFromMessageWithParsed(interaction.message as discord.Message<discord.TextChannel>, "command", [], "");
-          CommandManager.instance.resolve(command)?.run(commandMessage, this.createCommandRunnerArgs(commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
+          const commandMessage = CommandMessage.createFromInteraction(interaction as discord.ComponentInteraction<discord.GuildTextableWithThread>, command, [], "") as CommandMessage;
+          const args = this.createCommandRunnerArgs(commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions);
+          args.includeMention = true;
+          CommandManager.instance.resolve(command)?.run(commandMessage, args);
         }else{
           const updateEffectPanel = () => {
             const mes = interaction.message;
@@ -551,7 +551,8 @@ export class MusicBot extends MusicBotBase {
       server: this.guildData.get(guildId),
       rawArgs: optiont,
       client: this._client,
-      initData: this.initData.bind(this)
+      initData: this.initData.bind(this),
+      includeMention: false,
     };
   }
 }

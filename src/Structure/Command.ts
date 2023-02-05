@@ -100,4 +100,8 @@ export interface CommandArgs {
    * @param channelid チャンネルID
    */
   initData: (guildid:string, channelid:string) => void;
+  /**
+   * メンションをメッセージに含めるか
+   */
+  includeMention: boolean;
 }

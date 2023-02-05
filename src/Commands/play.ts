@@ -56,7 +56,12 @@ export default class Play extends BaseCommand {
     // 一時停止されてるね
     if(options.rawArgs === "" && server.player.isPaused){
       server.player.resume();
-      await message.reply(":arrow_forward: 再生を再開します。").catch(e => Util.logger.log(e, "error"));
+      await message.reply({
+        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:arrow_forward: 再生を再開します。`,
+        allowedMentions: {
+          users: false,
+        },
+      }).catch(e => Util.logger.log(e, "error"));
       return;
     }
     // 引数ついてたらそれ優先

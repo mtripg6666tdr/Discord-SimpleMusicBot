@@ -44,7 +44,12 @@ export default class Rewind extends BaseCommand {
       message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
     }else{
       options.server.player.rewind();
-      message.reply(":rewind:再生中の楽曲を頭出ししました:+1:").catch(e => Util.logger.log(e, "error"));
+      message.reply({
+        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:rewind:再生中の楽曲を頭出ししました:+1:`,
+        allowedMentions: {
+          users: false,
+        },
+      }).catch(e => Util.logger.log(e, "error"));
     }
   }
 }
