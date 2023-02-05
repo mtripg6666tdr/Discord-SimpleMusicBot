@@ -60,12 +60,16 @@ export default class Skip extends BaseCommand {
         }
         return;
       }
-      const response = await message.reply(":ok: スキップしています");
       const title = item.basicInfo.Title;
       server.player.stop();
       await server.queue.next();
       await server.player.play();
-      response.edit(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => Util.logger.log(e, "error"));
+      await message.reply({
+        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:track_next: \`${title}\`をスキップしました:white_check_mark:`,
+        allowedMentions: {
+          users: false,
+        },
+      }).catch(e => Util.logger.log(e, "error"));
     }
     catch(e){
       Util.logger.log(e, "error");

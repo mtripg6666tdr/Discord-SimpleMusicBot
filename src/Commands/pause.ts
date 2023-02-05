@@ -51,6 +51,11 @@ export default class Pause extends BaseCommand {
     }
     // 停止しま～す
     options.server.player.pause();
-    message.reply(":pause_button: 一時停止しました").catch(e => Util.logger.log(e, "error"));
+    message.reply({
+      content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:pause_button: 一時停止しました`,
+      allowedMentions: {
+        users: false,
+      },
+    }).catch(e => Util.logger.log(e, "error"));
   }
 }
