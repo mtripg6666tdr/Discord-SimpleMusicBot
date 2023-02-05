@@ -71,6 +71,9 @@ export default class Skip extends BaseCommand {
           users: false,
         },
       }).catch(e => Util.logger.log(e, "error"));
+      if(server.queue.isEmpty){
+        await server.player.onQueueEmpty();
+      }
     }
     catch(e){
       Util.logger.log(e, "error");

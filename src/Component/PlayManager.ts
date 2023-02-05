@@ -520,36 +520,40 @@ export class PlayManager extends ServerManagerBase {
     }
     // キューがなくなったら接続終了
     if(this.server.queue.isEmpty){
-      this.Log("Queue empty");
-      if(this.server.boundTextChannel){
-        await this.server.bot.client
-          .createMessage(this.server.boundTextChannel, ":upside_down: キューが空になりました")
-          .catch(e => Util.logger.log(e, "error"))
-        ;
-      }
-      const timer = setTimeout(() => {
-        this.off("playCalled", playHandler);
-        this.off("disconnect", playHandler);
-        this._finishTimeout = false;
-        if(!this.isPlaying && this.server.boundTextChannel){
-          this.server.bot.client
-            .createMessage(this.server.boundTextChannel, ":wave:キューが空になったため終了します")
-            .catch(e => Util.logger.log(e, "error"))
-          ;
-        }
-        this.disconnect();
-      }, 10 * 60 * 1000);
-      this._finishTimeout = true;
-      const playHandler = () => {
-        clearTimeout(timer);
-        this._finishTimeout = false;
-      };
-      this.once("playCalled", playHandler);
-      this.once("disconnect", playHandler);
+      await this.onQueueEmpty();
     // なくなってないなら再生開始！
     }else{
       this.play();
     }
+  }
+
+  async onQueueEmpty(){
+    this.Log("Queue empty");
+    if(this.server.boundTextChannel){
+      await this.server.bot.client
+        .createMessage(this.server.boundTextChannel, ":upside_down: キューが空になりました")
+        .catch(e => Util.logger.log(e, "error"))
+      ;
+    }
+    const timer = setTimeout(() => {
+      this.off("playCalled", playHandler);
+      this.off("disconnect", playHandler);
+      this._finishTimeout = false;
+      if(!this.isPlaying && this.server.boundTextChannel){
+        this.server.bot.client
+          .createMessage(this.server.boundTextChannel, ":wave:キューが空になったため終了します")
+          .catch(e => Util.logger.log(e, "error"))
+        ;
+      }
+      this.disconnect();
+    }, 10 * 60 * 1000);
+    this._finishTimeout = true;
+    const playHandler = () => {
+      clearTimeout(timer);
+      this._finishTimeout = false;
+    };
+    this.once("playCalled", playHandler);
+    this.once("disconnect", playHandler);
   }
 
   async onStreamFailed(){
@@ -604,6 +608,7 @@ interface PlayManagerEvents {
   pause: [];
   resume: [];
   rewind: [];
+  empty: [];
   error: [error:Error];
   all: [...any[]];
 }
