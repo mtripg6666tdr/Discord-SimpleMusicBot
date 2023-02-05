@@ -80,6 +80,7 @@ export default class Search extends SearchBase<ytsr.Result> {
         required: true
       }],
       permissionDescription: "ボットがボイスチャンネルに接続中ならば、ボットがどのボイスチャンネルにも接続していない、またはユーザーと同じボイスチャンネルに接続していること。どこにも接続していなければ特に権限必要なし。",
+      shouldDefer: true,
     });
   }
 

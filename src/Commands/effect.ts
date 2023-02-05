@@ -32,6 +32,7 @@ export default class Effect extends BaseCommand {
       unlist: false,
       category: "player",
       permissionDescription: "なし",
+      shouldDefer: false,
     });
   }
 

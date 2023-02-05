@@ -44,6 +44,7 @@ export default class Mv extends BaseCommand {
         required: true
       }],
       permissionDescription: "DJロール",
+      shouldDefer: false,
     });
   }
 

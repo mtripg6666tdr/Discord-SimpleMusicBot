@@ -40,6 +40,7 @@ export default class Invoke extends BaseCommand {
       usage: "invoke <コマンド>",
       examples: "invoke play 夜に駆ける",
       permissionDescription: "実行するコマンドの権限による",
+      shouldDefer: true,
     });
   }
 

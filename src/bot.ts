@@ -300,7 +300,8 @@ export class MusicBot extends MusicBotBase {
           // 無視して返却
           return;
         }
-        if(command.name === "再生"){
+        // 応答遅延するべきコマンドならば遅延
+        if(command.shouldDefer){
           await interaction.defer();
         }
         // メッセージライクに解決してコマンドメッセージに 

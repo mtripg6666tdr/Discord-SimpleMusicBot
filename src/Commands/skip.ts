@@ -30,7 +30,8 @@ export default class Skip extends BaseCommand {
       description: "現在再生中の曲をスキップします。",
       unlist: false,
       category: "player",
-      permissionDescription: "削除対象の楽曲を追加した人。要件を満たしていなければ投票を開始します"
+      permissionDescription: "削除対象の楽曲を追加した人。要件を満たしていなければ投票を開始します",
+      shouldDefer: false,
     });
   }
 

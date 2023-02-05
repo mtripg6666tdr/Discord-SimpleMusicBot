@@ -43,6 +43,7 @@ export default class Import extends BaseCommand {
         required: true
       }],
       permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはコマンドの実行者と同じボイスチャンネルにいる",
+      shouldDefer: false,
     });
   }
 

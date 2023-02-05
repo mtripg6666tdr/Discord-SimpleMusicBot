@@ -39,6 +39,7 @@ export default class Seek extends BaseCommand {
         required: true
       }],
       permissionDescription: "同じボイスチャンネルに接続",
+      shouldDefer: false,
     });
   }
 

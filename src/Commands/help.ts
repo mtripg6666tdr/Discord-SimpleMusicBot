@@ -35,6 +35,7 @@ export default class Help extends BaseCommand {
       unlist: false,
       category: "bot",
       permissionDescription: "なし",
+      shouldDefer: false,
     });
   }
 

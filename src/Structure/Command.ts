@@ -25,6 +25,7 @@ import type { Client } from "eris";
 export type BaseCommandInitializeOptions = {
   name:string,
   alias:Readonly<string[]>,
+  shouldDefer:boolean,
 };
 
 export type ListCommandWithArgumentsInitializeOptions = BaseCommandInitializeOptions & {

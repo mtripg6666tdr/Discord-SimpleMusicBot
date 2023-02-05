@@ -34,6 +34,7 @@ export default class EquallyPlayback extends BaseCommand {
       unlist: false,
       category: "playlist",
       permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはコマンドの実行者がDJロールを保持",
+      shouldDefer: false,
     });
   }
 

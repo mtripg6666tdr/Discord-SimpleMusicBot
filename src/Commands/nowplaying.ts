@@ -41,6 +41,7 @@ export default class NowPlaying extends BaseCommand {
         required: false
       }],
       permissionDescription: "なし",
+      shouldDefer: false,
     });
   }
   

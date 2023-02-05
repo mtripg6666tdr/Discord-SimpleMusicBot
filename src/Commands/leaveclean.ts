@@ -32,6 +32,7 @@ export default class LeaveClean extends BaseCommand {
       unlist: false,
       category: "playlist",
       permissionDescription: "DJロール",
+      shouldDefer: false,
     });
   }
 
