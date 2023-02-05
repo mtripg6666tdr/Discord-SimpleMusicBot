@@ -70,12 +70,26 @@ export default class SystemInfo extends BaseCommand {
           .addField("Version", `\`${options.bot.version}\``, true)
           .addField("Managed embed toggles", `\`${options.embedPageToggle.length}\``, true)
           .addField("Current total transforming costs", `\`${options.bot.totalTransformingCost}\``)
+          .addField("Modules", [
+            "eris",
+            "@mtripg6666tdr/eris-command-resolver",
+          ]
+            .map(mod => {
+              try{
+                return require(`../../node_modules/${mod}/package.json`).version;
+              }
+              catch{
+                return "unknown";
+              }
+            })
+            .join("\r\n")
+          )
           .setColor(getColor("UPTIME"))
           .toEris()
       );
     }
 
-    if(message.member.id === (Util.config.adminId ?? "593758391395155978") && (options.args.includes("log") || options.args.length === 0)){
+    if(message.member.id === (Util.config.adminId || "593758391395155978") && (options.args.includes("log") || options.args.length === 0)){
       let logs:string[] = [...Util.logger.logStore.data];
       logs.reverse();
       for(let i = 0; i < logs.length; i++){
