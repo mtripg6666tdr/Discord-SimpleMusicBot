@@ -61,12 +61,12 @@ export default class Invoke extends BaseCommand {
     if(ci){
       options.args = commandInfo.options;
       options.rawArgs = commandInfo.rawOptions;
-      await ci.run(message, options).catch(er => Util.logger.log(er));
+      await ci.run(message, options).catch(er => Util.logger.log(er, "error"));
       if(!message["isMessage"] && !message["_interactionReplied"]){
-        await message.reply("実行しました").catch(er => Util.logger.log(er));
+        await message.reply("実行しました").catch(er => Util.logger.log(er, "error"));
       }
     }else{
-      await message.reply("コマンドが見つかりませんでした").catch(er => Util.logger.log(er));
+      await message.reply("コマンドが見つかりませんでした").catch(er => Util.logger.log(er, "error"));
     }
   }
 
@@ -87,6 +87,12 @@ export default class Invoke extends BaseCommand {
       case "disabledsl":
         options.server.player.detailedLog = false;
         break;
+      case "enabledslmemory":
+        options.server.player.disableDetailedLogMemory = false;
+        break;
+      case "disabledslmemory":
+        options.server.player.disableDetailedLogMemory = true;
+        break;
       case "obtainsyslog":
         message.reply({
           files: [
@@ -95,17 +101,21 @@ export default class Invoke extends BaseCommand {
               name: "log.txt"
             }
           ]
-        });
+        }).catch(er => Util.logger.log(er));
         break;
       case "obtaindsl":
-        message.reply({
-          files: [
-            {
-              file: Buffer.from(options.server.player.csvLog.join("\r\n")),
-              name: "detailed_log.csv"
-            }
-          ]
-        });
+        if(options.server.player.csvLog.length === 0){
+          message.reply(`データが見つかりません。最後のファイル名: ${options.server.player.csvLogFilename || "なし"}`).catch(er => Util.logger.log(er, "error"));
+        }else{
+          message.reply({
+            files: [
+              {
+                file: Buffer.from(options.server.player.csvLog.join("\r\n")),
+                name: "detailed_log.csv"
+              }
+            ]
+          }).catch(er => Util.logger.log(er, "error"));
+        }
         break;
       default:
         return "特別コマンドが見つかりません。";

@@ -52,7 +52,9 @@ export class PlayManager extends ServerManagerBase {
   protected _cost = 0;
   protected _finishTimeout = false;
   csvLog:string[] = [];
+  csvLogFilename = "";
   detailedLog = !!process.env.DSL_ENABLE;
+  disableDetailedLogMemory = true;
   readonly onStreamFinishedBindThis:any = null;
 
   get preparing(){
@@ -170,6 +172,7 @@ export class PlayManager extends ServerManagerBase {
     if(this.detailedLog){
       this.Log("CSV based detailed log enabled. Be careful of heavy memory usage.", "warn");
       this.Log(`CSV filename will be ${filename}`);
+      this.csvLogFilename = filename;
     }
     const getNow = () => {
       const now = new Date();
@@ -184,7 +187,7 @@ export class PlayManager extends ServerManagerBase {
     const logStream = this.detailedLog && fs.createWriteStream(path.join(__dirname, `../../logs/${filename}`));
     const log = logStream ? (content:string) => {
       logStream.write(content + "\r\n");
-      this.csvLog.push(content);
+      if(!this.disableDetailedLogMemory) this.csvLog.push(content);
     } : () => {};
     const logStreams:Readable[] = [];
     log("type,datetime,id,total,current,buf");
@@ -210,7 +213,8 @@ export class PlayManager extends ServerManagerBase {
       readable
         .on("data", chunk => {
           // @ts-expect-error 7053
-          log(`flow,${getNow()},${i},${total += chunk.length},${chunk.length},${typeof connection === "object" && connection.piper["_dataPackets"]?.reduce((a, b) => a.length + b.length, 0) || ""}`);
+          const dataPackets:Buffer[] = connection.piper["_dataPackets"];
+          log(`flow,${getNow()},${i},${total += chunk.length},${chunk.length},${dataPackets?.reduce((a, b) => a + b.length, 0) || ""}`);
           log(`stock,${getNow()},${i},,${readable.readableLength},`);
         })
         .on("close", onClose)
