@@ -260,8 +260,9 @@ export class GuildDataContainer extends LogEmitter {
   /**
    * 指定されたボイスチャンネルに参加し、接続を保存し、適切なイベントハンドラを設定します。
    * @param channelId 接続先のボイスチャンネルのID
+   * @internal
    */
-  protected async _joinVoiceChannel(channelId:string){
+  async _joinVoiceChannel(channelId:string){
     const connection = await this.bot.client.joinVoiceChannel(channelId, {
       selfDeaf: true,
     });
