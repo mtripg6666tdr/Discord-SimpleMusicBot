@@ -136,11 +136,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     //              2                     0.5                      1.5
     // Total: 5
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM (cost: 5)`);
-    const info = streamInfo.type === "url" ? {
-      ...convertUrlStreamInfoToReadableStreamInfo(streamInfo),
-      type: "readable",
-    } as const : streamInfo;
-    const ffmpegPCM = transformThroughFFmpeg(info, bitrate, effects, seek, "pcm");
+    const ffmpegPCM = transformThroughFFmpeg(streamInfo, bitrate, effects, seek, "pcm");
     const passThrough = createPassThrough({
       highWaterMark: 1 * 1024 * 1024,
     });
@@ -153,7 +149,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       stream: passThrough,
       streamType: "pcm",
       cost: 5,
-      streams: [info.stream, ffmpegPCM, passThrough],
+      streams: [streamInfo.type === "readable" ? streamInfo.stream : undefined, ffmpegPCM, passThrough].filter(d => d),
     };
   }
 }
