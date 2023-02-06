@@ -64,4 +64,4 @@ jobs:
           file: ./Dockerfile
           outputs: >-
             type=oci,
-            name=target
+            name=target,
