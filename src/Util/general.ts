@@ -89,7 +89,10 @@ export function createPassThrough(opts:TransformOptions = {}):PassThrough{
   const id = Date.now();
   log(`[PassThrough] initialized (id: ${id})`, "debug");
   const stream = new PassThrough(Object.assign({
-    highWaterMark: 1024 * 256
+    highWaterMark: 1024 * 256,
+    allowHalfOpen: false,
+    emitClose: true,
+    autoDestroy: true,
   }, opts));
   stream._destroy = () => {
     // for debug purpose

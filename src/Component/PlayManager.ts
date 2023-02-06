@@ -210,17 +210,15 @@ export class PlayManager extends ServerManagerBase {
           }
         }
       };
-      readable
-        .on("data", chunk => {
-          // @ts-expect-error 7053
-          const dataPackets:Buffer[] = connection.piper["_dataPackets"];
-          log(`flow,${getNow()},${i},${total += chunk.length},${chunk.length},${dataPackets?.reduce((a, b) => a + b.length, 0) || ""}`);
-          log(`stock,${getNow()},${i},,${readable.readableLength},`);
-        })
-        .on("close", onClose)
-        .on("end", onClose)
-        .on("error", er => log(`error,${new Date().toLocaleString()},${i},${er}`))
-      ;
+      readable.on("data", chunk => {
+        // @ts-expect-error 7053
+        const dataPackets:Buffer[] = connection.piper["_dataPackets"];
+        log(`flow,${getNow()},${i},${total += chunk.length},${chunk.length},${dataPackets?.reduce((a, b) => a + b.length, 0) || ""}`);
+        log(`stock,${getNow()},${i},,${readable.readableLength},`);
+      });
+      readable.on("close", onClose);
+      readable.on("end", onClose);
+      readable.on("error", er => log(`error,${new Date().toLocaleString()},${i},${er}`));
     };
     // ここまで
 
@@ -343,14 +341,14 @@ export class PlayManager extends ServerManagerBase {
         }).catch(e => Util.logger.log(e, "error"));
         const removeControls = () => {
           this.off("playCompleted", removeControls);
-          this.off("error", removeControls);
+          this.off("handledError", removeControls);
           this.off("stop", removeControls);
           mes.edit({
             components: []
           }).catch(er => this.Log(er, "error"));
         };
         this.once("playCompleted", removeControls);
-        this.once("error", removeControls);
+        this.once("handledError", removeControls);
         this.once("stop", removeControls);
       }
     }
@@ -475,15 +473,26 @@ export class PlayManager extends ServerManagerBase {
 
   handleError(er:any){
     Util.logger.log("Error", "error");
-    this.emit("error", er);
+    this.emit("handledError", er);
     if(er){
       Util.logger.log(Util.general.StringifyObject(er), "error");
       if(Util.config.debug){
         console.error(er);
       }
     }
-    this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
-    this.onStreamFailed();
+    if(er instanceof Error && er.message.includes("1006")){
+      setImmediate(() => {
+        this.server._joinVoiceChannel(this.server.connection.channelID)
+          .then(() => {
+            this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
+            this.onStreamFailed();
+          })
+        ;
+      });
+    }else{
+      this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
+      this.onStreamFailed();
+    }
   }
 
   resetError(){
@@ -533,6 +542,7 @@ export class PlayManager extends ServerManagerBase {
 
   async onQueueEmpty(){
     this.Log("Queue empty");
+    this.destroyStream();
     if(this.server.boundTextChannel){
       await this.server.bot.client
         .createMessage(this.server.boundTextChannel, ":upside_down: キューが空になりました")
@@ -613,6 +623,6 @@ interface PlayManagerEvents {
   resume: [];
   rewind: [];
   empty: [];
-  error: [error:Error];
+  handledError: [error:Error];
   all: [...any[]];
 }

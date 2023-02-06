@@ -45,9 +45,9 @@ export class Normalizer extends Readable {
     this.origin.once("end", () => this.push(null));
     this.origin.once("error", er => this.destroy(er));
 
-    this.onDestroy = this.onDestroy.bind(this);
-    this.once("close", this.onDestroy);
-    this.once("end", this.onDestroy);
+    this._onDestroy = this._onDestroy.bind(this);
+    this.once("close", this._onDestroy);
+    this.once("end", this._onDestroy);
   }
 
   override _read(){
@@ -57,22 +57,32 @@ export class Normalizer extends Readable {
   }
 
   pauseOrigin(){
-    if(!this.origin.destroyed){
+    if(this.origin && !this.origin.destroyed){
       this.origin.pause();
     }
   }
 
   resumeOrigin(){
-    if(!this.origin.destroyed){
+    if(this.origin && !this.origin.destroyed){
       this.origin.resume();
     }
   }
 
-  protected onDestroy(){
-    this.off("close", this.onDestroy);
-    this.off("end", this.onDestroy);
-    if(!this.origin.destroyed){
-      this.origin.destroy();
+  protected _onDestroy(){
+    this.off("close", this._onDestroy);
+    this.off("end", this._onDestroy);
+    if(this.origin){
+      if(!this.origin.destroyed){
+        this.origin.destroy();
+      }
+      this.origin = null;
+      try{
+        // @ts-expect-error 2339
+        this._readableState?.buffer.clear();
+        // @ts-expect-error 2339
+        this._readableState?.length = 0;
+      }
+      catch{/* empty */}
     }
   }
 }

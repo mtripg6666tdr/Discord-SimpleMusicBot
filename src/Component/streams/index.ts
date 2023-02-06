@@ -83,9 +83,9 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       highWaterMark: 1 * 1024 * 1024,
     });
     ffmpeg
-      .on("error", e => destroyStream(passThrough, e))
+      .once("error", e => destroyStream(passThrough, e))
       .pipe(passThrough)
-      .on("close", () => destroyStream(ffmpeg))
+      .once("close", () => destroyStream(ffmpeg))
     ;
     return {
       stream: passThrough,
@@ -108,15 +108,15 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     });
     const passThrough = createPassThrough();
     rawStream.stream
-      .on("error", e => destroyStream(demuxer, e))
+      .once("error", e => destroyStream(demuxer, e))
       .pipe(demuxer)
-      .on("error", e => destroyStream(decoder, e))
-      .on("close", () => destroyStream(rawStream.stream))
+      .once("error", e => destroyStream(decoder, e))
+      .once("close", () => destroyStream(rawStream.stream))
       .pipe(decoder)
-      .on("error", e => destroyStream(passThrough, e))
-      .on("close", () => destroyStream(demuxer))
+      .once("error", e => destroyStream(passThrough, e))
+      .once("close", () => destroyStream(demuxer))
       .pipe(passThrough)
-      .on("close", () => destroyStream(decoder))
+      .once("close", () => destroyStream(decoder))
     ;
     return {
       stream: passThrough,
@@ -136,9 +136,9 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       highWaterMark: 1 * 1024 * 1024,
     });
     ffmpegPCM
-      .on("error", e => destroyStream(passThrough, e))
+      .once("error", e => destroyStream(passThrough, e))
       .pipe(passThrough)
-      .on("close", () => destroyStream(ffmpegPCM))
+      .once("close", () => destroyStream(ffmpegPCM))
     ;
     return {
       stream: passThrough,
@@ -166,6 +166,12 @@ function convertStreamInfoToReadableStreamInfo(streamInfo:UrlStreamInfo|Readable
 
 export function destroyStream(stream:Readable, error?:Error){
   if(!stream.destroyed){
+    // if stream._destroy was overwritten, callback might not be called so make sure to be called.
+    const originalDestroy = stream._destroy;
+    stream._destroy = function(er, callback){
+      originalDestroy.apply(this, [er, () => {}]);
+      callback.apply(this, [er]);
+    };
     stream.destroy(error);
   }else if(error){
     stream.emit("error", error);

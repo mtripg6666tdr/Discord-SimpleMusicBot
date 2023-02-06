@@ -59,12 +59,14 @@ export function transformThroughFFmpeg(readable:StreamInfo, bitrate:number, effe
   Util.logger.log("[FFmpeg] Passing arguments: " + args.map(arg => arg.startsWith("http") ? "<URL>" : arg).join(" "), "debug");
   const ffmpeg = new FFmpeg({args});
   if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log("[FFmpeg]" + chunk.toString(), "debug"));
-  ffmpeg.process.once("exit", () => ffmpeg.emit("close"));
+  ffmpeg.process.once("exit", () => {
+    ffmpeg.emit("close");
+  });
   if(readable.type === "readable"){
     readable.stream
-      .on("error", e => destroyStream(ffmpeg, e))
+      .once("error", e => destroyStream(ffmpeg, e))
       .pipe(ffmpeg)
-      .on("close", () => destroyStream(readable.stream))
+      .once("close", () => destroyStream(readable.stream))
     ;
   }
   return ffmpeg;
