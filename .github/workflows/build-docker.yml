@@ -62,9 +62,4 @@ jobs:
           cache-to: type=gha,mode=max,scope=docker
           context: .
           file: ./Dockerfile
-          outputs: >-
-            type=image,
-            name=target,
-            annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json.labels['org.opencontainers.image.description']) }},
-            annotation-index.org.opencontainers.image.source=${{ fromJSON(steps.meta.outputs.json.labels['org.opencontainers.image.source']) }},
-            annotation-index.org.opencontainers.image.licenses=${{ fromJSON(steps.meta.outputs.json.labels['org.opencontainers.image.licenses']) }}
+          outputs: type=image,name=target,annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json.labels['org.opencontainers.image.description']) }},annotation-index.org.opencontainers.image.source=${{ fromJSON(steps.meta.outputs.json.labels['org.opencontainers.image.source']) }},annotation-index.org.opencontainers.image.licenses=${{ fromJSON(steps.meta.outputs.json.labels['org.opencontainers.image.licenses']) }}
