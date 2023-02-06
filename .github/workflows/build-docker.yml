@@ -57,8 +57,14 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch' }}
           tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=docker
           cache-to: type=gha,mode=max,scope=docker
           context: .
           file: ./Dockerfile
-          labels: ${{ steps.meta.outputs.labels }}
+          outputs: "\
+            type=image,\
+            name=target,\
+            annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json.labels['org.opencontainers.image.description']) }}\
+            annotation-index.org.opencontainers.image.source=${{ fromJSON(steps.meta.outputs.json.labels['org.opencontainers.image.source']) }}\
+            annotation-index.org.opencontainers.image.licenses=${{ fromJSON(steps.meta.outputs.json.labels['org.opencontainers.image.licenses']) }}"
