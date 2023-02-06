@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { StreamInfo, StreamType, UrlStreamInfo } from "../../AudioSource";
+import type { ReadableStreamInfo, StreamInfo, StreamType, UrlStreamInfo } from "../../AudioSource";
 import type { Readable } from "stream";
 
 import { opus } from "prism-media";
@@ -25,12 +25,9 @@ import { transformThroughFFmpeg } from "./ffmpeg";
 import Util from "../../Util";
 import { createPassThrough } from "../../Util/general";
 
-type PlayableStreamInfo = PartialPlayableStream & {
+type PlayableStreamInfo = {
   cost:number,
   streams:Readable[],
-};
-
-type PartialPlayableStream = {
   stream:Readable,
   streamType:StreamType,
 };
@@ -66,7 +63,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     //                1
     // Total: 1
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType}) (no conversion/cost: 1)`);
-    const info = streamInfo.type === "url" ? convertUrlStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
+    const info = streamInfo.type === "url" ? convertStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
     return {
       stream: info.stream,
       streamType: "webm",
@@ -79,11 +76,8 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     //               2                      1
     // Total: 3
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Webm/Opus (cost: 3)`);
-    const info = streamInfo.type === "url" ? {
-      ...convertUrlStreamInfoToReadableStreamInfo(streamInfo),
-      type: "readable",
-    } as const : streamInfo;
-    const ffmpeg = transformThroughFFmpeg(info, bitrate, effects, seek, "ogg");
+    const info = seek > 0 ? streamInfo : convertStreamInfoToReadableStreamInfo(streamInfo);
+    const ffmpeg = transformThroughFFmpeg(info, bitrate, effects, seek, "webm");
     const passThrough = createPassThrough({
       // 1MB
       highWaterMark: 1 * 1024 * 1024,
@@ -97,15 +91,15 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       stream: passThrough,
       streamType: "webm",
       cost: 3,
-      streams: [info.stream, ffmpeg, passThrough],
+      streams: [streamInfo.type === "readable" ? streamInfo.stream : undefined, ffmpeg, passThrough].filter(d => d),
     };
-  }else if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && !effectEnabled){
+  }else if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && !effectEnabled && seek <= 0){
     // 3. volume is on and stream is webm or ogg
     // Webm/Ogg --(Demuxer)--> Opus --(Decoder)--> PCM --(VolumeTransformer)--> PCM --(Encoder)--> Opus
     //                1                  1.5                    0.5                      1.5
     // Total: 4.5
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(Demuxer)--(Decoder) --> PCM (cost: 4.5)`);
-    const rawStream = streamInfo.type === "url" ? convertUrlStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
+    const rawStream = streamInfo.type === "url" ? convertStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
     const demuxer = streamInfo.streamType === "webm" ? new opus.WebmDemuxer() : new opus.OggDemuxer();
     const decoder = new opus.Decoder({
       rate: 48000,
@@ -136,10 +130,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     //              2                     0.5                      1.5
     // Total: 5
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM (cost: 5)`);
-    const info = streamInfo.type === "url" ? {
-      ...convertUrlStreamInfoToReadableStreamInfo(streamInfo),
-      type: "readable",
-    } as const : streamInfo;
+    const info = seek > 0 ? streamInfo : convertStreamInfoToReadableStreamInfo(streamInfo);
     const ffmpegPCM = transformThroughFFmpeg(info, bitrate, effects, seek, "pcm");
     const passThrough = createPassThrough({
       highWaterMark: 1 * 1024 * 1024,
@@ -153,13 +144,17 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
       stream: passThrough,
       streamType: "pcm",
       cost: 5,
-      streams: [info.stream, ffmpegPCM, passThrough],
+      streams: [streamInfo.type === "readable" ? streamInfo.stream : undefined, ffmpegPCM, passThrough].filter(d => d),
     };
   }
 }
 
-function convertUrlStreamInfoToReadableStreamInfo(streamInfo:UrlStreamInfo):PartialPlayableStream{
+function convertStreamInfoToReadableStreamInfo(streamInfo:UrlStreamInfo|ReadableStreamInfo):ReadableStreamInfo{
+  if(streamInfo.type === "readable"){
+    return streamInfo;
+  }
   return {
+    type: "readable",
     stream: Util.web.DownloadAsReadable(streamInfo.url, streamInfo.userAgent ? {
       headers: {
         "User-Agent": streamInfo.userAgent
