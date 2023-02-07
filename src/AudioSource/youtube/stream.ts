@@ -61,7 +61,9 @@ export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoForm
 }
 
 export function createRefreshableYTLiveStream(info:ytdl.videoInfo, options:ytdl.downloadOptions, refresher:() => Promise<string>){
-  const stream = ytdl.downloadFromInfo(info, options) as Readable & {updatePlaylist: Stream["updatePlaylist"]};
+  const stream = ytdl.downloadFromInfo(info, Object.assign({
+    liveBuffer: 40000,
+  }, options)) as Readable & {updatePlaylist: Stream["updatePlaylist"]};
   let timeout:NodeJS.Timeout = null;
   stream.once("modified", () => {
     timeout = setInterval(async () => {
