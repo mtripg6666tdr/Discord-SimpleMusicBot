@@ -71,7 +71,7 @@ export function createRefreshableYTLiveStream(info:ytdl.videoInfo, options:ytdl.
         stream.updatePlaylist(await refresher());
         Util.logger.log("playlist updated");
       }
-    }, 60 * 60 * 1000);
+    }, 40 * 60 * 1000);
   });
   stream.once("close", () => {
     clearInterval(timeout);
