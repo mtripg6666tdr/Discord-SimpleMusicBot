@@ -22,6 +22,14 @@ docker pull ghcr.io/mtripg6666tdr/discord-music-bot:latest
 イメージが用意されているのは、v3.4.0以降です。  
 :::
 
+:::warning
+GitHub Packagesに公開されているパッケージのうち、`3.4.0`のようなバージョンの文字列でタグ付けされていないバージョンは、開発段階のイメージですので、使用しないでください。
+:::
+
+:::note
+イメージは、リリースノートが公開されてから、約30～40分後にビルドが完了し公開されます。
+:::
+
 ### 2. ボットの設定
 ボットを実行するには、ボットのトークンを含む各種設定が必要です。[「ボットの設定について」](./configuration)を参考に、設定を行ってください。  
 設定ファイルは適当な場所に配置します。その際はパスを控えておいてください。
@@ -56,10 +64,10 @@ docker container run --mount type=bind,source="<config.jsonのパス>",target=/a
   コマンドの使用方法に関する詳細は[Dockerの公式ドキュメント](https://docs.docker.jp/engine/reference/commandline/container_stop.html)を参照してください。
 
 ## 更新
-ボットを更新するには、インスタンスを削除してから、[上の手順](#実行)にしたがって再度コンテナを作成します。
+ボットを更新するには、コンテナを削除してから、[上の手順](#1-イメージをpull)にしたがって再度コンテナを作成します。
 ```bash
 # 稼働している場合は、停止します。
 docker container stop <インスタンスの名前>
-# インスタンスの削除
+# コンテナの削除
 docker container rm <インスタンスの名前>
 ```
