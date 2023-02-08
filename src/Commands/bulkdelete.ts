@@ -81,7 +81,7 @@ export default class BulkDelete extends BaseCommand {
       await reply.edit(messages.length + "件見つかりました。削除を実行します。");
       await options.client.deleteMessages(message.channel.id, messages.map(msg => msg.id), `${message.member.username}#${message.member.discriminator}により${count}件のメッセージの削除が要求されたため。`);
       await reply.edit(":sparkles:完了!(このメッセージは自動的に消去されます)");
-      setTimeout(() => reply.delete().catch(() => {}), 10 * 1000);
+      setTimeout(() => reply.delete().catch(() => {}), 10 * 1000).unref();
     }
     catch(er){
       Util.logger.log(er, "error");

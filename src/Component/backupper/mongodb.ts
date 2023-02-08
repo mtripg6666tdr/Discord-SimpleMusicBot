@@ -174,4 +174,9 @@ export class MongoBackupper extends Backupper {
       return null;
     }
   }
+
+  async destroy(){
+    await this.client.close();
+    this.collections = null;
+  }
 }

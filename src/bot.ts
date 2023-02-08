@@ -74,6 +74,8 @@ export class MusicBot extends MusicBotBase {
       .on("voiceChannelLeave", this.onVoiceChannelLeave.bind(this))
       .on("voiceChannelSwitch", this.onVoiceChannelSwitch.bind(this))
       .on("error", this.onError.bind(this))
+      .on("debug", this.onDebug.bind(this))
+      .on("warn", this.onWarn.bind(this))
     ;
   }
 
@@ -147,8 +149,8 @@ export class MusicBot extends MusicBotBase {
     // Set main tick
     setTimeout(() => {
       this.maintenanceTick();
-      setInterval(this.maintenanceTick.bind(this), 1 * 60 * 1000);
-    }, 10 * 1000);
+      setInterval(this.maintenanceTick.bind(this), 1 * 60 * 1000).unref();
+    }, 10 * 1000).unref();
     this.Log("Interval jobs set up successfully");
 
     // Command instance preparing
@@ -499,7 +501,7 @@ export class MusicBot extends MusicBotBase {
               this._client.createMessage(server.boundTextChannel, ":postbox: 長時間使用しなかったため、終了します").catch(e => this.Log(e, "error"));
               server.player.disconnect();
             }
-          }, 10 * 60 * 1000);
+          }, 10 * 60 * 1000).unref();
           const playHandler = () => clearTimeout(timer);
           server.player.once("playCalled", playHandler);
           server.player.once("disconnect", playHandler);
@@ -519,15 +521,23 @@ export class MusicBot extends MusicBotBase {
 
   private async onError(er:Error){
     Util.logger.log(er, "error");
-    this.Log("Attempt reconnecting after waiting for a while...");
-    await Util.general.wait(3000);
-    this.client.connect()
-      .then(() => Util.logger.log("Reconnected!"))
-      .catch(_er => {
-        this.Log(_er);
-        Util.logger.log("Reconnect attempt failed");
-      })
-    ;
+    if(er.message?.startsWith("Invalid token")){
+      this.Log("Invalid token detected. Please ensure that you set the correct token. You can also re-generate new token for your bot.");
+      process.exit(1);
+    }else{
+      this.Log("Attempt reconnecting after waiting for a while...");
+      this._client.disconnect({
+        reconnect: "auto",
+      });
+    }
+  }
+
+  private onDebug(message:string, id?:number){
+    this.Log(`${message} (ID: ${id || "NaN"})`, "debug");
+  }
+
+  private onWarn(message:string, id?:number){
+    this.Log(`${message} (ID: ${id || "NaN"})`, "warn");
   }
 
   /**
@@ -539,6 +549,19 @@ export class MusicBot extends MusicBotBase {
     this._client.connect().catch(e => this.Log(e, "error"));
     Util.logger.logStore.log = debugLog;
     if(debugLogStoreLength) Util.logger.logStore.maxLength = debugLogStoreLength;
+  }
+
+  async stop(){
+    this.Log("Shutting down the bot...");
+    this._client.removeAllListeners();
+    this._client.on("error", () => {});
+    if(this._backupper){
+      this.Log("Shutting down the db...");
+      await this._backupper.destroy();
+    }
+    this._client.disconnect({
+      reconnect: false,
+    });
   }
 
   /**

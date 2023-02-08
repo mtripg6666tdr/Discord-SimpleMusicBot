@@ -41,7 +41,7 @@ export class Normalizer extends Readable {
           this.pauseOrigin();
         }
       });
-    });
+    }).unref();
     this.origin.once("end", () => this.push(null));
     this.origin.on("error", er => this.destroy(er));
 

@@ -28,6 +28,7 @@ export type LoggerType = (content:string, level?:LogLevels)=>void;
 
 class LogStore {
   private readonly loggingStream = null as fs.WriteStream;
+  private destroyed = false;
   
   constructor(){
     if(config.debug && isMainThread){
@@ -36,19 +37,12 @@ class LogStore {
         fs.mkdirSync(path.join(__dirname, dirPath));
       }
       this.loggingStream = fs.createWriteStream(path.join(__dirname, `${dirPath}/log-${Date.now()}.log`));
-      const onExit = () => {
-        if(!this.loggingStream.destroyed){
-          this.loggingStream.write(Buffer.from(`INFO  ${new Date().toISOString()} [Logger] detect process exiting, closing stream...`));
-          this.loggingStream.destroy();
-        }
-      };
-      process.on("exit", onExit);
-      process.on("SIGINT", onExit);
     }
   }
 
   log:boolean = true;
   maxLength = 30;
+
   private readonly _data:string[] = [];
   get data():Readonly<LogStore["_data"]>{
     return this._data;
@@ -56,6 +50,7 @@ class LogStore {
   
   // eslint-disable-next-line @typescript-eslint/no-shadow
   addLog(level:LogLevels, log:string){
+    if(this.destroyed) return;
     if(level !== "debug"){
       this._data.push(`${level[0].toUpperCase()}:${log}`);
       if(this.data.length > this.maxLength){
@@ -76,6 +71,15 @@ class LogStore {
         .replace(/\r/g, "\n")
         .replace(/\n/g, "<br>")
       }\r\n`));
+    }
+  }
+
+  destroy(){
+    if(this.destroyed) return;
+    this.destroyed = true;
+    if(!this.loggingStream.destroyed){
+      this.loggingStream.write(Buffer.from(`INFO  ${new Date().toISOString()} [Logger] detect process exiting, closing stream...`));
+      this.loggingStream.destroy();
     }
   }
 }

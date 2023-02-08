@@ -51,4 +51,8 @@ export abstract class Backupper extends LogEmitter {
    * バックアップ済みのキューのデータを取得します
    */
   abstract getQueueDataFromBackup(guildids:string[]):Promise<Map<string, YmxFormat>>;
+  /**
+   * サーバーとの接続を破棄します
+   */
+  abstract destroy():void|Promise<void>;
 }

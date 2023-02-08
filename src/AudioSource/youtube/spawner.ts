@@ -26,6 +26,7 @@ import { type exportableYouTube, YouTube } from "..";
 import Util from "../../Util";
 
 const worker = isMainThread ? new Worker(path.join(__dirname, "./worker.js")).on("error", console.error) : null;
+global.workerThread = worker;
 
 export type WithId<T> = T & {id:string};
 export type spawnerJobMessage = spawnerGetInfoMessage | spawnerSearchMessage;
@@ -60,12 +61,14 @@ export type workerLoggingMessage = {
 };
 
 type jobCallback = (callback:workerMessage & {id: string}) => void;
-const jobQueue = worker && new Map<string, {
+type jobQueueContent = {
   callback: jobCallback,
   start: number,
-}>();
+};
+const jobQueue = worker && new Map<string, jobQueueContent>();
 
 if(worker){
+  worker.unref();
   worker.on("message", (message:WithId<workerMessage>) => {
     if(message.type === "log"){
       Util.logger.log(message.data, message.level);

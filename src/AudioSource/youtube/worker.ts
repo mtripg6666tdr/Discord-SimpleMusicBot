@@ -26,6 +26,8 @@ import * as ytsr from "ytsr";
 import { YouTube } from ".";
 import Util from "../../Util";
 
+parentPort.unref();
+
 function postMessage(message:workerMessage|WithId<workerMessage>){
   parentPort.postMessage(message);
 }
