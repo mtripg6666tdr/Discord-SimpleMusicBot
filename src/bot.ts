@@ -75,6 +75,7 @@ export class MusicBot extends MusicBotBase {
       .on("voiceChannelSwitch", this.onVoiceChannelSwitch.bind(this))
       .on("error", this.onError.bind(this))
       .on("debug", this.onDebug.bind(this))
+      .on("warn", this.onWarn.bind(this))
     ;
   }
 
@@ -533,6 +534,10 @@ export class MusicBot extends MusicBotBase {
 
   private onDebug(message:string, id?:number){
     this.Log(`${message} (ID: ${id || "NaN"})`, "debug");
+  }
+
+  private onWarn(message:string, id?:number){
+    this.Log(`${message} (ID: ${id || "NaN"})`, "warn");
   }
 
   /**
