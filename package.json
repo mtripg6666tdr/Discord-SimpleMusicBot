@@ -58,7 +58,7 @@
     "@discordjs/opus": "^0.8.0",
     "bufferutil": "^4.0.7",
     "ffmpeg-static": "^5.1.0",
-    "mongodb": "^4.13.0",
+    "mongodb": "^4.14.0",
     "opusscript": "^0.0.8",
     "pako": "^1.0.11",
     "play-dl": "^1.9.6",
