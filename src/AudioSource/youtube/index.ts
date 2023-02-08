@@ -30,6 +30,8 @@ import { Util } from "../../Util";
 import { SecondaryUserAgent } from "../../Util/ua";
 import { AudioSource } from "../audiosource";
 
+export * from "./spawner";
+
 const ua = SecondaryUserAgent;
 
 export class YouTube extends AudioSource {

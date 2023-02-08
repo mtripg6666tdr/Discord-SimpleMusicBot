@@ -16,65 +16,75 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { workerErrorMessage, workerMessage, workerInitSuccessMessage, workerSearchSuccessMessage, workerLoggingMessage } from "./spawner";
+import type { WithId, spawnerJobMessage, workerMessage } from "./spawner";
+import type { LogLevels } from "../../Util/log";
 
 import { parentPort } from "worker_threads";
 
 import * as ytsr from "ytsr";
 
 import { YouTube } from ".";
-// DO NOT import unnecessary module preventing from infinite spawned workers.
+import Util from "../../Util";
 
-type WithId<T> = T & {id:number};
+function postMessage(message:workerMessage|WithId<workerMessage>){
+  parentPort.postMessage(message);
+}
 
-parentPort.on("message", (value) => {
-  const data = value as workerMessage;
-  if(data && data.type === "init"){
-    const { id, url, prefetched, forceCache } = data;
-    const youtube = new YouTube(/* logger */ (content, level?) => {
-      parentPort.postMessage({
-        type: "log",
-        data: content,
-        level,
-        id,
-      } as WithId<workerLoggingMessage>);
-    });
-    youtube.init(url, prefetched, forceCache).then(() => {
-      // eslint-disable-next-line @typescript-eslint/no-shadow
-      const data = Object.assign({}, youtube);
-      delete data.logger;
-      parentPort.postMessage({
-        type: "initOk",
-        data,
-        id,
-      } as WithId<workerInitSuccessMessage>);
-    })
-      .catch((er) => {
-        parentPort.postMessage({
-          type: "error",
-          data: er,
+function logger(content:any, loglevel:LogLevels){
+  postMessage({
+    type: "log",
+    data: content,
+    level: loglevel,
+  });
+}
+
+function onMessage(message:WithId<spawnerJobMessage>){
+  if(!message){
+    return;
+  }
+  if(message.type === "init"){
+    const { id, url, prefetched, forceCache } = message;
+    const youtube = new YouTube(/* logger */ logger);
+    youtube.init(url, prefetched, forceCache)
+      .then(() => {
+        const data = Object.assign({}, youtube);
+        delete data.logger;
+        postMessage({
+          type: "initOk",
+          data,
           id,
-        } as WithId<workerErrorMessage>);
+        });
+      })
+      .catch((er) => {
+        postMessage({
+          type: "error",
+          data: Util.general.StringifyObject(er),
+          id,
+        });
       });
-  }else if(data && data.type === "search"){
-    const id = data.id;
-    ytsr.default(data.keyword, {
+  }else if(message.type === "search"){
+    const id = message.id;
+    ytsr.default(message.keyword, {
       limit: 12,
       gl: "JP",
       hl: "ja"
-    }).then((result) => {
-      parentPort.postMessage({
-        type: "searchOk",
-        data: result,
-        id
-      } as WithId<workerSearchSuccessMessage>);
     })
-      .catch((er) => {
-        parentPort.postMessage({
-          type: "error",
-          data: er,
+      .then((result) => {
+        postMessage({
+          type: "searchOk",
+          data: result,
           id
-        } as WithId<workerErrorMessage>);
-      });
+        });
+      })
+      .catch((er) => {
+        postMessage({
+          type: "error",
+          data: Util.general.StringifyObject(er),
+          id
+        });
+      })
+    ;
   }
-});
+}
+
+parentPort.on("message", onMessage);
