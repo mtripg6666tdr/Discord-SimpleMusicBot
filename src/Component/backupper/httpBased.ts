@@ -316,6 +316,10 @@ export class HttpBackupper extends Backupper {
       ;
     });
   }
+
+  destroy(){
+    /* empty */
+  }
 }
 
 type getResult = {

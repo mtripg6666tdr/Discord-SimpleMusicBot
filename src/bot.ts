@@ -541,10 +541,14 @@ export class MusicBot extends MusicBotBase {
     if(debugLogStoreLength) Util.logger.logStore.maxLength = debugLogStoreLength;
   }
 
-  stop(){
+  async stop(){
     this.Log("Shutting down the bot...");
     this._client.removeAllListeners();
     this._client.on("error", () => {});
+    if(this._backupper){
+      this.Log("Shutting down the db...");
+      await this._backupper.destroy();
+    }
     this._client.disconnect({
       reconnect: false,
     });
