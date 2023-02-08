@@ -17,6 +17,7 @@
  */
 
 import type { Stream } from "@mtripg6666tdr/m3u8stream";
+import type { IncomingMessage } from "http";
 import type { Readable } from "stream";
 
 import * as ytdl from "ytdl-core";
@@ -64,6 +65,11 @@ export function createRefreshableYTLiveStream(info:ytdl.videoInfo, options:ytdl.
   const stream = ytdl.downloadFromInfo(info, Object.assign({
     liveBuffer: 40000,
   }, options)) as Readable & {updatePlaylist: Stream["updatePlaylist"]};
+  stream.on("response", (message:IncomingMessage) => {
+    message.setTimeout(4000, () => {
+      message.destroy(new Error("ENOTFOUND"));
+    });
+  });
   let timeout:NodeJS.Timeout = null;
   stream.once("modified", () => {
     timeout = setInterval(async () => {
@@ -73,7 +79,7 @@ export function createRefreshableYTLiveStream(info:ytdl.videoInfo, options:ytdl.
         stream.updatePlaylist(await refresher());
         Util.logger.log("playlist updated");
       }
-    }, 40 * 60 * 1000);
+    }, 60 * 60 * 1000);
   });
   stream.once("close", () => {
     clearInterval(timeout);
