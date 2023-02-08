@@ -17,7 +17,6 @@ FROM base AS runner
 RUN apt-get install -y --no-install-recommends nscd
 WORKDIR /app
 COPY package.json package-lock.json ./
-COPY patches ./patches/
 RUN --mount=type=cache,target=/root/.npm npm pkg delete scripts.prepare && npm ci --omit=dev
 COPY --from=builder /app/dist /app/dist
 RUN echo DOCKER_BUILD_IMAGE>DOCKER_BUILD_IMAGE
