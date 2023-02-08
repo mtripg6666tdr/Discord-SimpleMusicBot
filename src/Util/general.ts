@@ -146,7 +146,7 @@ export function waitForEnteringState(predicate:()=>boolean, timeout:number = 10 
           resolve(Date.now() - startTime);
         }
       }
-    }, timeStep);
+    }, timeStep).unref();
   });
 }
 
@@ -155,5 +155,5 @@ export function waitForEnteringState(predicate:()=>boolean, timeout:number = 10 
  * @param time 待機時間（ミリ秒単位）
  */
 export function wait(time:number){
-  return new Promise<void>(resolve => setTimeout(resolve, time));
+  return new Promise<void>(resolve => setTimeout(resolve, time).unref());
 }

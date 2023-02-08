@@ -19,60 +19,67 @@
 import "./dotenv";
 import "./dangerouslyRequireOverride";
 
-import * as http from "http";
+import type { LogLevels } from "./Util/log";
+import type * as http from "http";
 
 import { Util } from "./Util";
 import { MusicBot } from "./bot";
-// =============
-// メインエントリ
-// =============
-Util.logger.log("[Entry] Discord-SimpleMusicBot by mtripg6666tdr");
-Util.logger.log("[Entry] This application was originally built by mtripg6666tdr and is licensed under GPLv3 or later.");
-Util.logger.log("[Entry] There is no warranty for the work, both of the original and its forks.");
-Util.logger.log("[Entry] However if you found any bugs in the original please feel free to report them by creating an issue on GitHub.");
-Util.logger.log("[Entry] Thank you for using Discord-SimpleMusicBot!");
-Util.logger.log(`[Entry] Node.js v${process.versions.node}`);
+import { createServer } from "./server";
+
+const logger = (content:any, loglevel?:LogLevels) => Util.logger.log(`[Entry]${typeof content === "string" ? content : Util.general.StringifyObject(content)}`, loglevel);
+
+logger("[Entry] Discord-SimpleMusicBot by mtripg6666tdr");
+logger("[Entry] This application was originally built by mtripg6666tdr and is licensed under GPLv3 or later.");
+logger("[Entry] There is no warranty for the work, both of the original and its forks.");
+logger("[Entry] However if you found any bugs in the original please feel free to report them by creating an issue on GitHub.");
+logger("[Entry] Thank you for using Discord-SimpleMusicBot!");
+logger(`[Entry] Node.js v${process.versions.node}`);
 
 const bot = new MusicBot(process.env.TOKEN, Boolean(Util.config.maintenance));
+let server:http.Server = null;
 
 // Webサーバーのインスタンス化
 if(Util.config.webserver){
-  http.createServer((req, res) => {
-    res.writeHead(200, { "Content-Type": "application/json" });
-    const data = {
-      status: 200,
-      message: "Discord bot is active now",
-      client: bot.client?.user ? Buffer.from(bot.client?.user.id).toString("base64") : null,
-      readyAt: bot.client?.uptime ? Buffer.from(bot.client.uptime.toString()).toString("base64") : null,
-      guilds: bot.client?.guilds.size || null,
-    };
-    Util.logger.log("[Server]Received a http request");
-    res.end(JSON.stringify(data));
-  }).listen(8081);
+  server = createServer(bot.client, Number(process.env.PORT) || 8081, Util.logger.log);
 }else{
-  Util.logger.log("[Entry] Skipping to start server");
+  logger("[Entry] Skipping to start server");
 }
 
 if(!Util.config.debug){
   // ハンドルされなかったエラーのハンドル
   process.on("uncaughtException", async (error)=>{
-    console.error(error);
+    logger(error, "error");
     if(bot.client && Util.config.errorChannel){
-      try{
-        const errorText = typeof error === "string" ? error : JSON.stringify(error);
-        await bot.client.createMessage(Util.config.errorChannel, errorText);
-      }
-      catch(e){
-        console.error(e);
-        process.exit(1);
-      }
+      await reportError(error);
     }
-  }).on("SIGINT", ()=>{
+  });
+  const onTerminated = async function(code:string){
+    logger(`${code} detected`);
+    logger("Shutting down the bot...");
+    bot.stop();
+    if(server && server.listening){
+      logger("Shutting down the server...");
+      await new Promise(resolve => server.close(resolve));
+    }
+    // 強制終了を報告
     if(bot.client && Util.config.errorChannel){
-      bot.client.createMessage(Util.config.errorChannel, "Process terminated");
+      bot.client.createMessage(Util.config.errorChannel, "Process terminated").catch(() => {});
     }
+    logger("Shutting down completed");
+  };
+  ["SIGINT", "SIGTERM", "SIGUSR2"].forEach(signal => {
+    process.on(signal, onTerminated.bind(undefined, signal));
   });
 }
 
 // ボット開始
 bot.run(true, 40);
+
+async function reportError(err:any){
+  try{
+    await bot.client.createMessage(Util.config.errorChannel, Util.general.StringifyObject(err)).catch(() => {});
+  }
+  catch(e){
+    logger(e, "error");
+  }
+}

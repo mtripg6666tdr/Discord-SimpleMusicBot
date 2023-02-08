@@ -45,7 +45,7 @@ export default class Effect extends BaseCommand {
         embeds: [embed.toEris()],
         components: [messageActions]
       });
-      setTimeout(() => reply.edit({components: []}), 5 * 60 * 1000);
+      setTimeout(() => reply.edit({components: []}), 5 * 60 * 1000).unref();
     }
     catch(e){
       Util.logger.log(e, "error");

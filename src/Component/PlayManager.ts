@@ -488,7 +488,7 @@ export class PlayManager extends ServerManagerBase {
             this.onStreamFailed();
           })
         ;
-      });
+      }).unref();
     }else{
       this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
       this.onStreamFailed();
@@ -560,7 +560,7 @@ export class PlayManager extends ServerManagerBase {
         ;
       }
       this.disconnect();
-    }, 10 * 60 * 1000);
+    }, 10 * 60 * 1000).unref();
     this._finishTimeout = true;
     const playHandler = () => {
       clearTimeout(timer);

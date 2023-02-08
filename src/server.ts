@@ -1,0 +1,36 @@
+/*
+ * Copyright 2021-2023 mtripg6666tdr
+ * 
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
+ * 
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
+ * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * If not, see <https://www.gnu.org/licenses/>.
+ */
+
+import type { Client } from "eris";
+
+import * as http from "http";
+
+export function createServer(client:Client, port:number, logger:(content:string) => void){
+  return http.createServer((_, res) => {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    const data = {
+      status: 200,
+      message: "Discord bot is active now",
+      client: client?.user ? Buffer.from(client?.user.id).toString("base64") : null,
+      readyAt: client?.uptime ? Buffer.from(client.uptime.toString()).toString("base64") : null,
+      guilds: client?.guilds.size || null,
+    };
+    logger("[Server]Received a http request");
+    res.end(JSON.stringify(data));
+  }).listen(port);
+}

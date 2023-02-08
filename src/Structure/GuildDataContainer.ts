@@ -366,7 +366,7 @@ export class GuildDataContainer extends LogEmitter {
    */
   async playFromURL(message:CommandMessage, rawArg:string, first:boolean = true, cancellable:boolean = false){
     const t = Util.time.timer.start("MusicBot#PlayFromURL");
-    setTimeout(() => message.suppressEmbeds(true).catch(e => this.Log(Util.general.StringifyObject(e), "warn")), 4000);
+    setTimeout(() => message.suppressEmbeds(true).catch(e => this.Log(Util.general.StringifyObject(e), "warn")), 4000).unref();
     if(rawArg.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){
       // Discordメッセへのリンクならば
       const smsg = await message.reply("🔍メッセージを取得しています...");
