@@ -73,14 +73,21 @@ export default class Play extends BaseCommand {
         }
       }else{
         const msg = await message.channel.createMessage("🔍検索中...");
-        const result = (await searchYouTube(options.rawArgs)).items.filter(it => it.type === "video") as ytsr.Video[];
-        if(result.length === 0){
-          await message.reply(":face_with_monocle:該当する動画が見つかりませんでした");
+        try{
+          const result = (await searchYouTube(options.rawArgs)).items.filter(it => it.type === "video") as ytsr.Video[];
+          if(result.length === 0){
+            await message.reply(":face_with_monocle:該当する動画が見つかりませんでした");
+            await msg.delete();
+            return;
+          }
+          await options.server.playFromURL(message, result[0].url, !wasConnected, options.server.queue.length >= 1);
           await msg.delete();
-          return;
         }
-        await options.server.playFromURL(message, result[0].url, !wasConnected, options.server.queue.length >= 1);
-        await msg.delete();
+        catch(e){
+          Util.logger.log(e, "error");
+          message.reply("✗内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
+          msg.delete().catch(er => Util.logger.log(er, "error"));
+        }
       }
     // 添付ファイルを確認
     }else if(message.attachments.length > 0){
