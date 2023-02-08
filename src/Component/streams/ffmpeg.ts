@@ -64,7 +64,7 @@ export function transformThroughFFmpeg(readable:StreamInfo, bitrate:number, effe
   });
   if(readable.type === "readable"){
     readable.stream
-      .once("error", e => destroyStream(ffmpeg, e))
+      .on("error", e => destroyStream(ffmpeg, e))
       .pipe(ffmpeg)
       .once("close", () => destroyStream(readable.stream))
     ;

@@ -80,7 +80,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     const ffmpeg = transformThroughFFmpeg(info, bitrate, effects, seek, "webm");
     const passThrough = createPassThrough();
     ffmpeg
-      .once("error", e => destroyStream(passThrough, e))
+      .on("error", e => destroyStream(passThrough, e))
       .pipe(passThrough)
       .once("close", () => destroyStream(ffmpeg))
     ;
@@ -105,12 +105,12 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     });
     const passThrough = createPassThrough();
     rawStream.stream
-      .once("error", e => destroyStream(demuxer, e))
+      .on("error", e => destroyStream(demuxer, e))
       .pipe(demuxer)
-      .once("error", e => destroyStream(decoder, e))
+      .on("error", e => destroyStream(decoder, e))
       .once("close", () => destroyStream(rawStream.stream))
       .pipe(decoder)
-      .once("error", e => destroyStream(passThrough, e))
+      .on("error", e => destroyStream(passThrough, e))
       .once("close", () => destroyStream(demuxer))
       .pipe(passThrough)
       .once("close", () => destroyStream(decoder))
@@ -131,7 +131,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     const ffmpegPCM = transformThroughFFmpeg(info, bitrate, effects, seek, "pcm");
     const passThrough = createPassThrough();
     ffmpegPCM
-      .once("error", e => destroyStream(passThrough, e))
+      .on("error", e => destroyStream(passThrough, e))
       .pipe(passThrough)
       .once("close", () => destroyStream(ffmpegPCM))
     ;
