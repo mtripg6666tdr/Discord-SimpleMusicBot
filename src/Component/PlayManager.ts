@@ -250,7 +250,7 @@ export class PlayManager extends ServerManagerBase {
         connection.play(normalizer, {
           format: streamType,
           inlineVolume: this.volume !== 100,
-          voiceDataTimeout: 30 * 1000
+          voiceDataTimeout: 40 * 1000
         });
         if(this.detailedLog){
           // @ts-expect-error 7053

@@ -39,6 +39,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set env vars for release
+        run: echo "DOCKER_PLATFORMS=linux/amd64,linux/arm64" >> $GITHUB_ENV
+        if: ${{ github.event_name == 'release' }}
+      
+      - name: Set env vars for others
+        run: echo "DOCKER_PLATFORMS=linux/amd64" >> $GITHUB_ENV
+        if: ${{ github.event_name != 'release' }}
+
       - name: Generate Docker meta
         uses: docker/metadata-action@v4
         id: meta
@@ -54,7 +62,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ env.DOCKER_PLATFORMS }}
           push: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

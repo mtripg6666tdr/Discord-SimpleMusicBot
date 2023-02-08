@@ -78,10 +78,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Webm/Opus (cost: 3)`);
     const info = seek > 0 ? streamInfo : convertStreamInfoToReadableStreamInfo(streamInfo);
     const ffmpeg = transformThroughFFmpeg(info, bitrate, effects, seek, "webm");
-    const passThrough = createPassThrough({
-      // 1MB
-      highWaterMark: 1 * 1024 * 1024,
-    });
+    const passThrough = createPassThrough();
     ffmpeg
       .once("error", e => destroyStream(passThrough, e))
       .pipe(passThrough)
@@ -132,9 +129,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM (cost: 5)`);
     const info = seek > 0 ? streamInfo : convertStreamInfoToReadableStreamInfo(streamInfo);
     const ffmpegPCM = transformThroughFFmpeg(info, bitrate, effects, seek, "pcm");
-    const passThrough = createPassThrough({
-      highWaterMark: 1 * 1024 * 1024,
-    });
+    const passThrough = createPassThrough();
     ffmpegPCM
       .once("error", e => destroyStream(passThrough, e))
       .pipe(passThrough)

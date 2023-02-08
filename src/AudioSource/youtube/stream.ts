@@ -17,6 +17,7 @@
  */
 
 import type { Stream } from "@mtripg6666tdr/m3u8stream";
+import type { IncomingMessage } from "http";
 import type { Readable } from "stream";
 
 import * as ytdl from "ytdl-core";
@@ -61,7 +62,19 @@ export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoForm
 }
 
 export function createRefreshableYTLiveStream(info:ytdl.videoInfo, options:ytdl.downloadOptions, refresher:() => Promise<string>){
-  const stream = ytdl.downloadFromInfo(info, options) as Readable & {updatePlaylist: Stream["updatePlaylist"]};
+  const stream = ytdl.downloadFromInfo(info, Object.assign({
+    liveBuffer: 40000,
+    requestOptions: {
+      maxRetries: 4,
+      maxReconnects: 4,
+    },
+  }, options)) as Readable & {updatePlaylist: Stream["updatePlaylist"]};
+  stream.on("response", (message:IncomingMessage) => {
+    message.setTimeout(4000, () => {
+      Util.logger.log("Segment timed out; retrying...");
+      message.destroy(new Error("ENOTFOUND"));
+    });
+  });
   let timeout:NodeJS.Timeout = null;
   stream.once("modified", () => {
     timeout = setInterval(async () => {
