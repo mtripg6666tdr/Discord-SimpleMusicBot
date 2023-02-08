@@ -16,6 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { LogLevels } from "../../Util/log";
 import type * as ytsr from "ytsr";
 
 import * as path from "path";
@@ -24,22 +25,23 @@ import { Worker, isMainThread } from "worker_threads";
 import { type exportableYouTube, YouTube } from "..";
 import Util from "../../Util";
 
-const worker = isMainThread && new Worker(path.join(__dirname, "./worker.js")).on("error", () => {});
+const worker = isMainThread ? new Worker(path.join(__dirname, "./worker.js")).on("error", console.error) : null;
 
-export type workerMessage = {id:number} & (
-  workerInitProcessMessage|workerSearchProcessMessage|workerInitSuccessMessage|workerSearchSuccessMessage|workerErrorMessage|workerLoggingMessage
-);
-export type workerInitProcessMessage = {
+export type WithId<T> = T & {id:string};
+export type spawnerJobMessage = spawnerGetInfoMessage | spawnerSearchMessage;
+export type spawnerGetInfoMessage = {
   type:"init",
   url:string,
   prefetched:exportableYouTube,
   forceCache:boolean,
 };
-export type workerSearchProcessMessage = {
+export type spawnerSearchMessage = {
   type:"search",
   keyword:string,
 };
-export type workerInitSuccessMessage = {
+export type workerMessage = workerSuccessMessage|workerErrorMessage|workerLoggingMessage;
+export type workerSuccessMessage = workerGetInfoSuccessMessage | workerSearchSuccessMessage;
+export type workerGetInfoSuccessMessage = {
   type:"initOk",
   data:YouTube,
 };
@@ -53,51 +55,68 @@ export type workerErrorMessage = {
 };
 export type workerLoggingMessage = {
   type:"log",
-  level:"log"|"error"|"warn",
+  level:LogLevels,
   data:string,
 };
 
-export function initYouTube(url:string, prefetched:exportableYouTube, forceCache?:boolean){
-  return new Promise<YouTube>((resolve, reject) => {
-    const id = (new Date()).getTime() * Math.random();
-    worker.postMessage({
-      type: "init",
-      url, prefetched, forceCache, id
-    } as workerInitProcessMessage);
-    const resolveHandler = (data:workerMessage) => {
-      if(data.id === id){
-        if(data.type === "log"){
-          Util.logger.log(data.data, data.level);
-          return;
-        }
-        if(data.type === "error"){
-          reject(data.data);
-        }else if(data.type === "initOk"){
-          resolve(Object.assign(new YouTube(), data.data));
-        }
-        worker.off("message", resolveHandler);
-      }
-    };
-    worker.addListener("message", resolveHandler);
+type jobCallback = (callback:workerMessage & {id: string}) => void;
+const jobQueue = worker && new Map<string, {
+  callback: jobCallback,
+  start: number,
+}>();
+
+if(worker){
+  worker.on("message", (message:WithId<workerMessage>) => {
+    if(message.type === "log"){
+      Util.logger.log(message.data, message.level);
+    }else if(jobQueue.has(message.id)){
+      const { callback, start } = jobQueue.get(message.id);
+      Util.logger.log(`[Spawner] Job(${message.id}) Finished (${Date.now() - start}ms)`);
+      callback(message);
+      jobQueue.delete(message.id);
+    }else{
+      Util.logger.log(`[Spawner] Invalid message received: ${message}`, "warn");
+    }
   });
 }
 
-export function searchYouTube(keyword:string){
-  return new Promise<ytsr.Result>((resolve, reject) => {
-    const id = (new Date()).getTime() * Math.random();
+function doJob(message:spawnerGetInfoMessage):Promise<workerGetInfoSuccessMessage>;
+function doJob(message:spawnerSearchMessage):Promise<workerSearchSuccessMessage>;
+function doJob(message:spawnerJobMessage):Promise<workerSuccessMessage>{
+  return new Promise((resolve, reject) => {
+    const uuid = Util.general.generateUUID();
     worker.postMessage({
-      type: "search", keyword, id
-    } as workerSearchProcessMessage);
-    const resolveHandler = (data:workerMessage) => {
-      if(data.id === id){
-        if(data.type === "error"){
-          reject(data.data);
-        }else if(data.type === "searchOk"){
-          resolve(data.data);
+      ...message,
+      id: uuid,
+    });
+    Util.logger.log(`[Spawner] Job(${uuid}) Started`);
+    jobQueue.set(uuid, {
+      start: Date.now(),
+      callback: result => {
+        if(result.type === "error"){
+          reject(result.data);
+        }else{
+          resolve(result as workerSuccessMessage);
         }
-        worker.off("message", resolveHandler);
-      }
-    };
-    worker.addListener("message", resolveHandler);
+      },
+    });
   });
+}
+
+export async function initYouTube(url:string, prefetched:exportableYouTube, forceCache?:boolean){
+  const result = await doJob({
+    type: "init",
+    url,
+    prefetched,
+    forceCache,
+  });
+  return Object.assign(new YouTube(), result.data);
+}
+
+export async function searchYouTube(keyword:string){
+  const result = await doJob({
+    type: "search",
+    keyword,
+  });
+  return result.data;
 }

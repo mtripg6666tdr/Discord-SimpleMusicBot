@@ -18,6 +18,7 @@
 
 import type { TransformOptions } from "stream";
 
+import * as crypto from "crypto";
 import * as path from "path";
 import { PassThrough } from "stream";
 
@@ -156,4 +157,21 @@ export function waitForEnteringState(predicate:()=>boolean, timeout:number = 10 
  */
 export function wait(time:number){
   return new Promise<void>(resolve => setTimeout(resolve, time).unref());
+}
+
+const UUID_TEMPLATE = "10000000-1000-4000-8000-100000000000";
+/**
+ * UUIDを生成します
+ * @returns 生成されたUUID
+ */
+export function generateUUID(){
+  if(typeof crypto.randomUUID === "function"){
+    return crypto.randomUUID();
+  }else{
+    // ref: https://www.30secondsofcode.org/js/s/uuid-generator-node
+    return UUID_TEMPLATE.replace(/[018]/g, c => {
+      const cn = Number(c);
+      return (cn ^ (crypto.randomBytes(1)[0] & (15 >> (cn / 4)))).toString(16);
+    });
+  }
 }
