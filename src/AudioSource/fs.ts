@@ -30,7 +30,7 @@ import { DefaultAudioThumbnailURL } from "../definition";
 export class FsStream extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "fs";
-  Thumnail:string = DefaultAudioThumbnailURL;
+  Thumbnail:string = DefaultAudioThumbnailURL;
 
   async init(url:string){
     this.Url = url;

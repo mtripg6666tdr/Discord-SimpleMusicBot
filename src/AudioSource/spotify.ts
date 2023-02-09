@@ -19,6 +19,7 @@
 import type { StreamInfo } from "./audiosource";
 import type { exportableCustom } from "./custom";
 import type { EmbedField } from "eris";
+import type { Track } from "spotify-url-info";
 import type ytsr from "ytsr";
 
 import candyget from "candyget";
@@ -45,7 +46,7 @@ export class Spotify extends AudioSource {
   protected readonly _serviceIdentifer = "spotify";
   protected _lengthSeconds = 0;
   protected artist = "";
-  Thumnail = DefaultAudioThumbnailURL;
+  Thumbnail:string = null;
 
   override async init(url: string, prefetched: exportableSpotify): Promise<Spotify>{
     if(!Spotify.validateTrackUrl(url)) throw new Error("Invalid url");
@@ -56,10 +57,11 @@ export class Spotify extends AudioSource {
       this.artist = prefetched.artist;
     }else{
       this.Url = url;
-      const track = (await client.getTracks(url))[0];
+      const track = await client.getData(url) as Track;
       this._lengthSeconds = Math.floor(track.duration / 1000);
       this.Title = track.name;
-      this.artist = track.artist;
+      this.artist = track.artists.map(artist => artist.name).join(", ");
+      this.Thumbnail = track.coverArt.sources[0]?.url || DefaultAudioThumbnailURL;
     }
     return this;
   }
@@ -72,7 +74,7 @@ export class Spotify extends AudioSource {
     const { result } = await attemptFetchForStrategies(Util.logger.log.bind(Util.logger), target.url, forceUrl);
     this.Title = result.info.title;
     this._lengthSeconds = result.info.length;
-    this.Thumnail = result.info.thumbnail;
+    this.Thumbnail = result.info.thumbnail;
     return result.stream;
   }
 

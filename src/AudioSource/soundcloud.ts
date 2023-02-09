@@ -30,7 +30,7 @@ export class SoundCloudS extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "soundcloud";
   Author:string;
-  Thumnail:string;
+  Thumbnail:string;
   
   async init(url:string, prefetched?:exportableSoundCloud){
     this.Url = url;
@@ -39,7 +39,7 @@ export class SoundCloudS extends AudioSource {
       this.Description = prefetched.description;
       this._lengthSeconds = prefetched.length;
       this.Author = prefetched.author;
-      this.Thumnail = prefetched.thumbnail;
+      this.Thumbnail = prefetched.thumbnail;
     }else{
       const sc = new SoundCloud();
       const info = await sc.tracks.getV2(url);
@@ -47,7 +47,7 @@ export class SoundCloudS extends AudioSource {
       this.Description = info.description;
       this._lengthSeconds = Math.floor(info.duration / 1000);
       this.Author = info.user.username;
-      this.Thumnail = info.artwork_url;
+      this.Thumbnail = info.artwork_url;
     }
     return this;
   }
@@ -92,7 +92,7 @@ export class SoundCloudS extends AudioSource {
       description: this.Description,
       length: this._lengthSeconds,
       author: this.Author,
-      thumbnail: this.Thumnail
+      thumbnail: this.Thumbnail
     };
   }
 

@@ -42,7 +42,7 @@ export class YouTube extends AudioSource {
   private cache:Cache<any, any> = null;
   ChannelName:string;
   ChannelUrl:string;
-  Thumnail:string;
+  Thumbnail:string;
   LiveStream:boolean;
   relatedVideos:exportableYouTube[] = [];
   logger: LoggerType;
@@ -124,7 +124,7 @@ export class YouTube extends AudioSource {
       length: this.LengthSeconds,
       channel: this.ChannelName,
       channelUrl: this.ChannelUrl,
-      thumbnail: this.Thumnail,
+      thumbnail: this.Thumbnail,
       isLive: this.LiveStream,
     };
   }
@@ -135,7 +135,7 @@ export class YouTube extends AudioSource {
     this._lengthSeconds = exportable.isLive ? NaN : exportable.length;
     this.ChannelName = exportable.channel;
     this.ChannelUrl = exportable.channelUrl;
-    this.Thumnail = exportable.thumbnail;
+    this.Thumbnail = exportable.thumbnail;
     this.LiveStream = exportable.isLive;
   }
 

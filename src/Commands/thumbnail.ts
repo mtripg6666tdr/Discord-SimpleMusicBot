@@ -62,7 +62,7 @@ export default class Thumbnail extends BaseCommand {
     }else if(!options.rawArgs && options.server.player.isPlaying && options.server.queue.length >= 1){
       const info = options.server.queue.get(0).basicInfo;
       embed
-        .setImage(info.Thumnail)
+        .setImage(info.Thumbnail)
         .setTitle(info.Title)
         .setDescription("URL: " + info.Url)
       ;

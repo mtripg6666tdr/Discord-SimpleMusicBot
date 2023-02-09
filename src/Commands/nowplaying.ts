@@ -76,7 +76,7 @@ export default class NowPlaying extends BaseCommand {
           (info.ServiceIdentifer === "youtube" && (info as YouTube).LiveStream) ? "(ライブストリーム)" : ` \`${min}:${sec}/${(_t === 0 ? "(不明)" : `${tmin}:${tsec}\``)}`
         }`
       )
-      .setThumbnail(info.Thumnail)
+      .setThumbnail(info.Thumbnail)
       .setFields(
         ...info.toField(
           ["long", "l", "verbose", "l", "true"].some(arg => options.args[0] === arg)
