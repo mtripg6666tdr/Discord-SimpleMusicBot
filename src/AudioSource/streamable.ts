@@ -26,7 +26,7 @@ import { DefaultAudioThumbnailURL } from "../definition";
 export class Streamable extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "streamable";
-  Thumnail = DefaultAudioThumbnailURL;
+  Thumbnail = DefaultAudioThumbnailURL;
   private streamUrl = "";
 
   async init(url:string, prefetched?:exportableStreamable){
@@ -35,13 +35,13 @@ export class Streamable extends AudioSource {
     if(!id) throw new Error("Invalid streamable url");
     if(prefetched){
       this._lengthSeconds = prefetched.length;
-      this.Thumnail = prefetched.thumbnail;
+      this.Thumbnail = prefetched.thumbnail;
       this.Title = prefetched.title;
       this.streamUrl = prefetched.streamUrl;
     }else{
       const streamInfo = await StreamableApi.getVideoDetails(id);
       this._lengthSeconds = Math.floor(streamInfo.files["mp4-mobile"].duration);
-      this.Thumnail = "https:" + streamInfo.thumbnail_url;
+      this.Thumbnail = "https:" + streamInfo.thumbnail_url;
       this.Title = streamInfo.title;
       this.streamUrl = streamInfo.files["mp4-mobile"].url;
     }
@@ -71,7 +71,7 @@ export class Streamable extends AudioSource {
     return {
       url: this.Url,
       length: this.LengthSeconds,
-      thumbnail: this.Thumnail,
+      thumbnail: this.Thumbnail,
       title: this.Title,
       streamUrl: this.streamUrl
     };

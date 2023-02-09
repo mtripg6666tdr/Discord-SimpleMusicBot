@@ -48,7 +48,7 @@ export abstract class AudioSource {
   // 曲の説明
   Description:string;
   // サムネイル
-  abstract Thumnail:string;
+  abstract Thumbnail:string;
   // 現在再生中の曲を示すEmbedField
   abstract toField(verbose:boolean):EmbedField[];
   // 再生するためのストリームをフェッチ

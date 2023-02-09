@@ -302,7 +302,7 @@ export class PlayManager extends ServerManagerBase {
             "次の曲がまだ登録されていません", true
           )
           .addField("再生待ちの曲", this.server.queue.loopEnabled ? "ループします" : (this.server.queue.length - 1) + "曲(" + Util.time.HourMinSecToString(timeFragments) + ")", true)
-          .setThumbnail(this.currentAudioInfo.Thumnail)
+          .setThumbnail(this.currentAudioInfo.Thumbnail)
         ;
         /* eslint-enable @typescript-eslint/indent */
         if(this.currentAudioInfo.ServiceIdentifer === "youtube" && (this.currentAudioInfo as YouTube).IsFallbacked){

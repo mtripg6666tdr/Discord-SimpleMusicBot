@@ -26,7 +26,7 @@ import { Util } from "../Util";
 export class Hibiki extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "hibiki";
-  Thumnail = "";
+  Thumbnail = "";
   private programId = "";
   private radioInfo:HibikiAPIResult;
   private uploadedAt = "";
@@ -37,7 +37,7 @@ export class Hibiki extends AudioSource {
     const match = this.Url.match(/^https?:\/\/hibiki-radio.jp\/description\/(?<id>.+)\/detail([/#].+)?$/);
     this.programId = match.groups.id;
     this.radioInfo = await HibikiApi.getBasicData(this.programId);
-    this.Thumnail = this.radioInfo.sp_image_url;
+    this.Thumbnail = this.radioInfo.sp_image_url;
     this.Title = this.radioInfo.episode.program_name + "(" + this.radioInfo.episode.name + ")";
     this._lengthSeconds = Math.floor(this.radioInfo.episode.video.duration);
     this.uploadedAt = this.radioInfo.episode.updated_at;

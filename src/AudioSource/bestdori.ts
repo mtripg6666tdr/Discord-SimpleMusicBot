@@ -25,7 +25,7 @@ import { Util } from "../Util";
 export class BestdoriS extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "bestdori";
-  Thumnail = "";
+  Thumbnail = "";
   Artist = "";
   Type:"anime"|"normal"|null = null;
   lyricist:string;
@@ -41,7 +41,7 @@ export class BestdoriS extends AudioSource {
     const data = bestdori.allsonginfo[this.id];
     this.Title = data.musicTitle[0];
     this.Type = data.tag;
-    this.Thumnail = BestdoriApi.getThumbnail(this.id, data.jacketImage[0]);
+    this.Thumbnail = BestdoriApi.getThumbnail(this.id, data.jacketImage[0]);
     this.Artist = bestdori.allbandinfo[data.bandId].bandName[0];
     if(prefetched){
       this._lengthSeconds = prefetched.length;

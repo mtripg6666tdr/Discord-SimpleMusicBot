@@ -27,7 +27,7 @@ import { DefaultAudioThumbnailURL } from "../definition";
 export class GoogleDrive extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "googledrive";
-  Thumnail:string = DefaultAudioThumbnailURL;
+  Thumbnail:string = DefaultAudioThumbnailURL;
 
   async init(url:string, prefetched:exportableCustom){
     if(prefetched){

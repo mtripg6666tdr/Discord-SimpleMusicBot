@@ -294,7 +294,7 @@ export class QueueManager extends ServerManagerBase {
           .addField("リクエスト", this.getDisplayNameFromMember(addedBy) ?? "不明", true)
           .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
           .addField("再生されるまでの予想時間", index === "0" ? "-" : Util.time.HourMinSecToString(timeFragments), true)
-          .setThumbnail(info.basicInfo.Thumnail)
+          .setThumbnail(info.basicInfo.Thumbnail)
         ;
         if(info.basicInfo.isYouTube() && info.basicInfo.IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);

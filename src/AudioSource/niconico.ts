@@ -30,7 +30,7 @@ export class NicoNicoS extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "niconico";
   private nico = null as NiconicoDL;
-  Thumnail = "";
+  Thumbnail = "";
   Author = "";
   Views = 0;
 
@@ -42,7 +42,7 @@ export class NicoNicoS extends AudioSource {
       this.Description = htmlToText(prefetched.description);
       this._lengthSeconds = prefetched.length;
       this.Author = prefetched.author;
-      this.Thumnail = prefetched.thumbnail;
+      this.Thumbnail = prefetched.thumbnail;
       this.Views = prefetched.views;
     }else{
       const info = await this.nico.getVideoInfo();
@@ -51,7 +51,7 @@ export class NicoNicoS extends AudioSource {
       this.Description = htmlToText(info.description);
       this._lengthSeconds = info.duration;
       this.Author = info.owner.nickname;
-      this.Thumnail = info.thumbnail.url;
+      this.Thumbnail = info.thumbnail.url;
       this.Views = info.count.view;
     }
     return this;
@@ -99,7 +99,7 @@ export class NicoNicoS extends AudioSource {
       title: this.Title,
       description: this.Description,
       author: this.Author,
-      thumbnail: this.Thumnail,
+      thumbnail: this.Thumbnail,
       views: this.Views
     };
   }
