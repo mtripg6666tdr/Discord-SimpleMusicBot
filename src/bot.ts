@@ -74,9 +74,13 @@ export class MusicBot extends MusicBotBase {
       .on("voiceChannelLeave", this.onVoiceChannelLeave.bind(this))
       .on("voiceChannelSwitch", this.onVoiceChannelSwitch.bind(this))
       .on("error", this.onError.bind(this))
-      .on("debug", this.onDebug.bind(this))
-      .on("warn", this.onWarn.bind(this))
     ;
+    if(Util.config.debug){
+      this.client
+        .on("debug", this.onDebug.bind(this))
+        .on("warn", this.onWarn.bind(this))
+      ;
+    }
   }
 
   private async onReady(){
