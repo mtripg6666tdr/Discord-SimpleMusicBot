@@ -26,7 +26,7 @@ import { debounce } from "throttle-debounce";
 import { Backupper } from ".";
 import Util from "../../Util";
 
-const { MongoClient } = (() => {
+const MongoClient = (() => {
   try{
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     return require("mongodb") as typeof import("mongodb");
@@ -34,7 +34,7 @@ const { MongoClient } = (() => {
   catch{
     return null;
   }
-})();
+})()?.MongoClient;
 
 type Collectionate<T> = T & {guildId:string};
 
