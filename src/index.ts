@@ -42,7 +42,7 @@ let server:http.Server = null;
 if(Util.config.webserver){
   server = createServer(bot.client, Number(process.env.PORT) || 8081, Util.logger.log);
 }else{
-  logger("[Entry] Skipping to start server");
+  logger("Skipping to start server");
 }
 
 if(!Util.config.debug){
