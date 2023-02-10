@@ -19,23 +19,32 @@
 import type { exportableStatuses } from ".";
 import type { GuildDataContainer, YmxFormat } from "../../Structure";
 import type { DataType, MusicBotBase } from "../../botBase";
-import type { Collection } from "mongodb";
+import type * as mongo from "mongodb";
 
-import { MongoClient } from "mongodb";
 import { debounce } from "throttle-debounce";
 
 import { Backupper } from ".";
 import Util from "../../Util";
 
+const { MongoClient } = (() => {
+  try{
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    return require("mongodb") as typeof import("mongodb");
+  }
+  catch{
+    return null;
+  }
+})();
+
 type Collectionate<T> = T & {guildId:string};
 
 export class MongoBackupper extends Backupper {
-  private readonly client:MongoClient = null;
+  private readonly client:mongo.MongoClient = null;
   private dbConnectionReady = false;
   private dbError:Error = null;
   collections: {
-    status: Collection<Collectionate<exportableStatuses>>,
-    queue: Collection<Collectionate<YmxFormat>>,
+    status: mongo.Collection<Collectionate<exportableStatuses>>,
+    queue: mongo.Collection<Collectionate<YmxFormat>>,
   } = null;
 
   static get backuppable(){
