@@ -22,4 +22,4 @@ COPY --from=builder /app/dist /app/dist
 RUN echo DOCKER_BUILD_IMAGE>DOCKER_BUILD_IMAGE
 RUN mkdir logs
 
-CMD ["/bin/bash", "-c", "service nscd start; node --dns-result-order=ipv4first dist/index.js"]
+CMD ["/bin/bash", "-c", "service nscd start; exec node --dns-result-order=ipv4first dist/index.js"]
