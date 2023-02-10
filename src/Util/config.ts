@@ -16,38 +16,68 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { Static } from "@sinclair/typebox";
+
 import * as fs from "fs";
 import * as path from "path";
 
+import { Type } from "@sinclair/typebox";
+import { TypeCompiler } from "@sinclair/typebox/compiler";
+import { Value } from "@sinclair/typebox/value";
 import CJSON from "comment-json";
-import { z } from "zod";
 
-/* eslint-disable newline-per-chained-call */
-const GuildBGMContainer = z.object({
-  voiceChannelId: z.string().regex(/^\d+$/, {message: "channelId is not a snowflake"}),
-  allowEditQueue: z.boolean(),
-  enableQueueLoop: z.boolean(),
-  items: z.array(z.string()).nonempty({message: "items cannot be empty"}),
-  volume: z.number().min(5).max(200),
-  mode: z.union([z.literal("only"), z.literal("prior"), z.literal("normal")]),
+const GuildBGMContainer = Type.Object({
+  voiceChannelId: Type.RegEx(/^\d+$/),
+  allowEditQueue: Type.Boolean(),
+  enableQueueLoop: Type.Boolean(),
+  items: Type.Array(Type.String({minLength: 1})),
+  volume: Type.Number({minimum: 5, maximum: 200}),
+  mode: Type.Union([
+    Type.Literal("only"),
+    Type.Literal("prior"),
+    Type.Literal("normal"),
+  ]),
 });
 
-const Config = z.object({
-  adminId: z.string().regex(/^\d+$/, {message: "adminId is not a snowflake"}).nullable(),
-  debug: z.boolean(),
-  errorChannel: z.string().min(1).regex(/^\d+$/, {message: "errorChannel is not a snowflake"}).nullable(),
-  maintenance: z.boolean(),
-  proxy: z.string().url("proxy value must be resolvable as url").nullable(),
-  prefix: z.string().min(1).nullish().default(">"),
-  webserver: z.boolean().optional().default(true),
-  bgm: z.record(z.string().regex(/^\d+$/, {message: "bgm object key is not a snowflake"}), GuildBGMContainer).optional(),
-  noMessageContent: z.boolean().optional().default(false),
+const Config = Type.Object({
+  adminId: Type.Union([
+    Type.RegEx(/^\d+$/),
+    Type.Null(),
+  ], {default: false}),
+  debug: Type.Boolean({default: false}),
+  errorChannel: Type.Union([
+    Type.RegEx(/^\d+$/),
+    Type.Null(),
+  ], {default: null}),
+  maintenance: Type.Boolean(),
+  proxy: Type.Union([
+    Type.RegEx(/https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+/),
+    Type.Null(),
+  ], {default: null}),
+  prefix: Type.Optional(Type.String({minLength: 1, default: ">"})),
+  webserver: Type.Optional(Type.Boolean({default: true})),
+  bgm: Type.Optional(Type.Record(Type.RegEx(/^\d+$/), GuildBGMContainer, {default: {}})),
+  noMessageContent: Type.Optional(Type.Boolean({default: false})),
 });
-/* eslint-enable newline-per-chained-call */
+
+const checker = TypeCompiler.Compile(Config);
 
 const rawConfig = fs.readFileSync(path.join(__dirname, "../../config.json"), {encoding: "utf-8"});
 
-const config = Config.parse(CJSON.parse(rawConfig, null, true));
+const config = CJSON.parse(rawConfig, null, true);
 
-export default config;
-export type GuildBGMContainerType = z.infer<typeof GuildBGMContainer>;
+const errs = [...checker.Errors(config)];
+if(errs.length > 0){
+  const er = new Error("Invalid config.json");
+  console.log(errs);
+  Object.defineProperty(er, "errors", {
+    value: errs,
+  });
+  throw er;
+}
+
+export default Object.assign(
+  Value.Create(Config),
+  config,
+) as unknown as Static<typeof Config>;
+export type GuildBGMContainerType = Static<typeof GuildBGMContainer>;
