@@ -69,7 +69,7 @@
     "test": "mocha",
     "prepare": "husky install",
     "start": "npm run build && npm run onlystart",
-    "onlystart": "node --dns-result-order=ipv4first dist/index.js",
+    "onlystart": "node dist",
     "build": "rimraf dist/ typings/ && tsc",
     "lint": "eslint .",
     "cleanup": "rimraf dist/ typings/ logs/",
