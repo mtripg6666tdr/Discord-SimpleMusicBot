@@ -51,13 +51,15 @@ const Config = Type.Object({
   ], {default: null}),
   maintenance: Type.Boolean(),
   proxy: Type.Union([
-    Type.RegEx(/https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+/),
+    Type.RegEx(/^https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+$/),
     Type.Null(),
   ], {default: null}),
   prefix: Type.Optional(Type.String({minLength: 1, default: ">"})),
   webserver: Type.Optional(Type.Boolean({default: true})),
   bgm: Type.Optional(Type.Record(Type.RegEx(/^\d+$/), GuildBGMContainer, {default: {}})),
   noMessageContent: Type.Optional(Type.Boolean({default: false})),
+  twentyFourSeven: Type.Optional(Type.Array(Type.RegEx(/^\d+$/), {default: []})),
+  alwaysTwentyFourSeven: Type.Optional(Type.Boolean({default: false})),
 });
 
 const checker = TypeCompiler.Compile(Config);
