@@ -30,7 +30,7 @@
     "ytdl-core": "^4.11.2",
     "ytpl": "^2.3.0",
     "ytsr": "^3.8.0",
-    "zod": "^3.20.5"
+    "zod": "^3.20.6"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.2",
