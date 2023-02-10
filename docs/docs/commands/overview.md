@@ -13,10 +13,27 @@ sidebar_position: 1
 - SoundCloud(楽曲ページURL指定)
 - Streamable(動画ページURL指定)
 - Discord(音声ファイルの添付付きメッセージのURL指定)
+  - 再生したいURLが以下のうちのいずれかで終わる必要があります。
+    - .mp3
+    - .wav
+    - .wma
+    - .mov
+    - .mp4
+    - .ogg
 - Googleドライブ(音声ファイルの限定公開リンクのURL指定)
 - ニコニコ動画(動画ページURL指定)
 - オーディオファイルへの直URL
-- Spotify(曲のURL、およびプレイリストのURL。曲を推測してYouTubeから再生します。Node.js v14+のみ。)
+  - 再生したいURLが以下のうちのいずれかで終わる必要があります。
+    - .mp3
+    - .wav
+    - .wma
+    - .mov
+    - .mp4
+    - .ogg
+- Spotify(曲のURL、およびプレイリストのURL)
+  - 曲を推測してYouTubeから再生します。
+  - Node.js v14以上でのみ対応しています。
+  - プレイリストで追加できる曲数は最大99曲です。
 
 ## 特徴的な機能
 あまり見かけないような、特殊な機能をここで列挙します。  

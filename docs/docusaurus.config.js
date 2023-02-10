@@ -83,17 +83,17 @@ const config = {
             title: 'ドキュメント',
             items: [
               {
-                label: 'ドキュメント',
+                label: 'ボット管理者向けドキュメント',
                 to: '/docs/docs/welcome',
               },
               {
-                label: '機能ガイド',
+                label: 'ボット利用者向け機能ガイド',
                 to: '/docs/commands/overview'
               }
             ],
           },
           {
-            title: 'コミュニティ',
+            title: 'コミュニティ/サポート',
             items: [
               {
                 label: 'Discord',
