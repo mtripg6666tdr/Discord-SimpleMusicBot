@@ -67,4 +67,4 @@ Discordにて、インストール等のサポート、および重要な更新�
 
 ## ライセンス
 GPLv3  
-詳細はリポジトリ直下の[LICENSE](LICENSE)を参照。
+詳細は[COPYING](COPYING)を参照。
