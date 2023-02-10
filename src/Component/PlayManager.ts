@@ -252,17 +252,19 @@ export class PlayManager extends ServerManagerBase {
           inlineVolume: this.volume !== 100,
           voiceDataTimeout: 40 * 1000
         });
-        // @ts-expect-error 7053
-        const erisStreams = (connection.piper["streams"] as (Readable & Writable)[]);
-        if(this.detailedLog) erisStreams.forEach((readable, i) => setReadableCsvLog(readable, i + streams.length));
-        const volume = erisStreams.find(r => r.constructor.name === "VolumeTransformer");
-        volume?.on("data", () => {
-          if(volume.readableLength < 128 * 1024){
-            normalizer.resumeOrigin();
-          }else{
-            normalizer.pauseOrigin();
-          }
-        });
+        if(this.detailedLog){
+          // @ts-expect-error 7053
+          const erisStreams = (connection.piper["streams"] as (Readable & Writable)[]);
+          erisStreams.forEach((readable, i) => setReadableCsvLog(readable, i + streams.length));
+          const volume = erisStreams.find(r => r.constructor.name === "VolumeTransformer");
+          volume?.on("data", () => {
+            if(volume.readableLength < 128 * 1024){
+              normalizer.resumeOrigin();
+            }else{
+              normalizer.pauseOrigin();
+            }
+          });
+        }
         // setup volume
         this.setVolume(this.volume);
         // wait for entering playing state
