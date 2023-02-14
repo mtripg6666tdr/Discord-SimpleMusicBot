@@ -106,7 +106,7 @@ export class YouTube extends AudioSource {
       inline: false
     }, {
       name: ":asterisk:概要",
-      value: this.Description.length > (verbose ? 4000 : 350) ? this.Description.substring(0, verbose ? 4000 : 300) + "..." : this.Description,
+      value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, verbose ? 1000 : 300) + "..." : this.Description || "*概要欄なし*",
       inline: false
     });
     return fields;
@@ -131,7 +131,7 @@ export class YouTube extends AudioSource {
 
   private importData(exportable:exportableYouTube){
     this.Title = exportable.title;
-    this.Description = exportable.description;
+    this.Description = exportable.description || "";
     this._lengthSeconds = exportable.isLive ? NaN : exportable.length;
     this.ChannelName = exportable.channel;
     this.ChannelUrl = exportable.channelUrl;
