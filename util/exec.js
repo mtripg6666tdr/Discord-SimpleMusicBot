@@ -1,12 +1,6 @@
-const { spawn } = require("child_process");
+const { spawn, spawnSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
-
-const nodeOptions = [];
-const nodeMajor = Number(process.versions.node.split(".")[0]);
-if(nodeMajor >= 17){
-  nodeOptions.push("--dns-result-order=ipv4first");
-}
 
 let nodePath = "node";
 
@@ -16,7 +10,17 @@ if(fs.existsSync("./node_modules/.bin/node.cmd")){
   nodePath = "node_modules/.bin/node";
 }
 
-console.log("OPTIONS:", nodeOptions.join(" ") || "<NONE>");
+const result = spawnSync(nodePath, ["--version"]);
+const version = result.stdout.toString().trim();
+console.log("Node.js " + version + " detected");
+const nodeOptions = [];
+const nodeMajor = Number(version.substring(1));
+if(nodeMajor >= 16){
+  nodeOptions.push("--dns-result-order=ipv4first");
+}
+console.log("Options:", nodeOptions.join(" ") || "<NONE>");
+console.log("Starting...");
+console.log("===========");
 
 const main = spawn(
   nodePath,
