@@ -5,7 +5,8 @@ dist
 docs
 node_modules
 test
-util
+util/*
+!util/exec.js
 .env.sample
 .eslint*
 .gitattributes
