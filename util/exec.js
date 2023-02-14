@@ -27,6 +27,4 @@ const main = spawn(
     env: process.env,
   }
 );
-main.on("exit", (code) => console.log(code));
-
-main.ref();
+main.on("exit", (code) => process.exit(code));
