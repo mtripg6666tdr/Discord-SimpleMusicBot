@@ -45,7 +45,7 @@ export default class Uptime extends BaseCommand {
     const embed = new Helper.MessageEmbedBuilder()
       .setColor(getColor("UPTIME"))
       .setTitle(options.client.user.username + "のアップタイム")
-      .addField("インスタンスからの経過した時間", `${insta[0]}時間${insta[1]}分${insta[2]}秒`)
+      .addField("インスタンス作成からの経過した時間", `${insta[0]}時間${insta[1]}分${insta[2]}秒`)
       .addField("Discordに接続してからの経過時間", `${ready[0]}時間${ready[1]}分${ready[2]}秒`)
       .addField("レイテンシ",
         `${now - message.createdTimestamp}ミリ秒(ボット接続実測値)\r\n`
