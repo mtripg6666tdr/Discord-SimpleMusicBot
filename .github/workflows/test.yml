@@ -124,7 +124,7 @@ jobs:
         run: npm test
 
       - name: Test to load scripts to Node.js
-        run: node -r ./util/testLoad -e 'process.exit()'
+        run: node util/exec -r ./util/testLoad -e 'process.exit()'
         
   docs:
     runs-on: ubuntu-latest
