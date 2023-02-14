@@ -151,7 +151,7 @@ export abstract class MusicBotBase extends LogEmitter {
    */
   protected maintenanceTick(){
     this.maintenanceTickCount++;
-    Util.logger.log(`[Tick] #${this.maintenanceTickCount}`, "debug");
+    if(Util.config.debug) Util.logger.log(`[Tick] #${this.maintenanceTickCount}`, "debug");
     this.emit("tick", this.maintenanceTickCount);
     // ページトグルの整理
     PageToggle.organize(this._embedPageToggle, 5);
