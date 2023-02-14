@@ -15,7 +15,7 @@ const version = result.stdout.toString().trim();
 console.log("Node.js " + version + " detected");
 const nodeOptions = [];
 const nodeMajor = Number(version.substring(1));
-if(nodeMajor >= 16){
+if(nodeMajor >= 17){
   nodeOptions.push("--dns-result-order=ipv4first");
 }
 console.log("Options:", nodeOptions.join(" ") || "<NONE>");
