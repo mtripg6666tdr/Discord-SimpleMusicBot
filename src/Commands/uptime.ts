@@ -39,21 +39,20 @@ export default class Uptime extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.server.updateBoundChannel(message);
-    const now = new Date();
-    const insta = Util.time.CalcTime(now.getTime() - options.bot.instantiatedTime.getTime());
+    const now = Date.now();
+    const insta = Util.time.CalcTime(now - options.bot.instantiatedTime.getTime());
     const ready = Util.time.CalcTime(options.client.uptime);
     const embed = new Helper.MessageEmbedBuilder()
       .setColor(getColor("UPTIME"))
       .setTitle(options.client.user.username + "のアップタイム")
-      .addField("サーバー起動からの経過した時間", insta[0] + "時間" + insta[1] + "分" + insta[2] + "秒")
-      .addField("Botが起動してからの経過時間", ready[0] + "時間" + ready[1] + "分" + ready[2] + "秒")
+      .addField("インスタンスからの経過した時間", `${insta[0]}時間${insta[1]}分${insta[2]}秒`)
+      .addField("Discordに接続してからの経過時間", `${ready[0]}時間${ready[1]}分${ready[2]}秒`)
       .addField("レイテンシ",
-        `${now.getTime() - message.createdAt.getTime()}ミリ秒(ボット接続実測値)\r\n`
-        + `${message.guild.shard.latency}ミリ秒(ボットWebSocket接続取得値)\r\n`
+        `${now - message.createdTimestamp}ミリ秒(ボット接続実測値)\r\n`
+        + `${message.guild.shard.latency === Infinity ? "-" : message.guild.shard.latency}ミリ秒(ボットWebSocket接続取得値)\r\n`
         + `${(options.server.player.isConnecting && options.server.vcPing) || "-"}ミリ秒(ボイスチャンネルUDP接続取得値)`
       )
-      .addField("データベースに登録されたサーバー数", options.bot.databaseCount + "サーバー")
+      .addField("データが保持されているサーバー数", `${options.bot.databaseCount}サーバー`)
       .toEris()
     ;
     message.reply({embeds: [embed]}).catch(e => Util.logger.log(e, "error"));
