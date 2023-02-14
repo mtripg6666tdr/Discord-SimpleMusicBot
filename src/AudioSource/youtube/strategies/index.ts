@@ -40,7 +40,7 @@ export const strategies:strategies[] = [
     return new Module(i);
   }
   catch(e){
-    Util.logger.log(e, "error");
+    if(Util.config.debug) Util.logger.log(e, "error");
     Util.logger.log(`[AudioSource:youtube] failed to load strategy#${i}`, "warn");
     return null;
   }
