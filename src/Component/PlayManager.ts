@@ -407,6 +407,7 @@ export class PlayManager extends ServerManagerBase {
    */
   disconnect():PlayManager{
     this.stop();
+    this.emit("disconnectAttempt");
     if(this.isConnecting){
       const connection = this.server.connection;
       this.Log("Disconnected from " + connection.channelID);
@@ -426,14 +427,16 @@ export class PlayManager extends ServerManagerBase {
   }
 
   destroyStream(){
-    setImmediate(() => {
-      if(this._currentAudioStream){
-        if(!this._currentAudioStream.destroyed){
-          this._currentAudioStream.destroy();
+    if(this._currentAudioStream){
+      setImmediate(() => {
+        if(this._currentAudioStream){
+          if(!this._currentAudioStream.destroyed){
+            this._currentAudioStream.destroy();
+          }
+          this._currentAudioStream = null;
         }
-        this._currentAudioStream = null;
-      }
-    });
+      });
+    }
   }
 
   /**
@@ -549,7 +552,7 @@ export class PlayManager extends ServerManagerBase {
     }
     const timer = setTimeout(() => {
       this.off("playCalled", playHandler);
-      this.off("disconnect", playHandler);
+      this.off("disconnectAttempt", playHandler);
       this._finishTimeout = false;
       if(!this.isPlaying && this.server.boundTextChannel){
         this.server.bot.client
@@ -565,7 +568,7 @@ export class PlayManager extends ServerManagerBase {
       this._finishTimeout = false;
     };
     this.once("playCalled", playHandler);
-    this.once("disconnect", playHandler);
+    this.once("disconnectAttempt", playHandler);
   }
 
   async onStreamFailed(){
@@ -617,6 +620,7 @@ interface PlayManagerEvents {
   playCompleted: [];
   stop: [];
   disconnect: [];
+  disconnectAttempt: [];
   pause: [];
   resume: [];
   rewind: [];
