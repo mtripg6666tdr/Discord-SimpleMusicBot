@@ -12,7 +12,7 @@
     "@mtripg6666tdr/async-lock": "^1.1.0",
     "@mtripg6666tdr/eris-command-resolver": "^2.0.0",
     "@mtripg6666tdr/m3u8stream": "^0.8.6",
-    "@sinclair/typebox": "^0.25.21",
+    "@sinclair/typebox": "^0.25.22",
     "candyget": "^0.5.2",
     "comment-json": "^4.2.3",
     "dotenv": "^16.0.3",
