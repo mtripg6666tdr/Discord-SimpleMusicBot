@@ -10,6 +10,7 @@ on:
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/build-docker.yml"
+      - "Dockerfile"
   release:
     types:
       - published
