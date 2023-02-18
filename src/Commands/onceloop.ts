@@ -55,7 +55,7 @@ export default class OnceLoop extends BaseCommand {
     }else{
       options.server.queue.onceLoopEnabled = true;
       message.reply({
-        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:ワンスループを無効にしました:x:`,
+        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:ワンスループを有効にしました:o:`,
         allowedMentions: {
           users: false,
         },
