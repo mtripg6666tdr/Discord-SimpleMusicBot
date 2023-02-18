@@ -260,13 +260,26 @@ export class MusicBot extends MusicBotBase {
   }
 
   private async onInteractionCreate(interaction:discord.Interaction){
+    // イベント発生
     this._addOn.emit("interactionCreate", interaction);
-    if(!Util.eris.interaction.interactionIsCommandOrComponent(interaction)) return;
-    if(this.maintenance){
-      if(!Util.config.adminId || interaction.member?.id !== Util.config.adminId) return;
+    // コマンドインタラクションおよびコンポーネントインタラクション以外は処理せず終了
+    if(!Util.eris.interaction.interactionIsCommandOrComponent(interaction)){
+      this.Log(`Unknown interaction received: ${interaction.type}`, "debug");
+      return;
     }
-    if(interaction.member?.bot) return;
-    if(this._rateLimitController.isRateLimited(interaction.member.id)) return;
+    // メンテナンスモードでかつボット管理者以外なら終了
+    if(this.maintenance && (!Util.config.adminId || interaction.member?.id !== Util.config.adminId)){
+      if(Util.config.debug) this.Log("Interaction ignored due to mentenance mode", "debug");
+      return;
+    }
+    // ボットによるインタラクション（の可能性があるのかは知らないけど）なら終了
+    if(interaction.member?.bot){
+      return;
+    }
+    // レートリミットしてるなら終了
+    if(this.rateLimitController.isRateLimited(interaction.member.id)){
+      return;
+    }
     // データ初期化
     const channel = interaction.channel as discord.TextChannel;
     const server = this.initData(channel.guild.id, channel.id);

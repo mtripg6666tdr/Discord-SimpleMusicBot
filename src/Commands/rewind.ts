@@ -37,7 +37,10 @@ export default class Rewind extends BaseCommand {
   
   async run(message:CommandMessage, options:CommandArgs){
     if(!Util.eris.user.isPrivileged(message.member) && !Util.eris.channel.sameVC(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
+      message.reply({
+        content: "この操作を実行する権限がありません",
+        ephemeral: true,
+      }).catch(e => Util.logger.log(e, "error"));
       return;
     }
     options.server.updateBoundChannel(message);
