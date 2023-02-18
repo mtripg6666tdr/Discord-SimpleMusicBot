@@ -96,6 +96,10 @@ export abstract class MusicBotBase extends LogEmitter {
     ;
   }
 
+  get rateLimitController():Readonly<RateLimitController>{
+    return this._rateLimitController;
+  }
+
   constructor(protected readonly maintenance:boolean = false){
     super();
     this.setTag("Main");
