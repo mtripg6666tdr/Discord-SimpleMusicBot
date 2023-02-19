@@ -76,12 +76,7 @@ if(errs.length > 0){
   throw er;
 }
 
-const log = <T>(d:T) => {
-  console.log(d);
-  return d;
-};
-
-export default log(Object.assign(
+export default Object.assign(
   Object.create(null),
   Value.Create(Config),
   {
@@ -91,5 +86,5 @@ export default log(Object.assign(
     noMessageContent: false,
   },
   config,
-) as unknown as Static<typeof Config>);
+) as unknown as Static<typeof Config>;
 export type GuildBGMContainerType = Static<typeof GuildBGMContainer>;

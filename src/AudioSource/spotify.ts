@@ -104,22 +104,22 @@ export class Spotify extends AudioSource {
       && !includes(item.title, "弾いてみた");
     };
     const validItems = items.filter(validate);
-    console.log("valid", validItems);
+    if(Util.config.debug) console.log("valid", validItems);
     // official channel
     let filtered = validItems.filter(item => item.author.ownerBadges.length > 0 || item.author.verified || item.author.name.endsWith("Topic") || item.author.name.endsWith("トピック"));
-    console.log("official ch", filtered);
+    if(Util.config.debug) console.log("official ch", filtered);
     if(filtered[0]) return filtered[0];
     // official item 
     filtered = validItems.filter(item => includes(item.title, "official") || includes(item.title, "公式"));
-    console.log("official item", filtered);
+    if(Util.config.debug) console.log("official item", filtered);
     if(filtered[0]) return filtered[0];
     // pv /mv
     filtered = validItems.filter(item => includes(item.title, "pv") || includes(item.title, "mv"));
-    console.log("PV/MV", filtered);
+    if(Util.config.debug) console.log("PV/MV", filtered);
     if(filtered[0]) return filtered[0];
     // no live
     filtered = validItems.filter(item => !includes(item.title, "live") && !includes(item.title, "ライブ"));
-    console.log("no live", filtered);
+    if(Util.config.debug) console.log("no live", filtered);
     if(filtered[0]) return filtered[0];
     // other
     if(validItems[0]) return validItems[0];
