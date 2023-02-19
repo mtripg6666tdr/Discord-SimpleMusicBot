@@ -1,6 +1,6 @@
 {
   "name": "discord-music-bot",
-  "version": "3.9.1",
+  "version": "3.9.5",
   "description": "Simple Music Bot for Discord without any database",
   "private": true,
   "main": "dist/lib.js",
@@ -12,12 +12,12 @@
     "@mtripg6666tdr/async-lock": "^1.1.0",
     "@mtripg6666tdr/eris-command-resolver": "^2.0.0",
     "@mtripg6666tdr/m3u8stream": "^0.8.6",
-    "@sinclair/typebox": "^0.25.21",
+    "@sinclair/typebox": "^0.25.23",
     "candyget": "^0.5.2",
     "comment-json": "^4.2.3",
     "dotenv": "^16.0.3",
     "eris": "^0.17.1",
-    "genius-lyrics": "^4.4.2",
+    "genius-lyrics": "^4.4.3",
     "html-entities": "^2.3.3",
     "html-to-text": "^8.2.1",
     "https-proxy-agent": "^5.0.1",
@@ -33,23 +33,20 @@
     "ytsr": "^3.8.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^17.4.2",
-    "@mtripg6666tdr/commitlint-config": "^1.1.0",
     "@types/follow-redirects": "^1.14.1",
     "@types/html-to-text": "^8.1.1",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.13.0",
     "@types/throttle-debounce": "^5.0.0",
     "@types/ws": "^8.5.4",
-    "@typescript-eslint/eslint-plugin": "^5.51.0",
-    "@typescript-eslint/parser": "^5.51.0",
-    "eslint": "^8.33.0",
+    "@typescript-eslint/eslint-plugin": "^5.52.0",
+    "@typescript-eslint/parser": "^5.52.0",
+    "eslint": "^8.34.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-license-header": "^0.6.0",
     "eslint-plugin-named-import-spacing": "^1.0.3",
     "eslint-plugin-node": "^11.1.0",
-    "husky": "^8.0.3",
     "mocha": "^10.2.0",
     "rimraf": "^3.0.2",
     "typescript": "^4.9.5"
@@ -67,9 +64,8 @@
   },
   "scripts": {
     "test": "mocha",
-    "prepare": "husky install",
     "start": "npm run build && npm run onlystart",
-    "onlystart": "node dist",
+    "onlystart": "node util/exec dist",
     "build": "rimraf dist/ typings/ && tsc",
     "lint": "eslint .",
     "cleanup": "rimraf dist/ typings/ logs/",
@@ -85,10 +81,5 @@
   "bugs": {
     "url": "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/issues"
   },
-  "readme": "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot#readme",
-  "commitlint": {
-    "extends": [
-      "@mtripg6666tdr/commitlint-config"
-    ]
-  }
+  "readme": "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot#readme"
 }

@@ -252,19 +252,17 @@ export class PlayManager extends ServerManagerBase {
           inlineVolume: this.volume !== 100,
           voiceDataTimeout: 40 * 1000
         });
-        if(this.detailedLog){
-          // @ts-expect-error 7053
-          const erisStreams = (connection.piper["streams"] as (Readable & Writable)[]);
-          erisStreams.forEach((readable, i) => setReadableCsvLog(readable, i + streams.length));
-          const volume = erisStreams.find(r => r.constructor.name === "VolumeTransformer");
-          volume?.on("data", () => {
-            if(volume.readableLength < 128 * 1024){
-              normalizer.resumeOrigin();
-            }else{
-              normalizer.pauseOrigin();
-            }
-          });
-        }
+        // @ts-expect-error 7053
+        const erisStreams = (connection.piper["streams"] as (Readable & Writable)[]);
+        if(this.detailedLog) erisStreams.forEach((readable, i) => setReadableCsvLog(readable, i + streams.length));
+        const volume = erisStreams.find(r => r.constructor.name === "VolumeTransformer");
+        volume?.on("data", () => {
+          if(volume.readableLength < 128 * 1024){
+            normalizer.resumeOrigin();
+          }else{
+            normalizer.pauseOrigin();
+          }
+        });
         // setup volume
         this.setVolume(this.volume);
         // wait for entering playing state
@@ -409,6 +407,7 @@ export class PlayManager extends ServerManagerBase {
    */
   disconnect():PlayManager{
     this.stop();
+    this.emit("disconnectAttempt");
     if(this.isConnecting){
       const connection = this.server.connection;
       this.Log("Disconnected from " + connection.channelID);
@@ -428,14 +427,16 @@ export class PlayManager extends ServerManagerBase {
   }
 
   destroyStream(){
-    setImmediate(() => {
-      if(this._currentAudioStream){
-        if(!this._currentAudioStream.destroyed){
-          this._currentAudioStream.destroy();
+    if(this._currentAudioStream){
+      setImmediate(() => {
+        if(this._currentAudioStream){
+          if(!this._currentAudioStream.destroyed){
+            this._currentAudioStream.destroy();
+          }
+          this._currentAudioStream = null;
         }
-        this._currentAudioStream = null;
-      }
-    });
+      });
+    }
   }
 
   /**
@@ -551,7 +552,7 @@ export class PlayManager extends ServerManagerBase {
     }
     const timer = setTimeout(() => {
       this.off("playCalled", playHandler);
-      this.off("disconnect", playHandler);
+      this.off("disconnectAttempt", playHandler);
       this._finishTimeout = false;
       if(!this.isPlaying && this.server.boundTextChannel){
         this.server.bot.client
@@ -567,7 +568,7 @@ export class PlayManager extends ServerManagerBase {
       this._finishTimeout = false;
     };
     this.once("playCalled", playHandler);
-    this.once("disconnect", playHandler);
+    this.once("disconnectAttempt", playHandler);
   }
 
   async onStreamFailed(){
@@ -619,6 +620,7 @@ interface PlayManagerEvents {
   playCompleted: [];
   stop: [];
   disconnect: [];
+  disconnectAttempt: [];
   pause: [];
   resume: [];
   rewind: [];

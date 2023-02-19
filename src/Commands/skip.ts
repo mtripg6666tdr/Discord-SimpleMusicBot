@@ -36,7 +36,6 @@ export default class Skip extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    options.server.updateBoundChannel(message);
     const server = options.server;
     // そもそも再生状態じゃないよ...
     if(!server.player.isPlaying){
@@ -50,9 +49,13 @@ export default class Skip extends BaseCommand {
       const item = server.queue.get(0);
       const members = Util.eris.channel.getVoiceMember(options);
       if(!members.has(message.member.id)){
-        message.reply("この操作を実行する権限がありません");
+        message.reply({
+          content: "この操作を実行する権限がありません",
+          ephemeral: true,
+        });
         return;
       }
+      options.server.updateBoundChannel(message);
       if(item.additionalInfo.addedBy.userId !== message.member.id && !Util.eris.user.isPrivileged(message.member) && members.size > 3){
         if(!server.skipSession){
           await server.createSkipSession(message);

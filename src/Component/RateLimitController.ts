@@ -16,6 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import Util from "../Util";
+
 export class RateLimitController {
   private readonly store = new Map<string, number[]>();
 
@@ -35,6 +37,7 @@ export class RateLimitController {
       if(Date.now() - currentStore[currentStore.length - 1] < 2 * 1000){
         currentStore.push(Date.now());
       }
+      Util.logger.log(`[RateLimitController] Key ${key} hit the ratelimit.`);
       return true;
     }else{
       currentStore.push(Date.now());
