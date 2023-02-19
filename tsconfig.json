@@ -14,20 +14,13 @@
     "outDir": "dist/",
     "allowJs": false,
     "skipLibCheck": true,
-    "declaration": false,
-    "incremental": true,
-    "tsBuildInfoFile": "node_modules/.tsbuildinfo.json",
     "lib": [
       "ES2019",
       "ES2020.Promise",
       "ES2020.BigInt",
       "ES2020.String",
     ],
-    "moduleResolution": "node",
-    "disableSizeLimit": true,
-  },
-  "typeAcquisition": {
-    "enable": false,
+    "moduleResolution": "node"
   },
   "include": [
     "src/**/*.ts"
