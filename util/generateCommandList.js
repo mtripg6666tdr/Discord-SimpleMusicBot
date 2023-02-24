@@ -41,7 +41,11 @@ sidebar_label: ${cmd.name}
 # \`${cmd.name}\`コマンド
 ${cmd.description}
 
-## エイリアス
+スラッシュコマンドでは、\`/${cmd.asciiName}\`を使用してください。
+
+## 別名
+\`${cmd.name}\`以外にも以下の別名を使用できます。
+
 ${cmd.alias.map(alias => `- ${alias}`).join("\r\n")}
 
 ${cmd.usage ? `## 使い方\r\n\`\`\`\r\n${cmd.usage}\r\n\`\`\`\r\n` : ""}
