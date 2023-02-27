@@ -1,0 +1,22 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.docsSidebar.category.インストール＆実行": {
+    "message": "Install & Run",
+    "description": "The label for category インストール＆実行 in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.ボットの各種機能": {
+    "message": "Features of the bot",
+    "description": "The label for category ボットの各種機能 in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.バックアップ": {
+    "message": "Backup",
+    "description": "The label for category バックアップ in sidebar docsSidebar"
+  },
+  "sidebar.commandsSidebar.category.コマンド一覧": {
+    "message": "Commands",
+    "description": "The label for category コマンド一覧 in sidebar commandsSidebar"
+  }
+}

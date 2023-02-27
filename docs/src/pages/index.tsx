@@ -6,6 +6,7 @@ import Layout from '@theme/Layout';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
 
 import styles from './index.module.css';
+import Translate, { translate } from '@docusaurus/Translate';
 
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
@@ -18,7 +19,11 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="/docs/docs/welcome">
-            🎵ドキュメントに進む▶️
+            🎵
+            <Translate id='home.godocbuttonlabel'>
+            ドキュメントに進む
+            </Translate>
+            ▶️
           </Link>
         </div>
       </div>
@@ -30,8 +35,18 @@ export default function Home(): JSX.Element {
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
-      title={`ドキュメント`}
-      description="Discord-SimpleMusicBotのドキュメントサイト">
+      title={
+        translate({
+          id: 'home.document.title',
+          message: 'ドキュメント',
+        })
+      }
+      description={
+        translate({
+          id: 'home.document.description',
+          message: "Discord-SimpleMusicBotのドキュメントサイト",
+        })
+      }>
       <HomepageHeader />
       <main>
         <HomepageFeatures />

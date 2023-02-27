@@ -1,39 +1,40 @@
 import React from 'react';
 import clsx from 'clsx';
 import styles from './styles.module.css';
+import Translate from '@docusaurus/Translate';
 
 type FeatureItem = {
-  title: string;
+  title: JSX.Element;
   Svg: React.ComponentType<React.ComponentProps<'svg'>>;
   description: JSX.Element;
 };
 
 const FeatureList: FeatureItem[] = [
   {
-    title: '高音質',
+    title: <Translate id='home.feature.highquality'>高音質</Translate>,
     Svg: require('@site/static/img/headphone.svg').default,
     description: (
-      <>
+      <Translate id='home.feature.highqualitydescription'>
         元の音質とボイスチャンネルのビットレートを考慮し、できる限り高音質で再生できるようにしています。
-      </>
+      </Translate>
     ),
   },
   {
-    title: 'メッセージベースのコマンドとスラッシュコマンド',
+    title: <Translate id='home.feature.commandtype'>メッセージベースのコマンドとスラッシュコマンド</Translate>,
     Svg: require('@site/static/img/keyboard.svg').default,
     description: (
-      <>
+      <Translate id='home.feature.commandtypedescription'>
         小規模で使用する場合には、昔ながらのメッセージベースのコマンドとスラッシュコマンドの両方に対応。使用しやすいほうを使用することができます。
-      </>
+      </Translate>
     ),
   },
   {
-    title: 'TypeScriptで構築',
+    title: <Translate id='home.feature.ts'>TypeScriptで構築</Translate>,
     Svg: require('@site/static/img/ts.svg').default,
     description: (
-      <>
+      <Translate id='home.feature.tsdescription'>
         ボットのソースコードはTypeScriptで構築されています。
-      </>
+      </Translate>
     ),
   },
 ];

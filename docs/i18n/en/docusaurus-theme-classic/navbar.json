@@ -1,0 +1,18 @@
+{
+  "title": {
+    "message": "Discord-SimpleMusicBot",
+    "description": "The title in the navbar"
+  },
+  "item.label.ドキュメント": {
+    "message": "Document",
+    "description": "Navbar item with label ドキュメント"
+  },
+  "item.label.機能ガイド": {
+    "message": "Features Guide",
+    "description": "Navbar item with label 機能ガイド"
+  },
+  "item.label.GitHub": {
+    "message": "GitHub",
+    "description": "Navbar item with label GitHub"
+  }
+}

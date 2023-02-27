@@ -1,0 +1,9 @@
+{
+  "label": "コマンド一覧",
+  "collapsed": false,
+  "collapsible": false,
+  "link": {
+    "type": "doc",
+    "id": "commands/commands/overview"
+  }
+}

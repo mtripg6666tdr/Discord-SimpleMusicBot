@@ -25,7 +25,7 @@ const config = {
   // to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'ja',
-    locales: ['ja'],
+    locales: ['ja', 'en'],
   },
 
   presets: [
@@ -72,6 +72,10 @@ const config = {
           {
             href: 'https://github.com/mtripg6666tdr/Discord-SimpleMusicBot',
             label: 'GitHub',
+            position: 'right',
+          },
+          {
+            type: 'localeDropdown',
             position: 'right',
           },
         ],
