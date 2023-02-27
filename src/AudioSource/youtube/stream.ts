@@ -16,13 +16,13 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Stream } from "@mtripg6666tdr/m3u8stream";
 import type { IncomingMessage } from "http";
 import type { Readable } from "stream";
 
 import * as ytdl from "ytdl-core";
 
 import { Util } from "../../Util";
+import { createPassThrough } from "../../Util/general";
 
 export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoFormat, options:ytdl.downloadOptions, chunkSize:number = 512 * 1024){
   const stream = Util.general.createPassThrough();
@@ -61,35 +61,65 @@ export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoForm
   return stream;
 }
 
-export function createRefreshableYTLiveStream(info:ytdl.videoInfo, options:ytdl.downloadOptions, refresher:() => Promise<string>){
-  const stream = ytdl.downloadFromInfo(info, Object.assign({
-    liveBuffer: 40000,
-    requestOptions: {
-      maxRetries: 4,
-      maxReconnects: 4,
-    },
-  }, options)) as Readable & {updatePlaylist: Stream["updatePlaylist"]};
-  stream.on("response", (message:IncomingMessage) => {
-    message.setTimeout(4000, () => {
-      Util.logger.log("Segment timed out; retrying...");
-      message.destroy(new Error("ENOTFOUND"));
+export function createRefreshableYTLiveStream(info:ytdl.videoInfo, url:string, options:ytdl.downloadOptions){
+  const setStreamTimeout = (_stream:Readable) => {
+    _stream.on("response", (message:IncomingMessage) => {
+      message.setTimeout(4000, () => {
+        Util.logger.log("Segment timed out; retrying...");
+        message.destroy(new Error("ENOTFOUND"));
+      });
     });
+  };
+
+  const downloadLiveStream = async (targetInfo:ytdl.videoInfo|string) => {
+    if(typeof targetInfo === "string"){
+      targetInfo = await ytdl.getInfo(targetInfo);
+      options.format = ytdl.chooseFormat(targetInfo.formats, {isHLS: true} as ytdl.chooseFormatOptions);
+    }
+    return ytdl.downloadFromInfo(targetInfo, Object.assign({
+      liveBuffer: 10000,
+      requestOptions: {
+        maxRetries: 4,
+        maxReconnects: 4,
+      },
+    }, options));
+  };
+
+  let currentStream:Readable = null;
+  const stream = createPassThrough({
+    allowHalfOpen: true,
+    autoDestroy: false,
   });
-  let timeout:NodeJS.Timeout = null;
-  stream.once("modified", () => {
-    timeout = setInterval(async () => {
-      if(stream.destroyed){
-        clearInterval(timeout);
-      }else{
-        stream.updatePlaylist(await refresher());
-        Util.logger.log("playlist updated");
-      }
-    }, 60 * 60 * 1000).unref();
-  });
+  setImmediate(async () => {
+    const firstStream = currentStream = await downloadLiveStream(info);
+    firstStream.pipe(stream, {
+      end: false,
+    });
+    firstStream.on("error", er => stream.destroy(er));
+    setStreamTimeout(firstStream);
+  }).unref();
+  const timeout = setInterval(async () => {
+    try{
+      if(Util.config.debug) Util.logger.log("preparing new stream", "debug");
+      const newStream = await downloadLiveStream(url);
+      setStreamTimeout(newStream);
+      await new Promise((resolve, reject) => newStream.once("readable", resolve).once("error", reject));
+      currentStream.destroy();
+      currentStream = newStream;
+      currentStream.on("error", er => stream.destroy(er));
+      currentStream.pipe(stream, {
+        end: false,
+      });
+      if(Util.config.debug) Util.logger.log("piped new stream", "debug");
+    }
+    catch(e){
+      stream.destroy(e);
+    }
+  }, 40 * 60 * 1000).unref();
   stream.once("close", () => {
+    currentStream.destroy();
     clearInterval(timeout);
-    timeout = null;
-    Util.logger.log("set interval cleared!");
+    Util.logger.log("Live refreshing schedule cleared");
   });
   return stream;
 }

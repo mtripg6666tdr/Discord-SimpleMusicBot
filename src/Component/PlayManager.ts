@@ -481,19 +481,23 @@ export class PlayManager extends ServerManagerBase {
         console.error(er);
       }
     }
-    if(er instanceof Error && er.message.includes("1006")){
-      setImmediate(() => {
-        this.server._joinVoiceChannel(this.server.connection.channelID)
-          .then(() => {
-            this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
-            this.onStreamFailed();
-          })
-        ;
-      }).unref();
-    }else{
-      this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
-      this.onStreamFailed();
+    if(er instanceof Error){
+      if(er.message.includes("1006")){
+        setImmediate(() => {
+          this.server._joinVoiceChannel(this.server.connection.channelID)
+            .then(() => {
+              this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
+              this.onStreamFailed();
+            })
+          ;
+        }).unref();
+        return;
+      }else if("type" in er && er.type === "workaround"){
+        this.onStreamFailed(/* count as error */ false);
+      }
     }
+    this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
+    this.onStreamFailed();
   }
 
   resetError(){
@@ -574,11 +578,11 @@ export class PlayManager extends ServerManagerBase {
     this.once("disconnectAttempt", playHandler);
   }
 
-  async onStreamFailed(){
+  async onStreamFailed(countAsError:boolean = true){
     this.Log("onStreamFailed called");
     this._cost = 0;
     this.destroyStream();
-    if(this._errorUrl === this.currentAudioInfo?.Url){
+    if(this._errorUrl === this.currentAudioInfo?.Url && countAsError){
       this._errorCount++;
     }else{
       this._errorCount = 1;
