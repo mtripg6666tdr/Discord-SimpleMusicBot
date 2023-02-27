@@ -23,5 +23,11 @@
 
   // MessageContent IntentがDiscord Developers Portalでオフになっている場合はtrueにします。
   // それ以外の場合はfalse
-  "noMessageContent": true
+  "noMessageContent": true,
+
+  // 参加しているユーザーがボイスチャンネルから退出しても、再生を一時停止しないボイスチャンネルのIDを配列で指定します。
+  "twentyFourSeven": [],
+
+  // 参加しているユーザーがボイスチャンネルから退出しても、再生を一時停止しない場合にはtrueに設定します。
+  "alwaysTwentyFourSeven": false
 }
