@@ -35,7 +35,7 @@ const commands = new CommandManager().commands.filter(
 
 for(let i = 0; i < commands.length; i++){
   const cmd = commands[i];
-  fs.writeFileSync(path.join(__dirname, `../docs/docs/commands/commands/${cmd.asciiName}.md`), `---
+  fs.writeFileSync(path.join(__dirname, `../docs/docs/guide/commands/${cmd.asciiName}.md`), `---
 sidebar_label: ${cmd.name}
 ---
 # \`${cmd.name}\`コマンド
