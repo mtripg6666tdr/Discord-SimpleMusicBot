@@ -90,15 +90,24 @@ export function createRefreshableYTLiveStream(info:ytdl.videoInfo, url:string, o
     allowHalfOpen: true,
     autoDestroy: false,
   });
+  const onError = (er:Error) => {
+    console.error(er);
+    if(er.message === "ENOTFOUND"){
+      refreshStream();
+    }else{
+      currentStream.destroy(er);
+      stream.destroy(er);
+    }
+  };
   setImmediate(async () => {
     const firstStream = currentStream = await downloadLiveStream(info);
     firstStream.pipe(stream, {
       end: false,
     });
-    firstStream.on("error", er => stream.destroy(er));
+    firstStream.on("error", onError);
     setStreamTimeout(firstStream);
   }).unref();
-  const timeout = setInterval(async () => {
+  const refreshStream = async () => {
     try{
       if(Util.config.debug) Util.logger.log("preparing new stream", "debug");
       const newStream = await downloadLiveStream(url);
@@ -106,7 +115,7 @@ export function createRefreshableYTLiveStream(info:ytdl.videoInfo, url:string, o
       await new Promise((resolve, reject) => newStream.once("readable", resolve).once("error", reject));
       currentStream.destroy();
       currentStream = newStream;
-      currentStream.on("error", er => stream.destroy(er));
+      currentStream.on("error", onError);
       currentStream.pipe(stream, {
         end: false,
       });
@@ -115,7 +124,8 @@ export function createRefreshableYTLiveStream(info:ytdl.videoInfo, url:string, o
     catch(e){
       stream.destroy(e);
     }
-  }, 40 * 60 * 1000).unref();
+  };
+  const timeout = setInterval(refreshStream, 40 * 60 * 1000).unref();
   stream.once("close", () => {
     currentStream.destroy();
     clearInterval(timeout);

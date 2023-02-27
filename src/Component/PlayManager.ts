@@ -494,6 +494,7 @@ export class PlayManager extends ServerManagerBase {
         return;
       }else if("type" in er && er.type === "workaround"){
         this.onStreamFailed(/* count as error */ false);
+        return;
       }
     }
     this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
