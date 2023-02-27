@@ -49,7 +49,8 @@ if(spotifyUrlInfo){
           uri: "spotify:artist:2aQ9IoRPwXEhhBVj4wbS46"
         }
       ]);
-      assert.equal(typeof data.coverArt.sources[0]?.url, "string");
+      var _a;
+      assert.equal(typeof ((_a = data.coverArt.sources[0]) ? _a.url : void 0), "string");
       assert.equal(data.duration, 187000);
       assert.equal(data.maxDuration, 187000);
     });
