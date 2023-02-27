@@ -86,6 +86,8 @@ export default Object.assign(
     webserver: true,
     bgm: {},
     noMessageContent: false,
+    twentyFourSeven: [],
+    alwaysTwentyFourSeven: false,
   },
   config,
 ) as unknown as Static<typeof Config>;
