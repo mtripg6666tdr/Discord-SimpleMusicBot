@@ -337,7 +337,7 @@ export class QueueManager extends ServerManagerBase {
       this.Log(e, "error");
       if(msg){
         msg.edit({
-          content: `:weary: キューの追加に失敗しました。追加できませんでした。(${Util.general.FilterContent(Util.general.StringifyObject(e))})`,
+          content: `:weary: キューの追加に失敗しました。追加できませんでした。${"message" in e ? `(${e.message})` : ""}`,
           embeds: null
         })
           .catch(er => Util.logger.log(er, "error"))
