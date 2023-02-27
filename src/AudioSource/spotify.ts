@@ -67,7 +67,11 @@ export class Spotify extends AudioSource {
   }
 
   override async fetch(forceUrl?: boolean): Promise<StreamInfo>{
-    const searchResult = await searchYouTube(`${this.Title} ${this.artist}`);
+    // eslint-disable-next-line newline-per-chained-call
+    const keyword = `${this.Title} ${this.artist.split(",").map(artist => artist.trim()).join(" ")}`;
+    if(Util.config.debug) Util.logger.log(`Searching the keyword: ${`${this.Title} ${this.artist.split(",").map(artist => artist.trim())}`}`, "debug");
+    const searchResult = await searchYouTube(keyword);
+    if(Util.config.debug) Util.logger.log("Extracting the valid item...");
     const items = searchResult.items.filter(({type}) => type === "video") as ytsr.Video[];
     const target = this.extractBestItem(items);
     if(!target) throw new Error("Not Found");
@@ -83,28 +87,37 @@ export class Spotify extends AudioSource {
     const normalize = (text:string) => {
       return text.toLowerCase()
         .replace(/’/g, "'")
-        .replace(/\(.+\)/g, "")
-        .replace(/（.+）/g, "")
+        .replace(/\(.+?\)/g, "")
+        .replace(/（.+?）/g, "")
+        .replace(/【.+?】/g, "")
+        // eslint-disable-next-line no-irregular-whitespace
+        .replace(/　/g, " ")
+        .replace(/-/g, "")
         .trim();
     };
     const includes = (text1:string, text2:string) => {
       text1 = normalize(text1);
-      text2 = normalize(text2);
-      return text1.includes(text2);
+      return normalize(text2)
+        .split(" ")
+        .every(p => text1.includes(p))
+      ;
     };
     const validate = (item:ytsr.Video) => {
       return (
         // 関連のないタイトルを除外
-        includes(item.title, this.Title.toLowerCase()) || includes(this.Title, item.title.toLowerCase())
+        includes(item.title, this.Title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase()) || includes(this.Title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase(), item.title.toLowerCase())
       )
       // カバー曲を除外
-      && !includes(item.title, "cover")
+      && !includes(item.title.toLowerCase(), "cover")
       && !includes(item.title, "カバー")
       && !includes(item.title, "歌ってみた")
-      && !includes(item.title, "弾いてみた");
+      && !includes(item.title, "弾いてみた")
+      && !includes(item.title.toLowerCase(), "#shorts")
+      && (this.Title.toLowerCase().includes("remix") || !includes(item.title.toLowerCase(), "remix"));
     };
     const validItems = items.filter(validate);
     if(Util.config.debug) console.log("valid", validItems);
+    if(validItems.length === 0) return items[0];
     // official channel
     let filtered = validItems.filter(item => item.author.ownerBadges.length > 0 || item.author.verified || item.author.name.endsWith("Topic") || item.author.name.endsWith("トピック"));
     if(Util.config.debug) console.log("official ch", filtered);
