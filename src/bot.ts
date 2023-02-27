@@ -501,7 +501,7 @@ export class MusicBot extends MusicBotBase {
     }else if(oldChannel.voiceMembers.has(this._client.user.id) && oldChannel.voiceMembers.size === 1){
       if(server.queue instanceof QueueManagerWithBgm && server.queue.isBGM){
         server.player.disconnect();
-      }else if(server.player.isPlaying){
+      }else if(server.player.isPlaying && !Util.config.twentyFourSeven.includes(oldChannel.id) && !Util.config.alwaysTwentyFourSeven){
         // 誰も聞いてる人がいない場合一時停止
         if(server.player.currentAudioInfo.LengthSeconds > 60 && server.player.currentAudioInfo.LengthSeconds - (server.player.currentTime / 1000) < 10){
           this.Log(`audio left less than 10sec; automatically disconnected from VC (${server.connection?.channelID})`);

@@ -67,19 +67,25 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
   エラーレポートを送信するテキストチャンネルのID。設定しない場合は`null`
 ### `proxy` (string|null)  
   プロキシを使用する場合はそのURL。設定しない場合は`null`
-### `prefix` (string|null)  
+### `prefix` (string|null|undefined)  
   指定する場合は一文字でデフォルトプレフィックスを指定してください。(任意指定)  
   こちらは互換性のため、プロパティ自体が省略されていても動作するようになっています。
-### `webserver` (boolean)  
+### `webserver` (boolean|undefined)  
   ウェブサーバーを起動するか（任意指定）  
   こちらは互換性のため、プロパティ自体が省略されていても動作するようになっています。
-### `bgm` (object)  
+### `bgm` (object|undefined)  
   このプロパティを設定することで、自動的にBGMを再生するように構成できます。(任意指定)  
   設定方法については[こちらのファイル](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/util/config-with-bgm.json)を参考にしてください。  
   こちらは互換性のため、プロパティ自体が省略されていても動作するようになっています。
-### `noMessageContent` (boolean)
+### `noMessageContent` (boolean|undefined)
   Message Content IntentがDiscord Developers Portalで無効になっている場合は、`true`に設定してください。(任意指定)  
   デフォルトは`false`です。  
+  こちらは互換性のため、プロパティ自体が省略されていても動作するようになっています。
+### `twentyFourSeven` (string[]|undefined)
+  参加しているユーザーがボイスチャンネルから退出しても、再生を一時停止しないボイスチャンネルのIDを配列で指定します。  
+  こちらは互換性のため、プロパティ自体が省略されていても動作するようになっています。
+### `alwaysTwentyFourSeven` (boolean|undefined)
+  参加しているユーザーがボイスチャンネルから退出しても、再生を一時停止しない場合には`true`に設定します。このオプションが`true`の場合、上の`twentyFourSeven`は常に無視されます。
   こちらは互換性のため、プロパティ自体が省略されていても動作するようになっています。
 
 ---
