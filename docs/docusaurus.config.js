@@ -65,9 +65,9 @@ const config = {
           },
           {
             type: 'doc',
-            docId: 'commands/overview',
+            docId: 'guide/overview',
             position: 'left',
-            label: '機能ガイド',
+            label: '使い方/ガイド',
           },
           {
             href: 'https://github.com/mtripg6666tdr/Discord-SimpleMusicBot',
@@ -88,7 +88,7 @@ const config = {
               },
               {
                 label: 'ボット利用者向け機能ガイド',
-                to: '/docs/commands/overview'
+                to: '/docs/guide/overview'
               }
             ],
           },
