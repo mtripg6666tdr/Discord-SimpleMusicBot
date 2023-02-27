@@ -90,7 +90,7 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(message.member.id === (Util.config.adminId || "593758391395155978") && (options.args.includes("log") || options.args.length === 0)){
+    if(Util.general.isBotAdmin(message.member.id) && (options.args.includes("log") || options.args.length === 0)){
       let logs:string[] = [...Util.logger.logStore.data];
       logs.reverse();
       for(let i = 0; i < logs.length; i++){

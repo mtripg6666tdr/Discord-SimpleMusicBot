@@ -42,6 +42,7 @@ const GuildBGMContainer = Type.Object({
 const Config = Type.Object({
   adminId: Type.Union([
     Type.RegEx(/^\d+$/),
+    Type.Array(Type.RegEx(/^\d+$/)),
     Type.Null(),
   ], {default: false}),
   debug: Type.Boolean({default: false}),
