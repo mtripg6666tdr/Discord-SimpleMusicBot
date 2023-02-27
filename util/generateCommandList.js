@@ -35,13 +35,17 @@ const commands = new CommandManager().commands.filter(
 
 for(let i = 0; i < commands.length; i++){
   const cmd = commands[i];
-  fs.writeFileSync(path.join(__dirname, `../docs/docs/commands/commands/${cmd.asciiName}.md`), `---
+  fs.writeFileSync(path.join(__dirname, `../docs/docs/guide/commands/${cmd.asciiName}.md`), `---
 sidebar_label: ${cmd.name}
 ---
 # \`${cmd.name}\`コマンド
 ${cmd.description}
 
-## エイリアス
+スラッシュコマンドでは、\`/${cmd.asciiName}\`を使用してください。
+
+## 別名
+\`${cmd.name}\`以外にも以下の別名を使用できます。
+
 ${cmd.alias.map(alias => `- ${alias}`).join("\r\n")}
 
 ${cmd.usage ? `## 使い方\r\n\`\`\`\r\n${cmd.usage}\r\n\`\`\`\r\n` : ""}

@@ -502,6 +502,9 @@ export class PlayManager extends ServerManagerBase {
   }
 
   async onStreamFinished(){
+    if(!this.currentAudioUrl){
+      return;
+    }
     this.Log("onStreamFinished called");
     if(this.server.connection && this.server.connection.playing){
       await Util.general.waitForEnteringState(() => !this.server.connection || !this.server.connection.playing, 20 * 1000)
