@@ -45,7 +45,7 @@ export default class Invoke extends BaseCommand {
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(options.rawArgs.startsWith("sp;") && message.member.id === Util.config.adminId){
+    if(options.rawArgs.startsWith("sp;") && Util.general.isBotAdmin(message.member.id)){
       this.evaluateSpecialCommands(options.rawArgs.substring(3), message, options)
         .then(result => message.reply(result))
         .catch(er => Util.logger.log(er, "error"))

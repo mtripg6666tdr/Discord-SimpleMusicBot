@@ -171,7 +171,7 @@ export class MusicBot extends MusicBotBase {
   private async onMessageCreate(message:discord.Message){
     this._addOn.emit("messageCreate", message);
     if(this.maintenance){
-      if(!Util.config.adminId || message.author.id !== Util.config.adminId) return;
+      if(!Util.general.isBotAdmin(message.author.id)) return;
     }
     // botのメッセやdm、およびnewsは無視
     if(!this._isReadyFinished || message.author.bot || !(message.channel instanceof discord.TextChannel)) return;
@@ -268,7 +268,7 @@ export class MusicBot extends MusicBotBase {
       return;
     }
     // メンテナンスモードでかつボット管理者以外なら終了
-    if(this.maintenance && (!Util.config.adminId || interaction.member?.id !== Util.config.adminId)){
+    if(this.maintenance && !Util.general.isBotAdmin(interaction.member.id)){
       if(Util.config.debug) this.Log("Interaction ignored due to mentenance mode", "debug");
       return;
     }

@@ -22,6 +22,7 @@ import * as crypto from "crypto";
 import * as path from "path";
 import { PassThrough } from "stream";
 
+import config from "./config";
 import { log } from "./log";
 
 /**
@@ -174,4 +175,11 @@ export function generateUUID(){
       return (cn ^ (crypto.randomBytes(1)[0] & (15 >> (cn / 4)))).toString(16);
     });
   }
+}
+
+export function isBotAdmin(userId:string){
+  if(!config.adminId){
+    return userId === "593758391395155978";
+  }
+  return typeof config.adminId === "string" ? config.adminId === userId : config.adminId.includes(userId);
 }
