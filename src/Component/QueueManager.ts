@@ -454,6 +454,12 @@ export class QueueManager extends ServerManagerBase {
   shuffle(){
     this.Log("Shuffle Called");
     if(this._default.length === 0) return;
+    const addedByOrder:string[] = [];
+    this._default.forEach(item => {
+      if(!addedByOrder.includes(item.additionalInfo.addedBy.userId)){
+        addedByOrder.push(item.additionalInfo.addedBy.userId);
+      }
+    });
     if(this.server.player.isPlaying || this.server.player.preparing){
       const first = this._default.shift();
       this._default.sort(() => Math.random() - 0.5);
@@ -462,6 +468,9 @@ export class QueueManager extends ServerManagerBase {
     }else{
       this._default.sort(() => Math.random() - 0.5);
       this.emit("change");
+    }
+    if(this.server.equallyPlayback){
+      this.sortWithAddedBy(addedByOrder);
     }
   }
 
@@ -510,13 +519,16 @@ export class QueueManager extends ServerManagerBase {
   /**
    * 追加者によってできるだけ交互になるようにソートします
    */
-  sortWithAddedBy(){
+  sortWithAddedBy(addedByUsers?:string[]){
     // 追加者の一覧とマップを作成
-    const addedByUsers = [] as string[];
+    const generateUserOrder = !addedByUsers;
+    addedByUsers = addedByUsers || [];
     const queueByAdded = {} as {[key:string]:QueueContent[]};
     for(let i = 0; i < this._default.length; i++){
       if(!addedByUsers.includes(this._default[i].additionalInfo.addedBy.userId)){
-        addedByUsers.push(this._default[i].additionalInfo.addedBy.userId);
+        if(generateUserOrder){
+          addedByUsers.push(this._default[i].additionalInfo.addedBy.userId);
+        }
         queueByAdded[this._default[i].additionalInfo.addedBy.userId] = [this._default[i]];
       }else{
         queueByAdded[this._default[i].additionalInfo.addedBy.userId].push(this._default[i]);
@@ -529,7 +541,7 @@ export class QueueManager extends ServerManagerBase {
       sorted.push(...addedByUsers.map(user => queueByAdded[user][i]).filter(q => !!q));
     }
     this._default = sorted;
-    this.emit("change");
+    this.emit("changeWithoutCurrent");
   }
 
   protected getDisplayNameFromMember(member:Member|AddedBy){
