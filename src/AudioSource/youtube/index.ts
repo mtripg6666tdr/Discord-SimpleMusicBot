@@ -45,6 +45,7 @@ export class YouTube extends AudioSource {
   Thumbnail:string;
   LiveStream:boolean;
   relatedVideos:exportableYouTube[] = [];
+  upcomingTimestamp:string = null;
   logger: LoggerType;
 
   constructor(logger?:typeof YouTube.prototype.logger){
@@ -60,14 +61,38 @@ export class YouTube extends AudioSource {
     return !!this.cache;
   }
 
+  get availableAfter(){
+    return this.upcomingTimestamp;
+  }
+
   async init(url:string, prefetched:exportableYouTube, forceCache?:boolean){
     this.Url = "https://www.youtube.com/watch?v=" + ytdl.getVideoID(url);
     if(prefetched){
       this.importData(prefetched);
     }else{
       const { result, resolved } = await attemptGetInfoForStrategies(this.logger, url);
+
+      // check if fallbacked
       this.fallback = resolved !== 0;
+
+      // check if upcoming
+      const videoDetails = "videoDetails" in result.cache.data && result.cache.data.videoDetails;
+      if(
+        videoDetails
+        && videoDetails.liveBroadcastDetails
+        && videoDetails.liveBroadcastDetails.startTimestamp
+        && !videoDetails.liveBroadcastDetails.isLiveNow
+        && !videoDetails.liveBroadcastDetails.endTimestamp
+      ){
+        this.upcomingTimestamp = videoDetails.liveBroadcastDetails.startTimestamp;
+      }else{
+        this.upcomingTimestamp = null;
+      }
+
+      // store data as cache if requested
       if(forceCache) this.cache = result.cache;
+
+      // import data to the current instance
       this.importData(result.data);
     }
     return this;

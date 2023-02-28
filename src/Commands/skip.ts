@@ -38,11 +38,11 @@ export default class Skip extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
     const server = options.server;
     // そもそも再生状態じゃないよ...
-    if(!server.player.isPlaying){
-      message.reply("再生中ではありません").catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"));
-      return;
-    }else if(server.player.preparing){
+    if(server.player.preparing){
       message.reply("再生準備中です").catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"));
+      return;
+    }else if(!server.player.isPlaying){
+      message.reply("再生中ではありません").catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"));
       return;
     }
     try{
