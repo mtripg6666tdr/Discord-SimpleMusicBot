@@ -16,19 +16,37 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-// main structure
-export * from "./audiosource";
-// resolver
-export * from "./resolver";
-// concrete sources
-export * from "./bestdori";
-export * from "./custom";
-export * from "./fs";
-export * from "./googledrive";
-export * from "./niconico";
-export * from "./hibiki";
-export * from "./soundcloud";
-export * from "./spotify";
-export * from "./streamable";
-export * from "./twitter";
-export * from "./youtube";
+declare module "twitter-url-direct" {
+  type TweetUser = {
+    name: string,
+    username: string,
+    text: string,
+  };
+  type Dimension = {
+    width: string,
+    height: string,
+    /**
+     * ex. 320x360
+     */
+    dimension: string,
+    url: string,
+  };
+  type FoundResponse = {
+    found: true,
+    tweet_user: TweetUser,
+    /**
+     * MIME type
+     */
+    type: string,
+    duration: number,
+    dimensionsAvailable: number,
+    download: Dimension[],
+  };
+  type NotFoundResponse = {
+    found: false,
+    error: string,
+  };
+  type Result = FoundResponse | NotFoundResponse;
+  function twitterGetUrl(url:string):Promise<Result>;
+  export = twitterGetUrl;
+}

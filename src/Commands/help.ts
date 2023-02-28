@@ -66,6 +66,7 @@ export default class Help extends BaseCommand {
         "・Discord(音声ファイルの添付付きメッセージのURL指定)",
         "・Googleドライブ(音声ファイルの限定公開リンクのURL指定)",
         "・ニコニコ動画(動画ページURL指定)",
+        "・Twitter(ツイートURL指定)",
         "・オーディオファイルへの直URL",
         Spotify.available ? "・Spotify(曲のURL、およびプレイリストのURL。曲を推測してYouTubeから再生します。)" : undefined,
       ].filter(d => d).join("\r\n"))
