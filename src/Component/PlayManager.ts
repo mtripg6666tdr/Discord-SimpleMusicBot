@@ -51,11 +51,12 @@ export class PlayManager extends ServerManagerBase {
   protected _currentAudioStream:Readable = null;
   protected _cost = 0;
   protected _finishTimeout = false;
+  readonly onStreamFinishedBindThis:any = null;
+  protected waitForLive:boolean = false;
   csvLog:string[] = [];
   csvLogFilename = "";
   detailedLog = !!process.env.DSL_ENABLE;
   disableDetailedLogMemory = true;
-  readonly onStreamFinishedBindThis:any = null;
 
   get preparing(){
     return this._preparing;
@@ -82,7 +83,7 @@ export class PlayManager extends ServerManagerBase {
    *  接続され、再生途中にあるか（たとえ一時停止されていても）
    */
   get isPlaying():boolean{
-    return this.isConnecting && this.server.connection.playing;
+    return this.isConnecting && (this.server.connection.playing || this.waitForLive);
   }
 
   /**
@@ -159,10 +160,49 @@ export class PlayManager extends ServerManagerBase {
     if(this.getNoticeNeeded() && !quiet){
       const [min, sec] = Util.time.CalcMinSec(this.currentAudioInfo.LengthSeconds);
       const isLive = this.currentAudioInfo.isYouTube() && this.currentAudioInfo.LiveStream;
-      mes = await this.server.bot.client.createMessage(
-        this.server.boundTextChannel,
-        `:hourglass_flowing_sand: \`${this.currentAudioInfo.Title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`
-      );
+      if(this._currentAudioInfo.isYouTube() && this._currentAudioInfo.availableAfter){
+        mes = await this.server.bot.client.createMessage(
+          this.server.boundTextChannel,
+          `:stopwatch: \`${this.currentAudioInfo.Title}\` \`(ライブストリーム)\`の開始を待機中...`
+        );
+        this.waitForLive = true;
+        this.preparing = false;
+        const waitTarget = this._currentAudioInfo;
+        await new Promise<void>(resolve => {
+          let timeout:NodeJS.Timeout = null;
+          this.once("stop", () => {
+            if(timeout) clearTimeout(timeout);
+            resolve();
+          });
+          const checkForLive = () => {
+            if(waitTarget !== this._currentAudioInfo) return;
+            const startTime = this._currentAudioInfo.isYouTube() && this._currentAudioInfo.availableAfter;
+            if(!startTime) resolve();
+            const waitTime = Math.max(new Date(startTime).getTime() - Date.now(), 20 * 1000);
+            this.Log(`Retrying after ${waitTime}ms`);
+            timeout = setTimeout(async () => {
+              if(waitTarget !== this._currentAudioInfo) return;
+              if(this._currentAudioInfo.isYouTube()){
+                this._currentAudioInfo.disableCache();
+                await this._currentAudioInfo.init(this._currentAudioInfo.Url, null);
+              }
+              checkForLive();
+            }, waitTime).unref();
+          };
+          checkForLive();
+        });
+        if(!this.waitForLive){
+          await mes.edit(":white_check_mark: 待機をキャンセルしました");
+          return this;
+        }
+        this.waitForLive = false;
+        this.preparing = true;
+      }else{
+        mes = await this.server.bot.client.createMessage(
+          this.server.boundTextChannel,
+          `:hourglass_flowing_sand: \`${this.currentAudioInfo.Title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`
+        );
+      }
     }
 
     // ログ関係モジュール
@@ -396,6 +436,7 @@ export class PlayManager extends ServerManagerBase {
       this.server.connection.off("end", this.onStreamFinishedBindThis);
       this.server.connection.stopPlaying();
       this.server.connection.on("end", this.onStreamFinishedBindThis);
+      this.waitForLive = false;
       this.emit("stop");
     }
     return this;
