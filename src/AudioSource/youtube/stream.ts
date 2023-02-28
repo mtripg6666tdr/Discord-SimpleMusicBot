@@ -124,7 +124,7 @@ export function createRefreshableYTLiveStream(info:ytdl.videoInfo, url:string, o
         end: false,
       });
       if(Util.config.debug) Util.logger.log("piped new stream", "debug");
-      refreshing = true;
+      refreshing = false;
     }
     catch(e){
       stream.destroy(e);
