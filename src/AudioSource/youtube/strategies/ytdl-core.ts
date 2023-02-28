@@ -121,7 +121,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
     }else{
       let readable = null as Readable;
       if(info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow){
-        readable = createRefreshableYTLiveStream(info, {format, lang: "ja"}, () => this.fetch(url, true).then(({stream}) => (stream as UrlStreamInfo).url));
+        readable = createRefreshableYTLiveStream(info, url, {format, lang: "ja"});
       }else{
         readable = createChunkedYTStream(info, format, {lang: "ja"}, 1 * 1024 * 1024);
       }

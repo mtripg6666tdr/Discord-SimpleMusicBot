@@ -143,7 +143,7 @@ export class PlayManager extends ServerManagerBase {
   /**
    *  再生します
    */
-  async play(time:number = 0):Promise<PlayManager>{
+  async play(time:number = 0, quiet:boolean = false):Promise<PlayManager>{
     this.emit("playCalled", time);
     // 再生できる状態か確認
     const badCondition = this.getIsBadCondition();
@@ -156,7 +156,7 @@ export class PlayManager extends ServerManagerBase {
     this.preparing = true;
     let mes:Message = null;
     this._currentAudioInfo = this.server.queue.get(0).basicInfo;
-    if(this.getNoticeNeeded()){
+    if(this.getNoticeNeeded() && !quiet){
       const [min, sec] = Util.time.CalcMinSec(this.currentAudioInfo.LengthSeconds);
       const isLive = this.currentAudioInfo.isYouTube() && this.currentAudioInfo.LiveStream;
       mes = await this.server.bot.client.createMessage(
@@ -274,7 +274,7 @@ export class PlayManager extends ServerManagerBase {
         u.end();
       }
       this.Log("Play started successfully");
-      if(mes){
+      if(mes && !quiet){
         // 再生開始メッセージ
         const _t = Number(this.currentAudioInfo.LengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
@@ -481,19 +481,24 @@ export class PlayManager extends ServerManagerBase {
         console.error(er);
       }
     }
-    if(er instanceof Error && er.message.includes("1006")){
-      setImmediate(() => {
-        this.server._joinVoiceChannel(this.server.connection.channelID)
-          .then(() => {
-            this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
-            this.onStreamFailed();
-          })
-        ;
-      }).unref();
-    }else{
-      this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
-      this.onStreamFailed();
+    if(er instanceof Error){
+      if(er.message.includes("1006")){
+        setImmediate(() => {
+          this.server._joinVoiceChannel(this.server.connection.channelID)
+            .then(() => {
+              this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
+              this.onStreamFailed();
+            })
+          ;
+        }).unref();
+        return;
+      }else if("type" in er && er.type === "workaround"){
+        this.onStreamFailed(/* quiet */ true);
+        return;
+      }
     }
+    this._errorReportChannel?.createMessage(":tired_face:曲の再生に失敗しました...。" + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
+    this.onStreamFailed();
   }
 
   resetError(){
@@ -574,11 +579,11 @@ export class PlayManager extends ServerManagerBase {
     this.once("disconnectAttempt", playHandler);
   }
 
-  async onStreamFailed(){
+  async onStreamFailed(quiet:boolean = false){
     this.Log("onStreamFailed called");
     this._cost = 0;
     this.destroyStream();
-    if(this._errorUrl === this.currentAudioInfo?.Url){
+    if(this._errorUrl === this.currentAudioInfo?.Url && !quiet){
       this._errorCount++;
     }else{
       this._errorCount = 1;
@@ -593,7 +598,7 @@ export class PlayManager extends ServerManagerBase {
       if(this.server.queue.length === 1 && this.server.queue.queueLoopEnabled) this.server.queue.queueLoopEnabled = false;
       await this.server.queue.next();
     }
-    this.play();
+    this.play(0, quiet);
   }
 
   override emit<T extends keyof PlayManagerEvents>(eventName:T, ...args:PlayManagerEvents[T]){

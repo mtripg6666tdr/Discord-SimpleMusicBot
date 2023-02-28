@@ -17,7 +17,6 @@
  */
 
 import "./dotenv";
-import "./dangerouslyRequireOverride";
 
 import type { LogLevels } from "./Util/log";
 import type * as http from "http";

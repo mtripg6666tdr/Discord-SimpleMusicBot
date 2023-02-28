@@ -16,13 +16,13 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Stream } from "@mtripg6666tdr/m3u8stream";
 import type { IncomingMessage } from "http";
 import type { Readable } from "stream";
 
 import * as ytdl from "ytdl-core";
 
 import { Util } from "../../Util";
+import { createPassThrough } from "../../Util/general";
 
 export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoFormat, options:ytdl.downloadOptions, chunkSize:number = 512 * 1024){
   const stream = Util.general.createPassThrough();
@@ -61,35 +61,98 @@ export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoForm
   return stream;
 }
 
-export function createRefreshableYTLiveStream(info:ytdl.videoInfo, options:ytdl.downloadOptions, refresher:() => Promise<string>){
-  const stream = ytdl.downloadFromInfo(info, Object.assign({
-    liveBuffer: 40000,
-    requestOptions: {
-      maxRetries: 4,
-      maxReconnects: 4,
-    },
-  }, options)) as Readable & {updatePlaylist: Stream["updatePlaylist"]};
-  stream.on("response", (message:IncomingMessage) => {
-    message.setTimeout(4000, () => {
-      Util.logger.log("Segment timed out; retrying...");
-      message.destroy(new Error("ENOTFOUND"));
+export function createRefreshableYTLiveStream(info:ytdl.videoInfo, url:string, options:ytdl.downloadOptions){
+  // set timeout to any miniget stream
+  const setStreamNetworkTimeout = (_stream:Readable) => {
+    _stream.on("response", (message:IncomingMessage) => {
+      message.setTimeout(4000, () => {
+        Util.logger.log("Segment timed out; retrying...");
+        const er = new Error("ENOTFOUND");
+        Object.defineProperty(er, "type", {
+          value: "workaround",
+        });
+        message.destroy(er);
+      });
     });
+  };
+
+  // start to download the live stream from the provided information (info object or url string)
+  const downloadLiveStream = async (targetInfo:ytdl.videoInfo|string) => {
+    if(typeof targetInfo === "string"){
+      targetInfo = await ytdl.getInfo(targetInfo);
+      options.format = ytdl.chooseFormat(targetInfo.formats, {isHLS: true} as ytdl.chooseFormatOptions);
+    }
+    return ytdl.downloadFromInfo(targetInfo, Object.assign({
+      liveBuffer: 10000,
+    }, options));
+  };
+
+  // handle errors occurred by the current live stream
+  const onError = (er:Error) => {
+    console.error(er);
+    if(er.message === "ENOTFOUND"){
+      refreshStream();
+    }else{
+      destroyCurrentStream(er);
+      stream.destroy(er);
+    }
+  };
+
+  // destroy the current stream safely
+  const destroyCurrentStream = (er?:Error) => {
+    currentStream.removeAllListeners("error");
+    currentStream.on("error", () => {});
+    currentStream.destroy(er);
+  };
+
+  // indicates if the stream is refreshing now or not.
+  let refreshing = false;
+  // re-create new stream to refresh instance
+  const refreshStream = async () => {
+    if(refreshing) return;
+    try{
+      refreshing = true;
+      if(Util.config.debug) Util.logger.log("preparing new stream", "debug");
+      const newStream = await downloadLiveStream(url);
+      newStream.on("error", onError);
+      setStreamNetworkTimeout(newStream);
+      // wait until the stream is ready
+      await new Promise((resolve, reject) => newStream.once("readable", resolve).once("error", reject));
+      destroyCurrentStream();
+      currentStream = newStream;
+      currentStream.pipe(stream, {
+        end: false,
+      });
+      if(Util.config.debug) Util.logger.log("piped new stream", "debug");
+      refreshing = false;
+    }
+    catch(e){
+      stream.destroy(e);
+    }
+  };
+
+  let currentStream:Readable = null;
+  const timeout = setInterval(refreshStream, 40 * 60 * 1000).unref();
+  const stream = createPassThrough({
+    allowHalfOpen: true,
+    autoDestroy: false,
   });
-  let timeout:NodeJS.Timeout = null;
-  stream.once("modified", () => {
-    timeout = setInterval(async () => {
-      if(stream.destroyed){
-        clearInterval(timeout);
-      }else{
-        stream.updatePlaylist(await refresher());
-        Util.logger.log("playlist updated");
-      }
-    }, 60 * 60 * 1000).unref();
-  });
+  setImmediate(async () => {
+    currentStream = await downloadLiveStream(info);
+    currentStream.pipe(stream, {
+      end: false,
+    });
+    currentStream.on("error", onError);
+    setStreamNetworkTimeout(currentStream);
+  }).unref();
+
+  // finalize the stream to prevent memory leaks
   stream.once("close", () => {
+    destroyCurrentStream();
+    currentStream = null;
     clearInterval(timeout);
-    timeout = null;
-    Util.logger.log("set interval cleared!");
+    Util.logger.log("Live refreshing schedule cleared");
   });
+
   return stream;
 }
