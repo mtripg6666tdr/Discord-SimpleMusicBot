@@ -61,6 +61,9 @@ export async function resolve(info:AudioSourceBasicInfo){
     }else if(AudioSource.NicoNicoS.validateUrl(url)){
       // NicoNico
       basicInfo = await new AudioSource.NicoNicoS().init(url, gotData as AudioSource.exportableNicoNico);
+    }else if(AudioSource.Twitter.validateUrl(url)){
+      // Twitter
+      basicInfo = await new AudioSource.Twitter().init(url, gotData as AudioSource.exportableTwitter);
     }
   }
 
