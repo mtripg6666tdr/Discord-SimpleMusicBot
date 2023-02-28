@@ -22,7 +22,7 @@
     "https-proxy-agent": "^5.0.1",
     "miniget": "^4.2.2",
     "niconico-dl.js": "^1.1.3",
-    "prism-media": "^1.3.4",
+    "prism-media": "^1.3.5",
     "soundcloud.ts": "^0.4.9",
     "spotify-url-info": "^3.2.3",
     "throttle-debounce": "^5.0.0",
