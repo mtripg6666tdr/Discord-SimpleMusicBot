@@ -96,11 +96,11 @@ export function createPassThrough(opts:TransformOptions = {}):PassThrough{
     emitClose: true,
     autoDestroy: true,
   }, opts));
-  stream._destroy = () => {
+  stream._destroy = (er, callback) => {
     // for debug purpose
     log(`[PassThrough] destroyed (id: ${id})`, "debug");
     stream.destroyed = true;
-    stream.emit("close");
+    callback(er);
   };
   return stream;
 }
