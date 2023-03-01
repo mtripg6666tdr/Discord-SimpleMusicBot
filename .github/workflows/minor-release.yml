@@ -22,6 +22,15 @@ jobs:
         run: echo $VERSION
         env:
           VERSION: ${{ steps.bump-version.outputs.VERSION }}
+
+      - name: Install dependencies on documentation
+        working-directory: "docs"
+        run: npm i
+
+      - name: Frozen the current documentation
+        run: node docs/frozen-version.js
+        env:
+          VERSION: ${{ steps.bump-version.outputs.VERSION }}
       
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
