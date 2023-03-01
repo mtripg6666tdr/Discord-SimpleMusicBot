@@ -38,16 +38,12 @@ export default class Volume extends BaseCommand {
         description: "変更先の音量。1~200までが指定できます。",
         required: false
       }],
-      permissionDescription: "同じボイスチャンネルに接続",
+      requiredPermissionsOr: ["admin", "sameVc"],
       shouldDefer: false,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && !Util.eris.channel.sameVC(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     if(options.rawArgs === ""){
       await message.reply(`:loud_sound:現在の音量は**${options.server.player.volume}**です(デフォルト:100)`)

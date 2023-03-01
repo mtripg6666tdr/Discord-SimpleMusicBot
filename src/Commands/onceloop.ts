@@ -30,19 +30,12 @@ export default class OnceLoop extends BaseCommand {
       description: "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
       unlist: false,
       category: "player",
-      permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはユーザーと同じボイスチャンネルに接続している",
+      requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: false,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.sameVC(message.member, options)){
-      message.reply({
-        content: "この操作を実行する権限がありません",
-        ephemeral: true,
-      }).catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     if(options.server.queue.onceLoopEnabled){
       options.server.queue.onceLoopEnabled = false;

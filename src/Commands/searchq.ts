@@ -42,16 +42,12 @@ export default class Searchq extends BaseCommand {
         description: "検索したい楽曲のキーワード",
         required: true
       }],
-      permissionDescription: "ボットがボイスチャンネルに接続中ならば、ボットがどのボイスチャンネルにも接続していない、またはユーザーと同じボイスチャンネルに接続していること。どこにも接続していなければ特に権限必要なし。",
+      requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.sameVC(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     if(options.server.queue.length === 0){
       message.reply("✘キューが空です").catch(e => Util.logger.log(e, "error"));

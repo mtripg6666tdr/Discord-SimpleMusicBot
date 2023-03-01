@@ -30,16 +30,12 @@ export default class Rmall extends BaseCommand {
       description: "キュー内の曲をすべて削除します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
       unlist: false,
       category: "playlist",
-      permissionDescription: "DJロール",
+      requiredPermissionsOr: ["admin", "onlyListener", "dj"],
       shouldDefer: false,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && !Util.eris.channel.isOnlyListener(message.member, options) && !Util.eris.user.isDJ(message.member, options) && !Util.eris.user.isPrivileged(message.member)){
-      message.reply("この操作を実行する権限がありません。").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     options.server.player.disconnect();
     options.server.queue.removeAll();

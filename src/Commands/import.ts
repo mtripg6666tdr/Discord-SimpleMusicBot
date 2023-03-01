@@ -42,16 +42,12 @@ export default class Import extends BaseCommand {
         description: "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURL、もしくはキューの埋め込みが添付されたURLを指定できます。",
         required: true
       }],
-      permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはコマンドの実行者と同じボイスチャンネルにいる",
+      requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: false,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.sameVC(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     if(options.rawArgs === ""){
       message.reply("❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(e => Util.logger.log(e, "error"));

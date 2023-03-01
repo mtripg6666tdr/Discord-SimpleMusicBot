@@ -30,16 +30,12 @@ export default class QueueLoop extends BaseCommand {
       description: "キュー内のループを設定します。",
       unlist: false,
       category: "player",
-      permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはユーザーと同じボイスチャンネルに接続している",
+      requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: false,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.sameVC(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     if(options.server.queue.queueLoopEnabled){
       options.server.queue.queueLoopEnabled = false;

@@ -30,23 +30,12 @@ export default class RmDuplicated extends BaseCommand {
       description: "キュー内の重複（ちょうふく）している曲を削除します。",
       unlist: false,
       category: "playlist",
-      permissionDescription: "ユーザーがDJロールを保持",
+      requiredPermissionsOr: ["admin", "onlyListener", "dj"],
       shouldDefer: false,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(
-      !Util.eris.user.isDJ(message.member, options)
-      && !Util.eris.channel.isOnlyListener(message.member, options)
-      && !Util.eris.user.isPrivileged(message.member)
-    ){
-      await message.reply({
-        content: "この操作を実行する権限がありません。この操作を実行するには、DJロールを保持しているか、ボイスチャンネルに対する唯一のメンバーか、サーバーの管理者である必要があります。",
-        ephemeral: true,
-      });
-      return;
-    }
     options.server.updateBoundChannel(message);
     const q = options.server.queue;
     const indexes:number[] = [];

@@ -232,7 +232,7 @@ export class MusicBot extends MusicBotBase {
         return;
       }
       // コマンドの処理
-      await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
+      await command.checkAndRun(commandMessage, this.createCommandRunnerArgs(commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
     }else if(server.hasSearchPanel(message.member.id)){
       // searchコマンドのキャンセルを捕捉
       const panel = server.getSearchPanel(message.member.id);
@@ -328,7 +328,7 @@ export class MusicBot extends MusicBotBase {
         // プレフィックス更新
         server.updatePrefix(commandMessage);
         // コマンドを実行
-        await command.run(commandMessage, this.createCommandRunnerArgs(commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
+        await command.checkAndRun(commandMessage, this.createCommandRunnerArgs(commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
       }else{
         await interaction.createMessage("おっと！なにかが間違ってしまったようです。\r\nコマンドが見つかりませんでした。 :sob:");
       }
@@ -399,7 +399,7 @@ export class MusicBot extends MusicBotBase {
           const commandMessage = CommandMessage.createFromInteraction(interaction as discord.ComponentInteraction<discord.GuildTextableWithThread>, command, [], "") as CommandMessage;
           const args = this.createCommandRunnerArgs(commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions);
           args.includeMention = true;
-          CommandManager.instance.resolve(command)?.run(commandMessage, args);
+          CommandManager.instance.resolve(command)?.checkAndRun(commandMessage, args);
         }else{
           const updateEffectPanel = () => {
             const mes = interaction.message;

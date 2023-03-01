@@ -41,7 +41,7 @@ export default class Thumbnail extends BaseCommand {
         description: "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します",
         required: false
       }],
-      permissionDescription: "なし",
+      requiredPermissionsOr: [],
       shouldDefer: false,
     });
   }

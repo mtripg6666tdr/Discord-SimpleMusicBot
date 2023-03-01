@@ -17,12 +17,14 @@
  */
 
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { ListCommandInitializeOptions, UnlistCommandInitializeOptions, ListCommandWithArgumentsInitializeOptions, CommandArgs, SlashCommandArgument } from "../Structure/Command";
+import type { ListCommandInitializeOptions, UnlistCommandInitializeOptions, ListCommandWithArgumentsInitializeOptions, CommandArgs, SlashCommandArgument, CommandPermission } from "../Structure/Command";
 import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString } from "eris";
 
 import { Constants } from "eris";
 
 import { CommandManager } from "../Component/CommandManager";
+import { permissionDescriptionParts } from "../Structure/Command";
+import Util from "../Util";
 
 export { CommandArgs } from "../Structure/Command";
 
@@ -30,7 +32,7 @@ export { CommandArgs } from "../Structure/Command";
  * すべてのコマンドハンドラーの基底クラスです
  */
 export abstract class BaseCommand {
-  abstract run(message:CommandMessage, options:Readonly<CommandArgs>):Promise<void>;
+  protected abstract run(message:CommandMessage, options:Readonly<CommandArgs>):Promise<void>;
   
   protected readonly _name:string;
   public get name(){
@@ -81,9 +83,18 @@ export abstract class BaseCommand {
     return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
   }
 
-  protected readonly _permissionDescription:string = null;
-  public get permissionDescription(){
-    return this._permissionDescription;
+  protected readonly _requiredPermissionsOr:CommandPermission[] = null;
+  public get requiredPermissionsOr(){
+    return this._requiredPermissionsOr;
+  }
+
+  get permissionDescription(){
+    const perms = this.requiredPermissionsOr.filter(perm => perm !== "admin");
+    if(perms.length === 0){
+      return "なし";
+    }else{
+      return perms.map(permission => permissionDescriptionParts[permission]).join("、");
+    }
   }
 
   constructor(opts:ListCommandInitializeOptions|UnlistCommandInitializeOptions){
@@ -93,14 +104,45 @@ export abstract class BaseCommand {
     this._shouldDefer = opts.shouldDefer;
     if(!this._unlist){
       if(!this.asciiName) throw new Error("Command has not ascii name");
-      const { description, examples, usage, category, argument, permissionDescription } = opts as ListCommandWithArgumentsInitializeOptions;
+      const { description, examples, usage, category, argument, requiredPermissionsOr } = opts as ListCommandWithArgumentsInitializeOptions;
       this._description = description;
       this._examples = examples || null;
       this._usage = usage || null;
       this._category = category;
       this._argument = argument || null;
-      this._permissionDescription = permissionDescription || "なし";
+      this._requiredPermissionsOr = requiredPermissionsOr || [];
     }
+  }
+
+  async checkAndRun(message:CommandMessage, options:Readonly<CommandArgs>){
+    const judgeIfPermissionMeeted = (perm:CommandPermission) => {
+      if(perm === "admin"){
+        return Util.eris.user.isPrivileged(message.member);
+      }else if(perm === "dj"){
+        return Util.eris.user.isDJ(message.member, options);
+      }else if(perm === "manageGuild"){
+        return message.member.permissions.has("manageGuild");
+      }else if(perm === "manageMessages"){
+        return message.channel.permissionsOf(message.member).has("manageMessages");
+      }else if(perm === "noConnection"){
+        return !options.server.player.isConnecting;
+      }else if(perm === "onlyListener"){
+        return Util.eris.channel.isOnlyListener(message.member, options);
+      }else if(perm === "sameVc"){
+        return Util.eris.channel.sameVC(message.member, options);
+      }else{
+        return false;
+      }
+    };
+    console.log(this.requiredPermissionsOr.filter(judgeIfPermissionMeeted));
+    if(this.requiredPermissionsOr.length !== 0 && !this.requiredPermissionsOr.some(judgeIfPermissionMeeted)){
+      await message.reply({
+        content: `この操作を実行するには、${this.permissionDescription}${this.requiredPermissionsOr.length > 1 ? "のいずれか" : ""}が必要です。`,
+        ephemeral: true,
+      });
+      return;
+    }
+    await this.run(message, options);
   }
 
   toApplicationCommandStructure(){

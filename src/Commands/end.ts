@@ -30,16 +30,12 @@ export default class End extends BaseCommand {
       description: "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します",
       unlist: false,
       category: "playlist",
-      permissionDescription: "DJロール",
+      requiredPermissionsOr: ["admin", "dj", "onlyListener"],
       shouldDefer: false,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && !Util.eris.channel.isOnlyListener(message.member, options) && !Util.eris.user.isDJ(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     if(!options.server.player.isPlaying){
       message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));

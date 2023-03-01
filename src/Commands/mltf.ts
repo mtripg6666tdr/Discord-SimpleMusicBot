@@ -30,16 +30,12 @@ export default class Mltf extends BaseCommand {
       description: "キューの最後の曲をキューの先頭に移動します。",
       unlist: false,
       category: "playlist",
-      permissionDescription: "DJロール",
+      requiredPermissionsOr: ["admin", "onlyListener", "dj"],
       shouldDefer: false,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && !Util.eris.channel.isOnlyListener(message.member, options) && !Util.eris.user.isDJ(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     if(options.server.queue.length <= 2){
       message.reply("キューに3曲以上追加されているときに使用できます。").catch(e => Util.logger.log(e, "error"));

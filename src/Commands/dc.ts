@@ -30,16 +30,12 @@ export default class Dc extends BaseCommand {
       alias: ["終了", "dc", "disconnect", "leave", "quit"] as const,
       description: "ボイスチャンネルから切断します。",
       category: "voice",
-      permissionDescription: "同じボイスチャンネルに接続",
+      requiredPermissionsOr: ["admin", "sameVc"],
       shouldDefer: false,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && !Util.eris.channel.sameVC(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.server.player.isConnecting){

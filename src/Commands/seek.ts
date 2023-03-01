@@ -38,16 +38,12 @@ export default class Seek extends BaseCommand {
         description: "シーク先の時間",
         required: true
       }],
-      permissionDescription: "同じボイスチャンネルに接続",
+      requiredPermissionsOr: ["admin", "dj"],
       shouldDefer: false,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && !Util.eris.channel.sameVC(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     const server = options.server;
     // そもそも再生状態じゃないよ...

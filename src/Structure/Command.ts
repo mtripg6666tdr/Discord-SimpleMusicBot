@@ -28,6 +28,26 @@ export type BaseCommandInitializeOptions = {
   shouldDefer:boolean,
 };
 
+export type CommandPermission =
+  | "admin"
+  | "dj"
+  | "sameVc"
+  | "manageMessages"
+  | "manageGuild"
+  | "onlyListener"
+  | "noConnection"
+;
+
+export const permissionDescriptionParts:Readonly<{[key in CommandPermission]:string}> = {
+  admin: "サーバー/チャンネルの管理権限を持っていること",
+  dj: "同じボイスチャンネルに接続していてかつDJロールを保持していること",
+  sameVc: "同じボイスチャンネルに接続していること",
+  manageMessages: "メッセージの管理権限を持っていること",
+  manageGuild: "サーバーの管理権限を持っていること",
+  onlyListener: "ボイスチャンネルの唯一のユーザーであること",
+  noConnection: "ボットがどこのボイスチャンネルにも接続していないこと",
+};
+
 export type ListCommandWithArgumentsInitializeOptions = BaseCommandInitializeOptions & {
   description:string,
   unlist:boolean,
@@ -35,14 +55,14 @@ export type ListCommandWithArgumentsInitializeOptions = BaseCommandInitializeOpt
   usage:string,
   category:keyof typeof categories,
   argument:SlashCommandArgument[],
-  permissionDescription:string,
+  requiredPermissionsOr:CommandPermission[],
 };
 
 export type ListCommandWithoutArgumentsInitializeOptions = BaseCommandInitializeOptions & {
   description:string,
   unlist:false,
   category:keyof typeof categories,
-  permissionDescription:string,
+  requiredPermissionsOr:CommandPermission[],
 };
 
 export type ListCommandInitializeOptions =
