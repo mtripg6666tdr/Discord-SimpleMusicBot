@@ -47,28 +47,29 @@ export default class Help extends BaseCommand {
         .then(user => user.username)
         .catch(() => null as string)
       ;
+    const { isDisabledSource } = Util.general;
     const embed = new Helper.MessageEmbedBuilder()
       .setTitle(options.client.user.username + ":notes:")
       .setDescription(
-        "高音質な音楽を再生して、Discordでのエクスペリエンスを最高にするため作られました:robot:\r\n"
-      + "利用可能なコマンドを確認するには、`" + options.server.prefix + "command`を使用してください。")
+        "高音質な音楽で、Discordで最高のエクスペリエンスを得るために作られました:robot:\r\n"
+      + `利用可能なコマンドを確認するには、\`${Util.config.noMessageContent ? "/" : options.server.prefix}command\`を使用してください。`)
       .addField("開発者", `[${developer || "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`)
       .addField("バージョン", "`" + options.bot.version + "`")
       .addField("レポジトリ/ソースコード", "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot")
       .addField("サポートサーバー", "https://discord.gg/7DrAEXBMHe")
       .addField("現在対応している再生ソース", [
-        "・YouTube(キーワード検索)",
-        "・YouTube(動画URL指定)",
-        "・YouTube(プレイリストURL指定)",
-        "・SoundCloud(キーワード検索)",
-        "・SoundCloud(楽曲ページURL指定)",
-        "・Streamable(動画ページURL指定)",
-        "・Discord(音声ファイルの添付付きメッセージのURL指定)",
-        "・Googleドライブ(音声ファイルの限定公開リンクのURL指定)",
-        "・ニコニコ動画(動画ページURL指定)",
-        "・Twitter(ツイートURL指定)",
-        "・オーディオファイルへの直URL",
-        Spotify.available ? "・Spotify(曲のURL、およびプレイリストのURL。曲を推測してYouTubeから再生します。)" : undefined,
+        !isDisabledSource("youtube") && "・YouTube(キーワード検索)",
+        !isDisabledSource("youtube") && "・YouTube(動画URL指定)",
+        !isDisabledSource("youtube") && "・YouTube(プレイリストURL指定)",
+        !isDisabledSource("soundcloud") && "・SoundCloud(キーワード検索)",
+        !isDisabledSource("soundcloud") && "・SoundCloud(楽曲ページURL指定)",
+        !isDisabledSource("streamable") && "・Streamable(動画ページURL指定)",
+        !isDisabledSource("custom") && "・Discord(音声ファイルの添付付きメッセージのURL指定)",
+        !isDisabledSource("googledrive") && "・Googleドライブ(音声ファイルの限定公開リンクのURL指定)",
+        !isDisabledSource("niconico") && "・ニコニコ動画(動画ページURL指定)",
+        !isDisabledSource("twitter") && "・Twitter(ツイートURL指定)",
+        !isDisabledSource("spotify") && Spotify.available && "・Spotify(曲のURL、およびプレイリストのURL。曲を推測してYouTubeから再生します。)",
+        !isDisabledSource("custom") && "・オーディオファイルへの直URL",
       ].filter(d => d).join("\r\n"))
       .setColor(getColor("HELP"))
       .toEris()

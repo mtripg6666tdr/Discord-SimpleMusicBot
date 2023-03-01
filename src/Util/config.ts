@@ -61,6 +61,7 @@ const Config = Type.Object({
   noMessageContent: Type.Optional(Type.Boolean({default: false})),
   twentyFourSeven: Type.Optional(Type.Array(Type.RegEx(/^\d+$/), {default: []})),
   alwaysTwentyFourSeven: Type.Optional(Type.Boolean({default: false})),
+  disabledSources: Type.Optional(Type.Array(Type.String(), {default: []})),
 });
 
 const checker = TypeCompiler.Compile(Config);
@@ -89,6 +90,7 @@ export default Object.assign(
     noMessageContent: false,
     twentyFourSeven: [],
     alwaysTwentyFourSeven: false,
+    disabledSources: [],
   },
   config,
 ) as unknown as Static<typeof Config>;

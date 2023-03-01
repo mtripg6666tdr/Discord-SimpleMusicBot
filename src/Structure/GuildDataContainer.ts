@@ -367,7 +367,7 @@ export class GuildDataContainer extends LogEmitter {
   async playFromURL(message:CommandMessage, rawArg:string, first:boolean = true, cancellable:boolean = false){
     const t = Util.time.timer.start("MusicBot#PlayFromURL");
     setTimeout(() => message.suppressEmbeds(true).catch(e => this.Log(Util.general.StringifyObject(e), "warn")), 4000).unref();
-    if(rawArg.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){
+    if(!Util.general.isDisabledSource("custom") && rawArg.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){
       // Discordメッセへのリンクならば
       const smsg = await message.reply("🔍メッセージを取得しています...");
       try{
@@ -385,12 +385,12 @@ export class GuildDataContainer extends LogEmitter {
         Util.logger.log(e, "error");
         await smsg.edit(`✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`).catch(er => this.Log(er, "error"));
       }
-    }else if(Util.fs.isAvailableRawAudioURL(rawArg)){
+    }else if(!Util.general.isDisabledSource("custom") && Util.fs.isAvailableRawAudioURL(rawArg)){
       // オーディオファイルへの直リンク？
       await this.queue.autoAddQueue(rawArg, message.member, "custom", first, false, message.channel as TextChannel);
       await this.player.play();
       return;
-    }else if(!rawArg.includes("v=") && !rawArg.includes("/channel/") && ytpl.validateID(rawArg)){
+    }else if(!Util.general.isDisabledSource("youtube") && !rawArg.includes("v=") && !rawArg.includes("/channel/") && ytpl.validateID(rawArg)){
       //違うならYouTubeプレイリストの直リンクか？
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const cancellation = this.bindCancellation(new TaskCancellationManager());
@@ -439,7 +439,7 @@ export class GuildDataContainer extends LogEmitter {
         this.unbindCancellation(cancellation);
       }
       await this.player.play();
-    }else if(SoundCloudS.validatePlaylistUrl(rawArg)){
+    }else if(!Util.general.isDisabledSource("soundcloud") && SoundCloudS.validatePlaylistUrl(rawArg)){
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const sc = new Soundcloud();
       const playlist = await sc.playlists.getV2(rawArg);
@@ -484,7 +484,7 @@ export class GuildDataContainer extends LogEmitter {
         this.unbindCancellation(cancellation);
       }
       await this.player.play();
-    }else if(Spotify.validatePlaylistUrl(rawArg) && Spotify.available){
+    }else if(!Util.general.isDisabledSource("spotify") && Spotify.validatePlaylistUrl(rawArg) && Spotify.available){
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const cancellation = this.bindCancellation(new TaskCancellationManager());
       try{

@@ -26,6 +26,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { LogEmitter } from "../Structure";
+import Util from "../Util";
 
 /**
  * コマンドマネージャー
@@ -61,6 +62,16 @@ export class CommandManager extends LogEmitter {
       .map(n => {
         // eslint-disable-next-line new-cap
         return new (require(path.join(__dirname, "../Commands/", n)).default)() as BaseCommand;
+      })
+      .filter(n => {
+        if(n.name === "検索" && Util.general.isDisabledSource("youtube")){
+          return false;
+        }else if(n.name === "searchb" && !process.env.BD_ENABLE){
+          return false;
+        }else if(n.name === "サウンドクラウドを検索" && Util.general.isDisabledSource("soundcloud")){
+          return false;
+        }
+        return true;
       });
     this.Log("Initialized");
   }

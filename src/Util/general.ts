@@ -183,3 +183,7 @@ export function isBotAdmin(userId:string){
   }
   return typeof config.adminId === "string" ? config.adminId === userId : config.adminId.includes(userId);
 }
+
+export function isDisabledSource(sourceIdentifer:string){
+  return config.disabledSources.includes(sourceIdentifer);
+}
