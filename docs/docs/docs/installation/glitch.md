@@ -1,7 +1,7 @@
 ---
 sidebar_position: 5
 ---
-# Glitchで使用する
+# 【環境別】Glitchで使用する
 Discord-SimpleMusicBotをreplitで実行する手順を説明します。
 
 ## 前提条件

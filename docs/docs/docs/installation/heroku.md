@@ -1,7 +1,7 @@
 ---
 sidebar_position: 3
 ---
-# Herokuで使用する
+# 【環境別】Herokuで使用する
 
 :::info
 
