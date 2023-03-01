@@ -21,7 +21,7 @@ import type { TaskCancellationManager } from "./TaskCancellationManager";
 import type { exportableCustom } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { AddedBy, QueueContent } from "../Structure/QueueContent";
-import type { Message, TextChannel } from "eris";
+import type { Message, TextableChannel, TextChannel } from "eris";
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 import { Helper } from "@mtripg6666tdr/eris-command-resolver";
@@ -294,29 +294,44 @@ export class QueueManager extends ServerManagerBase {
           .addField("リクエスト", this.getDisplayNameFromMember(addedBy) ?? "不明", true)
           .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
           .addField("再生されるまでの予想時間", index === "0" ? "-" : Util.time.HourMinSecToString(timeFragments), true)
-          .setThumbnail(info.basicInfo.Thumbnail)
         ;
         if(info.basicInfo.isYouTube() && info.basicInfo.IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }else if(info.basicInfo.isSpotify()){
           embed.addField(":warning:注意", "Spotifyのタイトルは正しく再生されない場合があります");
         }
-        const lastReply = await msg.edit({
-          content: "",
-          embeds: [
-            embed.toEris()
-          ],
-          components: !first && cancellable ? [
-            new Helper.MessageActionRowBuilder()
-              .addComponents(
-                new Helper.MessageButtonBuilder()
-                  .setCustomId(`cancel-last-${this.getUserIdFromMember(addedBy)}`)
-                  .setLabel("キャンセル")
-                  .setStyle("DANGER")
-              )
-              .toEris()
-          ] : [],
-        });
+        let lastReply:Message<TextableChannel>|ResponseMessage = null;
+        const components = !first && cancellable ? [
+          new Helper.MessageActionRowBuilder()
+            .addComponents(
+              new Helper.MessageButtonBuilder()
+                .setCustomId(`cancel-last-${this.getUserIdFromMember(addedBy)}`)
+                .setLabel("キャンセル")
+                .setStyle("DANGER")
+            )
+            .toEris()
+        ] : [];
+        if(typeof info.basicInfo.Thumbnail === "string"){
+          embed.setThumbnail(info.basicInfo.Thumbnail);
+          lastReply = await msg.edit({
+            content: "",
+            embeds: [embed.toEris()],
+            components,
+          });
+        }else{
+          embed.setThumbnail("attachment://thumbnail." + info.basicInfo.Thumbnail.ext);
+          lastReply = await this.server.bot.client.editMessage(msg.channel.id, msg.id, {
+            content: "",
+            embeds: [embed.toEris()],
+            components,
+            file: [
+              {
+                name: "thumbnail." + info.basicInfo.Thumbnail.ext,
+                file: info.basicInfo.Thumbnail.data,
+              }
+            ],
+          });
+        }
         if(!first && cancellable){
           let componentDeleted = false;
           (["change", "changeWithoutCurrent"] as const).forEach(event => this.once(event, () => {
