@@ -121,6 +121,7 @@ export default class Commands extends BaseCommand {
           .setDescription(ci.description)
           .setColor(getColor("COMMAND"))
           .addField("エイリアス", `\`${ci.alias.join("`, `")}\``)
+          .addField("実行に必要な権限", ci.permissionDescription)
         ;
         if(ci.usage){
           embed.addField("使い方", `\`${prefix}${ci.usage}\` \r\n\`<>\` 内の引数は必須の引数、\`[]\`内の引数は任意の引数です。`);
