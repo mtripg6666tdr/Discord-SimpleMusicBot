@@ -11,6 +11,8 @@ sidebar_label: スキップ
 
 - skip
 - s
+- playskip
+- ps
 
 
 

@@ -10,9 +10,10 @@ sidebar_label: 重複削除
 `重複削除`以外にも以下の別名を使用できます。
 
 - rmduplicated
-- rmduped
-- removeduped
-- removeduplicated
+- rmdupes
+- removedupes
+- removeduplicates
+- drm
 
 
 

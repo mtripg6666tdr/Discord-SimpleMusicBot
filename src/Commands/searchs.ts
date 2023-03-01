@@ -32,7 +32,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
   constructor(){
     super({
       name: "サウンドクラウドを検索",
-      alias: ["soundcloudを検索", "searchs", "ses", "ss"],
+      alias: ["soundcloudを検索", "searchsoundcloud", "searchs", "ses", "ss", "sc", "soundcloud"],
       description: "曲をSoundCloudで検索します",
       unlist: false,
       category: "playlist",
