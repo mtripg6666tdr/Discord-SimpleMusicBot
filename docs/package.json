@@ -26,6 +26,8 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "2.3.1",
     "@tsconfig/docusaurus": "^1.0.5",
+    "pretty-js": "^0.2.2",
+    "recursive-copy": "^2.0.14",
     "typescript": "^4.9.5"
   },
   "browserslist": {

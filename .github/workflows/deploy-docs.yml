@@ -2,13 +2,22 @@ name: Deploy Documentation
 
 on:
   workflow_dispatch:
-  
-  release:
-    types:
-      - published
-  
+  push:
+    branches: 
+      - master
+    paths:
+      - 'docs/**'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
-  run:
+  deploy:
+    environment:
+        name: github-pages
+        url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
@@ -17,19 +26,25 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: '16.x'
+          node-version: '18.x'
       
       - name: Install dependencies on docs
         working-directory: "docs"
         run: npm ci
 
-      - name: Update documentation
+      - name: Build documentation
         working-directory: "docs"
         run: |
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
           npm run build
-          npm run deploy
-        env:
-          GIT_USER: mtripg6666tdr
-          GIT_PASS: ${{ secrets.GH_PAT }}
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: './docs/build'
+      
+      - name: Deploy to GitHub Pages
+        id: github-pages
+        uses: actions/deploy-pages@v1
