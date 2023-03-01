@@ -93,7 +93,7 @@ export abstract class BaseCommand {
     if(perms.length === 0){
       return "なし";
     }else{
-      return perms.map(permission => permissionDescriptionParts[permission]).join("、");
+      return `${perms.map(permission => permissionDescriptionParts[permission]).join("、")}${perms.length > 1 ? "のいずれか" : ""}`;
     }
   }
 
@@ -137,7 +137,7 @@ export abstract class BaseCommand {
     console.log(this.requiredPermissionsOr.filter(judgeIfPermissionMeeted));
     if(this.requiredPermissionsOr.length !== 0 && !this.requiredPermissionsOr.some(judgeIfPermissionMeeted)){
       await message.reply({
-        content: `この操作を実行するには、${this.permissionDescription}${this.requiredPermissionsOr.length > 1 ? "のいずれか" : ""}が必要です。`,
+        content: `この操作を実行するには、${this.permissionDescription}が必要です。`,
         ephemeral: true,
       });
       return;
