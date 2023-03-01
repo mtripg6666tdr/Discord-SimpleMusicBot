@@ -340,43 +340,62 @@ export class PlayManager extends ServerManagerBase {
             "次の曲がまだ登録されていません", true
           )
           .addField("再生待ちの曲", this.server.queue.loopEnabled ? "ループします" : (this.server.queue.length - 1) + "曲(" + Util.time.HourMinSecToString(timeFragments) + ")", true)
-          .setThumbnail(this.currentAudioInfo.Thumbnail)
         ;
+        if(typeof this.currentAudioInfo.Thumbnail === "string"){
+          embed.setThumbnail(this.currentAudioInfo.Thumbnail);
+        }else{
+          embed.setThumbnail("attachment://thumbnail." + this.currentAudioInfo.Thumbnail.ext);
+        }
         /* eslint-enable @typescript-eslint/indent */
         if(this.currentAudioInfo.ServiceIdentifer === "youtube" && (this.currentAudioInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
         this.emit("playStartUIPrepared", embed);
-        mes.edit({
-          content: "",
-          embeds: [embed.toEris()],
-          components: [
-            new Helper.MessageActionRowBuilder()
-              .addComponents(
-                new Helper.MessageButtonBuilder()
-                  .setCustomId("control_rewind")
-                  .setEmoji("⏮️")
-                  .setLabel("頭出し")
-                  .setStyle("SECONDARY"),
-                new Helper.MessageButtonBuilder()
-                  .setCustomId("control_playpause")
-                  .setEmoji("⏯️")
-                  .setLabel("再生/一時停止")
-                  .setStyle("PRIMARY"),
-                new Helper.MessageButtonBuilder()
-                  .setCustomId("control_skip")
-                  .setEmoji("⏭️")
-                  .setLabel("スキップ")
-                  .setStyle("SECONDARY"),
-                new Helper.MessageButtonBuilder()
-                  .setCustomId("control_onceloop")
-                  .setEmoji("🔂")
-                  .setLabel("ワンスループ")
-                  .setStyle("SECONDARY"),
-              )
-              .toEris()
-          ]
-        }).catch(e => Util.logger.log(e, "error"));
+        const components = [
+          new Helper.MessageActionRowBuilder()
+            .addComponents(
+              new Helper.MessageButtonBuilder()
+                .setCustomId("control_rewind")
+                .setEmoji("⏮️")
+                .setLabel("頭出し")
+                .setStyle("SECONDARY"),
+              new Helper.MessageButtonBuilder()
+                .setCustomId("control_playpause")
+                .setEmoji("⏯️")
+                .setLabel("再生/一時停止")
+                .setStyle("PRIMARY"),
+              new Helper.MessageButtonBuilder()
+                .setCustomId("control_skip")
+                .setEmoji("⏭️")
+                .setLabel("スキップ")
+                .setStyle("SECONDARY"),
+              new Helper.MessageButtonBuilder()
+                .setCustomId("control_onceloop")
+                .setEmoji("🔂")
+                .setLabel("ワンスループ")
+                .setStyle("SECONDARY"),
+            )
+            .toEris()
+        ];
+        if(typeof this.currentAudioInfo.Thumbnail === "string"){
+          mes.edit({
+            content: "",
+            embeds: [embed.toEris()],
+            components,
+          }).catch(e => Util.logger.log(e, "error"));
+        }else{
+          this.server.bot.client.editMessage(mes.channel.id, mes.id, {
+            content: "",
+            embeds: [embed.toEris()],
+            components,
+            file: [
+              {
+                name: "thumbnail." + this.currentAudioInfo.Thumbnail.ext,
+                file: this.currentAudioInfo.Thumbnail.data
+              }
+            ]
+          });
+        }
         const removeControls = () => {
           this.off("playCompleted", removeControls);
           this.off("handledError", removeControls);

@@ -76,16 +76,27 @@ export default class NowPlaying extends BaseCommand {
           (info.ServiceIdentifer === "youtube" && (info as YouTube).LiveStream) ? "(ライブストリーム)" : ` \`${min}:${sec}/${(_t === 0 ? "(不明)" : `${tmin}:${tsec}\``)}`
         }`
       )
-      .setThumbnail(info.Thumbnail)
       .setFields(
         ...info.toField(
           ["long", "l", "verbose", "l", "true"].some(arg => options.args[0] === arg)
         )
       )
       .addField(":link:URL", info.Url)
-      .toEris()
     ;
-
-    await message.reply({embeds: [embed]}).catch(e => Util.logger.log(e, "error"));
+    if(typeof info.Thumbnail === "string"){
+      embed.setThumbnail(info.Thumbnail);
+      await message.reply({embeds: [embed.toEris()]}).catch(e => Util.logger.log(e, "error"));
+    }else{
+      embed.setThumbnail("attachment://thumbnail." + info.Thumbnail.ext);
+      await message.reply({
+        embeds: [embed.toEris()],
+        files: [
+          {
+            name: "thumbnail." + info.Thumbnail.ext,
+            file: info.Thumbnail.data,
+          }
+        ],
+      }).catch(e => Util.logger.log(e, "error"));
+    }
   }
 }

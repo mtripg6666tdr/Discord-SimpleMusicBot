@@ -62,14 +62,31 @@ export default class Thumbnail extends BaseCommand {
     }else if(!options.rawArgs && options.server.player.isPlaying && options.server.queue.length >= 1){
       const info = options.server.queue.get(0).basicInfo;
       embed
-        .setImage(info.Thumbnail)
         .setTitle(info.Title)
         .setDescription("URL: " + info.Url)
       ;
+      if(typeof info.Thumbnail === "string"){
+        embed.setImage(info.Thumbnail);
+        await message.reply({
+          embeds: [embed.toEris()]
+        }).catch(e => Util.logger.log(e, "error"));
+      }else{
+        embed.setImage("attachment://thumbnail." + info.Thumbnail.ext);
+        await message.reply({
+          embeds: [embed.toEris()],
+          files: [
+            {
+              name: "thumbnail." + info.Thumbnail.ext,
+              file: info.Thumbnail.data,
+            },
+          ],
+        }).catch(e => Util.logger.log(e, "error"));
+      }
     }else{
       message.reply("✘検索結果が見つかりません").catch(e => Util.logger.log(e, "error"));
       return;
     }
+    
     await message.reply({
       embeds: [embed.toEris()]
     }).catch(e => Util.logger.log(e, "error"));
