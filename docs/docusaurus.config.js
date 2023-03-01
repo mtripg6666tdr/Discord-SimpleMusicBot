@@ -59,7 +59,7 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'docs/welcome',
+            docId: 'setup/welcome',
             position: 'left',
             label: 'ドキュメント',
           },
@@ -84,7 +84,7 @@ const config = {
             items: [
               {
                 label: 'ボット管理者向けドキュメント',
-                to: '/docs/docs/welcome',
+                to: '/docs/setup/welcome',
               },
               {
                 label: 'ボット利用者向け機能ガイド',

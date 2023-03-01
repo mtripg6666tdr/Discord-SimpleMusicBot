@@ -4,7 +4,7 @@ sidebar_position: 6
 # プレフィックスの変更
 
 :::info
-この機能は、Message Content Intentが有効になっている場合にのみ使用できます。([→使用する権限](../../docs/permission.md))  
+この機能は、Message Content Intentが有効になっている場合にのみ使用できます。([→使用する権限](../../setup/permission.md))  
 :::
 
 メッセージベースのコマンドを使用する際のプレフィックスを変更することができます。  
@@ -12,7 +12,7 @@ sidebar_position: 6
 
 ## ボットレベルで変更する
 ボットの管理者は、ボットのデフォルトのプレフィックスを`config.json`にて変更することができます。  
-方法については、[こちら](../../docs/installation/configuration.md##prefix-stringnull)を参照してください。
+方法については、[こちら](../../setup/installation/configuration.md##prefix-stringnull)を参照してください。
 
 ## サーバーでのプレフィックスを変更する
 サーバーでのプレフィックスを変更するには、ボットのニックネームをDiscordで変更してください。  
