@@ -26,7 +26,7 @@ export default class Skip extends BaseCommand {
   constructor(){
     super({
       name: "スキップ",
-      alias: ["skip", "s"],
+      alias: ["skip", "s", "playskip", "ps"],
       description: "現在再生中の曲をスキップします。",
       unlist: false,
       category: "player",

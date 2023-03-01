@@ -32,7 +32,7 @@ export default class SystemInfo extends BaseCommand {
   constructor(){
     super({
       name: "システム情報",
-      alias: ["ログ", "log", "システム情報", "systeminfo", "sysinfo"],
+      alias: ["ログ", "log", "systeminfo", "sysinfo"],
       description: "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`、`cpu`、`basic`のうちいずれか)を指定して特定の内容のみ取得することもできます。",
       unlist: false,
       category: "utility",

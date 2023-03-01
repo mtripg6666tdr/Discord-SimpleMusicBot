@@ -73,7 +73,22 @@ export class CommandManager extends LogEmitter {
         }
         return true;
       });
+    this.checkDuplicate();
     this.Log("Initialized");
+  }
+
+  checkDuplicate(){
+    const sets = new Map<string, BaseCommand>();
+    const setCommand = (name:string, command:BaseCommand) => {
+      if(sets.has(name)){
+        this.Log(`Detected command ${command.name} the duplicated key ${name} with ${sets.get(name).name}; overwriting`, "warn");
+      }
+      sets.set(name, command);
+    };
+    this.commands.forEach(command => {
+      setCommand(command.name, command);
+      command.alias.forEach(name => setCommand(name, command));
+    });
   }
 
   /**
@@ -97,7 +112,14 @@ export class CommandManager extends LogEmitter {
 
   async sync(client:Client, removeOutdated:boolean = false){
     this.Log("Start syncing application commands");
-    const registeredCommands = (await client.getCommands()).filter(command => command.type === Constants.ApplicationCommandTypes.CHAT_INPUT);
+    const registeredAppCommands = await client.getCommands();
+    if(registeredAppCommands.length === 0){
+      this.Log("Detected no command registered; bulk-registering slash-commands");
+      await client.bulkEditCommands(this.commands.map(command => command.toApplicationCommandStructure()));
+      this.Log("Successfully registered");
+      return;
+    }
+    const registeredCommands = registeredAppCommands.filter(command => command.type === Constants.ApplicationCommandTypes.CHAT_INPUT);
     this.Log(`Successfully get ${registeredCommands.length} commands`);
     const commandsToEdit = this.commands.filter(target => {
       if(target.unlist) return false;

@@ -28,7 +28,7 @@ export default class Play extends BaseCommand {
   constructor(){
     super({
       name: "再生",
-      alias: ["play", "p"],
+      alias: ["play", "p", "resume", "re"],
       description: "キュー内の楽曲を再生します。引数として対応しているサイトの楽曲のURLを指定することもできます。",
       unlist: false,
       category: "player",

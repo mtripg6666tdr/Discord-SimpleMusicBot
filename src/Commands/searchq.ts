@@ -30,7 +30,7 @@ export default class Searchq extends BaseCommand {
   constructor(){
     super({
       name: "キュー内を検索",
-      alias: ["searchq", "seq", "sq"],
+      alias: ["searchqueue", "searchq", "seq", "sq"],
       description: "キュー内を検索します。引数にキーワードを指定します。",
       unlist: false,
       category: "playlist",

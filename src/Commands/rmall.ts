@@ -26,7 +26,7 @@ export default class Rmall extends BaseCommand {
   constructor(){
     super({
       name: "すべて削除",
-      alias: ["すべて削除", "rmall", "allrm", "removeall"],
+      alias: ["rmall", "allrm", "removeall", "clear"],
       description: "キュー内の曲をすべて削除します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
       unlist: false,
       category: "playlist",

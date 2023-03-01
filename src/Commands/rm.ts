@@ -26,7 +26,7 @@ export default class Rm extends BaseCommand {
   constructor(){
     super({
       name: "削除",
-      alias: ["消去", "rm", "remove"],
+      alias: ["消去", "remove", "rm", "del", "delete"],
       description: "キュー内の指定された位置の曲を削除します。",
       unlist: false,
       category: "playlist",

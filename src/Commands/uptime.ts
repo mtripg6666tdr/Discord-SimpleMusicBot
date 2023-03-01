@@ -29,7 +29,7 @@ export default class Uptime extends BaseCommand {
   constructor(){
     super({
       name: "アップタイム",
-      alias: ["アップタイム", "ピング", "uptime", "ping"],
+      alias: ["ピング", "uptime", "ping"],
       description: "ボットのアップタイムおよびping時間(レイテンシ)を表示します。",
       unlist: false,
       category: "utility",
