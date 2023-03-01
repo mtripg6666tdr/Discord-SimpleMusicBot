@@ -13,7 +13,9 @@ const prettyJsOption = {
 
 (async () => {
   const newDocsDir = path.join(__dirname, "./versioned_docs/version-" + versionPrefix);
-  fs.mkdirSync(newDocsDir);
+  if(!fs.existsSync(newDocsDir)){
+    fs.mkdirSync(newDocsDir);
+  }
   await copy(path.join(__dirname, "./docs"), newDocsDir);
   const sidebars = require("./sidebars");
   fs.writeFileSync(
