@@ -554,9 +554,9 @@ export class GuildDataContainer extends LogEmitter {
     const guild = "guild" in message ? message.guild : message.channel.guild;
     const oldPrefix = this.prefix;
     const member = guild.members.get(this.bot.client.user.id);
-    const pmatch = (member.nick || member.username).match(/^\[(?<prefix>.)\]/);
+    const pmatch = (member.nick || member.username).match(/^(\[(?<prefix0>[a-zA-Z!?-_]+)\]|【(?<prefix1>[a-zA-Z!?-_]+)】)/);
     if(pmatch){
-      if(this.prefix !== pmatch.groups.prefix){
+      if(this.prefix !== (pmatch.groups.prefix0 || pmatch.groups.prefix1)){
         this.prefix = Util.string.NormalizeText(pmatch.groups.prefix);
       }
     }else if(this.prefix !== Util.config.prefix){
