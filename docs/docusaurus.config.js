@@ -37,8 +37,7 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/master/docs/',
+          editUrl: 'https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/master/docs/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -70,11 +69,22 @@ const config = {
             label: '使い方/ガイド',
           },
           {
+            type: "docsVersionDropdown",
+            position: "right",
+            dropdownItemsAfter: [
+            ],
+            dropdownActiveClassDisabled: true,
+          },
+          {
             href: 'https://github.com/mtripg6666tdr/Discord-SimpleMusicBot',
             label: 'GitHub',
             position: 'right',
           },
         ],
+      },
+      tableOfContents: {
+        minHeadingLevel: 2,
+        maxHeadingLevel: 4,
       },
       footer: {
         style: 'dark',
