@@ -162,6 +162,14 @@ export class QueueManager extends ServerManagerBase {
     return this.default.map(callbackfn, thisArg);
   }
 
+  /**
+   * キュー内のコンテンツのすべてで与えられた関数を実行します。
+   * @param callbackfn 関数
+   */
+  forEach(callbackfn: (value: QueueContent, index: number, array: readonly QueueContent[]) => void, thisArg?: any){
+    this.default.forEach(callbackfn, thisArg);
+  }
+
   getLengthSecondsTo(index:number){
     let sec = 0;
     if(index < 0) throw new Error("Invalid argument: " + index);

@@ -30,7 +30,7 @@ export default class Skip extends BaseCommand {
       description: "現在再生中の曲をスキップします。",
       unlist: false,
       category: "player",
-      permissionDescription: "削除対象の楽曲を追加した人。要件を満たしていなければ投票を開始します",
+      permissionDescription: "削除対象の楽曲を追加した人、またはDJロールを保持している人。要件を満たしていなければ投票を開始します",
       shouldDefer: false,
     });
   }
@@ -56,7 +56,7 @@ export default class Skip extends BaseCommand {
         return;
       }
       options.server.updateBoundChannel(message);
-      if(item.additionalInfo.addedBy.userId !== message.member.id && !Util.eris.user.isPrivileged(message.member) && members.size > 3){
+      if(item.additionalInfo.addedBy.userId !== message.member.id && !Util.eris.user.isDJ(message.member, options) && !Util.eris.user.isPrivileged(message.member) && members.size > 3){
         if(!server.skipSession){
           await server.createSkipSession(message);
         }else{
