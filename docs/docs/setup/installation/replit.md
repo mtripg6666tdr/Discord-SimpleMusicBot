@@ -2,7 +2,7 @@
 sidebar_position: 4
 ---
 # 【環境別】Replit で使用する
-Discord-SimpleMusicBotをreplitで実行する手順を説明します。
+Discord-SimpleMusicBotを [replit](https://replit.com/) で実行する手順を説明します。
 
 ## 前提条件
 * Replitへの登録は完了しているものとします。
