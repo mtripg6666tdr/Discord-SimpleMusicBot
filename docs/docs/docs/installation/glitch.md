@@ -15,15 +15,16 @@ Glitchのトップ画面から、右上にある`New project`をクリックし�
 
 ### 2. ボットが動作するようファイルを編集します
 ボットが動作するよう、いくつかのファイルを変更する必要があります。
-* `tsconfig.json`
-  ```diff
+* 
+  ```diff title="tsconfig.json"
         "importHelpers": true,
   -     "outDir": "dist/",
   +     "outDir": "out/",
         "allowJs": false,
   ```
-* `package.json`
-  ```diff
+
+* 
+  ```diff title="package.json"
       "start": "npm run build && npm run onlystart",
   -   "onlystart": "node util/exec dist",
   +   "onlystart": "node util/exec out",

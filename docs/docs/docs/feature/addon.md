@@ -11,9 +11,8 @@ sidebar_position: 4
 
   アドオン機能を追加するには、プロジェクトの`src`フォルダと同じ階層に`addon`フォルダを作成します。
   ボットは、addonフォルダにある拡張子がjsのファイルを自動的にアドオンとして実行します。  
-  `サンプル.js`
 
-```js
+```js title="サンプル.js"
 module.exports = function(parent){
   console.log("aaa");
   parent.on("ready", ()=> {
