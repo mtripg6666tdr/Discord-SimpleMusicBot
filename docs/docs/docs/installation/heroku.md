@@ -66,7 +66,8 @@ sidebar_position: 3
 任意のエディタで".gitignore"を修正します。  
 
 `修正例:`
-```diff
+
+```diff title=".gitignore"
 - *.env
 + #*.env
 

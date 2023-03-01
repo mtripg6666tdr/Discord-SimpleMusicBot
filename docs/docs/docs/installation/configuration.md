@@ -39,7 +39,8 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
 :::caution
 任意指定の設定に関しては、**値をnullにしてください("null"ではなくnull)**  
 例：
-```json
+
+```json title="config.json"
 {
   "proxy": null
 }

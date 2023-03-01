@@ -25,7 +25,7 @@ Discord-SimpleMusicBotをreplitで実行する手順を説明します。
 
   #### Node.jsのバージョンが14以前の場合
   Node.jsのバージョンがv12.x.xやv14.x.xのような古いバージョンの場合、新しいバージョンのNode.jsが使えるよう次のコマンドを実行してください。
-  ```
+  ```sh
   npm i node@v18-lts --no-save
   ```
 
@@ -56,7 +56,7 @@ Discord-SimpleMusicBotをreplitで実行する手順を説明します。
   `Error: Cannot find module ...`というエラーが発生して、ボットが起動しない場合は、以下の手順に従ってください。
   1. Replitの画面の左側の`Files`の右にあるメニューボタンを押して、`Show hidden files`を選択します。
   2. ファイルの一覧から`.replit`というファイルを探し、以下のように変更します
-```diff
+```diff title=".replit"
 - entrypoint = "index.js"
 + entrypoint = "dist/index.js"
 ```
