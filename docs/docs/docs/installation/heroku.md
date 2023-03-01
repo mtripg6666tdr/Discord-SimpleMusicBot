@@ -1,7 +1,7 @@
 ---
 sidebar_position: 3
 ---
-# herokuで使用する
+# Herokuで使用する
 
 :::info
 
@@ -14,7 +14,7 @@ sidebar_position: 3
 - 最終確認日
   * 2023/1/1 15:30
 - ローカル
-  * Win10 PowerShell
+  * Windows 10 PowerShell
   * gitやheroku CLI導入済み
 - Heroku
   * スタックはheroku-22
@@ -50,7 +50,7 @@ sidebar_position: 3
   git clone https://github.com/mtripg6666tdr/Discord-SimpleMusicBot.git
   ```
 
-### 5. 設定用ファイル".env"と"Config.json"の準備
+### 5. 設定用ファイル`.env`と`Config.json`の準備
 
   ※[「ボットの設定について」](./configuration.md)を参照してください
 
