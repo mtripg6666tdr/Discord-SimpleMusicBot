@@ -40,7 +40,7 @@ export default class NowPlaying extends BaseCommand {
         description: "Trueが指定された場合、可能な場合より長く詳細を表示します",
         required: false
       }],
-      permissionDescription: "なし",
+      requiredPermissionsOr: [],
       shouldDefer: false,
     });
   }

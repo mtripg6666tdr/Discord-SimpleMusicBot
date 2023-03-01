@@ -44,7 +44,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
         description: "検索したい楽曲のキーワードまたはURL。",
         required: true
       }],
-      permissionDescription: "ボットがボイスチャンネルに接続中ならば、ボットがどのボイスチャンネルにも接続していない、またはユーザーと同じボイスチャンネルに接続していること。どこにも接続していなければ特に権限必要なし。",
+      requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
     });
   }

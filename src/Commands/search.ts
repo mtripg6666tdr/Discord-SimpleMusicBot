@@ -27,10 +27,6 @@ import { Util } from "../Util";
 
 export abstract class SearchBase<T> extends BaseCommand {
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.sameVC(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     options.server.joinVoiceChannel(message);
     if(this.urlCheck(options.rawArgs)){
@@ -79,7 +75,7 @@ export default class Search extends SearchBase<ytsr.Result> {
         description: "検索したい動画のキーワードまたはURL。",
         required: true
       }],
-      permissionDescription: "ボットがボイスチャンネルに接続中ならば、ボットがどのボイスチャンネルにも接続していない、またはユーザーと同じボイスチャンネルに接続していること。どこにも接続していなければ特に権限必要なし。",
+      requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
     });
   }

@@ -30,19 +30,12 @@ export default class Pause extends BaseCommand {
       description: "再生を一時停止します。",
       unlist: false,
       category: "player",
-      permissionDescription: "同じボイスチャンネルに接続",
+      requiredPermissionsOr: ["admin", "sameVc"],
       shouldDefer: false,
     });
   }
   
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && !Util.eris.channel.sameVC(message.member, options)){
-      message.reply({
-        content: "この操作を実行する権限がありません",
-        ephemeral: true,
-      }).catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.server.player.isPlaying){

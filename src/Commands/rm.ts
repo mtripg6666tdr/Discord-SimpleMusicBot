@@ -38,7 +38,7 @@ export default class Rm extends BaseCommand {
         description: "削除するインデックスはキューに併記されているものです。ハイフンを使って2-5のように範囲指定したり、スペースを使って1 4 8のように複数指定することも可能です。",
         required: true
       }],
-      permissionDescription: "削除対象の楽曲を追加した人、またはユーザーがDJロールを保持",
+      requiredPermissionsOr: [],
       shouldDefer: false,
     });
   }

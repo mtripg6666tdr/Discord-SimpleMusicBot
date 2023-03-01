@@ -50,7 +50,7 @@ export default class SystemInfo extends BaseCommand {
           "ログ(管理者のみ)": "log",
         }
       }],
-      permissionDescription: "なし",
+      requiredPermissionsOr: [],
       shouldDefer: false,
     });
   }

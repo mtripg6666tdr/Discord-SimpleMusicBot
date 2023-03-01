@@ -30,16 +30,12 @@ export default class Loop extends BaseCommand {
       description: "トラックごとのループを設定します。",
       unlist: false,
       category: "player",
-      permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはユーザーがDJロールを保持",
+      requiredPermissionsOr: ["admin", "noConnection", "onlyListener", "dj"],
       shouldDefer: false,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.isOnlyListener(message.member, options) && !Util.eris.user.isDJ(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     if(options.server.queue.loopEnabled){
       options.server.queue.loopEnabled = false;

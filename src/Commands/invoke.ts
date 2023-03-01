@@ -39,7 +39,7 @@ export default class Invoke extends BaseCommand {
       }],
       usage: "invoke <コマンド>",
       examples: "invoke play 夜に駆ける",
-      permissionDescription: "実行するコマンドの権限による",
+      requiredPermissionsOr: [],
       shouldDefer: true,
     });
   }
@@ -61,7 +61,7 @@ export default class Invoke extends BaseCommand {
     if(ci){
       options.args = commandInfo.options;
       options.rawArgs = commandInfo.rawOptions;
-      await ci.run(message, options).catch(er => Util.logger.log(er, "error"));
+      await ci.checkAndRun(message, options).catch(er => Util.logger.log(er, "error"));
       if(!message["isMessage"] && !message["_interactionReplied"]){
         await message.reply("実行しました").catch(er => Util.logger.log(er, "error"));
       }

@@ -30,16 +30,12 @@ export default class Cancel extends BaseCommand {
       description: "実行中のキャンセル可能な処理がある場合それをすべて中止します。",
       unlist: false,
       category: "utility",
-      permissionDescription: "同じボイスチャンネルに接続",
+      requiredPermissionsOr: ["admin", "sameVc"],
       shouldDefer: false,
     });
   }
   
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && !Util.eris.channel.sameVC(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     const result = options.server.cancelAll();
     if(result){

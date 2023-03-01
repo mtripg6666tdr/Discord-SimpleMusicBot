@@ -30,16 +30,12 @@ export default class Reset extends BaseCommand {
       description: "サーバーのキュー、設定やデータを削除して初期化します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
       unlist: false,
       category: "utility",
-      permissionDescription: "サーバーの管理権限",
+      requiredPermissionsOr: ["manageGuild"],
       shouldDefer: false,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!message.member.permissions.has("manageGuild")){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     // VC接続中なら切断
     options.server.player.disconnect();

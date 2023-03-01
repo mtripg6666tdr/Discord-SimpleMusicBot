@@ -42,16 +42,12 @@ export default class BulkDelete extends BaseCommand {
           required: true,
         }
       ],
-      permissionDescription: "メッセージ管理権",
+      requiredPermissionsOr: ["admin", "manageMessages"],
       shouldDefer: false,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!message.member.permissions.has("manageMessages")){
-      message.reply(":warning:この操作を実行する権限がありません").catch(e => Util.logger.log(e));
-      return;
-    }
     const count = Number(options.args[0]);
     if(isNaN(count)){
       message.reply(":warning:指定されたメッセージ数が無効です。");

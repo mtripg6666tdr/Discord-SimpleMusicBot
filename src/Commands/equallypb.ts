@@ -33,16 +33,12 @@ export default class EquallyPlayback extends BaseCommand {
       description: "追加ユーザーごとにキュー内の楽曲を均等に再生します",
       unlist: false,
       category: "playlist",
-      permissionDescription: "ボットがどのボイスチャンネルにも接続していない、またはコマンドの実行者がDJロールを保持",
+      requiredPermissionsOr: ["admin", "noConnection", "onlyListener", "dj"],
       shouldDefer: false,
     });
   }
 
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && options.server.player.isConnecting && !Util.eris.channel.isOnlyListener(message.member, options) && !Util.eris.user.isDJ(message.member, options)){
-      message.reply("この操作を実行する権限がありません").catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     if(options.server.equallyPlayback){
       options.server.equallyPlayback = false;

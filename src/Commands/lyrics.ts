@@ -32,7 +32,7 @@ export default class Lyrics extends BaseCommand {
     super({
       name: "歌詞",
       alias: ["lyrics", "l", "lyric"],
-      description: "指定された曲の歌詞を検索します。`utaten`をキーワードに入れると、Utatenを優先して検索します。",
+      description: "指定された曲の歌詞を検索します。",
       unlist: false,
       category: "utility",
       examples: "l 夜に駆ける",
@@ -43,7 +43,7 @@ export default class Lyrics extends BaseCommand {
         description: "楽曲を検索するキーワード",
         required: true
       }],
-      permissionDescription: "なし",
+      requiredPermissionsOr: [],
       shouldDefer: false,
     });
   }

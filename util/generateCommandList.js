@@ -30,7 +30,7 @@ const commands = new CommandManager().commands.filter(
    * @param { import("../src/Commands").BaseCommand } c 
    * @returns { boolean }
    */
-  c => !c.unlist || !!c.permissionDescription
+  c => !c.unlist
 );
 
 for(let i = 0; i < commands.length; i++){
@@ -54,7 +54,7 @@ ${cmd.examples ? `## 使用例\r\n\`\`\`\r\n${cmd.examples}\r\n\`\`\`\r\n` : ""}
 ## 実行に必要な権限
 ${cmd.permissionDescription}
 
-※管理者権限や、サーバーの管理権限を持つユーザーはこの権限を満たしていなくてもいつでもこのコマンドを実行できます。
+※管理者権限や、サーバーの管理権限、チャンネルの管理権限、および管理者権限を持つユーザーはこの権限を満たしていなくてもいつでもこのコマンドを実行できます。
   \r\n`, {encoding: "utf-8"});
 }
 

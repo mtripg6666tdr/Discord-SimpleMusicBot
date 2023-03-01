@@ -30,19 +30,12 @@ export default class Rewind extends BaseCommand {
       description: "再生中の曲の頭出しを行い、初めから再生します。",
       unlist: false,
       category: "player",
-      permissionDescription: "同じボイスチャンネルに接続",
+      requiredPermissionsOr: ["admin", "sameVc"],
       shouldDefer: false,
     });
   }
   
   async run(message:CommandMessage, options:CommandArgs){
-    if(!Util.eris.user.isPrivileged(message.member) && !Util.eris.channel.sameVC(message.member, options)){
-      message.reply({
-        content: "この操作を実行する権限がありません",
-        ephemeral: true,
-      }).catch(e => Util.logger.log(e, "error"));
-      return;
-    }
     options.server.updateBoundChannel(message);
     if(!options.server.player.isPlaying){
       message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
