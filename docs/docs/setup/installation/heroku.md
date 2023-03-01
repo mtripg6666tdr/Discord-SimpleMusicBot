@@ -15,8 +15,8 @@ sidebar_position: 3
   * 2023/1/1 15:30
 - ローカル
   * Windows 10 PowerShell
-  * gitやheroku CLI導入済み
-- Heroku
+  - [git](https://git-scm.com/) や [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) 導入済み
+- [Heroku](https://heroku.com/)
   * スタックはheroku-22
   * 契約プランはEco Dyno
 

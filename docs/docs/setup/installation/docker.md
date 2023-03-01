@@ -2,10 +2,10 @@
 sidebar_position: 2
 ---
 # Docker を使用する
-プリビルドされているDockerイメージを使用して簡単にボットを実行できます。
+[プリビルドされているDockerイメージ](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pkgs/container/discord-music-bot) を使用して簡単にボットを実行できます。
 
 ## 必要な環境
-このボットをDockerで利用するためには、以下の環境が必要です。
+このボットを [Docker](https://www.docker.com/) で利用するためには、以下の環境が必要です。
 - Dockerを利用できること
 - CPUのアーキテクチャがAMD64またはARM64
 
