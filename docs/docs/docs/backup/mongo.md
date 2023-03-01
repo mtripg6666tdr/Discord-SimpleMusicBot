@@ -1,7 +1,7 @@
 ---
 sidebar_position: 1
 ---
-# MongoDBを使用する
+# MongoDB を使用する
 MongoDBをバックアップ先のサーバーとして使用することができます。既存のインスタンスを使用することもできます。
 
 :::info

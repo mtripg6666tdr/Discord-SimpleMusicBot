@@ -1,7 +1,7 @@
 ---
 sidebar_position: 3
 ---
-# BGM機能
+# BGM 機能
 :::danger
 この機能はまだベータ版の機能です。
 :::
