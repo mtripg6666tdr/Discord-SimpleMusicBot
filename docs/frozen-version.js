@@ -22,8 +22,8 @@ const prettyJsOption = {
     path.join(__dirname, "./versioned_sidebars/", "version-" + versionPrefix + "-sidebars.json"),
     prettyJs(JSON.stringify(sidebars), prettyJsOption),
   );
-  const versionsFilePath = fs.readFileSync(path.join(__dirname, "./versions.json"));
-  const versions = JSON.parse(versionsFilePath, {encoding: "utf-8"});
+  const versionsFilePath = path.join(__dirname, "./versions.json");
+  const versions = JSON.parse(fs.readFileSync(versionsFilePath, {encoding: "utf-8"}));
   versions.push(versionPrefix);
   fs.writeFileSync(
     versionsFilePath,
