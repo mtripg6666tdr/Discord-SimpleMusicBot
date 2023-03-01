@@ -22,6 +22,8 @@ import type * as ytsr from "ytsr";
 import * as path from "path";
 import { Worker, isMainThread } from "worker_threads";
 
+import PQueue from "p-queue";
+
 import { type exportableYouTube, YouTube } from "..";
 import Util from "../../Util";
 
@@ -83,11 +85,18 @@ if(worker){
   });
 }
 
+const jobTriggerQueue = new PQueue({
+  concurrency: 2,
+  intervalCap: 4,
+  interval: 12,
+});
+
 function doJob(message:spawnerGetInfoMessage):Promise<workerGetInfoSuccessMessage>;
 function doJob(message:spawnerSearchMessage):Promise<workerSearchSuccessMessage>;
 function doJob(message:spawnerJobMessage):Promise<workerSuccessMessage>{
-  return new Promise((resolve, reject) => {
-    const uuid = Util.general.generateUUID();
+  const uuid = Util.general.generateUUID();
+  Util.logger.log(`[Spawner] Job(${uuid}) Scheduled`);
+  return jobTriggerQueue.add(() => new Promise((resolve, reject) => {
     worker.postMessage({
       ...message,
       id: uuid,
@@ -103,7 +112,7 @@ function doJob(message:spawnerJobMessage):Promise<workerSuccessMessage>{
         }
       },
     });
-  });
+  }));
 }
 
 export async function initYouTube(url:string, prefetched:exportableYouTube, forceCache?:boolean){
