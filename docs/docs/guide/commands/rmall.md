@@ -10,10 +10,10 @@ sidebar_label: すべて削除
 ## 別名
 `すべて削除`以外にも以下の別名を使用できます。
 
-- すべて削除
 - rmall
 - allrm
 - removeall
+- clear
 
 
 

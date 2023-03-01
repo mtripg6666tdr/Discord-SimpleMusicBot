@@ -11,7 +11,6 @@ sidebar_label: システム情報
 
 - ログ
 - log
-- システム情報
 - systeminfo
 - sysinfo
 

@@ -11,6 +11,8 @@ sidebar_label: 再生
 
 - play
 - p
+- resume
+- re
 
 
 
