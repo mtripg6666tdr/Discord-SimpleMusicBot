@@ -26,6 +26,8 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "mongodb"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "p-queue"
+        update-types: ["version-update:semver-major"]
 
   # documentation site (master)
   - package-ecosystem: npm
