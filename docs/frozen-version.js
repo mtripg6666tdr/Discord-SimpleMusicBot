@@ -24,7 +24,7 @@ const prettyJsOption = {
   );
   const versionsFilePath = path.join(__dirname, "./versions.json");
   const versions = JSON.parse(fs.readFileSync(versionsFilePath, {encoding: "utf-8"}));
-  versions.push(versionPrefix);
+  versions.unshift(versionPrefix);
   fs.writeFileSync(
     versionsFilePath,
     prettyJs(JSON.stringify(versions), prettyJsOption),
