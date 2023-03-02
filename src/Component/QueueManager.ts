@@ -202,8 +202,8 @@ export class QueueManager extends ServerManagerBase {
           }),
           additionalInfo: {
             addedBy: {
-              userId: this.getUserIdFromMember(addedBy) ?? "0",
-              displayName: this.getDisplayNameFromMember(addedBy) ?? "不明"
+              userId: (addedBy && this.getUserIdFromMember(addedBy)) || "0",
+              displayName: (addedBy && this.getDisplayNameFromMember(addedBy)) || "不明",
             }
           }
         } as QueueContent;
