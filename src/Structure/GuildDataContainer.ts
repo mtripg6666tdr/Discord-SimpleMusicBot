@@ -558,7 +558,7 @@ export class GuildDataContainer extends LogEmitter {
     const pmatch = (member.nick || member.username).match(/^(\[(?<prefix0>[a-zA-Z!?_-]+)\]|【(?<prefix1>[a-zA-Z!?_-]+)】)/);
     if(pmatch){
       if(this.prefix !== (pmatch.groups.prefix0 || pmatch.groups.prefix1)){
-        this.prefix = Util.string.NormalizeText(pmatch.groups.prefix);
+        this.prefix = Util.string.NormalizeText(pmatch.groups.prefix0 || pmatch.groups.prefix1);
       }
     }else if(this.prefix !== Util.config.prefix){
       this.prefix = Util.config.prefix;
