@@ -20,6 +20,6 @@ import type { ExportableQueueContent } from "./QueueContent";
 
 export const YmxVersion = 2;
 export type YmxFormat = {
-  version:number,
-  data:ExportableQueueContent[],
+  version: number,
+  data: ExportableQueueContent[],
 };

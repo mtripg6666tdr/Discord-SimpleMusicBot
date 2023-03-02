@@ -48,7 +48,7 @@ export default class Frame extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     const server = options.server;
     // そもそも再生状態じゃないよ...
@@ -98,7 +98,7 @@ export default class Frame extends BaseCommand {
   }
 }
 
-function getFrame(url:string, time:number, ua:string){
+function getFrame(url: string, time: number, ua: string){
   return new Promise<Buffer>((resolve, reject) => {
     const args = [
       "-analyzeduration", "0",

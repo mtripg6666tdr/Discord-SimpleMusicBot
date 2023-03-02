@@ -41,13 +41,13 @@ export type DataType = Map<string, GuildDataContainer>;
  */
 export abstract class MusicBotBase extends LogEmitter {
   // クライアントの初期化
-  protected readonly abstract _client:discord.Client;
-  protected readonly _instantiatedTime:Date = null;
-  protected readonly _versionInfo:string = null;
-  protected readonly _embedPageToggle:PageToggle[] = [];
+  protected readonly abstract _client: discord.Client;
+  protected readonly _instantiatedTime: Date = null;
+  protected readonly _versionInfo: string = null;
+  protected readonly _embedPageToggle: PageToggle[] = [];
   protected readonly _rateLimitController = new RateLimitController();
-  protected readonly guildData:DataType = new Map();
-  protected _backupper:Backupper = null;
+  protected readonly guildData: DataType = new Map();
+  protected _backupper: Backupper = null;
   private maintenanceTickCount = 0;
   /**
    * ページトグル
@@ -96,11 +96,11 @@ export abstract class MusicBotBase extends LogEmitter {
     ;
   }
 
-  get rateLimitController():Readonly<RateLimitController>{
+  get rateLimitController(): Readonly<RateLimitController>{
     return this._rateLimitController;
   }
 
-  constructor(protected readonly maintenance:boolean = false){
+  constructor(protected readonly maintenance: boolean = false){
     super();
     this.setTag("Main");
     this._instantiatedTime = new Date();
@@ -177,12 +177,12 @@ export abstract class MusicBotBase extends LogEmitter {
     Util.logger.log(`[Tick] [Main] Memory RSS: ${rss}MB, Heap total: ${Util.system.GetMBytes(nMem.heapTotal)}MB, Total: ${Util.math.GetPercentage(rss + ext, memory.total)}%`);
   }
 
-  abstract run(debugLog:boolean, debugLogStoreLength?:number):void;
+  abstract run(debugLog: boolean, debugLogStoreLength?: number): void;
 
   /**
    * 必要に応じてサーバーデータを初期化します
    */
-  protected initData(guildid:string, boundChannelId:string){
+  protected initData(guildid: string, boundChannelId: string){
     const prev = this.guildData.get(guildid);
     if(!prev){
       const server = new GuildDataContainer(guildid, boundChannelId, this);
@@ -194,7 +194,7 @@ export abstract class MusicBotBase extends LogEmitter {
     }
   }
 
-  protected initDataWithBgm(guildid:string, boundChannelId:string, bgmConfig:GuildBGMContainerType){
+  protected initDataWithBgm(guildid: string, boundChannelId: string, bgmConfig: GuildBGMContainerType){
     if(this.guildData.has(guildid)) throw new Error("guild data was already set");
     const server = new GuildDataContainerWithBgm(guildid, boundChannelId, this, bgmConfig);
     this.guildData.set(guildid, server);
@@ -202,36 +202,36 @@ export abstract class MusicBotBase extends LogEmitter {
     return server;
   }
 
-  resetData(guildId:string){
+  resetData(guildId: string){
     this.guildData.delete(guildId);
     this.emit("guildDataRemoved", guildId);
   }
 
-  override emit<T extends keyof BotBaseEvents>(eventName:T, ...args:BotBaseEvents[T]){
+  override emit<T extends keyof BotBaseEvents>(eventName: T, ...args: BotBaseEvents[T]){
     return super.emit(eventName, ...args);
   }
 
-  override on<T extends keyof BotBaseEvents>(eventName:T, listener: (...args:BotBaseEvents[T]) => void){
+  override on<T extends keyof BotBaseEvents>(eventName: T, listener: (...args: BotBaseEvents[T]) => void){
     return super.on(eventName, listener);
   }
 
-  override once<T extends keyof BotBaseEvents>(eventName:T, listener: (...args:BotBaseEvents[T]) => void){
+  override once<T extends keyof BotBaseEvents>(eventName: T, listener: (...args: BotBaseEvents[T]) => void){
     return super.on(eventName, listener);
   }
 
-  override off<T extends keyof BotBaseEvents>(eventName:T, listener: (...args:BotBaseEvents[T]) => void){
+  override off<T extends keyof BotBaseEvents>(eventName: T, listener: (...args: BotBaseEvents[T]) => void){
     return super.off(eventName, listener);
   }
 }
 
 interface BotBaseEvents {
-  beforeReady:[];
-  ready:[];
-  onMessageCreate:[message:discord.Message];
-  onInteractionCreate:[interaction:discord.Interaction];
-  onCommandHandler:[command:BaseCommand, args:CommandArgs];
-  onBotVoiceChannelJoin:[channel:discord.VoiceChannel];
-  guildDataAdded:[container:GuildDataContainer];
-  guildDataRemoved:[guildId:string];
-  tick:[count:number];
+  beforeReady: [];
+  ready: [];
+  onMessageCreate: [message:discord.Message];
+  onInteractionCreate: [interaction:discord.Interaction];
+  onCommandHandler: [command:BaseCommand, args:CommandArgs];
+  onBotVoiceChannelJoin: [channel:discord.VoiceChannel];
+  guildDataAdded: [container:GuildDataContainer];
+  guildDataRemoved: [guildId:string];
+  tick: [count:number];
 }

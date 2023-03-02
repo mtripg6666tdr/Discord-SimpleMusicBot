@@ -24,28 +24,28 @@ import { CommandMessage, Helper } from "@mtripg6666tdr/eris-command-resolver";
 /**
  * 最終的にメッセージの埋め込みに解決されるデータ
  */
-type MessageEmbedsResolvable = EmbedOptions[]|((pagenum:number)=>EmbedOptions)|((pagenum:number)=>Promise<EmbedOptions>);
+type MessageEmbedsResolvable = EmbedOptions[]|((pagenum: number) => EmbedOptions)|((pagenum: number) => Promise<EmbedOptions>);
 
 /**
  * リアクションによってページめくりができるメッセージの管理を行います
  */
 export class PageToggle {
-  private _message:ResponseMessage;
+  private _message: ResponseMessage;
   get Message(){
     return this._message;
   }
 
-  private _embeds:MessageEmbedsResolvable;
+  private _embeds: MessageEmbedsResolvable;
   get embeds(){
     return this._embeds;
   }
 
-  private _current:number = 0;
+  private _current: number = 0;
   get Current(){
     return this._current;
   }
 
-  private _total:number = -1;
+  private _total: number = -1;
   get Length(){
     return Array.isArray(this._embeds) ? this._embeds.length : this._total === -1 ? NaN : this._total;
   }
@@ -59,7 +59,7 @@ export class PageToggle {
   static arrowRight = "flip_page_next";
   static arrowLeft = "flip_page_prev";
 
-  static async init(msg:CommandMessage|ResponseMessage, embeds:MessageEmbedsResolvable, total?:number, current?:number):Promise<PageToggle>{
+  static async init(msg: CommandMessage|ResponseMessage, embeds: MessageEmbedsResolvable, total?: number, current?: number): Promise<PageToggle>{
     const n = new PageToggle();
     n._embeds = embeds;
     if(total){
@@ -91,7 +91,7 @@ export class PageToggle {
     return n;
   }
 
-  static organize(toggles:PageToggle[], min:number, forceRemovingUnfresh:string = null){
+  static organize(toggles: PageToggle[], min: number, forceRemovingUnfresh: string = null){
     const delIndex = [] as number[];
     for(let i = 0; i < toggles.length; i++){
       if(new Date().getTime() - toggles[i].Message.createdTimestamp >= min * 60 * 1000 || (forceRemovingUnfresh && toggles[i].IsFreshNecessary && toggles[i].Message.guild.id === forceRemovingUnfresh)){
@@ -107,7 +107,7 @@ export class PageToggle {
     });
   }
 
-  async flipPage(page:number, interaction?:ComponentInteraction){
+  async flipPage(page: number, interaction?: ComponentInteraction){
     this._current = page;
     const embed = await this.getEmbed(page);
     if(interaction){
@@ -123,7 +123,7 @@ export class PageToggle {
     }
   }
 
-  protected getEmbed(page:number){
+  protected getEmbed(page: number){
     if(Array.isArray(this._embeds)){
       return this._embeds[page];
     }else if(typeof this._embeds === "function"){
@@ -132,7 +132,7 @@ export class PageToggle {
     return null;
   }
 
-  setFresh(isFreshNecessary:boolean){
+  setFresh(isFreshNecessary: boolean){
     this.IsFreshNecessary = isFreshNecessary;
     return this;
   }

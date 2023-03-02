@@ -28,11 +28,11 @@ import Util from "../../Util";
 
 parentPort.unref();
 
-function postMessage(message:workerMessage|WithId<workerMessage>){
+function postMessage(message: workerMessage|WithId<workerMessage>){
   parentPort.postMessage(message);
 }
 
-function logger(content:any, loglevel:LogLevels){
+function logger(content: any, loglevel: LogLevels){
   postMessage({
     type: "log",
     data: content,
@@ -40,7 +40,7 @@ function logger(content:any, loglevel:LogLevels){
   });
 }
 
-function onMessage(message:WithId<spawnerJobMessage>){
+function onMessage(message: WithId<spawnerJobMessage>){
   if(!message){
     return;
   }

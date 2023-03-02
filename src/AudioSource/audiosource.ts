@@ -30,38 +30,38 @@ export type StreamType =
 
 export abstract class AudioSource {
   // ソースのURL
-  Url:string;
+  Url: string;
   // サービス識別子
-  protected abstract _serviceIdentifer:string;
-  get ServiceIdentifer():"youtube"|string{
+  protected abstract _serviceIdentifer: string;
+  get ServiceIdentifer(): "youtube"|string{
     return this._serviceIdentifer;
   }
 
   // タイトル(曲名)
-  Title:string;
+  Title: string;
   // 曲の長さ(秒)
-  protected abstract _lengthSeconds:number;
-  get LengthSeconds():number{
+  protected abstract _lengthSeconds: number;
+  get LengthSeconds(): number{
     return this._lengthSeconds;
   }
 
   // 曲の説明
-  Description:string;
+  Description: string;
   // サムネイル
-  abstract Thumbnail:string|{
-    ext:string,
-    data:Buffer,
+  abstract Thumbnail: string|{
+    ext: string,
+    data: Buffer,
   };
   // 現在再生中の曲を示すEmbedField
-  abstract toField(verbose:boolean):EmbedField[];
+  abstract toField(verbose: boolean): EmbedField[];
   // 再生するためのストリームをフェッチ
-  abstract fetch(url?:boolean):Promise<StreamInfo>;
+  abstract fetch(url?: boolean): Promise<StreamInfo>;
   // クラスを初期化する非同期メソッド
-  abstract init(url:string, prefetched:exportableCustom):Promise<AudioSource>;
+  abstract init(url: string, prefetched: exportableCustom): Promise<AudioSource>;
   // 現在再生中の曲に関する追加データ
-  abstract npAdditional():string;
+  abstract npAdditional(): string;
   // データをエクスポート
-  abstract exportData():exportableCustom;
+  abstract exportData(): exportableCustom;
 
   isYouTube(): this is Sources.YouTube{
     return this.ServiceIdentifer === "youtube";
@@ -86,13 +86,13 @@ export abstract class AudioSource {
 
 export type StreamInfo = ReadableStreamInfo|UrlStreamInfo;
 export type ReadableStreamInfo = {
-  type:"readable",
-  stream:Readable,
-  streamType?:StreamType,
+  type: "readable",
+  stream: Readable,
+  streamType?: StreamType,
 };
 export type UrlStreamInfo = {
-  type:"url",
-  url:string,
-  streamType?:StreamType,
-  userAgent?:string,
+  type: "url",
+  url: string,
+  streamType?: StreamType,
+  userAgent?: string,
 };

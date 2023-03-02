@@ -21,7 +21,7 @@ import Util from "../Util";
 export class RateLimitController {
   private readonly store = new Map<string, number[]>();
 
-  isRateLimited(key:string){
+  isRateLimited(key: string){
     if(!this.store.has(key)){
       this.store.set(key, [Date.now()]);
       return false;

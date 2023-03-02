@@ -35,7 +35,7 @@ export default class Shuffle extends BaseCommand {
     });
   }
   
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(options.server.queue.length === 0){
       message.reply("キューが空です。").catch(e => Util.logger.log(e, "error"));

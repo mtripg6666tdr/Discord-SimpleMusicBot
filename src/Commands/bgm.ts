@@ -37,7 +37,7 @@ export default class Bgm extends BaseCommand {
     });
   }
   
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(!(await options.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true))) return;
     const url = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";

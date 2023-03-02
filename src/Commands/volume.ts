@@ -43,7 +43,7 @@ export default class Volume extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(options.rawArgs === ""){
       await message.reply(`:loud_sound:現在の音量は**${options.server.player.volume}**です(デフォルト:100)`)

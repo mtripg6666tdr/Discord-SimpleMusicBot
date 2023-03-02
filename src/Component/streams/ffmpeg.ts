@@ -26,7 +26,7 @@ import { FFmpegDefaultNetworkArgs } from "../../definition";
 
 const { DefaultUserAgent } = Util.ua;
 
-export function transformThroughFFmpeg(readable:StreamInfo, bitrate:number, effectArgs:string[], seek:number, output:"webm"|"pcm"){
+export function transformThroughFFmpeg(readable: StreamInfo, bitrate: number, effectArgs: string[], seek: number, output: "webm"|"pcm"){
   const ffmpegNetworkArgs = readable.type === "url" ? [
     ...FFmpegDefaultNetworkArgs,
     "-user_agent", readable.userAgent || DefaultUserAgent

@@ -28,13 +28,13 @@ import { Util } from "../Util";
 export class Hibiki extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "hibiki";
-  override Thumbnail:{ ext: string, data: Buffer };
+  override Thumbnail: { ext: string, data: Buffer };
   private programId = "";
-  private radioInfo:HibikiAPIResult;
+  private radioInfo: HibikiAPIResult;
   private uploadedAt = "";
   private casts = "";
   
-  async init(url:string){
+  async init(url: string){
     this.Url = url;
     const match = this.Url.match(/^https?:\/\/hibiki-radio.jp\/description\/(?<id>.+)\/detail([/#].+)?$/);
     this.programId = match.groups.id;
@@ -58,7 +58,7 @@ export class Hibiki extends AudioSource {
     return this;
   }
 
-  async fetch():Promise<UrlStreamInfo>{
+  async fetch(): Promise<UrlStreamInfo>{
     const playcheck = await HibikiApi.playCheck(this.radioInfo.episode.video.id.toString());
     return {
       type: "url",
@@ -66,7 +66,7 @@ export class Hibiki extends AudioSource {
     };
   }
 
-  toField():EmbedField[]{
+  toField(): EmbedField[]{
     return [
       {
         name: "アップロード日時",
@@ -85,7 +85,7 @@ export class Hibiki extends AudioSource {
     return "\r\nキャスト: `" + this.casts + "`";
   }
 
-  exportData():exportableCustom{
+  exportData(): exportableCustom{
     return {
       url: this.Url,
       length: this._lengthSeconds,
@@ -95,11 +95,11 @@ export class Hibiki extends AudioSource {
 }
 
 export abstract class HibikiApi {
-  static validateURL(url:string):boolean{
+  static validateURL(url: string): boolean{
     return Boolean(url.match(/^https?:\/\/hibiki-radio.jp\/description\/(.+)\/detail(\/.+)?$/));
   }
 
-  static async getBasicData(programId:string):Promise<HibikiAPIResult>{
+  static async getBasicData(programId: string): Promise<HibikiAPIResult>{
     const api = "https://vcms-api.hibiki-radio.jp/api/v1/programs/" + programId;
     return JSON.parse(await Util.web.DownloadText(api, {
       "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
@@ -109,7 +109,7 @@ export abstract class HibikiApi {
     })) as HibikiAPIResult;
   }
 
-  static async playCheck(videoId:string):Promise<playCheckResult>{
+  static async playCheck(videoId: string): Promise<playCheckResult>{
     const playCheckURL = "https://vcms-api.hibiki-radio.jp/api/v1/videos/play_check?video_id=" + videoId;
     return JSON.parse(await Util.web.DownloadText(playCheckURL, {
       "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",

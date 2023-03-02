@@ -46,7 +46,7 @@ export class Spotify extends AudioSource {
   protected readonly _serviceIdentifer = "spotify";
   protected _lengthSeconds = 0;
   protected artist = "";
-  Thumbnail:string = null;
+  Thumbnail: string = null;
 
   override async init(url: string, prefetched: exportableSpotify): Promise<Spotify>{
     if(!Spotify.validateTrackUrl(url)) throw new Error("Invalid url");
@@ -82,9 +82,9 @@ export class Spotify extends AudioSource {
     return result.stream;
   }
 
-  protected extractBestItem(items:ytsr.Video[]){
+  protected extractBestItem(items: ytsr.Video[]){
     console.log("result", items);
-    const normalize = (text:string) => {
+    const normalize = (text: string) => {
       return text.toLowerCase()
         .replace(/’/g, "'")
         .replace(/\(.+?\)/g, "")
@@ -95,14 +95,14 @@ export class Spotify extends AudioSource {
         .replace(/-/g, "")
         .trim();
     };
-    const includes = (text1:string, text2:string) => {
+    const includes = (text1: string, text2: string) => {
       text1 = normalize(text1);
       return normalize(text2)
         .split(" ")
         .every(p => text1.includes(p))
       ;
     };
-    const validate = (item:ytsr.Video) => {
+    const validate = (item: ytsr.Video) => {
       return (
         // 関連のないタイトルを除外
         includes(item.title, this.Title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase()) || includes(this.Title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase(), item.title.toLowerCase())
@@ -156,19 +156,19 @@ export class Spotify extends AudioSource {
     return [];
   }
 
-  static validateTrackUrl(url:string){
+  static validateTrackUrl(url: string){
     return !!url.match(/^https?:\/\/open\.spotify\.com\/track\/([a-zA-Z0-9]+)(\?.*)?$/);
   }
 
-  static validatePlaylistUrl(url:string){
+  static validatePlaylistUrl(url: string){
     return !!url.match(/^https?:\/\/open\.spotify\.com\/playlist\/([a-zA-Z0-9]+)(\?.*)?$/);
   }
 
-  static getTrackUrl(uri:string){
+  static getTrackUrl(uri: string){
     return `https://open.spotify.com/track/${uri.replace(/spotify:track:/, "")}`;
   }
 
-  static getPlaylistUrl(uri:string){
+  static getPlaylistUrl(uri: string){
     return `https://open.spotify.com/playlist/${uri.replace(/spotify:playlist:/, "")}`;
   }
 

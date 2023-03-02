@@ -20,7 +20,7 @@ import type { Client } from "eris";
 
 import * as http from "http";
 
-export function createServer(client:Client, port:number, logger:(content:string) => void){
+export function createServer(client: Client, port: number, logger: (content: string) => void){
   return http.createServer((_, res) => {
     res.writeHead(200, { "Content-Type": "application/json" });
     const data = {

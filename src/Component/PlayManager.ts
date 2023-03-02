@@ -42,18 +42,18 @@ import { FallBackNotice } from "../definition";
 export class PlayManager extends ServerManagerBase {
   protected readonly retryLimit = 3;
   protected _seek = 0;
-  protected _errorReportChannel:TextChannel = null;
+  protected _errorReportChannel: TextChannel = null;
   protected _volume = 100;
   protected _errorCount = 0;
   protected _errorUrl = "";
   protected _preparing = false;
-  protected _currentAudioInfo:AudioSource = null;
-  protected _currentAudioStream:Readable = null;
+  protected _currentAudioInfo: AudioSource = null;
+  protected _currentAudioStream: Readable = null;
   protected _cost = 0;
   protected _finishTimeout = false;
-  readonly onStreamFinishedBindThis:any = null;
-  protected waitForLive:boolean = false;
-  csvLog:string[] = [];
+  readonly onStreamFinishedBindThis: any = null;
+  protected waitForLive: boolean = false;
+  csvLog: string[] = [];
   csvLogFilename = "";
   detailedLog = !!process.env.DSL_ENABLE;
   disableDetailedLogMemory = true;
@@ -62,15 +62,15 @@ export class PlayManager extends ServerManagerBase {
     return this._preparing;
   }
 
-  private set preparing(val:boolean){
+  private set preparing(val: boolean){
     this._preparing = val;
   }
 
-  get currentAudioInfo():Readonly<AudioSource>{
+  get currentAudioInfo(): Readonly<AudioSource>{
     return this._currentAudioInfo;
   }
 
-  get currentAudioUrl():string{
+  get currentAudioUrl(): string{
     if(this.currentAudioInfo) return this.currentAudioInfo.Url;
     else return "";
   }
@@ -82,21 +82,21 @@ export class PlayManager extends ServerManagerBase {
   /**
    *  接続され、再生途中にあるか（たとえ一時停止されていても）
    */
-  get isPlaying():boolean{
+  get isPlaying(): boolean{
     return this.isConnecting && (this.server.connection.playing || this.waitForLive);
   }
 
   /**
    *  VCに接続中かどうか
    */
-  get isConnecting():boolean{
+  get isConnecting(): boolean{
     return this.server.connection && (this.server.connection.connecting || this.server.connection.ready);
   }
 
   /**
    * 一時停止されているか
    */
-  get isPaused():boolean{
+  get isPaused(): boolean{
     return this.isConnecting && this.server.connection.paused;
   }
 
@@ -104,7 +104,7 @@ export class PlayManager extends ServerManagerBase {
    *  現在ストリーミングした時間(ミリ秒!)
    * @remarks ミリ秒単位なので秒に直すには1000分の一する必要がある
    */
-  get currentTime():number{
+  get currentTime(): number{
     return this.isPlaying ? this._seek * 1000 + this.server.connection.current?.playTime : 0;
   }
 
@@ -127,12 +127,12 @@ export class PlayManager extends ServerManagerBase {
   /**
    *  親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
    */
-  override setBinding(data:GuildDataContainer){
+  override setBinding(data: GuildDataContainer){
     this.Log("Set data of guild id " + data.guildId);
     super.setBinding(data);
   }
 
-  setVolume(val:number){
+  setVolume(val: number){
     this._volume = val;
     if((this.server.connection?.piper as any)?.["volume"]){
       this.server.connection.setVolume(val / 100);
@@ -144,7 +144,7 @@ export class PlayManager extends ServerManagerBase {
   /**
    *  再生します
    */
-  async play(time:number = 0, quiet:boolean = false):Promise<PlayManager>{
+  async play(time: number = 0, quiet: boolean = false): Promise<PlayManager>{
     this.emit("playCalled", time);
     // 再生できる状態か確認
     const badCondition = this.getIsBadCondition();
@@ -155,7 +155,7 @@ export class PlayManager extends ServerManagerBase {
     this.Log("Play called");
     this.emit("playPreparing", time);
     this.preparing = true;
-    let mes:Message = null;
+    let mes: Message = null;
     this._currentAudioInfo = this.server.queue.get(0).basicInfo;
     if(this.getNoticeNeeded() && !quiet){
       const [min, sec] = Util.time.CalcMinSec(this.currentAudioInfo.LengthSeconds);
@@ -169,7 +169,7 @@ export class PlayManager extends ServerManagerBase {
         this.preparing = false;
         const waitTarget = this._currentAudioInfo;
         await new Promise<void>(resolve => {
-          let timeout:NodeJS.Timeout = null;
+          let timeout: NodeJS.Timeout = null;
           this.once("stop", () => {
             if(timeout) clearTimeout(timeout);
             resolve();
@@ -225,13 +225,13 @@ export class PlayManager extends ServerManagerBase {
       catch{/* empty */}
     }
     const logStream = this.detailedLog && fs.createWriteStream(path.join(__dirname, `../../logs/${filename}`));
-    const log = logStream ? (content:string) => {
+    const log = logStream ? (content: string) => {
       logStream.write(content + "\r\n");
       if(!this.disableDetailedLogMemory) this.csvLog.push(content);
     } : () => {};
-    const logStreams:Readable[] = [];
+    const logStreams: Readable[] = [];
     log("type,datetime,id,total,current,buf");
-    const setReadableCsvLog = (readable:Readable, i:number) => {
+    const setReadableCsvLog = (readable: Readable, i: number) => {
       if(!readable || !this.detailedLog) return;
       logStreams.push(readable);
       this.Log(`ID:${i}=${readable.constructor.name} (highWaterMark:${readable.readableHighWaterMark})`);
@@ -252,7 +252,7 @@ export class PlayManager extends ServerManagerBase {
       };
       readable.on("data", chunk => {
         // @ts-expect-error 7053
-        const dataPackets:Buffer[] = connection.piper["_dataPackets"];
+        const dataPackets: Buffer[] = connection.piper["_dataPackets"];
         log(`flow,${getNow()},${i},${total += chunk.length},${chunk.length},${dataPackets?.reduce((a, b) => a + b.length, 0) || ""}`);
         log(`stock,${getNow()},${i},,${readable.readableLength},`);
       });
@@ -449,7 +449,7 @@ export class PlayManager extends ServerManagerBase {
    * 停止します。切断するにはDisconnectを使用してください。
    * @returns this
   */
-  stop():PlayManager{
+  stop(): PlayManager{
     this.Log("Stop called");
     if(this.server.connection){
       this.server.connection.off("end", this.onStreamFinishedBindThis);
@@ -465,7 +465,7 @@ export class PlayManager extends ServerManagerBase {
    * 切断します。内部的にはStopも呼ばれています。これを呼ぶ前にStopを呼ぶ必要はありません。
    * @returns this
    */
-  disconnect():PlayManager{
+  disconnect(): PlayManager{
     this.stop();
     this.emit("disconnectAttempt");
     if(this.isConnecting){
@@ -503,7 +503,7 @@ export class PlayManager extends ServerManagerBase {
    * 一時停止します。
    * @returns this
    */
-  pause():PlayManager{
+  pause(): PlayManager{
     this.Log("Pause called");
     this.emit("pause");
     this.server.connection?.pause();
@@ -514,7 +514,7 @@ export class PlayManager extends ServerManagerBase {
    * 一時停止再生します。
    * @returns this
    */
-  resume():PlayManager{
+  resume(): PlayManager{
     this.Log("Resume called");
     this.emit("resume");
     this.server.connection?.resume();
@@ -525,14 +525,14 @@ export class PlayManager extends ServerManagerBase {
    * 頭出しをします。
    * @returns this
    */
-  rewind():PlayManager{
+  rewind(): PlayManager{
     this.Log("Rewind called");
     this.emit("rewind");
     this.stop().play();
     return this;
   }
 
-  handleError(er:any){
+  handleError(er: any){
     Util.logger.log("Error", "error");
     this.emit("handledError", er);
     if(er){
@@ -639,7 +639,7 @@ export class PlayManager extends ServerManagerBase {
     this.once("disconnectAttempt", playHandler);
   }
 
-  async onStreamFailed(quiet:boolean = false){
+  async onStreamFailed(quiet: boolean = false){
     this.Log("onStreamFailed called");
     this._cost = 0;
     this.destroyStream();
@@ -661,20 +661,20 @@ export class PlayManager extends ServerManagerBase {
     this.play(0, quiet);
   }
 
-  override emit<T extends keyof PlayManagerEvents>(eventName:T, ...args:PlayManagerEvents[T]){
+  override emit<T extends keyof PlayManagerEvents>(eventName: T, ...args: PlayManagerEvents[T]){
     super.emit("all", ...args);
     return super.emit(eventName, ...args);
   }
 
-  override on<T extends keyof PlayManagerEvents>(eventName:T, listener: (...args:PlayManagerEvents[T]) => void){
+  override on<T extends keyof PlayManagerEvents>(eventName: T, listener: (...args: PlayManagerEvents[T]) => void){
     return super.on(eventName, listener);
   }
 
-  override once<T extends keyof PlayManagerEvents>(eventName:T, listener: (...args:PlayManagerEvents[T]) => void){
+  override once<T extends keyof PlayManagerEvents>(eventName: T, listener: (...args: PlayManagerEvents[T]) => void){
     return super.on(eventName, listener);
   }
 
-  override off<T extends keyof PlayManagerEvents>(eventName:T, listener: (...args:PlayManagerEvents[T]) => void){
+  override off<T extends keyof PlayManagerEvents>(eventName: T, listener: (...args: PlayManagerEvents[T]) => void){
     return super.off(eventName, listener);
   }
 }

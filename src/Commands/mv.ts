@@ -48,7 +48,7 @@ export default class Mv extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(options.args.length !== 2){
       message.reply("✘引数は`移動したい曲の元のオフセット(番号) 移動先のオフセット(番号)`のように指定します。").catch(e => Util.logger.log(e, "error"));

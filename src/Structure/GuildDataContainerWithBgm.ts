@@ -24,7 +24,7 @@ import { PlayManagerWithBgm } from "../Component/PlayManagerWithBgm";
 import { QueueManagerWithBgm } from "../Component/QueueManagerWithBGM";
 
 export class GuildDataContainerWithBgm extends GuildDataContainer {
-  protected override _queue:QueueManagerWithBgm;
+  protected override _queue: QueueManagerWithBgm;
   override get queue(){
     return this._queue;
   }
@@ -34,8 +34,8 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
     return this._player;
   }
 
-  protected _bgmConfig:GuildBGMContainerType;
-  get bgmConfig():Readonly<GuildBGMContainerType>{
+  protected _bgmConfig: GuildBGMContainerType;
+  get bgmConfig(): Readonly<GuildBGMContainerType>{
     return this._bgmConfig;
   }
 
@@ -49,7 +49,7 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
     this._queue.setBinding(this);
   }
 
-  constructor(guildid:string, boundchannelid:string, bot:MusicBotBase, bgmConfig:GuildBGMContainerType){
+  constructor(guildid: string, boundchannelid: string, bot: MusicBotBase, bgmConfig: GuildBGMContainerType){
     super(guildid, boundchannelid, bot);
     this._bgmConfig = bgmConfig;
   }

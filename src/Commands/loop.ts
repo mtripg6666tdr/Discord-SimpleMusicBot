@@ -35,7 +35,7 @@ export default class Loop extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(options.server.queue.loopEnabled){
       options.server.queue.loopEnabled = false;

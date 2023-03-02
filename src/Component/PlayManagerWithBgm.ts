@@ -22,9 +22,9 @@ import Util from "../Util";
 
 export class PlayManagerWithBgm extends PlayManager {
   protected override server: GuildDataContainerWithBgm;
-  private _bgm:boolean = false;
+  private _bgm: boolean = false;
 
-  override get isPlaying():boolean{
+  override get isPlaying(): boolean{
     return this.isConnecting && this.server.connection.playing && !this.server.queue.isBGM;
   }
 
@@ -39,7 +39,7 @@ export class PlayManagerWithBgm extends PlayManager {
     return super.play(time);
   }
 
-  protected override getIsBadCondition(bgm:boolean = this._bgm){
+  protected override getIsBadCondition(bgm: boolean = this._bgm){
     // 接続していない
     return !this.isConnecting
       // なにかしら再生中

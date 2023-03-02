@@ -35,11 +35,11 @@ export default class RmDuplicated extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     const q = options.server.queue;
-    const indexes:number[] = [];
-    const itemUrl:string[] = [];
+    const indexes: number[] = [];
+    const itemUrl: string[] = [];
     q.forEach((item, i) => {
       if(itemUrl.includes(item.basicInfo.Url)){
         indexes.push(i);

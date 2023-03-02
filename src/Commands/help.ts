@@ -39,7 +39,7 @@ export default class Help extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     const developerId = "593758391395155978";
     const cachedUser = options.client.users.get(developerId);
     const developer = cachedUser ? cachedUser.username :

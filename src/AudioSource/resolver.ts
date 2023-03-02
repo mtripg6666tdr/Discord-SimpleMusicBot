@@ -32,7 +32,7 @@ type AudioSourceBasicInfo = {
 
 const { isDisabledSource } = Util.general;
 
-export async function resolve(info:AudioSourceBasicInfo){
+export async function resolve(info: AudioSourceBasicInfo){
   let basicInfo = null as AudioSource.AudioSource;
   const {type, url, knownData: gotData, forceCache: cache} = info;
   if(!Util.general.isDisabledSource("youtube") && (type === "youtube" || (type === "unknown" && ytdl.validateURL(url)))){

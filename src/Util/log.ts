@@ -24,7 +24,7 @@ import config from "./config";
 import { StringifyObject } from "./general";
 
 export type LogLevels = "log"|"warn"|"error"|"debug";
-export type LoggerType = (content:string, level?:LogLevels)=>void;
+export type LoggerType = (content: string, level?: LogLevels) => void;
 
 class LogStore {
   private readonly loggingStream = null as fs.WriteStream;
@@ -40,16 +40,16 @@ class LogStore {
     }
   }
 
-  log:boolean = true;
+  log: boolean = true;
   maxLength = 30;
 
-  private readonly _data:string[] = [];
-  get data():Readonly<LogStore["_data"]>{
+  private readonly _data: string[] = [];
+  get data(): Readonly<LogStore["_data"]>{
     return this._data;
   }
   
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  addLog(level:LogLevels, log:string){
+  addLog(level: LogLevels, log: string){
     if(this.destroyed) return;
     if(level !== "debug"){
       this._data.push(`${level[0].toUpperCase()}:${log}`);
@@ -86,7 +86,7 @@ class LogStore {
 
 export const logStore = new LogStore();
 
-export function log(content:any, level:LogLevels = "log"){
+export function log(content: any, level: LogLevels = "log"){
   if(content instanceof Error) console[level](content);
   const text = StringifyObject(content);
   if(!logStore.log && level === "log") return;

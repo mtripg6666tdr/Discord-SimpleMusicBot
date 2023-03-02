@@ -48,7 +48,7 @@ export default class Lyrics extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     const msg = await message.reply("🔍検索中...");
     try{

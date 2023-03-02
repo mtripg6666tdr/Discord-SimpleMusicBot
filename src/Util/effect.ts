@@ -29,7 +29,7 @@ export const EffectsCustomIds = {
   LoudnessEqualization: "loudness_eq",
 };
 
-export function getFFmpegEffectArgs(data:GuildDataContainer){
+export function getFFmpegEffectArgs(data: GuildDataContainer){
   const effect = [];
   if(data.effectPrefs.BassBoost) effect.push("firequalizer=gain_entry='entry(75,2)'");
   if(data.effectPrefs.Reverb) effect.push("aecho=1.0:0.7:20:0.5");
@@ -42,7 +42,7 @@ export function getFFmpegEffectArgs(data:GuildDataContainer){
   }
 }
 
-export function getCurrentEffectPanel(avatarUrl:string, data:GuildDataContainer){
+export function getCurrentEffectPanel(avatarUrl: string, data: GuildDataContainer){
   const embed = new Helper.MessageEmbedBuilder()
     .setTitle(":cd:エフェクトコントロールパネル:microphone:")
     .setDescription("オーディオエフェクトの設定/解除することができます。\r\n・表示は古い情報であることがありますが、エフェクトを操作したとき、更新ボタンを押したときに更新されます。\r\n・エフェクトは次の曲から適用されます\r\n現在の曲に適用したい場合は、`頭出し`コマンドを使用してください\r\n")

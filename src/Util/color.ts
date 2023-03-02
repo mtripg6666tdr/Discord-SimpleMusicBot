@@ -33,7 +33,7 @@ const cmap = {
   "EQUALLY": 0xF8D53E,
 } as const;
 
-export function getColor(key:colorkey):number{
+export function getColor(key: colorkey): number{
   return cmap[key];
 }
 

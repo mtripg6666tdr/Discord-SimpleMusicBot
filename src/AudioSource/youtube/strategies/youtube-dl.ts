@@ -28,16 +28,16 @@ import { Strategy } from "./base";
 import { Util } from "../../../Util";
 
 type youtubeDl = "youtubeDl";
-const youtubeDl:youtubeDl = "youtubeDl";
+const youtubeDl: youtubeDl = "youtubeDl";
 
 export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>, YoutubeDlInfo> {
   get cacheType(){
     return youtubeDl;
   }
   
-  last:number = 0;
+  last: number = 0;
 
-  async getInfo(url:string){
+  async getInfo(url: string){
     this.useLog();
     const t = Util.time.timer.start(`YouTube(Strategy${this.priority})#getInfo`);
     let info = null as YoutubeDlInfo;
@@ -56,7 +56,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
     };
   }
 
-  async fetch(url: string, forceUrl:boolean = false, cache?: Cache<any, any>){
+  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
     this.useLog();
     const t = Util.time.timer.start(`YouTube(Strategy${this.priority})#fetch`);
     let info = null as YoutubeDlInfo;
@@ -123,13 +123,13 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
     }
   }
 
-  private readonly debugLog = (content:string) => {
+  private readonly debugLog = (content: string) => {
     if(Util.config.debug){
       this.logger("[YouTube(fallback)]" + content.replace(/\n/g, ""), "debug");
     }
   };
 
-  protected mapToExportable(url:string, info:YoutubeDlInfo):exportableYouTube{
+  protected mapToExportable(url: string, info: YoutubeDlInfo): exportableYouTube{
     return {
       url: url,
       title: info.title,
@@ -142,7 +142,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
     };
   }
 
-  private execAsync(command:string):Promise<string>{
+  private execAsync(command: string): Promise<string>{
     return new Promise((resolve, reject) => {
       try{
         const id = Date.now();
@@ -164,7 +164,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
     });
   }
 
-  private async dlbinary(ver:string){
+  private async dlbinary(ver: string){
     const releases = JSON.parse(await Util.web.DownloadText("https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest", {
       "Accept": "application/vnd.github.v3+json",
       "User-Agent": "Discord-SimpleMusicBot"
@@ -181,7 +181,7 @@ export class youtubeDlStrategy extends Strategy<Cache<youtubeDl, YoutubeDlInfo>,
     this.last = Date.now();
   }
 
-  private async getYouTubeDlInfo(url:string):Promise<Promise<string>>{
+  private async getYouTubeDlInfo(url: string): Promise<Promise<string>>{
     try{
       let version = "";
       try{

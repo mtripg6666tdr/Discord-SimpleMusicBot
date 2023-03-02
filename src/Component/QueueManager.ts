@@ -42,49 +42,49 @@ export class QueueManager extends ServerManagerBase {
   /**
    * キューの本体
    */
-  protected _default:QueueContent[] = [];
+  protected _default: QueueContent[] = [];
   /**
    * キューの本体のゲッタープロパティ
    */
-  protected get default():Readonly<QueueContent[]>{
+  protected get default(): Readonly<QueueContent[]>{
     return this._default;
   }
 
-  protected _loopEnabled:boolean = false;
+  protected _loopEnabled: boolean = false;
   /**
    * トラックループが有効か?
    */
-  get loopEnabled():boolean{
+  get loopEnabled(): boolean{
     return this._loopEnabled;
   }
 
-  set loopEnabled(value:boolean){
+  set loopEnabled(value: boolean){
     this._loopEnabled = value;
     this.emit("settingsChanged");
   }
 
-  protected _queueLoopEnabled:boolean = false;
+  protected _queueLoopEnabled: boolean = false;
   /**
    * キューループが有効か?
    */
-  get queueLoopEnabled():boolean{
+  get queueLoopEnabled(): boolean{
     return this._queueLoopEnabled;
   }
 
-  set queueLoopEnabled(value:boolean){
+  set queueLoopEnabled(value: boolean){
     this._queueLoopEnabled = value;
     this.emit("settingsChanged");
   }
 
-  protected _onceLoopEnabled:boolean = false;
+  protected _onceLoopEnabled: boolean = false;
   /**
    * ワンスループが有効か?
    */
-  get onceLoopEnabled():boolean{
+  get onceLoopEnabled(): boolean{
     return this._onceLoopEnabled;
   }
 
-  set onceLoopEnabled(value:boolean){
+  set onceLoopEnabled(value: boolean){
     this._onceLoopEnabled = value;
     this.emit("settingsChanged");
   }
@@ -92,7 +92,7 @@ export class QueueManager extends ServerManagerBase {
   /**
    * キューの長さ（トラック数）
    */
-  get length():number{
+  get length(): number{
     return this.default.length;
   }
 
@@ -100,18 +100,18 @@ export class QueueManager extends ServerManagerBase {
    * キューの長さ（時間秒）
    * ライブストリームが含まれていた場合、NaNとなります
    */
-  get lengthSeconds():number{
+  get lengthSeconds(): number{
     return this.default.reduce((prev, current) => prev + Number(current.basicInfo.LengthSeconds), 0);
   }
 
   /**
    * 現在取得できる限りのキューの長さ(時間秒)
    */
-  get lengthSecondsActual():number{
+  get lengthSecondsActual(): number{
     return this.default.reduce((prev, current) => prev + Number(current.basicInfo.LengthSeconds || 0), 0);
   }
 
-  get isEmpty():boolean{
+  get isEmpty(): boolean{
     return this.length === 0;
   }
 
@@ -121,7 +121,7 @@ export class QueueManager extends ServerManagerBase {
     this.Log("QueueManager instantiated");
   }
 
-  override setBinding(data:GuildDataContainer){
+  override setBinding(data: GuildDataContainer){
     this.Log("Set data of guild id " + data.guildId);
     super.setBinding(data);
   }
@@ -131,7 +131,7 @@ export class QueueManager extends ServerManagerBase {
    * @param index インデックス
    * @returns 指定された位置にあるキューコンテンツ
    */
-  get(index:number){
+  get(index: number){
     return this.default[index];
   }
 
@@ -158,7 +158,7 @@ export class QueueManager extends ServerManagerBase {
    * @param callbackfn 変換する関数
    * @returns 変換後の配列
    */
-  map<T>(callbackfn: (value: QueueContent, index: number, array: QueueContent[]) => T, thisArg?: any):T[]{
+  map<T>(callbackfn: (value: QueueContent, index: number, array: QueueContent[]) => T, thisArg?: any): T[]{
     return this.default.map(callbackfn, thisArg);
   }
 
@@ -170,7 +170,7 @@ export class QueueManager extends ServerManagerBase {
     this.default.forEach(callbackfn, thisArg);
   }
 
-  getLengthSecondsTo(index:number){
+  getLengthSecondsTo(index: number){
     let sec = 0;
     if(index < 0) throw new Error("Invalid argument: " + index);
     const target = Math.min(index, this.length);
@@ -183,13 +183,13 @@ export class QueueManager extends ServerManagerBase {
   private readonly addQueueLocker = new LockObj();
 
   async addQueue(
-    url:string,
-    addedBy:Member|AddedBy,
-    method:"push"|"unshift" = "push",
-    type:KnownAudioSourceIdentifer = "unknown",
-    gotData:AudioSource.exportableCustom = null,
-    preventCache:boolean = false,
-  ):Promise<QueueContent & {index:number}>{
+    url: string,
+    addedBy: Member|AddedBy,
+    method: "push"|"unshift" = "push",
+    type: KnownAudioSourceIdentifer = "unknown",
+    gotData: AudioSource.exportableCustom = null,
+    preventCache: boolean = false,
+  ): Promise<QueueContent & {index: number}>{
     return lock(this.addQueueLocker, async () => {
       this.Log("AddQueue called");
       const t = Util.time.timer.start("AddQueue");
@@ -238,19 +238,19 @@ export class QueueManager extends ServerManagerBase {
    * @returns 成功した場合はtrue、それ以外の場合はfalse
    */
   async autoAddQueue(
-    url:string,
-    addedBy:Member|AddedBy|null|undefined,
-    type:KnownAudioSourceIdentifer,
-    first:boolean = false,
-    fromSearch:false|ResponseMessage = false,
-    channel:TextChannel = null,
-    message:ResponseMessage = null,
-    gotData:AudioSource.exportableCustom = null,
-    cancellable:boolean = false,
-  ):Promise<boolean>{
+    url: string,
+    addedBy: Member|AddedBy|null|undefined,
+    type: KnownAudioSourceIdentifer,
+    first: boolean = false,
+    fromSearch: false|ResponseMessage = false,
+    channel: TextChannel = null,
+    message: ResponseMessage = null,
+    gotData: AudioSource.exportableCustom = null,
+    cancellable: boolean = false,
+  ): Promise<boolean>{
     this.Log("AutoAddQueue Called");
     const t = Util.time.timer.start("AutoAddQueue");
-    let msg:Message<TextChannel>|ResponseMessage = null;
+    let msg: Message<TextChannel>|ResponseMessage = null;
     try{
       if(fromSearch){
         // 検索パネルから
@@ -308,7 +308,7 @@ export class QueueManager extends ServerManagerBase {
         }else if(info.basicInfo.isSpotify()){
           embed.addField(":warning:注意", "Spotifyのタイトルは正しく再生されない場合があります");
         }
-        let lastReply:Message<TextableChannel>|ResponseMessage = null;
+        let lastReply: Message<TextableChannel>|ResponseMessage = null;
         const components = !first && cancellable ? [
           new Helper.MessageActionRowBuilder()
             .addComponents(
@@ -389,15 +389,15 @@ export class QueueManager extends ServerManagerBase {
    * @returns 追加に成功した楽曲数
    */
   async processPlaylist<T>(
-    msg:ResponseMessage,
-    cancellation:TaskCancellationManager,
-    first:boolean,
-    identifer:KnownAudioSourceIdentifer,
-    playlist:T[],
-    title:string,
-    totalCount:number,
-    exportableConsumer:(track:T)=>Promise<exportableCustom>|exportableCustom
-  ):Promise<number>{
+    msg: ResponseMessage,
+    cancellation: TaskCancellationManager,
+    first: boolean,
+    identifer: KnownAudioSourceIdentifer,
+    playlist: T[],
+    title: string,
+    totalCount: number,
+    exportableConsumer: (track: T) => Promise<exportableCustom>|exportableCustom
+  ): Promise<number>{
     const t = Util.time.timer.start("ProcessPlaylist");
     try{
       let index = 0;
@@ -447,7 +447,7 @@ export class QueueManager extends ServerManagerBase {
    * 指定された位置のキューコンテンツを削除します
    * @param offset 位置
    */
-  removeAt(offset:number){
+  removeAt(offset: number){
     this.Log(`RemoveAt Called (offset:${offset})`);
     this._default.splice(offset, 1);
     this.emit(offset === 0 ? "change" : "changeWithoutCurrent");
@@ -477,7 +477,7 @@ export class QueueManager extends ServerManagerBase {
   shuffle(){
     this.Log("Shuffle Called");
     if(this._default.length === 0) return;
-    const addedByOrder:string[] = [];
+    const addedByOrder: string[] = [];
     this._default.forEach(item => {
       if(!addedByOrder.includes(item.additionalInfo.addedBy.userId)){
         addedByOrder.push(item.additionalInfo.addedBy.userId);
@@ -502,7 +502,7 @@ export class QueueManager extends ServerManagerBase {
    * @param validator 条件を表す関数
    * @returns 削除されたオフセットの一覧
    */
-  removeIf(validator:(q:QueueContent)=>boolean){
+  removeIf(validator: (q: QueueContent) => boolean){
     this.Log("RemoveIf Called");
     if(this._default.length === 0) return [];
     const first = this.server.player.isPlaying ? 1 : 0;
@@ -523,7 +523,7 @@ export class QueueManager extends ServerManagerBase {
    * @param from 移動元のインデックス
    * @param to 移動先のインデックス
    */
-  move(from:number, to:number){
+  move(from: number, to: number){
     this.Log("Move Called");
     if(from < to){
       //要素追加
@@ -542,11 +542,11 @@ export class QueueManager extends ServerManagerBase {
   /**
    * 追加者によってできるだけ交互になるようにソートします
    */
-  sortWithAddedBy(addedByUsers?:string[]){
+  sortWithAddedBy(addedByUsers?: string[]){
     // 追加者の一覧とマップを作成
     const generateUserOrder = !addedByUsers;
     addedByUsers = addedByUsers || [];
-    const queueByAdded = {} as {[key:string]:QueueContent[]};
+    const queueByAdded = {} as {[key: string]: QueueContent[]};
     for(let i = 0; i < this._default.length; i++){
       if(!addedByUsers.includes(this._default[i].additionalInfo.addedBy.userId)){
         if(generateUserOrder){
@@ -567,27 +567,27 @@ export class QueueManager extends ServerManagerBase {
     this.emit("changeWithoutCurrent");
   }
 
-  protected getDisplayNameFromMember(member:Member|AddedBy){
+  protected getDisplayNameFromMember(member: Member|AddedBy){
     return member instanceof Member ? Util.eris.user.getDisplayName(member) : member.displayName;
   }
 
-  protected getUserIdFromMember(member:Member|AddedBy){
+  protected getUserIdFromMember(member: Member|AddedBy){
     return member instanceof Member ? member.id : member.userId;
   }
 
-  override emit<T extends keyof QueueManagerEvents>(eventName:T, ...args:QueueManagerEvents[T]){
+  override emit<T extends keyof QueueManagerEvents>(eventName: T, ...args: QueueManagerEvents[T]){
     return super.emit(eventName, ...args);
   }
 
-  override on<T extends keyof QueueManagerEvents>(eventName:T, listener: (...args:QueueManagerEvents[T]) => void){
+  override on<T extends keyof QueueManagerEvents>(eventName: T, listener: (...args: QueueManagerEvents[T]) => void){
     return super.on(eventName, listener);
   }
 
-  override once<T extends keyof QueueManagerEvents>(eventName:T, listener: (...args:QueueManagerEvents[T]) => void){
+  override once<T extends keyof QueueManagerEvents>(eventName: T, listener: (...args: QueueManagerEvents[T]) => void){
     return super.on(eventName, listener);
   }
 
-  override off<T extends keyof QueueManagerEvents>(eventName:T, listener: (...args:QueueManagerEvents[T]) => void){
+  override off<T extends keyof QueueManagerEvents>(eventName: T, listener: (...args: QueueManagerEvents[T]) => void){
     return super.off(eventName, listener);
   }
 }

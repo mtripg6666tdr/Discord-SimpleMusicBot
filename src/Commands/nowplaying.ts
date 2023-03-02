@@ -45,7 +45,7 @@ export default class NowPlaying extends BaseCommand {
     });
   }
   
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.server.player.isPlaying){

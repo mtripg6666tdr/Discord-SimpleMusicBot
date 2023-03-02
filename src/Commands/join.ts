@@ -36,7 +36,7 @@ export default class Join extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(message.member.voiceState.channelID && (options.client.getChannel(message.member.voiceState.channelID) as VoiceChannel).voiceMembers.has(options.client.user.id) && options.server.connection){
       message.reply("✘すでにボイスチャンネルに接続中です。").catch(e => Util.logger.log(e, "error"));

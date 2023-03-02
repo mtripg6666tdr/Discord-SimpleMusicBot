@@ -21,13 +21,13 @@ import type { CommandInteraction, ComponentInteraction, ComponentInteractionButt
 import { Constants } from "eris";
 
 export const interactionUtils = {
-  interactionIsCommandOrComponent(interaction:Interaction):interaction is CommandInteraction|ComponentInteraction{
+  interactionIsCommandOrComponent(interaction: Interaction): interaction is CommandInteraction|ComponentInteraction{
     return "channel" in interaction;
   },
-  componentInteractionDataIsButtonData(data:ComponentInteractionButtonData|ComponentInteractionSelectMenuData):data is ComponentInteractionButtonData{
+  componentInteractionDataIsButtonData(data: ComponentInteractionButtonData|ComponentInteractionSelectMenuData): data is ComponentInteractionButtonData{
     return data.component_type === Constants.ComponentTypes.BUTTON;
   },
-  componentInteractionDataIsSelectMenuData(data:ComponentInteractionButtonData|ComponentInteractionSelectMenuData):data is ComponentInteractionSelectMenuData{
+  componentInteractionDataIsSelectMenuData(data: ComponentInteractionButtonData|ComponentInteractionSelectMenuData): data is ComponentInteractionSelectMenuData{
     return data.component_type === Constants.ComponentTypes.SELECT_MENU;
   },
 } as const;
