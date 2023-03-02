@@ -85,7 +85,7 @@ export abstract class BaseCommand {
 
   protected readonly _requiredPermissionsOr: CommandPermission[] = null;
   public get requiredPermissionsOr(){
-    return this._requiredPermissionsOr;
+    return this._requiredPermissionsOr || [];
   }
 
   get permissionDescription(){
@@ -134,7 +134,6 @@ export abstract class BaseCommand {
         return false;
       }
     };
-    console.log(this.requiredPermissionsOr.filter(judgeIfPermissionMeeted));
     if(this.requiredPermissionsOr.length !== 0 && !this.requiredPermissionsOr.some(judgeIfPermissionMeeted)){
       await message.reply({
         content: `この操作を実行するには、${this.permissionDescription}が必要です。`,
