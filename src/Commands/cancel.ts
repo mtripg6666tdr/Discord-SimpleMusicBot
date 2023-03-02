@@ -35,7 +35,7 @@ export default class Cancel extends BaseCommand {
     });
   }
   
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     const result = options.server.cancelAll();
     if(result){

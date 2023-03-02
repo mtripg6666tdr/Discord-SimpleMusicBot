@@ -26,10 +26,10 @@ import Util from "../../Util";
 import { createPassThrough } from "../../Util/general";
 
 type PlayableStreamInfo = {
-  cost:number,
-  streams:Readable[],
-  stream:Readable,
-  streamType:StreamType,
+  cost: number,
+  streams: Readable[],
+  stream: Readable,
+  streamType: StreamType,
 };
 
 /*
@@ -55,7 +55,7 @@ so we decided to pass the strean if it is just Webm/Opus stream.
  * @param volumeTransform whether volume transform is required
  * @returns if volume transform is required, this will return a stream info that represents Ogg/Webm Opus, otherwise return a stream info represents PCM Opus.
  */
-export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[], seek:number, volumeTransform:boolean, bitrate:number):PlayableStreamInfo{
+export function resolveStreamToPlayable(streamInfo: StreamInfo, effects: string[], seek: number, volumeTransform: boolean, bitrate: number): PlayableStreamInfo{
   const effectEnabled = effects.length !== 0;
   if(streamInfo.streamType === "webm" && seek <= 0 && !effectEnabled && !volumeTransform){
     // 1. effect is off, volume is off, stream is webm
@@ -144,7 +144,7 @@ export function resolveStreamToPlayable(streamInfo:StreamInfo, effects:string[],
   }
 }
 
-function convertStreamInfoToReadableStreamInfo(streamInfo:UrlStreamInfo|ReadableStreamInfo):ReadableStreamInfo{
+function convertStreamInfoToReadableStreamInfo(streamInfo: UrlStreamInfo|ReadableStreamInfo): ReadableStreamInfo{
   if(streamInfo.type === "readable"){
     return streamInfo;
   }
@@ -159,7 +159,7 @@ function convertStreamInfoToReadableStreamInfo(streamInfo:UrlStreamInfo|Readable
   };
 }
 
-export function destroyStream(stream:Readable, error?:Error){
+export function destroyStream(stream: Readable, error?: Error){
   if(!stream.destroyed){
     // if stream._destroy was overwritten, callback might not be called so make sure to be called.
     const originalDestroy = stream._destroy;

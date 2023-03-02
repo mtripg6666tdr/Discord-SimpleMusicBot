@@ -47,6 +47,6 @@ declare module "twitter-url-direct" {
     error: string,
   };
   type Result = FoundResponse | NotFoundResponse;
-  function twitterGetUrl(url:string):Promise<Result>;
+  function twitterGetUrl(url: string): Promise<Result>;
   export = twitterGetUrl;
 }

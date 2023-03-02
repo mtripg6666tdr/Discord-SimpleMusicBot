@@ -35,7 +35,7 @@ export default class QueueLoop extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(options.server.queue.queueLoopEnabled){
       options.server.queue.queueLoopEnabled = false;

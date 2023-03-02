@@ -27,13 +27,13 @@ export class BestdoriS extends AudioSource {
   protected readonly _serviceIdentifer = "bestdori";
   Thumbnail = "";
   Artist = "";
-  Type:"anime"|"normal"|null = null;
-  lyricist:string;
-  composer:string;
-  arranger:string;
-  private id:number;
+  Type: "anime"|"normal"|null = null;
+  lyricist: string;
+  composer: string;
+  arranger: string;
+  private id: number;
 
-  async init(url:string, prefetched:exportableBestdori){
+  async init(url: string, prefetched: exportableBestdori){
     this.Url = url;
     await BestdoriApi.setupData();
     this.id = BestdoriApi.getAudioId(url);
@@ -58,7 +58,7 @@ export class BestdoriS extends AudioSource {
     return this;
   }
 
-  async fetch():Promise<UrlStreamInfo>{
+  async fetch(): Promise<UrlStreamInfo>{
     return {
       type: "url",
       url: "https://bestdori.com/assets/jp/sound/bgm" + Util.general.padZero(this.id.toString(), 3) + "_rip/bgm" + Util.general.padZero(this.id.toString(), 3) + ".mp3"
@@ -92,7 +92,7 @@ export class BestdoriS extends AudioSource {
 
   npAdditional(){return "\r\nアーティスト:`" + this.Artist + "`";}
 
-  exportData():exportableBestdori{
+  exportData(): exportableBestdori{
     return {
       url: this.Url,
       length: this.LengthSeconds,
@@ -105,9 +105,9 @@ export class BestdoriS extends AudioSource {
 }
 
 export type exportableBestdori = exportableCustom & {
-  lyricist:string,
-  composer:string,
-  arranger:string,
+  lyricist: string,
+  composer: string,
+  arranger: string,
 };
 
 /**
@@ -119,7 +119,7 @@ export abstract class BestdoriApi {
    * @param url BestdoriのURL
    * @returns BestdoriのID
    */
-  static getAudioId(url:string):number{
+  static getAudioId(url: string): number{
     const match = url.match(/^https?:\/\/bestdori\.com\/info\/songs\/(?<Id>\d+)(\/.*)?$/);
     if(match){
       return Number(match.groups.Id);
@@ -137,16 +137,16 @@ export abstract class BestdoriApi {
     }
   }
 
-  static getAudioPage(id:number):string{
+  static getAudioPage(id: number): string{
     return "https://bestdori.com/info/songs/" + id;
   }
 
-  static async getDetailedInfo(id:number){
+  static async getDetailedInfo(id: number){
     const apiUrl = `https://bestdori.com/api/songs/${id.toString()}.json`;
     return JSON.parse(await Util.web.DownloadText(apiUrl)) as BestdoriDetailedSongInfo;
   }
 
-  static getThumbnail(id:number, jacketimage:string){
+  static getThumbnail(id: number, jacketimage: string){
     return `https://bestdori.com/assets/jp/musicjacket/musicjacket${Math.ceil(id / 10) * 10}_rip/assets-star-forassetbundle-startapp-musicjacket-musicjacket${Math.ceil(id / 10) * 10}-${jacketimage}-jacket.png`;
   }
 }
@@ -154,8 +154,8 @@ export abstract class BestdoriApi {
 export const BestdoriAllSongInfoEndPoint = "https://bestdori.com/api/songs/all.5.json";
 export const BestdoriAllBandInfoEndPoint = "https://bestdori.com/api/bands/all.1.json";
 class BestdoriData {
-  allsonginfo:BestdoriAllSongInfo = null;
-  allbandinfo:BestdoriAllBandInfo = null;
+  allsonginfo: BestdoriAllSongInfo = null;
+  allbandinfo: BestdoriAllBandInfo = null;
 }
 export const bestdori = new BestdoriData();
 export type BandID = number;
@@ -168,19 +168,19 @@ export type SongID = number;
  * (一部改変)
  */
 export type BestdoriAllSongInfo = {
-  [key:number]:{
-    tag:"anime"|"normal",
-    bandId:BandID,
-    jacketImage:[string],
-    musicTitle:[string, string, string, string, string],
-    publishedAt:[string, string, string, string, string],
-    closedAt:[string, string, string, string, string],
-    difficulty:{[key in "0"|"1"|"2"|"3"|"4"]:{playLevel:number}},
+  [key: number]: {
+    tag: "anime"|"normal",
+    bandId: BandID,
+    jacketImage: [string],
+    musicTitle: [string, string, string, string, string],
+    publishedAt: [string, string, string, string, string],
+    closedAt: [string, string, string, string, string],
+    difficulty: {[key in "0"|"1"|"2"|"3"|"4"]: {playLevel: number}},
   },
 };
 export type BestdoriAllBandInfo = {
-  [key:number]:{
-    bandName:[string, string, string, string, string],
+  [key: number]: {
+    bandName: [string, string, string, string, string],
   },
 };
 export interface BestdoriDetailedSongInfo {

@@ -35,7 +35,7 @@ export default class Reset extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     // VC接続中なら切断
     options.server.player.disconnect();

@@ -17,7 +17,7 @@
  */
 
 export type AudioEffect = {
-  BassBoost:boolean,
-  Reverb:boolean,
-  LoudnessEqualization:boolean,
+  BassBoost: boolean,
+  Reverb: boolean,
+  LoudnessEqualization: boolean,
 };

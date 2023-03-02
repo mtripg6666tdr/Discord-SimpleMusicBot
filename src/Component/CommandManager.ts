@@ -44,7 +44,7 @@ export class CommandManager extends LogEmitter {
   /**
    * コマンドを返します
    */
-  get commands():Readonly<BaseCommand[]>{
+  get commands(): Readonly<BaseCommand[]>{
     return this._commands;
   }
 
@@ -79,7 +79,7 @@ export class CommandManager extends LogEmitter {
 
   checkDuplicate(){
     const sets = new Map<string, BaseCommand>();
-    const setCommand = (name:string, command:BaseCommand) => {
+    const setCommand = (name: string, command: BaseCommand) => {
       if(sets.has(name)){
         this.Log(`Detected command ${command.name} the duplicated key ${name} with ${sets.get(name).name}; overwriting`, "warn");
       }
@@ -96,7 +96,7 @@ export class CommandManager extends LogEmitter {
    * @param command コマンド名
    * @returns 解決されたコマンド
    */
-  resolve(command:string){
+  resolve(command: string){
     this.Log("Resolving command");
     let result = null;
     for(let i = 0; i < this._commands.length; i++){
@@ -110,7 +110,7 @@ export class CommandManager extends LogEmitter {
     return result;
   }
 
-  async sync(client:Client, removeOutdated:boolean = false){
+  async sync(client: Client, removeOutdated: boolean = false){
     this.Log("Start syncing application commands");
     const registeredAppCommands = await client.getCommands();
     if(registeredAppCommands.length === 0){
@@ -130,7 +130,7 @@ export class CommandManager extends LogEmitter {
         || (target.argument || []).length !== (registered.options || []).length
         || (target.argument && target.argument.some(
           (arg, i) => {
-            const choicesObjectMap:{[key:string]:string} = {};
+            const choicesObjectMap: {[key: string]: string} = {};
             ((registered.options[i] as ApplicationCommandOptionWithChoices).choices)?.forEach(c => choicesObjectMap[c.name] = c.value.toString());
             return !registered.options[i]
             || registered.options[i].name !== arg.name
@@ -182,19 +182,19 @@ export class CommandManager extends LogEmitter {
     }
   }
 
-  async removeAllApplicationCommand(client:Client){
+  async removeAllApplicationCommand(client: Client){
     this.Log("Removing all application commands");
     await client.bulkEditCommands([]);
     this.Log("Successfully removed all application commands");
   }
 
-  async removeAllGuildCommand(client:Client, guildId:string){
+  async removeAllGuildCommand(client: Client, guildId: string){
     this.Log("Removing all guild commands of " + guildId);
     await client.bulkEditGuildCommands(guildId, []);
     this.Log("Successfully removed all guild commands");
   }
 
-  static mapCommandOptionTypeToInteger(type:CommandOptionsTypes){
+  static mapCommandOptionTypeToInteger(type: CommandOptionsTypes){
     switch(type){
       case "bool":
         return Constants.ApplicationCommandOptionTypes.BOOLEAN;

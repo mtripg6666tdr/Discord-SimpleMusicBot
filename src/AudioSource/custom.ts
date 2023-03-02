@@ -26,9 +26,9 @@ import { DefaultAudioThumbnailURL } from "../definition";
 export class CustomStream extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "custom";
-  Thumbnail:string = DefaultAudioThumbnailURL;
+  Thumbnail: string = DefaultAudioThumbnailURL;
 
-  async init(url:string, prefetched:exportableCustom){
+  async init(url: string, prefetched: exportableCustom){
     if(prefetched){
       this.Title = prefetched.title || "カスタムストリーム";
       this.Url = url;
@@ -45,7 +45,7 @@ export class CustomStream extends AudioSource {
     return this;
   }
 
-  async fetch():Promise<UrlStreamInfo>{
+  async fetch(): Promise<UrlStreamInfo>{
     return {
       type: "url",
       url: this.Url
@@ -64,7 +64,7 @@ export class CustomStream extends AudioSource {
 
   npAdditional(){return "";}
 
-  exportData():exportableCustom{
+  exportData(): exportableCustom{
     return {
       url: this.Url,
       length: this._lengthSeconds,
@@ -81,5 +81,5 @@ export class CustomStream extends AudioSource {
 export type exportableCustom = {
   url: string,
   length: number,
-  title:string,
+  title: string,
 };

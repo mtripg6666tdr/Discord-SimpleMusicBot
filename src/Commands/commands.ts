@@ -60,16 +60,16 @@ export default class Commands extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     if(options.rawArgs === ""){
       // 引数がない場合は全コマンドの一覧を表示
       const embed = [] as MessageEmbedBuilder[];
-      const getCategoryText = (label:string)=>{
+      const getCategoryText = (label: string)=>{
         // @ts-expect-error
         return categories[label as any] as string;
       };
       const rawcommands = CommandManager.instance.commands.filter(ci => !ci.unlist);
-      const commands = {} as {[category:string]:BaseCommand[]};
+      const commands = {} as {[category: string]: BaseCommand[]};
       // Generate command list
       for(let i = 0; i < rawcommands.length; i++){
         if(commands[rawcommands[i].category]){

@@ -30,7 +30,7 @@ export class Twitter extends AudioSource {
   Thumbnail = DefaultAudioThumbnailURL;
   private streamUrl = "";
 
-  async init(url:string, prefetched?:exportableTwitter){
+  async init(url: string, prefetched?: exportableTwitter){
     this.Url = url;
     if(!Twitter.validateUrl(url)) throw new Error("Invalid streamable url");
     if(prefetched){
@@ -46,7 +46,7 @@ export class Twitter extends AudioSource {
         throw new Error("No media found");
       }
       this.streamUrl = streamInfo.download.sort((a, b) => {
-        const getDimensionFactor = (dimension:string) => dimension.split("x").reduce((prev, current) => prev + Number(current), 1);
+        const getDimensionFactor = (dimension: string) => dimension.split("x").reduce((prev, current) => prev + Number(current), 1);
         return getDimensionFactor(b.dimension) - getDimensionFactor(a.dimension);
       })[0]?.url;
       this.Description = streamInfo.tweet_user.text;
@@ -57,7 +57,7 @@ export class Twitter extends AudioSource {
     return this;
   }
 
-  async fetch():Promise<UrlStreamInfo>{
+  async fetch(): Promise<UrlStreamInfo>{
     return {
       type: "url",
       url: this.streamUrl
@@ -79,7 +79,7 @@ export class Twitter extends AudioSource {
 
   npAdditional(){return "";}
 
-  exportData():exportableTwitter{
+  exportData(): exportableTwitter{
     return {
       url: this.Url,
       length: this.LengthSeconds,
@@ -88,11 +88,11 @@ export class Twitter extends AudioSource {
     };
   }
 
-  static validateUrl(url:string){
+  static validateUrl(url: string){
     return !!url.match(/^https?:\/\/twitter\.com\/[a-zA-Z0-9_-]+\/status\/\d+(\?.+)?$/);
   }
 }
 
 export type exportableTwitter = exportableCustom & {
-  streamUrl:string,
+  streamUrl: string,
 };

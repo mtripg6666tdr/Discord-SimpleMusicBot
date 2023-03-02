@@ -30,7 +30,7 @@ type strategies =
   | playDlStrategy
 ;
 
-export const strategies:strategies[] = [
+export const strategies: strategies[] = [
   "./ytdl-core",
   "./play-dl",
   "./youtube-dl",
@@ -50,7 +50,7 @@ function setupLogger(logger: LoggerType){
   strategies.forEach(strategy => strategy.logger = logger);
 }
 
-export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(logger: LoggerType, ...parameters:Parameters<Strategy<T, U>["fetch"]>){
+export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(logger: LoggerType, ...parameters: Parameters<Strategy<T, U>["fetch"]>){
   setupLogger(logger);
   let checkedStrategy = -1;
   if(parameters[2]){
@@ -88,7 +88,7 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(l
   throw new Error("All strategies failed");
 }
 
-export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>(logger: LoggerType, ...parameters:Parameters<Strategy<T, U>["getInfo"]>){
+export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>(logger: LoggerType, ...parameters: Parameters<Strategy<T, U>["getInfo"]>){
   setupLogger(logger);
   for(let i = 0; i < strategies.length; i++){
     try{

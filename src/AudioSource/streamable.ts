@@ -29,7 +29,7 @@ export class Streamable extends AudioSource {
   Thumbnail = DefaultAudioThumbnailURL;
   private streamUrl = "";
 
-  async init(url:string, prefetched?:exportableStreamable){
+  async init(url: string, prefetched?: exportableStreamable){
     this.Url = url;
     const id = StreamableApi.getVideoId(url);
     if(!id) throw new Error("Invalid streamable url");
@@ -48,7 +48,7 @@ export class Streamable extends AudioSource {
     return this;
   }
 
-  async fetch():Promise<UrlStreamInfo>{
+  async fetch(): Promise<UrlStreamInfo>{
     return {
       type: "url",
       url: this.streamUrl
@@ -67,7 +67,7 @@ export class Streamable extends AudioSource {
 
   npAdditional(){return "";}
 
-  exportData():exportableStreamable{
+  exportData(): exportableStreamable{
     return {
       url: this.Url,
       length: this.LengthSeconds,
@@ -79,8 +79,8 @@ export class Streamable extends AudioSource {
 }
 
 export type exportableStreamable = exportableCustom & {
-  thumbnail:string,
-  streamUrl:string,
+  thumbnail: string,
+  streamUrl: string,
 };
 
 /**
@@ -92,7 +92,7 @@ export abstract class StreamableApi {
    * @param url 動画のURL
    * @returns 動画のID
    */
-  static getVideoId(url:string):string{
+  static getVideoId(url: string): string{
     const match = url.match(/^https?:\/\/streamable.com\/(?<Id>.+)$/);
     if(match){
       return match.groups.Id;
@@ -101,7 +101,7 @@ export abstract class StreamableApi {
     }
   }
 
-  static async getVideoDetails(id:string):Promise<StreamableAPIResult>{
+  static async getVideoDetails(id: string): Promise<StreamableAPIResult>{
     const BASE_API = "https://api.streamable.com/videos/";
     return JSON.parse(await Util.web.DownloadText(BASE_API + id)) as StreamableAPIResult;
   }

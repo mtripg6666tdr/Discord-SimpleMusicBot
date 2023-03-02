@@ -58,7 +58,7 @@ const normalizeTemplate = [
 /**
  * 文字列を正規化します
  */
-export function NormalizeText(rawText:string){
+export function NormalizeText(rawText: string){
   let result = rawText;
   normalizeTemplate.forEach(reg => {
     result = result.replace(reg.from, reg.to);

@@ -45,7 +45,7 @@ export default class Queue extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     const msg = await message.reply(":eyes: キューを確認しています。お待ちください...");
     const queue = options.server.queue;
@@ -64,8 +64,8 @@ export default class Queue extends BaseCommand {
     // 合計ページ数割り出し
     const totalpage = Math.ceil(queue.length / 10);
     // ページのキューを割り出す
-    const getQueueEmbed = (page:number) => {
-      const fields:{name:string, value:string}[] = [];
+    const getQueueEmbed = (page: number) => {
+      const fields: {name: string, value: string}[] = [];
       for(let i = 10 * (page - 1); i < 10 * page; i++){
         if(queue.length <= i){
           break;

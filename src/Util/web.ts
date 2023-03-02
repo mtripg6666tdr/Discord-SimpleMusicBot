@@ -33,7 +33,7 @@ import { DefaultUserAgent } from "./ua";
  * @param url URL
  * @returns ダウンロードされたテキストデータ
  */
-export function DownloadText(url:string, headers?:{[key:string]:string}, requestBody?:any):Promise<string>{
+export function DownloadText(url: string, headers?: {[key: string]: string}, requestBody?: any): Promise<string>{
   return candyget.string(url, {headers}, requestBody).then(r => r.body);
 }
 
@@ -43,7 +43,7 @@ export function DownloadText(url:string, headers?:{[key:string]:string}, request
  * @param headers 追加のカスタムリクエストヘッダ
  * @returns ステータスコード
  */
-export function RetriveHttpStatusCode(url:string, headers?:{[key:string]:string}){
+export function RetriveHttpStatusCode(url: string, headers?: {[key: string]: string}){
   return candyget("HEAD", url, "string", {
     headers: {
       "User-Agent": DefaultUserAgent,
@@ -60,7 +60,7 @@ const httpsAgent = new HttpsAgent({keepAlive: false});
  * @param url URL
  * @returns Readableストリーム
  */
-export function DownloadAsReadable(url:string, options:miniget.Options = {}):Readable{
+export function DownloadAsReadable(url: string, options: miniget.Options = {}): Readable{
   return miniget(url, {
     maxReconnects: 10,
     maxRetries: 3,
@@ -77,7 +77,7 @@ export function DownloadAsReadable(url:string, options:miniget.Options = {}):Rea
  * @param url リソースのURL
  * @returns 取得された秒数
  */
-export function RetriveLengthSeconds(url:string){
+export function RetriveLengthSeconds(url: string){
   return new Promise<number>((resolve, reject) => {
     let data = "";
     const proc = spawn(require("ffmpeg-static"), [

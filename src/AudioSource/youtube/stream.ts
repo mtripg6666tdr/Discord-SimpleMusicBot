@@ -24,7 +24,7 @@ import * as ytdl from "ytdl-core";
 import { Util } from "../../Util";
 import { createPassThrough } from "../../Util/general";
 
-export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoFormat, options:ytdl.downloadOptions, chunkSize:number = 512 * 1024){
+export function createChunkedYTStream(info: ytdl.videoInfo, format: ytdl.videoFormat, options: ytdl.downloadOptions, chunkSize: number = 512 * 1024){
   const stream = Util.general.createPassThrough();
   let current = -1;
   const contentLength = Number(format.contentLength);
@@ -61,10 +61,10 @@ export function createChunkedYTStream(info:ytdl.videoInfo, format:ytdl.videoForm
   return stream;
 }
 
-export function createRefreshableYTLiveStream(info:ytdl.videoInfo, url:string, options:ytdl.downloadOptions){
+export function createRefreshableYTLiveStream(info: ytdl.videoInfo, url: string, options: ytdl.downloadOptions){
   // set timeout to any miniget stream
-  const setStreamNetworkTimeout = (_stream:Readable) => {
-    _stream.on("response", (message:IncomingMessage) => {
+  const setStreamNetworkTimeout = (_stream: Readable) => {
+    _stream.on("response", (message: IncomingMessage) => {
       message.setTimeout(4000, () => {
         Util.logger.log("Segment timed out; retrying...");
         const er = new Error("ENOTFOUND");
@@ -77,7 +77,7 @@ export function createRefreshableYTLiveStream(info:ytdl.videoInfo, url:string, o
   };
 
   // start to download the live stream from the provided information (info object or url string)
-  const downloadLiveStream = async (targetInfo:ytdl.videoInfo|string) => {
+  const downloadLiveStream = async (targetInfo: ytdl.videoInfo|string) => {
     if(typeof targetInfo === "string"){
       targetInfo = await ytdl.getInfo(targetInfo);
       options.format = ytdl.chooseFormat(targetInfo.formats, {isHLS: true} as ytdl.chooseFormatOptions);
@@ -88,7 +88,7 @@ export function createRefreshableYTLiveStream(info:ytdl.videoInfo, url:string, o
   };
 
   // handle errors occurred by the current live stream
-  const onError = (er:Error) => {
+  const onError = (er: Error) => {
     console.error(er);
     if(er.message === "ENOTFOUND"){
       refreshStream();
@@ -99,7 +99,7 @@ export function createRefreshableYTLiveStream(info:ytdl.videoInfo, url:string, o
   };
 
   // destroy the current stream safely
-  const destroyCurrentStream = (er?:Error) => {
+  const destroyCurrentStream = (er?: Error) => {
     currentStream.removeAllListeners("error");
     currentStream.on("error", () => {});
     currentStream.destroy(er);
@@ -131,7 +131,7 @@ export function createRefreshableYTLiveStream(info:ytdl.videoInfo, url:string, o
     }
   };
 
-  let currentStream:Readable = null;
+  let currentStream: Readable = null;
   const timeout = setInterval(refreshStream, 40 * 60 * 1000).unref();
   const stream = createPassThrough({
     allowHalfOpen: true,

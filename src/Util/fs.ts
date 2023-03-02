@@ -24,10 +24,10 @@ const videoExtensions = [".mov", ".mp4"] as const;
  * @param str 検査対象のURL
  * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
  */
-export function isAvailableRawAudioURL(str:string){
+export function isAvailableRawAudioURL(str: string){
   return audioExtensions.some(ext => str.endsWith(ext));
 }
 
-export function isAvailableRawVideoURL(str:string){
+export function isAvailableRawVideoURL(str: string){
   return videoExtensions.some(ext => str.endsWith(ext));
 }

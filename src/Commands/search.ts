@@ -26,7 +26,7 @@ import { searchYouTube } from "../AudioSource";
 import { Util } from "../Util";
 
 export abstract class SearchBase<T> extends BaseCommand {
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     options.server.joinVoiceChannel(message);
     if(this.urlCheck(options.rawArgs)){
@@ -49,12 +49,12 @@ export abstract class SearchBase<T> extends BaseCommand {
     }
   }
 
-  protected abstract searchContent(query:string):Promise<T|{result:T, transformedQuery:string}>;
+  protected abstract searchContent(query: string): Promise<T|{result: T, transformedQuery: string}>;
 
-  protected abstract consumer(result:T):SongInfo[];
+  protected abstract consumer(result: T): SongInfo[];
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected urlCheck(query:string){
+  protected urlCheck(query: string){
     return false;
   }
 }
@@ -80,11 +80,11 @@ export default class Search extends SearchBase<ytsr.Result> {
     });
   }
 
-  protected override searchContent(query:string){
+  protected override searchContent(query: string){
     return searchYouTube(query);
   }
 
-  protected override consumer({items}:ytsr.Result){
+  protected override consumer({items}: ytsr.Result){
     return items.map(item => item.type !== "video" ? null : {
       url: item.url,
       title: item.title,

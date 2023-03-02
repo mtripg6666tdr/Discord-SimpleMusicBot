@@ -38,7 +38,7 @@ export class MusicBot extends MusicBotBase {
   private readonly _addOn = new Util.addOn.AddOn();
   private _isReadyFinished = false;
 
-  constructor(token:string, maintenance:boolean = false){
+  constructor(token: string, maintenance: boolean = false){
     super(maintenance);
 
     this._client = new discord.Client(token, {
@@ -168,7 +168,7 @@ export class MusicBot extends MusicBotBase {
     this.emit("ready");
   }
 
-  private async onMessageCreate(message:discord.Message){
+  private async onMessageCreate(message: discord.Message){
     this._addOn.emit("messageCreate", message);
     if(this.maintenance){
       if(!Util.general.isBotAdmin(message.author.id)) return;
@@ -259,7 +259,7 @@ export class MusicBot extends MusicBotBase {
     }
   }
 
-  private async onInteractionCreate(interaction:discord.Interaction){
+  private async onInteractionCreate(interaction: discord.Interaction){
     // イベント発生
     this._addOn.emit("interactionCreate", interaction);
     // コマンドインタラクションおよびコンポーネントインタラクション以外は処理せず終了
@@ -379,7 +379,7 @@ export class MusicBot extends MusicBotBase {
             }).catch(er => this.Log(er, "error"));
           }
         }else if(interaction.data.custom_id.startsWith("control_")){
-          let command:string = null;
+          let command: string = null;
           switch(interaction.data.custom_id){
             case "control_rewind":
               command = "rewind";
@@ -446,7 +446,7 @@ export class MusicBot extends MusicBotBase {
     }
   }
 
-  private async onVoiceChannelJoin(member:discord.Member, newChannel:discord.TextVoiceChannel){
+  private async onVoiceChannelJoin(member: discord.Member, newChannel: discord.TextVoiceChannel){
     if(member.id === this._client.user.id){
       // ボットが参加した際
       // ミュート状態/抑制状態なら自分で解除を試みる
@@ -490,7 +490,7 @@ export class MusicBot extends MusicBotBase {
     }
   }
 
-  private async onVoiceChannelLeave(member:discord.Member, oldChannel:discord.TextVoiceChannel){
+  private async onVoiceChannelLeave(member: discord.Member, oldChannel: discord.TextVoiceChannel){
     const server = this.guildData.get(oldChannel.guild.id);
     if(!server || !server.connection) return;
     if(member.id === this._client.user.id){
@@ -531,12 +531,12 @@ export class MusicBot extends MusicBotBase {
     server.skipSession?.checkThreshold();
   }
 
-  private async onVoiceChannelSwitch(member:discord.Member, newChannel:discord.TextVoiceChannel, oldChannel:discord.TextVoiceChannel){
+  private async onVoiceChannelSwitch(member: discord.Member, newChannel: discord.TextVoiceChannel, oldChannel: discord.TextVoiceChannel){
     this.onVoiceChannelJoin(member, newChannel);
     if(member.id !== this.client.user.id) this.onVoiceChannelLeave(member, oldChannel);
   }
 
-  private async onError(er:Error){
+  private async onError(er: Error){
     Util.logger.log(er, "error");
     if(er.message?.startsWith("Invalid token")){
       this.Log("Invalid token detected. Please ensure that you set the correct token. You can also re-generate new token for your bot.");
@@ -549,11 +549,11 @@ export class MusicBot extends MusicBotBase {
     }
   }
 
-  private onDebug(message:string, id?:number){
+  private onDebug(message: string, id?: number){
     this.Log(`${message} (ID: ${id || "NaN"})`, "debug");
   }
 
-  private onWarn(message:string, id?:number){
+  private onWarn(message: string, id?: number){
     this.Log(`${message} (ID: ${id || "NaN"})`, "warn");
   }
 
@@ -562,7 +562,7 @@ export class MusicBot extends MusicBotBase {
    * @param debugLog デバッグログを出力するかどうか
    * @param debugLogStoreLength デバッグログの保存する数
    */
-  run(debugLog:boolean = false, debugLogStoreLength?:number){
+  run(debugLog: boolean = false, debugLogStoreLength?: number){
     this._client.connect().catch(e => this.Log(e, "error"));
     Util.logger.logStore.log = debugLog;
     if(debugLogStoreLength) Util.logger.logStore.maxLength = debugLogStoreLength;
@@ -587,7 +587,7 @@ export class MusicBot extends MusicBotBase {
    * @param optiont コマンドの生の引数
    * @returns コマンドを実行する際にランナーに渡す引数
    */
-  private createCommandRunnerArgs(guildId:string, options:string[], optiont:string):CommandArgs{
+  private createCommandRunnerArgs(guildId: string, options: string[], optiont: string): CommandArgs{
     return {
       embedPageToggle: this._embedPageToggle,
       args: options,

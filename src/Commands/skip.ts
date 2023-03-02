@@ -35,7 +35,7 @@ export default class Skip extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     const server = options.server;
     // そもそも再生状態じゃないよ...
     if(server.player.preparing){

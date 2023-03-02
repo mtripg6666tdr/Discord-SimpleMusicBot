@@ -30,9 +30,9 @@ import { DefaultAudioThumbnailURL } from "../definition";
 export class FsStream extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "fs";
-  Thumbnail:string = DefaultAudioThumbnailURL;
+  Thumbnail: string = DefaultAudioThumbnailURL;
 
-  async init(url:string){
+  async init(url: string){
     this.Url = url;
     this.Title = "カスタムストリーム";
     try{
@@ -42,7 +42,7 @@ export class FsStream extends AudioSource {
     return this;
   }
 
-  async fetch():Promise<ReadableStreamInfo>{
+  async fetch(): Promise<ReadableStreamInfo>{
     return {
       type: "readable",
       stream: fs.createReadStream(path.join(__dirname, "../../", this.Url))
@@ -60,7 +60,7 @@ export class FsStream extends AudioSource {
     return "";
   }
 
-  exportData():exportableCustom{
+  exportData(): exportableCustom{
     return {
       url: this.Url,
       length: this._lengthSeconds,

@@ -27,14 +27,14 @@ import { Strategy } from "./base";
 import { Util } from "../../../Util";
 
 type playDl = "playDl";
-const playDl:playDl = "playDl";
+const playDl: playDl = "playDl";
 
 export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> {
   get cacheType(){
     return playDl;
   }
 
-  async getInfo(url:string){
+  async getInfo(url: string){
     this.useLog();
     const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#getInfo`);
     let info = null as InfoData;
@@ -54,7 +54,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async fetch(url:string, forceUrl:boolean = false, cache?: Cache<any, any>){
+  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
     this.useLog();
     const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch`);
     let info = null as InfoData;
@@ -93,7 +93,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
     }
   }
 
-  protected mapToExportable(url:string, info:InfoData):exportableYouTube{
+  protected mapToExportable(url: string, info: InfoData): exportableYouTube{
     if(info.video_details.upcoming) throw new Error("This video is still in upcoming");
     return {
       url,

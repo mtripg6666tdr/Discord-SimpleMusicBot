@@ -36,12 +36,12 @@ const MongoClient = (() => {
   }
 })()?.MongoClient;
 
-type Collectionate<T> = T & {guildId:string};
+type Collectionate<T> = T & {guildId: string};
 
 export class MongoBackupper extends Backupper {
-  private readonly client:mongo.MongoClient = null;
+  private readonly client: mongo.MongoClient = null;
   private dbConnectionReady = false;
-  private dbError:Error = null;
+  private dbError: Error = null;
   collections: {
     status: mongo.Collection<Collectionate<exportableStatuses>>,
     queue: mongo.Collection<Collectionate<YmxFormat>>,
@@ -51,7 +51,7 @@ export class MongoBackupper extends Backupper {
     return process.env.GAS_URL && (process.env.GAS_URL.startsWith("mongodb://") || process.env.GAS_URL.startsWith("mongodb+srv://"));
   }
 
-  constructor(bot:MusicBotBase, getData: () => DataType){
+  constructor(bot: MusicBotBase, getData: () => DataType){
     super(bot, getData);
     this.Log("Initializing Mongo DB backup server adapter...");
     this.client = new MongoClient(process.env.GAS_URL, {
@@ -75,14 +75,14 @@ export class MongoBackupper extends Backupper {
     ;
     this.bot.on("beforeReady", () => {
       const backupStatusDebounceFunctions = Object.create(null);
-      const backupStatusFuncFactory = (guildId:string) => {
+      const backupStatusFuncFactory = (guildId: string) => {
         return backupStatusDebounceFunctions[guildId] || (backupStatusDebounceFunctions[guildId] = debounce(5000, () => this.backupStatus(guildId)));
       };
       const backupQueueDebounceFunctions = Object.create(null);
-      const backupQueueFuncFactory = (guildId:string) => {
+      const backupQueueFuncFactory = (guildId: string) => {
         return backupQueueDebounceFunctions[guildId] || (backupQueueDebounceFunctions[guildId] = debounce(5000, () => this.backupQueue(guildId)));
       };
-      const setContainerEvent = (container:GuildDataContainer) => {
+      const setContainerEvent = (container: GuildDataContainer) => {
         (["change", "changeWithoutCurrent"] as const).forEach(eventName => container.queue.on(eventName, backupQueueFuncFactory(container.guildId)));
         container.queue.on("settingsChanged", backupStatusFuncFactory(container.guildId));
         container.player.on("all", backupStatusFuncFactory(container.guildId));
@@ -94,7 +94,7 @@ export class MongoBackupper extends Backupper {
     });
   }
 
-  async backupStatus(guildId:string){
+  async backupStatus(guildId: string){
     if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
     try{
       this.Log(`Backing up status...(${guildId})`);
@@ -114,7 +114,7 @@ export class MongoBackupper extends Backupper {
     }
   }
 
-  backupQueue(guildId:string){
+  backupQueue(guildId: string){
     if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
     try{
       const queue = this.data.get(guildId).exportQueue();

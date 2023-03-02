@@ -47,7 +47,7 @@ export default class BulkDelete extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     const count = Number(options.args[0]);
     if(isNaN(count)){
       message.reply(":warning:指定されたメッセージ数が無効です。");

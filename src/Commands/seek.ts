@@ -43,7 +43,7 @@ export default class Seek extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     const server = options.server;
     // そもそも再生状態じゃないよ...

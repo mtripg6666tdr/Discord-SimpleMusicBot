@@ -39,16 +39,16 @@ export class YouTube extends AudioSource {
   protected readonly _serviceIdentifer = "youtube";
   protected _lengthSeconds = 0;
   private fallback = false;
-  private cache:Cache<any, any> = null;
-  ChannelName:string;
-  ChannelUrl:string;
-  Thumbnail:string;
-  LiveStream:boolean;
-  relatedVideos:exportableYouTube[] = [];
-  upcomingTimestamp:string = null;
+  private cache: Cache<any, any> = null;
+  ChannelName: string;
+  ChannelUrl: string;
+  Thumbnail: string;
+  LiveStream: boolean;
+  relatedVideos: exportableYouTube[] = [];
+  upcomingTimestamp: string = null;
   logger: LoggerType;
 
-  constructor(logger?:typeof YouTube.prototype.logger){
+  constructor(logger?: typeof YouTube.prototype.logger){
     super();
     this.logger = logger || Util.logger.log.bind(Util.logger);
   }
@@ -65,7 +65,7 @@ export class YouTube extends AudioSource {
     return this.upcomingTimestamp;
   }
 
-  async init(url:string, prefetched:exportableYouTube, forceCache?:boolean){
+  async init(url: string, prefetched: exportableYouTube, forceCache?: boolean){
     this.Url = "https://www.youtube.com/watch?v=" + ytdl.getVideoID(url);
     if(prefetched){
       this.importData(prefetched);
@@ -98,7 +98,7 @@ export class YouTube extends AudioSource {
     return this;
   }
 
-  async fetch(forceUrl?:boolean):Promise<StreamInfo>{
+  async fetch(forceUrl?: boolean): Promise<StreamInfo>{
     const { result, resolved } = await attemptFetchForStrategies(this.logger, this.Url, forceUrl, this.cache);
     this.fallback = resolved !== 0;
     // store related videos
@@ -123,7 +123,7 @@ export class YouTube extends AudioSource {
     };
   }
 
-  toField(verbose:boolean = false){
+  toField(verbose: boolean = false){
     const fields = [] as EmbedField[];
     fields.push({
       name: ":cinema:チャンネル名",
@@ -141,7 +141,7 @@ export class YouTube extends AudioSource {
     return "\r\nチャンネル名:`" + this.ChannelName + "`";
   }
 
-  exportData():exportableYouTube{
+  exportData(): exportableYouTube{
     return {
       url: this.Url,
       title: this.Title,
@@ -154,7 +154,7 @@ export class YouTube extends AudioSource {
     };
   }
 
-  private importData(exportable:exportableYouTube){
+  private importData(exportable: exportableYouTube){
     this.Title = exportable.title;
     this.Description = exportable.description || "";
     this._lengthSeconds = exportable.isLive ? NaN : exportable.length;
@@ -170,12 +170,12 @@ export class YouTube extends AudioSource {
 }
 
 export type exportableYouTube = {
-  url:string,
-  title:string,
-  description:string,
-  length:number,
-  channel:string,
-  channelUrl:string,
-  thumbnail:string,
-  isLive:boolean,
+  url: string,
+  title: string,
+  description: string,
+  length: number,
+  channel: string,
+  channelUrl: string,
+  thumbnail: string,
+  isLive: boolean,
 };

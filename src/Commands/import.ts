@@ -47,7 +47,7 @@ export default class Import extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(options.rawArgs === ""){
       message.reply("❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(e => Util.logger.log(e, "error"));

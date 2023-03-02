@@ -43,7 +43,7 @@ export default class Play extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     const server = options.server;
     // キューが空だし引数もないし添付ファイルもない

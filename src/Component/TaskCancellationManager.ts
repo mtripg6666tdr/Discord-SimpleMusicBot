@@ -41,7 +41,7 @@ export class TaskCancellationManager {
    * タスクのキャンセルを要求します
    * @param message キャンセルの原因を表すメッセージ等の文字列
    */
-  cancel(message?:string){
+  cancel(message?: string){
     if(this._cancelled){
       return false;
     }else{

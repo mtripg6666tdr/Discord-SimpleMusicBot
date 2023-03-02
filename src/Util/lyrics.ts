@@ -23,7 +23,7 @@ import { convert } from "html-to-text";
 import { DownloadText } from "./web";
 import { DefaultAudioThumbnailURL } from "../definition";
 
-export async function GetLyrics(keyword:string):Promise<songInfo>{
+export async function GetLyrics(keyword: string): Promise<songInfo>{
   try{
     const client = new Genius.Client();
     const song = (await client.songs.search(keyword))[0];
@@ -71,11 +71,11 @@ export async function GetLyrics(keyword:string):Promise<songInfo>{
 }
 
 type songInfo = {
-  lyric:string,
-  artist:string,
-  title:string,
-  artwork:string,
-  url:string,
+  lyric: string,
+  artist: string,
+  title: string,
+  artwork: string,
+  url: string,
 };
 
 interface CSE_Result {

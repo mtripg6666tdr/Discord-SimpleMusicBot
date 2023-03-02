@@ -23,8 +23,8 @@ import { EventEmitter } from "stream";
 import { Util } from "../Util";
 
 export abstract class LogEmitter extends EventEmitter {
-  private _tag:string = "";
-  private _guildId:string = "";
+  private _tag: string = "";
+  private _guildId: string = "";
 
   get guildId(){
     return this._guildId;
@@ -34,7 +34,7 @@ export abstract class LogEmitter extends EventEmitter {
    * ログに使用するタグを設定します
    * @param tag タグ
    */
-  setTag(tag:string){
+  setTag(tag: string){
     this._tag = tag;
   }
   
@@ -42,7 +42,7 @@ export abstract class LogEmitter extends EventEmitter {
    * ログに使用するサーバーIDを設定します（存在する場合）
    * @param id id
    */
-  setGuildId(id:string){
+  setGuildId(id: string){
     this._guildId = id;
   }
 
@@ -50,7 +50,7 @@ export abstract class LogEmitter extends EventEmitter {
    * ログを出力します
    * @param message メッセージ
    */
-  Log(message:any, level?:LogLevels){
+  Log(message: any, level?: LogLevels){
     if(this._tag === "") throw new Error("Tag has not been specified");
     Util.logger.log(`[${this._tag}${this._guildId !== "" ? `/${this._guildId}` : ""}] ${typeof message === "string" ? message : Util.general.StringifyObject(message)}`, level);
   }

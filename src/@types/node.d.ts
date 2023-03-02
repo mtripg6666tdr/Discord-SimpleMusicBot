@@ -18,14 +18,14 @@
 
 declare namespace NodeJS {
   interface ProcessEnv {
-    readonly TOKEN:string;
-    readonly CSE_KEY?:string;
-    readonly CLIENT_ID?:string;
-    readonly GUILD_ID?:string;
-    readonly GAS_URL?:string;
-    readonly GAS_TOKEN?:string;
-    readonly DSL_ENABLE?:string;
-    readonly BD_ENABLE?:string;
-    readonly HIBIKI_ENABLE?:string;
+    readonly TOKEN: string;
+    readonly CSE_KEY?: string;
+    readonly CLIENT_ID?: string;
+    readonly GUILD_ID?: string;
+    readonly GAS_URL?: string;
+    readonly GAS_TOKEN?: string;
+    readonly DSL_ENABLE?: string;
+    readonly BD_ENABLE?: string;
+    readonly HIBIKI_ENABLE?: string;
   }
 }

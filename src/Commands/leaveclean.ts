@@ -36,7 +36,7 @@ export default class LeaveClean extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(!options.server.player.isConnecting){
       options.server.queue.removeAll();

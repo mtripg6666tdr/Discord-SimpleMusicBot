@@ -25,7 +25,7 @@ import { Util } from "./Util";
 import { MusicBot } from "./bot";
 import { createServer } from "./server";
 
-const logger = (content:any, loglevel?:LogLevels) => Util.logger.log(`[Entry]${typeof content === "string" ? content : Util.general.StringifyObject(content)}`, loglevel);
+const logger = (content: any, loglevel?: LogLevels) => Util.logger.log(`[Entry]${typeof content === "string" ? content : Util.general.StringifyObject(content)}`, loglevel);
 
 logger("Discord-SimpleMusicBot by mtripg6666tdr");
 logger("This application was originally built by mtripg6666tdr and is licensed under GPLv3 or later.");
@@ -35,7 +35,7 @@ logger("Thank you for using Discord-SimpleMusicBot!");
 logger(`Node.js v${process.versions.node}`);
 
 const bot = new MusicBot(process.env.TOKEN, Boolean(Util.config.maintenance));
-let server:http.Server = null;
+let server: http.Server = null;
 
 // Webサーバーのインスタンス化
 if(Util.config.webserver){
@@ -55,7 +55,7 @@ if(!Util.config.debug){
 }
 
 let terminating = false;
-const onTerminated = async function(code:string){
+const onTerminated = async function(code: string){
   if(terminating) return;
   terminating = true;
   logger(`${code} detected`);
@@ -87,7 +87,7 @@ const onTerminated = async function(code:string){
 // ボット開始
 bot.run(true, 40);
 
-async function reportError(err:any){
+async function reportError(err: any){
   try{
     await bot.client.createMessage(Util.config.errorChannel, Util.general.StringifyObject(err)).catch(() => {});
   }

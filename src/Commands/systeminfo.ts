@@ -55,7 +55,7 @@ export default class SystemInfo extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     // Run default logger
     options.bot.logGeneralInfo();
@@ -91,7 +91,7 @@ export default class SystemInfo extends BaseCommand {
     }
 
     if(Util.general.isBotAdmin(message.member.id) && (options.args.includes("log") || options.args.length === 0)){
-      let logs:string[] = [...Util.logger.logStore.data];
+      let logs: string[] = [...Util.logger.logStore.data];
       logs.reverse();
       for(let i = 0; i < logs.length; i++){
         if(logs.join("\r\n").length < 1950) break;

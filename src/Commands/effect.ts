@@ -36,7 +36,7 @@ export default class Effect extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     try{
       const {embed, messageActions } = getCurrentEffectPanel(message.member.avatarURL, options.server);
