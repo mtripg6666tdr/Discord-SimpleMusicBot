@@ -21,5 +21,5 @@
 import type { Worker } from "worker_threads";
 
 declare global {
-  var workerThread:Worker;
+  var workerThread: Worker;
 }

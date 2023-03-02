@@ -21,7 +21,7 @@ import { CommandMessage as LibCommandMessage } from "@mtripg6666tdr/eris-command
 import { Util } from "../Util";
 
 export class CommandMessage extends LibCommandMessage {
-  protected static override parseCommand(content:string, prefixLength:number){
+  protected static override parseCommand(content: string, prefixLength: number){
     const resolved = super.parseCommand(content, prefixLength, Util.string.NormalizeText);
     // 超省略形を捕捉
     if(resolved.command.startsWith("http")){

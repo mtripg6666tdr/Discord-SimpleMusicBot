@@ -25,22 +25,22 @@ export type QueueContent = {
   /**
    * 曲自体のメタ情報
    */
-  basicInfo:AudioSource,
+  basicInfo: AudioSource,
   /**
    * 曲の情報とは別の追加情報
    */
-  additionalInfo:AdditionalInfo,
+  additionalInfo: AdditionalInfo,
 };
 
 export type AddedBy = {
   /**
    * 曲の追加者の表示名。表示名は追加された時点での名前になります。
    */
-  displayName:string,
+  displayName: string,
   /**
    * 曲の追加者のユーザーID
    */
-  userId:string,
+  userId: string,
 };
 
 /**

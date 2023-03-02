@@ -111,6 +111,7 @@
     "@typescript-eslint/no-unsafe-return": "off",
     "@typescript-eslint/lines-between-class-members": "off",
     "@typescript-eslint/require-await": "off",
+    "@typescript-eslint/type-annotation-spacing": "warn",
 
     // other plugins
     "eslint-comments/no-unused-disable": "error",

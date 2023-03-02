@@ -38,7 +38,7 @@ export default class EquallyPlayback extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(options.server.equallyPlayback){
       options.server.equallyPlayback = false;

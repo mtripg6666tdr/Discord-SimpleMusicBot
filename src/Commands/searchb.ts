@@ -29,7 +29,7 @@ export default class Searchb extends SearchBase<string[]> {
     });
   }
 
-  protected async searchContent(query:string){
+  protected async searchContent(query: string){
     await BestdoriApi.setupData();
     const keys = Object.keys(bestdori.allsonginfo);
     const q = query.toLowerCase();
@@ -40,7 +40,7 @@ export default class Searchb extends SearchBase<string[]> {
     });
   }
 
-  protected consumer(items:string[]){
+  protected consumer(items: string[]){
     return items.map(item => ({
       title: bestdori.allsonginfo[Number(item)].musicTitle[0],
       url: BestdoriApi.getAudioPage(Number(item)),

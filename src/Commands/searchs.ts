@@ -50,7 +50,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
   }
 
   protected override async searchContent(query: string){
-    let result:SoundcloudTrackV2[] = [];
+    let result: SoundcloudTrackV2[] = [];
     let transformedQuery = query;
     if(query.match(/^https:\/\/soundcloud.com\/[^/]+$/)){
       // ユーザーの楽曲検索

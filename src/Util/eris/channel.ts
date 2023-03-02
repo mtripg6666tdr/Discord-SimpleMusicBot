@@ -29,23 +29,23 @@ const requirePermissions = [
 ] as const;
 
 export const channelUtil = {
-  checkSendable(channel:TextChannel, userId:string){
+  checkSendable(channel: TextChannel, userId: string){
     const permissions = channel.permissionsOf(userId);
     return requirePermissions.every(permission => permissions.has(permission));
   },
-  getVoiceMember(options:CommandArgs){
+  getVoiceMember(options: CommandArgs){
     if(!options.server.player.isConnecting) return null;
     const voiceChannel = options.bot.client.getChannel(options.server.connection.channelID) as VoiceChannel;
     if(!voiceChannel) return null;
     return voiceChannel.voiceMembers;
   },
-  sameVC(member:Member, options:CommandArgs){
+  sameVC(member: Member, options: CommandArgs){
     return this.getVoiceMember(options)?.has(member.id) || false;
   },
-  voiceMemberCount(options:CommandArgs){
+  voiceMemberCount(options: CommandArgs){
     return this.getVoiceMember(options)?.size || 0;
   },
-  isOnlyListener(member:Member, options:CommandArgs){
+  isOnlyListener(member: Member, options: CommandArgs){
     const vcMember = this.getVoiceMember(options);
     if(!vcMember) return false;
     if(vcMember.size > 2) return false;

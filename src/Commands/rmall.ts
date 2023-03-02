@@ -35,7 +35,7 @@ export default class Rmall extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     options.server.player.disconnect();
     options.server.queue.removeAll();

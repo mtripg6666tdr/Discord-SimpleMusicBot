@@ -27,9 +27,9 @@ import { DefaultAudioThumbnailURL } from "../definition";
 export class GoogleDrive extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "googledrive";
-  Thumbnail:string = DefaultAudioThumbnailURL;
+  Thumbnail: string = DefaultAudioThumbnailURL;
 
-  async init(url:string, prefetched:exportableCustom){
+  async init(url: string, prefetched: exportableCustom){
     if(prefetched){
       this.Title = prefetched.title || "Googleドライブストリーム";
       this.Url = url;
@@ -46,7 +46,7 @@ export class GoogleDrive extends AudioSource {
     return this;
   }
 
-  async fetch():Promise<UrlStreamInfo>{
+  async fetch(): Promise<UrlStreamInfo>{
     const id = GoogleDrive.getId(this.Url);
     return {
       type: "url",
@@ -63,7 +63,7 @@ export class GoogleDrive extends AudioSource {
 
   npAdditional(){return "";}
 
-  exportData():exportableCustom{
+  exportData(): exportableCustom{
     return {
       url: this.Url,
       length: this._lengthSeconds,
@@ -71,11 +71,11 @@ export class GoogleDrive extends AudioSource {
     };
   }
 
-  static validateUrl(url:string){
+  static validateUrl(url: string){
     return Boolean(url.match(/^https?:\/\/drive\.google\.com\/file\/d\/([^/?]+)(\/.+)?$/));
   }
 
-  static getId(url:string){
+  static getId(url: string){
     const match = url.match(/^https?:\/\/drive\.google\.com\/file\/d\/(?<id>[^/?]+)(\/.+)?$/);
     return match ? match.groups.id : null;
   }

@@ -23,9 +23,9 @@ import type { MusicBot } from "../bot";
 import type { Client } from "eris";
 
 export type BaseCommandInitializeOptions = {
-  name:string,
-  alias:Readonly<string[]>,
-  shouldDefer:boolean,
+  name: string,
+  alias: Readonly<string[]>,
+  shouldDefer: boolean,
 };
 
 export type CommandPermission =
@@ -38,7 +38,7 @@ export type CommandPermission =
   | "noConnection"
 ;
 
-export const permissionDescriptionParts:Readonly<{[key in CommandPermission]:string}> = {
+export const permissionDescriptionParts: Readonly<{[key in CommandPermission]: string}> = {
   admin: "サーバー/チャンネルの管理権限を持っていること",
   dj: "同じボイスチャンネルに接続していてかつDJロールを保持していること",
   sameVc: "同じボイスチャンネルに接続していること",
@@ -49,20 +49,20 @@ export const permissionDescriptionParts:Readonly<{[key in CommandPermission]:str
 };
 
 export type ListCommandWithArgumentsInitializeOptions = BaseCommandInitializeOptions & {
-  description:string,
-  unlist:boolean,
-  examples:string,
-  usage:string,
-  category:keyof typeof categories,
-  argument:SlashCommandArgument[],
-  requiredPermissionsOr:CommandPermission[],
+  description: string,
+  unlist: boolean,
+  examples: string,
+  usage: string,
+  category: keyof typeof categories,
+  argument: SlashCommandArgument[],
+  requiredPermissionsOr: CommandPermission[],
 };
 
 export type ListCommandWithoutArgumentsInitializeOptions = BaseCommandInitializeOptions & {
-  description:string,
-  unlist:false,
-  category:keyof typeof categories,
-  requiredPermissionsOr:CommandPermission[],
+  description: string,
+  unlist: false,
+  category: keyof typeof categories,
+  requiredPermissionsOr: CommandPermission[],
 };
 
 export type ListCommandInitializeOptions =
@@ -71,7 +71,7 @@ export type ListCommandInitializeOptions =
 ;
 
 export type UnlistCommandInitializeOptions = BaseCommandInitializeOptions & {
-  unlist:true,
+  unlist: true,
 };
 
 export type CommandOptionsTypes = "bool"|"integer"|"string";
@@ -80,11 +80,11 @@ export type CommandOptionsTypes = "bool"|"integer"|"string";
  * スラッシュコマンドの引数として取れるものを定義するインターフェースです
  */
 export interface SlashCommandArgument {
-  type:CommandOptionsTypes;
-  name:string;
-  description:string;
-  required:boolean;
-  choices?:{[key:string]:string|number};
+  type: CommandOptionsTypes;
+  name: string;
+  description: string;
+  required: boolean;
+  choices?: {[key: string]: string|number};
 }
 
 /**
@@ -94,33 +94,33 @@ export interface CommandArgs {
   /**
    * ボットのインスタンス
    */
-  bot:Readonly<MusicBot>;
+  bot: Readonly<MusicBot>;
   /**
    * ボットのサーバーデータ
    */
-  server:GuildDataContainer;
+  server: GuildDataContainer;
   /**
    * コマンドの生の引数
    */
-  rawArgs:Readonly<string>;
+  rawArgs: Readonly<string>;
   /**
    * コマンドのパース済み引数
    */
-  args:readonly string[];
+  args: readonly string[];
   /**
    * 生存しているPageToggleの配列
    */
-  embedPageToggle:PageToggle[];
+  embedPageToggle: PageToggle[];
   /**
    * ボットのクライアント
    */
-  client:Readonly<Client>;
+  client: Readonly<Client>;
   /**
    * サーバーデータの初期化関数
    * @param guildid サーバーID
    * @param channelid チャンネルID
    */
-  initData: (guildid:string, channelid:string) => void;
+  initData: (guildid: string, channelid: string) => void;
   /**
    * メンションをメッセージに含めるか
    */

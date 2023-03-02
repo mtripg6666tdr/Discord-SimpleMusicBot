@@ -49,58 +49,58 @@ import Util from "../Util";
  */
 export class GuildDataContainer extends LogEmitter {
   private readonly _cancellations = [] as TaskCancellationManager[];
-  private get cancellations():Readonly<TaskCancellationManager[]>{
+  private get cancellations(): Readonly<TaskCancellationManager[]>{
     return this._cancellations;
   }
   
   /** プレフィックス */
-  prefix:string;
+  prefix: string;
 
   /** 検索窓の格納します */
-  protected _searchPanels:Map<string, SearchPanel>;
+  protected _searchPanels: Map<string, SearchPanel>;
 
-  protected _queue:QueueManager;
+  protected _queue: QueueManager;
   /** キューマネジャ */
   get queue(){
     return this._queue;
   }
 
-  protected _player:PlayManager;
+  protected _player: PlayManager;
   /** 再生マネジャ */
   get player(){
     return this._player;
   }
 
-  protected _skipSession:SkipManager;
+  protected _skipSession: SkipManager;
   /** Skipマネージャ */
   get skipSession(){
     return this._skipSession;
   }
 
-  private _boundTextChannel:string;
+  private _boundTextChannel: string;
   /** 紐づけテキストチャンネルを取得します */
   get boundTextChannel(){
     return this._boundTextChannel;
   }
   /** 紐づけテキストチャンネルを設定します */
-  private set boundTextChannel(val:string){
+  private set boundTextChannel(val: string){
     this._boundTextChannel = val;
   }
 
   /** メインボット */
-  readonly bot:MusicBotBase;
+  readonly bot: MusicBotBase;
   /** オーディオエフェクトエフェクトの設定 */
-  readonly effectPrefs:AudioEffect;
+  readonly effectPrefs: AudioEffect;
   /** 関連動画自動追加が有効 */
-  addRelated:boolean;
+  addRelated: boolean;
   /** 均等再生が有効 */
-  equallyPlayback:boolean;
+  equallyPlayback: boolean;
   /** VCへの接続 */
-  connection:VoiceConnection;
+  connection: VoiceConnection;
   /** VCのping */
-  vcPing:number;
+  vcPing: number;
 
-  constructor(guildid:string, boundchannelid:string, bot:MusicBotBase){
+  constructor(guildid: string, boundchannelid: string, bot: MusicBotBase){
     super();
     this.setTag("GuildDataContainer");
     this.setGuildId(guildid);
@@ -144,7 +144,7 @@ export class GuildDataContainer extends LogEmitter {
    * 状況に応じてバインドチャンネルを更新します
    * @param message 更新元となるメッセージ
    */
-  updateBoundChannel(message:CommandMessage|string){
+  updateBoundChannel(message: CommandMessage|string){
     if(typeof message === "string"){
       this.boundTextChannel = message;
       return;
@@ -162,7 +162,7 @@ export class GuildDataContainer extends LogEmitter {
    * キューをエクスポートしてYMX形式で出力します
    * @returns YMX化されたキュー
    */
-  exportQueue():YmxFormat{
+  exportQueue(): YmxFormat{
     return {
       version: YmxVersion,
       data: this.queue.map(q => ({
@@ -177,7 +177,7 @@ export class GuildDataContainer extends LogEmitter {
    * @param exportedQueue YMXデータ
    * @returns 成功したかどうか
    */
-  async importQueue(exportedQueue:YmxFormat){
+  async importQueue(exportedQueue: YmxFormat){
     if(exportedQueue.version === YmxVersion){
       const { data } = exportedQueue;
       for(let i = 0; i < data.length; i++){
@@ -193,7 +193,7 @@ export class GuildDataContainer extends LogEmitter {
    * ステータスをエクスポートします
    * @returns ステータスのオブジェクト
    */
-  exportStatus():exportableStatuses{
+  exportStatus(): exportableStatuses{
     // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
     return {
       voiceChannelId: this.player.isPlaying && !this.player.isPaused ? this.connection.channelID : "0",
@@ -210,7 +210,7 @@ export class GuildDataContainer extends LogEmitter {
    * ステータスをオブジェクトからインポートします。
    * @param param0 読み取り元のオブジェクト
    */
-  importStatus(statuses:exportableStatuses){
+  importStatus(statuses: exportableStatuses){
     //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
     this.queue.loopEnabled = statuses.loopEnabled;
     this.queue.queueLoopEnabled = statuses.queueLoopEnabled;
@@ -229,7 +229,7 @@ export class GuildDataContainer extends LogEmitter {
    * キャンセルマネージャーをサーバーと紐づけます
    * @param cancellation キャンセルマネージャー
    */
-  bindCancellation(cancellation:TaskCancellationManager){
+  bindCancellation(cancellation: TaskCancellationManager){
     if(!this.cancellations.includes(cancellation)){
       this._cancellations.push(cancellation);
     }
@@ -250,7 +250,7 @@ export class GuildDataContainer extends LogEmitter {
    * @param cancellation 破棄するキャンセルマネージャー
    * @returns 成功したかどうか
    */
-  unbindCancellation(cancellation:TaskCancellationManager){
+  unbindCancellation(cancellation: TaskCancellationManager){
     const index = this.cancellations.findIndex(c => c === cancellation);
     if(index < 0) return false;
     this._cancellations.splice(index, 1);
@@ -262,7 +262,7 @@ export class GuildDataContainer extends LogEmitter {
    * @param channelId 接続先のボイスチャンネルのID
    * @internal
    */
-  async _joinVoiceChannel(channelId:string){
+  async _joinVoiceChannel(channelId: string){
     const connection = await this.bot.client.joinVoiceChannel(channelId, {
       selfDeaf: true,
     });
@@ -282,14 +282,14 @@ export class GuildDataContainer extends LogEmitter {
     this.Log(`Connected to ${channelId}`);
   }
 
-  private readonly joinVoiceChannelLocker:LockObj = new LockObj();
+  private readonly joinVoiceChannelLocker: LockObj = new LockObj();
   /**
    * ボイスチャンネルに接続します
    * @param message コマンドを表すメッセージ
    * @param reply 応答が必要な際に、コマンドに対して返信で応じるか新しいメッセージとして応答するか。(trueで返信で応じ、falseで新規メッセージを作成します。デフォルトではfalse)
    * @returns 成功した場合はtrue、それ以外の場合にはfalse
    */
-  async joinVoiceChannel(message:CommandMessage, reply:boolean = false, replyOnFail:boolean = false):Promise<boolean>{
+  async joinVoiceChannel(message: CommandMessage, reply: boolean = false, replyOnFail: boolean = false): Promise<boolean>{
     return lock(this.joinVoiceChannelLocker, async () => {
       const t = Util.time.timer.start("MusicBot#Join");
       try{
@@ -314,7 +314,7 @@ export class GuildDataContainer extends LogEmitter {
           }
 
           // 入ってないね～参加しよう
-          const msg = await ((mes:string) => {
+          const msg = await ((mes: string) => {
             if(reply){
               return message.reply(mes);
             }
@@ -364,7 +364,7 @@ export class GuildDataContainer extends LogEmitter {
    * メッセージからストリームを判定してキューに追加し、状況に応じて再生を開始します
    * @param first キューの先頭に追加するかどうか
    */
-  async playFromURL(message:CommandMessage, rawArg:string, first:boolean = true, cancellable:boolean = false){
+  async playFromURL(message: CommandMessage, rawArg: string, first: boolean = true, cancellable: boolean = false){
     const t = Util.time.timer.start("MusicBot#PlayFromURL");
     setTimeout(() => message.suppressEmbeds(true).catch(e => this.Log(Util.general.StringifyObject(e), "warn")), 4000).unref();
     if(!Util.general.isDisabledSource("custom") && rawArg.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){
@@ -550,7 +550,7 @@ export class GuildDataContainer extends LogEmitter {
    * プレフィックス更新します
    * @param message 更新元となるメッセージ
    */
-  updatePrefix(message:CommandMessage|Message<TextChannel>):void{
+  updatePrefix(message: CommandMessage|Message<TextChannel>): void{
     const guild = "guild" in message ? message.guild : message.channel.guild;
     const oldPrefix = this.prefix;
     const member = guild.members.get(this.bot.client.user.id);
@@ -572,7 +572,7 @@ export class GuildDataContainer extends LogEmitter {
    * @param nums インデックス番号の配列
    * @param message 
    */
-  async playFromSearchPanelOptions(nums:string[], panel:SearchPanel){
+  async playFromSearchPanelOptions(nums: string[], panel: SearchPanel){
     const includingNums = panel.filterOnlyIncludes(nums.map(n => Number(n)).filter(n => !isNaN(n)));
     const {
       urls: items,
@@ -599,7 +599,7 @@ export class GuildDataContainer extends LogEmitter {
    * 指定されたコマンドメッセージをもとに、スキップ投票を作成します
    * @param message ベースとなるコマンドメッセージ
    */
-  async createSkipSession(message:CommandMessage){
+  async createSkipSession(message: CommandMessage){
     this._skipSession = new SkipManager();
     this._skipSession.setBinding(this);
     await this._skipSession.init(message);
@@ -611,7 +611,7 @@ export class GuildDataContainer extends LogEmitter {
     this.player.once("disconnect", destroy);
   }
 
-  createSearchPanel(_commandMessage:CommandMessage, query:string, isRawTitle:boolean = false){
+  createSearchPanel(_commandMessage: CommandMessage, query: string, isRawTitle: boolean = false){
     if(this._searchPanels.size >= 3){
       _commandMessage.reply(":cry:すでに開いている検索パネルが上限を超えています").catch(er => this.Log(er, "error"));
       return null;
@@ -619,15 +619,15 @@ export class GuildDataContainer extends LogEmitter {
     return new SearchPanel(_commandMessage, query, isRawTitle);
   }
 
-  getSearchPanel(userId:string){
+  getSearchPanel(userId: string){
     return this._searchPanels.get(userId);
   }
 
-  hasSearchPanel(userId:string){
+  hasSearchPanel(userId: string){
     return this._searchPanels.has(userId);
   }
 
-  bindSearchPanel(panel:SearchPanel){
+  bindSearchPanel(panel: SearchPanel){
     this._searchPanels.set(panel.commandMessage.member.id, panel);
     panel.once("destroy", () => {
       this._searchPanels.delete(panel.commandMessage.member.id);

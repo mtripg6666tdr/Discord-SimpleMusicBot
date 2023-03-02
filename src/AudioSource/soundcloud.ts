@@ -29,10 +29,10 @@ import { Util } from "../Util";
 export class SoundCloudS extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "soundcloud";
-  Author:string;
-  Thumbnail:string;
+  Author: string;
+  Thumbnail: string;
   
-  async init(url:string, prefetched?:exportableSoundCloud){
+  async init(url: string, prefetched?: exportableSoundCloud){
     this.Url = url;
     if(prefetched){
       this.Title = prefetched.title;
@@ -52,7 +52,7 @@ export class SoundCloudS extends AudioSource {
     return this;
   }
 
-  async fetch():Promise<ReadableStreamInfo>{
+  async fetch(): Promise<ReadableStreamInfo>{
     const sc = new SoundCloud();
     const source = await sc.util.streamTrack(this.Url) as Readable;
     const stream = Util.general.createPassThrough();
@@ -67,7 +67,7 @@ export class SoundCloudS extends AudioSource {
     };
   }
 
-  toField(verbose:boolean = false){
+  toField(verbose: boolean = false){
     const fields = [] as EmbedField[];
     fields.push({
       name: ":musical_note:ユーザー",
@@ -85,7 +85,7 @@ export class SoundCloudS extends AudioSource {
     return "\r\nアーティスト:`" + this.Author + "`";
   }
 
-  exportData():exportableSoundCloud{
+  exportData(): exportableSoundCloud{
     return {
       url: this.Url,
       title: this.Title,
@@ -96,19 +96,19 @@ export class SoundCloudS extends AudioSource {
     };
   }
 
-  static validateUrl(url:string){
+  static validateUrl(url: string){
     return Boolean(url.match(/https?:\/\/soundcloud.com\/.+\/.+/));
   }
 
-  static validatePlaylistUrl(url:string){
+  static validatePlaylistUrl(url: string){
     return Boolean(url.match(/https?:\/\/soundcloud.com\/[^/?]+\/sets\/[^/?]+/));
   }
 }
 
 export type exportableSoundCloud = exportableCustom & {
-  description:string,
-  author:string,
-  thumbnail:string,
+  description: string,
+  author: string,
+  thumbnail: string,
 };
 
 /**

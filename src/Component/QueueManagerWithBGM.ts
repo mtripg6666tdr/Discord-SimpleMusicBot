@@ -29,10 +29,10 @@ import * as AudioSource from "../AudioSource";
 
 export class QueueManagerWithBgm extends QueueManager {
   protected override server: GuildDataContainerWithBgm;
-  protected _bgmDefault:QueueContent[] = [];
-  protected _bgmInitial:QueueContent[] = [];
+  protected _bgmDefault: QueueContent[] = [];
+  protected _bgmInitial: QueueContent[] = [];
 
-  protected _isBGM:boolean = false;
+  protected _isBGM: boolean = false;
   get isBGM(){
     return this._isBGM;
   }
@@ -48,7 +48,7 @@ export class QueueManagerWithBgm extends QueueManager {
     this._bgmDefault = [...this._bgmInitial];
   }
 
-  setToPlayBgm(val:boolean = true){
+  setToPlayBgm(val: boolean = true){
     this._isBGM = val;
   }
 
@@ -60,22 +60,22 @@ export class QueueManagerWithBgm extends QueueManager {
     return this._bgmDefault.length === 0;
   }
 
-  override setBinding(data:GuildDataContainerWithBgm){
+  override setBinding(data: GuildDataContainerWithBgm){
     super.setBinding(data);
   }
 
-  override get(index:number){
+  override get(index: number){
     return this.isBGM ? this._bgmDefault[index] : super.get(index);
   }
 
   override async addQueue(
-    url:string,
-    addedBy:Member|AddedBy,
-    method:"push"|"unshift" = "push",
-    type:KnownAudioSourceIdentifer = "unknown",
-    gotData:AudioSource.exportableCustom = null,
-    preventCache:boolean = false,
-  ):Promise<QueueContent & {index:number}>{
+    url: string,
+    addedBy: Member|AddedBy,
+    method: "push"|"unshift" = "push",
+    type: KnownAudioSourceIdentifer = "unknown",
+    gotData: AudioSource.exportableCustom = null,
+    preventCache: boolean = false,
+  ): Promise<QueueContent & {index: number}>{
     if(!url.startsWith("http://") && !url.startsWith("https://") && fs.existsSync(path.join(__dirname, "../../", url))){
       const result = {
         basicInfo: await (new AudioSource.FsStream().init(url)),

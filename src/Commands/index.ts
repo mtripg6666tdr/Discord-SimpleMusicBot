@@ -32,24 +32,24 @@ export { CommandArgs } from "../Structure/Command";
  * すべてのコマンドハンドラーの基底クラスです
  */
 export abstract class BaseCommand {
-  protected abstract run(message:CommandMessage, options:Readonly<CommandArgs>):Promise<void>;
+  protected abstract run(message: CommandMessage, options: Readonly<CommandArgs>): Promise<void>;
   
-  protected readonly _name:string;
+  protected readonly _name: string;
   public get name(){
     return this._name;
   }
 
-  protected readonly _alias:Readonly<string[]>;
+  protected readonly _alias: Readonly<string[]>;
   public get alias(){
     return this._alias;
   }
 
-  protected readonly _description:string = null;
+  protected readonly _description: string = null;
   public get description(){
     return this._description;
   }
 
-  protected readonly _unlist:boolean;
+  protected readonly _unlist: boolean;
   public get unlist(){
     return this._unlist;
   }
@@ -64,17 +64,17 @@ export abstract class BaseCommand {
     return this._usage;
   }
 
-  protected readonly _category:string = null;
+  protected readonly _category: string = null;
   public get category(){
     return this._category;
   }
 
-  protected readonly _shouldDefer:boolean = false;
+  protected readonly _shouldDefer: boolean = false;
   public get shouldDefer(){
     return this._shouldDefer;
   }
 
-  protected readonly _argument:Readonly<SlashCommandArgument[]> = null;
+  protected readonly _argument: Readonly<SlashCommandArgument[]> = null;
   public get argument(){
     return this._argument;
   }
@@ -83,7 +83,7 @@ export abstract class BaseCommand {
     return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
   }
 
-  protected readonly _requiredPermissionsOr:CommandPermission[] = null;
+  protected readonly _requiredPermissionsOr: CommandPermission[] = null;
   public get requiredPermissionsOr(){
     return this._requiredPermissionsOr;
   }
@@ -97,7 +97,7 @@ export abstract class BaseCommand {
     }
   }
 
-  constructor(opts:ListCommandInitializeOptions|UnlistCommandInitializeOptions){
+  constructor(opts: ListCommandInitializeOptions|UnlistCommandInitializeOptions){
     this._name = opts.name;
     this._alias = opts.alias;
     this._unlist = opts.unlist;
@@ -114,8 +114,8 @@ export abstract class BaseCommand {
     }
   }
 
-  async checkAndRun(message:CommandMessage, options:Readonly<CommandArgs>){
-    const judgeIfPermissionMeeted = (perm:CommandPermission) => {
+  async checkAndRun(message: CommandMessage, options: Readonly<CommandArgs>){
+    const judgeIfPermissionMeeted = (perm: CommandPermission) => {
       if(perm === "admin"){
         return Util.eris.user.isPrivileged(message.member);
       }else if(perm === "dj"){

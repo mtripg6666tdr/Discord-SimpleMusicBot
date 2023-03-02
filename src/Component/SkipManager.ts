@@ -31,12 +31,12 @@ type voteResult = "voted"|"cancelled"|"ignored";
 export class SkipManager extends ServerManagerBase {
   private inited = false;
   private readonly agreeUsers = new Set<string>();
-  private reply:ResponseMessage = null;
-  private currentSong:QueueContent = null;
+  private reply: ResponseMessage = null;
+  private currentSong: QueueContent = null;
   private destroyed = false;
-  private issuer:string = null;
+  private issuer: string = null;
 
-  async init(message:CommandMessage){
+  async init(message: CommandMessage){
     if(this.inited || this.destroyed) throw new Error("This manager has already initialized or destroyed");
     this.inited = true;
     this.currentSong = this.server.queue.get(0);
@@ -58,7 +58,7 @@ export class SkipManager extends ServerManagerBase {
     });
   }
 
-  vote(user:Member):voteResult{
+  vote(user: Member): voteResult{
     if(!this.inited || this.destroyed) return "ignored";
     this.organize();
     if(!user.voiceState.channelID || !this.getVoiceMembers().has(user.id)){

@@ -38,7 +38,7 @@ export default class Related extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(options.server.addRelated){
       options.server.addRelated = false;

@@ -31,7 +31,7 @@ import { log } from "./log";
  * @param length 補完後の長さ
  * @returns 保管された文字列
  */
-export function padZero(str:string, length:number){
+export function padZero(str: string, length: number){
   if(str.length >= length) return str;
   return `${"0".repeat(length - str.length)}${str}`;
 }
@@ -41,7 +41,7 @@ export function padZero(str:string, length:number){
  * @param txt エンコードする文字列
  * @returns Base64エンコードされた文字列
  */
-export function btoa(txt:string){
+export function btoa(txt: string){
   return Buffer.from(txt).toString("base64");
 }
 
@@ -50,7 +50,7 @@ export function btoa(txt:string){
  * @param obj 対象のオブジェクト
  * @returns 文字列。JSON、またはその他の文字列、および空の文字列の場合があります
  */
-export function StringifyObject(obj:any):string{
+export function StringifyObject(obj: any): string{
   if(typeof obj === "string"){
     return obj;
   }else if(obj instanceof Error){
@@ -74,7 +74,7 @@ const projectRoot = path.join(__dirname, "../../").slice(0, -1);
  * @param original 
  * @returns 
  */
-export function FilterContent(original:string){
+export function FilterContent(original: string){
   let result = original;
   while(result.includes(projectRoot)){
     result = result.replace(projectRoot, "***");
@@ -87,7 +87,7 @@ export function FilterContent(original:string){
  * 空のPassThroughを生成します
  * @returns PassThrough
  */
-export function createPassThrough(opts:TransformOptions = {}):PassThrough{
+export function createPassThrough(opts: TransformOptions = {}): PassThrough{
   const id = Date.now();
   log(`[PassThrough] initialized (id: ${id})`, "debug");
   const stream = new PassThrough(Object.assign({
@@ -112,15 +112,15 @@ export function createPassThrough(opts:TransformOptions = {}):PassThrough{
  * @param options 追加の設定
  * @returns 
  */
-export function waitForEnteringState(predicate:()=>boolean, timeout:number = 10 * 1000, options?:{
+export function waitForEnteringState(predicate: () => boolean, timeout: number = 10 * 1000, options?: {
   /**
    * タイムアウトした際にエラーとするかどうかを表します。
    */
-  rejectOnTimeout?:boolean,
+  rejectOnTimeout?: boolean,
   /**
    * 与えられた判定関数を呼ぶ時間間隔をミリ秒単位で指定します。
    */
-  timeStep?:number,
+  timeStep?: number,
 }){
   const { rejectOnTimeout, timeStep } = Object.assign({
     rejectOnTimeout: true,
@@ -156,7 +156,7 @@ export function waitForEnteringState(predicate:()=>boolean, timeout:number = 10 
  * 指定された時間だけ非同期で待機します。
  * @param time 待機時間（ミリ秒単位）
  */
-export function wait(time:number){
+export function wait(time: number){
   return new Promise<void>(resolve => setTimeout(resolve, time).unref());
 }
 
@@ -177,13 +177,13 @@ export function generateUUID(){
   }
 }
 
-export function isBotAdmin(userId:string){
+export function isBotAdmin(userId: string){
   if(!config.adminId){
     return userId === "593758391395155978";
   }
   return typeof config.adminId === "string" ? config.adminId === userId : config.adminId.includes(userId);
 }
 
-export function isDisabledSource(sourceIdentifer:string){
+export function isDisabledSource(sourceIdentifer: string){
   return config.disabledSources.includes(sourceIdentifer);
 }

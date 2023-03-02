@@ -31,14 +31,14 @@ import { createChunkedYTStream, createRefreshableYTLiveStream } from "../stream"
 const ua = SecondaryUserAgent;
 
 type ytdlCore = "ytdlCore";
-export const ytdlCore:ytdlCore = "ytdlCore";
+export const ytdlCore: ytdlCore = "ytdlCore";
 
 export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, ytdl.videoInfo> {
   get cacheType(){
     return ytdlCore;
   }
 
-  async getInfo(url:string){
+  async getInfo(url: string){
     this.useLog();
     const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
     const requestOptions = agent ? {agent} : undefined;
@@ -62,7 +62,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
     };
   }
 
-  async fetch(url:string, forceUrl:boolean = false, cache?: Cache<any, any>){
+  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
     this.useLog();
     const info = await (async () => {
       if(cache && cache.type === "ytdlCore"){
@@ -136,7 +136,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
     }
   }
 
-  protected mapToExportable(url:string, info:ytdl.videoInfo){
+  protected mapToExportable(url: string, info: ytdl.videoInfo){
     return {
       url,
       title: info.videoDetails.title,

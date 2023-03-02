@@ -38,7 +38,7 @@ export default class Uptime extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     const now = Date.now();
     const insta = Util.time.CalcTime(now - options.bot.instantiatedTime.getTime());
     const ready = Util.time.CalcTime(options.client.uptime);

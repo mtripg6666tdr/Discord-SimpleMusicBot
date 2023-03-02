@@ -21,7 +21,7 @@ import type { ReadableOptions } from "stream";
 import { Readable } from "stream";
 
 export class Normalizer extends Readable {
-  constructor(protected origin:Readable, protected inlineVolume:boolean, options:ReadableOptions = {}){
+  constructor(protected origin: Readable, protected inlineVolume: boolean, options: ReadableOptions = {}){
     super(Object.assign({
       highWaterMark: 64 * 4 * 1024,
     }, options));

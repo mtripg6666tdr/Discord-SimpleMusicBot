@@ -44,7 +44,7 @@ export default class Invoke extends BaseCommand {
     });
   }
 
-  async run(message:CommandMessage, options:CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs){
     if(options.rawArgs.startsWith("sp;") && Util.general.isBotAdmin(message.member.id)){
       this.evaluateSpecialCommands(options.rawArgs.substring(3), message, options)
         .then(result => message.reply(result))
@@ -70,7 +70,7 @@ export default class Invoke extends BaseCommand {
     }
   }
 
-  private async evaluateSpecialCommands(specialCommand:string, message:CommandMessage, options:CommandArgs){
+  private async evaluateSpecialCommands(specialCommand: string, message: CommandMessage, options: CommandArgs){
     switch(specialCommand){
       case "cleanupsc":
         await CommandManager.instance.sync(options.client, true);
