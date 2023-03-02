@@ -19,21 +19,27 @@
 import type { Strategy, Cache } from "./base";
 import type { playDlStrategy } from "./play-dl";
 import type { youtubeDlStrategy } from "./youtube-dl";
+import type { ytDlPStrategy } from "./yt-dlp";
 import type { ytdlCoreStrategy } from "./ytdl-core";
+import type { ytDlPatchedYoutubeDl } from "./ytdl-patched_youtube-dl";
 import type { LoggerType } from "../../../Util";
 
 import { Util } from "../../../Util";
 
 type strategies =
   | ytdlCoreStrategy
-  | youtubeDlStrategy
   | playDlStrategy
+  | youtubeDlStrategy
+  | ytDlPStrategy
+  | ytDlPatchedYoutubeDl
 ;
 
 export const strategies: strategies[] = [
   "./ytdl-core",
   "./play-dl",
   "./youtube-dl",
+  "./yt-dlp",
+  "./ytdl-patched_youtube-dl",
 ].map((path, i) => {
   try{
     const { default: Module } = require(path);
@@ -44,17 +50,17 @@ export const strategies: strategies[] = [
     Util.logger.log(`[AudioSource:youtube] failed to load strategy#${i}`, "warn");
     return null;
   }
-}).filter(mod => !!mod);
+});
 
 function setupLogger(logger: LoggerType){
-  strategies.forEach(strategy => strategy.logger = logger);
+  strategies.forEach(strategy => strategy && (strategy.logger = logger));
 }
 
 export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(logger: LoggerType, ...parameters: Parameters<Strategy<T, U>["fetch"]>){
   setupLogger(logger);
   let checkedStrategy = -1;
   if(parameters[2]){
-    checkedStrategy = strategies.findIndex(s => s.cacheType === parameters[2].type);
+    checkedStrategy = strategies.findIndex(s => s && s.cacheType === parameters[2].type);
     if(checkedStrategy >= 0){
       try{
         const result = await strategies[checkedStrategy].fetch(...parameters);
@@ -70,7 +76,7 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(l
     }
   }
   for(let i = 0; i < strategies.length; i++){
-    if(i !== checkedStrategy){
+    if(i !== checkedStrategy && strategies[i]){
       try{
         const result = await strategies[i].fetch(...parameters);
         return {
@@ -92,11 +98,13 @@ export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>
   setupLogger(logger);
   for(let i = 0; i < strategies.length; i++){
     try{
-      const result = await strategies[i].getInfo(...parameters);
-      return {
-        result,
-        resolved: i
-      };
+      if(strategies[i]){
+        const result = await strategies[i].getInfo(...parameters);
+        return {
+          result,
+          resolved: i
+        };
+      }
     }
     catch(e){
       logger(e, "error");

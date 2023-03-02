@@ -360,7 +360,7 @@ export class QueueManager extends ServerManagerBase {
       this.Log(e, "error");
       if(msg){
         msg.edit({
-          content: `:weary: キューの追加に失敗しました。追加できませんでした。${"message" in e ? `(${e.message})` : ""}`,
+          content: `:weary: キューの追加に失敗しました。追加できませんでした。${typeof e === "object" && "message" in e ? `(${e.message})` : ""}`,
           embeds: null
         })
           .catch(er => Util.logger.log(er, "error"))

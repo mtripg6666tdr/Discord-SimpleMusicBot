@@ -347,7 +347,7 @@ export class PlayManager extends ServerManagerBase {
           embed.setThumbnail("attachment://thumbnail." + this.currentAudioInfo.Thumbnail.ext);
         }
         /* eslint-enable @typescript-eslint/indent */
-        if(this.currentAudioInfo.ServiceIdentifer === "youtube" && (this.currentAudioInfo as YouTube).IsFallbacked){
+        if(this.currentAudioInfo.isYouTube() && this.currentAudioInfo.IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
         this.emit("playStartUIPrepared", embed);

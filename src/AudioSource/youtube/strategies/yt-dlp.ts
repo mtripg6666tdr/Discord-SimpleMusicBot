@@ -19,20 +19,20 @@
 import { baseYoutubeDlStrategy } from "./baseYoutubeDlStrategy";
 import { BinaryManager } from "../../../Component/BinaryManager";
 
-const youtubeDlBinaryManager = new BinaryManager({
-  binaryName: "youtube-dl",
-  localBinaryName: "youtube-dl",
-  binaryRepo: "ytdl-org/youtube-dl",
+const ytDlPBinaryManager = new BinaryManager({
+  binaryName: "yt-dlp",
+  localBinaryName: "yt-dlp",
+  binaryRepo: "yt-dlp/yt-dlp",
   checkImmediately: false,
 });
 
-type youtubeDl = "youtubeDl";
-const youtubeDl: youtubeDl = "youtubeDl";
+type ytDlP = "ytDlP";
+const ytDlP: ytDlP = "ytDlP";
 
-export class youtubeDlStrategy extends baseYoutubeDlStrategy<youtubeDl> {
+export class ytDlPStrategy extends baseYoutubeDlStrategy<ytDlP> {
   constructor(priority: number){
-    super(priority, youtubeDl, youtubeDlBinaryManager);
+    super(priority, ytDlP, ytDlPBinaryManager);
   }
 }
 
-export default youtubeDlStrategy;
+export default ytDlPStrategy;
