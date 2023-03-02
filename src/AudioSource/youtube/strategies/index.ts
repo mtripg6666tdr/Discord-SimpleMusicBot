@@ -35,10 +35,10 @@ type strategies =
 ;
 
 export const strategies: strategies[] = [
-  "./ytdl-core-",
-  "./play-dl-",
-  "./youtube-dl-",
-  "./yt-dlp-",
+  "./ytdl-core",
+  "./play-dl",
+  "./youtube-dl",
+  "./yt-dlp",
   "./ytdl-patched_youtube-dl",
 ].map((path, i) => {
   try{
