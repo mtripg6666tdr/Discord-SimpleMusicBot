@@ -19,7 +19,8 @@ RUN npx tsc
 FROM base AS runner
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
-    apt-get install -y --no-install-recommends nscd ca-certificates
+    apt-get install -y --no-install-recommends nscd ca-certificates && \
+    ln -s /usr/bin/python3 /usr/bin/python
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
