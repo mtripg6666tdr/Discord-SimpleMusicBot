@@ -16,36 +16,43 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { lock, LockObj } from "@mtripg6666tdr/async-lock";
+
 import { spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 
 import candyget from "candyget";
-import { pEvent } from "p-event";
+import pEvent from "p-event";
 
 import { LogEmitter } from "../Structure";
 
 type BinaryManagerOptions = {
-  binaryName:string,
-  binaryRepo:string,
-  checkImmediately:boolean,
-  checkVersionArgs?:readonly string[],
+  binaryName: string,
+  localBinaryName: string,
+  binaryRepo: string,
+  checkImmediately: boolean,
+  checkVersionArgs?: readonly string[],
+  checkUpdateTimeout?: number,
 };
 
 export class BinaryManager extends LogEmitter {
+  protected readonly checkUpdateTimeout = this.options.checkUpdateTimeout || 1000 * 60 /* 1 min */ * 60 /* 1 hour */ * 3/* 3 hour */;
   protected baseUrl = path.join(__dirname, "../../bin");
-  protected lastChecked:number = 0;
-  protected releaseInfo:GitHubRelease = null;
+  protected lastChecked: number = 0;
+  protected releaseInfo: GitHubRelease = null;
 
   get binaryPath(){
-    return path.join(this.baseUrl, "./", this.options.binaryName);
+    return path.join(this.baseUrl, "./", this.options.localBinaryName + (process.platform === "win32" ? ".exe" : ""));
   }
 
-  constructor(protected options:Readonly<BinaryManagerOptions>){
-    super({
-      captureRejections: true,
-    });
-    this.setTag(`BinaryManager(${options.binaryName})`);
+  get isStaleInfo(){
+    return Date.now() - this.lastChecked >= this.checkUpdateTimeout;
+  }
+
+  constructor(protected options: Readonly<BinaryManagerOptions>){
+    super();
+    this.setTag(`BinaryManager(${options.localBinaryName})`);
     if(!fs.existsSync(this.baseUrl)){
       try{
         fs.mkdirSync(this.baseUrl);
@@ -57,75 +64,124 @@ export class BinaryManager extends LogEmitter {
       }
     }
     if(options.checkImmediately){
-      this.checkIsLatestVersion();
+      const latest = this.checkIsLatestVersion();
+      if(!latest){
+        this.downloadBinary();
+      }
     }
   }
 
-  async checkIsLatestVersion(){
+  private readonly getReleaseInfoLocker = new LockObj();
+  protected async getReleaseInfo(){
+    return lock(this.getReleaseInfoLocker, async () => {
+      if(this.releaseInfo && !this.isStaleInfo){
+        this.Log("Skipping the binary info fetching due to valid info cache found");
+        return this.releaseInfo;
+      }
+      const { body } = await candyget.json<GitHubRelease>(`https://api.github.com/repos/${this.options.binaryRepo}/releases/latest`, {
+        headers: {
+          "Accept": "application/vnd.github.v3+json",
+          "User-Agent": "mtripg6666tdr/Discord-SimpleMusicBot"
+        },
+        validator: (res): res is GitHubRelease => true,
+      });
+      return this.releaseInfo = body;
+    });
+  }
+
+  protected async checkIsLatestVersion(){
     this.lastChecked = Date.now();
     if(!fs.existsSync(this.binaryPath)){
       return false;
     }else{
+      this.Log("Checking the latest version");
       const [latestVersion, currentVersion] = await Promise.all([
-        candyget.json<GitHubRelease>(`https://api.github.com/repos/${this.options.binaryRepo}/releases/latest`, {
-          headers: {
-            "Accept": "application/vnd.github.v3+json",
-            "User-Agent": "mtripg6666tdr/Discord-SimpleMusicBot"
-          },
-          validator: (res): res is GitHubRelease => true,
-        }).then(r => (this.releaseInfo = r.body).tag_name),
+        this.getReleaseInfo().then(info => info.tag_name),
         this.exec(this.options.checkVersionArgs || ["--version"]).then(output => output.trim()),
       ]);
-      return latestVersion === currentVersion;
+      const isLatest = latestVersion === currentVersion;
+      this.Log(isLatest ? "The binary is latest" : "The binary is stale");
+      return isLatest;
     }
   }
 
-  async downloadBinary(){
+  protected async downloadBinary(){
+    if(!this.releaseInfo){
+      await this.getReleaseInfo();
+    }
     const binaryUrl = this.releaseInfo.assets.find(asset => asset.name === `${this.options.binaryName}${process.platform === "win32" ? ".exe" : ""}`)?.browser_download_url;
     if(!binaryUrl){
       throw new Error("No binary url detected");
     }else{
+      this.Log("Start downloading the binary");
       const result = await candyget.stream(binaryUrl, {
         headers: {
           "Accept": "*/*",
           "User-Agent": "mtripg6666tdr/Discord-SimpleMusicBot"
         }
       });
-      await pEvent(
-        result.body.pipe(fs.createWriteStream(this.binaryPath, {
-          mode: 0o777,
-        })),
-        "end"
-      );
+      const fileStream = result.body.pipe(fs.createWriteStream(this.binaryPath, {
+        mode: 0o777,
+      }));
+      await Promise.all([
+        pEvent(
+          result.body,
+          "close",
+        ),
+        pEvent(
+          fileStream,
+          "close",
+        )
+      ]);
+      this.Log("Finish downloading the binary");
     }
   }
 
-  exec(args:readonly string[]):Promise<string>{
+  async exec(args: readonly string[]): Promise<string>{
+    if(!fs.existsSync(this.binaryPath) || this.isStaleInfo){
+      const latest = await this.checkIsLatestVersion();
+      if(!latest){
+        await this.downloadBinary();
+      }
+    }
     return new Promise((resolve, reject) => {
-      const process = spawn(this.binaryPath, args, {
-        stdio: ["ignore", "pipe", "pipe"],
-        shell: false,
-        windowsHide: true,
-      });
-      let bufs:Buffer[] = [];
-      let ended = false;
-      const onEnd = () => {
-        if(ended) return;
-        ended = true;
-        resolve(Buffer.concat(bufs).toString());
-      };
-      process.stdout.on("data", (chunk:Buffer) => bufs.push(chunk));
-      process.stdout.on("end", onEnd);
-      process.on("exit", onEnd);
-      process.stdout.on("error", err => {
-        bufs = null;
-        reject(err);
-      });
-      process.stderr.on("data", (chunk:Buffer) => this.Log(`[Child] ${chunk.toString()}`));
+      try{
+        this.Log(`Passing arguments: ${args.join(" ")}`);
+        const process = spawn(this.binaryPath, args, {
+          stdio: ["ignore", "pipe", "pipe"],
+          shell: false,
+          windowsHide: true,
+        });
+        let bufs: Buffer[] = [];
+        let ended = false;
+        const onEnd = () => {
+          if(ended) return;
+          ended = true;
+          resolve(
+            Buffer.concat(bufs).toString()
+              .trim()
+          );
+          if(process.connected){
+            process.kill("SIGTERM");
+          }
+        };
+        process.stdout.on("data", (chunk: Buffer) => bufs.push(chunk));
+        process.stdout.on("end", onEnd);
+        process.on("exit", onEnd);
+        process.stdout.on("error", err => {
+          bufs = null;
+          reject(err);
+        });
+        process.stderr.on("data", (chunk: Buffer) => this.Log(`[Child] ${chunk.toString()}`));
+      }
+      catch(e){
+        reject(e);
+      }
     });
   }
 }
 
+// GitHub Release JSON structure generated by QuickType Visual Studio Code Extension
 interface GitHubRelease {
   url: string;
   assets_url: string;

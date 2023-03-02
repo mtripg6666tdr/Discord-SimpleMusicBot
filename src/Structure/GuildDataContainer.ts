@@ -536,7 +536,8 @@ export class GuildDataContainer extends LogEmitter {
         if(success) this.player.play();
         return;
       }
-      catch{
+      catch(er){
+        this.Log(er, "error");
         // なに指定したし…
         await message.reply("🔭有効なURLを指定してください。キーワードで再生する場合はsearchコマンドを使用してください。")
           .catch(e => this.Log(e, "error"));
