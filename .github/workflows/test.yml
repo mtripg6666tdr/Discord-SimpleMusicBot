@@ -33,7 +33,7 @@ jobs:
           echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
       - name: Check npm cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
@@ -144,7 +144,7 @@ jobs:
           echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
       - name: Check npm cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
@@ -163,7 +163,9 @@ jobs:
           npm run generatecommandlist
       
       - name: Check if there are changes
-        run: git diff -w --exit-code
+        run: |
+          git add .
+          git diff --staged -w --exit-code
         
       - name: Build documentation site
         working-directory: "docs"
