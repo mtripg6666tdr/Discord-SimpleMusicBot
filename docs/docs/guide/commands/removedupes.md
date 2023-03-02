@@ -4,14 +4,14 @@ sidebar_label: 重複削除
 # `重複削除`コマンド
 キュー内の重複（ちょうふく）している曲を削除します。
 
-スラッシュコマンドでは、`/rmduplicated`を使用してください。
+スラッシュコマンドでは、`/removedupes`を使用してください。
 
 ## 別名
 `重複削除`以外にも以下の別名を使用できます。
 
-- rmduplicated
-- rmdupes
 - removedupes
+- rmdupes
+- rmduplicated
 - removeduplicates
 - drm
 

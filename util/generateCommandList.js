@@ -20,7 +20,13 @@
 const fs = require("fs");
 const path = require("path");
 const { CommandManager } = require("../dist/Component/CommandManager");
-const { categories, categoriesList } = require("../dist/Commands/commands");
+// const { categories, categoriesList } = require("../dist/Commands/commands");
+
+const commandDocPath = path.join(__dirname, "../docs/docs/guide/commands/");
+
+const existingFiles = new Set(fs.readdirSync(commandDocPath));
+existingFiles.delete("_category_.json");
+existingFiles.delete("overview.md");
 
 /**
  * @type { import("../src/Commands").BaseCommand[] }
@@ -35,7 +41,11 @@ const commands = new CommandManager().commands.filter(
 
 for(let i = 0; i < commands.length; i++){
   const cmd = commands[i];
-  fs.writeFileSync(path.join(__dirname, `../docs/docs/guide/commands/${cmd.asciiName}.md`), `---
+  const filename = `${cmd.asciiName}.md`;
+  if(existingFiles.has(filename)){
+    existingFiles.delete(filename);
+  }
+  fs.writeFileSync(path.join(commandDocPath, filename), `---
 sidebar_label: ${cmd.name}
 ---
 # \`${cmd.name}\`コマンド
@@ -57,5 +67,7 @@ ${cmd.permissionDescription}
 ※管理者権限や、サーバーの管理権限、チャンネルの管理権限、および管理者権限を持つユーザーはこの権限を満たしていなくてもいつでもこのコマンドを実行できます。
   \r\n`, {encoding: "utf-8"});
 }
+
+existingFiles.forEach(file => fs.unlinkSync(path.join(commandDocPath, file)));
 
 process.exit(0);
