@@ -115,7 +115,11 @@ export class CommandManager extends LogEmitter {
     const registeredAppCommands = await client.getCommands();
     if(registeredAppCommands.length === 0){
       this.Log("Detected no command registered; bulk-registering slash-commands");
-      await client.bulkEditCommands(this.commands.map(command => command.toApplicationCommandStructure()));
+      await client.bulkEditCommands(
+        this.commands
+          .filter(command => !command.unlist)
+          .map(command => command.toApplicationCommandStructure())
+      );
       this.Log("Successfully registered");
       return;
     }
