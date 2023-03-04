@@ -23,7 +23,7 @@ OAuth認証でボットをサーバーに追加する際に、`permissions=74659
 |Mute Members|メンバーをミュート|抑制されているボイスチャンネルでミュートを外すのに必要|
 
 :::info
-Discord Developer Portalで、ボットに対してMessage Content Intentを有効にしないと、メッセベースのコマンドや、その他の一部機能を使用することはできません。
+Discord Developer Portalで、ボットに対してMessage Content Intentを有効にしないと、メッセージベースのコマンドや、その他の一部機能を使用することはできません。
 ![Message Content Intent](https://cdn.discordapp.com/attachments/1024683345625497601/1025018178146926733/unknown.png)
 
 無効にしたまま使用する場合は、[`config.json`で`noMessageContent`を`true`に設定](installation/configuration.md#nomessagecontent-boolean)してください。 
