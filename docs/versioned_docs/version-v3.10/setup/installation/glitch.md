@@ -13,7 +13,17 @@ Discord-SimpleMusicBotを [Glitch](https://glitch.com/) で実行する手順を
 ### 1. 新しいプロジェクトを作成します
 Glitchのトップ画面から、右上にある`New project`をクリックして`Import from GitHub`をクリックします。表示されたプロンプトに`https://github.com/mtripg6666tdr/Discord-SimpleMusicBot`と入力してOKします。
 
-### 2. ボットが動作するようファイルを編集します
+### 2. 最新のバージョンにリセットします。
+  `master`ブランチは開発用ブランチなので、最新のリリースの時点にリセットします。  
+  `TERMINAL`から、以下のコマンドを実行します。
+  ```sh
+  git remote add origin https://github.com/mtripg6666tdr/Discord-SimpleMusicBot.git
+  git fetch
+  git reset --hard <最新のバージョン>
+  ```
+  `最新のバージョン`は適宜現時点での最新のバージョンに読みかえてください。
+
+### 3. ボットが動作するようファイルを編集します
 ボットが動作するよう、いくつかのファイルを変更する必要があります。
 * 
   ```diff title="tsconfig.json"
@@ -33,7 +43,7 @@ Glitchのトップ画面から、右上にある`New project`をクリックし�
       "lint": "eslint .",
   ```
 
-### 3. ボットの各種設定をします
+### 4. ボットの各種設定をします
 [「ボットの設定について」](./configuration.md)を参考に、ボットの設定を行います。
 
 * `config.json`は画面左の`Files`のところにある`+`ボタンをクリックし、`config.json`という名前でファイルを作成し、`config.json.sample`の内容をコピー＆ペーストして設定します。  
@@ -43,5 +53,5 @@ Glitchのトップ画面から、右上にある`New project`をクリックし�
 * `.env`は図のように設定します。
   ![envの設定例](https://cdn.discordapp.com/attachments/1076366496818806825/1076524525115670648/image.png)
 
-### 4. 完了
+### 5. 完了
   しばらくすると、ボットが起動します。ボットの状況については画面下の`LOGS`をクリックしてログを参照してください。
