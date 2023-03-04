@@ -13,11 +13,15 @@ const client = new eris.Client(TOKEN, {
 });
 client.once("ready", async () => {
   (candyget.defaultOptions.headers || (candyget.defaultOptions.headers = {}))["User-Agent"] = "mtripg6666tdr/Discord-SimpleMusicBot Actions";
-  const { html_url: htmlUrl, name, draft } = await candyget.json("https://api.github.com/repos/mtripg6666tdr/Discord-SimpleMusicBot/releases/latest").then(res => res.body);
+  const apiData = await candyget.json("https://api.github.com/repos/mtripg6666tdr/Discord-SimpleMusicBot/releases/latest").then(res => res.body);
+  const { html_url: htmlUrl, name, draft } = apiData;
   const ogpImage = await candyget.buffer("https://opengraph.githubassets.com/1/mtripg6666tdr/Discord-SimpleMusicBot/releases/tag/" + name).then(res => {
     if(!res.headers["content-type"]?.startsWith("image/")) throw new Error("No image detected");
     return res.body;
   });
+  if(!name){
+    throw new Error(`No name detected: ${apiData}`);
+  }
   if(!draft){
     const message = await client.createMessage(CHANNEL_ID, {
       content: `**お知らせ**\r\n${name}リリース🎉\r\nリリースノート: <${htmlUrl}>`,
