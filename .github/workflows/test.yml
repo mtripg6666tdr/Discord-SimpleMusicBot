@@ -168,6 +168,7 @@ jobs:
           git diff --staged -w --exit-code
         
       - name: Build documentation site
+        if: ${{ github.event_name != 'pull_request' }}
         working-directory: "docs"
         run: |
           npm ci

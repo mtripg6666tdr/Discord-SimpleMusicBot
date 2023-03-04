@@ -48,6 +48,7 @@ sidebar_position: 3
 
   ```sh
   git clone https://github.com/mtripg6666tdr/Discord-SimpleMusicBot.git
+  git reset --hard <使用したいバージョン>
   ```
 
 ### 5. 設定用ファイル`.env`と`Config.json`の準備

@@ -17,7 +17,15 @@ Discord-SimpleMusicBotを [replit](https://replit.com/) で実行する手順を
   
   この状態で`Import from GitHub`をクリックして、完了するまで待ちます。
 
-### 2. Node.jsのバージョンを確認します
+### 2. 最新のバージョンにリセットします
+  `master`ブランチは開発用ブランチなので、最新のリリースの時点にリセットします。  
+  貝殻マークの`Shell`に移動し、以下のコマンドを実行します。
+  ```sh
+  git reset --hard <最新のバージョン>
+  ```
+  `<最新のバージョン>`は、適宜現時点での最新バージョンに読みかえてください。
+
+### 3. Node.jsのバージョンを確認します
   貝殻のマークの`Shell`に移動し、以下のコマンドを実行し、バージョンを確認します
   ```sh
   node -v
@@ -29,19 +37,19 @@ Discord-SimpleMusicBotを [replit](https://replit.com/) で実行する手順を
   npm i node@v18-lts --no-save
   ```
 
-### 3. 依存関係をインストールします
+### 4. 依存関係をインストールします
   以下のコマンドで依存関係をインストールします
   ```sh
   npm i
   ```
 
-### 4. ソースコードをトランスパイルします
+### 5. ソースコードをトランスパイルします
   以下のコマンドでソースコードをトランスパイルします。
   ```sh
   npm run build
   ```
 
-### 4. ボットの各種設定を行います
+### 6. ボットの各種設定を行います
   ボットの各種設定を[「ボットの設定について」](./configuration.md)を参考に行ってください。
 
   * `.env`ファイルは**作成せず**に、Replitの画面左側の`Tools`の中にある、`Secrets`を選択して設定してください。
@@ -49,7 +57,7 @@ Discord-SimpleMusicBotを [replit](https://replit.com/) で実行する手順を
   * `config.json`は、Replitの画面左側の`Files`のところにある`New File`と出るボタンを押して、`config.json`を作成し、`config.json.sample`をコピー＆ペースとして設定してください。
   * `config.json`の`webserver`は必ず`true`に設定してください。
 
-### 5. 画面上の`Run`から実行します
+### 7. 画面上の`Run`から実行します
   これで設定は完了です。
 
 ### エラーが発生して動かない場合
