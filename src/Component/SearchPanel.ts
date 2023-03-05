@@ -148,10 +148,10 @@ export class SearchPanel extends EventEmitter {
     };
   }
 
-  async destroy(){
+  async destroy(quiet: boolean = false){
     if(this.status !== "consumed") return;
-    await this._responseMessage.channel.createMessage("✅キャンセルしました");
-    await this._responseMessage.delete();
+    if(!quiet) await this._responseMessage.channel.createMessage("✅キャンセルしました").catch(er => Util.logger.log(er, "error"));
+    await this._responseMessage.delete().catch(er => Util.logger.log(er, "error"));
     this.status = "destroyed";
   }
 

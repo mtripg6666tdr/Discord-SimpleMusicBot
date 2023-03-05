@@ -373,8 +373,18 @@ export class MusicBot extends MusicBotBase {
             server.queue.removeAt(server.queue.length - 1);
             interaction.createMessage(`🚮\`${item.basicInfo.Title}\`の追加を取り消しました`).catch(er => this.Log(er, "error"));
             interaction.message.edit({
-              content: interaction.message.content,
-              embeds: interaction.message.embeds,
+              components: [],
+            }).catch(er => this.Log(er, "error"));
+          }
+        }else if(interaction.data.custom_id.startsWith("cancel-search-")){
+          const userId = interaction.data.custom_id.substring("cancel-search-".length);
+          if(interaction.member.id === userId && this.guildData.get(interaction.guildID)?.hasSearchPanel(userId)){
+            this.guildData.get(interaction.guildID)
+              .getSearchPanel(userId)
+              .destroy(/* quiet */ true)
+            ;
+            interaction.createMessage("🚮検索パネルを破棄しました:white_check_mark:").catch(er => this.Log(er, "error"));
+            interaction.message.edit({
               components: [],
             }).catch(er => this.Log(er, "error"));
           }

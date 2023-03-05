@@ -20,7 +20,8 @@
       "ES2020.BigInt",
       "ES2020.String",
     ],
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "strictBindCallApply": true
   },
   "include": [
     "src/**/*.ts"
