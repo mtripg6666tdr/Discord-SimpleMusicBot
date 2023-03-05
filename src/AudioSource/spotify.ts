@@ -161,15 +161,15 @@ export class Spotify extends AudioSource {
   }
 
   static validatePlaylistUrl(url: string){
-    return !!url.match(/^https?:\/\/open\.spotify\.com\/playlist\/([a-zA-Z0-9]+)(\?.*)?$/);
+    return !!url.match(/^https?:\/\/open\.spotify\.com\/(playlist|album)\/([a-zA-Z0-9]+)(\?.*)?$/);
   }
 
   static getTrackUrl(uri: string){
     return `https://open.spotify.com/track/${uri.replace(/spotify:track:/, "")}`;
   }
 
-  static getPlaylistUrl(uri: string){
-    return `https://open.spotify.com/playlist/${uri.replace(/spotify:playlist:/, "")}`;
+  static getPlaylistUrl(uri: string, type: "playlist"|"album"){
+    return `https://open.spotify.com/${type}/${uri.replace(/spotify:(playlist|album):/, "")}`;
   }
 
   static get client(){
