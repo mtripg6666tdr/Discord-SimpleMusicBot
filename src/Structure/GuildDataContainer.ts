@@ -648,8 +648,6 @@ export class GuildDataContainer extends LogEmitter {
   bindSearchPanel(panel: SearchPanel){
     this._searchPanels.set(panel.commandMessage.member.id, panel);
     const destroyPanel = panel.destroy.bind(panel);
-    // why?????
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval
     const timeout = setTimeout(destroyPanel, 10 * 60 * 1000).unref();
     panel.once("destroy", () => {
       clearTimeout(timeout);
