@@ -581,7 +581,15 @@ export class GuildDataContainer extends LogEmitter {
     } = panel.decideItems(includingNums);
     const [first, ...rest] = items;
     // いっこめをしょり
-    await this.queue.autoAddQueue(first, panel.commandMessage.member, "unknown", false, responseMessage);
+    await this.queue.autoAddQueue(
+      /* url */ first,
+      /* added by */ panel.commandMessage.member,
+      /* known source type */ "unknown",
+      /* add the item at the first or not */ false,
+      /* search panel */ responseMessage,
+      null, null, null,
+      /* cancellable */ this.queue.length >= 1
+    );
     // 現在の状態を確認してVCに接続中なら接続試行
     if(panel.commandMessage.member.voiceState.channelID){
       await this.joinVoiceChannel(panel.commandMessage, false, false);
@@ -592,7 +600,16 @@ export class GuildDataContainer extends LogEmitter {
     }
     // 二個目以上を処理
     for(let i = 0; i < rest.length; i++){
-      await this.queue.autoAddQueue(rest[i], panel.commandMessage.member, "unknown", false, false, panel.commandMessage.channel as TextChannel);
+      await this.queue.autoAddQueue(
+        /* url */ rest[i],
+        /* added by */ panel.commandMessage.member,
+        /* known source type */ "unknown",
+        /* add the item at the first or not */ false,
+        /* from search panel or not */ false,
+        /* the channel at which interaction should happen */ panel.commandMessage.channel as TextChannel,
+        null, null,
+        /* cancellable */ true
+      );
     }
   }
 
