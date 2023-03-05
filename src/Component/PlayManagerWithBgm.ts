@@ -22,7 +22,20 @@ import Util from "../Util";
 
 export class PlayManagerWithBgm extends PlayManager {
   protected override server: GuildDataContainerWithBgm;
-  private _bgm: boolean = false;
+  protected _bgm: boolean = false;
+  protected _originalVolume: number = 100;
+  protected get bgm(){
+    return this._bgm;
+  }
+  protected set bgm(value: boolean){
+    if(value && !this._bgm){
+      this._originalVolume = this.volume;
+      this.setVolume(this.server.bgmConfig.volume);
+    }else if(!value && this._bgm){
+      this.setVolume(this._originalVolume);
+    }
+    this._bgm = value;
+  }
 
   override get isPlaying(): boolean{
     return this.isConnecting && this.server.connection.playing && !this.server.queue.isBGM;
@@ -35,11 +48,11 @@ export class PlayManagerWithBgm extends PlayManager {
       }
       this.server.queue.setToPlayBgm(bgm);
     }
-    if(!this.getIsBadCondition(bgm)) this._bgm = bgm;
+    if(!this.getIsBadCondition(bgm)) this.bgm = bgm;
     return super.play(time);
   }
 
-  protected override getIsBadCondition(bgm: boolean = this._bgm){
+  protected override getIsBadCondition(bgm: boolean = this.bgm){
     // 接続していない
     return !this.isConnecting
       // なにかしら再生中
@@ -52,7 +65,7 @@ export class PlayManagerWithBgm extends PlayManager {
   }
 
   protected override getNoticeNeeded(){
-    return this.server.boundTextChannel && !this._bgm;
+    return this.server.boundTextChannel && !this.bgm;
   }
 
   override disconnect(){
@@ -74,7 +87,7 @@ export class PlayManagerWithBgm extends PlayManager {
     this._errorCount = 0;
     this._errorUrl = "";
     this._cost = 0;
-    if(this._bgm){
+    if(this.bgm){
       this.server.queue.next();
       if(this.server.queue.isBgmEmpty){
         this.Log("Queue empty");

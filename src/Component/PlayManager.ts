@@ -295,9 +295,9 @@ export class PlayManager extends ServerManagerBase {
         // @ts-expect-error 7053
         const erisStreams = (connection.piper["streams"] as (Readable & Writable)[]);
         if(this.detailedLog) erisStreams.forEach((readable, i) => setReadableCsvLog(readable, i + streams.length));
-        const volume = erisStreams.find(r => r.constructor.name === "VolumeTransformer");
-        volume?.on("data", () => {
-          if(volume.readableLength < 128 * 1024){
+        const volumeTransformer = erisStreams.find(r => r.constructor.name === "VolumeTransformer");
+        volumeTransformer?.on("data", () => {
+          if(volumeTransformer.readableLength < 128 * 1024){
             normalizer.resumeOrigin();
           }else{
             normalizer.pauseOrigin();

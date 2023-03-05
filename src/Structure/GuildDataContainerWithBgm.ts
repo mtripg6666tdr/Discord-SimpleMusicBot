@@ -81,7 +81,6 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
     }
     return this._joinVoiceChannel(this.bgmConfig.voiceChannelId)
       .then(() => {
-        this.player.setVolume(this.bgmConfig.volume);
         this.player.play(0, /* BGM */ true);
       })
       .catch(er => this.Log(er, "error"))
