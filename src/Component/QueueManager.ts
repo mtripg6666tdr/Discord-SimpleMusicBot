@@ -230,7 +230,7 @@ export class QueueManager extends ServerManagerBase {
    * @param addedBy 追加したユーザー
    * @param type 追加するURLのソースが判明している場合にはyoutubeまたはcustom、不明な場合はunknownを指定
    * @param first 最初に追加する場合はtrue、末尾に追加する場合はfalse
-   * @param fromSearch 検索パネルの破棄を行うかどうか。検索パネルからのキュー追加の場合にはtrue、それ以外はfalse
+   * @param fromSearch 検索パネルの破棄を行うかどうか。検索パネルからのキュー追加の場合にはその検索パネル、それ以外はfalse
    * @param channel 検索パネルからのキュー追加でない場合に、ユーザーへのインタラクションメッセージを送信するチャンネル。送信しない場合はnull
    * @param message 各インタラクションを上書きするメッセージが既にある場合はここにメッセージを指定します。それ以外の場合はnull
    * @param gotData すでにデータを取得していて新たにフェッチする必要がなくローカルでキューコンテンツをインスタンス化する場合はここにデータを指定します
