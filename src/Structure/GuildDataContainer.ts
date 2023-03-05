@@ -647,7 +647,10 @@ export class GuildDataContainer extends LogEmitter {
 
   bindSearchPanel(panel: SearchPanel){
     this._searchPanels.set(panel.commandMessage.member.id, panel);
+    const destroyPanel = panel.destroy.bind(panel);
+    const timeout = setTimeout(destroyPanel, 10 * 60 * 1000).unref();
     panel.once("destroy", () => {
+      clearTimeout(timeout);
       this._searchPanels.delete(panel.commandMessage.member.id);
     });
   }

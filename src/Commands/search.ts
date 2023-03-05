@@ -21,6 +21,8 @@ import type { CommandMessage } from "../Component/CommandMessage";
 import type { SongInfo } from "../Component/SearchPanel";
 import type * as ytsr from "ytsr";
 
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+
 import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
 import { Util } from "../Util";
@@ -33,8 +35,27 @@ export abstract class SearchBase<T> extends BaseCommand {
       await Promise.all(options.args.map(u => options.server.playFromURL(message, u, !options.server.player.isConnecting)));
       return;
     }
-    if(options.server.getSearchPanel(message.member.id)){
-      message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
+    if(options.server.hasSearchPanel(message.member.id)){
+      const responseMessage = await message.reply({
+        content: "✘既に開かれている検索窓があります",
+        components: [
+          new Helper.MessageActionRowBuilder()
+            .addComponents(
+              new Helper.MessageButtonBuilder()
+                .setCustomId(`cancel-search-${message.member.id}`)
+                .setLabel("以前の検索結果を破棄")
+                .setStyle("DANGER")
+            )
+            .toEris()
+        ]
+      }).catch(e => Util.logger.log(e, "error"));
+      if(responseMessage){
+        options.server.getSearchPanel(message.member.id).once("destroy", () => {
+          responseMessage.edit({
+            components: [],
+          });
+        });
+      }
       return;
     }
     if(options.rawArgs !== ""){

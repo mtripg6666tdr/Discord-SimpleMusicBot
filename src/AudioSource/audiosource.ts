@@ -22,10 +22,10 @@ import type { EmbedField } from "eris";
 import type { Readable } from "stream";
 
 export type StreamType =
-| "dca"
-| "ogg"
-| "webm"
-| "pcm"
+  | "dca"
+  | "ogg"
+  | "webm"
+  | "pcm"
 ;
 
 export abstract class AudioSource {
