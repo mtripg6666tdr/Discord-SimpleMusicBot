@@ -364,7 +364,19 @@ export class GuildDataContainer extends LogEmitter {
    * メッセージからストリームを判定してキューに追加し、状況に応じて再生を開始します
    * @param first キューの先頭に追加するかどうか
    */
-  async playFromURL(message: CommandMessage, rawArg: string, first: boolean = true, cancellable: boolean = false){
+  async playFromURL(message: CommandMessage, rawArg: string|string[], first: boolean = true, cancellable: boolean = false){
+    if(Array.isArray(rawArg)){
+      const [firstUrl, ...restUrls] = rawArg.flatMap(fragment => Util.string.NormalizeText(fragment).split(" ")).filter(url => url.startsWith("http"));
+      if(firstUrl){
+        await this.playFromURL(message, firstUrl, first, false);
+        if(restUrls){
+          for(let i = 0; i < restUrls.length; i++){
+            await this.queue.autoAddQueue(restUrls[i], message.member, "unknown", false, null, message.channel as TextChannel, null, null, false);
+          }
+        }
+      }
+      return;
+    }
     const t = Util.time.timer.start("MusicBot#PlayFromURL");
     setTimeout(() => message.suppressEmbeds(true).catch(e => this.Log(Util.general.StringifyObject(e), "warn")), 4000).unref();
     if(!Util.general.isDisabledSource("custom") && rawArg.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){

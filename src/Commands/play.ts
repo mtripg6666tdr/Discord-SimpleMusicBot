@@ -68,9 +68,7 @@ export default class Play extends BaseCommand {
     // 引数ついてたらそれ優先
     if(options.rawArgs !== ""){
       if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){
-        for(let i = 0; i < options.args.length; i++){
-          await options.server.playFromURL(message, options.args[i], i === 0 ? !wasConnected : false);
-        }
+        await options.server.playFromURL(message, options.args as string[], !wasConnected);
       }else{
         const msg = await message.channel.createMessage("🔍検索中...");
         try{
