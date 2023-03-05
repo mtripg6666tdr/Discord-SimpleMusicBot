@@ -512,7 +512,7 @@ export class GuildDataContainer extends LogEmitter {
         }else{
           const embed = new Helper.MessageEmbedBuilder()
             .setTitle("✅プレイリストが処理されました")
-            .setDescription(`[${playlist.title}](${Spotify.getPlaylistUrl(playlist.uri)}) \`(${playlist.subtitle})\` \r\n${index}曲が追加されました`)
+            .setDescription(`[${playlist.title}](${Spotify.getPlaylistUrl(playlist.uri, playlist.type)}) \`(${playlist.subtitle})\` \r\n${index}曲が追加されました`)
             .setThumbnail(playlist.coverArt.sources[0].url)
             .setFields({
               name: ":warning:注意",
