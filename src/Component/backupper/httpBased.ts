@@ -200,7 +200,7 @@ export class HttpBackupper extends Backupper {
           const res = new Map<string, YmxFormat>();
           Object.keys(frozenQueues).forEach(key => {
             try{
-              const ymx = JSON.parse(frozenQueues[key]);
+              const ymx = JSON.parse(decodeURIComponent(frozenQueues[key]));
               res.set(key, ymx);
             }
             catch{ /* empty */ }
