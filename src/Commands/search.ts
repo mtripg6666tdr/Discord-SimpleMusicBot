@@ -30,7 +30,7 @@ export abstract class SearchBase<T> extends BaseCommand {
     options.server.updateBoundChannel(message);
     options.server.joinVoiceChannel(message);
     if(this.urlCheck(options.rawArgs)){
-      await Promise.all(options.args.map(u => options.server.playFromURL(message, u, !options.server.player.isConnecting)));
+      await options.server.playFromURL(message, options.args as string[], !options.server.player.isConnecting);
       return;
     }
     if(options.server.getSearchPanel(message.member.id)){
