@@ -422,7 +422,7 @@ export class PlayManager extends ServerManagerBase {
         }
       } catch{ /* empty */ }
       if(mes){
-        mes.edit(`:tired_face:曲の再生に失敗しました...。${"message" in e ? `(${e.message})` : ""}` + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
+        mes.edit(`:tired_face:曲の再生に失敗しました...。${e ? `(${typeof e === "object" && "message" in e ? e.message : e})` : ""}` + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"));
         this.onStreamFailed();
       }
     }
