@@ -25,39 +25,59 @@ import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Bgm extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "bgm",
       alias: ["study"],
-      description: "開発者が勝手に作った勉強用・作業用BGMのプリセットプレイリストを表示し、聞きたいものを選択して再生することができます。",
+      description:
+        "開発者が勝手に作った勉強用・作業用BGMのプリセットプレイリストを表示し、聞きたいものを選択して再生することができます。",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: [],
       shouldDefer: true,
     });
   }
-  
-  async run(message: CommandMessage, options: CommandArgs){
+
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if(!(await options.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true))) return;
-    const url = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
-    if(options.server.hasSearchPanel(message.member.id)){
-      message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
+    if (
+      !(await options.server.joinVoiceChannel(
+        message,
+        /* reply */ false,
+        /* reply when failed */ true,
+      ))
+    )
+      return;
+    const url =
+      "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
+    if (options.server.hasSearchPanel(message.member.id)) {
+      message
+        .reply("✘既に開かれている検索窓があります")
+        .catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const searchPanel = options.server.createSearchPanel(message, "プリセットBGM一覧", true);
-    if(!searchPanel) return;
-    const result = await searchPanel.consumeSearchResult(ytpl.default(url, {
-      gl: "JP", hl: "ja"
-    }), ({items}) => items.map(item => ({
-      title: item.title,
-      author: item.author.name,
-      description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`,
-      duration: item.duration,
-      thumbnail: item.thumbnails[0].url,
-      url: item.url,
-    })));
-    if(result){
+    const searchPanel = options.server.createSearchPanel(
+      message,
+      "プリセットBGM一覧",
+      true,
+    );
+    if (!searchPanel) return;
+    const result = await searchPanel.consumeSearchResult(
+      ytpl.default(url, {
+        gl: "JP",
+        hl: "ja",
+      }),
+      ({items}) =>
+        items.map(item => ({
+          title: item.title,
+          author: item.author.name,
+          description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`,
+          duration: item.duration,
+          thumbnail: item.thumbnails[0].url,
+          url: item.url,
+        })),
+    );
+    if (result) {
       options.server.bindSearchPanel(searchPanel);
     }
   }

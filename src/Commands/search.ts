@@ -28,28 +28,34 @@ import { searchYouTube } from "../AudioSource";
 import { Util } from "../Util";
 
 export abstract class SearchBase<T> extends BaseCommand {
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
     options.server.joinVoiceChannel(message);
-    if(this.urlCheck(options.rawArgs)){
-      await options.server.playFromURL(message, options.args as string[], !options.server.player.isConnecting);
+    if (this.urlCheck(options.rawArgs)) {
+      await options.server.playFromURL(
+        message,
+        options.args as string[],
+        !options.server.player.isConnecting,
+      );
       return;
     }
-    if(options.server.hasSearchPanel(message.member.id)){
-      const responseMessage = await message.reply({
-        content: "✘既に開かれている検索窓があります",
-        components: [
-          new Helper.MessageActionRowBuilder()
-            .addComponents(
-              new Helper.MessageButtonBuilder()
-                .setCustomId(`cancel-search-${message.member.id}`)
-                .setLabel("以前の検索結果を破棄")
-                .setStyle("DANGER")
-            )
-            .toEris()
-        ]
-      }).catch(e => Util.logger.log(e, "error"));
-      if(responseMessage){
+    if (options.server.hasSearchPanel(message.member.id)) {
+      const responseMessage = await message
+        .reply({
+          content: "✘既に開かれている検索窓があります",
+          components: [
+            new Helper.MessageActionRowBuilder()
+              .addComponents(
+                new Helper.MessageButtonBuilder()
+                  .setCustomId(`cancel-search-${message.member.id}`)
+                  .setLabel("以前の検索結果を破棄")
+                  .setStyle("DANGER"),
+              )
+              .toEris(),
+          ],
+        })
+        .catch(e => Util.logger.log(e, "error"));
+      if (responseMessage) {
         options.server.getSearchPanel(message.member.id).once("destroy", () => {
           responseMessage.edit({
             components: [],
@@ -58,65 +64,84 @@ export abstract class SearchBase<T> extends BaseCommand {
       }
       return;
     }
-    if(options.rawArgs !== ""){
-      const searchPanel = options.server.createSearchPanel(message, options.rawArgs);
-      if(!searchPanel) return;
-      const result = await searchPanel.consumeSearchResult(this.searchContent(options.rawArgs), this.consumer);
-      if(result){
+    if (options.rawArgs !== "") {
+      const searchPanel = options.server.createSearchPanel(
+        message,
+        options.rawArgs,
+      );
+      if (!searchPanel) return;
+      const result = await searchPanel.consumeSearchResult(
+        this.searchContent(options.rawArgs),
+        this.consumer,
+      );
+      if (result) {
         options.server.bindSearchPanel(searchPanel);
       }
-    }else{
-      await message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));
+    } else {
+      await message
+        .reply("引数を指定してください")
+        .catch(e => Util.logger.log(e, "error"));
     }
   }
 
-  protected abstract searchContent(query: string): Promise<T|{result: T, transformedQuery: string}>;
+  protected abstract searchContent(
+    query: string,
+  ): Promise<T | {result: T; transformedQuery: string}>;
 
   protected abstract consumer(result: T): SongInfo[];
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected urlCheck(query: string){
+  protected urlCheck(query: string) {
     return false;
   }
 }
 
 export default class Search extends SearchBase<ytsr.Result> {
-  constructor(){
+  constructor() {
     super({
       name: "検索",
       alias: ["search", "se"],
-      description: "曲をYouTubeで検索します。直接URLを直接指定することもできます。",
+      description:
+        "曲をYouTubeで検索します。直接URLを直接指定することもできます。",
       unlist: false,
       category: "playlist",
       examples: "検索 夜に駆ける",
       usage: "検索 <キーワード>",
-      argument: [{
-        type: "string",
-        name: "keyword",
-        description: "検索したい動画のキーワードまたはURL。",
-        required: true
-      }],
+      argument: [
+        {
+          type: "string",
+          name: "keyword",
+          description: "検索したい動画のキーワードまたはURL。",
+          required: true,
+        },
+      ],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
     });
   }
 
-  protected override searchContent(query: string){
+  protected override searchContent(query: string) {
     return searchYouTube(query);
   }
 
-  protected override consumer({items}: ytsr.Result){
-    return items.map(item => item.type !== "video" ? null : {
-      url: item.url,
-      title: item.title,
-      duration: item.duration,
-      thumbnail: item.bestThumbnail.url,
-      author: item.author.name,
-      description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`
-    }).filter(n => n);
+  protected override consumer({items}: ytsr.Result) {
+    return items
+      .map(item =>
+        item.type !== "video"
+          ? null
+          : {
+              url: item.url,
+              title: item.title,
+              duration: item.duration,
+              thumbnail: item.bestThumbnail.url,
+              author: item.author.name,
+              description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`,
+            },
+      )
+      .filter(n => n);
   }
 
-  protected override urlCheck(query: string){
+  protected override urlCheck(query: string) {
     return query.startsWith("http://") || query.startsWith("https://");
   }
 }

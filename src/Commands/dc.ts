@@ -23,7 +23,7 @@ import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Dc extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       unlist: false,
       name: "切断",
@@ -35,15 +35,19 @@ export default class Dc extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
-    if(!options.server.player.isConnecting){
-      message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
+    if (!options.server.player.isConnecting) {
+      message
+        .reply("再生中ではありません")
+        .catch(e => Util.logger.log(e, "error"));
       return;
     }
     // 停止しま～す
     options.server.player.disconnect();
-    message.reply(":postbox: 正常に切断しました").catch(e => Util.logger.log(e, "error"));
+    message
+      .reply(":postbox: 正常に切断しました")
+      .catch(e => Util.logger.log(e, "error"));
   }
 }

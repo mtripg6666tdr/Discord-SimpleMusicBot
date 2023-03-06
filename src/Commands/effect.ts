@@ -24,7 +24,7 @@ import { Util } from "../Util";
 import { getCurrentEffectPanel } from "../Util/effect";
 
 export default class Effect extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "エフェクト",
       alias: ["effect", "音声エフェクト", "音声効果", "効果"],
@@ -36,20 +36,24 @@ export default class Effect extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    try{
-      const {embed, messageActions } = getCurrentEffectPanel(message.member.avatarURL, options.server);
+    try {
+      const {embed, messageActions} = getCurrentEffectPanel(
+        message.member.avatarURL,
+        options.server,
+      );
       const reply = await message.reply({
         content: "",
         embeds: [embed.toEris()],
-        components: [messageActions]
+        components: [messageActions],
       });
       setTimeout(() => reply.edit({components: []}), 5 * 60 * 1000).unref();
-    }
-    catch(e){
+    } catch (e) {
       Util.logger.log(e, "error");
-      message.reply(":cry:エラーが発生しました").catch(er => Util.logger.log(er, "error"));
+      message
+        .reply(":cry:エラーが発生しました")
+        .catch(er => Util.logger.log(er, "error"));
     }
   }
 }

@@ -23,11 +23,12 @@ import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Rmall extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "すべて削除",
       alias: ["rmall", "allrm", "removeall", "clear"],
-      description: "キュー内の曲をすべて削除します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
+      description:
+        "キュー内の曲をすべて削除します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "onlyListener", "dj"],
@@ -35,10 +36,12 @@ export default class Rmall extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
     options.server.player.disconnect();
     options.server.queue.removeAll();
-    await message.reply("✅すべて削除しました").catch(e => Util.logger.log(e, "error"));
+    await message
+      .reply("✅すべて削除しました")
+      .catch(e => Util.logger.log(e, "error"));
   }
 }

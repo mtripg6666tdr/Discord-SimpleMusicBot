@@ -30,7 +30,7 @@ type ytDlP = "ytDlP";
 const ytDlP: ytDlP = "ytDlP";
 
 export class ytDlPStrategy extends baseYoutubeDlStrategy<ytDlP> {
-  constructor(priority: number){
+  constructor(priority: number) {
     super(priority, ytDlP, ytDlPBinaryManager);
   }
 }

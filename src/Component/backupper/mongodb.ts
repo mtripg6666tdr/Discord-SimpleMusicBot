@@ -27,11 +27,10 @@ import { Backupper } from ".";
 import Util from "../../Util";
 
 const MongoClient = (() => {
-  try{
+  try {
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     return require("mongodb") as typeof import("mongodb");
-  }
-  catch{
+  } catch {
     return null;
   }
 })()?.MongoClient;
@@ -43,24 +42,33 @@ export class MongoBackupper extends Backupper {
   private dbConnectionReady = false;
   private dbError: Error = null;
   collections: {
-    status: mongo.Collection<Collectionate<exportableStatuses>>,
-    queue: mongo.Collection<Collectionate<YmxFormat>>,
+    status: mongo.Collection<Collectionate<exportableStatuses>>;
+    queue: mongo.Collection<Collectionate<YmxFormat>>;
   } = null;
 
-  static get backuppable(){
-    return process.env.GAS_URL && (process.env.GAS_URL.startsWith("mongodb://") || process.env.GAS_URL.startsWith("mongodb+srv://"));
+  static get backuppable() {
+    return (
+      process.env.GAS_URL &&
+      (process.env.GAS_URL.startsWith("mongodb://") ||
+        process.env.GAS_URL.startsWith("mongodb+srv://"))
+    );
   }
 
-  constructor(bot: MusicBotBase, getData: () => DataType){
+  constructor(bot: MusicBotBase, getData: () => DataType) {
     super(bot, getData);
     this.Log("Initializing Mongo DB backup server adapter...");
     this.client = new MongoClient(process.env.GAS_URL, {
-      appName: `mtripg6666tdr/Discord-SimpleMusicBot#${this.bot.version || "unknown"} MondoDB backup server adapter`,
+      appName: `mtripg6666tdr/Discord-SimpleMusicBot#${
+        this.bot.version || "unknown"
+      } MondoDB backup server adapter`,
     });
-    this.client.connect()
+    this.client
+      .connect()
       .then(() => {
         this.Log("Database connection ready");
-        const db = this.client.db(process.env.GAS_TOKEN || "discord_music_bot_backup");
+        const db = this.client.db(
+          process.env.GAS_TOKEN || "discord_music_bot_backup",
+        );
         this.collections = {
           status: db.collection<Collectionate<exportableStatuses>>("Status"),
           queue: db.collection<Collectionate<YmxFormat>>("Queue"),
@@ -71,79 +79,110 @@ export class MongoBackupper extends Backupper {
         this.Log(e, "error");
         this.Log("Database connection failed", "warn");
         this.dbError = e;
-      })
-    ;
+      });
     this.bot.on("beforeReady", () => {
       const backupStatusDebounceFunctions = Object.create(null);
       const backupStatusFuncFactory = (guildId: string) => {
-        return backupStatusDebounceFunctions[guildId] || (backupStatusDebounceFunctions[guildId] = debounce(5000, () => this.backupStatus(guildId)));
+        return (
+          backupStatusDebounceFunctions[guildId] ||
+          (backupStatusDebounceFunctions[guildId] = debounce(5000, () =>
+            this.backupStatus(guildId),
+          ))
+        );
       };
       const backupQueueDebounceFunctions = Object.create(null);
       const backupQueueFuncFactory = (guildId: string) => {
-        return backupQueueDebounceFunctions[guildId] || (backupQueueDebounceFunctions[guildId] = debounce(5000, () => this.backupQueue(guildId)));
+        return (
+          backupQueueDebounceFunctions[guildId] ||
+          (backupQueueDebounceFunctions[guildId] = debounce(5000, () =>
+            this.backupQueue(guildId),
+          ))
+        );
       };
       const setContainerEvent = (container: GuildDataContainer) => {
-        (["change", "changeWithoutCurrent"] as const).forEach(eventName => container.queue.on(eventName, backupQueueFuncFactory(container.guildId)));
-        container.queue.on("settingsChanged", backupStatusFuncFactory(container.guildId));
+        (["change", "changeWithoutCurrent"] as const).forEach(eventName =>
+          container.queue.on(
+            eventName,
+            backupQueueFuncFactory(container.guildId),
+          ),
+        );
+        container.queue.on(
+          "settingsChanged",
+          backupStatusFuncFactory(container.guildId),
+        );
         container.player.on("all", backupStatusFuncFactory(container.guildId));
       };
       this.data.forEach(setContainerEvent);
       this.bot.on("guildDataAdded", setContainerEvent);
-      this.bot.on("onBotVoiceChannelJoin", (channel) => backupStatusFuncFactory(channel.guild.id)());
+      this.bot.on("onBotVoiceChannelJoin", channel =>
+        backupStatusFuncFactory(channel.guild.id)(),
+      );
       this.Log("Hook was set up successfully");
     });
   }
 
-  async backupStatus(guildId: string){
-    if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
-    try{
+  async backupStatus(guildId: string) {
+    if (!MongoBackupper.backuppable || !this.dbConnectionReady) return;
+    try {
       this.Log(`Backing up status...(${guildId})`);
       const status = this.data.get(guildId).exportStatus();
-      await this.collections.status.updateOne({guildId}, {
-        "$set": {
-          guildId,
-          ...status
+      await this.collections.status.updateOne(
+        {guildId},
+        {
+          $set: {
+            guildId,
+            ...status,
+          },
         },
-      }, {
-        upsert: true,
-      });
-    }
-    catch(er){
+        {
+          upsert: true,
+        },
+      );
+    } catch (er) {
       this.Log(er, "error");
       this.Log("Something went wrong while backing up status");
     }
   }
 
-  backupQueue(guildId: string){
-    if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
-    try{
+  backupQueue(guildId: string) {
+    if (!MongoBackupper.backuppable || !this.dbConnectionReady) return;
+    try {
       const queue = this.data.get(guildId).exportQueue();
       this.Log(`Backing up queue...(${guildId})`);
-      this.collections.queue.updateOne({guildId}, {
-        "$set": {
-          guildId,
-          ...queue
+      this.collections.queue.updateOne(
+        {guildId},
+        {
+          $set: {
+            guildId,
+            ...queue,
+          },
         },
-      }, {
-        upsert: true,
-      });
-    }
-    catch(er){
+        {
+          upsert: true,
+        },
+      );
+    } catch (er) {
       this.Log(er, "error");
       this.Log("Something went wrong while backing up queue");
     }
   }
 
-  override async getStatusFromBackup(guildIds: string[]): Promise<Map<string, exportableStatuses>>{
-    if(!this.dbConnectionReady && !this.dbError) await Util.general.waitForEnteringState(() => this.dbConnectionReady || !!this.dbError, Infinity);
-    if(this.dbError){
+  override async getStatusFromBackup(
+    guildIds: string[],
+  ): Promise<Map<string, exportableStatuses>> {
+    if (!this.dbConnectionReady && !this.dbError)
+      await Util.general.waitForEnteringState(
+        () => this.dbConnectionReady || !!this.dbError,
+        Infinity,
+      );
+    if (this.dbError) {
       this.Log("Database connecting failed!!", "warn");
       return null;
     }
-    try{
+    try {
       const dbResult = this.collections.status.find({
-        "$or": guildIds.map(id => ({
-          guildId: id
+        $or: guildIds.map(id => ({
+          guildId: id,
         })),
       });
       const result = new Map<string, exportableStatuses>();
@@ -151,24 +190,29 @@ export class MongoBackupper extends Backupper {
         result.set(doc.guildId, doc);
       });
       return result;
-    }
-    catch(er){
+    } catch (er) {
       this.Log(er, "error");
       this.Log("Status restoring failed!", "error");
       return null;
     }
   }
 
-  override async getQueueDataFromBackup(guildids: string[]): Promise<Map<string, YmxFormat>>{
-    if(!this.dbConnectionReady && !this.dbError) await Util.general.waitForEnteringState(() => this.dbConnectionReady || !!this.dbError, Infinity);
-    if(this.dbError){
+  override async getQueueDataFromBackup(
+    guildids: string[],
+  ): Promise<Map<string, YmxFormat>> {
+    if (!this.dbConnectionReady && !this.dbError)
+      await Util.general.waitForEnteringState(
+        () => this.dbConnectionReady || !!this.dbError,
+        Infinity,
+      );
+    if (this.dbError) {
       this.Log("Database connecting failed!!", "warn");
       return null;
     }
-    try{
+    try {
       const dbResult = this.collections.queue.find({
-        "$or": guildids.map(id => ({
-          guildId: id
+        $or: guildids.map(id => ({
+          guildId: id,
         })),
       });
       const result = new Map<string, YmxFormat>();
@@ -176,15 +220,14 @@ export class MongoBackupper extends Backupper {
         result.set(doc.guildId, doc);
       });
       return result;
-    }
-    catch(er){
+    } catch (er) {
       this.Log(er, "error");
       this.Log("Queue restoring failed!", "error");
       return null;
     }
   }
 
-  async destroy(){
+  async destroy() {
     await this.client.close();
     this.collections = null;
   }

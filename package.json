@@ -71,7 +71,8 @@
     "start": "npm run build && npm run onlystart",
     "onlystart": "node util/exec dist",
     "build": "rimraf dist/ typings/ && tsc",
-    "lint": "eslint .",
+    "lint": "prettier --check . && eslint .",
+    "lint:fix": "prettier --write . && eslint --fix .",
     "cleanup": "rimraf dist/ typings/ logs/",
     "generatecommandlist": "node util/generateCommandList"
   },

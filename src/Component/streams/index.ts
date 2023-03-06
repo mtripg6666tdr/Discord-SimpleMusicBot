@@ -16,7 +16,12 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { ReadableStreamInfo, StreamInfo, StreamType, UrlStreamInfo } from "../../AudioSource";
+import type {
+  ReadableStreamInfo,
+  StreamInfo,
+  StreamType,
+  UrlStreamInfo,
+} from "../../AudioSource";
 import type { Readable } from "stream";
 
 import { opus } from "prism-media";
@@ -26,10 +31,10 @@ import Util from "../../Util";
 import { createPassThrough } from "../../Util/general";
 
 type PlayableStreamInfo = {
-  cost: number,
-  streams: Readable[],
-  stream: Readable,
-  streamType: StreamType,
+  cost: number;
+  streams: Readable[];
+  stream: Readable;
+  streamType: StreamType;
 };
 
 /*
@@ -55,49 +60,91 @@ so we decided to pass the strean if it is just Webm/Opus stream.
  * @param volumeTransform whether volume transform is required
  * @returns if volume transform is required, this will return a stream info that represents Ogg/Webm Opus, otherwise return a stream info represents PCM Opus.
  */
-export function resolveStreamToPlayable(streamInfo: StreamInfo, effects: string[], seek: number, volumeTransform: boolean, bitrate: number): PlayableStreamInfo{
+export function resolveStreamToPlayable(
+  streamInfo: StreamInfo,
+  effects: string[],
+  seek: number,
+  volumeTransform: boolean,
+  bitrate: number,
+): PlayableStreamInfo {
   const effectEnabled = effects.length !== 0;
-  if(streamInfo.streamType === "webm" && seek <= 0 && !effectEnabled && !volumeTransform){
+  if (
+    streamInfo.streamType === "webm" &&
+    seek <= 0 &&
+    !effectEnabled &&
+    !volumeTransform
+  ) {
     // 1. effect is off, volume is off, stream is webm
     // Webm --(Demuxer)--> Opus
     //                1
     // Total: 1
-    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType}) (no conversion/cost: 1)`);
-    const info = streamInfo.type === "url" ? convertStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
+    Util.logger.log(
+      `[StreamResolver] stream edges: raw(${streamInfo.streamType}) (no conversion/cost: 1)`,
+    );
+    const info =
+      streamInfo.type === "url"
+        ? convertStreamInfoToReadableStreamInfo(streamInfo)
+        : streamInfo;
     return {
       stream: info.stream,
       streamType: "webm",
       cost: 1,
       streams: [info.stream],
     };
-  }else if(!volumeTransform){
+  } else if (!volumeTransform) {
     // 2. volume is off and stream is unknown
     // Unknown --(FFmpeg)--> Webm/Opus or Webm/Vorbis --(Demuxer)--> Opus
     //               2                      1
     // Total: 3
-    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Webm/Opus (cost: 3)`);
-    const info = seek > 0 || (streamInfo.type === "url" && streamInfo.url.split("?")[0].endsWith(".m3u8")) ? streamInfo : convertStreamInfoToReadableStreamInfo(streamInfo);
+    Util.logger.log(
+      `[StreamResolver] stream edges: raw(${
+        streamInfo.streamType || "unknown"
+      }) --(FFmpeg)--> Webm/Opus (cost: 3)`,
+    );
+    const info =
+      seek > 0 ||
+      (streamInfo.type === "url" &&
+        streamInfo.url.split("?")[0].endsWith(".m3u8"))
+        ? streamInfo
+        : convertStreamInfoToReadableStreamInfo(streamInfo);
     const ffmpeg = transformThroughFFmpeg(info, bitrate, effects, seek, "webm");
     const passThrough = createPassThrough();
     ffmpeg
       .on("error", e => destroyStream(passThrough, e))
       .pipe(passThrough)
-      .once("close", () => destroyStream(ffmpeg))
-    ;
+      .once("close", () => destroyStream(ffmpeg));
     return {
       stream: passThrough,
       streamType: "webm",
       cost: 3,
-      streams: [streamInfo.type === "readable" ? streamInfo.stream : undefined, ffmpeg, passThrough].filter(d => d),
+      streams: [
+        streamInfo.type === "readable" ? streamInfo.stream : undefined,
+        ffmpeg,
+        passThrough,
+      ].filter(d => d),
     };
-  }else if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && !effectEnabled && seek <= 0){
+  } else if (
+    (streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") &&
+    !effectEnabled &&
+    seek <= 0
+  ) {
     // 3. volume is on and stream is webm or ogg
     // Webm/Ogg --(Demuxer)--> Opus --(Decoder)--> PCM --(VolumeTransformer)--> PCM --(Encoder)--> Opus
     //                1                  1.5                    0.5                      1.5
     // Total: 4.5
-    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(Demuxer)--(Decoder) --> PCM (cost: 4.5)`);
-    const rawStream = streamInfo.type === "url" ? convertStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
-    const demuxer = streamInfo.streamType === "webm" ? new opus.WebmDemuxer() : new opus.OggDemuxer();
+    Util.logger.log(
+      `[StreamResolver] stream edges: raw(${
+        streamInfo.streamType || "unknown"
+      }) --(Demuxer)--(Decoder) --> PCM (cost: 4.5)`,
+    );
+    const rawStream =
+      streamInfo.type === "url"
+        ? convertStreamInfoToReadableStreamInfo(streamInfo)
+        : streamInfo;
+    const demuxer =
+      streamInfo.streamType === "webm"
+        ? new opus.WebmDemuxer()
+        : new opus.OggDemuxer();
     const decoder = new opus.Decoder({
       rate: 48000,
       channels: 2,
@@ -113,62 +160,82 @@ export function resolveStreamToPlayable(streamInfo: StreamInfo, effects: string[
       .on("error", e => destroyStream(passThrough, e))
       .once("close", () => destroyStream(demuxer))
       .pipe(passThrough)
-      .once("close", () => destroyStream(decoder))
-    ;
+      .once("close", () => destroyStream(decoder));
     return {
       stream: passThrough,
       streamType: "pcm",
       cost: 4.5,
       streams: [rawStream.stream, demuxer, decoder, passThrough],
     };
-  }else{
+  } else {
     // 4. volume is on and stream is unknown
     // Unknown --(FFmpeg)--> PCM --(VolumeTransformer)--> PCM --(Encoder)--> Opus
     //              2                     0.5                      1.5
     // Total: 5
-    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM (cost: 5)`);
-    const info = seek > 0 ? streamInfo : convertStreamInfoToReadableStreamInfo(streamInfo);
-    const ffmpegPCM = transformThroughFFmpeg(info, bitrate, effects, seek, "pcm");
+    Util.logger.log(
+      `[StreamResolver] stream edges: raw(${
+        streamInfo.streamType || "unknown"
+      }) --(FFmpeg) --> PCM (cost: 5)`,
+    );
+    const info =
+      seek > 0 ? streamInfo : convertStreamInfoToReadableStreamInfo(streamInfo);
+    const ffmpegPCM = transformThroughFFmpeg(
+      info,
+      bitrate,
+      effects,
+      seek,
+      "pcm",
+    );
     const passThrough = createPassThrough();
     ffmpegPCM
       .on("error", e => destroyStream(passThrough, e))
       .pipe(passThrough)
-      .once("close", () => destroyStream(ffmpegPCM))
-    ;
+      .once("close", () => destroyStream(ffmpegPCM));
     return {
       stream: passThrough,
       streamType: "pcm",
       cost: 5,
-      streams: [streamInfo.type === "readable" ? streamInfo.stream : undefined, ffmpegPCM, passThrough].filter(d => d),
+      streams: [
+        streamInfo.type === "readable" ? streamInfo.stream : undefined,
+        ffmpegPCM,
+        passThrough,
+      ].filter(d => d),
     };
   }
 }
 
-function convertStreamInfoToReadableStreamInfo(streamInfo: UrlStreamInfo|ReadableStreamInfo): ReadableStreamInfo{
-  if(streamInfo.type === "readable"){
+function convertStreamInfoToReadableStreamInfo(
+  streamInfo: UrlStreamInfo | ReadableStreamInfo,
+): ReadableStreamInfo {
+  if (streamInfo.type === "readable") {
     return streamInfo;
   }
   return {
     type: "readable",
-    stream: Util.web.DownloadAsReadable(streamInfo.url, streamInfo.userAgent ? {
-      headers: {
-        "User-Agent": streamInfo.userAgent
-      }
-    } : {}),
+    stream: Util.web.DownloadAsReadable(
+      streamInfo.url,
+      streamInfo.userAgent
+        ? {
+            headers: {
+              "User-Agent": streamInfo.userAgent,
+            },
+          }
+        : {},
+    ),
     streamType: streamInfo.streamType,
   };
 }
 
-export function destroyStream(stream: Readable, error?: Error){
-  if(!stream.destroyed){
+export function destroyStream(stream: Readable, error?: Error) {
+  if (!stream.destroyed) {
     // if stream._destroy was overwritten, callback might not be called so make sure to be called.
     const originalDestroy = stream._destroy;
-    stream._destroy = function(er, callback){
+    stream._destroy = function (er, callback) {
       originalDestroy.apply(this, [er, () => {}]);
       callback.apply(this, [er]);
     };
     stream.destroy(error);
-  }else if(error){
+  } else if (error) {
     stream.emit("error", error);
   }
 }

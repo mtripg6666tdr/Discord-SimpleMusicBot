@@ -29,16 +29,16 @@ export class Streamable extends AudioSource {
   Thumbnail = DefaultAudioThumbnailURL;
   private streamUrl = "";
 
-  async init(url: string, prefetched?: exportableStreamable){
+  async init(url: string, prefetched?: exportableStreamable) {
     this.Url = url;
     const id = StreamableApi.getVideoId(url);
-    if(!id) throw new Error("Invalid streamable url");
-    if(prefetched){
+    if (!id) throw new Error("Invalid streamable url");
+    if (prefetched) {
       this._lengthSeconds = prefetched.length;
       this.Thumbnail = prefetched.thumbnail;
       this.Title = prefetched.title;
       this.streamUrl = prefetched.streamUrl;
-    }else{
+    } else {
       const streamInfo = await StreamableApi.getVideoDetails(id);
       this._lengthSeconds = Math.floor(streamInfo.files["mp4-mobile"].duration);
       this.Thumbnail = "https:" + streamInfo.thumbnail_url;
@@ -48,39 +48,44 @@ export class Streamable extends AudioSource {
     return this;
   }
 
-  async fetch(): Promise<UrlStreamInfo>{
+  async fetch(): Promise<UrlStreamInfo> {
     return {
       type: "url",
-      url: this.streamUrl
+      url: this.streamUrl,
     };
   }
 
-  toField(){
-    return [{
-      name: ":link:URL",
-      value: this.Url
-    }, {
-      name: ":asterisk:詳細",
-      value: "Streamableにて共有されたファイル"
-    }] as EmbedField[];
+  toField() {
+    return [
+      {
+        name: ":link:URL",
+        value: this.Url,
+      },
+      {
+        name: ":asterisk:詳細",
+        value: "Streamableにて共有されたファイル",
+      },
+    ] as EmbedField[];
   }
 
-  npAdditional(){return "";}
+  npAdditional() {
+    return "";
+  }
 
-  exportData(): exportableStreamable{
+  exportData(): exportableStreamable {
     return {
       url: this.Url,
       length: this.LengthSeconds,
       thumbnail: this.Thumbnail,
       title: this.Title,
-      streamUrl: this.streamUrl
+      streamUrl: this.streamUrl,
     };
   }
 }
 
 export type exportableStreamable = exportableCustom & {
-  thumbnail: string,
-  streamUrl: string,
+  thumbnail: string;
+  streamUrl: string;
 };
 
 /**
@@ -92,18 +97,20 @@ export abstract class StreamableApi {
    * @param url 動画のURL
    * @returns 動画のID
    */
-  static getVideoId(url: string): string{
+  static getVideoId(url: string): string {
     const match = url.match(/^https?:\/\/streamable.com\/(?<Id>.+)$/);
-    if(match){
+    if (match) {
       return match.groups.Id;
-    }else{
+    } else {
       return null;
     }
   }
 
-  static async getVideoDetails(id: string): Promise<StreamableAPIResult>{
+  static async getVideoDetails(id: string): Promise<StreamableAPIResult> {
     const BASE_API = "https://api.streamable.com/videos/";
-    return JSON.parse(await Util.web.DownloadText(BASE_API + id)) as StreamableAPIResult;
+    return JSON.parse(
+      await Util.web.DownloadText(BASE_API + id),
+    ) as StreamableAPIResult;
   }
 }
 
@@ -125,9 +132,9 @@ export interface StreamableAPIResult {
 }
 
 interface Files {
-  mp4: Mp4;
+  "mp4": Mp4;
   "mp4-mobile": Mp4;
-  original: Mp4;
+  "original": Mp4;
 }
 
 interface Mp4 {

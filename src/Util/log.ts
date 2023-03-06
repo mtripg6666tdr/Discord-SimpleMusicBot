@@ -23,20 +23,22 @@ import { isMainThread } from "worker_threads";
 import config from "./config";
 import { StringifyObject } from "./general";
 
-export type LogLevels = "log"|"warn"|"error"|"debug";
+export type LogLevels = "log" | "warn" | "error" | "debug";
 export type LoggerType = (content: string, level?: LogLevels) => void;
 
 class LogStore {
   private readonly loggingStream = null as fs.WriteStream;
   private destroyed = false;
-  
-  constructor(){
-    if(config.debug && isMainThread){
+
+  constructor() {
+    if (config.debug && isMainThread) {
       const dirPath = "../../logs";
-      if(!fs.existsSync(path.join(__dirname, dirPath))){
+      if (!fs.existsSync(path.join(__dirname, dirPath))) {
         fs.mkdirSync(path.join(__dirname, dirPath));
       }
-      this.loggingStream = fs.createWriteStream(path.join(__dirname, `${dirPath}/log-${Date.now()}.log`));
+      this.loggingStream = fs.createWriteStream(
+        path.join(__dirname, `${dirPath}/log-${Date.now()}.log`),
+      );
     }
   }
 
@@ -44,41 +46,50 @@ class LogStore {
   maxLength = 30;
 
   private readonly _data: string[] = [];
-  get data(): Readonly<LogStore["_data"]>{
+  get data(): Readonly<LogStore["_data"]> {
     return this._data;
   }
-  
+
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  addLog(level: LogLevels, log: string){
-    if(this.destroyed) return;
-    if(level !== "debug"){
+  addLog(level: LogLevels, log: string) {
+    if (this.destroyed) return;
+    if (level !== "debug") {
       this._data.push(`${level[0].toUpperCase()}:${log}`);
-      if(this.data.length > this.maxLength){
+      if (this.data.length > this.maxLength) {
         this._data.shift();
       }
     }
-    if(typeof log !== "string"){
+    if (typeof log !== "string") {
       log = StringifyObject(log);
     }
-    if(this.loggingStream && !this.loggingStream.destroyed){
-      this.loggingStream.write(Buffer.from(`${{
-        "log": "INFO ",
-        "warn": "WARN ",
-        "error": "ERROR",
-        "debug": "DEBUG",
-      }[level]} ${new Date().toISOString()} ${log
-        .replace(/\r\n/g, "\r")
-        .replace(/\r/g, "\n")
-        .replace(/\n/g, "<br>")
-      }\r\n`));
+    if (this.loggingStream && !this.loggingStream.destroyed) {
+      this.loggingStream.write(
+        Buffer.from(
+          `${
+            {
+              log: "INFO ",
+              warn: "WARN ",
+              error: "ERROR",
+              debug: "DEBUG",
+            }[level]
+          } ${new Date().toISOString()} ${log
+            .replace(/\r\n/g, "\r")
+            .replace(/\r/g, "\n")
+            .replace(/\n/g, "<br>")}\r\n`,
+        ),
+      );
     }
   }
 
-  destroy(){
-    if(!this || this.destroyed) return;
+  destroy() {
+    if (!this || this.destroyed) return;
     this.destroyed = true;
-    if(this.loggingStream && !this.loggingStream.destroyed){
-      this.loggingStream.write(Buffer.from(`INFO  ${new Date().toISOString()} [Logger] detect process exiting, closing stream...`));
+    if (this.loggingStream && !this.loggingStream.destroyed) {
+      this.loggingStream.write(
+        Buffer.from(
+          `INFO  ${new Date().toISOString()} [Logger] detect process exiting, closing stream...`,
+        ),
+      );
       this.loggingStream.destroy();
     }
   }
@@ -86,13 +97,13 @@ class LogStore {
 
 export const logStore = new LogStore();
 
-export function log(content: any, level: LogLevels = "log"){
-  if(content instanceof Error) console[level](content);
+export function log(content: any, level: LogLevels = "log") {
+  if (content instanceof Error) console[level](content);
   const text = StringifyObject(content);
-  if(!logStore.log && level === "log") return;
-  if(text.length < 200){
+  if (!logStore.log && level === "log") return;
+  if (text.length < 200) {
     console[level](text);
-  }else{
+  } else {
     console.warn("[Logger] truncated; see log file if in debug mode");
   }
   logStore.addLog(level, text);

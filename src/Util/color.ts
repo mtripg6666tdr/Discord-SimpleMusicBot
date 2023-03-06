@@ -17,23 +17,23 @@
  */
 
 const cmap = {
-  "COMMAND": 0xE9506A,
-  "HELP": 0x4898F0,
-  "SEARCH": 0x60F246,
-  "NP": 0xBC42F7,
-  "QUEUE": 0xF4BCFC,
-  "UPTIME": 0xD3FEFE,
-  "SONG_ADDED": 0x77EAC8,
-  "LYRIC": 0xE4F004,
-  "AUTO_NP": 0xC4F74D,
-  "PLAYLIST_COMPLETED": 0xF152DA,
-  "THUMB": 0xBEEF16,
-  "RELATIVE_SETUP": 0xFD0202,
-  "EFFECT": 0xCCFFCC,
-  "EQUALLY": 0xF8D53E,
+  COMMAND: 0xe9506a,
+  HELP: 0x4898f0,
+  SEARCH: 0x60f246,
+  NP: 0xbc42f7,
+  QUEUE: 0xf4bcfc,
+  UPTIME: 0xd3fefe,
+  SONG_ADDED: 0x77eac8,
+  LYRIC: 0xe4f004,
+  AUTO_NP: 0xc4f74d,
+  PLAYLIST_COMPLETED: 0xf152da,
+  THUMB: 0xbeef16,
+  RELATIVE_SETUP: 0xfd0202,
+  EFFECT: 0xccffcc,
+  EQUALLY: 0xf8d53e,
 } as const;
 
-export function getColor(key: colorkey): number{
+export function getColor(key: colorkey): number {
   return cmap[key];
 }
 

@@ -24,7 +24,11 @@ import type { EmbedField } from "eris";
 
 import * as ytdl from "ytdl-core";
 
-import { attemptGetInfoForStrategies, attemptFetchForStrategies, strategies } from "./strategies";
+import {
+  attemptGetInfoForStrategies,
+  attemptFetchForStrategies,
+  strategies,
+} from "./strategies";
 import { ytdlCore } from "./strategies/ytdl-core";
 import { Util } from "../../Util";
 import { SecondaryUserAgent } from "../../Util/ua";
@@ -48,49 +52,54 @@ export class YouTube extends AudioSource {
   upcomingTimestamp: string = null;
   logger: LoggerType;
 
-  constructor(logger?: typeof YouTube.prototype.logger){
+  constructor(logger?: typeof YouTube.prototype.logger) {
     super();
     this.logger = logger || Util.logger.log.bind(Util.logger);
   }
 
-  get IsFallbacked(){
+  get IsFallbacked() {
     return this.fallback;
   }
 
-  get IsCached(){
+  get IsCached() {
     return !!this.cache;
   }
 
-  get availableAfter(){
+  get availableAfter() {
     return this.upcomingTimestamp;
   }
 
-  async init(url: string, prefetched: exportableYouTube, forceCache?: boolean){
+  async init(url: string, prefetched: exportableYouTube, forceCache?: boolean) {
     this.Url = "https://www.youtube.com/watch?v=" + ytdl.getVideoID(url);
-    if(prefetched){
+    if (prefetched) {
       this.importData(prefetched);
-    }else{
-      const { result, resolved } = await attemptGetInfoForStrategies(this.logger, url);
+    } else {
+      const {result, resolved} = await attemptGetInfoForStrategies(
+        this.logger,
+        url,
+      );
 
       // check if fallbacked
       this.fallback = resolved !== 0;
 
       // check if upcoming
-      const videoDetails = "videoDetails" in result.cache.data && result.cache.data.videoDetails;
-      if(
-        videoDetails
-        && videoDetails.liveBroadcastDetails
-        && videoDetails.liveBroadcastDetails.startTimestamp
-        && !videoDetails.liveBroadcastDetails.isLiveNow
-        && !videoDetails.liveBroadcastDetails.endTimestamp
-      ){
-        this.upcomingTimestamp = videoDetails.liveBroadcastDetails.startTimestamp;
-      }else{
+      const videoDetails =
+        "videoDetails" in result.cache.data && result.cache.data.videoDetails;
+      if (
+        videoDetails &&
+        videoDetails.liveBroadcastDetails &&
+        videoDetails.liveBroadcastDetails.startTimestamp &&
+        !videoDetails.liveBroadcastDetails.isLiveNow &&
+        !videoDetails.liveBroadcastDetails.endTimestamp
+      ) {
+        this.upcomingTimestamp =
+          videoDetails.liveBroadcastDetails.startTimestamp;
+      } else {
         this.upcomingTimestamp = null;
       }
 
       // store data as cache if requested
-      if(forceCache) this.cache = result.cache;
+      if (forceCache) this.cache = result.cache;
 
       // import data to the current instance
       this.importData(result.data);
@@ -98,50 +107,71 @@ export class YouTube extends AudioSource {
     return this;
   }
 
-  async fetch(forceUrl?: boolean): Promise<StreamInfo>{
-    const { result, resolved } = await attemptFetchForStrategies(this.logger, this.Url, forceUrl, this.cache);
+  async fetch(forceUrl?: boolean): Promise<StreamInfo> {
+    const {result, resolved} = await attemptFetchForStrategies(
+      this.logger,
+      this.Url,
+      forceUrl,
+      this.cache,
+    );
     this.fallback = resolved !== 0;
     // store related videos
     this.relatedVideos = result.relatedVideos;
     this.importData(result.info);
-    if(forceUrl) this.logger("[AudioSource:youtube]Returning a url instead of stream");
+    if (forceUrl)
+      this.logger("[AudioSource:youtube]Returning a url instead of stream");
     return result.stream;
   }
 
-  async fetchVideo(){
-    let info = (this.cache?.type === ytdlCore && this.cache.data as ytdl.videoInfo) || null;
-    if(!info) info = await (strategies[0] as ytdlCoreStrategy).getInfo(this.Url).then(result => (this.cache = result.cache).data);
-    const isLive = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
+  async fetchVideo() {
+    let info =
+      (this.cache?.type === ytdlCore && (this.cache.data as ytdl.videoInfo)) ||
+      null;
+    if (!info)
+      info = await (strategies[0] as ytdlCoreStrategy)
+        .getInfo(this.Url)
+        .then(result => (this.cache = result.cache).data);
+    const isLive =
+      info.videoDetails.liveBroadcastDetails &&
+      info.videoDetails.liveBroadcastDetails.isLiveNow;
     const format = ytdl.chooseFormat(info.formats, {
       quality: isLive ? null : "highestvideo",
-      isHLS: isLive
+      isHLS: isLive,
     } as ytdl.chooseFormatOptions);
-    const { url } = format;
+    const {url} = format;
     return {
       url,
-      ua
+      ua,
     };
   }
 
-  toField(verbose: boolean = false){
+  toField(verbose: boolean = false) {
     const fields = [] as EmbedField[];
-    fields.push({
-      name: ":cinema:チャンネル名",
-      value: this.ChannelUrl ? `[${this.ChannelName}](${this.ChannelUrl})` : this.ChannelName,
-      inline: false
-    }, {
-      name: ":asterisk:概要",
-      value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, verbose ? 1000 : 300) + "..." : this.Description || "*概要欄なし*",
-      inline: false
-    });
+    fields.push(
+      {
+        name: ":cinema:チャンネル名",
+        value: this.ChannelUrl
+          ? `[${this.ChannelName}](${this.ChannelUrl})`
+          : this.ChannelName,
+        inline: false,
+      },
+      {
+        name: ":asterisk:概要",
+        value:
+          this.Description.length > (verbose ? 1000 : 350)
+            ? this.Description.substring(0, verbose ? 1000 : 300) + "..."
+            : this.Description || "*概要欄なし*",
+        inline: false,
+      },
+    );
     return fields;
   }
 
-  npAdditional(){
+  npAdditional() {
     return "\r\nチャンネル名:`" + this.ChannelName + "`";
   }
 
-  exportData(): exportableYouTube{
+  exportData(): exportableYouTube {
     return {
       url: this.Url,
       title: this.Title,
@@ -154,7 +184,7 @@ export class YouTube extends AudioSource {
     };
   }
 
-  private importData(exportable: exportableYouTube){
+  private importData(exportable: exportableYouTube) {
     this.Title = exportable.title;
     this.Description = exportable.description || "";
     this._lengthSeconds = exportable.isLive ? NaN : exportable.length;
@@ -164,18 +194,18 @@ export class YouTube extends AudioSource {
     this.LiveStream = exportable.isLive;
   }
 
-  disableCache(){
+  disableCache() {
     this.cache = null;
   }
 }
 
 export type exportableYouTube = {
-  url: string,
-  title: string,
-  description: string,
-  length: number,
-  channel: string,
-  channelUrl: string,
-  thumbnail: string,
-  isLive: boolean,
+  url: string;
+  title: string;
+  description: string;
+  length: number;
+  channel: string;
+  channelUrl: string;
+  thumbnail: string;
+  isLive: boolean;
 };

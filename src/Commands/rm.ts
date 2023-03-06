@@ -23,7 +23,7 @@ import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Rm extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "削除",
       alias: ["消去", "remove", "rm", "del", "delete"],
@@ -32,23 +32,28 @@ export default class Rm extends BaseCommand {
       category: "playlist",
       examples: "rm 5",
       usage: "削除 <削除する位置>",
-      argument: [{
-        type: "string",
-        name: "index",
-        description: "削除するインデックスはキューに併記されているものです。ハイフンを使って2-5のように範囲指定したり、スペースを使って1 4 8のように複数指定することも可能です。",
-        required: true
-      }],
+      argument: [
+        {
+          type: "string",
+          name: "index",
+          description:
+            "削除するインデックスはキューに併記されているものです。ハイフンを使って2-5のように範囲指定したり、スペースを使って1 4 8のように複数指定することも可能です。",
+          required: true,
+        },
+      ],
       requiredPermissionsOr: [],
       shouldDefer: false,
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    if(options.args.length === 0){
-      message.reply("引数に消去する曲のオフセット(番号)を入力してください。").catch(e => Util.logger.log(e, "error"));
+  async run(message: CommandMessage, options: CommandArgs) {
+    if (options.args.length === 0) {
+      message
+        .reply("引数に消去する曲のオフセット(番号)を入力してください。")
+        .catch(e => Util.logger.log(e, "error"));
       return;
     }
-    if(options.args.includes("0") && options.server.player.isPlaying){
+    if (options.args.includes("0") && options.server.player.isPlaying) {
       message.reply("現在再生中の楽曲を削除することはできません。");
       return;
     }
@@ -57,29 +62,33 @@ export default class Rm extends BaseCommand {
     const addition = [] as number[];
     options.args.forEach(o => {
       let match = o.match(/^(?<from>[0-9]+)-(?<to>[0-9]+)$/);
-      if(match){
+      if (match) {
         const from = Number(match.groups.from);
         const to = Number(match.groups.to);
-        if(!isNaN(from) && !isNaN(to) && from <= to){
-          for(let i = from; i <= to; i++){
+        if (!isNaN(from) && !isNaN(to) && from <= to) {
+          for (let i = from; i <= to; i++) {
             addition.push(i);
           }
         }
-      }else{
+      } else {
         match = o.match(/^(?<from>[0-9]+)-$/);
-        if(match){
+        if (match) {
           const from = Number(match.groups.from);
-          if(!isNaN(from)){
-            for(let i = from; i < q.length; i++){
+          if (!isNaN(from)) {
+            for (let i = from; i < q.length; i++) {
               addition.push(i);
             }
           }
-        }else{
+        } else {
           match = o.match(/^-(?<to>[0-9]+)$/);
-          if(match){
+          if (match) {
             const to = Number(match.groups.to);
-            if(!isNaN(to)){
-              for(let i = (options.server.player.isPlaying ? 1 : 0); i <= to; i++){
+            if (!isNaN(to)) {
+              for (
+                let i = options.server.player.isPlaying ? 1 : 0;
+                i <= to;
+                i++
+              ) {
                 addition.push(i);
               }
             }
@@ -93,37 +102,53 @@ export default class Rm extends BaseCommand {
         indexes
           .map(str => Number(str))
           .filter(n => !isNaN(n))
-          .sort((a, b) => b - a)
-      )
+          .sort((a, b) => b - a),
+      ),
     );
     const actualDeleted = [] as number[];
     const failed = [] as number[];
     let firstItemTitle = null;
-    for(let i = 0; i < dels.length; i++){
+    for (let i = 0; i < dels.length; i++) {
       const item = q.get(dels[i]);
-      if(
-        Util.eris.user.isDJ(message.member, options)
-        || item.additionalInfo.addedBy.userId === message.member.id
-        || !Util.eris.channel.getVoiceMember(options).has(item.additionalInfo.addedBy.userId)
-        || Util.eris.channel.isOnlyListener(message.member, options)
-        || Util.eris.user.isPrivileged(message.member)
-      ){
+      if (
+        Util.eris.user.isDJ(message.member, options) ||
+        item.additionalInfo.addedBy.userId === message.member.id ||
+        !Util.eris.channel
+          .getVoiceMember(options)
+          .has(item.additionalInfo.addedBy.userId) ||
+        Util.eris.channel.isOnlyListener(message.member, options) ||
+        Util.eris.user.isPrivileged(message.member)
+      ) {
         q.removeAt(dels[i]);
         actualDeleted.push(dels[i]);
-        if(actualDeleted.length === 1){
+        if (actualDeleted.length === 1) {
           firstItemTitle = item.basicInfo.Title;
         }
-      }else{
+      } else {
         failed.push(dels[i]);
       }
     }
-    if(actualDeleted.length > 0){
+    if (actualDeleted.length > 0) {
       const title = actualDeleted.length === 1 ? firstItemTitle : null;
       const resultStr = actualDeleted.sort((a, b) => a - b).join(",");
       const failedStr = failed.sort((a, b) => a - b).join(",");
-      message.reply(`🚮${resultStr.length > 100 ? "指定された" : `${resultStr}番目の`}曲${title ? ("(`" + title + "`)") : ""}を削除しました${failed.length > 0 ? `\r\n:warning:${failed.length > 100 ? "一部" : `${failedStr}番目`}の曲は権限がないため削除できませんでした。` : ""}`).catch(e => Util.logger.log(e, "error"));
-    }else{
-      message.reply("削除できませんでした。権限が不足している可能性があります。").catch(e => Util.logger.log(e, "error"));
+      message
+        .reply(
+          `🚮${resultStr.length > 100 ? "指定された" : `${resultStr}番目の`}曲${
+            title ? "(`" + title + "`)" : ""
+          }を削除しました${
+            failed.length > 0
+              ? `\r\n:warning:${
+                  failed.length > 100 ? "一部" : `${failedStr}番目`
+                }の曲は権限がないため削除できませんでした。`
+              : ""
+          }`,
+        )
+        .catch(e => Util.logger.log(e, "error"));
+    } else {
+      message
+        .reply("削除できませんでした。権限が不足している可能性があります。")
+        .catch(e => Util.logger.log(e, "error"));
     }
   }
 }

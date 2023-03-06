@@ -40,38 +40,40 @@ const GuildBGMContainer = Type.Object({
 });
 
 const Config = Type.Object({
-  adminId: Type.Union([
-    Type.RegEx(/^\d+$/),
-    Type.Array(Type.RegEx(/^\d+$/)),
-    Type.Null(),
-  ], {default: false}),
+  adminId: Type.Union(
+    [Type.RegEx(/^\d+$/), Type.Array(Type.RegEx(/^\d+$/)), Type.Null()],
+    {default: false},
+  ),
   debug: Type.Boolean({default: false}),
-  errorChannel: Type.Union([
-    Type.RegEx(/^\d+$/),
-    Type.Null(),
-  ], {default: null}),
+  errorChannel: Type.Union([Type.RegEx(/^\d+$/), Type.Null()], {default: null}),
   maintenance: Type.Boolean(),
-  proxy: Type.Union([
-    Type.RegEx(/^https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+$/),
-    Type.Null(),
-  ], {default: null}),
+  proxy: Type.Union(
+    [Type.RegEx(/^https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+$/), Type.Null()],
+    {default: null},
+  ),
   prefix: Type.Optional(Type.String({minLength: 1, default: ">"})),
   webserver: Type.Optional(Type.Boolean({default: true})),
-  bgm: Type.Optional(Type.Record(Type.RegEx(/^\d+$/), GuildBGMContainer, {default: {}})),
+  bgm: Type.Optional(
+    Type.Record(Type.RegEx(/^\d+$/), GuildBGMContainer, {default: {}}),
+  ),
   noMessageContent: Type.Optional(Type.Boolean({default: false})),
-  twentyFourSeven: Type.Optional(Type.Array(Type.RegEx(/^\d+$/), {default: []})),
+  twentyFourSeven: Type.Optional(
+    Type.Array(Type.RegEx(/^\d+$/), {default: []}),
+  ),
   alwaysTwentyFourSeven: Type.Optional(Type.Boolean({default: false})),
   disabledSources: Type.Optional(Type.Array(Type.String(), {default: []})),
 });
 
 const checker = TypeCompiler.Compile(Config);
 
-const rawConfig = fs.readFileSync(path.join(__dirname, "../../config.json"), {encoding: "utf-8"});
+const rawConfig = fs.readFileSync(path.join(__dirname, "../../config.json"), {
+  encoding: "utf-8",
+});
 
 const config = CJSON.parse(rawConfig, null, true);
 
 const errs = [...checker.Errors(config)];
-if(errs.length > 0){
+if (errs.length > 0) {
   const er = new Error("Invalid config.json");
   console.log(errs);
   Object.defineProperty(er, "errors", {
@@ -80,9 +82,13 @@ if(errs.length > 0){
   throw er;
 }
 
-if(typeof config !== "object" || !("debug" in config) || !config.debug){
-  console.error("This is still a development phase, and running without debug mode is currently disabled.");
-  console.error("You should use the latest version instead of the current branch.");
+if (typeof config !== "object" || !("debug" in config) || !config.debug) {
+  console.error(
+    "This is still a development phase, and running without debug mode is currently disabled.",
+  );
+  console.error(
+    "You should use the latest version instead of the current branch.",
+  );
   process.exit(1);
 }
 

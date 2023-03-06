@@ -26,25 +26,35 @@ import miniget from "miniget";
 import { Strategy } from "./base";
 import { Util } from "../../../Util";
 
-export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, YoutubeDlInfo>, YoutubeDlInfo> {
-  constructor(priority: number, protected id: T, protected binaryManager: BinaryManager){
+export class baseYoutubeDlStrategy<T extends string> extends Strategy<
+  Cache<T, YoutubeDlInfo>,
+  YoutubeDlInfo
+> {
+  constructor(
+    priority: number,
+    protected id: T,
+    protected binaryManager: BinaryManager,
+  ) {
     super(priority);
   }
 
-  get cacheType(){
+  get cacheType() {
     return this.id;
   }
-  
+
   last: number = 0;
 
-  async getInfo(url: string){
+  async getInfo(url: string) {
     this.useLog();
-    const t = Util.time.timer.start(`YouTube(Strategy${this.priority})#getInfo`);
+    const t = Util.time.timer.start(
+      `YouTube(Strategy${this.priority})#getInfo`,
+    );
     let info = null as YoutubeDlInfo;
-    try{
-      info = JSON.parse(await this.binaryManager.exec(["--skip-download", "--print-json", url])) as YoutubeDlInfo;
-    }
-    finally{
+    try {
+      info = JSON.parse(
+        await this.binaryManager.exec(["--skip-download", "--print-json", url]),
+      ) as YoutubeDlInfo;
+    } finally {
       t.end(this.logger);
     }
     return {
@@ -52,54 +62,71 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
       cache: {
         type: this.id,
         data: info,
-      }
+      },
     };
   }
 
-  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
+  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>) {
     this.useLog();
     const t = Util.time.timer.start(`YouTube(Strategy${this.priority})#fetch`);
     let info = null as YoutubeDlInfo;
-    try{
-      const availableCache = cache?.type === this.id && cache.data as YoutubeDlInfo;
-      this.logger(`[AudioSource:youtube] ${availableCache ? "using cache without obtaining" : "obtaining info"}`);
-      info = availableCache || JSON.parse(await this.binaryManager.exec(["--skip-download", "--print-json", url])) as YoutubeDlInfo;
-    }
-    finally{
+    try {
+      const availableCache =
+        cache?.type === this.id && (cache.data as YoutubeDlInfo);
+      this.logger(
+        `[AudioSource:youtube] ${
+          availableCache ? "using cache without obtaining" : "obtaining info"
+        }`,
+      );
+      info =
+        availableCache ||
+        (JSON.parse(
+          await this.binaryManager.exec([
+            "--skip-download",
+            "--print-json",
+            url,
+          ]),
+        ) as YoutubeDlInfo);
+    } finally {
       t.end(this.logger);
     }
     const partialResult = {
       info: this.mapToExportable(url, info),
       relatedVideos: null as exportableYouTube[],
     };
-    if(info.is_live){
+    if (info.is_live) {
       const format = info.formats.filter(f => f.format_id === info.format_id);
       return {
         ...partialResult,
         stream: {
           type: "url",
           url: format[0].url,
-          userAgent: format[0].http_headers["User-Agent"]
-        } as UrlStreamInfo
+          userAgent: format[0].http_headers["User-Agent"],
+        } as UrlStreamInfo,
       };
-    }else{
-      const formats = info.formats.filter(f => (f.format_note === "tiny" || f.video_ext === "none" && f.abr));
-      if(formats.length === 0) throw new Error("no format found!");
+    } else {
+      const formats = info.formats.filter(
+        f => f.format_note === "tiny" || (f.video_ext === "none" && f.abr),
+      );
+      if (formats.length === 0) throw new Error("no format found!");
       const [format] = formats.sort((fa, fb) => fb.abr - fa.abr);
       const stream = miniget(format.url, {
         headers: {
           ...format.http_headers,
-        }
+        },
       });
-      if(forceUrl){
+      if (forceUrl) {
         return {
           ...partialResult,
           stream: {
             type: "url",
             url: format.url,
-            streamType: format.ext === "webm" && format.acodec === "opus" ? "webm" : undefined,
+            streamType:
+              format.ext === "webm" && format.acodec === "opus"
+                ? "webm"
+                : undefined,
             userAgent: format.http_headers["User-Agent"],
-          } as UrlStreamInfo
+          } as UrlStreamInfo,
         };
       }
       return {
@@ -107,13 +134,19 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
         stream: {
           type: "readable",
           stream,
-          streamType: format.ext === "webm" && format.acodec === "opus" ? "webm" : undefined,
+          streamType:
+            format.ext === "webm" && format.acodec === "opus"
+              ? "webm"
+              : undefined,
         } as ReadableStreamInfo,
       };
     }
   }
 
-  protected mapToExportable(url: string, info: YoutubeDlInfo): exportableYouTube{
+  protected mapToExportable(
+    url: string,
+    info: YoutubeDlInfo,
+  ): exportableYouTube {
     return {
       url: url,
       title: info.title,
@@ -148,7 +181,7 @@ export interface YoutubeDlInfo {
   categories: string[];
   tags: string[];
   is_live: null;
-  automatic_captions: { [key: string]: any[] };
+  automatic_captions: {[key: string]: any[]};
   subtitles: any;
   like_count: number;
   dislike_count: number;
@@ -186,13 +219,13 @@ export interface YoutubeDlInfo {
 enum Acodec {
   Mp4A402 = "mp4a.40.2",
   None = "none",
-  Opus = "opus"
+  Opus = "opus",
 }
 
 enum TempEXT {
   M4A = "m4a",
   Mp4 = "mp4",
-  Webm = "webm"
+  Webm = "webm",
 }
 
 interface Format {
@@ -222,7 +255,7 @@ interface Format {
 enum Container {
   M4ADash = "m4a_dash",
   Mp4Dash = "mp4_dash",
-  WebmDash = "webm_dash"
+  WebmDash = "webm_dash",
 }
 
 interface DownloaderOptions {
@@ -232,29 +265,29 @@ interface DownloaderOptions {
 interface HTTPHeaders {
   "User-Agent": string;
   "Accept-Charset": AcceptCharset;
-  Accept: Accept;
+  "Accept": Accept;
   "Accept-Encoding": AcceptEncoding;
   "Accept-Language": AcceptLanguage;
 }
 
 enum Accept {
-  TextHTMLApplicationXHTMLXMLApplicationXMLQ09Q08 = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+  TextHTMLApplicationXHTMLXMLApplicationXMLQ09Q08 = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 }
 
 enum AcceptCharset {
-  ISO88591UTF8Q07Q07 = "ISO-8859-1,utf-8;q=0.7,*;q=0.7"
+  ISO88591UTF8Q07Q07 = "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
 }
 
 enum AcceptEncoding {
-  GzipDeflate = "gzip, deflate"
+  GzipDeflate = "gzip, deflate",
 }
 
 enum AcceptLanguage {
-  EnUsEnQ05 = "en-us,en;q=0.5"
+  EnUsEnQ05 = "en-us,en;q=0.5",
 }
 
 enum Protocol {
-  HTTPS = "https"
+  HTTPS = "https",
 }
 
 interface Thumbnail {

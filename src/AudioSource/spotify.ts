@@ -31,16 +31,17 @@ import Util from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
 
 const spotifyUrlInfo = (() => {
-  try{
+  try {
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     return require("spotify-url-info") as typeof import("spotify-url-info");
-  }
-  catch{
+  } catch {
     return null;
   }
 })();
 
-const client = spotifyUrlInfo?.((url, opts) => candyget(url, "string", opts).then(res => ({text: () => res.body})));
+const client = spotifyUrlInfo?.((url, opts) =>
+  candyget(url, "string", opts).then(res => ({text: () => res.body})),
+);
 
 export class Spotify extends AudioSource {
   protected readonly _serviceIdentifer = "spotify";
@@ -48,98 +49,138 @@ export class Spotify extends AudioSource {
   protected artist = "";
   Thumbnail: string = null;
 
-  override async init(url: string, prefetched: exportableSpotify): Promise<Spotify>{
-    if(!Spotify.validateTrackUrl(url)) throw new Error("Invalid url");
-    if(prefetched){
+  override async init(
+    url: string,
+    prefetched: exportableSpotify,
+  ): Promise<Spotify> {
+    if (!Spotify.validateTrackUrl(url)) throw new Error("Invalid url");
+    if (prefetched) {
       this.Url = prefetched.url;
       this._lengthSeconds = prefetched.length;
       this.Title = prefetched.title;
       this.artist = prefetched.artist;
-    }else{
+    } else {
       this.Url = url;
-      const track = await client.getData(url) as Track;
+      const track = (await client.getData(url)) as Track;
       this._lengthSeconds = Math.floor(track.duration / 1000);
       this.Title = track.name;
       this.artist = track.artists.map(artist => artist.name).join(", ");
-      this.Thumbnail = track.coverArt.sources[0]?.url || DefaultAudioThumbnailURL;
+      this.Thumbnail =
+        track.coverArt.sources[0]?.url || DefaultAudioThumbnailURL;
     }
     return this;
   }
 
-  override async fetch(forceUrl?: boolean): Promise<StreamInfo>{
-    // eslint-disable-next-line newline-per-chained-call
-    const keyword = `${this.Title} ${this.artist.split(",").map(artist => artist.trim()).join(" ")}`;
-    if(Util.config.debug) Util.logger.log(`Searching the keyword: ${`${this.Title} ${this.artist.split(",").map(artist => artist.trim())}`}`, "debug");
+  override async fetch(forceUrl?: boolean): Promise<StreamInfo> {
+    const keyword = `${this.Title} ${this.artist
+      .split(",")
+      .map(artist => artist.trim())
+      .join(" ")}`;
+    if (Util.config.debug)
+      Util.logger.log(
+        `Searching the keyword: ${`${this.Title} ${this.artist
+          .split(",")
+          .map(artist => artist.trim())}`}`,
+        "debug",
+      );
     const searchResult = await searchYouTube(keyword);
-    if(Util.config.debug) Util.logger.log("Extracting the valid item...");
-    const items = searchResult.items.filter(({type}) => type === "video") as ytsr.Video[];
+    if (Util.config.debug) Util.logger.log("Extracting the valid item...");
+    const items = searchResult.items.filter(
+      ({type}) => type === "video",
+    ) as ytsr.Video[];
     const target = this.extractBestItem(items);
-    if(!target) throw new Error("Not Found");
-    const { result } = await attemptFetchForStrategies(Util.logger.log.bind(Util.logger), target.url, forceUrl);
+    if (!target) throw new Error("Not Found");
+    const {result} = await attemptFetchForStrategies(
+      Util.logger.log.bind(Util.logger),
+      target.url,
+      forceUrl,
+    );
     this.Title = result.info.title;
     this._lengthSeconds = result.info.length;
     this.Thumbnail = result.info.thumbnail;
     return result.stream;
   }
 
-  protected extractBestItem(items: ytsr.Video[]){
+  protected extractBestItem(items: ytsr.Video[]) {
     console.log("result", items);
     const normalize = (text: string) => {
-      return text.toLowerCase()
-        .replace(/’/g, "'")
-        .replace(/\(.+?\)/g, "")
-        .replace(/（.+?）/g, "")
-        .replace(/【.+?】/g, "")
-        // eslint-disable-next-line no-irregular-whitespace
-        .replace(/　/g, " ")
-        .replace(/-/g, "")
-        .trim();
+      return (
+        text
+          .toLowerCase()
+          .replace(/’/g, "'")
+          .replace(/\(.+?\)/g, "")
+          .replace(/（.+?）/g, "")
+          .replace(/【.+?】/g, "")
+          // eslint-disable-next-line no-irregular-whitespace
+          .replace(/　/g, " ")
+          .replace(/-/g, "")
+          .trim()
+      );
     };
     const includes = (text1: string, text2: string) => {
       text1 = normalize(text1);
       return normalize(text2)
         .split(" ")
-        .every(p => text1.includes(p))
-      ;
+        .every(p => text1.includes(p));
     };
     const validate = (item: ytsr.Video) => {
       return (
         // 関連のないタイトルを除外
-        includes(item.title, this.Title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase()) || includes(this.Title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase(), item.title.toLowerCase())
-      )
-      // カバー曲を除外
-      && !includes(item.title.toLowerCase(), "cover")
-      && !includes(item.title, "カバー")
-      && !includes(item.title, "歌ってみた")
-      && !includes(item.title, "弾いてみた")
-      && !includes(item.title.toLowerCase(), "#shorts")
-      && (this.Title.toLowerCase().includes("remix") || !includes(item.title.toLowerCase(), "remix"));
+        (includes(
+          item.title,
+          this.Title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase(),
+        ) ||
+          includes(
+            this.Title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase(),
+            item.title.toLowerCase(),
+          )) &&
+        // カバー曲を除外
+        !includes(item.title.toLowerCase(), "cover") &&
+        !includes(item.title, "カバー") &&
+        !includes(item.title, "歌ってみた") &&
+        !includes(item.title, "弾いてみた") &&
+        !includes(item.title.toLowerCase(), "#shorts") &&
+        (this.Title.toLowerCase().includes("remix") ||
+          !includes(item.title.toLowerCase(), "remix"))
+      );
     };
     const validItems = items.filter(validate);
-    if(Util.config.debug) console.log("valid", validItems);
-    if(validItems.length === 0) return items[0];
+    if (Util.config.debug) console.log("valid", validItems);
+    if (validItems.length === 0) return items[0];
     // official channel
-    let filtered = validItems.filter(item => item.author.ownerBadges.length > 0 || item.author.verified || item.author.name.endsWith("Topic") || item.author.name.endsWith("トピック"));
-    if(Util.config.debug) console.log("official ch", filtered);
-    if(filtered[0]) return filtered[0];
-    // official item 
-    filtered = validItems.filter(item => includes(item.title, "official") || includes(item.title, "公式"));
-    if(Util.config.debug) console.log("official item", filtered);
-    if(filtered[0]) return filtered[0];
+    let filtered = validItems.filter(
+      item =>
+        item.author.ownerBadges.length > 0 ||
+        item.author.verified ||
+        item.author.name.endsWith("Topic") ||
+        item.author.name.endsWith("トピック"),
+    );
+    if (Util.config.debug) console.log("official ch", filtered);
+    if (filtered[0]) return filtered[0];
+    // official item
+    filtered = validItems.filter(
+      item => includes(item.title, "official") || includes(item.title, "公式"),
+    );
+    if (Util.config.debug) console.log("official item", filtered);
+    if (filtered[0]) return filtered[0];
     // pv /mv
-    filtered = validItems.filter(item => includes(item.title, "pv") || includes(item.title, "mv"));
-    if(Util.config.debug) console.log("PV/MV", filtered);
-    if(filtered[0]) return filtered[0];
+    filtered = validItems.filter(
+      item => includes(item.title, "pv") || includes(item.title, "mv"),
+    );
+    if (Util.config.debug) console.log("PV/MV", filtered);
+    if (filtered[0]) return filtered[0];
     // no live
-    filtered = validItems.filter(item => !includes(item.title, "live") && !includes(item.title, "ライブ"));
-    if(Util.config.debug) console.log("no live", filtered);
-    if(filtered[0]) return filtered[0];
+    filtered = validItems.filter(
+      item => !includes(item.title, "live") && !includes(item.title, "ライブ"),
+    );
+    if (Util.config.debug) console.log("no live", filtered);
+    if (filtered[0]) return filtered[0];
     // other
-    if(validItems[0]) return validItems[0];
+    if (validItems[0]) return validItems[0];
     return items[0];
   }
 
-  override exportData(): exportableSpotify{
+  override exportData(): exportableSpotify {
     return {
       url: this.Url,
       title: this.Title,
@@ -148,39 +189,49 @@ export class Spotify extends AudioSource {
     };
   }
 
-  override npAdditional(): string{
+  override npAdditional(): string {
     return "";
   }
 
-  override toField(): EmbedField[]{
+  override toField(): EmbedField[] {
     return [];
   }
 
-  static validateTrackUrl(url: string){
-    return !!url.match(/^https?:\/\/open\.spotify\.com\/track\/([a-zA-Z0-9]+)(\?.*)?$/);
+  static validateTrackUrl(url: string) {
+    return !!url.match(
+      /^https?:\/\/open\.spotify\.com\/track\/([a-zA-Z0-9]+)(\?.*)?$/,
+    );
   }
 
-  static validatePlaylistUrl(url: string){
-    return !!url.match(/^https?:\/\/open\.spotify\.com\/(playlist|album)\/([a-zA-Z0-9]+)(\?.*)?$/);
+  static validatePlaylistUrl(url: string) {
+    return !!url.match(
+      /^https?:\/\/open\.spotify\.com\/(playlist|album)\/([a-zA-Z0-9]+)(\?.*)?$/,
+    );
   }
 
-  static getTrackUrl(uri: string){
-    return `https://open.spotify.com/track/${uri.replace(/spotify:track:/, "")}`;
+  static getTrackUrl(uri: string) {
+    return `https://open.spotify.com/track/${uri.replace(
+      /spotify:track:/,
+      "",
+    )}`;
   }
 
-  static getPlaylistUrl(uri: string, type: "playlist"|"album"){
-    return `https://open.spotify.com/${type}/${uri.replace(/spotify:(playlist|album):/, "")}`;
+  static getPlaylistUrl(uri: string, type: "playlist" | "album") {
+    return `https://open.spotify.com/${type}/${uri.replace(
+      /spotify:(playlist|album):/,
+      "",
+    )}`;
   }
 
-  static get client(){
+  static get client() {
     return client;
   }
 
-  static get available(){
+  static get available() {
     return !!client;
   }
 }
 
 export type exportableSpotify = exportableCustom & {
-  artist: string,
+  artist: string;
 };

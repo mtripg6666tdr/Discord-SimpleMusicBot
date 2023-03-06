@@ -31,16 +31,16 @@ export class SoundCloudS extends AudioSource {
   protected readonly _serviceIdentifer = "soundcloud";
   Author: string;
   Thumbnail: string;
-  
-  async init(url: string, prefetched?: exportableSoundCloud){
+
+  async init(url: string, prefetched?: exportableSoundCloud) {
     this.Url = url;
-    if(prefetched){
+    if (prefetched) {
       this.Title = prefetched.title;
       this.Description = prefetched.description;
       this._lengthSeconds = prefetched.length;
       this.Author = prefetched.author;
       this.Thumbnail = prefetched.thumbnail;
-    }else{
+    } else {
       const sc = new SoundCloud();
       const info = await sc.tracks.getV2(url);
       this.Title = info.title;
@@ -52,63 +52,72 @@ export class SoundCloudS extends AudioSource {
     return this;
   }
 
-  async fetch(): Promise<ReadableStreamInfo>{
+  async fetch(): Promise<ReadableStreamInfo> {
     const sc = new SoundCloud();
-    const source = await sc.util.streamTrack(this.Url) as Readable;
+    const source = (await sc.util.streamTrack(this.Url)) as Readable;
     const stream = Util.general.createPassThrough();
     source
-      .on("error", e => !stream.destroyed ? stream.destroy(e) : stream.emit("error", e))
+      .on("error", e =>
+        !stream.destroyed ? stream.destroy(e) : stream.emit("error", e),
+      )
       .pipe(stream)
-      .on("close", () => !source.destroyed && source.destroy?.())
-    ;
+      .on("close", () => !source.destroyed && source.destroy?.());
     return {
       type: "readable",
-      stream
+      stream,
     };
   }
 
-  toField(verbose: boolean = false){
+  toField(verbose: boolean = false) {
     const fields = [] as EmbedField[];
-    fields.push({
-      name: ":musical_note:ユーザー",
-      value: this.Author,
-      inline: false
-    }, {
-      name: ":asterisk:概要",
-      value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, (verbose ? 1000 : 300)) + "..." : this.Description,
-      inline: false
-    });
+    fields.push(
+      {
+        name: ":musical_note:ユーザー",
+        value: this.Author,
+        inline: false,
+      },
+      {
+        name: ":asterisk:概要",
+        value:
+          this.Description.length > (verbose ? 1000 : 350)
+            ? this.Description.substring(0, verbose ? 1000 : 300) + "..."
+            : this.Description,
+        inline: false,
+      },
+    );
     return fields;
   }
 
-  npAdditional(){
+  npAdditional() {
     return "\r\nアーティスト:`" + this.Author + "`";
   }
 
-  exportData(): exportableSoundCloud{
+  exportData(): exportableSoundCloud {
     return {
       url: this.Url,
       title: this.Title,
       description: this.Description,
       length: this._lengthSeconds,
       author: this.Author,
-      thumbnail: this.Thumbnail
+      thumbnail: this.Thumbnail,
     };
   }
 
-  static validateUrl(url: string){
+  static validateUrl(url: string) {
     return Boolean(url.match(/https?:\/\/soundcloud.com\/.+\/.+/));
   }
 
-  static validatePlaylistUrl(url: string){
-    return Boolean(url.match(/https?:\/\/soundcloud.com\/[^/?]+\/sets\/[^/?]+/));
+  static validatePlaylistUrl(url: string) {
+    return Boolean(
+      url.match(/https?:\/\/soundcloud.com\/[^/?]+\/sets\/[^/?]+/),
+    );
   }
 }
 
 export type exportableSoundCloud = exportableCustom & {
-  description: string,
-  author: string,
-  thumbnail: string,
+  description: string;
+  author: string;
+  thumbnail: string;
 };
 
 /**

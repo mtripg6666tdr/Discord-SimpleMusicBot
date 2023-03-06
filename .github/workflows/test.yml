@@ -49,7 +49,10 @@ jobs:
         continue-on-error: true
 
       - name: Lint
-        run: npm run lint -- --max-warnings 0
+        run: |
+          npm run lint:fix
+          git add .
+          git diff --staged -w --exit-code
 
   build:
     runs-on: ubuntu-latest

@@ -32,35 +32,38 @@ export class FsStream extends AudioSource {
   protected readonly _serviceIdentifer = "fs";
   Thumbnail: string = DefaultAudioThumbnailURL;
 
-  async init(url: string){
+  async init(url: string) {
     this.Url = url;
     this.Title = "カスタムストリーム";
-    try{
+    try {
       this._lengthSeconds = await Util.web.RetriveLengthSeconds(url);
+    } catch {
+      /* empty */
     }
-    catch{ /* empty */ }
     return this;
   }
 
-  async fetch(): Promise<ReadableStreamInfo>{
+  async fetch(): Promise<ReadableStreamInfo> {
     return {
       type: "readable",
-      stream: fs.createReadStream(path.join(__dirname, "../../", this.Url))
+      stream: fs.createReadStream(path.join(__dirname, "../../", this.Url)),
     };
   }
 
-  toField(){
-    return [{
-      name: ":asterisk:詳細",
-      value: "カスタムストリーム"
-    }] as EmbedField[];
+  toField() {
+    return [
+      {
+        name: ":asterisk:詳細",
+        value: "カスタムストリーム",
+      },
+    ] as EmbedField[];
   }
 
-  npAdditional(){
+  npAdditional() {
     return "";
   }
 
-  exportData(): exportableCustom{
+  exportData(): exportableCustom {
     return {
       url: this.Url,
       length: this._lengthSeconds,

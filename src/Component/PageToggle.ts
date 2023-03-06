@@ -24,55 +24,66 @@ import { CommandMessage, Helper } from "@mtripg6666tdr/eris-command-resolver";
 /**
  * 最終的にメッセージの埋め込みに解決されるデータ
  */
-type MessageEmbedsResolvable = EmbedOptions[]|((pagenum: number) => EmbedOptions)|((pagenum: number) => Promise<EmbedOptions>);
+type MessageEmbedsResolvable =
+  | EmbedOptions[]
+  | ((pagenum: number) => EmbedOptions)
+  | ((pagenum: number) => Promise<EmbedOptions>);
 
 /**
  * リアクションによってページめくりができるメッセージの管理を行います
  */
 export class PageToggle {
   private _message: ResponseMessage;
-  get Message(){
+  get Message() {
     return this._message;
   }
 
   private _embeds: MessageEmbedsResolvable;
-  get embeds(){
+  get embeds() {
     return this._embeds;
   }
 
   private _current: number = 0;
-  get Current(){
+  get Current() {
     return this._current;
   }
 
   private _total: number = -1;
-  get Length(){
-    return Array.isArray(this._embeds) ? this._embeds.length : this._total === -1 ? NaN : this._total;
+  get Length() {
+    return Array.isArray(this._embeds)
+      ? this._embeds.length
+      : this._total === -1
+      ? NaN
+      : this._total;
   }
 
   IsFreshNecessary = false;
 
-  private constructor(){}
+  private constructor() {}
 
   static arrowRightEmoji = "▶";
   static arrowLeftEmoji = "◀";
   static arrowRight = "flip_page_next";
   static arrowLeft = "flip_page_prev";
 
-  static async init(msg: CommandMessage|ResponseMessage, embeds: MessageEmbedsResolvable, total?: number, current?: number): Promise<PageToggle>{
+  static async init(
+    msg: CommandMessage | ResponseMessage,
+    embeds: MessageEmbedsResolvable,
+    total?: number,
+    current?: number,
+  ): Promise<PageToggle> {
     const n = new PageToggle();
     n._embeds = embeds;
-    if(total){
+    if (total) {
       n._total = total;
     }
-    if(current){
+    if (current) {
       n._current = current;
     }
-    const apply:(CommandMessage["reply"]|ResponseMessage["edit"]) = msg instanceof CommandMessage ? msg.reply.bind(msg) : msg.edit.bind(msg);
+    const apply: CommandMessage["reply"] | ResponseMessage["edit"] =
+      msg instanceof CommandMessage ? msg.reply.bind(msg) : msg.edit.bind(msg);
     n._message = await apply({
-      embeds: [
-        await n.getEmbed(current || 0)
-      ],
+      embeds: [await n.getEmbed(current || 0)],
       components: [
         new Helper.MessageActionRowBuilder()
           .addComponents(
@@ -83,39 +94,49 @@ export class PageToggle {
             new Helper.MessageButtonBuilder()
               .setCustomId(this.arrowRight)
               .setEmoji(this.arrowRightEmoji)
-              .setStyle("PRIMARY")
+              .setStyle("PRIMARY"),
           )
-          .toEris()
-      ]
+          .toEris(),
+      ],
     });
     return n;
   }
 
-  static organize(toggles: PageToggle[], min: number, forceRemovingUnfresh: string = null){
+  static organize(
+    toggles: PageToggle[],
+    min: number,
+    forceRemovingUnfresh: string = null,
+  ) {
     const delIndex = [] as number[];
-    for(let i = 0; i < toggles.length; i++){
-      if(new Date().getTime() - toggles[i].Message.createdTimestamp >= min * 60 * 1000 || (forceRemovingUnfresh && toggles[i].IsFreshNecessary && toggles[i].Message.guild.id === forceRemovingUnfresh)){
+    for (let i = 0; i < toggles.length; i++) {
+      if (
+        new Date().getTime() - toggles[i].Message.createdTimestamp >=
+          min * 60 * 1000 ||
+        (forceRemovingUnfresh &&
+          toggles[i].IsFreshNecessary &&
+          toggles[i].Message.guild.id === forceRemovingUnfresh)
+      ) {
         delIndex.push(i);
       }
     }
-    delIndex.sort((a, b)=>b - a);
+    delIndex.sort((a, b) => b - a);
     delIndex.forEach(i => {
       toggles[i].Message.edit({
-        components: []
+        components: [],
       });
       toggles.splice(i, 1);
     });
   }
 
-  async flipPage(page: number, interaction?: ComponentInteraction){
+  async flipPage(page: number, interaction?: ComponentInteraction) {
     this._current = page;
     const embed = await this.getEmbed(page);
-    if(interaction){
+    if (interaction) {
       await interaction.editOriginalMessage({
         content: this.Message.content,
         embeds: [embed],
       });
-    }else{
+    } else {
       await this.Message.edit({
         content: this.Message.content,
         embeds: [embed],
@@ -123,16 +144,16 @@ export class PageToggle {
     }
   }
 
-  protected getEmbed(page: number){
-    if(Array.isArray(this._embeds)){
+  protected getEmbed(page: number) {
+    if (Array.isArray(this._embeds)) {
       return this._embeds[page];
-    }else if(typeof this._embeds === "function"){
+    } else if (typeof this._embeds === "function") {
       return this._embeds(page);
     }
     return null;
   }
 
-  setFresh(isFreshNecessary: boolean){
+  setFresh(isFreshNecessary: boolean) {
     this.IsFreshNecessary = isFreshNecessary;
     return this;
   }

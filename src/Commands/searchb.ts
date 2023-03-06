@@ -20,7 +20,7 @@ import { SearchBase } from "./search";
 import { bestdori, BestdoriApi } from "../AudioSource";
 
 export default class Searchb extends SearchBase<string[]> {
-  constructor(){
+  constructor() {
     super({
       name: "searchb",
       alias: ["seb", "sb"],
@@ -29,25 +29,39 @@ export default class Searchb extends SearchBase<string[]> {
     });
   }
 
-  protected async searchContent(query: string){
+  protected async searchContent(query: string) {
     await BestdoriApi.setupData();
     const keys = Object.keys(bestdori.allsonginfo);
     const q = query.toLowerCase();
     return keys.filter(k => {
       const info = bestdori.allsonginfo[Number(k)];
-      if(!info.musicTitle[0]) return false;
-      return (info.musicTitle[0] + bestdori.allbandinfo[info.bandId].bandName[0]).toLowerCase().includes(q);
+      if (!info.musicTitle[0]) return false;
+      return (
+        info.musicTitle[0] + bestdori.allbandinfo[info.bandId].bandName[0]
+      )
+        .toLowerCase()
+        .includes(q);
     });
   }
 
-  protected consumer(items: string[]){
-    return items.map(item => ({
-      title: bestdori.allsonginfo[Number(item)].musicTitle[0],
-      url: BestdoriApi.getAudioPage(Number(item)),
-      duration: "0",
-      thumbnail: BestdoriApi.getThumbnail(Number(item), bestdori.allsonginfo[Number(item)].jacketImage[0]),
-      author: bestdori.allbandinfo[bestdori.allsonginfo[Number(item)].bandId].bandName[0],
-      description: `バンド名: ${bestdori.allbandinfo[bestdori.allsonginfo[Number(item)].bandId].bandName[0]}`,
-    })).filter(item => item.title);
+  protected consumer(items: string[]) {
+    return items
+      .map(item => ({
+        title: bestdori.allsonginfo[Number(item)].musicTitle[0],
+        url: BestdoriApi.getAudioPage(Number(item)),
+        duration: "0",
+        thumbnail: BestdoriApi.getThumbnail(
+          Number(item),
+          bestdori.allsonginfo[Number(item)].jacketImage[0],
+        ),
+        author:
+          bestdori.allbandinfo[bestdori.allsonginfo[Number(item)].bandId]
+            .bandName[0],
+        description: `バンド名: ${
+          bestdori.allbandinfo[bestdori.allsonginfo[Number(item)].bandId]
+            .bandName[0]
+        }`,
+      }))
+      .filter(item => item.title);
   }
 }

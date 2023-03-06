@@ -27,7 +27,7 @@ import { Util } from "../Util";
 import { getColor } from "../Util/color";
 
 export default class Searchq extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "キュー内を検索",
       alias: ["searchqueue", "searchq", "seq", "sq"],
@@ -36,45 +36,58 @@ export default class Searchq extends BaseCommand {
       category: "playlist",
       examples: "seq milk boy",
       usage: "seq <キーワード>",
-      argument: [{
-        type: "string",
-        name: "keyword",
-        description: "検索したい楽曲のキーワード",
-        required: true
-      }],
+      argument: [
+        {
+          type: "string",
+          name: "keyword",
+          description: "検索したい楽曲のキーワード",
+          required: true,
+        },
+      ],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if(options.server.queue.length === 0){
+    if (options.server.queue.length === 0) {
       message.reply("✘キューが空です").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const qsresult = options.server.queue
-      .filter(c =>
-        c.basicInfo.Title.toLowerCase().includes(options.rawArgs.toLowerCase())
-        || c.basicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase())
-        || c.basicInfo.Description.toLowerCase().includes(options.rawArgs.toLowerCase())
-      )
-    ;
-    if(qsresult.length === 0){
-      message.reply(":confused:見つかりませんでした").catch(e => Util.logger.log(e, "error"));
+    const qsresult = options.server.queue.filter(
+      c =>
+        c.basicInfo.Title.toLowerCase().includes(
+          options.rawArgs.toLowerCase(),
+        ) ||
+        c.basicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase()) ||
+        c.basicInfo.Description.toLowerCase().includes(
+          options.rawArgs.toLowerCase(),
+        ),
+    );
+    if (qsresult.length === 0) {
+      message
+        .reply(":confused:見つかりませんでした")
+        .catch(e => Util.logger.log(e, "error"));
       return;
     }
-    if(qsresult.length > 20) qsresult.splice(20);
+    if (qsresult.length > 20) qsresult.splice(20);
     const fields = qsresult.map(c => {
-      const index = options.server.queue.findIndex(d => d.basicInfo.Title === c.basicInfo.Title).toString();
+      const index = options.server.queue
+        .findIndex(d => d.basicInfo.Title === c.basicInfo.Title)
+        .toString();
       const _t = c.basicInfo.LengthSeconds;
       const [min, sec] = Util.time.CalcMinSec(_t);
       return {
         name: index === "0" ? "現在再生中/再生待ち" : index,
-        value: `[${c.basicInfo.Title}](${c.basicInfo.Url})\r\nリクエスト: \`${c.additionalInfo.addedBy.displayName}\` \r\n長さ: ${
-          (c.basicInfo.isYouTube() && c.basicInfo.LiveStream) ? "(ライブストリーム)" : ` \`${_t === 0 ? "(不明)" : `${min}:${sec}`}\`)`
+        value: `[${c.basicInfo.Title}](${c.basicInfo.Url})\r\nリクエスト: \`${
+          c.additionalInfo.addedBy.displayName
+        }\` \r\n長さ: ${
+          c.basicInfo.isYouTube() && c.basicInfo.LiveStream
+            ? "(ライブストリーム)"
+            : ` \`${_t === 0 ? "(不明)" : `${min}:${sec}`}\`)`
         }`,
-        inline: false
+        inline: false,
       } as EmbedField;
     });
     const embed = new Helper.MessageEmbedBuilder()
@@ -82,8 +95,7 @@ export default class Searchq extends BaseCommand {
       .setDescription("キュー内での検索結果です。最大20件表示されます。")
       .setFields(...fields)
       .setColor(getColor("SEARCH"))
-      .toEris()
-    ;
+      .toEris();
     message.reply({embeds: [embed]});
   }
 }

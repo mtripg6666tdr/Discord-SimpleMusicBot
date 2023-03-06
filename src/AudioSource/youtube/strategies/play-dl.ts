@@ -29,19 +29,23 @@ import { Util } from "../../../Util";
 type playDl = "playDl";
 const playDl: playDl = "playDl";
 
-export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> {
-  get cacheType(){
+export class playDlStrategy extends Strategy<
+  Cache<playDl, InfoData>,
+  InfoData
+> {
+  get cacheType() {
     return playDl;
   }
 
-  async getInfo(url: string){
+  async getInfo(url: string) {
     this.useLog();
-    const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#getInfo`);
+    const t = Util.time.timer.start(
+      `YouTube(Strategy#${this.priority})#getInfo`,
+    );
     let info = null as InfoData;
-    try{
+    try {
       info = await video_info(url);
-    }
-    finally{
+    } finally {
       t.end(this.logger);
     }
     return {
@@ -49,52 +53,60 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
       cache: {
         type: playDl,
         data: info,
-      }
+      },
     };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
+  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>) {
     this.useLog();
     const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch`);
     let info = null as InfoData;
-    try{
+    try {
       const cacheAvailable = cache?.type === playDl && cache.data;
-      this.logger(`[AudioSource:youtube] ${cacheAvailable ? "using cache without obtaining" : "obtaining info"}`);
-      info = cacheAvailable || await video_info(url);
-    }
-    finally{
+      this.logger(
+        `[AudioSource:youtube] ${
+          cacheAvailable ? "using cache without obtaining" : "obtaining info"
+        }`,
+      );
+      info = cacheAvailable || (await video_info(url));
+    } finally {
       t.end(this.logger);
     }
     const partialResult = {
       info: this.mapToExportable(url, info),
       relatedVideos: null as exportableYouTube[],
     };
-    if(info.LiveStreamData.isLive){
+    if (info.LiveStreamData.isLive) {
       return {
         ...partialResult,
         stream: {
           type: "url",
           url: info.LiveStreamData.hlsManifestUrl,
-        } as UrlStreamInfo
+        } as UrlStreamInfo,
       };
-    }else{
+    } else {
       const format = info.format.filter(f => f.mimeType.startsWith("audio"));
-      if(format.length === 0) throw new Error("no format found!");
+      if (format.length === 0) throw new Error("no format found!");
       format.sort((fa, fb) => fb.bitrate - fa.bitrate);
       return {
         ...partialResult,
         stream: {
           type: "url",
           url: format[0].url,
-          streamType: (format[0] as any)["container"] === "webm" && (format[0] as any)["codec"] === "opus" ? "webm" : undefined,
-        } as UrlStreamInfo
+          streamType:
+            (format[0] as any)["container"] === "webm" &&
+            (format[0] as any)["codec"] === "opus"
+              ? "webm"
+              : undefined,
+        } as UrlStreamInfo,
       };
     }
   }
 
-  protected mapToExportable(url: string, info: InfoData): exportableYouTube{
-    if(info.video_details.upcoming) throw new Error("This video is still in upcoming");
+  protected mapToExportable(url: string, info: InfoData): exportableYouTube {
+    if (info.video_details.upcoming)
+      throw new Error("This video is still in upcoming");
     return {
       url,
       title: info.video_details.title,

@@ -31,38 +31,44 @@ export class HttpBackupper extends Backupper {
   private _queueModifiedGuilds: string[] = [];
   private _previousStatuses: {[guildId: string]: string} = {};
 
-  constructor(bot: MusicBotBase, getData: () => DataType){
+  constructor(bot: MusicBotBase, getData: () => DataType) {
     super(bot, getData);
     this.Log("Initializing http based backup server adapter...");
     // ボットの準備完了直前に実行する
     this.bot.once("beforeReady", () => {
       // コンテナにイベントハンドラを設定する関数
-      const setContainerEvent = (container: GuildDataContainer) => (["change", "changeWithoutCurrent"] as const).forEach(event => container.queue.on(event, () => this.addModifiedGuild(container.guildId)));
+      const setContainerEvent = (container: GuildDataContainer) =>
+        (["change", "changeWithoutCurrent"] as const).forEach(event =>
+          container.queue.on(event, () =>
+            this.addModifiedGuild(container.guildId),
+          ),
+        );
       // すでに登録されているコンテナにイベントハンドラを登録する
       this.data.forEach(setContainerEvent);
       // これから登録されるコンテナにイベントハンドラを登録する
       this.bot.on("guildDataAdded", setContainerEvent);
       // バックアップのタイマーをセット
-      this.bot.on("tick", (count) => count % 2 === 0 && this.backup());
-      
+      this.bot.on("tick", count => count % 2 === 0 && this.backup());
+
       this.Log("Hook was set up successfully");
     });
   }
 
   /**
-   * 指定したサーバーIDのキューを、変更済みとしてマークします  
+   * 指定したサーバーIDのキューを、変更済みとしてマークします
    * マークされたサーバーのキューは、次回のティックにバックアップが試行されます
    */
-  addModifiedGuild(guildId: string){
-    if(!this._queueModifiedGuilds.includes(guildId)) this._queueModifiedGuilds.push(guildId);
+  addModifiedGuild(guildId: string) {
+    if (!this._queueModifiedGuilds.includes(guildId))
+      this._queueModifiedGuilds.push(guildId);
   }
 
-  static get backuppable(){
+  static get backuppable() {
     return !!(process.env.GAS_TOKEN && process.env.GAS_URL);
   }
 
-  backup(): Promise<any>|void{
-    if(HttpBackupper.backuppable){
+  backup(): Promise<any> | void {
+    if (HttpBackupper.backuppable) {
       return this.backupQueue().then(() => this.backupStatus());
     }
   }
@@ -70,24 +76,23 @@ export class HttpBackupper extends Backupper {
   /**
    * キューをバックアップします
    */
-  private async backupQueue(){
-    try{
+  private async backupQueue() {
+    try {
       const queue = this._queueModifiedGuilds.map(id => ({
         guildid: id,
-        queue: JSON.stringify(this.data.get(id).exportQueue())
+        queue: JSON.stringify(this.data.get(id).exportQueue()),
       }));
-      if(queue.length > 0){
+      if (queue.length > 0) {
         this.Log("Backing up modified queue...");
-        if(await this._backupQueueData(queue)){
+        if (await this._backupQueueData(queue)) {
           this._queueModifiedGuilds = [];
-        }else{
+        } else {
           this.Log("Something went wrong while backing up queue", "warn");
         }
-      }else{
+      } else {
         this.Log("No modified queue found, skipping", "debug");
       }
-    }
-    catch(e){
+    } catch (e) {
       this.Log(e, "error");
     }
   }
@@ -95,22 +100,28 @@ export class HttpBackupper extends Backupper {
   /**
    * 接続ステータス等をバックアップします
    */
-  private async backupStatus(){
-    try{
+  private async backupStatus() {
+    try {
       // 参加ステータスの送信
-      const speaking = [] as {guildid: string, value: string}[];
-      const currentStatuses = Object.assign({}, this._previousStatuses) as {[guildId: string]: string};
+      const speaking = [] as {guildid: string; value: string}[];
+      const currentStatuses = Object.assign({}, this._previousStatuses) as {
+        [guildId: string]: string;
+      };
       this.data.forEach(container => {
-        const currentStatus = ((status: exportableStatuses) => [
-          status.voiceChannelId,
-          status.boundChannelId,
-          status.loopEnabled ? "1" : "0",
-          status.queueLoopEnabled ? "1" : "0",
-          status.addRelatedSongs ? "1" : "0",
-          status.equallyPlayback ? "1" : "0",
-          status.volume,
-        ].join(":"))(container.exportStatus());
-        if(!this._previousStatuses[container.guildId] || this._previousStatuses[container.guildId] !== currentStatus){
+        const currentStatus = ((status: exportableStatuses) =>
+          [
+            status.voiceChannelId,
+            status.boundChannelId,
+            status.loopEnabled ? "1" : "0",
+            status.queueLoopEnabled ? "1" : "0",
+            status.addRelatedSongs ? "1" : "0",
+            status.equallyPlayback ? "1" : "0",
+            status.volume,
+          ].join(":"))(container.exportStatus());
+        if (
+          !this._previousStatuses[container.guildId] ||
+          this._previousStatuses[container.guildId] !== currentStatus
+        ) {
           speaking.push({
             guildid: container.guildId,
             value: currentStatus,
@@ -118,33 +129,39 @@ export class HttpBackupper extends Backupper {
           currentStatuses[container.guildId] = currentStatus;
         }
       });
-      if(speaking.length > 0){
+      if (speaking.length > 0) {
         this.Log("Backing up modified status..");
-        if(await this._backupStatusData(speaking)){
+        if (await this._backupStatusData(speaking)) {
           this._previousStatuses = currentStatuses;
-        }else{
+        } else {
           this.Log("Something went wrong while backing up statuses", "warn");
         }
-      }else{
+      } else {
         this.Log("No modified status found, skipping", "debug");
       }
-    }
-    catch(e){
+    } catch (e) {
       this.Log(e, "warn");
     }
   }
 
-  async getStatusFromBackup(guildids: string[]){
-    if(HttpBackupper.backuppable){
+  async getStatusFromBackup(guildids: string[]) {
+    if (HttpBackupper.backuppable) {
       const t = Util.time.timer.start("GetIsSpeking");
-      try{
-        const result = await this._requestHttp("GET", process.env.GAS_URL, {
-          token: process.env.GAS_TOKEN,
-          guildid: guildids.join(","),
-          type: "j"
-        } as requestBody, MIME_JSON);
-        if(result.status === 200){
-          const frozenGuildStatuses = result.data as {[guildid: string]: string};
+      try {
+        const result = await this._requestHttp(
+          "GET",
+          process.env.GAS_URL,
+          {
+            token: process.env.GAS_TOKEN,
+            guildid: guildids.join(","),
+            type: "j",
+          } as requestBody,
+          MIME_JSON,
+        );
+        if (result.status === 200) {
+          const frozenGuildStatuses = result.data as {
+            [guildid: string]: string;
+          };
           const map = new Map<string, exportableStatuses>();
           Object.keys(frozenGuildStatuses).forEach(key => {
             const [
@@ -169,56 +186,58 @@ export class HttpBackupper extends Backupper {
             });
           });
           return map;
-        }else{
+        } else {
           return null;
         }
-      }
-      catch(er){
+      } catch (er) {
         this.Log(er, "error");
         this.Log("Status restoring failed!", "warn");
         return null;
-      }
-      finally{
+      } finally {
         t.end();
       }
-    }else{
+    } else {
       return null;
     }
   }
 
-  async getQueueDataFromBackup(guildids: string[]){
-    if(HttpBackupper.backuppable){
+  async getQueueDataFromBackup(guildids: string[]) {
+    if (HttpBackupper.backuppable) {
       const t = Util.time.timer.start("GetQueueData");
-      try{
-        const result = await this._requestHttp("GET", process.env.GAS_URL, {
-          token: process.env.GAS_TOKEN,
-          guildid: guildids.join(","),
-          type: "queue"
-        } as requestBody, MIME_JSON);
-        if(result.status === 200){
+      try {
+        const result = await this._requestHttp(
+          "GET",
+          process.env.GAS_URL,
+          {
+            token: process.env.GAS_TOKEN,
+            guildid: guildids.join(","),
+            type: "queue",
+          } as requestBody,
+          MIME_JSON,
+        );
+        if (result.status === 200) {
           const frozenQueues = result.data as {[guildid: string]: string};
           const res = new Map<string, YmxFormat>();
           Object.keys(frozenQueues).forEach(key => {
-            try{
+            try {
               const ymx = JSON.parse(decodeURIComponent(frozenQueues[key]));
               res.set(key, ymx);
+            } catch {
+              /* empty */
             }
-            catch{ /* empty */ }
           });
           return res;
-        }else{
+        } else {
           return null;
         }
-      }
-      catch(er){
+      } catch (er) {
         this.Log(er, "error");
         this.Log("Queue restoring failed!", "warn");
         return null;
-      }
-      finally{
+      } finally {
         t.end();
       }
-    }else{
+    } else {
       return null;
     }
   }
@@ -226,34 +245,37 @@ export class HttpBackupper extends Backupper {
   /**
    * ステータス情報をサーバーへバックアップする
    */
-  private async _backupStatusData(data: {guildid: string, value: string}[]){
-    if(HttpBackupper.backuppable){
+  private async _backupStatusData(data: {guildid: string; value: string}[]) {
+    if (HttpBackupper.backuppable) {
       const t = Util.time.timer.start("backupStatusData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as {[key: string]: string};
-      data.forEach(d => rawData[d.guildid] = d.value);
-      try{
-        const result = await this._requestHttp("POST", process.env.GAS_URL, {
-          token: process.env.GAS_TOKEN,
-          guildid: ids,
-          data: JSON.stringify(rawData),
-          type: "j"
-        } as requestBody, MIME_JSON);
-        if(result.status === 200){
+      data.forEach(d => (rawData[d.guildid] = d.value));
+      try {
+        const result = await this._requestHttp(
+          "POST",
+          process.env.GAS_URL,
+          {
+            token: process.env.GAS_TOKEN,
+            guildid: ids,
+            data: JSON.stringify(rawData),
+            type: "j",
+          } as requestBody,
+          MIME_JSON,
+        );
+        if (result.status === 200) {
           return true;
-        }else{
+        } else {
           return false;
         }
-      }
-      catch(er){
+      } catch (er) {
         this.Log(er, "error");
         this.Log("Status backup failed!", "warn");
         return false;
-      }
-      finally{
+      } finally {
         t.end();
       }
-    }else{
+    } else {
       return false;
     }
   }
@@ -261,30 +283,33 @@ export class HttpBackupper extends Backupper {
   /**
    * キューのデータをサーバーへバックアップする
    */
-  private async _backupQueueData(data: {guildid: string, queue: string}[]){
-    if(HttpBackupper.backuppable){
+  private async _backupQueueData(data: {guildid: string; queue: string}[]) {
+    if (HttpBackupper.backuppable) {
       const t = Util.time.timer.start("SetQueueData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as {[guildid: string]: string};
-      data.forEach(d => rawData[d.guildid] = encodeURIComponent(d.queue));
-      try{
-        const result = await this._requestHttp("POST", process.env.GAS_URL, {
-          token: process.env.GAS_TOKEN,
-          guildid: ids,
-          data: JSON.stringify(rawData),
-          type: "queue"
-        } as requestBody, MIME_JSON);
+      data.forEach(d => (rawData[d.guildid] = encodeURIComponent(d.queue)));
+      try {
+        const result = await this._requestHttp(
+          "POST",
+          process.env.GAS_URL,
+          {
+            token: process.env.GAS_TOKEN,
+            guildid: ids,
+            data: JSON.stringify(rawData),
+            type: "queue",
+          } as requestBody,
+          MIME_JSON,
+        );
         return result.status === 200;
-      }
-      catch(er){
+      } catch (er) {
         this.Log(er, "error");
         this.Log("Queue backup failed!", "warn");
         return false;
-      }
-      finally{
+      } finally {
         t.end();
       }
-    }else{
+    } else {
       return false;
     }
   }
@@ -292,45 +317,55 @@ export class HttpBackupper extends Backupper {
   /**
    * HTTPでデータをバックアップするユーティリティメソッド
    */
-  private async _requestHttp(method: "GET"|"POST", url: string, data?: requestBody, mimeType?: string){
+  private async _requestHttp(
+    method: "GET" | "POST",
+    url: string,
+    data?: requestBody,
+    mimeType?: string,
+  ) {
     return new Promise<postResult>((resolve, reject) => {
-      if(method === "GET"){
-        url += "?" + (Object.keys(data) as (keyof requestBody)[]).map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k])).join("&");
+      if (method === "GET") {
+        url +=
+          "?" +
+          (Object.keys(data) as (keyof requestBody)[])
+            .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(data[k]))
+            .join("&");
       }
 
       candyget(method, url, "json", {
         headers: {
           "Content-Type": mimeType,
-          "User-Agent": `mtripg6666tdr/Discord-SimpleMusicBot#${this.bot.version || "unknown"} http based backup server adapter`
+          "User-Agent": `mtripg6666tdr/Discord-SimpleMusicBot#${
+            this.bot.version || "unknown"
+          } http based backup server adapter`,
         },
         body: method === "POST" ? data : undefined,
       })
         .then(result => {
-          if(typeof result.body === "string"){
+          if (typeof result.body === "string") {
             reject(result.body);
-          }else{
+          } else {
             resolve(result.body);
           }
         })
-        .catch(reject)
-      ;
+        .catch(reject);
     });
   }
 
-  destroy(){
+  destroy() {
     /* empty */
   }
 }
 
 type getResult = {
-  status: 200|404,
+  status: 200 | 404;
 };
 type postResult = getResult & {
-  data: any,
+  data: any;
 };
 type requestBody = {
-  token: string,
-  guildid: string,
-  data?: any,
-  type: "queue"|"j",
+  token: string;
+  guildid: string;
+  data?: any;
+  type: "queue" | "j";
 };

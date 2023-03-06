@@ -28,43 +28,50 @@ export class CustomStream extends AudioSource {
   protected readonly _serviceIdentifer = "custom";
   Thumbnail: string = DefaultAudioThumbnailURL;
 
-  async init(url: string, prefetched: exportableCustom){
-    if(prefetched){
+  async init(url: string, prefetched: exportableCustom) {
+    if (prefetched) {
       this.Title = prefetched.title || "カスタムストリーム";
       this.Url = url;
       this._lengthSeconds = prefetched.length;
-    }else{
-      if(!Util.fs.isAvailableRawAudioURL(url)) throw new Error("正しいストリームではありません");
+    } else {
+      if (!Util.fs.isAvailableRawAudioURL(url))
+        throw new Error("正しいストリームではありません");
       this.Url = url;
       this.Title = this.extractFilename() || "カスタムストリーム";
-      try{
+      try {
         this._lengthSeconds = await Util.web.RetriveLengthSeconds(url);
+      } catch {
+        /* empty */
       }
-      catch{ /* empty */ }
     }
     return this;
   }
 
-  async fetch(): Promise<UrlStreamInfo>{
+  async fetch(): Promise<UrlStreamInfo> {
     return {
       type: "url",
-      url: this.Url
+      url: this.Url,
     };
   }
 
-  toField(){
-    return [{
-      name: ":link:URL",
-      value: this.Url
-    }, {
-      name: ":asterisk:詳細",
-      value: "カスタムストリーム"
-    }] as EmbedField[];
+  toField() {
+    return [
+      {
+        name: ":link:URL",
+        value: this.Url,
+      },
+      {
+        name: ":asterisk:詳細",
+        value: "カスタムストリーム",
+      },
+    ] as EmbedField[];
   }
 
-  npAdditional(){return "";}
+  npAdditional() {
+    return "";
+  }
 
-  exportData(): exportableCustom{
+  exportData(): exportableCustom {
     return {
       url: this.Url,
       length: this._lengthSeconds,
@@ -72,14 +79,14 @@ export class CustomStream extends AudioSource {
     };
   }
 
-  private extractFilename(){
+  private extractFilename() {
     const paths = this.Url.split("/");
     return paths[paths.length - 1];
   }
 }
 
 export type exportableCustom = {
-  url: string,
-  length: number,
-  title: string,
+  url: string;
+  length: number;
+  title: string;
 };

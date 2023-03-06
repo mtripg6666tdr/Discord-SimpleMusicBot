@@ -23,62 +23,81 @@ import * as path from "path";
 import { EventEmitter } from "stream";
 
 interface EventKeys {
-  ready: [client:Client];
+  ready: [client: Client];
   messageCreate: [message: Message];
   interactionCreate: [interaction: Interaction];
 }
 
 export class AddOn extends EventEmitter {
-  override on<T extends keyof EventKeys>(event: T, callback: (...args: EventKeys[T]) => any): this{
+  override on<T extends keyof EventKeys>(
+    event: T,
+    callback: (...args: EventKeys[T]) => any,
+  ): this {
     super.on(event, callback);
     return this;
   }
 
-  override off<T extends keyof EventKeys>(event: T, callback: (...args: EventKeys[T]) => any){
+  override off<T extends keyof EventKeys>(
+    event: T,
+    callback: (...args: EventKeys[T]) => any,
+  ) {
     super.off(event, callback);
     return this;
   }
 
-  override once<T extends keyof EventKeys>(event: T, callback: (...args: EventKeys[T]) => any){
+  override once<T extends keyof EventKeys>(
+    event: T,
+    callback: (...args: EventKeys[T]) => any,
+  ) {
     super.once(event, callback);
     return this;
   }
 
-  override addListener<T extends keyof EventKeys>(event: T, callback: (...args: EventKeys[T]) => any){
+  override addListener<T extends keyof EventKeys>(
+    event: T,
+    callback: (...args: EventKeys[T]) => any,
+  ) {
     super.addListener(event, callback);
     return this;
   }
 
-  override removeListener<T extends keyof EventKeys>(event: T, callback: (...args: EventKeys[T]) => any){
+  override removeListener<T extends keyof EventKeys>(
+    event: T,
+    callback: (...args: EventKeys[T]) => any,
+  ) {
     super.removeListener(event, callback);
     return this;
   }
 
-  override removeAllListeners<T extends keyof EventKeys>(event: T){
+  override removeAllListeners<T extends keyof EventKeys>(event: T) {
     super.removeAllListeners(event);
     return this;
   }
 
-  override emit<T extends keyof EventKeys>(event: T, ...args: EventKeys[T]){
+  override emit<T extends keyof EventKeys>(event: T, ...args: EventKeys[T]) {
     return super.emit(event, ...args);
   }
 
-  constructor(){
+  constructor() {
     super({
-      captureRejections: false
+      captureRejections: false,
     });
-    try{
-      fs.readdirSync(path.join(__dirname, "../../addon/"), {withFileTypes: true})
+    try {
+      fs.readdirSync(path.join(__dirname, "../../addon/"), {
+        withFileTypes: true,
+      })
         .filter(d => d.isFile())
         .map(d => require("../../addon/" + d.name.slice(0, -3)))
         .filter(d => typeof d === "function")
         .forEach(d => {
-          try{
+          try {
             d(this);
+          } catch {
+            /* empty */
           }
-          catch{ /* empty */ }
         });
+    } catch {
+      /* empty */
     }
-    catch{ /* empty */ }
   }
 }

@@ -23,7 +23,7 @@ import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Pause extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "一時停止",
       alias: ["一旦停止", "停止", "pause", "stop"],
@@ -34,25 +34,35 @@ export default class Pause extends BaseCommand {
       shouldDefer: false,
     });
   }
-  
-  async run(message: CommandMessage, options: CommandArgs){
+
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
-    if(!options.server.player.isPlaying){
-      await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
+    if (!options.server.player.isPlaying) {
+      await message
+        .reply("再生中ではありません")
+        .catch(e => Util.logger.log(e, "error"));
       return;
     }
-    if(options.server.player.isPaused){
-      await message.reply(":pause_button: すでに一時停止されています\r\n再生を再開するには`再生`コマンドを使用してください").catch(e => Util.logger.log(e, "error"));
+    if (options.server.player.isPaused) {
+      await message
+        .reply(
+          ":pause_button: すでに一時停止されています\r\n再生を再開するには`再生`コマンドを使用してください",
+        )
+        .catch(e => Util.logger.log(e, "error"));
       return;
     }
     // 停止しま～す
     options.server.player.pause();
-    message.reply({
-      content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:pause_button: 一時停止しました`,
-      allowedMentions: {
-        users: false,
-      },
-    }).catch(e => Util.logger.log(e, "error"));
+    message
+      .reply({
+        content: `${
+          options.includeMention ? `<@${message.member.id}> ` : ""
+        }:pause_button: 一時停止しました`,
+        allowedMentions: {
+          users: false,
+        },
+      })
+      .catch(e => Util.logger.log(e, "error"));
   }
 }

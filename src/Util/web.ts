@@ -33,7 +33,11 @@ import { DefaultUserAgent } from "./ua";
  * @param url URL
  * @returns ダウンロードされたテキストデータ
  */
-export function DownloadText(url: string, headers?: {[key: string]: string}, requestBody?: any): Promise<string>{
+export function DownloadText(
+  url: string,
+  headers?: {[key: string]: string},
+  requestBody?: any,
+): Promise<string> {
   return candyget.string(url, {headers}, requestBody).then(r => r.body);
 }
 
@@ -43,7 +47,10 @@ export function DownloadText(url: string, headers?: {[key: string]: string}, req
  * @param headers 追加のカスタムリクエストヘッダ
  * @returns ステータスコード
  */
-export function RetriveHttpStatusCode(url: string, headers?: {[key: string]: string}){
+export function RetriveHttpStatusCode(
+  url: string,
+  headers?: {[key: string]: string},
+) {
   return candyget("HEAD", url, "string", {
     headers: {
       "User-Agent": DefaultUserAgent,
@@ -60,16 +67,21 @@ const httpsAgent = new HttpsAgent({keepAlive: false});
  * @param url URL
  * @returns Readableストリーム
  */
-export function DownloadAsReadable(url: string, options: miniget.Options = {}): Readable{
+export function DownloadAsReadable(
+  url: string,
+  options: miniget.Options = {},
+): Readable {
   return miniget(url, {
     maxReconnects: 10,
     maxRetries: 3,
-    backoff: { inc: 500, max: 10000 },
+    backoff: {inc: 500, max: 10000},
     agent: url.startsWith("https:") ? httpsAgent : httpAgent,
     ...options,
-  })
-    .on("reconnect", () => Util.logger.log("Miniget is now trying to re-send a request due to failing"))
-  ;
+  }).on("reconnect", () =>
+    Util.logger.log(
+      "Miniget is now trying to re-send a request due to failing",
+    ),
+  );
 }
 
 /**
@@ -77,31 +89,30 @@ export function DownloadAsReadable(url: string, options: miniget.Options = {}): 
  * @param url リソースのURL
  * @returns 取得された秒数
  */
-export function RetriveLengthSeconds(url: string){
+export function RetriveLengthSeconds(url: string) {
   return new Promise<number>((resolve, reject) => {
     let data = "";
-    const proc = spawn(require("ffmpeg-static"), [
-      "-i", url,
-      "-user_agent", DefaultUserAgent
-    ], {
-      windowsHide: true,
-      stdio: ["ignore", "ignore", "pipe"]
-    })
-      .on("exit", () => {
-        if(data.length === 0) reject("zero");
-        const match = data.match(/Duration: (?<length>(\d+:)*\d+(\.\d+)?),/i);
-        if(match){
-          const lengthSec = match.groups.length
-            .split(":")
-            .map(n => Number(n))
-            .reduce((prev, current) => prev * 60 + current)
-            ;
-          resolve(Math.ceil(lengthSec));
-        }else{
-          reject("not match");
-        }
-      });
-    proc.stderr.on("data", (chunk) => {
+    const proc = spawn(
+      require("ffmpeg-static"),
+      ["-i", url, "-user_agent", DefaultUserAgent],
+      {
+        windowsHide: true,
+        stdio: ["ignore", "ignore", "pipe"],
+      },
+    ).on("exit", () => {
+      if (data.length === 0) reject("zero");
+      const match = data.match(/Duration: (?<length>(\d+:)*\d+(\.\d+)?),/i);
+      if (match) {
+        const lengthSec = match.groups.length
+          .split(":")
+          .map(n => Number(n))
+          .reduce((prev, current) => prev * 60 + current);
+        resolve(Math.ceil(lengthSec));
+      } else {
+        reject("not match");
+      }
+    });
+    proc.stderr.on("data", chunk => {
       data += chunk;
     });
   });

@@ -22,37 +22,44 @@ import type { DataType, MusicBotBase } from "../../botBase";
 import { LogEmitter } from "../../Structure";
 
 export type exportableStatuses = {
-  voiceChannelId: string,
-  boundChannelId: string,
-  loopEnabled: boolean,
-  queueLoopEnabled: boolean,
-  addRelatedSongs: boolean,
-  equallyPlayback: boolean,
-  volume: number,
+  voiceChannelId: string;
+  boundChannelId: string;
+  loopEnabled: boolean;
+  queueLoopEnabled: boolean;
+  addRelatedSongs: boolean;
+  equallyPlayback: boolean;
+  volume: number;
 };
 
 export abstract class Backupper extends LogEmitter {
   /**
    * 初期化時に与えられたアクセサを使って、サーバーのデータを返します。
    */
-  protected get data(){
+  protected get data() {
     return this.getData();
   }
 
-  constructor(protected readonly bot: MusicBotBase, protected readonly getData:(() => DataType)){
+  constructor(
+    protected readonly bot: MusicBotBase,
+    protected readonly getData: () => DataType,
+  ) {
     super();
     this.setTag("Backup");
   }
   /**
    * バックアップ済みの接続ステータス等を取得します
    */
-  abstract getStatusFromBackup(guildids: string[]): Promise<Map<string, exportableStatuses>>;
+  abstract getStatusFromBackup(
+    guildids: string[],
+  ): Promise<Map<string, exportableStatuses>>;
   /**
    * バックアップ済みのキューのデータを取得します
    */
-  abstract getQueueDataFromBackup(guildids: string[]): Promise<Map<string, YmxFormat>>;
+  abstract getQueueDataFromBackup(
+    guildids: string[],
+  ): Promise<Map<string, YmxFormat>>;
   /**
    * サーバーとの接続を破棄します
    */
-  abstract destroy(): void|Promise<void>;
+  abstract destroy(): void | Promise<void>;
 }

@@ -24,78 +24,93 @@ export class PlayManagerWithBgm extends PlayManager {
   protected override server: GuildDataContainerWithBgm;
   protected _bgm: boolean = false;
   protected _originalVolume: number = 100;
-  protected get bgm(){
+  protected get bgm() {
     return this._bgm;
   }
-  protected set bgm(value: boolean){
-    if(value && !this._bgm){
+  protected set bgm(value: boolean) {
+    if (value && !this._bgm) {
       this._originalVolume = this.volume;
       this.setVolume(this.server.bgmConfig.volume);
-    }else if(!value && this._bgm){
+    } else if (!value && this._bgm) {
       this.setVolume(this._originalVolume);
     }
     this._bgm = value;
   }
 
-  override get isPlaying(): boolean{
-    return this.isConnecting && this.server.connection.playing && !this.server.queue.isBGM;
+  override get isPlaying(): boolean {
+    return (
+      this.isConnecting &&
+      this.server.connection.playing &&
+      !this.server.queue.isBGM
+    );
   }
 
-  override async play(time?: number, bgm: boolean = false){
-    if(this.server instanceof GuildDataContainerWithBgm){
-      if(((this.server.queue.isBGM && !bgm) || (!this.server.queue.isBgmEmpty && bgm)) && this.server.connection?.playing){
+  override async play(time?: number, bgm: boolean = false) {
+    if (this.server instanceof GuildDataContainerWithBgm) {
+      if (
+        ((this.server.queue.isBGM && !bgm) ||
+          (!this.server.queue.isBgmEmpty && bgm)) &&
+        this.server.connection?.playing
+      ) {
         this.stop();
       }
       this.server.queue.setToPlayBgm(bgm);
     }
-    if(!this.getIsBadCondition(bgm)) this.bgm = bgm;
+    if (!this.getIsBadCondition(bgm)) this.bgm = bgm;
     return super.play(time);
   }
 
-  protected override getIsBadCondition(bgm: boolean = this.bgm){
+  protected override getIsBadCondition(bgm: boolean = this.bgm) {
     // 接続していない
-    return !this.isConnecting
+    return (
+      !this.isConnecting ||
       // なにかしら再生中
-      || this.isPlaying
+      this.isPlaying ||
       // キューが空
-      || this.server.queue.isEmpty && (!bgm || this.server.queue.isBgmEmpty)
+      (this.server.queue.isEmpty && (!bgm || this.server.queue.isBgmEmpty)) ||
       // 準備中
-      || this.preparing
-    ;
+      this.preparing
+    );
   }
 
-  protected override getNoticeNeeded(){
+  protected override getNoticeNeeded() {
     return this.server.boundTextChannel && !this.bgm;
   }
 
-  override disconnect(){
+  override disconnect() {
     const result = super.disconnect();
     this.server.queue.setToPlayBgm(false);
     return result;
   }
 
-  override async onStreamFinished(){
-    if(this.server.connection && this.server.connection.playing){
-      await Util.general.waitForEnteringState(() => !this.server.connection || !this.server.connection.playing, 20 * 1000)
+  override async onStreamFinished() {
+    if (this.server.connection && this.server.connection.playing) {
+      await Util.general
+        .waitForEnteringState(
+          () => !this.server.connection || !this.server.connection.playing,
+          20 * 1000,
+        )
         .catch(() => {
-          this.Log("Stream has not ended in time and will force stream into destroying", "warn");
+          this.Log(
+            "Stream has not ended in time and will force stream into destroying",
+            "warn",
+          );
           this.stop();
-        })
-      ;
+        });
     }
     // 再生が終わったら
     this._errorCount = 0;
     this._errorUrl = "";
     this._cost = 0;
-    if(this.bgm){
+    if (this.bgm) {
       this.server.queue.next();
-      if(this.server.queue.isBgmEmpty){
+      if (this.server.queue.isBgmEmpty) {
         this.Log("Queue empty");
         this.disconnect();
-      }else{
+      } else {
         this.play(0, true);
       }
-    }else{
+    } else {
       return super.onStreamFinished();
     }
   }

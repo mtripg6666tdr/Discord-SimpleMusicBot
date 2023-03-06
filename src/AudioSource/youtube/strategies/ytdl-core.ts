@@ -33,24 +33,29 @@ const ua = SecondaryUserAgent;
 type ytdlCore = "ytdlCore";
 export const ytdlCore: ytdlCore = "ytdlCore";
 
-export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, ytdl.videoInfo> {
-  get cacheType(){
+export class ytdlCoreStrategy extends Strategy<
+  Cache<ytdlCore, ytdl.videoInfo>,
+  ytdl.videoInfo
+> {
+  get cacheType() {
     return ytdlCore;
   }
 
-  async getInfo(url: string){
+  async getInfo(url: string) {
     this.useLog();
-    const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
+    const agent =
+      Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
     const requestOptions = agent ? {agent} : undefined;
-    const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#getInfo`);
+    const t = Util.time.timer.start(
+      `YouTube(Strategy#${this.priority})#getInfo`,
+    );
     let info = null as ytdl.videoInfo;
-    try{
+    try {
       info = await ytdl.getInfo(url, {
         lang: "ja",
         requestOptions,
       });
-    }
-    finally{
+    } finally {
       t.end(this.logger);
     }
     return {
@@ -58,85 +63,110 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
       cache: {
         type: ytdlCore,
         data: info,
-      }
+      },
     };
   }
 
-  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
+  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>) {
     this.useLog();
     const info = await (async () => {
-      if(cache && cache.type === "ytdlCore"){
+      if (cache && cache.type === "ytdlCore") {
         this.logger("[AudioSource:youtube] using cache without obtaining");
         return cache.data as ytdl.videoInfo;
-      }else{
+      } else {
         this.logger("[AudioSource:youtube] obtaining info");
-        const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
+        const agent =
+          Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
         const requestOptions = agent ? {agent} : undefined;
-        const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch`);
+        const t = Util.time.timer.start(
+          `YouTube(Strategy#${this.priority})#fetch`,
+        );
         // eslint-disable-next-line @typescript-eslint/no-shadow
         let info = null as ytdl.videoInfo;
-        try{
+        try {
           info = await ytdl.getInfo(url, {
             lang: "ja",
             requestOptions,
           });
-        }
-        finally{
+        } finally {
           t.end(this.logger);
         }
         return info;
       }
     })();
-    const format = ytdl.chooseFormat(info.formats, info.videoDetails.liveBroadcastDetails?.isLiveNow ? {
-      filter: null,
-      quality: null,
-      isHLS: false
-    } as ytdl.chooseFormatOptions : {
-      filter: "audioonly",
-      quality: "highestaudio",
-    });
-    this.logger(`[AudioSource:youtube]Format: ${format.itag}, Bitrate: ${format.bitrate}bps, Audio codec:${format.audioCodec}, Container: ${format.container}`);
+    const format = ytdl.chooseFormat(
+      info.formats,
+      info.videoDetails.liveBroadcastDetails?.isLiveNow
+        ? ({
+            filter: null,
+            quality: null,
+            isHLS: false,
+          } as ytdl.chooseFormatOptions)
+        : {
+            filter: "audioonly",
+            quality: "highestaudio",
+          },
+    );
+    this.logger(
+      `[AudioSource:youtube]Format: ${format.itag}, Bitrate: ${format.bitrate}bps, Audio codec:${format.audioCodec}, Container: ${format.container}`,
+    );
     const partialResult = {
       info: this.mapToExportable(url, info),
-      relatedVideos: info.related_videos.map(video => ({
-        url: "https://www.youtube.com/watch?v=" + video.id,
-        title: video.title,
-        description: "関連動画として取得したため詳細は表示されません",
-        length: video.length_seconds,
-        channel: (video.author as ytdl.Author)?.name,
-        channelUrl: (video.author as ytdl.Author)?.channel_url,
-        thumbnail: video.thumbnails[0].url,
-        isLive: video.isLive
-      })).filter(v => !v.isLive),
+      relatedVideos: info.related_videos
+        .map(video => ({
+          url: "https://www.youtube.com/watch?v=" + video.id,
+          title: video.title,
+          description: "関連動画として取得したため詳細は表示されません",
+          length: video.length_seconds,
+          channel: (video.author as ytdl.Author)?.name,
+          channelUrl: (video.author as ytdl.Author)?.channel_url,
+          thumbnail: video.thumbnails[0].url,
+          isLive: video.isLive,
+        }))
+        .filter(v => !v.isLive),
     };
-    if(forceUrl){
+    if (forceUrl) {
       return {
         ...partialResult,
         stream: {
           type: "url",
           url: format.url,
           userAgent: ua,
-        } as UrlStreamInfo
+        } as UrlStreamInfo,
       };
-    }else{
+    } else {
       let readable = null as Readable;
-      if(info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow){
-        readable = createRefreshableYTLiveStream(info, url, {format, lang: "ja"});
-      }else{
-        readable = createChunkedYTStream(info, format, {lang: "ja"}, 1 * 1024 * 1024);
+      if (
+        info.videoDetails.liveBroadcastDetails &&
+        info.videoDetails.liveBroadcastDetails.isLiveNow
+      ) {
+        readable = createRefreshableYTLiveStream(info, url, {
+          format,
+          lang: "ja",
+        });
+      } else {
+        readable = createChunkedYTStream(
+          info,
+          format,
+          {lang: "ja"},
+          1 * 1024 * 1024,
+        );
       }
       return {
         ...partialResult,
         stream: {
           type: "readable",
           stream: readable,
-          streamType: format.container === "webm" && format.audioCodec === "opus" ? "webm" : undefined
-        } as ReadableStreamInfo
+          streamType:
+            format.container === "webm" && format.audioCodec === "opus"
+              ? "webm"
+              : undefined,
+        } as ReadableStreamInfo,
       };
     }
   }
 
-  protected mapToExportable(url: string, info: ytdl.videoInfo){
+  protected mapToExportable(url: string, info: ytdl.videoInfo) {
     return {
       url,
       title: info.videoDetails.title,
@@ -145,7 +175,10 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
       channel: info.videoDetails.ownerChannelName,
       channelUrl: info.videoDetails.author.channel_url,
       thumbnail: info.videoDetails.thumbnails[0].url,
-      isLive: !!(info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails?.isLiveNow),
+      isLive: !!(
+        info.videoDetails.isLiveContent &&
+        info.videoDetails.liveBroadcastDetails?.isLiveNow
+      ),
     };
   }
 }

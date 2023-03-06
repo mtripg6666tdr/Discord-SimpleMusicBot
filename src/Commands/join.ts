@@ -24,7 +24,7 @@ import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Join extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "接続",
       alias: ["join", "参加", "connect"],
@@ -36,12 +36,25 @@ export default class Join extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if(message.member.voiceState.channelID && (options.client.getChannel(message.member.voiceState.channelID) as VoiceChannel).voiceMembers.has(options.client.user.id) && options.server.connection){
-      message.reply("✘すでにボイスチャンネルに接続中です。").catch(e => Util.logger.log(e, "error"));
-    }else{
-      await options.server.joinVoiceChannel(message, /* reply result to user inside this method  */ true);
+    if (
+      message.member.voiceState.channelID &&
+      (
+        options.client.getChannel(
+          message.member.voiceState.channelID,
+        ) as VoiceChannel
+      ).voiceMembers.has(options.client.user.id) &&
+      options.server.connection
+    ) {
+      message
+        .reply("✘すでにボイスチャンネルに接続中です。")
+        .catch(e => Util.logger.log(e, "error"));
+    } else {
+      await options.server.joinVoiceChannel(
+        message,
+        /* reply result to user inside this method  */ true,
+      );
     }
   }
 }

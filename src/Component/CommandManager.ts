@@ -18,7 +18,11 @@
 
 import type { BaseCommand } from "../Commands";
 import type { CommandOptionsTypes } from "../Structure";
-import type { ApplicationCommandOptionsWithValue, ApplicationCommandOptionWithChoices, Client } from "eris";
+import type {
+  ApplicationCommandOptionsWithValue,
+  ApplicationCommandOptionWithChoices,
+  Client,
+} from "eris";
 
 import { Constants } from "eris";
 
@@ -36,39 +40,47 @@ export class CommandManager extends LogEmitter {
   /**
    * コマンドマネージャーの唯一のインスタンスを返します
    */
-  static get instance(){
-    if(this._instance) return this._instance;
-    else return this._instance = new CommandManager();
+  static get instance() {
+    if (this._instance) return this._instance;
+    else return (this._instance = new CommandManager());
   }
 
   /**
    * コマンドを返します
    */
-  get commands(): Readonly<BaseCommand[]>{
+  get commands(): Readonly<BaseCommand[]> {
     return this._commands;
   }
 
   private readonly _commands = null as BaseCommand[];
 
-  private constructor(){
+  private constructor() {
     super();
     this.setTag("CommandsManager");
     this.Log("Initializing");
-    this._commands = fs.readdirSync(path.join(__dirname, "../Commands/"), {withFileTypes: true})
+    this._commands = fs
+      .readdirSync(path.join(__dirname, "../Commands/"), {withFileTypes: true})
       .filter(d => d.isFile())
       .map(d => d.name)
       .filter(n => n.endsWith(".js") && n !== "index.js")
       .map(n => n.slice(0, -3))
       .map(n => {
-        // eslint-disable-next-line new-cap
-        return new (require(path.join(__dirname, "../Commands/", n)).default)() as BaseCommand;
+        return new (require(path.join(
+          __dirname,
+          "../Commands/",
+          n,
+          // eslint-disable-next-line new-cap
+        )).default)() as BaseCommand;
       })
       .filter(n => {
-        if(n.name === "検索" && Util.general.isDisabledSource("youtube")){
+        if (n.name === "検索" && Util.general.isDisabledSource("youtube")) {
           return false;
-        }else if(n.name === "searchb" && !process.env.BD_ENABLE){
+        } else if (n.name === "searchb" && !process.env.BD_ENABLE) {
           return false;
-        }else if(n.name === "サウンドクラウドを検索" && Util.general.isDisabledSource("soundcloud")){
+        } else if (
+          n.name === "サウンドクラウドを検索" &&
+          Util.general.isDisabledSource("soundcloud")
+        ) {
           return false;
         }
         return true;
@@ -77,11 +89,16 @@ export class CommandManager extends LogEmitter {
     this.Log("Initialized");
   }
 
-  checkDuplicate(){
+  checkDuplicate() {
     const sets = new Map<string, BaseCommand>();
     const setCommand = (name: string, command: BaseCommand) => {
-      if(sets.has(name)){
-        this.Log(`Detected command ${command.name} the duplicated key ${name} with ${sets.get(name).name}; overwriting`, "warn");
+      if (sets.has(name)) {
+        this.Log(
+          `Detected command ${command.name} the duplicated key ${name} with ${
+            sets.get(name).name
+          }; overwriting`,
+          "warn",
+        );
       }
       sets.set(name, command);
     };
@@ -96,110 +113,153 @@ export class CommandManager extends LogEmitter {
    * @param command コマンド名
    * @returns 解決されたコマンド
    */
-  resolve(command: string){
+  resolve(command: string) {
     this.Log("Resolving command");
     let result = null;
-    for(let i = 0; i < this._commands.length; i++){
-      if(this._commands[i].name === command || this._commands[i].alias.includes(command)){
+    for (let i = 0; i < this._commands.length; i++) {
+      if (
+        this._commands[i].name === command ||
+        this._commands[i].alias.includes(command)
+      ) {
         result = this._commands[i];
         break;
       }
     }
-    if(result) this.Log(`Command "${command}" was resolved successfully`);
+    if (result) this.Log(`Command "${command}" was resolved successfully`);
     else this.Log("Command not found");
     return result;
   }
 
-  async sync(client: Client, removeOutdated: boolean = false){
+  async sync(client: Client, removeOutdated: boolean = false) {
     this.Log("Start syncing application commands");
     const registeredAppCommands = await client.getCommands();
-    if(registeredAppCommands.length === 0){
-      this.Log("Detected no command registered; bulk-registering slash-commands");
+    if (registeredAppCommands.length === 0) {
+      this.Log(
+        "Detected no command registered; bulk-registering slash-commands",
+      );
       await client.bulkEditCommands(
         this.commands
           .filter(command => !command.unlist)
-          .map(command => command.toApplicationCommandStructure())
+          .map(command => command.toApplicationCommandStructure()),
       );
       this.Log("Successfully registered");
       return;
     }
-    const registeredCommands = registeredAppCommands.filter(command => command.type === Constants.ApplicationCommandTypes.CHAT_INPUT);
+    const registeredCommands = registeredAppCommands.filter(
+      command => command.type === Constants.ApplicationCommandTypes.CHAT_INPUT,
+    );
     this.Log(`Successfully get ${registeredCommands.length} commands`);
     const commandsToEdit = this.commands.filter(target => {
-      if(target.unlist) return false;
-      const index = registeredCommands.findIndex(reg => reg.name === target.asciiName);
-      if(index < 0) return false;
+      if (target.unlist) return false;
+      const index = registeredCommands.findIndex(
+        reg => reg.name === target.asciiName,
+      );
+      if (index < 0) return false;
       const registered = registeredCommands[index];
-      return target.description.replace(/\r/g, "").replace(/\n/g, "") !== registered.description
-        || (target.argument || []).length !== (registered.options || []).length
-        || (target.argument && target.argument.some(
-          (arg, i) => {
+      return (
+        target.description.replace(/\r/g, "").replace(/\n/g, "") !==
+          registered.description ||
+        (target.argument || []).length !== (registered.options || []).length ||
+        (target.argument &&
+          target.argument.some((arg, i) => {
             const choicesObjectMap: {[key: string]: string} = {};
-            ((registered.options[i] as ApplicationCommandOptionWithChoices).choices)?.forEach(c => choicesObjectMap[c.name] = c.value.toString());
-            return !registered.options[i]
-            || registered.options[i].name !== arg.name
-            || registered.options[i].description !== arg.description
-            || registered.options[i].type !== CommandManager.mapCommandOptionTypeToInteger(arg.type)
-            || !!(registered.options[i] as ApplicationCommandOptionsWithValue).required !== arg.required
-            || (
-              ((registered.options[i] as ApplicationCommandOptionWithChoices).choices || arg.choices)
-              && [...Object.keys(choicesObjectMap), ...Object.keys(arg.choices)].some(name => choicesObjectMap[name] !== arg.choices[name])
+            (
+              registered.options[i] as ApplicationCommandOptionWithChoices
+            ).choices?.forEach(
+              c => (choicesObjectMap[c.name] = c.value.toString()),
             );
-          }
-        ))
-      ;
+            return (
+              !registered.options[i] ||
+              registered.options[i].name !== arg.name ||
+              registered.options[i].description !== arg.description ||
+              registered.options[i].type !==
+                CommandManager.mapCommandOptionTypeToInteger(arg.type) ||
+              !!(registered.options[i] as ApplicationCommandOptionsWithValue)
+                .required !== arg.required ||
+              (((registered.options[i] as ApplicationCommandOptionWithChoices)
+                .choices ||
+                arg.choices) &&
+                [
+                  ...Object.keys(choicesObjectMap),
+                  ...Object.keys(arg.choices),
+                ].some(name => choicesObjectMap[name] !== arg.choices[name]))
+            );
+          }))
+      );
     });
     const commandsToAdd = this.commands.filter(target => {
-      if(target.unlist) return false;
-      const index = registeredCommands.findIndex(reg => reg.name === target.asciiName);
+      if (target.unlist) return false;
+      const index = registeredCommands.findIndex(
+        reg => reg.name === target.asciiName,
+      );
       return index < 0;
     });
-    if(commandsToEdit.length > 0 || commandsToAdd.length > 0){
-      this.Log(`Detected ${commandsToEdit.length + commandsToAdd.length} commands that should be updated; updating`);
-      this.Log(`These are ${[...commandsToEdit, ...commandsToAdd].map(command => command.name)}`);
-      for(let i = 0; i < commandsToEdit.length; i++){
-        const commandToRegister = commandsToEdit[i].toApplicationCommandStructure();
-        const id = registeredCommands.find(cmd => cmd.name === commandToRegister.name).id;
+    if (commandsToEdit.length > 0 || commandsToAdd.length > 0) {
+      this.Log(
+        `Detected ${
+          commandsToEdit.length + commandsToAdd.length
+        } commands that should be updated; updating`,
+      );
+      this.Log(
+        `These are ${[...commandsToEdit, ...commandsToAdd].map(
+          command => command.name,
+        )}`,
+      );
+      for (let i = 0; i < commandsToEdit.length; i++) {
+        const commandToRegister =
+          commandsToEdit[i].toApplicationCommandStructure();
+        const id = registeredCommands.find(
+          cmd => cmd.name === commandToRegister.name,
+        ).id;
         await client.editCommand(id, commandToRegister);
       }
-      for(let i = 0; i < commandsToAdd.length; i++){
-        const commandToRegister = commandsToAdd[i].toApplicationCommandStructure();
+      for (let i = 0; i < commandsToAdd.length; i++) {
+        const commandToRegister =
+          commandsToAdd[i].toApplicationCommandStructure();
         await client.createCommand(commandToRegister);
       }
       this.Log("Updating success.");
-    }else{
+    } else {
       this.Log("Detected no command that should be updated");
     }
-    if(removeOutdated){
+    if (removeOutdated) {
       const commandsToRemove = registeredCommands.filter(registered => {
-        const index = this.commands.findIndex(command => registered.name === command.asciiName);
+        const index = this.commands.findIndex(
+          command => registered.name === command.asciiName,
+        );
         return index < 0 || this.commands[index].unlist;
       });
-      if(commandsToRemove.length > 0){
-        this.Log(`Detected ${commandsToRemove.length} commands that should be removed; removing...`);
+      if (commandsToRemove.length > 0) {
+        this.Log(
+          `Detected ${commandsToRemove.length} commands that should be removed; removing...`,
+        );
         this.Log(`These are ${commandsToRemove.map(command => command.name)}`);
-        await client.bulkEditCommands(this.commands.filter(cmd => !cmd.unlist).map(cmd => cmd.toApplicationCommandStructure()));
+        await client.bulkEditCommands(
+          this.commands
+            .filter(cmd => !cmd.unlist)
+            .map(cmd => cmd.toApplicationCommandStructure()),
+        );
         this.Log("Removing success.");
-      }else{
+      } else {
         this.Log("Detected no command that should be removed");
       }
     }
   }
 
-  async removeAllApplicationCommand(client: Client){
+  async removeAllApplicationCommand(client: Client) {
     this.Log("Removing all application commands");
     await client.bulkEditCommands([]);
     this.Log("Successfully removed all application commands");
   }
 
-  async removeAllGuildCommand(client: Client, guildId: string){
+  async removeAllGuildCommand(client: Client, guildId: string) {
     this.Log("Removing all guild commands of " + guildId);
     await client.bulkEditGuildCommands(guildId, []);
     this.Log("Successfully removed all guild commands");
   }
 
-  static mapCommandOptionTypeToInteger(type: CommandOptionsTypes){
-    switch(type){
+  static mapCommandOptionTypeToInteger(type: CommandOptionsTypes) {
+    switch (type) {
       case "bool":
         return Constants.ApplicationCommandOptionTypes.BOOLEAN;
       case "integer":

@@ -23,11 +23,12 @@ import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class OnceLoop extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "ワンスループ",
       alias: ["onceloop", "looponce"],
-      description: "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
+      description:
+        "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
       unlist: false,
       category: "player",
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
@@ -35,24 +36,32 @@ export default class OnceLoop extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if(options.server.queue.onceLoopEnabled){
+    if (options.server.queue.onceLoopEnabled) {
       options.server.queue.onceLoopEnabled = false;
-      message.reply({
-        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:ワンスループを無効にしました:x:`,
-        allowedMentions: {
-          users: false,
-        },
-      }).catch(e => Util.logger.log(e, "error"));
-    }else{
+      message
+        .reply({
+          content: `${
+            options.includeMention ? `<@${message.member.id}> ` : ""
+          }:repeat_one:ワンスループを無効にしました:x:`,
+          allowedMentions: {
+            users: false,
+          },
+        })
+        .catch(e => Util.logger.log(e, "error"));
+    } else {
       options.server.queue.onceLoopEnabled = true;
-      message.reply({
-        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:ワンスループを有効にしました:o:`,
-        allowedMentions: {
-          users: false,
-        },
-      }).catch(e => Util.logger.log(e, "error"));
+      message
+        .reply({
+          content: `${
+            options.includeMention ? `<@${message.member.id}> ` : ""
+          }:repeat_one:ワンスループを有効にしました:o:`,
+          allowedMentions: {
+            users: false,
+          },
+        })
+        .catch(e => Util.logger.log(e, "error"));
     }
   }
 }

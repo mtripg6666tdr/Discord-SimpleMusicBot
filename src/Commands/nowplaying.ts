@@ -27,29 +27,35 @@ import { Util } from "../Util";
 import { getColor } from "../Util/color";
 
 export default class NowPlaying extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "現在再生中",
       alias: ["今の曲", "np", "nowplaying"],
-      description: "現在再生中の曲の情報を表示します。 `l`(スラッシュコマンドの場合はTrue)を引数にするとより長く概要を表示します(可能な場合)",
+      description:
+        "現在再生中の曲の情報を表示します。 `l`(スラッシュコマンドの場合はTrue)を引数にするとより長く概要を表示します(可能な場合)",
       unlist: false,
       category: "player",
-      argument: [{
-        type: "bool",
-        name: "detailed",
-        description: "Trueが指定された場合、可能な場合より長く詳細を表示します",
-        required: false
-      }],
+      argument: [
+        {
+          type: "bool",
+          name: "detailed",
+          description:
+            "Trueが指定された場合、可能な場合より長く詳細を表示します",
+          required: false,
+        },
+      ],
       requiredPermissionsOr: [],
       shouldDefer: false,
     });
   }
-  
-  async run(message: CommandMessage, options: CommandArgs){
+
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
-    if(!options.server.player.isPlaying){
-      message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
+    if (!options.server.player.isPlaying) {
+      message
+        .reply("再生中ではありません")
+        .catch(e => Util.logger.log(e, "error"));
       return;
     }
     const _s = Math.floor(options.server.player.currentTime / 1000);
@@ -58,13 +64,13 @@ export default class NowPlaying extends BaseCommand {
     const [tmin, tsec] = Util.time.CalcMinSec(_t);
     const info = options.server.player.currentAudioInfo;
     let progressBar = "";
-    if(_t > 0){
-      const progress = Math.floor(_s / _t * 20);
-      for(let i = 1; i < progress; i++){
+    if (_t > 0) {
+      const progress = Math.floor((_s / _t) * 20);
+      for (let i = 1; i < progress; i++) {
         progressBar += "=";
       }
       progressBar += "●";
-      for(let i = progress + 1; i <= 20; i++){
+      for (let i = progress + 1; i <= 20; i++) {
         progressBar += "=";
       }
     }
@@ -73,30 +79,37 @@ export default class NowPlaying extends BaseCommand {
       .setTitle("現在再生中の曲:musical_note:")
       .setDescription(
         `[${info.Title}](${info.Url})\r\n${progressBar}${
-          (info.ServiceIdentifer === "youtube" && (info as YouTube).LiveStream) ? "(ライブストリーム)" : ` \`${min}:${sec}/${(_t === 0 ? "(不明)" : `${tmin}:${tsec}\``)}`
-        }`
+          info.ServiceIdentifer === "youtube" && (info as YouTube).LiveStream
+            ? "(ライブストリーム)"
+            : ` \`${min}:${sec}/${_t === 0 ? "(不明)" : `${tmin}:${tsec}\``}`
+        }`,
       )
       .setFields(
         ...info.toField(
-          ["long", "l", "verbose", "l", "true"].some(arg => options.args[0] === arg)
-        )
+          ["long", "l", "verbose", "l", "true"].some(
+            arg => options.args[0] === arg,
+          ),
+        ),
       )
-      .addField(":link:URL", info.Url)
-    ;
-    if(typeof info.Thumbnail === "string"){
+      .addField(":link:URL", info.Url);
+    if (typeof info.Thumbnail === "string") {
       embed.setThumbnail(info.Thumbnail);
-      await message.reply({embeds: [embed.toEris()]}).catch(e => Util.logger.log(e, "error"));
-    }else{
+      await message
+        .reply({embeds: [embed.toEris()]})
+        .catch(e => Util.logger.log(e, "error"));
+    } else {
       embed.setThumbnail("attachment://thumbnail." + info.Thumbnail.ext);
-      await message.reply({
-        embeds: [embed.toEris()],
-        files: [
-          {
-            name: "thumbnail." + info.Thumbnail.ext,
-            file: info.Thumbnail.data,
-          }
-        ],
-      }).catch(e => Util.logger.log(e, "error"));
+      await message
+        .reply({
+          embeds: [embed.toEris()],
+          files: [
+            {
+              name: "thumbnail." + info.Thumbnail.ext,
+              file: info.Thumbnail.data,
+            },
+          ],
+        })
+        .catch(e => Util.logger.log(e, "error"));
     }
   }
 }

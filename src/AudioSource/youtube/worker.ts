@@ -28,11 +28,11 @@ import Util from "../../Util";
 
 parentPort.unref();
 
-function postMessage(message: workerMessage|WithId<workerMessage>){
+function postMessage(message: workerMessage | WithId<workerMessage>) {
   parentPort.postMessage(message);
 }
 
-function logger(content: any, loglevel: LogLevels){
+function logger(content: any, loglevel: LogLevels) {
   postMessage({
     type: "log",
     data: content,
@@ -40,14 +40,15 @@ function logger(content: any, loglevel: LogLevels){
   });
 }
 
-function onMessage(message: WithId<spawnerJobMessage>){
-  if(!message){
+function onMessage(message: WithId<spawnerJobMessage>) {
+  if (!message) {
     return;
   }
-  if(message.type === "init"){
-    const { id, url, prefetched, forceCache } = message;
+  if (message.type === "init") {
+    const {id, url, prefetched, forceCache} = message;
     const youtube = new YouTube(/* logger */ logger);
-    youtube.init(url, prefetched, forceCache)
+    youtube
+      .init(url, prefetched, forceCache)
       .then(() => {
         const data = Object.assign({}, youtube);
         delete data.logger;
@@ -57,35 +58,35 @@ function onMessage(message: WithId<spawnerJobMessage>){
           id,
         });
       })
-      .catch((er) => {
+      .catch(er => {
         postMessage({
           type: "error",
           data: Util.general.StringifyObject(er),
           id,
         });
       });
-  }else if(message.type === "search"){
+  } else if (message.type === "search") {
     const id = message.id;
-    ytsr.default(message.keyword, {
-      limit: 12,
-      gl: "JP",
-      hl: "ja"
-    })
-      .then((result) => {
+    ytsr
+      .default(message.keyword, {
+        limit: 12,
+        gl: "JP",
+        hl: "ja",
+      })
+      .then(result => {
         postMessage({
           type: "searchOk",
           data: result,
-          id
+          id,
         });
       })
-      .catch((er) => {
+      .catch(er => {
         postMessage({
           type: "error",
           data: Util.general.StringifyObject(er),
-          id
+          id,
         });
-      })
-    ;
+      });
   }
 }
 

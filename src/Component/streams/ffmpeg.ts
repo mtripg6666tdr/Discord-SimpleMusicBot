@@ -24,50 +24,64 @@ import { destroyStream } from ".";
 import Util from "../../Util";
 import { FFmpegDefaultNetworkArgs } from "../../definition";
 
-const { DefaultUserAgent } = Util.ua;
+const {DefaultUserAgent} = Util.ua;
 
-export function transformThroughFFmpeg(readable: StreamInfo, bitrate: number, effectArgs: string[], seek: number, output: "webm"|"pcm"){
-  const ffmpegNetworkArgs = readable.type === "url" ? [
-    ...FFmpegDefaultNetworkArgs,
-    "-user_agent", readable.userAgent || DefaultUserAgent
-  ] : [];
-  const ffmpegSeekArgs = seek > 0 ? [
-    "-ss", seek.toString(),
-  ] : [];
-  const outputArgs = output === "webm" ? [
-    "-acodec", "libopus",
-    "-f", "webm",
-  ] : [
-    "-f", "s16le",
-  ];
-  const bitrateArgs = effectArgs.length === 2 && effectArgs[1].includes("loudnorm") ? [] : [
-    "-vbr", "on",
-    "-b:a", bitrate.toString(),
-  ];
+export function transformThroughFFmpeg(
+  readable: StreamInfo,
+  bitrate: number,
+  effectArgs: string[],
+  seek: number,
+  output: "webm" | "pcm",
+) {
+  const ffmpegNetworkArgs =
+    readable.type === "url"
+      ? [
+          ...FFmpegDefaultNetworkArgs,
+          "-user_agent",
+          readable.userAgent || DefaultUserAgent,
+        ]
+      : [];
+  const ffmpegSeekArgs = seek > 0 ? ["-ss", seek.toString()] : [];
+  const outputArgs =
+    output === "webm" ? ["-acodec", "libopus", "-f", "webm"] : ["-f", "s16le"];
+  const bitrateArgs =
+    effectArgs.length === 2 && effectArgs[1].includes("loudnorm")
+      ? []
+      : ["-vbr", "on", "-b:a", bitrate.toString()];
   const args = [
-    "-analyzeduration", "0",
+    "-analyzeduration",
+    "0",
     ...ffmpegNetworkArgs,
     ...ffmpegSeekArgs,
-    "-i", readable.type === "readable" ? "-" : readable.url,
+    "-i",
+    readable.type === "readable" ? "-" : readable.url,
     ...effectArgs,
     "-vn",
     ...outputArgs,
-    "-ar", "48000",
-    "-ac", "2",
+    "-ar",
+    "48000",
+    "-ac",
+    "2",
     ...bitrateArgs,
   ];
-  Util.logger.log("[FFmpeg] Passing arguments: " + args.map(arg => arg.startsWith("http") ? "<URL>" : arg).join(" "), "debug");
+  Util.logger.log(
+    "[FFmpeg] Passing arguments: " +
+      args.map(arg => (arg.startsWith("http") ? "<URL>" : arg)).join(" "),
+    "debug",
+  );
   const ffmpeg = new FFmpeg({args});
-  if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log("[FFmpeg]" + chunk.toString(), "debug"));
+  if (Util.config.debug)
+    ffmpeg.process.stderr.on("data", chunk =>
+      Util.logger.log("[FFmpeg]" + chunk.toString(), "debug"),
+    );
   ffmpeg.process.once("exit", () => {
     ffmpeg.emit("close");
   });
-  if(readable.type === "readable"){
+  if (readable.type === "readable") {
     readable.stream
       .on("error", e => destroyStream(ffmpeg, e))
       .pipe(ffmpeg)
-      .once("close", () => destroyStream(readable.stream))
-    ;
+      .once("close", () => destroyStream(readable.stream));
   }
   return ffmpeg;
 }

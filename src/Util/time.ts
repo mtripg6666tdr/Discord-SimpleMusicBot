@@ -26,7 +26,7 @@ import { log } from "./log";
  * @param _t 合計時間(秒)
  * @returns [ゼロ補完された分,ゼロ補完された秒]
  */
-export function CalcMinSec(_t: number){
+export function CalcMinSec(_t: number) {
   const sec = _t % 60;
   const min = (_t - sec) / 60;
   return [padZero(min.toString(), 2), padZero(sec.toString(), 2)];
@@ -37,20 +37,26 @@ export function CalcMinSec(_t: number){
  * @param seconds 合計時間(秒)
  * @returns [時間, ゼロ補完された分, ゼロ補完された秒]
  */
-export function CalcHourMinSec(seconds: number){
+export function CalcHourMinSec(seconds: number) {
   const sec = seconds % 60;
-  const min = (seconds - sec) / 60 % 60;
+  const min = ((seconds - sec) / 60) % 60;
   const hor = ((seconds - sec) / 60 - min) / 60;
-  return [hor.toString(), padZero(min.toString(), 2), padZero(sec.toString(), 2)];
+  return [
+    hor.toString(),
+    padZero(min.toString(), 2),
+    padZero(sec.toString(), 2),
+  ];
 }
 
 /**
  * [時間, ゼロ補完された分, ゼロ補完された秒]から表示するための時刻表示を作成します。
- * @param param0 
- * @returns 
+ * @param param0
+ * @returns
  */
-export function HourMinSecToString([hour, min, sec]: string[]){
-  return hour === "NaN" ? "不明" : `${hour === "0" ? "" : `${hour}:`}${min}:${sec}`;
+export function HourMinSecToString([hour, min, sec]: string[]) {
+  return hour === "NaN"
+    ? "不明"
+    : `${hour === "0" ? "" : `${hour}:`}${min}:${sec}`;
 }
 
 // Returns hour, min, sec and millisec from total millisec
@@ -59,7 +65,7 @@ export function HourMinSecToString([hour, min, sec]: string[]){
  * @param date 合計時間(ミリ秒)
  * @returns [時間,分,秒,ミリ秒]
  */
-export function CalcTime(date: number): number[]{
+export function CalcTime(date: number): number[] {
   const millisec = date % 1000;
   let ato = (date - millisec) / 1000;
   const sec = ato % 60;
@@ -72,17 +78,19 @@ export function CalcTime(date: number): number[]{
 class _timerStore {
   private readonly timers = new Map<string, number>();
 
-  start(key: string){
+  start(key: string) {
     this.timers.set(key, performance.now());
     return new TimerStopper(this, key);
   }
 
-  end(key: string, logger?: (content: string) => void){
-    if(this.timers.get(key)){
-      const content = `[TimeLogger] Elapsed ${(Math.floor((performance.now() - this.timers.get(key)) * 100) / 100)}ms. (${key})`;
-      if(logger){
+  end(key: string, logger?: (content: string) => void) {
+    if (this.timers.get(key)) {
+      const content = `[TimeLogger] Elapsed ${
+        Math.floor((performance.now() - this.timers.get(key)) * 100) / 100
+      }ms. (${key})`;
+      if (logger) {
         logger(content);
-      }else{
+      } else {
         log(content);
       }
       this.timers.delete(key);
@@ -91,11 +99,14 @@ class _timerStore {
 }
 
 class TimerStopper {
-  constructor(private readonly parent: _timerStore, private readonly key: string){
+  constructor(
+    private readonly parent: _timerStore,
+    private readonly key: string,
+  ) {
     //
   }
 
-  end(logger?: (content: string) => void){
+  end(logger?: (content: string) => void) {
     this.parent.end(this.key, logger);
   }
 }

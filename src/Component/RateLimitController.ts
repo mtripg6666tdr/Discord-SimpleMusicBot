@@ -21,25 +21,25 @@ import Util from "../Util";
 export class RateLimitController {
   private readonly store = new Map<string, number[]>();
 
-  isRateLimited(key: string){
-    if(!this.store.has(key)){
+  isRateLimited(key: string) {
+    if (!this.store.has(key)) {
       this.store.set(key, [Date.now()]);
       return false;
     }
     let cnt10sec = 0;
     const currentStore = this.store.get(key).filter(dt => {
       const sub = Date.now() - dt;
-      if(sub < 10 * 1000) cnt10sec++;
+      if (sub < 10 * 1000) cnt10sec++;
       return sub < 60 * 1000;
     });
     this.store.set(key, currentStore);
-    if(currentStore.length > 15 || cnt10sec > 5){
-      if(Date.now() - currentStore[currentStore.length - 1] < 2 * 1000){
+    if (currentStore.length > 15 || cnt10sec > 5) {
+      if (Date.now() - currentStore[currentStore.length - 1] < 2 * 1000) {
         currentStore.push(Date.now());
       }
       Util.logger.log(`[RateLimitController] Key ${key} hit the ratelimit.`);
       return true;
-    }else{
+    } else {
       currentStore.push(Date.now());
       return false;
     }

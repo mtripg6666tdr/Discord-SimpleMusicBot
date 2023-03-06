@@ -23,7 +23,7 @@ import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Rewind extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "頭出し",
       alias: ["rewind", "gotop", "replay"],
@@ -34,19 +34,25 @@ export default class Rewind extends BaseCommand {
       shouldDefer: false,
     });
   }
-  
-  async run(message: CommandMessage, options: CommandArgs){
+
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if(!options.server.player.isPlaying){
-      message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
-    }else{
+    if (!options.server.player.isPlaying) {
+      message
+        .reply("再生中ではありません")
+        .catch(e => Util.logger.log(e, "error"));
+    } else {
       options.server.player.rewind();
-      message.reply({
-        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:rewind:再生中の楽曲を頭出ししました:+1:`,
-        allowedMentions: {
-          users: false,
-        },
-      }).catch(e => Util.logger.log(e, "error"));
+      message
+        .reply({
+          content: `${
+            options.includeMention ? `<@${message.member.id}> ` : ""
+          }:rewind:再生中の楽曲を頭出ししました:+1:`,
+          allowedMentions: {
+            users: false,
+          },
+        })
+        .catch(e => Util.logger.log(e, "error"));
     }
   }
 }

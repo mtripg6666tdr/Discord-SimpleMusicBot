@@ -23,11 +23,12 @@ import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class Reset extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "リセット",
       alias: ["reset"],
-      description: "サーバーのキュー、設定やデータを削除して初期化します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
+      description:
+        "サーバーのキュー、設定やデータを削除して初期化します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
       unlist: false,
       category: "utility",
       requiredPermissionsOr: ["manageGuild"],
@@ -35,13 +36,15 @@ export default class Reset extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
     // VC接続中なら切断
     options.server.player.disconnect();
     options.server.bot.resetData(message.guild.id);
     // データ初期化
     options.initData(message.guild.id, message.channel.id);
-    message.reply("✅サーバーの設定を初期化しました").catch(e => Util.logger.log(e, "error"));
+    message
+      .reply("✅サーバーの設定を初期化しました")
+      .catch(e => Util.logger.log(e, "error"));
   }
 }

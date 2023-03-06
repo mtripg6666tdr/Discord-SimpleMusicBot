@@ -33,75 +33,81 @@ export class QueueManagerWithBgm extends QueueManager {
   protected _bgmInitial: QueueContent[] = [];
 
   protected _isBGM: boolean = false;
-  get isBGM(){
+  get isBGM() {
     return this._isBGM;
   }
 
-  moveCurrentTracksToBGM(){
+  moveCurrentTracksToBGM() {
     this._bgmDefault = [...this._default];
     this._bgmInitial = [...this._default];
     this._default = [];
-    this.Log(`Moved ${this._bgmDefault.length} tracks to bgm queue, and the default queue is now empty`);
+    this.Log(
+      `Moved ${this._bgmDefault.length} tracks to bgm queue, and the default queue is now empty`,
+    );
   }
 
-  resetBgmTracks(){
+  resetBgmTracks() {
     this._bgmDefault = [...this._bgmInitial];
   }
 
-  setToPlayBgm(val: boolean = true){
+  setToPlayBgm(val: boolean = true) {
     this._isBGM = val;
   }
 
-  get bgmLength(){
+  get bgmLength() {
     return this._bgmDefault.length;
   }
 
-  get isBgmEmpty(){
+  get isBgmEmpty() {
     return this._bgmDefault.length === 0;
   }
 
-  override setBinding(data: GuildDataContainerWithBgm){
+  override setBinding(data: GuildDataContainerWithBgm) {
     super.setBinding(data);
   }
 
-  override get(index: number){
+  override get(index: number) {
     return this.isBGM ? this._bgmDefault[index] : super.get(index);
   }
 
   override async addQueue(
     url: string,
-    addedBy: Member|AddedBy,
-    method: "push"|"unshift" = "push",
+    addedBy: Member | AddedBy,
+    method: "push" | "unshift" = "push",
     type: KnownAudioSourceIdentifer = "unknown",
     gotData: AudioSource.exportableCustom = null,
     preventCache: boolean = false,
-  ): Promise<QueueContent & {index: number}>{
-    if(!url.startsWith("http://") && !url.startsWith("https://") && fs.existsSync(path.join(__dirname, "../../", url))){
+  ): Promise<QueueContent & {index: number}> {
+    if (
+      !url.startsWith("http://") &&
+      !url.startsWith("https://") &&
+      fs.existsSync(path.join(__dirname, "../../", url))
+    ) {
       const result = {
-        basicInfo: await (new AudioSource.FsStream().init(url)),
+        basicInfo: await new AudioSource.FsStream().init(url),
         additionalInfo: {
           addedBy: {
             userId: this.getUserIdFromMember(addedBy) ?? "0",
-            displayName: this.getDisplayNameFromMember(addedBy) ?? "不明"
-          }
-        }
+            displayName: this.getDisplayNameFromMember(addedBy) ?? "不明",
+          },
+        },
       } as QueueContent;
       this._default[method](result);
-      if(this.server.equallyPlayback) this.sortWithAddedBy();
+      if (this.server.equallyPlayback) this.sortWithAddedBy();
       const index = this._default.findIndex(q => q === result);
       return {...result, index};
     }
     return super.addQueue(url, addedBy, method, type, gotData, preventCache);
   }
 
-  override async next(){
-    if(this.isBGM){
+  override async next() {
+    if (this.isBGM) {
       this.server.player.resetError();
-      if(this.server.bgmConfig.enableQueueLoop){
+      if (this.server.bgmConfig.enableQueueLoop) {
         this._bgmDefault.push(this._bgmDefault[0]);
       }
       this._bgmDefault.shift();
-    }else{
+    } else {
       return super.next();
     }
   }

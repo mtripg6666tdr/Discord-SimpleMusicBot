@@ -24,19 +24,22 @@ import { CommandMessage } from "../Component/CommandMessage";
 import Util from "../Util";
 
 export default class Invoke extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "インボーク",
       alias: ["invoke"],
-      description: "指定されたコマンドを実行します。基本的に使用しないでください",
+      description:
+        "指定されたコマンドを実行します。基本的に使用しないでください",
       unlist: false,
       category: "utility",
-      argument: [{
-        name: "command",
-        description: "実行するコマンド",
-        type: "string",
-        required: true
-      }],
+      argument: [
+        {
+          name: "command",
+          description: "実行するコマンド",
+          type: "string",
+          required: true,
+        },
+      ],
       usage: "invoke <コマンド>",
       examples: "invoke play 夜に駆ける",
       requiredPermissionsOr: [],
@@ -44,34 +47,55 @@ export default class Invoke extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    if(options.rawArgs.startsWith("sp;") && Util.general.isBotAdmin(message.member.id)){
-      this.evaluateSpecialCommands(options.rawArgs.substring(3), message, options)
+  async run(message: CommandMessage, options: CommandArgs) {
+    if (
+      options.rawArgs.startsWith("sp;") &&
+      Util.general.isBotAdmin(message.member.id)
+    ) {
+      this.evaluateSpecialCommands(
+        options.rawArgs.substring(3),
+        message,
+        options,
+      )
         .then(result => message.reply(result))
-        .catch(er => Util.logger.log(er, "error"))
-      ;
+        .catch(er => Util.logger.log(er, "error"));
       return;
     }
-    const commandInfo = CommandMessage.resolveCommandMessage(options.rawArgs, 0);
-    if(commandInfo.command === "invoke"){
-      await message.reply("invokeコマンドをinvokeコマンドで実行することはできません").catch(er => Util.logger.log(er, "error"));
+    const commandInfo = CommandMessage.resolveCommandMessage(
+      options.rawArgs,
+      0,
+    );
+    if (commandInfo.command === "invoke") {
+      await message
+        .reply("invokeコマンドをinvokeコマンドで実行することはできません")
+        .catch(er => Util.logger.log(er, "error"));
       return;
     }
     const ci = CommandManager.instance.resolve(commandInfo.command);
-    if(ci){
+    if (ci) {
       options.args = commandInfo.options;
       options.rawArgs = commandInfo.rawOptions;
-      await ci.checkAndRun(message, options).catch(er => Util.logger.log(er, "error"));
-      if(!message["isMessage"] && !message["_interactionReplied"]){
-        await message.reply("実行しました").catch(er => Util.logger.log(er, "error"));
+      await ci
+        .checkAndRun(message, options)
+        .catch(er => Util.logger.log(er, "error"));
+      if (!message["isMessage"] && !message["_interactionReplied"]) {
+        await message
+          .reply("実行しました")
+          .catch(er => Util.logger.log(er, "error"));
       }
-    }else{
-      await message.reply("コマンドが見つかりませんでした").catch(er => Util.logger.log(er, "error"));
+    } else {
+      await message
+        .reply("コマンドが見つかりませんでした")
+        .catch(er => Util.logger.log(er, "error"));
     }
   }
 
-  private async evaluateSpecialCommands(specialCommand: string, message: CommandMessage, options: CommandArgs){
-    switch(specialCommand){
+  private async evaluateSpecialCommands(
+    specialCommand: string,
+    message: CommandMessage,
+    options: CommandArgs,
+  ) {
+    switch (specialCommand) {
       case "cleanupsc":
         await CommandManager.instance.sync(options.client, true);
         break;
@@ -79,7 +103,10 @@ export default class Invoke extends BaseCommand {
         CommandManager.instance.removeAllApplicationCommand(options.client);
         break;
       case "removescg":
-        CommandManager.instance.removeAllGuildCommand(options.client, message.guild.id);
+        CommandManager.instance.removeAllGuildCommand(
+          options.client,
+          message.guild.id,
+        );
         break;
       case "enabledsl":
         options.server.player.detailedLog = true;
@@ -94,27 +121,37 @@ export default class Invoke extends BaseCommand {
         options.server.player.disableDetailedLogMemory = true;
         break;
       case "obtainsyslog":
-        message.reply({
-          files: [
-            {
-              file: Buffer.from(Util.logger.logStore.data.join("\r\n")),
-              name: "log.txt"
-            }
-          ]
-        }).catch(er => Util.logger.log(er));
-        break;
-      case "obtaindsl":
-        if(options.server.player.csvLog.length === 0){
-          message.reply(`データが見つかりません。最後のファイル名: ${options.server.player.csvLogFilename || "なし"}`).catch(er => Util.logger.log(er, "error"));
-        }else{
-          message.reply({
+        message
+          .reply({
             files: [
               {
-                file: Buffer.from(options.server.player.csvLog.join("\r\n")),
-                name: "detailed_log.csv"
-              }
-            ]
-          }).catch(er => Util.logger.log(er, "error"));
+                file: Buffer.from(Util.logger.logStore.data.join("\r\n")),
+                name: "log.txt",
+              },
+            ],
+          })
+          .catch(er => Util.logger.log(er));
+        break;
+      case "obtaindsl":
+        if (options.server.player.csvLog.length === 0) {
+          message
+            .reply(
+              `データが見つかりません。最後のファイル名: ${
+                options.server.player.csvLogFilename || "なし"
+              }`,
+            )
+            .catch(er => Util.logger.log(er, "error"));
+        } else {
+          message
+            .reply({
+              files: [
+                {
+                  file: Buffer.from(options.server.player.csvLog.join("\r\n")),
+                  name: "detailed_log.csv",
+                },
+              ],
+            })
+            .catch(er => Util.logger.log(er, "error"));
         }
         break;
       default:

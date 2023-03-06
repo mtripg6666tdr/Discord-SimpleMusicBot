@@ -26,69 +26,86 @@ import { Util } from "../Util";
 import { getColor } from "../Util/color";
 
 export default class Thumbnail extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "サムネイル",
       alias: ["サムネ", "thumbnail", "thumb", "t"],
-      description: "現在再生中のサムネイルを表示します。検索パネルが開いていて検索パネル中の番号が指定された場合にはその曲のサムネイルを表示します。",
+      description:
+        "現在再生中のサムネイルを表示します。検索パネルが開いていて検索パネル中の番号が指定された場合にはその曲のサムネイルを表示します。",
       unlist: false,
       category: "player",
       examples: "サムネイル 5",
       usage: "サムネイル [検索パネル中のインデックス]",
-      argument: [{
-        type: "integer",
-        name: "index",
-        description: "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します",
-        required: false
-      }],
+      argument: [
+        {
+          type: "integer",
+          name: "index",
+          description:
+            "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します",
+          required: false,
+        },
+      ],
       requiredPermissionsOr: [],
       shouldDefer: false,
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
     const embed = new Helper.MessageEmbedBuilder();
     embed.setColor(getColor("THUMB"));
     const userSearchPanel = options.server.getSearchPanel(message.member.id);
     const rawArgNumber = Number(options.rawArgs);
-    if(options.rawArgs && userSearchPanel && 0 < rawArgNumber && rawArgNumber <= userSearchPanel.options.length){
+    if (
+      options.rawArgs &&
+      userSearchPanel &&
+      0 < rawArgNumber &&
+      rawArgNumber <= userSearchPanel.options.length
+    ) {
       const opt = userSearchPanel.options[rawArgNumber - 1];
       embed
         .setImage(opt.thumbnail)
         .setTitle(opt.title)
-        .setDescription("URL: " + opt.url)
-      ;
-    }else if(!options.rawArgs && options.server.player.isPlaying && options.server.queue.length >= 1){
+        .setDescription("URL: " + opt.url);
+    } else if (
+      !options.rawArgs &&
+      options.server.player.isPlaying &&
+      options.server.queue.length >= 1
+    ) {
       const info = options.server.queue.get(0).basicInfo;
-      embed
-        .setTitle(info.Title)
-        .setDescription("URL: " + info.Url)
-      ;
-      if(typeof info.Thumbnail === "string"){
+      embed.setTitle(info.Title).setDescription("URL: " + info.Url);
+      if (typeof info.Thumbnail === "string") {
         embed.setImage(info.Thumbnail);
-        await message.reply({
-          embeds: [embed.toEris()]
-        }).catch(e => Util.logger.log(e, "error"));
-      }else{
+        await message
+          .reply({
+            embeds: [embed.toEris()],
+          })
+          .catch(e => Util.logger.log(e, "error"));
+      } else {
         embed.setImage("attachment://thumbnail." + info.Thumbnail.ext);
-        await message.reply({
-          embeds: [embed.toEris()],
-          files: [
-            {
-              name: "thumbnail." + info.Thumbnail.ext,
-              file: info.Thumbnail.data,
-            },
-          ],
-        }).catch(e => Util.logger.log(e, "error"));
+        await message
+          .reply({
+            embeds: [embed.toEris()],
+            files: [
+              {
+                name: "thumbnail." + info.Thumbnail.ext,
+                file: info.Thumbnail.data,
+              },
+            ],
+          })
+          .catch(e => Util.logger.log(e, "error"));
       }
-    }else{
-      message.reply("✘検索結果が見つかりません").catch(e => Util.logger.log(e, "error"));
+    } else {
+      message
+        .reply("✘検索結果が見つかりません")
+        .catch(e => Util.logger.log(e, "error"));
       return;
     }
-    
-    await message.reply({
-      embeds: [embed.toEris()]
-    }).catch(e => Util.logger.log(e, "error"));
+
+    await message
+      .reply({
+        embeds: [embed.toEris()],
+      })
+      .catch(e => Util.logger.log(e, "error"));
   }
 }

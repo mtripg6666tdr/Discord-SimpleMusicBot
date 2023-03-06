@@ -29,24 +29,30 @@ export class GoogleDrive extends AudioSource {
   protected readonly _serviceIdentifer = "googledrive";
   Thumbnail: string = DefaultAudioThumbnailURL;
 
-  async init(url: string, prefetched: exportableCustom){
-    if(prefetched){
+  async init(url: string, prefetched: exportableCustom) {
+    if (prefetched) {
       this.Title = prefetched.title || "Googleドライブストリーム";
       this.Url = url;
       this._lengthSeconds = prefetched.length;
-    }else{
+    } else {
       this.Title = "Googleドライブストリーム";
       this.Url = url;
-      if(await Util.web.RetriveHttpStatusCode(this.Url) !== 200) throw new Error("URLがみつかりません");
-      try{
-        this._lengthSeconds = await Util.web.RetriveLengthSeconds((await this.fetch()).url);
+      if ((await Util.web.RetriveHttpStatusCode(this.Url)) !== 200)
+        throw new Error("URLがみつかりません");
+      try {
+        this._lengthSeconds = await Util.web.RetriveLengthSeconds(
+          (
+            await this.fetch()
+          ).url,
+        );
+      } catch {
+        /* empty */
       }
-      catch{ /* empty */ }
     }
     return this;
   }
 
-  async fetch(): Promise<UrlStreamInfo>{
+  async fetch(): Promise<UrlStreamInfo> {
     const id = GoogleDrive.getId(this.Url);
     return {
       type: "url",
@@ -54,16 +60,20 @@ export class GoogleDrive extends AudioSource {
     };
   }
 
-  toField(){
-    return [{
-      name: ":asterisk:詳細",
-      value: "Googleドライブにて共有されたファイル"
-    }] as EmbedField[];
+  toField() {
+    return [
+      {
+        name: ":asterisk:詳細",
+        value: "Googleドライブにて共有されたファイル",
+      },
+    ] as EmbedField[];
   }
 
-  npAdditional(){return "";}
+  npAdditional() {
+    return "";
+  }
 
-  exportData(): exportableCustom{
+  exportData(): exportableCustom {
     return {
       url: this.Url,
       length: this._lengthSeconds,
@@ -71,12 +81,16 @@ export class GoogleDrive extends AudioSource {
     };
   }
 
-  static validateUrl(url: string){
-    return Boolean(url.match(/^https?:\/\/drive\.google\.com\/file\/d\/([^/?]+)(\/.+)?$/));
+  static validateUrl(url: string) {
+    return Boolean(
+      url.match(/^https?:\/\/drive\.google\.com\/file\/d\/([^/?]+)(\/.+)?$/),
+    );
   }
 
-  static getId(url: string){
-    const match = url.match(/^https?:\/\/drive\.google\.com\/file\/d\/(?<id>[^/?]+)(\/.+)?$/);
+  static getId(url: string) {
+    const match = url.match(
+      /^https?:\/\/drive\.google\.com\/file\/d\/(?<id>[^/?]+)(\/.+)?$/,
+    );
     return match ? match.groups.id : null;
   }
 }

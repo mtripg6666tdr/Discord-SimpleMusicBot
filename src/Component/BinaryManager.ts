@@ -28,76 +28,89 @@ import pEvent from "p-event";
 import { LogEmitter } from "../Structure";
 
 type BinaryManagerOptions = {
-  binaryName: string,
-  localBinaryName: string,
-  binaryRepo: string,
-  checkImmediately: boolean,
-  checkVersionArgs?: readonly string[],
-  checkUpdateTimeout?: number,
+  binaryName: string;
+  localBinaryName: string;
+  binaryRepo: string;
+  checkImmediately: boolean;
+  checkVersionArgs?: readonly string[];
+  checkUpdateTimeout?: number;
 };
 
 export class BinaryManager extends LogEmitter {
-  protected readonly checkUpdateTimeout = this.options.checkUpdateTimeout || 1000 * 60 /* 1 min */ * 60 /* 1 hour */ * 3/* 3 hour */;
+  protected readonly checkUpdateTimeout =
+    this.options.checkUpdateTimeout ||
+    1000 * 60 /* 1 min */ * 60 /* 1 hour */ * 3 /* 3 hour */;
   protected baseUrl = path.join(__dirname, "../../bin");
   protected lastChecked: number = 0;
   protected releaseInfo: GitHubRelease = null;
 
-  get binaryPath(){
-    return path.join(this.baseUrl, "./", this.options.localBinaryName + (process.platform === "win32" ? ".exe" : ""));
+  get binaryPath() {
+    return path.join(
+      this.baseUrl,
+      "./",
+      this.options.localBinaryName +
+        (process.platform === "win32" ? ".exe" : ""),
+    );
   }
 
-  get isStaleInfo(){
+  get isStaleInfo() {
     return Date.now() - this.lastChecked >= this.checkUpdateTimeout;
   }
 
-  constructor(protected options: Readonly<BinaryManagerOptions>){
+  constructor(protected options: Readonly<BinaryManagerOptions>) {
     super();
     this.setTag(`BinaryManager(${options.localBinaryName})`);
-    if(!fs.existsSync(this.baseUrl)){
-      try{
+    if (!fs.existsSync(this.baseUrl)) {
+      try {
         fs.mkdirSync(this.baseUrl);
-      }
-      catch(e){
+      } catch (e) {
         this.Log(e, "warn");
         this.Log("Fallbacking to the root directory");
         this.baseUrl = path.join(__dirname, "../../");
       }
     }
-    if(options.checkImmediately){
+    if (options.checkImmediately) {
       const latest = this.checkIsLatestVersion();
-      if(!latest){
+      if (!latest) {
         this.downloadBinary();
       }
     }
   }
 
   private readonly getReleaseInfoLocker = new LockObj();
-  protected async getReleaseInfo(){
+  protected async getReleaseInfo() {
     return lock(this.getReleaseInfoLocker, async () => {
-      if(this.releaseInfo && !this.isStaleInfo){
-        this.Log("Skipping the binary info fetching due to valid info cache found");
+      if (this.releaseInfo && !this.isStaleInfo) {
+        this.Log(
+          "Skipping the binary info fetching due to valid info cache found",
+        );
         return this.releaseInfo;
       }
-      const { body } = await candyget.json<GitHubRelease>(`https://api.github.com/repos/${this.options.binaryRepo}/releases/latest`, {
-        headers: {
-          "Accept": "application/vnd.github.v3+json",
-          "User-Agent": "mtripg6666tdr/Discord-SimpleMusicBot"
+      const {body} = await candyget.json<GitHubRelease>(
+        `https://api.github.com/repos/${this.options.binaryRepo}/releases/latest`,
+        {
+          headers: {
+            "Accept": "application/vnd.github.v3+json",
+            "User-Agent": "mtripg6666tdr/Discord-SimpleMusicBot",
+          },
+          validator: (res): res is GitHubRelease => true,
         },
-        validator: (res): res is GitHubRelease => true,
-      });
-      return this.releaseInfo = body;
+      );
+      return (this.releaseInfo = body);
     });
   }
 
-  protected async checkIsLatestVersion(){
+  protected async checkIsLatestVersion() {
     this.lastChecked = Date.now();
-    if(!fs.existsSync(this.binaryPath)){
+    if (!fs.existsSync(this.binaryPath)) {
       return false;
-    }else{
+    } else {
       this.Log("Checking the latest version");
       const [latestVersion, currentVersion] = await Promise.all([
         this.getReleaseInfo().then(info => info.tag_name),
-        this.exec(this.options.checkVersionArgs || ["--version"]).then(output => output.trim()),
+        this.exec(this.options.checkVersionArgs || ["--version"]).then(output =>
+          output.trim(),
+        ),
       ]);
       const isLatest = latestVersion === currentVersion;
       this.Log(isLatest ? "The binary is latest" : "The binary is stale");
@@ -105,47 +118,49 @@ export class BinaryManager extends LogEmitter {
     }
   }
 
-  protected async downloadBinary(){
-    if(!this.releaseInfo){
+  protected async downloadBinary() {
+    if (!this.releaseInfo) {
       await this.getReleaseInfo();
     }
-    const binaryUrl = this.releaseInfo.assets.find(asset => asset.name === `${this.options.binaryName}${process.platform === "win32" ? ".exe" : ""}`)?.browser_download_url;
-    if(!binaryUrl){
+    const binaryUrl = this.releaseInfo.assets.find(
+      asset =>
+        asset.name ===
+        `${this.options.binaryName}${
+          process.platform === "win32" ? ".exe" : ""
+        }`,
+    )?.browser_download_url;
+    if (!binaryUrl) {
       throw new Error("No binary url detected");
-    }else{
+    } else {
       this.Log("Start downloading the binary");
       const result = await candyget.stream(binaryUrl, {
         headers: {
           "Accept": "*/*",
-          "User-Agent": "mtripg6666tdr/Discord-SimpleMusicBot"
-        }
+          "User-Agent": "mtripg6666tdr/Discord-SimpleMusicBot",
+        },
       });
-      const fileStream = result.body.pipe(fs.createWriteStream(this.binaryPath, {
-        mode: 0o777,
-      }));
+      const fileStream = result.body.pipe(
+        fs.createWriteStream(this.binaryPath, {
+          mode: 0o777,
+        }),
+      );
       await Promise.all([
-        pEvent(
-          result.body,
-          "close",
-        ),
-        pEvent(
-          fileStream,
-          "close",
-        )
+        pEvent(result.body, "close"),
+        pEvent(fileStream, "close"),
       ]);
       this.Log("Finish downloading the binary");
     }
   }
 
-  async exec(args: readonly string[]): Promise<string>{
-    if(!fs.existsSync(this.binaryPath) || this.isStaleInfo){
+  async exec(args: readonly string[]): Promise<string> {
+    if (!fs.existsSync(this.binaryPath) || this.isStaleInfo) {
       const latest = await this.checkIsLatestVersion();
-      if(!latest){
+      if (!latest) {
         await this.downloadBinary();
       }
     }
     return new Promise((resolve, reject) => {
-      try{
+      try {
         this.Log(`Passing arguments: ${args.join(" ")}`);
         const process = spawn(this.binaryPath, args, {
           stdio: ["ignore", "pipe", "pipe"],
@@ -155,13 +170,10 @@ export class BinaryManager extends LogEmitter {
         let bufs: Buffer[] = [];
         let ended = false;
         const onEnd = () => {
-          if(ended) return;
+          if (ended) return;
           ended = true;
-          resolve(
-            Buffer.concat(bufs).toString()
-              .trim()
-          );
-          if(process.connected){
+          resolve(Buffer.concat(bufs).toString().trim());
+          if (process.connected) {
             process.kill("SIGTERM");
           }
         };
@@ -172,9 +184,10 @@ export class BinaryManager extends LogEmitter {
           bufs = null;
           reject(err);
         });
-        process.stderr.on("data", (chunk: Buffer) => this.Log(`[Child] ${chunk.toString()}`));
-      }
-      catch(e){
+        process.stderr.on("data", (chunk: Buffer) =>
+          this.Log(`[Child] ${chunk.toString()}`),
+        );
+      } catch (e) {
         reject(e);
       }
     });
@@ -223,11 +236,11 @@ export interface Asset {
 export enum ContentType {
   ApplicationOctetStream = "application/octet-stream",
   ApplicationPGPSignature = "application/pgp-signature",
-  ApplicationXTar = "application/x-tar"
+  ApplicationXTar = "application/x-tar",
 }
 
 export enum State {
-  Uploaded = "uploaded"
+  Uploaded = "uploaded",
 }
 
 export interface Author {
@@ -252,18 +265,18 @@ export interface Author {
 }
 
 enum Type {
-  User = "User"
+  User = "User",
 }
 
 interface Reactions {
-  url: string;
-  total_count: number;
+  "url": string;
+  "total_count": number;
   "+1": number;
   "-1": number;
-  laugh: number;
-  hooray: number;
-  confused: number;
-  heart: number;
-  rocket: number;
-  eyes: number;
+  "laugh": number;
+  "hooray": number;
+  "confused": number;
+  "heart": number;
+  "rocket": number;
+  "eyes": number;
 }

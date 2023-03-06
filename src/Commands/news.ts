@@ -25,7 +25,7 @@ import { BaseCommand } from ".";
 import { Util } from "../Util";
 
 export default class News extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "ニュース",
       alias: ["news"],
@@ -37,27 +37,40 @@ export default class News extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
     options.server.joinVoiceChannel(message);
-    const url = "https://www.youtube.com/playlist?list=PL3ZQ5CpNulQk8-p0CWo9ufI81IdrGoyNZ";
-    if(options.server.hasSearchPanel(message.member.id)){
-      message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
+    const url =
+      "https://www.youtube.com/playlist?list=PL3ZQ5CpNulQk8-p0CWo9ufI81IdrGoyNZ";
+    if (options.server.hasSearchPanel(message.member.id)) {
+      message
+        .reply("✘既に開かれている検索窓があります")
+        .catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const searchPanel = options.server.createSearchPanel(message, "ニューストピックス", true);
-    if(!searchPanel) return;
-    const result = await searchPanel.consumeSearchResult(ytpl.default(url, {
-      gl: "JP", hl: "ja", limit: 20
-    }), ({items}) => items.map(item => ({
-      title: item.title,
-      author: item.author.name,
-      description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`,
-      duration: item.duration,
-      thumbnail: item.thumbnails[0].url,
-      url: item.url,
-    })));
-    if(result){
+    const searchPanel = options.server.createSearchPanel(
+      message,
+      "ニューストピックス",
+      true,
+    );
+    if (!searchPanel) return;
+    const result = await searchPanel.consumeSearchResult(
+      ytpl.default(url, {
+        gl: "JP",
+        hl: "ja",
+        limit: 20,
+      }),
+      ({items}) =>
+        items.map(item => ({
+          title: item.title,
+          author: item.author.name,
+          description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`,
+          duration: item.duration,
+          thumbnail: item.thumbnails[0].url,
+          url: item.url,
+        })),
+    );
+    if (result) {
       options.server.bindSearchPanel(searchPanel);
     }
   }

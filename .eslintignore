@@ -7,3 +7,5 @@ util/exampleDbServer/node/dist
 test/*
 dist/*
 docs
+*.tmp.*
+*.temp.*

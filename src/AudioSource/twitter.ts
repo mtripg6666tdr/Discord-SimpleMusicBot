@@ -30,56 +30,68 @@ export class Twitter extends AudioSource {
   Thumbnail = DefaultAudioThumbnailURL;
   private streamUrl = "";
 
-  async init(url: string, prefetched?: exportableTwitter){
+  async init(url: string, prefetched?: exportableTwitter) {
     this.Url = url;
-    if(!Twitter.validateUrl(url)) throw new Error("Invalid streamable url");
-    if(prefetched){
+    if (!Twitter.validateUrl(url)) throw new Error("Invalid streamable url");
+    if (prefetched) {
       this._lengthSeconds = prefetched.length;
       this.Title = prefetched.title;
       this.streamUrl = prefetched.streamUrl;
-    }else{
+    } else {
       const streamInfo = await twitterDl(url.split("?")[0]);
-      if(!streamInfo.found) throw new Error("error" in streamInfo && streamInfo.error);
+      if (!streamInfo.found)
+        throw new Error("error" in streamInfo && streamInfo.error);
       this._lengthSeconds = Math.floor(streamInfo.duration);
       this.Title = `${streamInfo.tweet_user.name}(@${streamInfo.tweet_user.username})のツイート`;
-      if(!streamInfo.download){
+      if (!streamInfo.download) {
         throw new Error("No media found");
       }
       this.streamUrl = streamInfo.download.sort((a, b) => {
-        const getDimensionFactor = (dimension: string) => dimension.split("x").reduce((prev, current) => prev + Number(current), 1);
-        return getDimensionFactor(b.dimension) - getDimensionFactor(a.dimension);
+        const getDimensionFactor = (dimension: string) =>
+          dimension
+            .split("x")
+            .reduce((prev, current) => prev + Number(current), 1);
+        return (
+          getDimensionFactor(b.dimension) - getDimensionFactor(a.dimension)
+        );
       })[0]?.url;
       this.Description = streamInfo.tweet_user.text;
-      if(!this.streamUrl){
+      if (!this.streamUrl) {
         throw new Error("No format found");
       }
     }
     return this;
   }
 
-  async fetch(): Promise<UrlStreamInfo>{
+  async fetch(): Promise<UrlStreamInfo> {
     return {
       type: "url",
-      url: this.streamUrl
+      url: this.streamUrl,
     };
   }
 
-  toField(){
-    return [{
-      name: ":link:URL",
-      value: this.Url
-    }, {
-      name: "ツイートの内容",
-      value: this.Description.substring(0, 1950),
-    }, {
-      name: ":asterisk:詳細",
-      value: "Twitterにて共有されたファイル"
-    }] as EmbedField[];
+  toField() {
+    return [
+      {
+        name: ":link:URL",
+        value: this.Url,
+      },
+      {
+        name: "ツイートの内容",
+        value: this.Description.substring(0, 1950),
+      },
+      {
+        name: ":asterisk:詳細",
+        value: "Twitterにて共有されたファイル",
+      },
+    ] as EmbedField[];
   }
 
-  npAdditional(){return "";}
+  npAdditional() {
+    return "";
+  }
 
-  exportData(): exportableTwitter{
+  exportData(): exportableTwitter {
     return {
       url: this.Url,
       length: this.LengthSeconds,
@@ -88,11 +100,13 @@ export class Twitter extends AudioSource {
     };
   }
 
-  static validateUrl(url: string){
-    return !!url.match(/^https?:\/\/twitter\.com\/[a-zA-Z0-9_-]+\/status\/\d+(\?.+)?$/);
+  static validateUrl(url: string) {
+    return !!url.match(
+      /^https?:\/\/twitter\.com\/[a-zA-Z0-9_-]+\/status\/\d+(\?.+)?$/,
+    );
   }
 }
 
 export type exportableTwitter = exportableCustom & {
-  streamUrl: string,
+  streamUrl: string;
 };

@@ -17,8 +17,19 @@
  */
 
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { ListCommandInitializeOptions, UnlistCommandInitializeOptions, ListCommandWithArgumentsInitializeOptions, CommandArgs, SlashCommandArgument, CommandPermission } from "../Structure/Command";
-import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString } from "eris";
+import type {
+  ListCommandInitializeOptions,
+  UnlistCommandInitializeOptions,
+  ListCommandWithArgumentsInitializeOptions,
+  CommandArgs,
+  SlashCommandArgument,
+  CommandPermission,
+} from "../Structure/Command";
+import type {
+  ApplicationCommandOptionsBoolean,
+  ApplicationCommandOptionsInteger,
+  ApplicationCommandOptionsString,
+} from "eris";
 
 import { Constants } from "eris";
 
@@ -26,85 +37,99 @@ import { CommandManager } from "../Component/CommandManager";
 import { permissionDescriptionParts } from "../Structure/Command";
 import Util from "../Util";
 
-export { CommandArgs } from "../Structure/Command";
+export {CommandArgs} from "../Structure/Command";
 
 /**
  * すべてのコマンドハンドラーの基底クラスです
  */
 export abstract class BaseCommand {
-  protected abstract run(message: CommandMessage, options: Readonly<CommandArgs>): Promise<void>;
-  
+  protected abstract run(
+    message: CommandMessage,
+    options: Readonly<CommandArgs>,
+  ): Promise<void>;
+
   protected readonly _name: string;
-  public get name(){
+  public get name() {
     return this._name;
   }
 
   protected readonly _alias: Readonly<string[]>;
-  public get alias(){
+  public get alias() {
     return this._alias;
   }
 
   protected readonly _description: string = null;
-  public get description(){
+  public get description() {
     return this._description;
   }
 
   protected readonly _unlist: boolean;
-  public get unlist(){
+  public get unlist() {
     return this._unlist;
   }
 
   protected readonly _examples: string = null;
-  public get examples(){
+  public get examples() {
     return this._examples;
   }
 
   protected readonly _usage: string = null;
-  public get usage(){
+  public get usage() {
     return this._usage;
   }
 
   protected readonly _category: string = null;
-  public get category(){
+  public get category() {
     return this._category;
   }
 
   protected readonly _shouldDefer: boolean = false;
-  public get shouldDefer(){
+  public get shouldDefer() {
     return this._shouldDefer;
   }
 
   protected readonly _argument: Readonly<SlashCommandArgument[]> = null;
-  public get argument(){
+  public get argument() {
     return this._argument;
   }
 
-  get asciiName(){
+  get asciiName() {
     return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
   }
 
   protected readonly _requiredPermissionsOr: CommandPermission[] = null;
-  public get requiredPermissionsOr(){
+  public get requiredPermissionsOr() {
     return this._requiredPermissionsOr || [];
   }
 
-  get permissionDescription(){
+  get permissionDescription() {
     const perms = this.requiredPermissionsOr.filter(perm => perm !== "admin");
-    if(perms.length === 0){
+    if (perms.length === 0) {
       return "なし";
-    }else{
-      return `${perms.map(permission => permissionDescriptionParts[permission]).join("、")}${perms.length > 1 ? "のいずれか" : ""}`;
+    } else {
+      return `${perms
+        .map(permission => permissionDescriptionParts[permission])
+        .join("、")}${perms.length > 1 ? "のいずれか" : ""}`;
     }
   }
 
-  constructor(opts: ListCommandInitializeOptions|UnlistCommandInitializeOptions){
+  constructor(
+    opts: ListCommandInitializeOptions | UnlistCommandInitializeOptions,
+  ) {
     this._name = opts.name;
     this._alias = opts.alias;
     this._unlist = opts.unlist;
     this._shouldDefer = opts.shouldDefer;
-    if(!this._unlist){
-      if(!this.asciiName) throw new Error("Command has not ascii name");
-      const { description, examples, usage, category, argument, requiredPermissionsOr } = opts as ListCommandWithArgumentsInitializeOptions;
+    if (!this._unlist) {
+      if (!this.asciiName) throw new Error("Command has not ascii name");
+      const {
+        description,
+        examples,
+        usage,
+        category,
+        argument,
+        requiredPermissionsOr,
+      } = opts as ListCommandWithArgumentsInitializeOptions;
       this._description = description;
       this._examples = examples || null;
       this._usage = usage || null;
@@ -114,27 +139,32 @@ export abstract class BaseCommand {
     }
   }
 
-  async checkAndRun(message: CommandMessage, options: Readonly<CommandArgs>){
+  async checkAndRun(message: CommandMessage, options: Readonly<CommandArgs>) {
     const judgeIfPermissionMeeted = (perm: CommandPermission) => {
-      if(perm === "admin"){
+      if (perm === "admin") {
         return Util.eris.user.isPrivileged(message.member);
-      }else if(perm === "dj"){
+      } else if (perm === "dj") {
         return Util.eris.user.isDJ(message.member, options);
-      }else if(perm === "manageGuild"){
+      } else if (perm === "manageGuild") {
         return message.member.permissions.has("manageGuild");
-      }else if(perm === "manageMessages"){
-        return message.channel.permissionsOf(message.member).has("manageMessages");
-      }else if(perm === "noConnection"){
+      } else if (perm === "manageMessages") {
+        return message.channel
+          .permissionsOf(message.member)
+          .has("manageMessages");
+      } else if (perm === "noConnection") {
         return !options.server.player.isConnecting;
-      }else if(perm === "onlyListener"){
+      } else if (perm === "onlyListener") {
         return Util.eris.channel.isOnlyListener(message.member, options);
-      }else if(perm === "sameVc"){
+      } else if (perm === "sameVc") {
         return Util.eris.channel.sameVC(message.member, options);
-      }else{
+      } else {
         return false;
       }
     };
-    if(this.requiredPermissionsOr.length !== 0 && !this.requiredPermissionsOr.some(judgeIfPermissionMeeted)){
+    if (
+      this.requiredPermissionsOr.length !== 0 &&
+      !this.requiredPermissionsOr.some(judgeIfPermissionMeeted)
+    ) {
       await message.reply({
         content: `この操作を実行するには、${this.permissionDescription}が必要です。`,
         ephemeral: true,
@@ -144,30 +174,36 @@ export abstract class BaseCommand {
     await this.run(message, options);
   }
 
-  toApplicationCommandStructure(){
-    if(this.unlist) throw new Error("This command cannot be listed due to private command!");
+  toApplicationCommandStructure() {
+    if (this.unlist)
+      throw new Error("This command cannot be listed due to private command!");
     const options = this.argument?.map(arg => {
       const erisCommandStruct = {
         type: CommandManager.mapCommandOptionTypeToInteger(arg.type),
         name: arg.name,
         description: arg.description.replace(/\r/g, "").replace(/\n/g, ""),
         required: arg.required,
-        choices: !arg.choices ? undefined : Object.keys(arg.choices).map(name => ({
-          name,
-          value: arg.choices[name],
-        }))
+        choices: !arg.choices
+          ? undefined
+          : Object.keys(arg.choices).map(name => ({
+              name,
+              value: arg.choices[name],
+            })),
       };
-      if(!erisCommandStruct.choices) delete erisCommandStruct.choices;
-      return erisCommandStruct as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean;
+      if (!erisCommandStruct.choices) delete erisCommandStruct.choices;
+      return erisCommandStruct as
+        | ApplicationCommandOptionsString
+        | ApplicationCommandOptionsInteger
+        | ApplicationCommandOptionsBoolean;
     });
-    if(options && options.length > 0){
+    if (options && options.length > 0) {
       return {
         type: Constants.ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
         description: this.description,
         options,
       };
-    }else{
+    } else {
       return {
         type: Constants.ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,

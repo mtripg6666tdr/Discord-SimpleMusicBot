@@ -29,32 +29,41 @@ export const EffectsCustomIds = {
   LoudnessEqualization: "loudness_eq",
 };
 
-export function getFFmpegEffectArgs(data: GuildDataContainer){
+export function getFFmpegEffectArgs(data: GuildDataContainer) {
   const effect = [];
-  if(data.effectPrefs.BassBoost) effect.push("firequalizer=gain_entry='entry(75,2)'");
-  if(data.effectPrefs.Reverb) effect.push("aecho=1.0:0.7:20:0.5");
-  if(data.effectPrefs.LoudnessEqualization) effect.push("loudnorm");
-  
-  if(effect.length >= 1){
+  if (data.effectPrefs.BassBoost)
+    effect.push("firequalizer=gain_entry='entry(75,2)'");
+  if (data.effectPrefs.Reverb) effect.push("aecho=1.0:0.7:20:0.5");
+  if (data.effectPrefs.LoudnessEqualization) effect.push("loudnorm");
+
+  if (effect.length >= 1) {
     return ["-af", effect.join(",")];
-  }else{
+  } else {
     return [];
   }
 }
 
-export function getCurrentEffectPanel(avatarUrl: string, data: GuildDataContainer){
+export function getCurrentEffectPanel(
+  avatarUrl: string,
+  data: GuildDataContainer,
+) {
   const embed = new Helper.MessageEmbedBuilder()
     .setTitle(":cd:エフェクトコントロールパネル:microphone:")
-    .setDescription("オーディオエフェクトの設定/解除することができます。\r\n・表示は古い情報であることがありますが、エフェクトを操作したとき、更新ボタンを押したときに更新されます。\r\n・エフェクトは次の曲から適用されます\r\n現在の曲に適用したい場合は、`頭出し`コマンドを使用してください\r\n")
+    .setDescription(
+      "オーディオエフェクトの設定/解除することができます。\r\n・表示は古い情報であることがありますが、エフェクトを操作したとき、更新ボタンを押したときに更新されます。\r\n・エフェクトは次の曲から適用されます\r\n現在の曲に適用したい場合は、`頭出し`コマンドを使用してください\r\n",
+    )
     .addField("Bass Boost", data.effectPrefs.BassBoost ? "⭕" : "❌", true)
     .addField("Reverb", data.effectPrefs.Reverb ? "⭕" : "❌", true)
-    .addField("Loudness Eq", data.effectPrefs.LoudnessEqualization ? "⭕" : "❌", true)
+    .addField(
+      "Loudness Eq",
+      data.effectPrefs.LoudnessEqualization ? "⭕" : "❌",
+      true,
+    )
     .setColor(getColor("EFFECT"))
     .setFooter({
       icon_url: avatarUrl,
-      text: "エフェクトを選択してボタンを押してください"
-    })
-  ;
+      text: "エフェクトを選択してボタンを押してください",
+    });
   const messageActions = new Helper.MessageActionRowBuilder()
     .addComponents(
       new Helper.MessageButtonBuilder()
@@ -72,11 +81,11 @@ export function getCurrentEffectPanel(avatarUrl: string, data: GuildDataContaine
         .setLabel("Reverb"),
       new Helper.MessageButtonBuilder()
         .setCustomId("loudness_eq")
-        .setStyle(data.effectPrefs.LoudnessEqualization ? "SUCCESS" : "SECONDARY")
-        .setLabel("Loudness Eq")
+        .setStyle(
+          data.effectPrefs.LoudnessEqualization ? "SUCCESS" : "SECONDARY",
+        )
+        .setLabel("Loudness Eq"),
     )
-    .toEris()
-  ;
-  
-  return { embed, messageActions };
+    .toEris();
+  return {embed, messageActions};
 }

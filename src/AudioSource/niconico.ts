@@ -34,19 +34,20 @@ export class NicoNicoS extends AudioSource {
   Author = "";
   Views = 0;
 
-  async init(url: string, prefetched: exportableNicoNico){
+  async init(url: string, prefetched: exportableNicoNico) {
     this.Url = url;
     this.nico = new NiconicoDL(url, /* quality */ "high");
-    if(prefetched){
+    if (prefetched) {
       this.Title = prefetched.title;
       this.Description = htmlToText(prefetched.description);
       this._lengthSeconds = prefetched.length;
       this.Author = prefetched.author;
       this.Thumbnail = prefetched.thumbnail;
       this.Views = prefetched.views;
-    }else{
+    } else {
       const info = await this.nico.getVideoInfo();
-      if(info.isDeleted || info.isPrivate) throw new Error("動画が再生できません");
+      if (info.isDeleted || info.isPrivate)
+        throw new Error("動画が再生できません");
       this.Title = info.title;
       this.Description = htmlToText(info.description);
       this._lengthSeconds = info.duration;
@@ -57,42 +58,51 @@ export class NicoNicoS extends AudioSource {
     return this;
   }
 
-  async fetch(): Promise<ReadableStreamInfo>{
+  async fetch(): Promise<ReadableStreamInfo> {
     const stream = Util.general.createPassThrough();
-    const source = await this.nico.download() as Readable;
+    const source = (await this.nico.download()) as Readable;
     source
-      .on("error", e => !stream.destroyed ? stream.destroy(e) : stream.emit("error", e))
+      .on("error", e =>
+        !stream.destroyed ? stream.destroy(e) : stream.emit("error", e),
+      )
       .pipe(stream)
-      .on("close", () => !source.destroyed && source.destroy?.())
-    ;
+      .on("close", () => !source.destroyed && source.destroy?.());
     return {
-      type: "readable", stream
+      type: "readable",
+      stream,
     };
   }
 
-  toField(verbose: boolean = false){
+  toField(verbose: boolean = false) {
     const fields = [] as EmbedField[];
-    fields.push({
-      name: ":cinema:投稿者",
-      value: this.Author,
-      inline: false
-    }, {
-      name: ":eyes:視聴回数",
-      value: this.Views + "回",
-      inline: false
-    }, {
-      name: ":asterisk:概要",
-      value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, (verbose ? 1000 : 300)) + "..." : this.Description,
-      inline: false
-    });
+    fields.push(
+      {
+        name: ":cinema:投稿者",
+        value: this.Author,
+        inline: false,
+      },
+      {
+        name: ":eyes:視聴回数",
+        value: this.Views + "回",
+        inline: false,
+      },
+      {
+        name: ":asterisk:概要",
+        value:
+          this.Description.length > (verbose ? 1000 : 350)
+            ? this.Description.substring(0, verbose ? 1000 : 300) + "..."
+            : this.Description,
+        inline: false,
+      },
+    );
     return fields;
   }
 
-  npAdditional(){
+  npAdditional() {
     return "投稿者: " + this.Author;
   }
 
-  exportData(): exportableNicoNico{
+  exportData(): exportableNicoNico {
     return {
       url: this.Url,
       length: this.LengthSeconds,
@@ -100,18 +110,18 @@ export class NicoNicoS extends AudioSource {
       description: this.Description,
       author: this.Author,
       thumbnail: this.Thumbnail,
-      views: this.Views
+      views: this.Views,
     };
   }
 
-  static validateUrl(url: string){
+  static validateUrl(url: string) {
     return isValidURL(url);
   }
 }
 
 export type exportableNicoNico = exportableCustom & {
-  description: string,
-  author: string,
-  thumbnail: string,
-  views: number,
+  description: string;
+  author: string;
+  thumbnail: string;
+  views: number;
 };

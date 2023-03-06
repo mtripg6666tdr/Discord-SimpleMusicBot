@@ -26,11 +26,20 @@ import { Util } from "../Util";
 import { getColor } from "../Util/color";
 
 export default class Related extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "関連動画",
-      alias: ["関連曲", "おすすめ", "オススメ", "related", "relatedsong", "r", "recommend"],
-      description: "YouTubeから楽曲を再生終了時に、関連曲をキューに自動で追加する機能の有効/無効を設定します",
+      alias: [
+        "関連曲",
+        "おすすめ",
+        "オススメ",
+        "related",
+        "relatedsong",
+        "r",
+        "recommend",
+      ],
+      description:
+        "YouTubeから楽曲を再生終了時に、関連曲をキューに自動で追加する機能の有効/無効を設定します",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
@@ -38,19 +47,22 @@ export default class Related extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if(options.server.addRelated){
+    if (options.server.addRelated) {
       options.server.addRelated = false;
-      message.reply("❌関連曲自動再生をオフにしました").catch(e => Util.logger.log(e, "error"));
-    }else{
+      message
+        .reply("❌関連曲自動再生をオフにしました")
+        .catch(e => Util.logger.log(e, "error"));
+    } else {
       options.server.addRelated = true;
       const embed = new Helper.MessageEmbedBuilder()
         .setTitle("⭕関連曲自動再生をオンにしました")
-        .setDescription("YouTubeからの楽曲再生終了時に、関連曲をキューの末尾に自動追加する機能です。\r\n※YouTube以外のソースからの再生時、ループ有効時には追加されません")
+        .setDescription(
+          "YouTubeからの楽曲再生終了時に、関連曲をキューの末尾に自動追加する機能です。\r\n※YouTube以外のソースからの再生時、ループ有効時には追加されません",
+        )
         .setColor(getColor("RELATIVE_SETUP"))
-        .toEris()
-      ;
+        .toEris();
       message.reply({embeds: [embed]});
     }
   }
