@@ -54,7 +54,9 @@ Discordにて、インストール等のサポート、およびアップデー�
 |[v1](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v1)|>=12.0.0|^12.0.0 |-|:x:サポート終了|-|2021/08|
 |[v2](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v2)|>=16.6.0|<=13.6.0|-|:x:サポート終了|-|2022/12|
 |[v3](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v3)|>=12 |-|@latest|:white_check_mark:サポート中|バグ修正と依存関係の更新|未定|
-|[v4(master)🚧](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/master)|未定|未定|未定|🚧未サポート|-|-|
+|[master🚧](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/master)|未定|未定|未定|🚧未サポート|-|-|
+
+masterブランチは、現在メジャーアップデートの開発用ブランチです。
 
 ## ライセンス
 GPLv3  
