@@ -74,7 +74,7 @@ const onTerminated = async function(code: string){
     await global.workerThread.terminate();
   }
   logger("Shutting down completed");
-  Util.logger.logStore.destroy();
+  Util.logger.logStore?.destroy();
   setTimeout(() => {
     console.error("Killing... (forced)");
     process.exit(1);
