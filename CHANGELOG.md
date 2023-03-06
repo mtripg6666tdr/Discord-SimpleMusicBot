@@ -1,79 +1,27 @@
 # v3.10.0
-# 機能追加
-* 24/7再生（常時再生）ができるようになりました(#993)
-* ボットの管理者のユーザーを複数人登録できるようになりました(#1050)
-* 配信予定のライブを待機する(#1060)
-* Twitterの動画を再生する(#1061)
-* 任意の配信ソースを無効にする機能(#1063)
+## 機能追加
+* 検索結果から再生した場合もキャンセルボタンを表示する(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1102)
+* Spotifyのアルバムを解決できるようになりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1103)
+* 検索パネルのタイムアウトを追加しました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1105)
+* すでに検索パネルが開かれている状態で検索コマンドが使用された際に、すでに開いている検索を破棄するボタンを表示するようになりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1105)
+* 管理者向けに参加サーバーの分析機能を追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1110)
   * 詳細はお問い合わせください。
-* 重複した楽曲を削除する機能(#1065)
-  * `重複削除`コマンドです。
-  * 詳細は[ドキュメント](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/guide/commands/rmduplicated)をご確認ください。
-* 曲の情報取得にレートリミットを追加(#1066)
-# 機能修正/変更
-* エラー発生時にスタックトレースを送信しないよう設定(#1051)
-* サーバーごとのプレフィックスの変更がさらにカスタマイズできるようになりました(#1067)
-  * 二文字以上のプレフィックスに対応しました。
-  * 括弧も`[]`だけでなく`【】`に対応しました。
-  * 詳細は[ドキュメント](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/guide/prefix)をご確認ください。
-* **BREAKING** Rythmとの互換性を高めました(#1068)
-  * これにより、一部のスラッシュコマンドが変更となりました！
-  * スラッシュコマンドは、ボットの管理者が削除するまでは登録されたままとなり、削除するまでは使用することができます。
-    * 削除には`invoke sp;cleanupsc`コマンドを使用してください。
-  * 変更されたスラッシュコマンドは以下です。
-  
-  |旧コマンド名|新コマンド名|
-  |----|----|
-  |lc|leaveclean|
-  |rm|remove|
-  |searchq|searchqueue|
-  |searchs|searchsoundcloud|
-  
-  * これに伴い、ドキュメントのURLも更新されました。
-    * 以前のリンクはリンク切れを起こす可能性がありますが、あらかじめご了承ください。
-* 権限の管理を一元化し、表示をわかりやすくしました(#1070)
-# バグ修正
-* Spotifyの再生時の、推測アルゴリズムを改善(#1054)
-* ライブストリームの再生が中断されるバグを修正(#1055)
-* `シャッフル`コマンドを使用すると、均等再生が台無しになる問題を修正(#1062)
-* 一部のソースで再生ができない問題の修正(#1064)
-* TLS通信で証明書の問題を修正(#1084)
-* Pythonのパスを修正(#1084)
-* キュー追加時に一部の条件でエラーが発生する問題を修正(#1087)
-# ドキュメント
-* ドキュメントの継続的な改善(#1040, #1072, #1073, #1074, #1075, #1088)
-* チュートリアルを追加(#1049)
-* 他サービスでのホスティングに関するガイドを追加しました(#1071)
-  * 各種サービスでの設定方法を解説しています。
-  * これらのサービスに関するサポートができるということを意味しているわけではなく、これらのサービスに関する完全なサポートはいたしかねます。
-* 以前のバージョンのドキュメントが見られるようになりました(#1076)
-# 依存関係のアップデート
-* @sinclair/typebox 0.25.23 => 0.25.24
-* candyget 0.5.3 => 0.5.4
-* prism-media 1.3.4 => 1.3.5
-* @discordjs/opus 0.8.0 => 0.9.0
-# その他の変更
-* Spotifyのデータに対してテストをする(#1052)
-* コマンドのドキュメントの生成を改善(#1085)
+## 機能修正/変更
+* BGM機能で設定した音量が、ノーマルキューでの音量と別に管理されるようになりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1104)
+* HTTPベースのデータベースが機能しないバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1107)
+* ボイスチャンネルへの参加失敗時にスタックトレースを表示しないよう変更(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1111)
+## バグ修正
+* 検索パネルの削除に関するいくつかのバグの修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1105)
+* 複数のURLを再生コマンドなどに渡した際に正しく追加されないバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1106)
+* 一部の環境でのボットのシャットダウン時のエラーを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1113)
+## ドキュメント
+* ドキュメントの継続的な更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1099, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1100, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1108)
+## 依存関係のアップデート
+## その他の変更
 
-## その他の特記事項
+### その他の特記事項
 - Dockerのイメージは、リリース後30～40分程度で公開されます。
-- v3.8.3から引き続きご案内していた、ライブストリームを長時間再生すると、ライブストリームが終了していないにもかかわらず、予期せず再生が終了するバグは、v3.10.0で解消されたと思われます。引き続きバグが発生する場合は、サポートまでお知らせください。ご協力お願いします。
 
-[**マイルストーン**](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/milestone/9?closed=1)
+[**マイルストーン**](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/milestone/12?closed=1)
 
 ---
-
-# v3.10.1
-# バグ修正
-* サーバーごとのプレフィックスを設定していると応答しない問題を修正(#1089)
-## その他の特記事項
-- Dockerのイメージは、リリース後30～40分程度で公開されます。
-
----
-
-# v3.10.2
-# バグ修正
-* ボットを起動した際に、既に登録されているコマンドがない場合にスラッシュコマンドの登録に失敗する問題を修正(#1095)
-## その他の特記事項
-- Dockerのイメージは、リリース後30～40分程度で公開されます。
