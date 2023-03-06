@@ -80,6 +80,12 @@ if(errs.length > 0){
   throw er;
 }
 
+if(typeof config !== "object" || !("debug" in config) || !config.debug){
+  console.error("This is still a development phase, and running without debug mode is currently disabled.");
+  console.error("You should use the latest version instead of the current branch.");
+  process.exit(1);
+}
+
 export default Object.assign(
   Object.create(null),
   Value.Create(Config),
