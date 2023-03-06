@@ -77,7 +77,7 @@ export class QueueManagerWithBgm extends QueueManager {
     type: KnownAudioSourceIdentifer = "unknown",
     gotData: AudioSource.exportableCustom = null,
     preventCache: boolean = false,
-  ): Promise<QueueContent & {index: number}> {
+  ): Promise<QueueContent & { index: number }> {
     if (
       !url.startsWith("http://") &&
       !url.startsWith("https://") &&
@@ -95,7 +95,7 @@ export class QueueManagerWithBgm extends QueueManager {
       this._default[method](result);
       if (this.server.equallyPlayback) this.sortWithAddedBy();
       const index = this._default.findIndex(q => q === result);
-      return {...result, index};
+      return { ...result, index };
     }
     return super.addQueue(url, addedBy, method, type, gotData, preventCache);
   }

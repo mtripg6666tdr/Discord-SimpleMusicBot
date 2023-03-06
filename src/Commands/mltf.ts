@@ -48,11 +48,7 @@ export default class Mltf extends BaseCommand {
     q.move(q.length - 1, to);
     const info = q.get(to);
     message
-      .reply(
-        "✅`" +
-          info.basicInfo.Title +
-          "`を一番最後からキューの先頭に移動しました",
-      )
+      .reply("✅`" + info.basicInfo.Title + "`を一番最後からキューの先頭に移動しました")
       .catch(e => Util.logger.log(e, "error"));
   }
 }

@@ -23,9 +23,9 @@ import type { MusicBot } from "../bot";
 import type { Client } from "eris";
 
 export type BaseCommandInitializeOptions = {
-  name: string;
-  alias: Readonly<string[]>;
-  shouldDefer: boolean;
+  name: string,
+  alias: Readonly<string[]>,
+  shouldDefer: boolean,
 };
 
 export type CommandPermission =
@@ -49,31 +49,29 @@ export const permissionDescriptionParts: Readonly<{
   noConnection: "ボットがどこのボイスチャンネルにも接続していないこと",
 };
 
-export type ListCommandWithArgumentsInitializeOptions =
-  BaseCommandInitializeOptions & {
-    description: string;
-    unlist: boolean;
-    examples: string;
-    usage: string;
-    category: keyof typeof categories;
-    argument: SlashCommandArgument[];
-    requiredPermissionsOr: CommandPermission[];
-  };
+export type ListCommandWithArgumentsInitializeOptions = BaseCommandInitializeOptions & {
+  description: string,
+  unlist: boolean,
+  examples: string,
+  usage: string,
+  category: keyof typeof categories,
+  argument: SlashCommandArgument[],
+  requiredPermissionsOr: CommandPermission[],
+};
 
-export type ListCommandWithoutArgumentsInitializeOptions =
-  BaseCommandInitializeOptions & {
-    description: string;
-    unlist: false;
-    category: keyof typeof categories;
-    requiredPermissionsOr: CommandPermission[];
-  };
+export type ListCommandWithoutArgumentsInitializeOptions = BaseCommandInitializeOptions & {
+  description: string,
+  unlist: false,
+  category: keyof typeof categories,
+  requiredPermissionsOr: CommandPermission[],
+};
 
 export type ListCommandInitializeOptions =
   | ListCommandWithArgumentsInitializeOptions
   | ListCommandWithoutArgumentsInitializeOptions;
 
 export type UnlistCommandInitializeOptions = BaseCommandInitializeOptions & {
-  unlist: true;
+  unlist: true,
 };
 
 export type CommandOptionsTypes = "bool" | "integer" | "string";
@@ -86,7 +84,7 @@ export interface SlashCommandArgument {
   name: string;
   description: string;
   required: boolean;
-  choices?: {[key: string]: string | number};
+  choices?: { [key: string]: string | number };
 }
 
 /**

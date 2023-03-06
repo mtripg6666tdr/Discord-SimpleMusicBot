@@ -55,9 +55,7 @@ export default class Import extends BaseCommand {
     options.server.updateBoundChannel(message);
     if (options.rawArgs === "") {
       message
-        .reply(
-          "❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。",
-        )
+        .reply("❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。")
         .catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -76,9 +74,7 @@ export default class Import extends BaseCommand {
       url.startsWith("https://discord.com/channels/")
     ) {
       let smsg = null as ResponseMessage;
-      const cancellation = options.server.bindCancellation(
-        new TaskCancellationManager(),
-      );
+      const cancellation = options.server.bindCancellation(new TaskCancellationManager());
       try {
         smsg = await message.reply("🔍メッセージを取得しています...");
         const ids = url.split("/");
@@ -99,14 +95,8 @@ export default class Import extends BaseCommand {
           for (let i = 0; i < fields.length; i++) {
             const lines = fields[i].value.split("\r\n");
             const tMatch = lines[0].match(/\[(?<title>.+)\]\((?<url>.+)\)/);
-            await options.server.queue.autoAddQueue(
-              tMatch.groups.url,
-              message.member,
-              "unknown",
-            );
-            await smsg.edit(
-              fields.length + "曲中" + (i + 1) + "曲処理しました。",
-            );
+            await options.server.queue.autoAddQueue(tMatch.groups.url, message.member, "unknown");
+            await smsg.edit(fields.length + "曲中" + (i + 1) + "曲処理しました。");
             if (cancellation.Cancelled) break;
           }
           if (!cancellation.Cancelled) {
@@ -115,9 +105,7 @@ export default class Import extends BaseCommand {
             await smsg.edit("✅キャンセルされました");
           }
         } else if (attac && attac.filename.endsWith(".ymx")) {
-          const raw = JSON.parse(
-            await Util.web.DownloadText(attac.url),
-          ) as YmxFormat;
+          const raw = JSON.parse(await Util.web.DownloadText(attac.url)) as YmxFormat;
           if (raw.version !== YmxVersion) {
             await smsg.edit(
               "✘指定されたファイルはバージョンに互換性がないためインポートできません(現行:v" +
@@ -141,9 +129,7 @@ export default class Import extends BaseCommand {
               qs[i],
             );
             if (qs.length <= 10 || i % 10 === 9) {
-              await smsg.edit(
-                qs.length + "曲中" + (i + 1) + "曲処理しました。",
-              );
+              await smsg.edit(qs.length + "曲中" + (i + 1) + "曲処理しました。");
             }
             if (cancellation.Cancelled) break;
           }
@@ -153,9 +139,7 @@ export default class Import extends BaseCommand {
             await smsg.edit("✅キャンセルされました");
           }
         } else {
-          await smsg.edit(
-            "❌キューの埋め込みもしくは添付ファイルが見つかりませんでした",
-          );
+          await smsg.edit("❌キューの埋め込みもしくは添付ファイルが見つかりませんでした");
           return;
         }
       } catch (e) {

@@ -45,8 +45,7 @@ export default class Commands extends BaseCommand {
       unlist: false,
       name: "コマンド",
       alias: ["command", "commands", "cmd"],
-      description:
-        "コマンド一覧を表示します。コマンド名を渡すとそのコマンドの詳細を表示します。",
+      description: "コマンド一覧を表示します。コマンド名を渡すとそのコマンドの詳細を表示します。",
       category: "bot",
       usage: "command [コマンド名]",
       examples: "command search",
@@ -71,10 +70,8 @@ export default class Commands extends BaseCommand {
         // @ts-expect-error
         return categories[label as any] as string;
       };
-      const rawcommands = CommandManager.instance.commands.filter(
-        ci => !ci.unlist,
-      );
-      const commands = {} as {[category: string]: BaseCommand[]};
+      const rawcommands = CommandManager.instance.commands.filter(ci => !ci.unlist);
+      const commands = {} as { [category: string]: BaseCommand[] };
       // Generate command list
       for (let i = 0; i < rawcommands.length; i++) {
         if (commands[rawcommands[i].category]) {
@@ -86,18 +83,16 @@ export default class Commands extends BaseCommand {
       // Generate embed
       for (let i = 0; i < categoriesList.length; i++) {
         embed.push(
-          new Helper.MessageEmbedBuilder()
-            .setTitle(getCategoryText(categoriesList[i]))
-            .addFields(
-              ...commands[categoriesList[i]].map(
-                ci =>
-                  ({
-                    name: ci.name + ", " + ci.alias.join(", "),
-                    value: ci.description,
-                    inline: true,
-                  } as EmbedField),
-              ),
+          new Helper.MessageEmbedBuilder().setTitle(getCategoryText(categoriesList[i])).addFields(
+            ...commands[categoriesList[i]].map(
+              ci =>
+                ({
+                  name: ci.name + ", " + ci.alias.join(", "),
+                  value: ci.description,
+                  inline: true,
+                } as EmbedField),
             ),
+          ),
         );
       }
       for (let i = 0; i < embed.length; i++) {
@@ -137,11 +132,9 @@ export default class Commands extends BaseCommand {
         if (ci.examples) {
           embed.addField("使用例", `\`${prefix + ci.examples}\``);
         }
-        await message.reply({embeds: [embed.toEris()]});
+        await message.reply({ embeds: [embed.toEris()] });
       } else {
-        await message.reply(
-          ":face_with_raised_eyebrow: コマンドが見つかりませんでした",
-        );
+        await message.reply(":face_with_raised_eyebrow: コマンドが見つかりませんでした");
       }
     }
   }

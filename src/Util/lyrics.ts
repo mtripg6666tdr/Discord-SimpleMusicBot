@@ -45,9 +45,7 @@ export async function GetLyrics(keyword: string): Promise<songInfo> {
           encodeURIComponent(keyword),
       ),
     ) as CSE_Result;
-    const items = data.items?.filter(i =>
-      new URL(i.link).pathname.startsWith("/lyric/"),
-    );
+    const items = data.items?.filter(i => new URL(i.link).pathname.startsWith("/lyric/"));
     if (!items || items.length === 0) {
       throw new Error("No lyric was found");
     }
@@ -71,8 +69,7 @@ export async function GetLyrics(keyword: string): Promise<songInfo> {
     const match = doc.match(
       /<meta name="description" content="(?<artist>.+?)が歌う(?<title>.+)の歌詞ページ.+です。.+">/,
     );
-    const artwork = doc.match(/<img src="(?<url>.+?)" alt=".+? 歌詞" \/>/)
-      .groups?.url;
+    const artwork = doc.match(/<img src="(?<url>.+?)" alt=".+? 歌詞" \/>/).groups?.url;
     return {
       lyric: decode(lyric),
       artist: decode(match.groups.artist),
@@ -84,11 +81,11 @@ export async function GetLyrics(keyword: string): Promise<songInfo> {
 }
 
 type songInfo = {
-  lyric: string;
-  artist: string;
-  title: string;
-  artwork: string;
-  url: string;
+  lyric: string,
+  artist: string,
+  title: string,
+  artwork: string,
+  url: string,
 };
 
 interface CSE_Result {
@@ -120,7 +117,7 @@ interface Item {
 
 interface Pagemap {
   cse_thumbnail?: CSEThumbnail[];
-  metatags: {[key: string]: string}[];
+  metatags: { [key: string]: string }[];
   cse_image: CSEImage[];
   listitem?: Listitem[];
   Article?: Article[];

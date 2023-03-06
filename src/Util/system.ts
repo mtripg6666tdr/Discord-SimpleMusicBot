@@ -24,10 +24,10 @@ import { GetPercentage } from "./math";
  * メモリ使用情報
  */
 type MemoryUsageInfo = {
-  free: number;
-  total: number;
-  used: number;
-  usage: number;
+  free: number,
+  total: number,
+  used: number,
+  usage: number,
 };
 
 /**

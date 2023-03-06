@@ -38,18 +38,13 @@ export class PlayManagerWithBgm extends PlayManager {
   }
 
   override get isPlaying(): boolean {
-    return (
-      this.isConnecting &&
-      this.server.connection.playing &&
-      !this.server.queue.isBGM
-    );
+    return this.isConnecting && this.server.connection.playing && !this.server.queue.isBGM;
   }
 
   override async play(time?: number, bgm: boolean = false) {
     if (this.server instanceof GuildDataContainerWithBgm) {
       if (
-        ((this.server.queue.isBGM && !bgm) ||
-          (!this.server.queue.isBgmEmpty && bgm)) &&
+        ((this.server.queue.isBGM && !bgm) || (!this.server.queue.isBgmEmpty && bgm)) &&
         this.server.connection?.playing
       ) {
         this.stop();
@@ -91,10 +86,7 @@ export class PlayManagerWithBgm extends PlayManager {
           20 * 1000,
         )
         .catch(() => {
-          this.Log(
-            "Stream has not ended in time and will force stream into destroying",
-            "warn",
-          );
+          this.Log("Stream has not ended in time and will force stream into destroying", "warn");
           this.stop();
         });
     }

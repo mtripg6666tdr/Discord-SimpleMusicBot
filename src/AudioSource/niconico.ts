@@ -46,8 +46,7 @@ export class NicoNicoS extends AudioSource {
       this.Views = prefetched.views;
     } else {
       const info = await this.nico.getVideoInfo();
-      if (info.isDeleted || info.isPrivate)
-        throw new Error("動画が再生できません");
+      if (info.isDeleted || info.isPrivate) throw new Error("動画が再生できません");
       this.Title = info.title;
       this.Description = htmlToText(info.description);
       this._lengthSeconds = info.duration;
@@ -62,9 +61,7 @@ export class NicoNicoS extends AudioSource {
     const stream = Util.general.createPassThrough();
     const source = (await this.nico.download()) as Readable;
     source
-      .on("error", e =>
-        !stream.destroyed ? stream.destroy(e) : stream.emit("error", e),
-      )
+      .on("error", e => (!stream.destroyed ? stream.destroy(e) : stream.emit("error", e)))
       .pipe(stream)
       .on("close", () => !source.destroyed && source.destroy?.());
     return {
@@ -120,8 +117,8 @@ export class NicoNicoS extends AudioSource {
 }
 
 export type exportableNicoNico = exportableCustom & {
-  description: string;
-  author: string;
-  thumbnail: string;
-  views: number;
+  description: string,
+  author: string,
+  thumbnail: string,
+  views: number,
 };

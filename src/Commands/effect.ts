@@ -39,7 +39,7 @@ export default class Effect extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
     try {
-      const {embed, messageActions} = getCurrentEffectPanel(
+      const { embed, messageActions } = getCurrentEffectPanel(
         message.member.avatarURL,
         options.server,
       );
@@ -48,12 +48,10 @@ export default class Effect extends BaseCommand {
         embeds: [embed.toEris()],
         components: [messageActions],
       });
-      setTimeout(() => reply.edit({components: []}), 5 * 60 * 1000).unref();
+      setTimeout(() => reply.edit({ components: [] }), 5 * 60 * 1000).unref();
     } catch (e) {
       Util.logger.log(e, "error");
-      message
-        .reply(":cry:エラーが発生しました")
-        .catch(er => Util.logger.log(er, "error"));
+      message.reply(":cry:エラーが発生しました").catch(er => Util.logger.log(er, "error"));
     }
   }
 }

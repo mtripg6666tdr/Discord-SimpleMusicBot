@@ -40,8 +40,7 @@ export default class Thumbnail extends BaseCommand {
         {
           type: "integer",
           name: "index",
-          description:
-            "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します",
+          description: "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します",
           required: false,
         },
       ],
@@ -96,9 +95,7 @@ export default class Thumbnail extends BaseCommand {
           .catch(e => Util.logger.log(e, "error"));
       }
     } else {
-      message
-        .reply("✘検索結果が見つかりません")
-        .catch(e => Util.logger.log(e, "error"));
+      message.reply("✘検索結果が見つかりません").catch(e => Util.logger.log(e, "error"));
       return;
     }
 

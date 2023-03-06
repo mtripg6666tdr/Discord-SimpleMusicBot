@@ -57,9 +57,7 @@ export class SoundCloudS extends AudioSource {
     const source = (await sc.util.streamTrack(this.Url)) as Readable;
     const stream = Util.general.createPassThrough();
     source
-      .on("error", e =>
-        !stream.destroyed ? stream.destroy(e) : stream.emit("error", e),
-      )
+      .on("error", e => (!stream.destroyed ? stream.destroy(e) : stream.emit("error", e)))
       .pipe(stream)
       .on("close", () => !source.destroyed && source.destroy?.());
     return {
@@ -108,16 +106,14 @@ export class SoundCloudS extends AudioSource {
   }
 
   static validatePlaylistUrl(url: string) {
-    return Boolean(
-      url.match(/https?:\/\/soundcloud.com\/[^/?]+\/sets\/[^/?]+/),
-    );
+    return Boolean(url.match(/https?:\/\/soundcloud.com\/[^/?]+\/sets\/[^/?]+/));
   }
 }
 
 export type exportableSoundCloud = exportableCustom & {
-  description: string;
-  author: string;
-  thumbnail: string;
+  description: string,
+  author: string,
+  thumbnail: string,
 };
 
 /**

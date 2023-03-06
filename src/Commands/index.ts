@@ -37,16 +37,13 @@ import { CommandManager } from "../Component/CommandManager";
 import { permissionDescriptionParts } from "../Structure/Command";
 import Util from "../Util";
 
-export {CommandArgs} from "../Structure/Command";
+export { CommandArgs } from "../Structure/Command";
 
 /**
  * すべてのコマンドハンドラーの基底クラスです
  */
 export abstract class BaseCommand {
-  protected abstract run(
-    message: CommandMessage,
-    options: Readonly<CommandArgs>,
-  ): Promise<void>;
+  protected abstract run(message: CommandMessage, options: Readonly<CommandArgs>): Promise<void>;
 
   protected readonly _name: string;
   public get name() {
@@ -107,29 +104,21 @@ export abstract class BaseCommand {
     if (perms.length === 0) {
       return "なし";
     } else {
-      return `${perms
-        .map(permission => permissionDescriptionParts[permission])
-        .join("、")}${perms.length > 1 ? "のいずれか" : ""}`;
+      return `${perms.map(permission => permissionDescriptionParts[permission]).join("、")}${
+        perms.length > 1 ? "のいずれか" : ""
+      }`;
     }
   }
 
-  constructor(
-    opts: ListCommandInitializeOptions | UnlistCommandInitializeOptions,
-  ) {
+  constructor(opts: ListCommandInitializeOptions | UnlistCommandInitializeOptions) {
     this._name = opts.name;
     this._alias = opts.alias;
     this._unlist = opts.unlist;
     this._shouldDefer = opts.shouldDefer;
     if (!this._unlist) {
       if (!this.asciiName) throw new Error("Command has not ascii name");
-      const {
-        description,
-        examples,
-        usage,
-        category,
-        argument,
-        requiredPermissionsOr,
-      } = opts as ListCommandWithArgumentsInitializeOptions;
+      const { description, examples, usage, category, argument, requiredPermissionsOr } =
+        opts as ListCommandWithArgumentsInitializeOptions;
       this._description = description;
       this._examples = examples || null;
       this._usage = usage || null;
@@ -148,9 +137,7 @@ export abstract class BaseCommand {
       } else if (perm === "manageGuild") {
         return message.member.permissions.has("manageGuild");
       } else if (perm === "manageMessages") {
-        return message.channel
-          .permissionsOf(message.member)
-          .has("manageMessages");
+        return message.channel.permissionsOf(message.member).has("manageMessages");
       } else if (perm === "noConnection") {
         return !options.server.player.isConnecting;
       } else if (perm === "onlyListener") {
@@ -175,8 +162,7 @@ export abstract class BaseCommand {
   }
 
   toApplicationCommandStructure() {
-    if (this.unlist)
-      throw new Error("This command cannot be listed due to private command!");
+    if (this.unlist) throw new Error("This command cannot be listed due to private command!");
     const options = this.argument?.map(arg => {
       const erisCommandStruct = {
         type: CommandManager.mapCommandOptionTypeToInteger(arg.type),

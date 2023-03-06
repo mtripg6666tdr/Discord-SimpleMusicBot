@@ -40,11 +40,7 @@ export class GoogleDrive extends AudioSource {
       if ((await Util.web.RetriveHttpStatusCode(this.Url)) !== 200)
         throw new Error("URLがみつかりません");
       try {
-        this._lengthSeconds = await Util.web.RetriveLengthSeconds(
-          (
-            await this.fetch()
-          ).url,
-        );
+        this._lengthSeconds = await Util.web.RetriveLengthSeconds((await this.fetch()).url);
       } catch {
         /* empty */
       }
@@ -82,15 +78,11 @@ export class GoogleDrive extends AudioSource {
   }
 
   static validateUrl(url: string) {
-    return Boolean(
-      url.match(/^https?:\/\/drive\.google\.com\/file\/d\/([^/?]+)(\/.+)?$/),
-    );
+    return Boolean(url.match(/^https?:\/\/drive\.google\.com\/file\/d\/([^/?]+)(\/.+)?$/));
   }
 
   static getId(url: string) {
-    const match = url.match(
-      /^https?:\/\/drive\.google\.com\/file\/d\/(?<id>[^/?]+)(\/.+)?$/,
-    );
+    const match = url.match(/^https?:\/\/drive\.google\.com\/file\/d\/(?<id>[^/?]+)(\/.+)?$/);
     return match ? match.groups.id : null;
   }
 }

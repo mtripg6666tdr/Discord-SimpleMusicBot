@@ -80,17 +80,13 @@ export class SkipManager extends ServerManagerBase {
     if (!this.inited || this.destroyed) return;
     if (this.agreeUsers.size * 2 >= this.getVoiceMembers().size - 1) {
       try {
-        const response = (this.reply = await this.reply.edit(
-          ":ok: スキップしています",
-        ));
+        const response = (this.reply = await this.reply.edit(":ok: スキップしています"));
         const title = this.server.queue.get(0).basicInfo.Title;
         this.server.player.stop();
         await this.server.queue.next();
         await this.server.player.play();
         response
-          .edit(
-            ":track_next: `" + title + "`をスキップしました:white_check_mark:",
-          )
+          .edit(":track_next: `" + title + "`をスキップしました:white_check_mark:")
           .catch(e => Util.logger.log(e, "error"));
       } catch (e) {
         Util.logger.log(e, "error");
@@ -107,11 +103,8 @@ export class SkipManager extends ServerManagerBase {
   }
 
   private getVoiceMembers() {
-    return (
-      this.server.bot.client.getChannel(
-        this.server.connection.channelID,
-      ) as VoiceChannel
-    ).voiceMembers;
+    return (this.server.bot.client.getChannel(this.server.connection.channelID) as VoiceChannel)
+      .voiceMembers;
   }
 
   private createMessageContent() {

@@ -28,7 +28,7 @@ import { Util } from "../Util";
 export class Hibiki extends AudioSource {
   protected _lengthSeconds = 0;
   protected readonly _serviceIdentifer = "hibiki";
-  override Thumbnail: {ext: string; data: Buffer};
+  override Thumbnail: { ext: string, data: Buffer };
   private programId = "";
   private radioInfo: HibikiAPIResult;
   private uploadedAt = "";
@@ -55,11 +55,7 @@ export class Hibiki extends AudioSource {
         })
       ).body,
     };
-    this.Title =
-      this.radioInfo.episode.program_name +
-      "(" +
-      this.radioInfo.episode.name +
-      ")";
+    this.Title = this.radioInfo.episode.program_name + "(" + this.radioInfo.episode.name + ")";
     this._lengthSeconds = Math.floor(this.radioInfo.episode.video.duration);
     this.uploadedAt = this.radioInfo.episode.updated_at;
     this.Description = this.radioInfo.description;
@@ -68,9 +64,7 @@ export class Hibiki extends AudioSource {
   }
 
   async fetch(): Promise<UrlStreamInfo> {
-    const playcheck = await HibikiApi.playCheck(
-      this.radioInfo.episode.video.id.toString(),
-    );
+    const playcheck = await HibikiApi.playCheck(this.radioInfo.episode.video.id.toString());
     return {
       type: "url",
       url: playcheck.playlist_url,
@@ -107,11 +101,7 @@ export class Hibiki extends AudioSource {
 
 export abstract class HibikiApi {
   static validateURL(url: string): boolean {
-    return Boolean(
-      url.match(
-        /^https?:\/\/hibiki-radio.jp\/description\/(.+)\/detail(\/.+)?$/,
-      ),
-    );
+    return Boolean(url.match(/^https?:\/\/hibiki-radio.jp\/description\/(.+)\/detail(\/.+)?$/));
   }
 
   static async getBasicData(programId: string): Promise<HibikiAPIResult> {
@@ -130,8 +120,7 @@ export abstract class HibikiApi {
 
   static async playCheck(videoId: string): Promise<playCheckResult> {
     const playCheckURL =
-      "https://vcms-api.hibiki-radio.jp/api/v1/videos/play_check?video_id=" +
-      videoId;
+      "https://vcms-api.hibiki-radio.jp/api/v1/videos/play_check?video_id=" + videoId;
     return JSON.parse(
       await Util.web.DownloadText(playCheckURL, {
         "Accept":

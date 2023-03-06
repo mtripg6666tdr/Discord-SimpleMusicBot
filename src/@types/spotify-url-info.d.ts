@@ -97,11 +97,11 @@ declare module "spotify-url-info" {
   }
   type fetchType = (
     url: string | URL,
-    opts: {headers: {[key: string]: string}},
-  ) => Promise<{text: () => string | Promise<string>}>;
+    opts: { headers: { [key: string]: string } },
+  ) => Promise<{ text: () => string | Promise<string> }>;
   type SpotifyUrlInfoClient = {
-    getTracks: (url: string) => Promise<PlaylistTrack[]>;
-    getData: (url: string) => Promise<Track | Playlist>;
+    getTracks: (url: string) => Promise<PlaylistTrack[]>,
+    getData: (url: string) => Promise<Track | Playlist>,
   };
   function SpotifyUrlInfo(fetchImplement: fetchType): SpotifyUrlInfoClient;
   export = SpotifyUrlInfo;

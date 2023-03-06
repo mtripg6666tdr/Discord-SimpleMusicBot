@@ -49,9 +49,7 @@ export default class Queue extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    const msg = await message.reply(
-      ":eyes: キューを確認しています。お待ちください...",
-    );
+    const msg = await message.reply(":eyes: キューを確認しています。お待ちください...");
     const queue = options.server.queue;
     if (queue.length === 0) {
       msg
@@ -64,16 +62,14 @@ export default class Queue extends BaseCommand {
     let _page = options.rawArgs === "" ? 1 : Number(options.rawArgs);
     if (isNaN(_page)) _page = 1;
     if (queue.length > 0 && _page > Math.ceil(queue.length / 10)) {
-      msg
-        .edit(":warning:指定されたページは範囲外です")
-        .catch(e => Util.logger.log(e, "error"));
+      msg.edit(":warning:指定されたページは範囲外です").catch(e => Util.logger.log(e, "error"));
       return;
     }
     // 合計ページ数割り出し
     const totalpage = Math.ceil(queue.length / 10);
     // ページのキューを割り出す
     const getQueueEmbed = (page: number) => {
-      const fields: {name: string; value: string}[] = [];
+      const fields: { name: string, value: string }[] = [];
       for (let i = 10 * (page - 1); i < 10 * page; i++) {
         if (queue.length <= i) {
           break;
@@ -83,11 +79,7 @@ export default class Queue extends BaseCommand {
         const [min, sec] = Util.time.CalcMinSec(_t);
         fields.push({
           name:
-            i !== 0
-              ? i.toString()
-              : options.server.player.isPlaying
-              ? "現在再生中"
-              : "再生待ち",
+            i !== 0 ? i.toString() : options.server.player.isPlaying ? "現在再生中" : "再生待ち",
           value: [
             `[${q.basicInfo.Title}](${q.basicInfo.Url})`,
             `長さ: \`${
@@ -110,13 +102,9 @@ export default class Queue extends BaseCommand {
           icon_url: options.client.user.avatarURL,
         })
         .setFooter({
-          text: `${
-            queue.length
-          }曲 | 合計:${thour}:${tmin}:${tsec} | トラックループ:${
+          text: `${queue.length}曲 | 合計:${thour}:${tmin}:${tsec} | トラックループ:${
             queue.loopEnabled ? "⭕" : "❌"
-          } | キューループ:${
-            queue.queueLoopEnabled ? "⭕" : "❌"
-          } | 関連曲自動再生:${
+          } | キューループ:${queue.queueLoopEnabled ? "⭕" : "❌"} | 関連曲自動再生:${
             options.server.addRelated ? "⭕" : "❌"
           } | 均等再生:${options.server.equallyPlayback ? "⭕" : "❌"}`,
         })
@@ -127,18 +115,13 @@ export default class Queue extends BaseCommand {
 
     // 送信
     await msg
-      .edit({content: "", embeds: [getQueueEmbed(_page)]})
+      .edit({ content: "", embeds: [getQueueEmbed(_page)] })
       .catch(e => Util.logger.log(e, "error"));
     if (totalpage > 1) {
       options.embedPageToggle.push(
-        (
-          await PageToggle.init(
-            msg,
-            n => getQueueEmbed(n + 1),
-            totalpage,
-            _page - 1,
-          )
-        ).setFresh(true),
+        (await PageToggle.init(msg, n => getQueueEmbed(n + 1), totalpage, _page - 1)).setFresh(
+          true,
+        ),
       );
     }
   }

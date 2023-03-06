@@ -26,10 +26,10 @@ http
   .createServer((req, res) => {
     console.log(req.url);
     if (req.method === "GET" && req.url.startsWith("/?")) {
-      const {type, token, guildid} = parseQuery(req.url.substring(2));
+      const { type, token, guildid } = parseQuery(req.url.substring(2));
       if (type && token === process.env.TOKEN && guildid) {
         if (type === "j") {
-          res.writeHead(200, {"Content-Type": "application/json"});
+          res.writeHead(200, { "Content-Type": "application/json" });
           res.end(
             JSON.stringify({
               status: 200,
@@ -37,7 +37,7 @@ http
             }),
           );
         } else if (type === "queue") {
-          res.writeHead(200, {"Content-Type": "application/json"});
+          res.writeHead(200, { "Content-Type": "application/json" });
           res.end(
             JSON.stringify({
               status: 200,
@@ -58,10 +58,10 @@ http
       req.on("end", () => {
         try {
           const body = JSON.parse(Buffer.concat(bufs).toString("utf-8")) as {
-            token: string;
-            type: "j" | "queue";
-            guildid: string;
-            data: string;
+            token: string,
+            type: "j" | "queue",
+            guildid: string,
+            data: string,
           };
           // eslint-disable-next-line @typescript-eslint/no-throw-literal
           if (body.token !== process.env.TOKEN) throw "";

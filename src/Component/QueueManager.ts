@@ -33,12 +33,7 @@ import { Util } from "../Util";
 import { getColor } from "../Util/color";
 import { FallBackNotice } from "../definition";
 
-export type KnownAudioSourceIdentifer =
-  | "youtube"
-  | "custom"
-  | "soundcloud"
-  | "spotify"
-  | "unknown";
+export type KnownAudioSourceIdentifer = "youtube" | "custom" | "soundcloud" | "spotify" | "unknown";
 /**
  * サーバーごとのキューを管理するマネージャー。
  * キューの追加および削除などの機能を提供します。
@@ -152,11 +147,7 @@ export class QueueManager extends ServerManagerBase {
    * @returns 条件に適合した要素の配列
    */
   filter(
-    predicate: (
-      value: QueueContent,
-      index: number,
-      array: QueueContent[],
-    ) => unknown,
+    predicate: (value: QueueContent, index: number, array: QueueContent[]) => unknown,
     thisArg?: any,
   ) {
     return this.default.filter(predicate, thisArg);
@@ -168,11 +159,7 @@ export class QueueManager extends ServerManagerBase {
    * @returns インデックス
    */
   findIndex(
-    predicate: (
-      value: QueueContent,
-      index: number,
-      obj: QueueContent[],
-    ) => unknown,
+    predicate: (value: QueueContent, index: number, obj: QueueContent[]) => unknown,
     thisArg?: any,
   ) {
     return this.default.findIndex(predicate, thisArg);
@@ -184,11 +171,7 @@ export class QueueManager extends ServerManagerBase {
    * @returns 変換後の配列
    */
   map<T>(
-    callbackfn: (
-      value: QueueContent,
-      index: number,
-      array: QueueContent[],
-    ) => T,
+    callbackfn: (value: QueueContent, index: number, array: QueueContent[]) => T,
     thisArg?: any,
   ): T[] {
     return this.default.map(callbackfn, thisArg);
@@ -199,11 +182,7 @@ export class QueueManager extends ServerManagerBase {
    * @param callbackfn 関数
    */
   forEach(
-    callbackfn: (
-      value: QueueContent,
-      index: number,
-      array: readonly QueueContent[],
-    ) => void,
+    callbackfn: (value: QueueContent, index: number, array: readonly QueueContent[]) => void,
     thisArg?: any,
   ) {
     this.default.forEach(callbackfn, thisArg);
@@ -228,7 +207,7 @@ export class QueueManager extends ServerManagerBase {
     type: KnownAudioSourceIdentifer = "unknown",
     gotData: AudioSource.exportableCustom = null,
     preventCache: boolean = false,
-  ): Promise<QueueContent & {index: number}> {
+  ): Promise<QueueContent & { index: number }> {
     return lock(this.addQueueLocker, async () => {
       this.Log("AddQueue called");
       const t = Util.time.timer.start("AddQueue");
@@ -247,8 +226,7 @@ export class QueueManager extends ServerManagerBase {
           additionalInfo: {
             addedBy: {
               userId: (addedBy && this.getUserIdFromMember(addedBy)) || "0",
-              displayName:
-                (addedBy && this.getDisplayNameFromMember(addedBy)) || "不明",
+              displayName: (addedBy && this.getDisplayNameFromMember(addedBy)) || "不明",
             },
           },
         } as QueueContent;
@@ -259,7 +237,7 @@ export class QueueManager extends ServerManagerBase {
           this.emit("add", result);
           const index = this._default.findIndex(q => q === result);
           this.Log("queue content added in position " + index);
-          return {...result, index};
+          return { ...result, index };
         }
       } finally {
         t.end();
@@ -319,12 +297,8 @@ export class QueueManager extends ServerManagerBase {
         msg = message;
       } else if (channel) {
         // まだないので生成
-        this.Log(
-          "AutoAddQueue will make a message that will be used to report statuses",
-        );
-        msg = await channel.createMessage(
-          "情報を取得しています。お待ちください...",
-        );
+        this.Log("AutoAddQueue will make a message that will be used to report statuses");
+        msg = await channel.createMessage("情報を取得しています。お待ちください...");
       }
       if (this.server.queue.length > 999) {
         // キュー上限
@@ -366,16 +340,8 @@ export class QueueManager extends ServerManagerBase {
               : "不明",
             true,
           )
-          .addField(
-            "リクエスト",
-            this.getDisplayNameFromMember(addedBy) ?? "不明",
-            true,
-          )
-          .addField(
-            "キュー内の位置",
-            index === "0" ? "再生中/再生待ち" : index,
-            true,
-          )
+          .addField("リクエスト", this.getDisplayNameFromMember(addedBy) ?? "不明", true)
+          .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
           .addField(
             "再生されるまでの予想時間",
             index === "0" ? "-" : Util.time.HourMinSecToString(timeFragments),
@@ -384,10 +350,7 @@ export class QueueManager extends ServerManagerBase {
         if (info.basicInfo.isYouTube() && info.basicInfo.IsFallbacked) {
           embed.addField(":warning:注意", FallBackNotice);
         } else if (info.basicInfo.isSpotify()) {
-          embed.addField(
-            ":warning:注意",
-            "Spotifyのタイトルは正しく再生されない場合があります",
-          );
+          embed.addField(":warning:注意", "Spotifyのタイトルは正しく再生されない場合があります");
         }
         let lastReply: Message<TextableChannel> | ResponseMessage = null;
         const components =
@@ -396,9 +359,7 @@ export class QueueManager extends ServerManagerBase {
                 new Helper.MessageActionRowBuilder()
                   .addComponents(
                     new Helper.MessageButtonBuilder()
-                      .setCustomId(
-                        `cancel-last-${this.getUserIdFromMember(addedBy)}`,
-                      )
+                      .setCustomId(`cancel-last-${this.getUserIdFromMember(addedBy)}`)
                       .setLabel("キャンセル")
                       .setStyle("DANGER"),
                   )
@@ -413,24 +374,18 @@ export class QueueManager extends ServerManagerBase {
             components,
           });
         } else {
-          embed.setThumbnail(
-            "attachment://thumbnail." + info.basicInfo.Thumbnail.ext,
-          );
-          lastReply = await this.server.bot.client.editMessage(
-            msg.channel.id,
-            msg.id,
-            {
-              content: "",
-              embeds: [embed.toEris()],
-              components,
-              file: [
-                {
-                  name: "thumbnail." + info.basicInfo.Thumbnail.ext,
-                  file: info.basicInfo.Thumbnail.data,
-                },
-              ],
-            },
-          );
+          embed.setThumbnail("attachment://thumbnail." + info.basicInfo.Thumbnail.ext);
+          lastReply = await this.server.bot.client.editMessage(msg.channel.id, msg.id, {
+            content: "",
+            embeds: [embed.toEris()],
+            components,
+            file: [
+              {
+                name: "thumbnail." + info.basicInfo.Thumbnail.ext,
+                file: info.basicInfo.Thumbnail.data,
+              },
+            ],
+          });
         }
         if (!first && cancellable) {
           let componentDeleted = false;
@@ -490,9 +445,7 @@ export class QueueManager extends ServerManagerBase {
     playlist: T[],
     title: string,
     totalCount: number,
-    exportableConsumer: (
-      track: T,
-    ) => Promise<exportableCustom> | exportableCustom,
+    exportableConsumer: (track: T) => Promise<exportableCustom> | exportableCustom,
   ): Promise<number> {
     const t = Util.time.timer.start("ProcessPlaylist");
     try {
@@ -542,18 +495,11 @@ export class QueueManager extends ServerManagerBase {
       this.server.addRelated &&
       this.server.player.currentAudioInfo.ServiceIdentifer === "youtube"
     ) {
-      const relatedVideos = (
-        this.server.player.currentAudioInfo as AudioSource.YouTube
-      ).relatedVideos;
+      const relatedVideos = (this.server.player.currentAudioInfo as AudioSource.YouTube)
+        .relatedVideos;
       if (relatedVideos.length >= 1) {
         const video = relatedVideos[0];
-        await this.server.queue.addQueue(
-          video.url,
-          null,
-          "push",
-          "youtube",
-          video,
-        );
+        await this.server.queue.addQueue(video.url, null, "push", "youtube", video);
       }
     }
     this._default.shift();
@@ -663,51 +609,36 @@ export class QueueManager extends ServerManagerBase {
     // 追加者の一覧とマップを作成
     const generateUserOrder = !addedByUsers;
     addedByUsers = addedByUsers || [];
-    const queueByAdded = {} as {[key: string]: QueueContent[]};
+    const queueByAdded = {} as { [key: string]: QueueContent[] };
     for (let i = 0; i < this._default.length; i++) {
-      if (
-        !addedByUsers.includes(this._default[i].additionalInfo.addedBy.userId)
-      ) {
+      if (!addedByUsers.includes(this._default[i].additionalInfo.addedBy.userId)) {
         if (generateUserOrder) {
           addedByUsers.push(this._default[i].additionalInfo.addedBy.userId);
         }
-        queueByAdded[this._default[i].additionalInfo.addedBy.userId] = [
-          this._default[i],
-        ];
+        queueByAdded[this._default[i].additionalInfo.addedBy.userId] = [this._default[i]];
       } else {
-        queueByAdded[this._default[i].additionalInfo.addedBy.userId].push(
-          this._default[i],
-        );
+        queueByAdded[this._default[i].additionalInfo.addedBy.userId].push(this._default[i]);
       }
     }
     // ソートをもとにキューを再構築
     const sorted = [] as QueueContent[];
-    const maxLengthByUser = Math.max(
-      ...addedByUsers.map(user => queueByAdded[user].length),
-    );
+    const maxLengthByUser = Math.max(...addedByUsers.map(user => queueByAdded[user].length));
     for (let i = 0; i < maxLengthByUser; i++) {
-      sorted.push(
-        ...addedByUsers.map(user => queueByAdded[user][i]).filter(q => !!q),
-      );
+      sorted.push(...addedByUsers.map(user => queueByAdded[user][i]).filter(q => !!q));
     }
     this._default = sorted;
     this.emit("changeWithoutCurrent");
   }
 
   protected getDisplayNameFromMember(member: Member | AddedBy) {
-    return member instanceof Member
-      ? Util.eris.user.getDisplayName(member)
-      : member.displayName;
+    return member instanceof Member ? Util.eris.user.getDisplayName(member) : member.displayName;
   }
 
   protected getUserIdFromMember(member: Member | AddedBy) {
     return member instanceof Member ? member.id : member.userId;
   }
 
-  override emit<T extends keyof QueueManagerEvents>(
-    eventName: T,
-    ...args: QueueManagerEvents[T]
-  ) {
+  override emit<T extends keyof QueueManagerEvents>(eventName: T, ...args: QueueManagerEvents[T]) {
     return super.emit(eventName, ...args);
   }
 

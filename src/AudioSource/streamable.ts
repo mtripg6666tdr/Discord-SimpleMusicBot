@@ -84,8 +84,8 @@ export class Streamable extends AudioSource {
 }
 
 export type exportableStreamable = exportableCustom & {
-  thumbnail: string;
-  streamUrl: string;
+  thumbnail: string,
+  streamUrl: string,
 };
 
 /**
@@ -108,9 +108,7 @@ export abstract class StreamableApi {
 
   static async getVideoDetails(id: string): Promise<StreamableAPIResult> {
     const BASE_API = "https://api.streamable.com/videos/";
-    return JSON.parse(
-      await Util.web.DownloadText(BASE_API + id),
-    ) as StreamableAPIResult;
+    return JSON.parse(await Util.web.DownloadText(BASE_API + id)) as StreamableAPIResult;
   }
 }
 

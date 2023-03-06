@@ -29,7 +29,7 @@ const MIME_JSON = "application/json";
 
 export class HttpBackupper extends Backupper {
   private _queueModifiedGuilds: string[] = [];
-  private _previousStatuses: {[guildId: string]: string} = {};
+  private _previousStatuses: { [guildId: string]: string } = {};
 
   constructor(bot: MusicBotBase, getData: () => DataType) {
     super(bot, getData);
@@ -39,9 +39,7 @@ export class HttpBackupper extends Backupper {
       // コンテナにイベントハンドラを設定する関数
       const setContainerEvent = (container: GuildDataContainer) =>
         (["change", "changeWithoutCurrent"] as const).forEach(event =>
-          container.queue.on(event, () =>
-            this.addModifiedGuild(container.guildId),
-          ),
+          container.queue.on(event, () => this.addModifiedGuild(container.guildId)),
         );
       // すでに登録されているコンテナにイベントハンドラを登録する
       this.data.forEach(setContainerEvent);
@@ -59,8 +57,7 @@ export class HttpBackupper extends Backupper {
    * マークされたサーバーのキューは、次回のティックにバックアップが試行されます
    */
   addModifiedGuild(guildId: string) {
-    if (!this._queueModifiedGuilds.includes(guildId))
-      this._queueModifiedGuilds.push(guildId);
+    if (!this._queueModifiedGuilds.includes(guildId)) this._queueModifiedGuilds.push(guildId);
   }
 
   static get backuppable() {
@@ -103,9 +100,9 @@ export class HttpBackupper extends Backupper {
   private async backupStatus() {
     try {
       // 参加ステータスの送信
-      const speaking = [] as {guildid: string; value: string}[];
+      const speaking = [] as { guildid: string, value: string }[];
       const currentStatuses = Object.assign({}, this._previousStatuses) as {
-        [guildId: string]: string;
+        [guildId: string]: string,
       };
       this.data.forEach(container => {
         const currentStatus = ((status: exportableStatuses) =>
@@ -160,7 +157,7 @@ export class HttpBackupper extends Backupper {
         );
         if (result.status === 200) {
           const frozenGuildStatuses = result.data as {
-            [guildid: string]: string;
+            [guildid: string]: string,
           };
           const map = new Map<string, exportableStatuses>();
           Object.keys(frozenGuildStatuses).forEach(key => {
@@ -216,7 +213,7 @@ export class HttpBackupper extends Backupper {
           MIME_JSON,
         );
         if (result.status === 200) {
-          const frozenQueues = result.data as {[guildid: string]: string};
+          const frozenQueues = result.data as { [guildid: string]: string };
           const res = new Map<string, YmxFormat>();
           Object.keys(frozenQueues).forEach(key => {
             try {
@@ -245,11 +242,11 @@ export class HttpBackupper extends Backupper {
   /**
    * ステータス情報をサーバーへバックアップする
    */
-  private async _backupStatusData(data: {guildid: string; value: string}[]) {
+  private async _backupStatusData(data: { guildid: string, value: string }[]) {
     if (HttpBackupper.backuppable) {
       const t = Util.time.timer.start("backupStatusData");
       const ids = data.map(d => d.guildid).join(",");
-      const rawData = {} as {[key: string]: string};
+      const rawData = {} as { [key: string]: string };
       data.forEach(d => (rawData[d.guildid] = d.value));
       try {
         const result = await this._requestHttp(
@@ -283,11 +280,11 @@ export class HttpBackupper extends Backupper {
   /**
    * キューのデータをサーバーへバックアップする
    */
-  private async _backupQueueData(data: {guildid: string; queue: string}[]) {
+  private async _backupQueueData(data: { guildid: string, queue: string }[]) {
     if (HttpBackupper.backuppable) {
       const t = Util.time.timer.start("SetQueueData");
       const ids = data.map(d => d.guildid).join(",");
-      const rawData = {} as {[guildid: string]: string};
+      const rawData = {} as { [guildid: string]: string };
       data.forEach(d => (rawData[d.guildid] = encodeURIComponent(d.queue)));
       try {
         const result = await this._requestHttp(
@@ -358,14 +355,14 @@ export class HttpBackupper extends Backupper {
 }
 
 type getResult = {
-  status: 200 | 404;
+  status: 200 | 404,
 };
 type postResult = getResult & {
-  data: any;
+  data: any,
 };
 type requestBody = {
-  token: string;
-  guildid: string;
-  data?: any;
-  type: "queue" | "j";
+  token: string,
+  guildid: string,
+  data?: any,
+  type: "queue" | "j",
 };

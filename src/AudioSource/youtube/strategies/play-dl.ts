@@ -29,19 +29,14 @@ import { Util } from "../../../Util";
 type playDl = "playDl";
 const playDl: playDl = "playDl";
 
-export class playDlStrategy extends Strategy<
-  Cache<playDl, InfoData>,
-  InfoData
-> {
+export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> {
   get cacheType() {
     return playDl;
   }
 
   async getInfo(url: string) {
     this.useLog();
-    const t = Util.time.timer.start(
-      `YouTube(Strategy#${this.priority})#getInfo`,
-    );
+    const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#getInfo`);
     let info = null as InfoData;
     try {
       info = await video_info(url);
@@ -95,8 +90,7 @@ export class playDlStrategy extends Strategy<
           type: "url",
           url: format[0].url,
           streamType:
-            (format[0] as any)["container"] === "webm" &&
-            (format[0] as any)["codec"] === "opus"
+            (format[0] as any)["container"] === "webm" && (format[0] as any)["codec"] === "opus"
               ? "webm"
               : undefined,
         } as UrlStreamInfo,
@@ -105,8 +99,7 @@ export class playDlStrategy extends Strategy<
   }
 
   protected mapToExportable(url: string, info: InfoData): exportableYouTube {
-    if (info.video_details.upcoming)
-      throw new Error("This video is still in upcoming");
+    if (info.video_details.upcoming) throw new Error("This video is still in upcoming");
     return {
       url,
       title: info.video_details.title,

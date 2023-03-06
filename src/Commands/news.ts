@@ -40,19 +40,12 @@ export default class News extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
     options.server.joinVoiceChannel(message);
-    const url =
-      "https://www.youtube.com/playlist?list=PL3ZQ5CpNulQk8-p0CWo9ufI81IdrGoyNZ";
+    const url = "https://www.youtube.com/playlist?list=PL3ZQ5CpNulQk8-p0CWo9ufI81IdrGoyNZ";
     if (options.server.hasSearchPanel(message.member.id)) {
-      message
-        .reply("✘既に開かれている検索窓があります")
-        .catch(e => Util.logger.log(e, "error"));
+      message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const searchPanel = options.server.createSearchPanel(
-      message,
-      "ニューストピックス",
-      true,
-    );
+    const searchPanel = options.server.createSearchPanel(message, "ニューストピックス", true);
     if (!searchPanel) return;
     const result = await searchPanel.consumeSearchResult(
       ytpl.default(url, {
@@ -60,7 +53,7 @@ export default class News extends BaseCommand {
         hl: "ja",
         limit: 20,
       }),
-      ({items}) =>
+      ({ items }) =>
         items.map(item => ({
           title: item.title,
           author: item.author.name,

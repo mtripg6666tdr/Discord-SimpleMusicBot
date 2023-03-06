@@ -48,7 +48,7 @@ export default class Help extends BaseCommand {
           .getRESTUser(developerId)
           .then(user => user.username)
           .catch(() => null as string);
-    const {isDisabledSource} = Util.general;
+    const { isDisabledSource } = Util.general;
     const embed = new Helper.MessageEmbedBuilder()
       .setTitle(options.client.user.username + ":notes:")
       .setDescription(
@@ -57,10 +57,7 @@ export default class Help extends BaseCommand {
             Util.config.noMessageContent ? "/" : options.server.prefix
           }command\`を使用してください。`,
       )
-      .addField(
-        "開発者",
-        `[${developer || "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`,
-      )
+      .addField("開発者", `[${developer || "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`)
       .addField("バージョン", "`" + options.bot.version + "`")
       .addField(
         "レポジトリ/ソースコード",
@@ -76,8 +73,7 @@ export default class Help extends BaseCommand {
           !isDisabledSource("soundcloud") && "・SoundCloud(キーワード検索)",
           !isDisabledSource("soundcloud") && "・SoundCloud(楽曲ページURL指定)",
           !isDisabledSource("streamable") && "・Streamable(動画ページURL指定)",
-          !isDisabledSource("custom") &&
-            "・Discord(音声ファイルの添付付きメッセージのURL指定)",
+          !isDisabledSource("custom") && "・Discord(音声ファイルの添付付きメッセージのURL指定)",
           !isDisabledSource("googledrive") &&
             "・Googleドライブ(音声ファイルの限定公開リンクのURL指定)",
           !isDisabledSource("niconico") && "・ニコニコ動画(動画ページURL指定)",
@@ -92,8 +88,6 @@ export default class Help extends BaseCommand {
       )
       .setColor(getColor("HELP"))
       .toEris();
-    await message
-      .reply({embeds: [embed]})
-      .catch(e => Util.logger.log(e, "error"));
+    await message.reply({ embeds: [embed] }).catch(e => Util.logger.log(e, "error"));
   }
 }

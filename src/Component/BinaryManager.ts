@@ -28,18 +28,17 @@ import pEvent from "p-event";
 import { LogEmitter } from "../Structure";
 
 type BinaryManagerOptions = {
-  binaryName: string;
-  localBinaryName: string;
-  binaryRepo: string;
-  checkImmediately: boolean;
-  checkVersionArgs?: readonly string[];
-  checkUpdateTimeout?: number;
+  binaryName: string,
+  localBinaryName: string,
+  binaryRepo: string,
+  checkImmediately: boolean,
+  checkVersionArgs?: readonly string[],
+  checkUpdateTimeout?: number,
 };
 
 export class BinaryManager extends LogEmitter {
   protected readonly checkUpdateTimeout =
-    this.options.checkUpdateTimeout ||
-    1000 * 60 /* 1 min */ * 60 /* 1 hour */ * 3 /* 3 hour */;
+    this.options.checkUpdateTimeout || 1000 * 60 /* 1 min */ * 60 /* 1 hour */ * 3 /* 3 hour */;
   protected baseUrl = path.join(__dirname, "../../bin");
   protected lastChecked: number = 0;
   protected releaseInfo: GitHubRelease = null;
@@ -48,8 +47,7 @@ export class BinaryManager extends LogEmitter {
     return path.join(
       this.baseUrl,
       "./",
-      this.options.localBinaryName +
-        (process.platform === "win32" ? ".exe" : ""),
+      this.options.localBinaryName + (process.platform === "win32" ? ".exe" : ""),
     );
   }
 
@@ -81,12 +79,10 @@ export class BinaryManager extends LogEmitter {
   protected async getReleaseInfo() {
     return lock(this.getReleaseInfoLocker, async () => {
       if (this.releaseInfo && !this.isStaleInfo) {
-        this.Log(
-          "Skipping the binary info fetching due to valid info cache found",
-        );
+        this.Log("Skipping the binary info fetching due to valid info cache found");
         return this.releaseInfo;
       }
-      const {body} = await candyget.json<GitHubRelease>(
+      const { body } = await candyget.json<GitHubRelease>(
         `https://api.github.com/repos/${this.options.binaryRepo}/releases/latest`,
         {
           headers: {
@@ -108,9 +104,7 @@ export class BinaryManager extends LogEmitter {
       this.Log("Checking the latest version");
       const [latestVersion, currentVersion] = await Promise.all([
         this.getReleaseInfo().then(info => info.tag_name),
-        this.exec(this.options.checkVersionArgs || ["--version"]).then(output =>
-          output.trim(),
-        ),
+        this.exec(this.options.checkVersionArgs || ["--version"]).then(output => output.trim()),
       ]);
       const isLatest = latestVersion === currentVersion;
       this.Log(isLatest ? "The binary is latest" : "The binary is stale");
@@ -124,10 +118,7 @@ export class BinaryManager extends LogEmitter {
     }
     const binaryUrl = this.releaseInfo.assets.find(
       asset =>
-        asset.name ===
-        `${this.options.binaryName}${
-          process.platform === "win32" ? ".exe" : ""
-        }`,
+        asset.name === `${this.options.binaryName}${process.platform === "win32" ? ".exe" : ""}`,
     )?.browser_download_url;
     if (!binaryUrl) {
       throw new Error("No binary url detected");
@@ -144,10 +135,7 @@ export class BinaryManager extends LogEmitter {
           mode: 0o777,
         }),
       );
-      await Promise.all([
-        pEvent(result.body, "close"),
-        pEvent(fileStream, "close"),
-      ]);
+      await Promise.all([pEvent(result.body, "close"), pEvent(fileStream, "close")]);
       this.Log("Finish downloading the binary");
     }
   }
@@ -184,9 +172,7 @@ export class BinaryManager extends LogEmitter {
           bufs = null;
           reject(err);
         });
-        process.stderr.on("data", (chunk: Buffer) =>
-          this.Log(`[Child] ${chunk.toString()}`),
-        );
+        process.stderr.on("data", (chunk: Buffer) => this.Log(`[Child] ${chunk.toString()}`));
       } catch (e) {
         reject(e);
       }

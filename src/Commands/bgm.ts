@@ -48,26 +48,19 @@ export default class Bgm extends BaseCommand {
       ))
     )
       return;
-    const url =
-      "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
+    const url = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
     if (options.server.hasSearchPanel(message.member.id)) {
-      message
-        .reply("✘既に開かれている検索窓があります")
-        .catch(e => Util.logger.log(e, "error"));
+      message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const searchPanel = options.server.createSearchPanel(
-      message,
-      "プリセットBGM一覧",
-      true,
-    );
+    const searchPanel = options.server.createSearchPanel(message, "プリセットBGM一覧", true);
     if (!searchPanel) return;
     const result = await searchPanel.consumeSearchResult(
       ytpl.default(url, {
         gl: "JP",
         hl: "ja",
       }),
-      ({items}) =>
+      ({ items }) =>
         items.map(item => ({
           title: item.title,
           author: item.author.name,

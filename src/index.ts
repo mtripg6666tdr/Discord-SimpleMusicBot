@@ -27,11 +27,7 @@ import { createServer } from "./server";
 
 const logger = (content: any, loglevel?: LogLevels) =>
   Util.logger.log(
-    `[Entry]${
-      typeof content === "string"
-        ? content
-        : Util.general.StringifyObject(content)
-    }`,
+    `[Entry]${typeof content === "string" ? content : Util.general.StringifyObject(content)}`,
     loglevel,
   );
 
@@ -39,9 +35,7 @@ logger("Discord-SimpleMusicBot by mtripg6666tdr");
 logger(
   "This application was originally built by mtripg6666tdr and is licensed under GPLv3 or later.",
 );
-logger(
-  "There is no warranty for the work, both of the original and its forks.",
-);
+logger("There is no warranty for the work, both of the original and its forks.");
 logger(
   "However if you found any bugs in the original please feel free to report them by creating an issue on GitHub.",
 );
@@ -53,11 +47,7 @@ let server: http.Server = null;
 
 // Webサーバーのインスタンス化
 if (Util.config.webserver) {
-  server = createServer(
-    bot.client,
-    Number(process.env.PORT) || 8081,
-    Util.logger.log,
-  );
+  server = createServer(bot.client, Number(process.env.PORT) || 8081, Util.logger.log);
 } else {
   logger("Skipping to start server");
 }
@@ -85,9 +75,7 @@ const onTerminated = async function (code: string) {
   }
   // 強制終了を報告
   if (bot.client && Util.config.errorChannel) {
-    bot.client
-      .createMessage(Util.config.errorChannel, "Process terminated")
-      .catch(() => {});
+    bot.client.createMessage(Util.config.errorChannel, "Process terminated").catch(() => {});
   }
   if (global.workerThread) {
     logger("Shutting down worker...");
@@ -110,10 +98,7 @@ bot.run(true, 40);
 async function reportError(err: any) {
   try {
     await bot.client
-      .createMessage(
-        Util.config.errorChannel,
-        Util.general.StringifyObject(err),
-      )
+      .createMessage(Util.config.errorChannel, Util.general.StringifyObject(err))
       .catch(() => {});
   } catch (e) {
     logger(e, "error");

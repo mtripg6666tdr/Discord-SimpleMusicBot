@@ -35,15 +35,15 @@ const MongoClient = (() => {
   }
 })()?.MongoClient;
 
-type Collectionate<T> = T & {guildId: string};
+type Collectionate<T> = T & { guildId: string };
 
 export class MongoBackupper extends Backupper {
   private readonly client: mongo.MongoClient = null;
   private dbConnectionReady = false;
   private dbError: Error = null;
   collections: {
-    status: mongo.Collection<Collectionate<exportableStatuses>>;
-    queue: mongo.Collection<Collectionate<YmxFormat>>;
+    status: mongo.Collection<Collectionate<exportableStatuses>>,
+    queue: mongo.Collection<Collectionate<YmxFormat>>,
   } = null;
 
   static get backuppable() {
@@ -66,9 +66,7 @@ export class MongoBackupper extends Backupper {
       .connect()
       .then(() => {
         this.Log("Database connection ready");
-        const db = this.client.db(
-          process.env.GAS_TOKEN || "discord_music_bot_backup",
-        );
+        const db = this.client.db(process.env.GAS_TOKEN || "discord_music_bot_backup");
         this.collections = {
           status: db.collection<Collectionate<exportableStatuses>>("Status"),
           queue: db.collection<Collectionate<YmxFormat>>("Queue"),
@@ -94,29 +92,19 @@ export class MongoBackupper extends Backupper {
       const backupQueueFuncFactory = (guildId: string) => {
         return (
           backupQueueDebounceFunctions[guildId] ||
-          (backupQueueDebounceFunctions[guildId] = debounce(5000, () =>
-            this.backupQueue(guildId),
-          ))
+          (backupQueueDebounceFunctions[guildId] = debounce(5000, () => this.backupQueue(guildId)))
         );
       };
       const setContainerEvent = (container: GuildDataContainer) => {
         (["change", "changeWithoutCurrent"] as const).forEach(eventName =>
-          container.queue.on(
-            eventName,
-            backupQueueFuncFactory(container.guildId),
-          ),
+          container.queue.on(eventName, backupQueueFuncFactory(container.guildId)),
         );
-        container.queue.on(
-          "settingsChanged",
-          backupStatusFuncFactory(container.guildId),
-        );
+        container.queue.on("settingsChanged", backupStatusFuncFactory(container.guildId));
         container.player.on("all", backupStatusFuncFactory(container.guildId));
       };
       this.data.forEach(setContainerEvent);
       this.bot.on("guildDataAdded", setContainerEvent);
-      this.bot.on("onBotVoiceChannelJoin", channel =>
-        backupStatusFuncFactory(channel.guild.id)(),
-      );
+      this.bot.on("onBotVoiceChannelJoin", channel => backupStatusFuncFactory(channel.guild.id)());
       this.Log("Hook was set up successfully");
     });
   }
@@ -127,7 +115,7 @@ export class MongoBackupper extends Backupper {
       this.Log(`Backing up status...(${guildId})`);
       const status = this.data.get(guildId).exportStatus();
       await this.collections.status.updateOne(
-        {guildId},
+        { guildId },
         {
           $set: {
             guildId,
@@ -150,7 +138,7 @@ export class MongoBackupper extends Backupper {
       const queue = this.data.get(guildId).exportQueue();
       this.Log(`Backing up queue...(${guildId})`);
       this.collections.queue.updateOne(
-        {guildId},
+        { guildId },
         {
           $set: {
             guildId,
@@ -167,9 +155,7 @@ export class MongoBackupper extends Backupper {
     }
   }
 
-  override async getStatusFromBackup(
-    guildIds: string[],
-  ): Promise<Map<string, exportableStatuses>> {
+  override async getStatusFromBackup(guildIds: string[]): Promise<Map<string, exportableStatuses>> {
     if (!this.dbConnectionReady && !this.dbError)
       await Util.general.waitForEnteringState(
         () => this.dbConnectionReady || !!this.dbError,
@@ -197,9 +183,7 @@ export class MongoBackupper extends Backupper {
     }
   }
 
-  override async getQueueDataFromBackup(
-    guildids: string[],
-  ): Promise<Map<string, YmxFormat>> {
+  override async getQueueDataFromBackup(guildids: string[]): Promise<Map<string, YmxFormat>> {
     if (!this.dbConnectionReady && !this.dbError)
       await Util.general.waitForEnteringState(
         () => this.dbConnectionReady || !!this.dbError,

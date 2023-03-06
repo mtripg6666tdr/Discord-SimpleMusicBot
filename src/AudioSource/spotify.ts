@@ -40,7 +40,7 @@ const spotifyUrlInfo = (() => {
 })();
 
 const client = spotifyUrlInfo?.((url, opts) =>
-  candyget(url, "string", opts).then(res => ({text: () => res.body})),
+  candyget(url, "string", opts).then(res => ({ text: () => res.body })),
 );
 
 export class Spotify extends AudioSource {
@@ -49,10 +49,7 @@ export class Spotify extends AudioSource {
   protected artist = "";
   Thumbnail: string = null;
 
-  override async init(
-    url: string,
-    prefetched: exportableSpotify,
-  ): Promise<Spotify> {
+  override async init(url: string, prefetched: exportableSpotify): Promise<Spotify> {
     if (!Spotify.validateTrackUrl(url)) throw new Error("Invalid url");
     if (prefetched) {
       this.Url = prefetched.url;
@@ -65,8 +62,7 @@ export class Spotify extends AudioSource {
       this._lengthSeconds = Math.floor(track.duration / 1000);
       this.Title = track.name;
       this.artist = track.artists.map(artist => artist.name).join(", ");
-      this.Thumbnail =
-        track.coverArt.sources[0]?.url || DefaultAudioThumbnailURL;
+      this.Thumbnail = track.coverArt.sources[0]?.url || DefaultAudioThumbnailURL;
     }
     return this;
   }
@@ -85,12 +81,10 @@ export class Spotify extends AudioSource {
       );
     const searchResult = await searchYouTube(keyword);
     if (Util.config.debug) Util.logger.log("Extracting the valid item...");
-    const items = searchResult.items.filter(
-      ({type}) => type === "video",
-    ) as ytsr.Video[];
+    const items = searchResult.items.filter(({ type }) => type === "video") as ytsr.Video[];
     const target = this.extractBestItem(items);
     if (!target) throw new Error("Not Found");
-    const {result} = await attemptFetchForStrategies(
+    const { result } = await attemptFetchForStrategies(
       Util.logger.log.bind(Util.logger),
       target.url,
       forceUrl,
@@ -126,10 +120,7 @@ export class Spotify extends AudioSource {
     const validate = (item: ytsr.Video) => {
       return (
         // 関連のないタイトルを除外
-        (includes(
-          item.title,
-          this.Title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase(),
-        ) ||
+        (includes(item.title, this.Title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase()) ||
           includes(
             this.Title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase(),
             item.title.toLowerCase(),
@@ -140,8 +131,7 @@ export class Spotify extends AudioSource {
         !includes(item.title, "歌ってみた") &&
         !includes(item.title, "弾いてみた") &&
         !includes(item.title.toLowerCase(), "#shorts") &&
-        (this.Title.toLowerCase().includes("remix") ||
-          !includes(item.title.toLowerCase(), "remix"))
+        (this.Title.toLowerCase().includes("remix") || !includes(item.title.toLowerCase(), "remix"))
       );
     };
     const validItems = items.filter(validate);
@@ -164,9 +154,7 @@ export class Spotify extends AudioSource {
     if (Util.config.debug) console.log("official item", filtered);
     if (filtered[0]) return filtered[0];
     // pv /mv
-    filtered = validItems.filter(
-      item => includes(item.title, "pv") || includes(item.title, "mv"),
-    );
+    filtered = validItems.filter(item => includes(item.title, "pv") || includes(item.title, "mv"));
     if (Util.config.debug) console.log("PV/MV", filtered);
     if (filtered[0]) return filtered[0];
     // no live
@@ -198,29 +186,19 @@ export class Spotify extends AudioSource {
   }
 
   static validateTrackUrl(url: string) {
-    return !!url.match(
-      /^https?:\/\/open\.spotify\.com\/track\/([a-zA-Z0-9]+)(\?.*)?$/,
-    );
+    return !!url.match(/^https?:\/\/open\.spotify\.com\/track\/([a-zA-Z0-9]+)(\?.*)?$/);
   }
 
   static validatePlaylistUrl(url: string) {
-    return !!url.match(
-      /^https?:\/\/open\.spotify\.com\/(playlist|album)\/([a-zA-Z0-9]+)(\?.*)?$/,
-    );
+    return !!url.match(/^https?:\/\/open\.spotify\.com\/(playlist|album)\/([a-zA-Z0-9]+)(\?.*)?$/);
   }
 
   static getTrackUrl(uri: string) {
-    return `https://open.spotify.com/track/${uri.replace(
-      /spotify:track:/,
-      "",
-    )}`;
+    return `https://open.spotify.com/track/${uri.replace(/spotify:track:/, "")}`;
   }
 
   static getPlaylistUrl(uri: string, type: "playlist" | "album") {
-    return `https://open.spotify.com/${type}/${uri.replace(
-      /spotify:(playlist|album):/,
-      "",
-    )}`;
+    return `https://open.spotify.com/${type}/${uri.replace(/spotify:(playlist|album):/, "")}`;
   }
 
   static get client() {
@@ -233,5 +211,5 @@ export class Spotify extends AudioSource {
 }
 
 export type exportableSpotify = exportableCustom & {
-  artist: string;
+  artist: string,
 };

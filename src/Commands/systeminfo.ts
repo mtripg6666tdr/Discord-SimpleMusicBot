@@ -72,23 +72,14 @@ export default class SystemInfo extends BaseCommand {
           .setTitle("Discord-SimpleMusicBot")
           .setDescription("Basic info")
           .addField("Version", `\`${options.bot.version}\``, true)
-          .addField(
-            "Managed embed toggles",
-            `\`${options.embedPageToggle.length}\``,
-            true,
-          )
-          .addField(
-            "Current total transforming costs",
-            `\`${options.bot.totalTransformingCost}\``,
-          )
+          .addField("Managed embed toggles", `\`${options.embedPageToggle.length}\``, true)
+          .addField("Current total transforming costs", `\`${options.bot.totalTransformingCost}\``)
           .addField(
             "Modules",
             ["eris", "@mtripg6666tdr/eris-command-resolver"]
               .map(mod => {
                 try {
-                  return `\`${mod}\`@v${
-                    require(`../../node_modules/${mod}/package.json`).version
-                  }`;
+                  return `\`${mod}\`@v${require(`../../node_modules/${mod}/package.json`).version}`;
                 } catch {
                   return "unknown";
                 }
@@ -116,11 +107,7 @@ export default class SystemInfo extends BaseCommand {
         new Helper.MessageEmbedBuilder()
           .setColor(getColor("UPTIME"))
           .setTitle("Log")
-          .setDescription(
-            `Last ${logs.length}bot logs\r\n\`\`\`\r\n${logs.join(
-              "\r\n",
-            )}\r\n\`\`\``,
-          )
+          .setDescription(`Last ${logs.length}bot logs\r\n\`\`\`\r\n${logs.join("\r\n")}\r\n\`\`\``)
           .toEris(),
       );
     }
@@ -138,39 +125,21 @@ export default class SystemInfo extends BaseCommand {
               options.client.guilds
                 .map(
                   guild =>
-                    `${
-                      guild.name.length > 17
-                        ? guild.name.substring(0, 17) + "…"
-                        : guild.name
-                    } (${guild.nsfwLevel},${guild.id})`,
+                    `${guild.name.length > 17 ? guild.name.substring(0, 17) + "…" : guild.name} (${
+                      guild.nsfwLevel
+                    },${guild.id})`,
                 )
                 .join("\r\n"),
           )
-          .addField(
-            "参加サーバー数",
-            options.bot.client.guilds.size.toString(),
-            true,
-          )
-          .addField(
-            "データが保持されているサーバー数",
-            options.bot.databaseCount.toString(),
-            true,
-          )
-          .addField(
-            "接続中サーバー数",
-            options.bot.connectingGuildCount.toString(),
-            true,
-          )
+          .addField("参加サーバー数", options.bot.client.guilds.size.toString(), true)
+          .addField("データが保持されているサーバー数", options.bot.databaseCount.toString(), true)
+          .addField("接続中サーバー数", options.bot.connectingGuildCount.toString(), true)
           .addField(
             "再生中サーバー数(一時停止含む)",
             options.bot.playingGuildCount.toString(),
             true,
           )
-          .addField(
-            "一時停止サーバー数",
-            options.bot.pausedGuildCount.toString(),
-            true,
-          )
+          .addField("一時停止サーバー数", options.bot.pausedGuildCount.toString(), true)
           .toEris(),
       );
     }
@@ -190,45 +159,16 @@ export default class SystemInfo extends BaseCommand {
           .addField("サーバー名", target.name, true)
           .addField("サーバーID", target.id)
           .addField("サーバーアイコン", target.icon)
-          .addField(
-            "チャンネル数(キャッシュによる)",
-            target.channels.size.toString(),
-            true,
-          )
-          .addField(
-            "メンバー数(概算)",
-            target.approximateMemberCount?.toString() || "不明",
-            true,
-          )
-          .addField(
-            "接続中",
-            data?.player.isConnecting ? "はい" : "いいえ",
-            true,
-          )
-          .addField(
-            "再生/一時停止中",
-            data?.player.isPaused ? "はい" : "いいえ",
-            true,
-          )
-          .addField(
-            "一時停止中",
-            data?.player.isPaused ? "はい" : "いいえ",
-            true,
-          )
-          .addField(
-            "キュー内のアイテム数",
-            data?.queue.length.toString() || "0",
-            true,
-          )
-          .addField(
-            "現在の変換コスト",
-            data?.player.cost.toString() || "0",
-            true,
-          )
+          .addField("チャンネル数(キャッシュによる)", target.channels.size.toString(), true)
+          .addField("メンバー数(概算)", target.approximateMemberCount?.toString() || "不明", true)
+          .addField("接続中", data?.player.isConnecting ? "はい" : "いいえ", true)
+          .addField("再生/一時停止中", data?.player.isPaused ? "はい" : "いいえ", true)
+          .addField("一時停止中", data?.player.isPaused ? "はい" : "いいえ", true)
+          .addField("キュー内のアイテム数", data?.queue.length.toString() || "0", true)
+          .addField("現在の変換コスト", data?.player.cost.toString() || "0", true)
           .addField(
             "ライブストリーム",
-            data?.player.currentAudioInfo?.isYouTube() &&
-              data?.player.currentAudioInfo.LiveStream
+            data?.player.currentAudioInfo?.isYouTube() && data?.player.currentAudioInfo.LiveStream
               ? "はい"
               : "いいえ",
             true,
@@ -341,9 +281,7 @@ export default class SystemInfo extends BaseCommand {
     }
 
     if (embeds.length > 0) {
-      await message.channel
-        .createMessage({embeds})
-        .catch(e => Util.logger.log(e, "error"));
+      await message.channel.createMessage({ embeds }).catch(e => Util.logger.log(e, "error"));
     }
   }
 }

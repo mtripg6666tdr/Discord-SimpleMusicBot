@@ -34,8 +34,7 @@ export class CustomStream extends AudioSource {
       this.Url = url;
       this._lengthSeconds = prefetched.length;
     } else {
-      if (!Util.fs.isAvailableRawAudioURL(url))
-        throw new Error("正しいストリームではありません");
+      if (!Util.fs.isAvailableRawAudioURL(url)) throw new Error("正しいストリームではありません");
       this.Url = url;
       this.Title = this.extractFilename() || "カスタムストリーム";
       try {
@@ -86,7 +85,7 @@ export class CustomStream extends AudioSource {
 }
 
 export type exportableCustom = {
-  url: string;
-  length: number;
-  title: string;
+  url: string,
+  length: number,
+  title: string,
 };

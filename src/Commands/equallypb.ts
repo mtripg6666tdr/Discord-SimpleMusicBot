@@ -42,9 +42,7 @@ export default class EquallyPlayback extends BaseCommand {
     options.server.updateBoundChannel(message);
     if (options.server.equallyPlayback) {
       options.server.equallyPlayback = false;
-      message
-        .reply("❌均等再生をオフにしました")
-        .catch(e => Util.logger.log(e, "error"));
+      message.reply("❌均等再生をオフにしました").catch(e => Util.logger.log(e, "error"));
     } else {
       options.server.equallyPlayback = true;
       const embed = new Helper.MessageEmbedBuilder()
@@ -54,9 +52,7 @@ export default class EquallyPlayback extends BaseCommand {
         )
         .setColor(getColor("EQUALLY"))
         .toEris();
-      message
-        .reply({embeds: [embed]})
-        .catch(er => Util.logger.log(er, "error"));
+      message.reply({ embeds: [embed] }).catch(er => Util.logger.log(er, "error"));
     }
   }
 }

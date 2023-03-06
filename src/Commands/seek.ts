@@ -50,9 +50,7 @@ export default class Seek extends BaseCommand {
     const server = options.server;
     // そもそも再生状態じゃないよ...
     if (!server.player.isPlaying || server.player.preparing) {
-      await message
-        .reply("再生中ではありません")
-        .catch(e => Util.logger.log(e, "error"));
+      await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     } else if (
       server.player.currentAudioInfo.LengthSeconds === 0 ||

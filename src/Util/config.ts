@@ -30,38 +30,28 @@ const GuildBGMContainer = Type.Object({
   voiceChannelId: Type.RegEx(/^\d+$/),
   allowEditQueue: Type.Boolean(),
   enableQueueLoop: Type.Boolean(),
-  items: Type.Array(Type.String({minLength: 1})),
-  volume: Type.Number({minimum: 5, maximum: 200}),
-  mode: Type.Union([
-    Type.Literal("only"),
-    Type.Literal("prior"),
-    Type.Literal("normal"),
-  ]),
+  items: Type.Array(Type.String({ minLength: 1 })),
+  volume: Type.Number({ minimum: 5, maximum: 200 }),
+  mode: Type.Union([Type.Literal("only"), Type.Literal("prior"), Type.Literal("normal")]),
 });
 
 const Config = Type.Object({
-  adminId: Type.Union(
-    [Type.RegEx(/^\d+$/), Type.Array(Type.RegEx(/^\d+$/)), Type.Null()],
-    {default: false},
-  ),
-  debug: Type.Boolean({default: false}),
-  errorChannel: Type.Union([Type.RegEx(/^\d+$/), Type.Null()], {default: null}),
+  adminId: Type.Union([Type.RegEx(/^\d+$/), Type.Array(Type.RegEx(/^\d+$/)), Type.Null()], {
+    default: false,
+  }),
+  debug: Type.Boolean({ default: false }),
+  errorChannel: Type.Union([Type.RegEx(/^\d+$/), Type.Null()], { default: null }),
   maintenance: Type.Boolean(),
-  proxy: Type.Union(
-    [Type.RegEx(/^https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+$/), Type.Null()],
-    {default: null},
-  ),
-  prefix: Type.Optional(Type.String({minLength: 1, default: ">"})),
-  webserver: Type.Optional(Type.Boolean({default: true})),
-  bgm: Type.Optional(
-    Type.Record(Type.RegEx(/^\d+$/), GuildBGMContainer, {default: {}}),
-  ),
-  noMessageContent: Type.Optional(Type.Boolean({default: false})),
-  twentyFourSeven: Type.Optional(
-    Type.Array(Type.RegEx(/^\d+$/), {default: []}),
-  ),
-  alwaysTwentyFourSeven: Type.Optional(Type.Boolean({default: false})),
-  disabledSources: Type.Optional(Type.Array(Type.String(), {default: []})),
+  proxy: Type.Union([Type.RegEx(/^https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+$/), Type.Null()], {
+    default: null,
+  }),
+  prefix: Type.Optional(Type.String({ minLength: 1, default: ">" })),
+  webserver: Type.Optional(Type.Boolean({ default: true })),
+  bgm: Type.Optional(Type.Record(Type.RegEx(/^\d+$/), GuildBGMContainer, { default: {} })),
+  noMessageContent: Type.Optional(Type.Boolean({ default: false })),
+  twentyFourSeven: Type.Optional(Type.Array(Type.RegEx(/^\d+$/), { default: [] })),
+  alwaysTwentyFourSeven: Type.Optional(Type.Boolean({ default: false })),
+  disabledSources: Type.Optional(Type.Array(Type.String(), { default: [] })),
 });
 
 const checker = TypeCompiler.Compile(Config);
@@ -86,9 +76,7 @@ if (typeof config !== "object" || !("debug" in config) || !config.debug) {
   console.error(
     "This is still a development phase, and running without debug mode is currently disabled.",
   );
-  console.error(
-    "You should use the latest version instead of the current branch.",
-  );
+  console.error("You should use the latest version instead of the current branch.");
   process.exit(1);
 }
 

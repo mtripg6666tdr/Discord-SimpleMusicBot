@@ -43,8 +43,6 @@ export default class Reset extends BaseCommand {
     options.server.bot.resetData(message.guild.id);
     // データ初期化
     options.initData(message.guild.id, message.channel.id);
-    message
-      .reply("✅サーバーの設定を初期化しました")
-      .catch(e => Util.logger.log(e, "error"));
+    message.reply("✅サーバーの設定を初期化しました").catch(e => Util.logger.log(e, "error"));
   }
 }

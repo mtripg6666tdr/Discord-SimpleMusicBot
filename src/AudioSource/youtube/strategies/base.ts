@@ -23,8 +23,8 @@ import type { StreamInfo } from "../../audiosource";
 import { Util } from "../../../Util";
 
 export type Cache<T extends string, U> = {
-  type: T;
-  data: U;
+  type: T,
+  data: U,
 };
 
 export abstract class Strategy<T extends Cache<any, U>, U> {
@@ -36,8 +36,8 @@ export abstract class Strategy<T extends Cache<any, U>, U> {
   }
 
   abstract getInfo(url: string): Promise<{
-    data: exportableYouTube;
-    cache: T;
+    data: exportableYouTube,
+    cache: T,
   }>;
 
   abstract fetch(
@@ -45,9 +45,9 @@ export abstract class Strategy<T extends Cache<any, U>, U> {
     forceCache?: boolean,
     cache?: Cache<any, any>,
   ): Promise<{
-    stream: StreamInfo;
-    info: exportableYouTube;
-    relatedVideos: exportableYouTube[];
+    stream: StreamInfo,
+    info: exportableYouTube,
+    relatedVideos: exportableYouTube[],
   }>;
 
   protected useLog() {

@@ -58,6 +58,24 @@
     }],
     "@typescript-eslint/default-param-last": "error",
     "@typescript-eslint/init-declarations": "warn",
+    "@typescript-eslint/member-delimiter-style": ["error", {
+      "multiline": {
+        "delimiter": "comma",
+        "requireLast": true
+      },
+      "singleline": {
+        "delimiter": "comma",
+        "requireLast": false
+      },
+      "overrides": {
+        "interface": {
+          "multiline": {
+            "delimiter": "semi",
+            "requireLast": true
+          }
+        }
+      }
+    }],
     "@typescript-eslint/method-signature-style": ["error", "property"],
     "@typescript-eslint/no-confusing-non-null-assertion": "warn",
     "@typescript-eslint/no-empty-interface": ["error", {
@@ -69,6 +87,7 @@
     "@typescript-eslint/no-unnecessary-type-assertion": "warn",
     "@typescript-eslint/return-await": ["warn", "in-try-catch"],
     "@typescript-eslint/await-thenable": "warn",
+    "@typescript-eslint/object-curly-spacing": ["warn", "always"],
 
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/ban-ts-comment": "off",

@@ -32,47 +32,42 @@ const worker = isMainThread
   : null;
 global.workerThread = worker;
 
-export type WithId<T> = T & {id: string};
+export type WithId<T> = T & { id: string };
 export type spawnerJobMessage = spawnerGetInfoMessage | spawnerSearchMessage;
 export type spawnerGetInfoMessage = {
-  type: "init";
-  url: string;
-  prefetched: exportableYouTube;
-  forceCache: boolean;
+  type: "init",
+  url: string,
+  prefetched: exportableYouTube,
+  forceCache: boolean,
 };
 export type spawnerSearchMessage = {
-  type: "search";
-  keyword: string;
+  type: "search",
+  keyword: string,
 };
-export type workerMessage =
-  | workerSuccessMessage
-  | workerErrorMessage
-  | workerLoggingMessage;
-export type workerSuccessMessage =
-  | workerGetInfoSuccessMessage
-  | workerSearchSuccessMessage;
+export type workerMessage = workerSuccessMessage | workerErrorMessage | workerLoggingMessage;
+export type workerSuccessMessage = workerGetInfoSuccessMessage | workerSearchSuccessMessage;
 export type workerGetInfoSuccessMessage = {
-  type: "initOk";
-  data: YouTube;
+  type: "initOk",
+  data: YouTube,
 };
 export type workerSearchSuccessMessage = {
-  type: "searchOk";
-  data: ytsr.Result;
+  type: "searchOk",
+  data: ytsr.Result,
 };
 export type workerErrorMessage = {
-  type: "error";
-  data: any;
+  type: "error",
+  data: any,
 };
 export type workerLoggingMessage = {
-  type: "log";
-  level: LogLevels;
-  data: string;
+  type: "log",
+  level: LogLevels,
+  data: string,
 };
 
-type jobCallback = (callback: workerMessage & {id: string}) => void;
+type jobCallback = (callback: workerMessage & { id: string }) => void;
 type jobQueueContent = {
-  callback: jobCallback;
-  start: number;
+  callback: jobCallback,
+  start: number,
 };
 const jobQueue = worker && new Map<string, jobQueueContent>();
 
@@ -82,10 +77,8 @@ if (worker) {
     if (message.type === "log") {
       Util.logger.log(message.data, message.level);
     } else if (jobQueue.has(message.id)) {
-      const {callback, start} = jobQueue.get(message.id);
-      Util.logger.log(
-        `[Spawner] Job(${message.id}) Finished (${Date.now() - start}ms)`,
-      );
+      const { callback, start } = jobQueue.get(message.id);
+      Util.logger.log(`[Spawner] Job(${message.id}) Finished (${Date.now() - start}ms)`);
       callback(message);
       jobQueue.delete(message.id);
     } else {
@@ -100,12 +93,8 @@ const jobTriggerQueue = new PQueue({
   interval: 12,
 });
 
-function doJob(
-  message: spawnerGetInfoMessage,
-): Promise<workerGetInfoSuccessMessage>;
-function doJob(
-  message: spawnerSearchMessage,
-): Promise<workerSearchSuccessMessage>;
+function doJob(message: spawnerGetInfoMessage): Promise<workerGetInfoSuccessMessage>;
+function doJob(message: spawnerSearchMessage): Promise<workerSearchSuccessMessage>;
 function doJob(message: spawnerJobMessage): Promise<workerSuccessMessage> {
   const uuid = Util.general.generateUUID();
   Util.logger.log(`[Spawner] Job(${uuid}) Scheduled`);

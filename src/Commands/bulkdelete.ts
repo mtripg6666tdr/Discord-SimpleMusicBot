@@ -39,8 +39,7 @@ export default class BulkDelete extends BaseCommand {
         {
           type: "integer",
           name: "count",
-          description:
-            "削除するメッセージの上限数。100以下で設定してください。",
+          description: "削除するメッセージの上限数。100以下で設定してください。",
           required: true,
         },
       ],
@@ -76,21 +75,16 @@ export default class BulkDelete extends BaseCommand {
         );
         if (allMsgs.length === 0) break;
         const msgs = allMsgs.filter(
-          _msg =>
-            _msg.author.id === options.client.user.id && _msg.id !== reply.id,
+          _msg => _msg.author.id === options.client.user.id && _msg.id !== reply.id,
         );
         msgs.sort((a, b) => b.createdAt - a.createdAt);
         messages.push(...msgs);
         before = allMsgs.at(-1).id;
         i++;
-        await reply.edit(
-          `:mag:取得中(${messages.length}件ヒット/取得した${i * 100}件中)...`,
-        );
+        await reply.edit(`:mag:取得中(${messages.length}件ヒット/取得した${i * 100}件中)...`);
       } while (messages.length < count && i <= 10);
       if (messages.length > count) messages.splice(count);
-      await reply.edit(
-        messages.length + "件見つかりました。削除を実行します。",
-      );
+      await reply.edit(messages.length + "件見つかりました。削除を実行します。");
       await options.client.deleteMessages(
         message.channel.id,
         messages.map(msg => msg.id),
@@ -101,9 +95,7 @@ export default class BulkDelete extends BaseCommand {
     } catch (er) {
       Util.logger.log(er, "error");
       if (reply) {
-        await reply
-          .edit("失敗しました...")
-          .catch(e => Util.logger.log(e, "error"));
+        await reply.edit("失敗しました...").catch(e => Util.logger.log(e, "error"));
       }
     }
   }

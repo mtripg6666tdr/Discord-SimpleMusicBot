@@ -56,9 +56,7 @@ export default class Frame extends BaseCommand {
     const server = options.server;
     // そもそも再生状態じゃないよ...
     if (!server.player.isConnecting || !server.player.isPlaying) {
-      await message
-        .reply("再生中ではありません")
-        .catch(e => Util.logger.log(e, "error"));
+      await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const vinfo = server.player.currentAudioInfo;
@@ -69,15 +67,12 @@ export default class Frame extends BaseCommand {
       return;
     } else if (vinfo["cache"] && vinfo["cache"].type !== ytdlCore) {
       await message
-        .reply(
-          ":warning:フォールバックしているため、現在この機能を使用できません。",
-        )
+        .reply(":warning:フォールバックしているため、現在この機能を使用できません。")
         .catch(e => Util.logger.log(e, "error"));
       return;
     }
     const time = (function (rawTime) {
-      if (rawTime === "" || vinfo.LiveStream)
-        return server.player.currentTime / 1000;
+      if (rawTime === "" || vinfo.LiveStream) return server.player.currentTime / 1000;
       else if (rawTime.match(/^(\d+:)*\d+(\.\d+)?$/))
         return rawTime
           .split(":")
@@ -86,9 +81,7 @@ export default class Frame extends BaseCommand {
       else return NaN;
     })(options.rawArgs);
     if (options.rawArgs !== "" && vinfo.LiveStream) {
-      await message.channel.createMessage(
-        "ライブストリームでは時間指定できません",
-      );
+      await message.channel.createMessage("ライブストリームでは時間指定できません");
       return;
     }
     if (!vinfo.LiveStream && (isNaN(time) || time > vinfo.LengthSeconds)) {
@@ -98,11 +91,9 @@ export default class Frame extends BaseCommand {
       return;
     }
     try {
-      const [hour, min, sec] = Util.time.CalcHourMinSec(
-        Math.round(time * 100) / 100,
-      );
+      const [hour, min, sec] = Util.time.CalcHourMinSec(Math.round(time * 100) / 100);
       const response = await message.reply(":camera_with_flash:取得中...");
-      const {url, ua} = await vinfo.fetchVideo();
+      const { url, ua } = await vinfo.fetchVideo();
       const frame = await getFrame(url, time, ua);
       await response.channel.createMessage("", {
         file: frame,
@@ -110,8 +101,7 @@ export default class Frame extends BaseCommand {
       });
       await response.edit({
         content:
-          ":white_check_mark:完了!" +
-          (vinfo.LiveStream ? "" : `(${hour}:${min}:${sec}時点)`),
+          ":white_check_mark:完了!" + (vinfo.LiveStream ? "" : `(${hour}:${min}:${sec}時点)`),
       });
     } catch (e) {
       Util.logger.log(e, "error");
@@ -143,7 +133,7 @@ function getFrame(url: string, time: number, ua: string) {
     ];
     Util.logger.log(`[FFmpeg] Passing args: ${args.join(" ")}`, "debug");
     const bufs = [] as Buffer[];
-    const ffmpeg = new FFmpeg({args});
+    const ffmpeg = new FFmpeg({ args });
     if (Util.config.debug)
       ffmpeg.process.stderr.on("data", chunk =>
         Util.logger.log(`[FFmpeg] ${chunk.toString()}`, "debug"),

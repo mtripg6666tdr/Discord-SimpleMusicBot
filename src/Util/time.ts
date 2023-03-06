@@ -41,11 +41,7 @@ export function CalcHourMinSec(seconds: number) {
   const sec = seconds % 60;
   const min = ((seconds - sec) / 60) % 60;
   const hor = ((seconds - sec) / 60 - min) / 60;
-  return [
-    hor.toString(),
-    padZero(min.toString(), 2),
-    padZero(sec.toString(), 2),
-  ];
+  return [hor.toString(), padZero(min.toString(), 2), padZero(sec.toString(), 2)];
 }
 
 /**
@@ -54,9 +50,7 @@ export function CalcHourMinSec(seconds: number) {
  * @returns
  */
 export function HourMinSecToString([hour, min, sec]: string[]) {
-  return hour === "NaN"
-    ? "不明"
-    : `${hour === "0" ? "" : `${hour}:`}${min}:${sec}`;
+  return hour === "NaN" ? "不明" : `${hour === "0" ? "" : `${hour}:`}${min}:${sec}`;
 }
 
 // Returns hour, min, sec and millisec from total millisec
@@ -99,10 +93,7 @@ class _timerStore {
 }
 
 class TimerStopper {
-  constructor(
-    private readonly parent: _timerStore,
-    private readonly key: string,
-  ) {
+  constructor(private readonly parent: _timerStore, private readonly key: string) {
     //
   }
 

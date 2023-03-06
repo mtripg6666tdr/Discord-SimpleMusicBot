@@ -35,10 +35,8 @@ export function createChunkedYTStream(
   const contentLength = Number(format.contentLength);
   if (contentLength < chunkSize) {
     ytdl
-      .downloadFromInfo(info, {format, ...options})
-      .on("error", er =>
-        !stream.destroyed ? stream.destroy(er) : stream.emit("error", er),
-      )
+      .downloadFromInfo(info, { format, ...options })
+      .on("error", er => (!stream.destroyed ? stream.destroy(er) : stream.emit("error", er)))
       .pipe(stream);
     Util.logger.log("[AudioSource:youtube]Stream was created as single stream");
   } else {
@@ -54,22 +52,16 @@ export function createChunkedYTStream(
           end,
         },
       });
-      Util.logger.log(
-        `[AudioSource:youtube]Stream #${current + 1} was created.`,
-      );
+      Util.logger.log(`[AudioSource:youtube]Stream #${current + 1} was created.`);
       nextStream
-        .on("error", er =>
-          !stream.destroyed ? stream.destroy(er) : stream.emit("error", er),
-        )
-        .pipe(stream, {end: end === undefined});
+        .on("error", er => (!stream.destroyed ? stream.destroy(er) : stream.emit("error", er)))
+        .pipe(stream, { end: end === undefined });
       if (end !== undefined) {
         nextStream.on("end", () => {
           pipeNextStream();
         });
       } else {
-        Util.logger.log(
-          `[AudioSource:youtube]Last stream (total:${current + 1})`,
-        );
+        Util.logger.log(`[AudioSource:youtube]Last stream (total:${current + 1})`);
       }
     };
     pipeNextStream();

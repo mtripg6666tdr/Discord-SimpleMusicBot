@@ -66,7 +66,7 @@ export class SearchPanel extends EventEmitter {
   }
 
   async consumeSearchResult<T>(
-    searchPromise: Promise<T | {result: T; transformedQuery: string}>,
+    searchPromise: Promise<T | { result: T, transformedQuery: string }>,
     consumer: (result: T) => SongInfo[],
   ) {
     if (this.status !== "init") return false;
@@ -75,18 +75,13 @@ export class SearchPanel extends EventEmitter {
     try {
       reply = await this._commandMessage.reply("🔍検索中...");
       const waitedPromiseResult = await searchPromise;
-      if (
-        "transformedQuery" in
-        (waitedPromiseResult as {result: T; transformedQuery: string})
-      )
+      if ("transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string }))
         this.query = (
-          waitedPromiseResult as {result: T; transformedQuery: string}
+          waitedPromiseResult as { result: T, transformedQuery: string }
         ).transformedQuery;
       const songResult = (this._options = consumer(
-        "transformedQuery" in
-          (waitedPromiseResult as {result: T; transformedQuery: string})
-          ? (waitedPromiseResult as {result: T; transformedQuery: string})
-              .result
+        "transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string })
+          ? (waitedPromiseResult as { result: T, transformedQuery: string }).result
           : (waitedPromiseResult as T),
       ).slice(0, 20));
       if (songResult.length <= 0) {
@@ -95,7 +90,7 @@ export class SearchPanel extends EventEmitter {
       }
       let searchPanelDescription = "";
       const selectOpts: SelectMenuOptions[] = songResult.map(
-        ({url, title, author, duration, description}, j) => {
+        ({ url, title, author, duration, description }, j) => {
           searchPanelDescription += `\`${
             j + 1
           }.\` [${title}](${url}) \`${duration}\` - \`${author}\` \r\n\r\n`;
@@ -112,9 +107,7 @@ export class SearchPanel extends EventEmitter {
         content: "",
         embeds: [
           new Helper.MessageEmbedBuilder()
-            .setTitle(
-              this.isRawTitle ? this.query : `"${this.query}"の検索結果✨`,
-            )
+            .setTitle(this.isRawTitle ? this.query : `"${this.query}"の検索結果✨`)
             .setColor(getColor("SEARCH"))
             .setDescription(searchPanelDescription)
             .setFooter({
@@ -149,9 +142,7 @@ export class SearchPanel extends EventEmitter {
     } catch (e) {
       Util.logger.log(e, "error");
       if (reply) {
-        reply
-          .edit("✘内部エラーが発生しました")
-          .catch(er => Util.logger.log(er, "error"));
+        reply.edit("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
       } else {
         this._commandMessage
           .reply("✘内部エラーが発生しました")
@@ -179,16 +170,11 @@ export class SearchPanel extends EventEmitter {
       await this._responseMessage.channel
         .createMessage("✅キャンセルしました")
         .catch(er => Util.logger.log(er, "error"));
-    await this._responseMessage
-      .delete()
-      .catch(er => Util.logger.log(er, "error"));
+    await this._responseMessage.delete().catch(er => Util.logger.log(er, "error"));
     this.status = "destroyed";
   }
 
-  override emit<T extends keyof SearchPanelEvents>(
-    eventName: T,
-    ...args: SearchPanelEvents[T]
-  ) {
+  override emit<T extends keyof SearchPanelEvents>(eventName: T, ...args: SearchPanelEvents[T]) {
     return super.emit(eventName, ...args);
   }
 
@@ -219,10 +205,10 @@ interface SearchPanelEvents {
 }
 
 export type SongInfo = {
-  url: string;
-  title: string;
-  author: string;
-  duration: string;
-  thumbnail: string;
-  description: string;
+  url: string,
+  title: string,
+  author: string,
+  duration: string,
+  thumbnail: string,
+  description: string,
 };

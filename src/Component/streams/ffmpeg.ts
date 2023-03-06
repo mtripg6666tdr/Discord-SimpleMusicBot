@@ -24,7 +24,7 @@ import { destroyStream } from ".";
 import Util from "../../Util";
 import { FFmpegDefaultNetworkArgs } from "../../definition";
 
-const {DefaultUserAgent} = Util.ua;
+const { DefaultUserAgent } = Util.ua;
 
 export function transformThroughFFmpeg(
   readable: StreamInfo,
@@ -35,15 +35,10 @@ export function transformThroughFFmpeg(
 ) {
   const ffmpegNetworkArgs =
     readable.type === "url"
-      ? [
-          ...FFmpegDefaultNetworkArgs,
-          "-user_agent",
-          readable.userAgent || DefaultUserAgent,
-        ]
+      ? [...FFmpegDefaultNetworkArgs, "-user_agent", readable.userAgent || DefaultUserAgent]
       : [];
   const ffmpegSeekArgs = seek > 0 ? ["-ss", seek.toString()] : [];
-  const outputArgs =
-    output === "webm" ? ["-acodec", "libopus", "-f", "webm"] : ["-f", "s16le"];
+  const outputArgs = output === "webm" ? ["-acodec", "libopus", "-f", "webm"] : ["-f", "s16le"];
   const bitrateArgs =
     effectArgs.length === 2 && effectArgs[1].includes("loudnorm")
       ? []
@@ -69,7 +64,7 @@ export function transformThroughFFmpeg(
       args.map(arg => (arg.startsWith("http") ? "<URL>" : arg)).join(" "),
     "debug",
   );
-  const ffmpeg = new FFmpeg({args});
+  const ffmpeg = new FFmpeg({ args });
   if (Util.config.debug)
     ffmpeg.process.stderr.on("data", chunk =>
       Util.logger.log("[FFmpeg]" + chunk.toString(), "debug"),

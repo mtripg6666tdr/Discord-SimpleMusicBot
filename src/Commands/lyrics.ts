@@ -61,9 +61,7 @@ export default class Lyrics extends BaseCommand {
       for (let i = 0; i < chunkLength; i++) {
         const partial = songInfo.lyric.substring(4000 * i, 4000 * (i + 1) - 1);
         embeds.push(
-          new Helper.MessageEmbedBuilder()
-            .setDescription(partial)
-            .setColor(getColor("LYRIC")),
+          new Helper.MessageEmbedBuilder().setDescription(partial).setColor(getColor("LYRIC")),
         );
       }
       embeds[0]
@@ -81,9 +79,7 @@ export default class Lyrics extends BaseCommand {
     } catch (e) {
       Util.logger.log(e, "error");
       await msg
-        .edit(
-          ":confounded:失敗しました。曲名を確認してもう一度試してみてください。",
-        )
+        .edit(":confounded:失敗しました。曲名を確認してもう一度試してみてください。")
         .catch(er => Util.logger.log(er, "error"));
     }
   }

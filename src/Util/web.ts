@@ -35,10 +35,10 @@ import { DefaultUserAgent } from "./ua";
  */
 export function DownloadText(
   url: string,
-  headers?: {[key: string]: string},
+  headers?: { [key: string]: string },
   requestBody?: any,
 ): Promise<string> {
-  return candyget.string(url, {headers}, requestBody).then(r => r.body);
+  return candyget.string(url, { headers }, requestBody).then(r => r.body);
 }
 
 /**
@@ -47,10 +47,7 @@ export function DownloadText(
  * @param headers 追加のカスタムリクエストヘッダ
  * @returns ステータスコード
  */
-export function RetriveHttpStatusCode(
-  url: string,
-  headers?: {[key: string]: string},
-) {
+export function RetriveHttpStatusCode(url: string, headers?: { [key: string]: string }) {
   return candyget("HEAD", url, "string", {
     headers: {
       "User-Agent": DefaultUserAgent,
@@ -59,28 +56,23 @@ export function RetriveHttpStatusCode(
   }).then(r => r.statusCode);
 }
 
-const httpAgent = new HttpAgent({keepAlive: false});
-const httpsAgent = new HttpsAgent({keepAlive: false});
+const httpAgent = new HttpAgent({ keepAlive: false });
+const httpsAgent = new HttpsAgent({ keepAlive: false });
 
 /**
  * 指定されたURLからReadable Streamを生成します
  * @param url URL
  * @returns Readableストリーム
  */
-export function DownloadAsReadable(
-  url: string,
-  options: miniget.Options = {},
-): Readable {
+export function DownloadAsReadable(url: string, options: miniget.Options = {}): Readable {
   return miniget(url, {
     maxReconnects: 10,
     maxRetries: 3,
-    backoff: {inc: 500, max: 10000},
+    backoff: { inc: 500, max: 10000 },
     agent: url.startsWith("https:") ? httpsAgent : httpAgent,
     ...options,
   }).on("reconnect", () =>
-    Util.logger.log(
-      "Miniget is now trying to re-send a request due to failing",
-    ),
+    Util.logger.log("Miniget is now trying to re-send a request due to failing"),
   );
 }
 
@@ -92,14 +84,10 @@ export function DownloadAsReadable(
 export function RetriveLengthSeconds(url: string) {
   return new Promise<number>((resolve, reject) => {
     let data = "";
-    const proc = spawn(
-      require("ffmpeg-static"),
-      ["-i", url, "-user_agent", DefaultUserAgent],
-      {
-        windowsHide: true,
-        stdio: ["ignore", "ignore", "pipe"],
-      },
-    ).on("exit", () => {
+    const proc = spawn(require("ffmpeg-static"), ["-i", url, "-user_agent", DefaultUserAgent], {
+      windowsHide: true,
+      stdio: ["ignore", "ignore", "pipe"],
+    }).on("exit", () => {
       if (data.length === 0) reject("zero");
       const match = data.match(/Duration: (?<length>(\d+:)*\d+(\.\d+)?),/i);
       if (match) {

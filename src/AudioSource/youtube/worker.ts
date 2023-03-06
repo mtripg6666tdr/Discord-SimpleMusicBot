@@ -45,7 +45,7 @@ function onMessage(message: WithId<spawnerJobMessage>) {
     return;
   }
   if (message.type === "init") {
-    const {id, url, prefetched, forceCache} = message;
+    const { id, url, prefetched, forceCache } = message;
     const youtube = new YouTube(/* logger */ logger);
     youtube
       .init(url, prefetched, forceCache)

@@ -41,9 +41,7 @@ export default class Join extends BaseCommand {
     if (
       message.member.voiceState.channelID &&
       (
-        options.client.getChannel(
-          message.member.voiceState.channelID,
-        ) as VoiceChannel
+        options.client.getChannel(message.member.voiceState.channelID) as VoiceChannel
       ).voiceMembers.has(options.client.user.id) &&
       options.server.connection
     ) {

@@ -24,7 +24,7 @@ import Soundcloud from "soundcloud.ts";
 import { SearchBase } from "./search";
 import { Util } from "../Util";
 
-const {DefaultUserAgent} = Util.ua;
+const { DefaultUserAgent } = Util.ua;
 
 export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
   private readonly soundcloud = new Soundcloud();
@@ -32,15 +32,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
   constructor() {
     super({
       name: "サウンドクラウドを検索",
-      alias: [
-        "soundcloudを検索",
-        "searchsoundcloud",
-        "searchs",
-        "ses",
-        "ss",
-        "sc",
-        "soundcloud",
-      ],
+      alias: ["soundcloudを検索", "searchsoundcloud", "searchs", "ses", "ss", "sc", "soundcloud"],
       description: "曲をSoundCloudで検索します",
       unlist: false,
       category: "playlist",
@@ -71,10 +63,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
         "users/" + user.id + "/tracks",
       )) as SoundCloudTrackCollection;
       result.push(...rawResult.collection);
-      nextUrl =
-        rawResult.next_href +
-        "&client_id=" +
-        (await this.soundcloud.api.getClientID());
+      nextUrl = rawResult.next_href + "&client_id=" + (await this.soundcloud.api.getClientID());
       while (nextUrl && result.length < 10) {
         const data = await Util.web.DownloadText(nextUrl, {
           "User-Agent": DefaultUserAgent,
@@ -82,14 +71,12 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
         rawResult = JSON.parse(data) as SoundCloudTrackCollection;
         result.push(...rawResult.collection);
         nextUrl = rawResult.next_href
-          ? rawResult.next_href +
-            "&client_id=" +
-            (await this.soundcloud.api.getClientID())
+          ? rawResult.next_href + "&client_id=" + (await this.soundcloud.api.getClientID())
           : rawResult.next_href;
       }
     } else {
       // 楽曲検索
-      result = (await this.soundcloud.tracks.searchV2({q: query})).collection;
+      result = (await this.soundcloud.tracks.searchV2({ q: query })).collection;
     }
     if (result.length > 12) result = result.splice(0, 11);
     return {

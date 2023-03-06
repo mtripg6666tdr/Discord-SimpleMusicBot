@@ -20,23 +20,15 @@ import type { Client } from "eris";
 
 import * as http from "http";
 
-export function createServer(
-  client: Client,
-  port: number,
-  logger: (content: string) => void,
-) {
+export function createServer(client: Client, port: number, logger: (content: string) => void) {
   return http
     .createServer((_, res) => {
-      res.writeHead(200, {"Content-Type": "application/json"});
+      res.writeHead(200, { "Content-Type": "application/json" });
       const data = {
         status: 200,
         message: "Discord bot is active now",
-        client: client?.user
-          ? Buffer.from(client?.user.id).toString("base64")
-          : null,
-        readyAt: client?.uptime
-          ? Buffer.from(client.uptime.toString()).toString("base64")
-          : null,
+        client: client?.user ? Buffer.from(client?.user.id).toString("base64") : null,
+        readyAt: client?.uptime ? Buffer.from(client.uptime.toString()).toString("base64") : null,
         guilds: client?.guilds.size || null,
       };
       logger("[Server]Received a http request");

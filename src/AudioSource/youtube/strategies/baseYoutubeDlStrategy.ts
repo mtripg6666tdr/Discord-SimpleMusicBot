@@ -30,11 +30,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<
   Cache<T, YoutubeDlInfo>,
   YoutubeDlInfo
 > {
-  constructor(
-    priority: number,
-    protected id: T,
-    protected binaryManager: BinaryManager,
-  ) {
+  constructor(priority: number, protected id: T, protected binaryManager: BinaryManager) {
     super(priority);
   }
 
@@ -46,9 +42,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<
 
   async getInfo(url: string) {
     this.useLog();
-    const t = Util.time.timer.start(
-      `YouTube(Strategy${this.priority})#getInfo`,
-    );
+    const t = Util.time.timer.start(`YouTube(Strategy${this.priority})#getInfo`);
     let info = null as YoutubeDlInfo;
     try {
       info = JSON.parse(
@@ -71,8 +65,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<
     const t = Util.time.timer.start(`YouTube(Strategy${this.priority})#fetch`);
     let info = null as YoutubeDlInfo;
     try {
-      const availableCache =
-        cache?.type === this.id && (cache.data as YoutubeDlInfo);
+      const availableCache = cache?.type === this.id && (cache.data as YoutubeDlInfo);
       this.logger(
         `[AudioSource:youtube] ${
           availableCache ? "using cache without obtaining" : "obtaining info"
@@ -81,11 +74,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<
       info =
         availableCache ||
         (JSON.parse(
-          await this.binaryManager.exec([
-            "--skip-download",
-            "--print-json",
-            url,
-          ]),
+          await this.binaryManager.exec(["--skip-download", "--print-json", url]),
         ) as YoutubeDlInfo);
     } finally {
       t.end(this.logger);
@@ -121,10 +110,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<
           stream: {
             type: "url",
             url: format.url,
-            streamType:
-              format.ext === "webm" && format.acodec === "opus"
-                ? "webm"
-                : undefined,
+            streamType: format.ext === "webm" && format.acodec === "opus" ? "webm" : undefined,
             userAgent: format.http_headers["User-Agent"],
           } as UrlStreamInfo,
         };
@@ -134,19 +120,13 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<
         stream: {
           type: "readable",
           stream,
-          streamType:
-            format.ext === "webm" && format.acodec === "opus"
-              ? "webm"
-              : undefined,
+          streamType: format.ext === "webm" && format.acodec === "opus" ? "webm" : undefined,
         } as ReadableStreamInfo,
       };
     }
   }
 
-  protected mapToExportable(
-    url: string,
-    info: YoutubeDlInfo,
-  ): exportableYouTube {
+  protected mapToExportable(url: string, info: YoutubeDlInfo): exportableYouTube {
     return {
       url: url,
       title: info.title,
@@ -181,7 +161,7 @@ export interface YoutubeDlInfo {
   categories: string[];
   tags: string[];
   is_live: null;
-  automatic_captions: {[key: string]: any[]};
+  automatic_captions: { [key: string]: any[] };
   subtitles: any;
   like_count: number;
   dislike_count: number;

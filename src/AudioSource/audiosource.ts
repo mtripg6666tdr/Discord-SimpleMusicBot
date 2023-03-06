@@ -46,18 +46,15 @@ export abstract class AudioSource {
   abstract Thumbnail:
     | string
     | {
-        ext: string;
-        data: Buffer;
+        ext: string,
+        data: Buffer,
       };
   // 現在再生中の曲を示すEmbedField
   abstract toField(verbose: boolean): EmbedField[];
   // 再生するためのストリームをフェッチ
   abstract fetch(url?: boolean): Promise<StreamInfo>;
   // クラスを初期化する非同期メソッド
-  abstract init(
-    url: string,
-    prefetched: exportableCustom,
-  ): Promise<AudioSource>;
+  abstract init(url: string, prefetched: exportableCustom): Promise<AudioSource>;
   // 現在再生中の曲に関する追加データ
   abstract npAdditional(): string;
   // データをエクスポート
@@ -86,13 +83,13 @@ export abstract class AudioSource {
 
 export type StreamInfo = ReadableStreamInfo | UrlStreamInfo;
 export type ReadableStreamInfo = {
-  type: "readable";
-  stream: Readable;
-  streamType?: StreamType;
+  type: "readable",
+  stream: Readable,
+  streamType?: StreamType,
 };
 export type UrlStreamInfo = {
-  type: "url";
-  url: string;
-  streamType?: StreamType;
-  userAgent?: string;
+  type: "url",
+  url: string,
+  streamType?: StreamType,
+  userAgent?: string,
 };

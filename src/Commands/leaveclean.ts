@@ -28,8 +28,7 @@ export default class LeaveClean extends BaseCommand {
     super({
       name: "キューを整理",
       alias: ["leaveclean", "lc", "leavecleanup"],
-      description:
-        "ボイスチャンネルから離脱した人がリクエストした曲をキューから削除して整理します",
+      description: "ボイスチャンネルから離脱した人がリクエストした曲をキューから削除して整理します",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "onlyListener", "dj"],
@@ -41,28 +40,20 @@ export default class LeaveClean extends BaseCommand {
     options.server.updateBoundChannel(message);
     if (!options.server.player.isConnecting) {
       options.server.queue.removeAll();
-      message
-        .reply("✅すべて削除しました")
-        .catch(e => Util.logger.log(e, "error"));
+      message.reply("✅すべて削除しました").catch(e => Util.logger.log(e, "error"));
       return;
     } else if (options.server.queue.length === 0) {
       message.reply("キューが空です").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const members = (
-      options.client.getChannel(
-        options.server.connection.channelID,
-      ) as VoiceChannel
+      options.client.getChannel(options.server.connection.channelID) as VoiceChannel
     ).voiceMembers.map(member => member.id);
     const number = options.server.queue.removeIf(
       q => !members.includes(q.additionalInfo.addedBy.userId),
     ).length;
     await message
-      .reply(
-        number >= 1
-          ? "✅" + number + "曲削除しました。"
-          : "削除するものはありませんでした。",
-      )
+      .reply(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。")
       .catch(e => Util.logger.log(e, "error"));
   }
 }

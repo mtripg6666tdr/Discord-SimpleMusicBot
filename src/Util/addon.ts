@@ -29,26 +29,17 @@ interface EventKeys {
 }
 
 export class AddOn extends EventEmitter {
-  override on<T extends keyof EventKeys>(
-    event: T,
-    callback: (...args: EventKeys[T]) => any,
-  ): this {
+  override on<T extends keyof EventKeys>(event: T, callback: (...args: EventKeys[T]) => any): this {
     super.on(event, callback);
     return this;
   }
 
-  override off<T extends keyof EventKeys>(
-    event: T,
-    callback: (...args: EventKeys[T]) => any,
-  ) {
+  override off<T extends keyof EventKeys>(event: T, callback: (...args: EventKeys[T]) => any) {
     super.off(event, callback);
     return this;
   }
 
-  override once<T extends keyof EventKeys>(
-    event: T,
-    callback: (...args: EventKeys[T]) => any,
-  ) {
+  override once<T extends keyof EventKeys>(event: T, callback: (...args: EventKeys[T]) => any) {
     super.once(event, callback);
     return this;
   }

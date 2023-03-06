@@ -29,15 +29,7 @@ export default class Related extends BaseCommand {
   constructor() {
     super({
       name: "関連動画",
-      alias: [
-        "関連曲",
-        "おすすめ",
-        "オススメ",
-        "related",
-        "relatedsong",
-        "r",
-        "recommend",
-      ],
+      alias: ["関連曲", "おすすめ", "オススメ", "related", "relatedsong", "r", "recommend"],
       description:
         "YouTubeから楽曲を再生終了時に、関連曲をキューに自動で追加する機能の有効/無効を設定します",
       unlist: false,
@@ -51,9 +43,7 @@ export default class Related extends BaseCommand {
     options.server.updateBoundChannel(message);
     if (options.server.addRelated) {
       options.server.addRelated = false;
-      message
-        .reply("❌関連曲自動再生をオフにしました")
-        .catch(e => Util.logger.log(e, "error"));
+      message.reply("❌関連曲自動再生をオフにしました").catch(e => Util.logger.log(e, "error"));
     } else {
       options.server.addRelated = true;
       const embed = new Helper.MessageEmbedBuilder()
@@ -63,7 +53,7 @@ export default class Related extends BaseCommand {
         )
         .setColor(getColor("RELATIVE_SETUP"))
         .toEris();
-      message.reply({embeds: [embed]});
+      message.reply({ embeds: [embed] });
     }
   }
 }

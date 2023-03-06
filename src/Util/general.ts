@@ -78,10 +78,7 @@ export function FilterContent(original: string) {
   while (result.includes(projectRoot)) {
     result = result.replace(projectRoot, "***");
   }
-  result = result.replace(
-    /https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+/g,
-    "http:***",
-  );
+  result = result.replace(/https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+/g, "http:***");
   return result.replace(/\\/g, "/").replace(/\*/g, "\\*");
 }
 
@@ -126,14 +123,14 @@ export function waitForEnteringState(
     /**
      * タイムアウトした際にエラーとするかどうかを表します。
      */
-    rejectOnTimeout?: boolean;
+    rejectOnTimeout?: boolean,
     /**
      * 与えられた判定関数を呼ぶ時間間隔をミリ秒単位で指定します。
      */
-    timeStep?: number;
+    timeStep?: number,
   },
 ) {
-  const {rejectOnTimeout, timeStep} = Object.assign(
+  const { rejectOnTimeout, timeStep } = Object.assign(
     {
       rejectOnTimeout: true,
       timeStep: 50,
@@ -156,9 +153,7 @@ export function waitForEnteringState(
       } else if (timeout <= timeStep * count) {
         clearInterval(ticker);
         if (rejectOnTimeout) {
-          reject(
-            `target predicate has not return true in time (${timeout}ms) and timed out`,
-          );
+          reject(`target predicate has not return true in time (${timeout}ms) and timed out`);
         } else {
           resolve(Date.now() - startTime);
         }

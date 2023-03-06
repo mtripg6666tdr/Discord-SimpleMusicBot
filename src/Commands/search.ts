@@ -65,10 +65,7 @@ export abstract class SearchBase<T> extends BaseCommand {
       return;
     }
     if (options.rawArgs !== "") {
-      const searchPanel = options.server.createSearchPanel(
-        message,
-        options.rawArgs,
-      );
+      const searchPanel = options.server.createSearchPanel(message, options.rawArgs);
       if (!searchPanel) return;
       const result = await searchPanel.consumeSearchResult(
         this.searchContent(options.rawArgs),
@@ -78,15 +75,13 @@ export abstract class SearchBase<T> extends BaseCommand {
         options.server.bindSearchPanel(searchPanel);
       }
     } else {
-      await message
-        .reply("引数を指定してください")
-        .catch(e => Util.logger.log(e, "error"));
+      await message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));
     }
   }
 
   protected abstract searchContent(
     query: string,
-  ): Promise<T | {result: T; transformedQuery: string}>;
+  ): Promise<T | { result: T, transformedQuery: string }>;
 
   protected abstract consumer(result: T): SongInfo[];
 
@@ -101,8 +96,7 @@ export default class Search extends SearchBase<ytsr.Result> {
     super({
       name: "検索",
       alias: ["search", "se"],
-      description:
-        "曲をYouTubeで検索します。直接URLを直接指定することもできます。",
+      description: "曲をYouTubeで検索します。直接URLを直接指定することもできます。",
       unlist: false,
       category: "playlist",
       examples: "検索 夜に駆ける",
@@ -124,7 +118,7 @@ export default class Search extends SearchBase<ytsr.Result> {
     return searchYouTube(query);
   }
 
-  protected override consumer({items}: ytsr.Result) {
+  protected override consumer({ items }: ytsr.Result) {
     return items
       .map(item =>
         item.type !== "video"

@@ -16,4 +16,4 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-export {ResponseMessage} from "@mtripg6666tdr/eris-command-resolver";
+export { ResponseMessage } from "@mtripg6666tdr/eris-command-resolver";

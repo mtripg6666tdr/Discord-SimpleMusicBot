@@ -117,9 +117,9 @@ export class BestdoriS extends AudioSource {
 }
 
 export type exportableBestdori = exportableCustom & {
-  lyricist: string;
-  composer: string;
-  arranger: string;
+  lyricist: string,
+  composer: string,
+  arranger: string,
 };
 
 /**
@@ -132,9 +132,7 @@ export abstract class BestdoriApi {
    * @returns BestdoriのID
    */
   static getAudioId(url: string): number {
-    const match = url.match(
-      /^https?:\/\/bestdori\.com\/info\/songs\/(?<Id>\d+)(\/.*)?$/,
-    );
+    const match = url.match(/^https?:\/\/bestdori\.com\/info\/songs\/(?<Id>\d+)(\/.*)?$/);
     if (match) {
       return Number(match.groups.Id);
     } else {
@@ -144,14 +142,10 @@ export abstract class BestdoriApi {
 
   static async setupData() {
     if (!bestdori.allbandinfo) {
-      bestdori.allbandinfo = JSON.parse(
-        await Util.web.DownloadText(BestdoriAllBandInfoEndPoint),
-      );
+      bestdori.allbandinfo = JSON.parse(await Util.web.DownloadText(BestdoriAllBandInfoEndPoint));
     }
     if (!bestdori.allsonginfo) {
-      bestdori.allsonginfo = JSON.parse(
-        await Util.web.DownloadText(BestdoriAllSongInfoEndPoint),
-      );
+      bestdori.allsonginfo = JSON.parse(await Util.web.DownloadText(BestdoriAllSongInfoEndPoint));
     }
   }
 
@@ -161,9 +155,7 @@ export abstract class BestdoriApi {
 
   static async getDetailedInfo(id: number) {
     const apiUrl = `https://bestdori.com/api/songs/${id.toString()}.json`;
-    return JSON.parse(
-      await Util.web.DownloadText(apiUrl),
-    ) as BestdoriDetailedSongInfo;
+    return JSON.parse(await Util.web.DownloadText(apiUrl)) as BestdoriDetailedSongInfo;
   }
 
   static getThumbnail(id: number, jacketimage: string) {
@@ -175,10 +167,8 @@ export abstract class BestdoriApi {
   }
 }
 
-export const BestdoriAllSongInfoEndPoint =
-  "https://bestdori.com/api/songs/all.5.json";
-export const BestdoriAllBandInfoEndPoint =
-  "https://bestdori.com/api/bands/all.1.json";
+export const BestdoriAllSongInfoEndPoint = "https://bestdori.com/api/songs/all.5.json";
+export const BestdoriAllBandInfoEndPoint = "https://bestdori.com/api/bands/all.1.json";
 class BestdoriData {
   allsonginfo: BestdoriAllSongInfo = null;
   allbandinfo: BestdoriAllBandInfo = null;
@@ -195,19 +185,19 @@ export type SongID = number;
  */
 export type BestdoriAllSongInfo = {
   [key: number]: {
-    tag: "anime" | "normal";
-    bandId: BandID;
-    jacketImage: [string];
-    musicTitle: [string, string, string, string, string];
-    publishedAt: [string, string, string, string, string];
-    closedAt: [string, string, string, string, string];
-    difficulty: {[key in "0" | "1" | "2" | "3" | "4"]: {playLevel: number}};
-  };
+    tag: "anime" | "normal",
+    bandId: BandID,
+    jacketImage: [string],
+    musicTitle: [string, string, string, string, string],
+    publishedAt: [string, string, string, string, string],
+    closedAt: [string, string, string, string, string],
+    difficulty: { [key in "0" | "1" | "2" | "3" | "4"]: { playLevel: number } },
+  },
 };
 export type BestdoriAllBandInfo = {
   [key: number]: {
-    bandName: [string, string, string, string, string];
-  };
+    bandName: [string, string, string, string, string],
+  },
 };
 export interface BestdoriDetailedSongInfo {
   bgmId: SongID;
@@ -224,10 +214,10 @@ export interface BestdoriDetailedSongInfo {
   howToGet: (null | string)[];
   publishedAt: (null | string)[];
   closedAt: (null | string)[];
-  difficulty: {[key: string]: Difficulty};
+  difficulty: { [key: string]: Difficulty };
   length: number;
-  notes: {[key: string]: number};
-  bpm: {[key: string]: BPM[]};
+  notes: { [key: string]: number };
+  bpm: { [key: string]: BPM[] };
 }
 
 export interface Achievement {
@@ -252,7 +242,7 @@ export interface BPM {
 
 export interface Difficulty {
   playLevel: number;
-  multiLiveScoreMap: {[key: string]: MultiLiveScoreMap};
+  multiLiveScoreMap: { [key: string]: MultiLiveScoreMap };
   notesQuantity: number;
   scoreC: number;
   scoreB: number;

@@ -57,18 +57,12 @@ export default class Searchq extends BaseCommand {
     }
     const qsresult = options.server.queue.filter(
       c =>
-        c.basicInfo.Title.toLowerCase().includes(
-          options.rawArgs.toLowerCase(),
-        ) ||
+        c.basicInfo.Title.toLowerCase().includes(options.rawArgs.toLowerCase()) ||
         c.basicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase()) ||
-        c.basicInfo.Description.toLowerCase().includes(
-          options.rawArgs.toLowerCase(),
-        ),
+        c.basicInfo.Description.toLowerCase().includes(options.rawArgs.toLowerCase()),
     );
     if (qsresult.length === 0) {
-      message
-        .reply(":confused:見つかりませんでした")
-        .catch(e => Util.logger.log(e, "error"));
+      message.reply(":confused:見つかりませんでした").catch(e => Util.logger.log(e, "error"));
       return;
     }
     if (qsresult.length > 20) qsresult.splice(20);
@@ -96,6 +90,6 @@ export default class Searchq extends BaseCommand {
       .setFields(...fields)
       .setColor(getColor("SEARCH"))
       .toEris();
-    message.reply({embeds: [embed]});
+    message.reply({ embeds: [embed] });
   }
 }

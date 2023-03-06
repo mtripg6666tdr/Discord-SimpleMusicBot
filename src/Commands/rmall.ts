@@ -40,8 +40,6 @@ export default class Rmall extends BaseCommand {
     options.server.updateBoundChannel(message);
     options.server.player.disconnect();
     options.server.queue.removeAll();
-    await message
-      .reply("✅すべて削除しました")
-      .catch(e => Util.logger.log(e, "error"));
+    await message.reply("✅すべて削除しました").catch(e => Util.logger.log(e, "error"));
   }
 }

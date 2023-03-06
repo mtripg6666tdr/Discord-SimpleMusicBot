@@ -59,7 +59,7 @@ export class CommandManager extends LogEmitter {
     this.setTag("CommandsManager");
     this.Log("Initializing");
     this._commands = fs
-      .readdirSync(path.join(__dirname, "../Commands/"), {withFileTypes: true})
+      .readdirSync(path.join(__dirname, "../Commands/"), { withFileTypes: true })
       .filter(d => d.isFile())
       .map(d => d.name)
       .filter(n => n.endsWith(".js") && n !== "index.js")
@@ -117,10 +117,7 @@ export class CommandManager extends LogEmitter {
     this.Log("Resolving command");
     let result = null;
     for (let i = 0; i < this._commands.length; i++) {
-      if (
-        this._commands[i].name === command ||
-        this._commands[i].alias.includes(command)
-      ) {
+      if (this._commands[i].name === command || this._commands[i].alias.includes(command)) {
         result = this._commands[i];
         break;
       }
@@ -134,9 +131,7 @@ export class CommandManager extends LogEmitter {
     this.Log("Start syncing application commands");
     const registeredAppCommands = await client.getCommands();
     if (registeredAppCommands.length === 0) {
-      this.Log(
-        "Detected no command registered; bulk-registering slash-commands",
-      );
+      this.Log("Detected no command registered; bulk-registering slash-commands");
       await client.bulkEditCommands(
         this.commands
           .filter(command => !command.unlist)
@@ -151,21 +146,16 @@ export class CommandManager extends LogEmitter {
     this.Log(`Successfully get ${registeredCommands.length} commands`);
     const commandsToEdit = this.commands.filter(target => {
       if (target.unlist) return false;
-      const index = registeredCommands.findIndex(
-        reg => reg.name === target.asciiName,
-      );
+      const index = registeredCommands.findIndex(reg => reg.name === target.asciiName);
       if (index < 0) return false;
       const registered = registeredCommands[index];
       return (
-        target.description.replace(/\r/g, "").replace(/\n/g, "") !==
-          registered.description ||
+        target.description.replace(/\r/g, "").replace(/\n/g, "") !== registered.description ||
         (target.argument || []).length !== (registered.options || []).length ||
         (target.argument &&
           target.argument.some((arg, i) => {
-            const choicesObjectMap: {[key: string]: string} = {};
-            (
-              registered.options[i] as ApplicationCommandOptionWithChoices
-            ).choices?.forEach(
+            const choicesObjectMap: { [key: string]: string } = {};
+            (registered.options[i] as ApplicationCommandOptionWithChoices).choices?.forEach(
               c => (choicesObjectMap[c.name] = c.value.toString()),
             );
             return (
@@ -174,24 +164,20 @@ export class CommandManager extends LogEmitter {
               registered.options[i].description !== arg.description ||
               registered.options[i].type !==
                 CommandManager.mapCommandOptionTypeToInteger(arg.type) ||
-              !!(registered.options[i] as ApplicationCommandOptionsWithValue)
-                .required !== arg.required ||
-              (((registered.options[i] as ApplicationCommandOptionWithChoices)
-                .choices ||
+              !!(registered.options[i] as ApplicationCommandOptionsWithValue).required !==
+                arg.required ||
+              (((registered.options[i] as ApplicationCommandOptionWithChoices).choices ||
                 arg.choices) &&
-                [
-                  ...Object.keys(choicesObjectMap),
-                  ...Object.keys(arg.choices),
-                ].some(name => choicesObjectMap[name] !== arg.choices[name]))
+                [...Object.keys(choicesObjectMap), ...Object.keys(arg.choices)].some(
+                  name => choicesObjectMap[name] !== arg.choices[name],
+                ))
             );
           }))
       );
     });
     const commandsToAdd = this.commands.filter(target => {
       if (target.unlist) return false;
-      const index = registeredCommands.findIndex(
-        reg => reg.name === target.asciiName,
-      );
+      const index = registeredCommands.findIndex(reg => reg.name === target.asciiName);
       return index < 0;
     });
     if (commandsToEdit.length > 0 || commandsToAdd.length > 0) {
@@ -200,22 +186,14 @@ export class CommandManager extends LogEmitter {
           commandsToEdit.length + commandsToAdd.length
         } commands that should be updated; updating`,
       );
-      this.Log(
-        `These are ${[...commandsToEdit, ...commandsToAdd].map(
-          command => command.name,
-        )}`,
-      );
+      this.Log(`These are ${[...commandsToEdit, ...commandsToAdd].map(command => command.name)}`);
       for (let i = 0; i < commandsToEdit.length; i++) {
-        const commandToRegister =
-          commandsToEdit[i].toApplicationCommandStructure();
-        const id = registeredCommands.find(
-          cmd => cmd.name === commandToRegister.name,
-        ).id;
+        const commandToRegister = commandsToEdit[i].toApplicationCommandStructure();
+        const id = registeredCommands.find(cmd => cmd.name === commandToRegister.name).id;
         await client.editCommand(id, commandToRegister);
       }
       for (let i = 0; i < commandsToAdd.length; i++) {
-        const commandToRegister =
-          commandsToAdd[i].toApplicationCommandStructure();
+        const commandToRegister = commandsToAdd[i].toApplicationCommandStructure();
         await client.createCommand(commandToRegister);
       }
       this.Log("Updating success.");
@@ -224,9 +202,7 @@ export class CommandManager extends LogEmitter {
     }
     if (removeOutdated) {
       const commandsToRemove = registeredCommands.filter(registered => {
-        const index = this.commands.findIndex(
-          command => registered.name === command.asciiName,
-        );
+        const index = this.commands.findIndex(command => registered.name === command.asciiName);
         return index < 0 || this.commands[index].unlist;
       });
       if (commandsToRemove.length > 0) {
@@ -235,9 +211,7 @@ export class CommandManager extends LogEmitter {
         );
         this.Log(`These are ${commandsToRemove.map(command => command.name)}`);
         await client.bulkEditCommands(
-          this.commands
-            .filter(cmd => !cmd.unlist)
-            .map(cmd => cmd.toApplicationCommandStructure()),
+          this.commands.filter(cmd => !cmd.unlist).map(cmd => cmd.toApplicationCommandStructure()),
         );
         this.Log("Removing success.");
       } else {

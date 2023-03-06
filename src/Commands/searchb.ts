@@ -36,9 +36,7 @@ export default class Searchb extends SearchBase<string[]> {
     return keys.filter(k => {
       const info = bestdori.allsonginfo[Number(k)];
       if (!info.musicTitle[0]) return false;
-      return (
-        info.musicTitle[0] + bestdori.allbandinfo[info.bandId].bandName[0]
-      )
+      return (info.musicTitle[0] + bestdori.allbandinfo[info.bandId].bandName[0])
         .toLowerCase()
         .includes(q);
     });
@@ -54,12 +52,9 @@ export default class Searchb extends SearchBase<string[]> {
           Number(item),
           bestdori.allsonginfo[Number(item)].jacketImage[0],
         ),
-        author:
-          bestdori.allbandinfo[bestdori.allsonginfo[Number(item)].bandId]
-            .bandName[0],
+        author: bestdori.allbandinfo[bestdori.allsonginfo[Number(item)].bandId].bandName[0],
         description: `バンド名: ${
-          bestdori.allbandinfo[bestdori.allsonginfo[Number(item)].bandId]
-            .bandName[0]
+          bestdori.allbandinfo[bestdori.allsonginfo[Number(item)].bandId].bandName[0]
         }`,
       }))
       .filter(item => item.title);

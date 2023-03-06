@@ -84,11 +84,7 @@ export default class Rm extends BaseCommand {
           if (match) {
             const to = Number(match.groups.to);
             if (!isNaN(to)) {
-              for (
-                let i = options.server.player.isPlaying ? 1 : 0;
-                i <= to;
-                i++
-              ) {
+              for (let i = options.server.player.isPlaying ? 1 : 0; i <= to; i++) {
                 addition.push(i);
               }
             }
@@ -113,9 +109,7 @@ export default class Rm extends BaseCommand {
       if (
         Util.eris.user.isDJ(message.member, options) ||
         item.additionalInfo.addedBy.userId === message.member.id ||
-        !Util.eris.channel
-          .getVoiceMember(options)
-          .has(item.additionalInfo.addedBy.userId) ||
+        !Util.eris.channel.getVoiceMember(options).has(item.additionalInfo.addedBy.userId) ||
         Util.eris.channel.isOnlyListener(message.member, options) ||
         Util.eris.user.isPrivileged(message.member)
       ) {

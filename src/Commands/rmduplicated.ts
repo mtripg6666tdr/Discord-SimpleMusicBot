@@ -26,13 +26,7 @@ export default class RmDuplicated extends BaseCommand {
   constructor() {
     super({
       name: "重複削除",
-      alias: [
-        "removedupes",
-        "rmdupes",
-        "rmduplicated",
-        "removeduplicates",
-        "drm",
-      ],
+      alias: ["removedupes", "rmdupes", "rmduplicated", "removeduplicates", "drm"],
       description: "キュー内の重複（ちょうふく）している曲を削除します。",
       unlist: false,
       category: "playlist",
@@ -53,9 +47,7 @@ export default class RmDuplicated extends BaseCommand {
         itemUrl.push(item.basicInfo.Url);
       }
     });
-    const dels = Array.from(
-      new Set(indexes.filter(n => !isNaN(n)).sort((a, b) => b - a)),
-    );
+    const dels = Array.from(new Set(indexes.filter(n => !isNaN(n)).sort((a, b) => b - a)));
     const actualDeleted = [] as number[];
     const failed = [] as number[];
     let firstItemTitle = null;
@@ -73,9 +65,9 @@ export default class RmDuplicated extends BaseCommand {
       const failedStr = failed.sort((a, b) => a - b).join(",");
       message
         .reply(
-          `🚮${
-            resultStr.length > 100 ? "重複していた" : `${resultStr}番目の`
-          }曲${title ? "(`" + title + "`)" : ""}を削除しました${
+          `🚮${resultStr.length > 100 ? "重複していた" : `${resultStr}番目の`}曲${
+            title ? "(`" + title + "`)" : ""
+          }を削除しました${
             failed.length > 0
               ? `\r\n:warning:${
                   failed.length > 100 ? "一部" : `${failedStr}番目`
@@ -85,9 +77,7 @@ export default class RmDuplicated extends BaseCommand {
         )
         .catch(e => Util.logger.log(e, "error"));
     } else {
-      message
-        .reply("削除できる楽曲がありませんでした。")
-        .catch(e => Util.logger.log(e, "error"));
+      message.reply("削除できる楽曲がありませんでした。").catch(e => Util.logger.log(e, "error"));
     }
   }
 }

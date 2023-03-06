@@ -39,15 +39,11 @@ export default class Dc extends BaseCommand {
     options.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if (!options.server.player.isConnecting) {
-      message
-        .reply("再生中ではありません")
-        .catch(e => Util.logger.log(e, "error"));
+      message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     // 停止しま～す
     options.server.player.disconnect();
-    message
-      .reply(":postbox: 正常に切断しました")
-      .catch(e => Util.logger.log(e, "error"));
+    message.reply(":postbox: 正常に切断しました").catch(e => Util.logger.log(e, "error"));
   }
 }

@@ -90,19 +90,15 @@ export abstract class MusicBotBase extends LogEmitter {
   }
 
   get connectingGuildCount() {
-    return [...this.guildData.values()].filter(
-      guild => guild.player.isConnecting,
-    ).length;
+    return [...this.guildData.values()].filter(guild => guild.player.isConnecting).length;
   }
 
   get playingGuildCount() {
-    return [...this.guildData.values()].filter(guild => guild.player.isPlaying)
-      .length;
+    return [...this.guildData.values()].filter(guild => guild.player.isPlaying).length;
   }
 
   get pausedGuildCount() {
-    return [...this.guildData.values()].filter(guild => guild.player.isPaused)
-      .length;
+    return [...this.guildData.values()].filter(guild => guild.player.isPaused).length;
   }
 
   get totalTransformingCost() {
@@ -165,8 +161,7 @@ export abstract class MusicBotBase extends LogEmitter {
    */
   protected maintenanceTick() {
     this.maintenanceTickCount++;
-    if (Util.config.debug)
-      Util.logger.log(`[Tick] #${this.maintenanceTickCount}`, "debug");
+    if (Util.config.debug) Util.logger.log(`[Tick] #${this.maintenanceTickCount}`, "debug");
     this.emit("tick", this.maintenanceTickCount);
     // ページトグルの整理
     PageToggle.organize(this._embedPageToggle, 5);
@@ -183,9 +178,9 @@ export abstract class MusicBotBase extends LogEmitter {
     Util.logger.log(
       `[Tick] [Main] Participating: ${this._client.guilds.size}, Registered: ${
         this.guildData.size
-      } Connecting: ${
-        guildDataArray.filter(d => d.player.isConnecting).length
-      } Paused: ${guildDataArray.filter(d => d.player.isPaused).length}`,
+      } Connecting: ${guildDataArray.filter(d => d.player.isConnecting).length} Paused: ${
+        guildDataArray.filter(d => d.player.isPaused).length
+      }`,
     );
     Util.logger.log(
       `[Tick] [System] Free:${Math.floor(memory.free)}MB; Total:${Math.floor(
@@ -224,14 +219,8 @@ export abstract class MusicBotBase extends LogEmitter {
     boundChannelId: string,
     bgmConfig: GuildBGMContainerType,
   ) {
-    if (this.guildData.has(guildid))
-      throw new Error("guild data was already set");
-    const server = new GuildDataContainerWithBgm(
-      guildid,
-      boundChannelId,
-      this,
-      bgmConfig,
-    );
+    if (this.guildData.has(guildid)) throw new Error("guild data was already set");
+    const server = new GuildDataContainerWithBgm(guildid, boundChannelId, this, bgmConfig);
     this.guildData.set(guildid, server);
     this.emit("guildDataAdded", server);
     return server;
@@ -246,10 +235,7 @@ export abstract class MusicBotBase extends LogEmitter {
     return this.guildData.get(guildId);
   }
 
-  override emit<T extends keyof BotBaseEvents>(
-    eventName: T,
-    ...args: BotBaseEvents[T]
-  ) {
+  override emit<T extends keyof BotBaseEvents>(eventName: T, ...args: BotBaseEvents[T]) {
     return super.emit(eventName, ...args);
   }
 

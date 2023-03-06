@@ -18,33 +18,33 @@
 
 declare module "twitter-url-direct" {
   type TweetUser = {
-    name: string;
-    username: string;
-    text: string;
+    name: string,
+    username: string,
+    text: string,
   };
   type Dimension = {
-    width: string;
-    height: string;
+    width: string,
+    height: string,
     /**
      * ex. 320x360
      */
-    dimension: string;
-    url: string;
+    dimension: string,
+    url: string,
   };
   type FoundResponse = {
-    found: true;
-    tweet_user: TweetUser;
+    found: true,
+    tweet_user: TweetUser,
     /**
      * MIME type
      */
-    type: string;
-    duration: number;
-    dimensionsAvailable: number;
-    download: Dimension[];
+    type: string,
+    duration: number,
+    dimensionsAvailable: number,
+    download: Dimension[],
   };
   type NotFoundResponse = {
-    found: false;
-    error: string;
+    found: false,
+    error: string,
   };
   type Result = FoundResponse | NotFoundResponse;
   function twitterGetUrl(url: string): Promise<Result>;

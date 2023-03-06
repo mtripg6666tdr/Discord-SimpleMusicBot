@@ -27,8 +27,7 @@ export default class End extends BaseCommand {
     super({
       name: "この曲で終了",
       alias: ["end"],
-      description:
-        "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します",
+      description: "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "dj", "onlyListener"],
@@ -39,9 +38,7 @@ export default class End extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
     if (!options.server.player.isPlaying) {
-      message
-        .reply("再生中ではありません")
-        .catch(e => Util.logger.log(e, "error"));
+      message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     if (options.server.queue.length <= 1) {
@@ -55,8 +52,6 @@ export default class End extends BaseCommand {
       options.server.queue.onceLoopEnabled =
       options.server.queue.loopEnabled =
         false;
-    message
-      .reply("✅キューに残された曲を削除しました")
-      .catch(e => Util.logger.log(e, "error"));
+    message.reply("✅キューに残された曲を削除しました").catch(e => Util.logger.log(e, "error"));
   }
 }

@@ -16,14 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-const audioExtensions = [
-  ".mp3",
-  ".wav",
-  ".wma",
-  ".mov",
-  ".mp4",
-  ".ogg",
-] as const;
+const audioExtensions = [".mp3", ".wav", ".wma", ".mov", ".mp4", ".ogg"] as const;
 const videoExtensions = [".mov", ".mp4"] as const;
 
 /**

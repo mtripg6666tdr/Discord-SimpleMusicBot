@@ -57,9 +57,7 @@ export default class Play extends BaseCommand {
       message.attachments.length === 0 &&
       !(message["_message"] && message["_message"].referencedMessage)
     ) {
-      await message
-        .reply("再生するコンテンツがありません")
-        .catch(e => Util.logger.log(e, "error"));
+      await message.reply("再生するコンテンツがありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const wasConnected = server.player.isConnecting;
@@ -89,15 +87,8 @@ export default class Play extends BaseCommand {
     }
     // 引数ついてたらそれ優先
     if (options.rawArgs !== "") {
-      if (
-        options.rawArgs.startsWith("http://") ||
-        options.rawArgs.startsWith("https://")
-      ) {
-        await options.server.playFromURL(
-          message,
-          options.args as string[],
-          !wasConnected,
-        );
+      if (options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")) {
+        await options.server.playFromURL(message, options.args as string[], !wasConnected);
       } else {
         const msg = await message.channel.createMessage("🔍検索中...");
         try {
@@ -105,9 +96,7 @@ export default class Play extends BaseCommand {
             it => it.type === "video",
           ) as ytsr.Video[];
           if (result.length === 0) {
-            await message.reply(
-              ":face_with_monocle:該当する動画が見つかりませんでした",
-            );
+            await message.reply(":face_with_monocle:該当する動画が見つかりませんでした");
             await msg.delete();
             return;
           }
@@ -120,19 +109,13 @@ export default class Play extends BaseCommand {
           await msg.delete();
         } catch (e) {
           Util.logger.log(e, "error");
-          message
-            .reply("✗内部エラーが発生しました")
-            .catch(er => Util.logger.log(er, "error"));
+          message.reply("✗内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
           msg.delete().catch(er => Util.logger.log(er, "error"));
         }
       }
       // 添付ファイルを確認
     } else if (message.attachments.length > 0) {
-      await options.server.playFromURL(
-        message,
-        message.attachments[0].url,
-        !wasConnected,
-      );
+      await options.server.playFromURL(message, message.attachments[0].url, !wasConnected);
       // 返信先のメッセージを確認
     } else if (message["_message"]?.referencedMessage) {
       const messageReference = message["_message"].referencedMessage;
@@ -142,16 +125,10 @@ export default class Play extends BaseCommand {
         messageReference.content.startsWith("http://") ||
         messageReference.content.startsWith("https://")
       ) {
-        await options.server.playFromURL(
-          message,
-          messageReference.content,
-          !wasConnected,
-        );
+        await options.server.playFromURL(message, messageReference.content, !wasConnected);
         // プレフィックス+URLのメッセージか？
       } else if (
-        messageReference.content
-          .substring(prefixLength)
-          .startsWith("http://") ||
+        messageReference.content.substring(prefixLength).startsWith("http://") ||
         messageReference.content.substring(prefixLength).startsWith("https://")
       ) {
         await options.server.playFromURL(
@@ -175,8 +152,7 @@ export default class Play extends BaseCommand {
           embed.color === Util.color.getColor("AUTO_NP") ||
           embed.color === Util.color.getColor("NP")
         ) {
-          const url = embed.description.match(/^\[.+\]\((?<url>https?.+)\)/)
-            ?.groups.url;
+          const url = embed.description.match(/^\[.+\]\((?<url>https?.+)\)/)?.groups.url;
           await options.server.playFromURL(message, url, !wasConnected);
         } else {
           await message
@@ -195,19 +171,13 @@ export default class Play extends BaseCommand {
       // なにもないからキューから再生
     } else if (server.queue.length >= 1) {
       if (!server.player.isPlaying && !server.player.preparing) {
-        await message
-          .reply("再生します")
-          .catch(e => Util.logger.log(e, "error"));
+        await message.reply("再生します").catch(e => Util.logger.log(e, "error"));
         await server.player.play();
       } else {
-        await message
-          .reply("すでに再生中です")
-          .catch(e => Util.logger.log(e, "error"));
+        await message.reply("すでに再生中です").catch(e => Util.logger.log(e, "error"));
       }
     } else {
-      await message
-        .reply("✘キューが空です")
-        .catch(e => Util.logger.log(e, "error"));
+      await message.reply("✘キューが空です").catch(e => Util.logger.log(e, "error"));
     }
   }
 }

@@ -50,9 +50,7 @@ export default class Volume extends BaseCommand {
     options.server.updateBoundChannel(message);
     if (options.rawArgs === "") {
       await message
-        .reply(
-          `:loud_sound:現在の音量は**${options.server.player.volume}**です(デフォルト:100)`,
-        )
+        .reply(`:loud_sound:現在の音量は**${options.server.player.volume}**です(デフォルト:100)`)
         .catch(e => Util.logger.log(e, "error"));
       return;
     }

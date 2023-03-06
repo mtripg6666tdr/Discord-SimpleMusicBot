@@ -63,9 +63,7 @@ export default class Mv extends BaseCommand {
       return;
     } else if (options.args.includes("0") && options.server.player.isPlaying) {
       message
-        .reply(
-          "✘音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。",
-        )
+        .reply("✘音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。")
         .catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -77,15 +75,7 @@ export default class Mv extends BaseCommand {
       if (from !== to) {
         q.move(from, to);
         message
-          .reply(
-            "✅ `" +
-              title +
-              "`を`" +
-              from +
-              "`番目から`" +
-              to +
-              "`番目に移動しました",
-          )
+          .reply("✅ `" + title + "`を`" + from + "`番目から`" + to + "`番目に移動しました")
           .catch(e => Util.logger.log(e, "error"));
       } else {
         message

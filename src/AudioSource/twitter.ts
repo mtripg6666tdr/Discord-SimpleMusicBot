@@ -39,8 +39,7 @@ export class Twitter extends AudioSource {
       this.streamUrl = prefetched.streamUrl;
     } else {
       const streamInfo = await twitterDl(url.split("?")[0]);
-      if (!streamInfo.found)
-        throw new Error("error" in streamInfo && streamInfo.error);
+      if (!streamInfo.found) throw new Error("error" in streamInfo && streamInfo.error);
       this._lengthSeconds = Math.floor(streamInfo.duration);
       this.Title = `${streamInfo.tweet_user.name}(@${streamInfo.tweet_user.username})のツイート`;
       if (!streamInfo.download) {
@@ -48,12 +47,8 @@ export class Twitter extends AudioSource {
       }
       this.streamUrl = streamInfo.download.sort((a, b) => {
         const getDimensionFactor = (dimension: string) =>
-          dimension
-            .split("x")
-            .reduce((prev, current) => prev + Number(current), 1);
-        return (
-          getDimensionFactor(b.dimension) - getDimensionFactor(a.dimension)
-        );
+          dimension.split("x").reduce((prev, current) => prev + Number(current), 1);
+        return getDimensionFactor(b.dimension) - getDimensionFactor(a.dimension);
       })[0]?.url;
       this.Description = streamInfo.tweet_user.text;
       if (!this.streamUrl) {
@@ -101,12 +96,10 @@ export class Twitter extends AudioSource {
   }
 
   static validateUrl(url: string) {
-    return !!url.match(
-      /^https?:\/\/twitter\.com\/[a-zA-Z0-9_-]+\/status\/\d+(\?.+)?$/,
-    );
+    return !!url.match(/^https?:\/\/twitter\.com\/[a-zA-Z0-9_-]+\/status\/\d+(\?.+)?$/);
   }
 }
 
 export type exportableTwitter = exportableCustom & {
-  streamUrl: string;
+  streamUrl: string,
 };

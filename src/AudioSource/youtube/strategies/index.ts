@@ -41,14 +41,11 @@ export const strategies: strategies[] = [
   "./ytdl-patched_youtube-dl",
 ].map((path, i) => {
   try {
-    const {default: Module} = require(path);
+    const { default: Module } = require(path);
     return new Module(i);
   } catch (e) {
     if (Util.config.debug) Util.logger.log(e, "error");
-    Util.logger.log(
-      `[AudioSource:youtube] failed to load strategy#${i}`,
-      "warn",
-    );
+    Util.logger.log(`[AudioSource:youtube] failed to load strategy#${i}`, "warn");
     return null;
   }
 });
@@ -64,9 +61,7 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(
   setupLogger(logger);
   let checkedStrategy = -1;
   if (parameters[2]) {
-    checkedStrategy = strategies.findIndex(
-      s => s && s.cacheType === parameters[2].type,
-    );
+    checkedStrategy = strategies.findIndex(s => s && s.cacheType === parameters[2].type);
     if (checkedStrategy >= 0) {
       try {
         const result = await strategies[checkedStrategy].fetch(...parameters);
@@ -76,10 +71,7 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(
         };
       } catch (e) {
         logger(e, "error");
-        logger(
-          `[AudioSource:youtube] fetch in strategy#${checkedStrategy} failed: ${e}`,
-          "warn",
-        );
+        logger(`[AudioSource:youtube] fetch in strategy#${checkedStrategy} failed: ${e}`, "warn");
       }
     }
   }
@@ -93,10 +85,7 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(
         };
       } catch (e) {
         logger(e, "error");
-        logger(
-          `[AudioSource:youtube] fetch in strategy#${i} failed: ${e}`,
-          "warn",
-        );
+        logger(`[AudioSource:youtube] fetch in strategy#${i} failed: ${e}`, "warn");
       }
     }
     logger(
@@ -109,10 +98,10 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(
   throw new Error("All strategies failed");
 }
 
-export async function attemptGetInfoForStrategies<
-  T extends Cache<string, U>,
-  U,
->(logger: LoggerType, ...parameters: Parameters<Strategy<T, U>["getInfo"]>) {
+export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>(
+  logger: LoggerType,
+  ...parameters: Parameters<Strategy<T, U>["getInfo"]>
+) {
   setupLogger(logger);
   for (let i = 0; i < strategies.length; i++) {
     try {
@@ -125,10 +114,7 @@ export async function attemptGetInfoForStrategies<
       }
     } catch (e) {
       logger(e, "error");
-      logger(
-        `[AudioSource:youtube] getInfo in strategy#${i} failed: ${e}`,
-        "warn",
-      );
+      logger(`[AudioSource:youtube] getInfo in strategy#${i} failed: ${e}`, "warn");
       logger(
         i + 1 === strategies.length
           ? "[AudioSource:youtube] All strategies failed"

@@ -28,8 +28,7 @@ export default class Invoke extends BaseCommand {
     super({
       name: "インボーク",
       alias: ["invoke"],
-      description:
-        "指定されたコマンドを実行します。基本的に使用しないでください",
+      description: "指定されたコマンドを実行します。基本的に使用しないでください",
       unlist: false,
       category: "utility",
       argument: [
@@ -48,23 +47,13 @@ export default class Invoke extends BaseCommand {
   }
 
   async run(message: CommandMessage, options: CommandArgs) {
-    if (
-      options.rawArgs.startsWith("sp;") &&
-      Util.general.isBotAdmin(message.member.id)
-    ) {
-      this.evaluateSpecialCommands(
-        options.rawArgs.substring(3),
-        message,
-        options,
-      )
+    if (options.rawArgs.startsWith("sp;") && Util.general.isBotAdmin(message.member.id)) {
+      this.evaluateSpecialCommands(options.rawArgs.substring(3), message, options)
         .then(result => message.reply(result))
         .catch(er => Util.logger.log(er, "error"));
       return;
     }
-    const commandInfo = CommandMessage.resolveCommandMessage(
-      options.rawArgs,
-      0,
-    );
+    const commandInfo = CommandMessage.resolveCommandMessage(options.rawArgs, 0);
     if (commandInfo.command === "invoke") {
       await message
         .reply("invokeコマンドをinvokeコマンドで実行することはできません")
@@ -75,13 +64,9 @@ export default class Invoke extends BaseCommand {
     if (ci) {
       options.args = commandInfo.options;
       options.rawArgs = commandInfo.rawOptions;
-      await ci
-        .checkAndRun(message, options)
-        .catch(er => Util.logger.log(er, "error"));
+      await ci.checkAndRun(message, options).catch(er => Util.logger.log(er, "error"));
       if (!message["isMessage"] && !message["_interactionReplied"]) {
-        await message
-          .reply("実行しました")
-          .catch(er => Util.logger.log(er, "error"));
+        await message.reply("実行しました").catch(er => Util.logger.log(er, "error"));
       }
     } else {
       await message
@@ -103,10 +88,7 @@ export default class Invoke extends BaseCommand {
         CommandManager.instance.removeAllApplicationCommand(options.client);
         break;
       case "removescg":
-        CommandManager.instance.removeAllGuildCommand(
-          options.client,
-          message.guild.id,
-        );
+        CommandManager.instance.removeAllGuildCommand(options.client, message.guild.id);
         break;
       case "enabledsl":
         options.server.player.detailedLog = true;

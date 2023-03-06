@@ -33,22 +33,16 @@ const ua = SecondaryUserAgent;
 type ytdlCore = "ytdlCore";
 export const ytdlCore: ytdlCore = "ytdlCore";
 
-export class ytdlCoreStrategy extends Strategy<
-  Cache<ytdlCore, ytdl.videoInfo>,
-  ytdl.videoInfo
-> {
+export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, ytdl.videoInfo> {
   get cacheType() {
     return ytdlCore;
   }
 
   async getInfo(url: string) {
     this.useLog();
-    const agent =
-      Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
-    const requestOptions = agent ? {agent} : undefined;
-    const t = Util.time.timer.start(
-      `YouTube(Strategy#${this.priority})#getInfo`,
-    );
+    const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
+    const requestOptions = agent ? { agent } : undefined;
+    const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#getInfo`);
     let info = null as ytdl.videoInfo;
     try {
       info = await ytdl.getInfo(url, {
@@ -75,12 +69,9 @@ export class ytdlCoreStrategy extends Strategy<
         return cache.data as ytdl.videoInfo;
       } else {
         this.logger("[AudioSource:youtube] obtaining info");
-        const agent =
-          Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
-        const requestOptions = agent ? {agent} : undefined;
-        const t = Util.time.timer.start(
-          `YouTube(Strategy#${this.priority})#fetch`,
-        );
+        const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
+        const requestOptions = agent ? { agent } : undefined;
+        const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch`);
         // eslint-disable-next-line @typescript-eslint/no-shadow
         let info = null as ytdl.videoInfo;
         try {
@@ -145,12 +136,7 @@ export class ytdlCoreStrategy extends Strategy<
           lang: "ja",
         });
       } else {
-        readable = createChunkedYTStream(
-          info,
-          format,
-          {lang: "ja"},
-          1 * 1024 * 1024,
-        );
+        readable = createChunkedYTStream(info, format, { lang: "ja" }, 1 * 1024 * 1024);
       }
       return {
         ...partialResult,
@@ -158,9 +144,7 @@ export class ytdlCoreStrategy extends Strategy<
           type: "readable",
           stream: readable,
           streamType:
-            format.container === "webm" && format.audioCodec === "opus"
-              ? "webm"
-              : undefined,
+            format.container === "webm" && format.audioCodec === "opus" ? "webm" : undefined,
         } as ReadableStreamInfo,
       };
     }
@@ -176,8 +160,7 @@ export class ytdlCoreStrategy extends Strategy<
       channelUrl: info.videoDetails.author.channel_url,
       thumbnail: info.videoDetails.thumbnails[0].url,
       isLive: !!(
-        info.videoDetails.isLiveContent &&
-        info.videoDetails.liveBroadcastDetails?.isLiveNow
+        info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails?.isLiveNow
       ),
     };
   }

@@ -135,8 +135,7 @@ export class GuildDataContainer extends LogEmitter {
   protected initQueueManager() {
     this._queue = new QueueManager();
     this._queue.setBinding(this);
-    const pageToggleOrganizer = () =>
-      PageToggle.organize(this.bot.toggles, 5, this.guildId);
+    const pageToggleOrganizer = () => PageToggle.organize(this.bot.toggles, 5, this.guildId);
     this._queue.on("change", pageToggleOrganizer);
     this._queue.on("changeWithoutCurrent", pageToggleOrganizer);
   }
@@ -154,14 +153,11 @@ export class GuildDataContainer extends LogEmitter {
       !this.player.isConnecting ||
       (message.member.voiceState.channelID &&
         (
-          this.bot.client.getChannel(
-            message.member.voiceState.channelID,
-          ) as VoiceChannel
+          this.bot.client.getChannel(message.member.voiceState.channelID) as VoiceChannel
         ).voiceMembers.has(this.bot.client.user.id)) ||
       message.content.includes("join")
     ) {
-      if (message.content !== this.prefix)
-        this.boundTextChannel = message.channelId;
+      if (message.content !== this.prefix) this.boundTextChannel = message.channelId;
     }
   }
 
@@ -186,16 +182,10 @@ export class GuildDataContainer extends LogEmitter {
    */
   async importQueue(exportedQueue: YmxFormat) {
     if (exportedQueue.version === YmxVersion) {
-      const {data} = exportedQueue;
+      const { data } = exportedQueue;
       for (let i = 0; i < data.length; i++) {
         const item = data[i];
-        await this.queue.addQueue(
-          item.url,
-          item.addBy,
-          "push",
-          "unknown",
-          item,
-        );
+        await this.queue.addQueue(item.url, item.addBy, "push", "unknown", item);
       }
       return true;
     }
@@ -210,9 +200,7 @@ export class GuildDataContainer extends LogEmitter {
     // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
     return {
       voiceChannelId:
-        this.player.isPlaying && !this.player.isPaused
-          ? this.connection.channelID
-          : "0",
+        this.player.isPlaying && !this.player.isPaused ? this.connection.channelID : "0",
       boundChannelId: this.boundTextChannel,
       loopEnabled: this.queue.loopEnabled,
       queueLoopEnabled: this.queue.queueLoopEnabled,
@@ -321,18 +309,13 @@ export class GuildDataContainer extends LogEmitter {
               return true;
             }
             // すでになにかしらのVCに参加している場合
-          } else if (
-            this.connection &&
-            !message.member.permissions.has("voiceMoveMembers")
-          ) {
+          } else if (this.connection && !message.member.permissions.has("voiceMoveMembers")) {
             const failedMsg =
               ":warning:既にほかのボイスチャンネルに接続中です。この操作を実行する権限がありません。";
             if (reply || replyOnFail) {
               await message.reply(failedMsg).catch(er => this.Log(er, "error"));
             } else {
-              await message.channel
-                .createMessage(failedMsg)
-                .catch(er => this.Log(er, "error"));
+              await message.channel.createMessage(failedMsg).catch(er => this.Log(er, "error"));
             }
             return false;
           }
@@ -346,18 +329,10 @@ export class GuildDataContainer extends LogEmitter {
             }
           })(":electric_plug:接続中...");
           try {
-            if (
-              !targetVC
-                .permissionsOf(this.bot.client.user.id)
-                .has("voiceConnect")
-            )
-              throw new Error(
-                "ボイスチャンネルに参加できません。権限を確認してください。",
-              );
+            if (!targetVC.permissionsOf(this.bot.client.user.id).has("voiceConnect"))
+              throw new Error("ボイスチャンネルに参加できません。権限を確認してください。");
             await this._joinVoiceChannel(targetVC.id);
-            await msg.edit(
-              `:+1:ボイスチャンネル:speaker:\`${targetVC.name}\`に接続しました!`,
-            );
+            await msg.edit(`:+1:ボイスチャンネル:speaker:\`${targetVC.name}\`に接続しました!`);
             return true;
           } catch (e) {
             Util.logger.log(e, "error");
@@ -375,14 +350,11 @@ export class GuildDataContainer extends LogEmitter {
           }
         } else {
           // あらメッセージの送信者さんはボイチャ入ってないん…
-          const msg =
-            "ボイスチャンネルに参加してからコマンドを送信してください:relieved:";
+          const msg = "ボイスチャンネルに参加してからコマンドを送信してください:relieved:";
           if (reply || replyOnFail) {
             await message.reply(msg).catch(e => this.Log(e, "error"));
           } else {
-            await message.channel
-              .createMessage(msg)
-              .catch(e => this.Log(e, "error"));
+            await message.channel.createMessage(msg).catch(e => this.Log(e, "error"));
           }
           return false;
         }
@@ -429,9 +401,7 @@ export class GuildDataContainer extends LogEmitter {
     const t = Util.time.timer.start("MusicBot#PlayFromURL");
     setTimeout(
       () =>
-        message
-          .suppressEmbeds(true)
-          .catch(e => this.Log(Util.general.StringifyObject(e), "warn")),
+        message.suppressEmbeds(true).catch(e => this.Log(Util.general.StringifyObject(e), "warn")),
       4000,
     ).unref();
     if (
@@ -453,10 +423,7 @@ export class GuildDataContainer extends LogEmitter {
         )) as Message<TextChannel>;
         if (ch.guild.id !== msg.channel.guild.id)
           throw new Error("異なるサーバーのコンテンツは再生できません");
-        if (
-          msg.attachments.length <= 0 ||
-          !Util.fs.isAvailableRawAudioURL(msg.attachments[0]?.url)
-        )
+        if (msg.attachments.length <= 0 || !Util.fs.isAvailableRawAudioURL(msg.attachments[0]?.url))
           throw new Error("添付ファイルが見つかりません");
         await this.queue.autoAddQueue(
           msg.attachments[0].url,
@@ -473,16 +440,11 @@ export class GuildDataContainer extends LogEmitter {
         Util.logger.log(e, "error");
         await smsg
           .edit(
-            `✘追加できませんでした(${Util.general.FilterContent(
-              Util.general.StringifyObject(e),
-            )})`,
+            `✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`,
           )
           .catch(er => this.Log(er, "error"));
       }
-    } else if (
-      !Util.general.isDisabledSource("custom") &&
-      Util.fs.isAvailableRawAudioURL(rawArg)
-    ) {
+    } else if (!Util.general.isDisabledSource("custom") && Util.fs.isAvailableRawAudioURL(rawArg)) {
       // オーディオファイルへの直リンク？
       await this.queue.autoAddQueue(
         rawArg,
@@ -537,20 +499,16 @@ export class GuildDataContainer extends LogEmitter {
           const embed = new Helper.MessageEmbedBuilder()
             .setTitle("✅プレイリストが処理されました")
             // \`(${result.author.name})\` author has been null lately
-            .setDescription(
-              `[${result.title}](${result.url}) \r\n${index}曲が追加されました`,
-            )
+            .setDescription(`[${result.title}](${result.url}) \r\n${index}曲が追加されました`)
             .setThumbnail(result.bestThumbnail.url)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-          await msg.edit({content: "", embeds: [embed.toEris()]});
+          await msg.edit({ content: "", embeds: [embed.toEris()] });
         }
       } catch (e) {
         Util.logger.log(e, "error");
         await msg
           .edit(
-            `✘追加できませんでした(${Util.general.FilterContent(
-              Util.general.StringifyObject(e),
-            )})`,
+            `✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`,
           )
           .catch(er => this.Log(er, "error"));
       } finally {
@@ -598,15 +556,13 @@ export class GuildDataContainer extends LogEmitter {
             )
             .setThumbnail(playlist.artwork_url)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-          await msg.edit({content: "", embeds: [embed.toEris()]});
+          await msg.edit({ content: "", embeds: [embed.toEris()] });
         }
       } catch (e) {
         Util.logger.log(e, "error");
         await msg
           .edit(
-            `✘追加できませんでした(${Util.general.FilterContent(
-              Util.general.StringifyObject(e),
-            )})`,
+            `✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`,
           )
           .catch(er => this.Log(er, "error"));
       } finally {
@@ -648,10 +604,9 @@ export class GuildDataContainer extends LogEmitter {
           const embed = new Helper.MessageEmbedBuilder()
             .setTitle("✅プレイリストが処理されました")
             .setDescription(
-              `[${playlist.title}](${Spotify.getPlaylistUrl(
-                playlist.uri,
-                playlist.type,
-              )}) \`(${playlist.subtitle})\` \r\n${index}曲が追加されました`,
+              `[${playlist.title}](${Spotify.getPlaylistUrl(playlist.uri, playlist.type)}) \`(${
+                playlist.subtitle
+              })\` \r\n${index}曲が追加されました`,
             )
             .setThumbnail(playlist.coverArt.sources[0].url)
             .setFields({
@@ -659,15 +614,13 @@ export class GuildDataContainer extends LogEmitter {
               value: "Spotifyのタイトルは、正しく再生されない場合があります",
             })
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-          await msg.edit({content: "", embeds: [embed.toEris()]});
+          await msg.edit({ content: "", embeds: [embed.toEris()] });
         }
       } catch (e) {
         Util.logger.log(e, "error");
         await msg
           .edit(
-            `✘追加できませんでした(${Util.general.FilterContent(
-              Util.general.StringifyObject(e),
-            )})`,
+            `✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`,
           )
           .catch(er => this.Log(er, "error"));
       } finally {
@@ -716,9 +669,7 @@ export class GuildDataContainer extends LogEmitter {
     );
     if (pmatch) {
       if (this.prefix !== (pmatch.groups.prefix0 || pmatch.groups.prefix1)) {
-        this.prefix = Util.string.NormalizeText(
-          pmatch.groups.prefix0 || pmatch.groups.prefix1,
-        );
+        this.prefix = Util.string.NormalizeText(pmatch.groups.prefix0 || pmatch.groups.prefix1);
       }
     } else if (this.prefix !== Util.config.prefix) {
       this.prefix = Util.config.prefix;
@@ -734,10 +685,8 @@ export class GuildDataContainer extends LogEmitter {
    * @param message
    */
   async playFromSearchPanelOptions(nums: string[], panel: SearchPanel) {
-    const includingNums = panel.filterOnlyIncludes(
-      nums.map(n => Number(n)).filter(n => !isNaN(n)),
-    );
-    const {urls: items, responseMessage} = panel.decideItems(includingNums);
+    const includingNums = panel.filterOnlyIncludes(nums.map(n => Number(n)).filter(n => !isNaN(n)));
+    const { urls: items, responseMessage } = panel.decideItems(includingNums);
     const [first, ...rest] = items;
     // いっこめをしょり
     await this.queue.autoAddQueue(
@@ -767,8 +716,8 @@ export class GuildDataContainer extends LogEmitter {
         /* known source type */ "unknown",
         /* add the item at the first or not */ false,
         /* from search panel or not */ false,
-        /* the channel at which interaction should happen */ panel
-          .commandMessage.channel as TextChannel,
+        /* the channel at which interaction should happen */ panel.commandMessage
+          .channel as TextChannel,
         null,
         null,
         /* cancellable */ true,
@@ -792,11 +741,7 @@ export class GuildDataContainer extends LogEmitter {
     this.player.once("disconnect", destroy);
   }
 
-  createSearchPanel(
-    _commandMessage: CommandMessage,
-    query: string,
-    isRawTitle: boolean = false,
-  ) {
+  createSearchPanel(_commandMessage: CommandMessage, query: string, isRawTitle: boolean = false) {
     if (this._searchPanels.size >= 3) {
       _commandMessage
         .reply(":cry:すでに開いている検索パネルが上限を超えています")

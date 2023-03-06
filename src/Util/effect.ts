@@ -31,8 +31,7 @@ export const EffectsCustomIds = {
 
 export function getFFmpegEffectArgs(data: GuildDataContainer) {
   const effect = [];
-  if (data.effectPrefs.BassBoost)
-    effect.push("firequalizer=gain_entry='entry(75,2)'");
+  if (data.effectPrefs.BassBoost) effect.push("firequalizer=gain_entry='entry(75,2)'");
   if (data.effectPrefs.Reverb) effect.push("aecho=1.0:0.7:20:0.5");
   if (data.effectPrefs.LoudnessEqualization) effect.push("loudnorm");
 
@@ -43,10 +42,7 @@ export function getFFmpegEffectArgs(data: GuildDataContainer) {
   }
 }
 
-export function getCurrentEffectPanel(
-  avatarUrl: string,
-  data: GuildDataContainer,
-) {
+export function getCurrentEffectPanel(avatarUrl: string, data: GuildDataContainer) {
   const embed = new Helper.MessageEmbedBuilder()
     .setTitle(":cd:エフェクトコントロールパネル:microphone:")
     .setDescription(
@@ -54,11 +50,7 @@ export function getCurrentEffectPanel(
     )
     .addField("Bass Boost", data.effectPrefs.BassBoost ? "⭕" : "❌", true)
     .addField("Reverb", data.effectPrefs.Reverb ? "⭕" : "❌", true)
-    .addField(
-      "Loudness Eq",
-      data.effectPrefs.LoudnessEqualization ? "⭕" : "❌",
-      true,
-    )
+    .addField("Loudness Eq", data.effectPrefs.LoudnessEqualization ? "⭕" : "❌", true)
     .setColor(getColor("EFFECT"))
     .setFooter({
       icon_url: avatarUrl,
@@ -81,11 +73,9 @@ export function getCurrentEffectPanel(
         .setLabel("Reverb"),
       new Helper.MessageButtonBuilder()
         .setCustomId("loudness_eq")
-        .setStyle(
-          data.effectPrefs.LoudnessEqualization ? "SUCCESS" : "SECONDARY",
-        )
+        .setStyle(data.effectPrefs.LoudnessEqualization ? "SUCCESS" : "SECONDARY")
         .setLabel("Loudness Eq"),
     )
     .toEris();
-  return {embed, messageActions};
+  return { embed, messageActions };
 }

@@ -24,31 +24,26 @@ import * as AudioSource from ".";
 import { Util } from "../Util";
 
 type AudioSourceBasicInfo = {
-  type: KnownAudioSourceIdentifer;
-  url: string;
-  knownData: AudioSource.exportableCustom;
-  forceCache: boolean;
+  type: KnownAudioSourceIdentifer,
+  url: string,
+  knownData: AudioSource.exportableCustom,
+  forceCache: boolean,
 };
 
-const {isDisabledSource} = Util.general;
+const { isDisabledSource } = Util.general;
 
 export async function resolve(info: AudioSourceBasicInfo) {
   let basicInfo = null as AudioSource.AudioSource;
-  const {type, url, knownData: gotData, forceCache: cache} = info;
+  const { type, url, knownData: gotData, forceCache: cache } = info;
   if (
     !Util.general.isDisabledSource("youtube") &&
     (type === "youtube" || (type === "unknown" && ytdl.validateURL(url)))
   ) {
     // youtube
-    basicInfo = await AudioSource.initYouTube(
-      url,
-      gotData as AudioSource.exportableYouTube,
-      cache,
-    );
+    basicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.exportableYouTube, cache);
   } else if (
     !isDisabledSource("custom") &&
-    (type === "custom" ||
-      (type === "unknown" && Util.fs.isAvailableRawAudioURL(url)))
+    (type === "custom" || (type === "unknown" && Util.fs.isAvailableRawAudioURL(url)))
   ) {
     // カスタムストリーム
     basicInfo = await new AudioSource.CustomStream().init(url, info.knownData);
@@ -67,54 +62,33 @@ export async function resolve(info: AudioSourceBasicInfo) {
     AudioSource.Spotify.available
   ) {
     // spotify
-    basicInfo = await new AudioSource.Spotify().init(
-      url,
-      gotData as AudioSource.exportableSpotify,
-    );
+    basicInfo = await new AudioSource.Spotify().init(url, gotData as AudioSource.exportableSpotify);
   } else if (type === "unknown") {
     // google drive
-    if (
-      !isDisabledSource("googledrive") &&
-      AudioSource.GoogleDrive.validateUrl(url)
-    ) {
+    if (!isDisabledSource("googledrive") && AudioSource.GoogleDrive.validateUrl(url)) {
       basicInfo = await new AudioSource.GoogleDrive().init(url, info.knownData);
-    } else if (
-      !isDisabledSource("streamable") &&
-      AudioSource.StreamableApi.getVideoId(url)
-    ) {
+    } else if (!isDisabledSource("streamable") && AudioSource.StreamableApi.getVideoId(url)) {
       // Streamable
       basicInfo = await new AudioSource.Streamable().init(
         url,
         gotData as AudioSource.exportableStreamable,
       );
-    } else if (
-      process.env.BD_ENABLE &&
-      AudioSource.BestdoriApi.getAudioId(url)
-    ) {
+    } else if (process.env.BD_ENABLE && AudioSource.BestdoriApi.getAudioId(url)) {
       // Bestdori
       basicInfo = await new AudioSource.BestdoriS().init(
         url,
         gotData as AudioSource.exportableBestdori,
       );
-    } else if (
-      process.env.HIBIKI_ENABLE &&
-      AudioSource.HibikiApi.validateURL(url)
-    ) {
+    } else if (process.env.HIBIKI_ENABLE && AudioSource.HibikiApi.validateURL(url)) {
       // Hibiki
       basicInfo = await new AudioSource.Hibiki().init(url);
-    } else if (
-      !isDisabledSource("niconico") &&
-      AudioSource.NicoNicoS.validateUrl(url)
-    ) {
+    } else if (!isDisabledSource("niconico") && AudioSource.NicoNicoS.validateUrl(url)) {
       // NicoNico
       basicInfo = await new AudioSource.NicoNicoS().init(
         url,
         gotData as AudioSource.exportableNicoNico,
       );
-    } else if (
-      !isDisabledSource("twitter") &&
-      AudioSource.Twitter.validateUrl(url)
-    ) {
+    } else if (!isDisabledSource("twitter") && AudioSource.Twitter.validateUrl(url)) {
       // Twitter
       basicInfo = await new AudioSource.Twitter().init(
         url,

@@ -64,7 +64,7 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
    */
   async initBgmTracks() {
     if (this.bgmConfig) {
-      const {items} = this.bgmConfig;
+      const { items } = this.bgmConfig;
       for (let i = 0; i < items.length; i++) {
         await this.queue.addQueue(
           items[i],

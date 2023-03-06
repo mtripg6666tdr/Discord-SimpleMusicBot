@@ -39,8 +39,7 @@ export default class NowPlaying extends BaseCommand {
         {
           type: "bool",
           name: "detailed",
-          description:
-            "Trueが指定された場合、可能な場合より長く詳細を表示します",
+          description: "Trueが指定された場合、可能な場合より長く詳細を表示します",
           required: false,
         },
       ],
@@ -53,9 +52,7 @@ export default class NowPlaying extends BaseCommand {
     options.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if (!options.server.player.isPlaying) {
-      message
-        .reply("再生中ではありません")
-        .catch(e => Util.logger.log(e, "error"));
+      message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const _s = Math.floor(options.server.player.currentTime / 1000);
@@ -85,18 +82,12 @@ export default class NowPlaying extends BaseCommand {
         }`,
       )
       .setFields(
-        ...info.toField(
-          ["long", "l", "verbose", "l", "true"].some(
-            arg => options.args[0] === arg,
-          ),
-        ),
+        ...info.toField(["long", "l", "verbose", "l", "true"].some(arg => options.args[0] === arg)),
       )
       .addField(":link:URL", info.Url);
     if (typeof info.Thumbnail === "string") {
       embed.setThumbnail(info.Thumbnail);
-      await message
-        .reply({embeds: [embed.toEris()]})
-        .catch(e => Util.logger.log(e, "error"));
+      await message.reply({ embeds: [embed.toEris()] }).catch(e => Util.logger.log(e, "error"));
     } else {
       embed.setThumbnail("attachment://thumbnail." + info.Thumbnail.ext);
       await message
