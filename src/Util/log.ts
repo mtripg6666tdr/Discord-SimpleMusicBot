@@ -75,9 +75,9 @@ class LogStore {
   }
 
   destroy(){
-    if(this.destroyed) return;
+    if(!this || this.destroyed) return;
     this.destroyed = true;
-    if(!this.loggingStream.destroyed){
+    if(this.loggingStream && !this.loggingStream.destroyed){
       this.loggingStream.write(Buffer.from(`INFO  ${new Date().toISOString()} [Logger] detect process exiting, closing stream...`));
       this.loggingStream.destroy();
     }
