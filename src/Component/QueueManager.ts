@@ -189,7 +189,7 @@ export class QueueManager extends ServerManagerBase {
     type: KnownAudioSourceIdentifer = "unknown",
     gotData: AudioSource.exportableCustom = null,
     preventCache: boolean = false,
-  ): Promise<QueueContent & {index: number}>{
+  ): Promise<QueueContent & { index: number }>{
     return lock(this.addQueueLocker, async () => {
       this.Log("AddQueue called");
       const t = Util.time.timer.start("AddQueue");
@@ -202,8 +202,8 @@ export class QueueManager extends ServerManagerBase {
           }),
           additionalInfo: {
             addedBy: {
-              userId: (addedBy && this.getUserIdFromMember(addedBy)) || "0",
-              displayName: (addedBy && this.getDisplayNameFromMember(addedBy)) || "不明",
+              userId: addedBy && this.getUserIdFromMember(addedBy) || "0",
+              displayName: addedBy && this.getDisplayNameFromMember(addedBy) || "不明",
             }
           }
         } as QueueContent;
@@ -214,7 +214,7 @@ export class QueueManager extends ServerManagerBase {
           this.emit("add", result);
           const index = this._default.findIndex(q => q === result);
           this.Log("queue content added in position " + index);
-          return {...result, index};
+          return { ...result, index };
         }
       }
       finally{
@@ -298,7 +298,7 @@ export class QueueManager extends ServerManagerBase {
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
           .setDescription(`[${info.basicInfo.Title}](${info.basicInfo.Url})`)
-          .addField("長さ", ((info.basicInfo.ServiceIdentifer === "youtube" && (info.basicInfo as AudioSource.YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true)
+          .addField("長さ", info.basicInfo.ServiceIdentifer === "youtube" && (info.basicInfo as AudioSource.YouTube).LiveStream ? "ライブストリーム" : _t !== 0 ? min + ":" + sec : "不明", true)
           .addField("リクエスト", this.getDisplayNameFromMember(addedBy) ?? "不明", true)
           .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
           .addField("再生されるまでの予想時間", index === "0" ? "-" : Util.time.HourMinSecToString(timeFragments), true)
@@ -409,8 +409,8 @@ export class QueueManager extends ServerManagerBase {
         if(_result) index++;
         if(
           index % 50 === 0
-          || (totalCount <= 50 && index % 10 === 0)
-          || (totalCount <= 10 && index % 4 === 0)
+          || totalCount <= 50 && index % 10 === 0
+          || totalCount <= 10 && index % 4 === 0
         ){
           await msg.edit(`:hourglass_flowing_sand:プレイリスト\`${title}\`を処理しています。お待ちください。${totalCount}曲中${index}曲処理済み。`);
         }
@@ -546,7 +546,7 @@ export class QueueManager extends ServerManagerBase {
     // 追加者の一覧とマップを作成
     const generateUserOrder = !addedByUsers;
     addedByUsers = addedByUsers || [];
-    const queueByAdded = {} as {[key: string]: QueueContent[]};
+    const queueByAdded = {} as { [key: string]: QueueContent[] };
     for(let i = 0; i < this._default.length; i++){
       if(!addedByUsers.includes(this._default[i].additionalInfo.addedBy.userId)){
         if(generateUserOrder){

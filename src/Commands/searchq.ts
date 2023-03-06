@@ -72,7 +72,7 @@ export default class Searchq extends BaseCommand {
       return {
         name: index === "0" ? "現在再生中/再生待ち" : index,
         value: `[${c.basicInfo.Title}](${c.basicInfo.Url})\r\nリクエスト: \`${c.additionalInfo.addedBy.displayName}\` \r\n長さ: ${
-          (c.basicInfo.isYouTube() && c.basicInfo.LiveStream) ? "(ライブストリーム)" : ` \`${_t === 0 ? "(不明)" : `${min}:${sec}`}\`)`
+          c.basicInfo.isYouTube() && c.basicInfo.LiveStream ? "(ライブストリーム)" : ` \`${_t === 0 ? "(不明)" : `${min}:${sec}`}\`)`
         }`,
         inline: false
       } as EmbedField;
@@ -84,6 +84,6 @@ export default class Searchq extends BaseCommand {
       .setColor(getColor("SEARCH"))
       .toEris()
     ;
-    message.reply({embeds: [embed]});
+    message.reply({ embeds: [embed] });
   }
 }

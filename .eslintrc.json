@@ -40,7 +40,7 @@
       "functions": "only-multiline"
     }],
     "@typescript-eslint/no-dupe-class-members": "error",
-    "@typescript-eslint/no-extra-parens": ["warn", "functions"],
+    "@typescript-eslint/no-extra-parens": ["warn", "all"],
     "@typescript-eslint/no-loop-func": "warn",
     "@typescript-eslint/no-loss-of-precision": "error",
     "@typescript-eslint/no-throw-literal": "warn",
@@ -101,6 +101,7 @@
     "@typescript-eslint/no-unnecessary-type-assertion": "warn",
     "@typescript-eslint/return-await": ["warn", "in-try-catch"],
     "@typescript-eslint/await-thenable": "warn",
+    "@typescript-eslint/object-curly-spacing": ["warn", "always"],
 
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/ban-ts-comment": "off",
@@ -197,7 +198,7 @@
           "after": true
         },
         "do": {
-          "after": true
+          "after": false
         },
         "case": {
           "after": true
@@ -206,9 +207,9 @@
     }],
     "no-return-await": "warn",
     "space-before-blocks": ["warn", {
-      "functions": "never", 
-      "keywords": "never", 
-      "classes": "always"
+      "functions": "off",
+      "keywords": "never",
+      "classes": "off" 
     }],
     "space-before-function-paren": ["warn", {
       "anonymous": "never",

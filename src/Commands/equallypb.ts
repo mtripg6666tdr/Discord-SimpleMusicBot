@@ -51,7 +51,7 @@ export default class EquallyPlayback extends BaseCommand {
         .setColor(getColor("EQUALLY"))
         .toEris()
       ;
-      message.reply({embeds: [embed]}).catch(er => Util.logger.log(er, "error"));
+      message.reply({ embeds: [embed] }).catch(er => Util.logger.log(er, "error"));
     }
   }
 }

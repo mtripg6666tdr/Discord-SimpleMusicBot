@@ -51,7 +51,7 @@ export default class Related extends BaseCommand {
         .setColor(getColor("RELATIVE_SETUP"))
         .toEris()
       ;
-      message.reply({embeds: [embed]});
+      message.reply({ embeds: [embed] });
     }
   }
 }

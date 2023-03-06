@@ -40,7 +40,7 @@ const spotifyUrlInfo = (() => {
   }
 })();
 
-const client = spotifyUrlInfo?.((url, opts) => candyget(url, "string", opts).then(res => ({text: () => res.body})));
+const client = spotifyUrlInfo?.((url, opts) => candyget(url, "string", opts).then(res => ({ text: () => res.body })));
 
 export class Spotify extends AudioSource {
   protected readonly _serviceIdentifer = "spotify";
@@ -72,7 +72,7 @@ export class Spotify extends AudioSource {
     if(Util.config.debug) Util.logger.log(`Searching the keyword: ${`${this.Title} ${this.artist.split(",").map(artist => artist.trim())}`}`, "debug");
     const searchResult = await searchYouTube(keyword);
     if(Util.config.debug) Util.logger.log("Extracting the valid item...");
-    const items = searchResult.items.filter(({type}) => type === "video") as ytsr.Video[];
+    const items = searchResult.items.filter(({ type }) => type === "video") as ytsr.Video[];
     const target = this.extractBestItem(items);
     if(!target) throw new Error("Not Found");
     const { result } = await attemptFetchForStrategies(Util.logger.log.bind(Util.logger), target.url, forceUrl);

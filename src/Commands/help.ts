@@ -74,6 +74,6 @@ export default class Help extends BaseCommand {
       .setColor(getColor("HELP"))
       .toEris()
     ;
-    await message.reply({embeds: [embed]}).catch(e => Util.logger.log(e, "error"));
+    await message.reply({ embeds: [embed] }).catch(e => Util.logger.log(e, "error"));
   }
 }

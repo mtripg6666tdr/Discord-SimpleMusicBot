@@ -68,7 +68,7 @@ export class AddOn extends EventEmitter {
       captureRejections: false
     });
     try{
-      fs.readdirSync(path.join(__dirname, "../../addon/"), {withFileTypes: true})
+      fs.readdirSync(path.join(__dirname, "../../addon/"), { withFileTypes: true })
         .filter(d => d.isFile())
         .map(d => require("../../addon/" + d.name.slice(0, -3)))
         .filter(d => typeof d === "function")

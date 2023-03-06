@@ -69,7 +69,7 @@ export default class Commands extends BaseCommand {
         return categories[label as any] as string;
       };
       const rawcommands = CommandManager.instance.commands.filter(ci => !ci.unlist);
-      const commands = {} as {[category: string]: BaseCommand[]};
+      const commands = {} as { [category: string]: BaseCommand[] };
       // Generate command list
       for(let i = 0; i < rawcommands.length; i++){
         if(commands[rawcommands[i].category]){
@@ -84,11 +84,11 @@ export default class Commands extends BaseCommand {
           new Helper.MessageEmbedBuilder()
             .setTitle(getCategoryText(categoriesList[i]))
             .addFields(
-              ...(commands[categoriesList[i]].map(ci => ({
+              ...commands[categoriesList[i]].map(ci => ({
                 name: ci.name + ", " + ci.alias.join(", "),
                 value: ci.description,
                 inline: true
-              } as EmbedField)))
+              } as EmbedField))
             )
         );
       }
@@ -100,12 +100,10 @@ export default class Commands extends BaseCommand {
             + `\`${i + 1}ページ目(${embed.length}ページ中)\`\r\n`
             + (
               Util.config.noMessageContent
-                ? (
-                  "`/コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。"
-                ) : (
-                  `コマンドプレフィックスは、\`${options.server.prefix}\`です。\r\n\``
+                ? "`/コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。" :
+                `コマンドプレフィックスは、\`${options.server.prefix}\`です。\r\n\``
                   + `\`${options.server.prefix}コマンド 再生\`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。`
-                )
+                
             )
           )
           .setColor(getColor("COMMAND"));
@@ -129,7 +127,7 @@ export default class Commands extends BaseCommand {
         if(ci.examples){
           embed.addField("使用例", `\`${prefix + ci.examples}\``);
         }
-        await message.reply({embeds: [embed.toEris()]});
+        await message.reply({ embeds: [embed.toEris()] });
       }else{
         await message.reply(":face_with_raised_eyebrow: コマンドが見つかりませんでした");
       }

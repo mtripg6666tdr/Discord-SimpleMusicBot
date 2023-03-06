@@ -58,7 +58,7 @@ export default class BulkDelete extends BaseCommand {
       let before = "";
       const messages = [] as Message[];
       let i = 0;
-      do {
+      do{
         const allMsgs = await options.client.getMessages(message.channel.id, before ? {
           limit: 100,
           before,

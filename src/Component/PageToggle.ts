@@ -94,7 +94,7 @@ export class PageToggle {
   static organize(toggles: PageToggle[], min: number, forceRemovingUnfresh: string = null){
     const delIndex = [] as number[];
     for(let i = 0; i < toggles.length; i++){
-      if(new Date().getTime() - toggles[i].Message.createdTimestamp >= min * 60 * 1000 || (forceRemovingUnfresh && toggles[i].IsFreshNecessary && toggles[i].Message.guild.id === forceRemovingUnfresh)){
+      if(new Date().getTime() - toggles[i].Message.createdTimestamp >= min * 60 * 1000 || forceRemovingUnfresh && toggles[i].IsFreshNecessary && toggles[i].Message.guild.id === forceRemovingUnfresh){
         delIndex.push(i);
       }
     }

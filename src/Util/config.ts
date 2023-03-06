@@ -30,8 +30,8 @@ const GuildBGMContainer = Type.Object({
   voiceChannelId: Type.RegEx(/^\d+$/),
   allowEditQueue: Type.Boolean(),
   enableQueueLoop: Type.Boolean(),
-  items: Type.Array(Type.String({minLength: 1})),
-  volume: Type.Number({minimum: 5, maximum: 200}),
+  items: Type.Array(Type.String({ minLength: 1 })),
+  volume: Type.Number({ minimum: 5, maximum: 200 }),
   mode: Type.Union([
     Type.Literal("only"),
     Type.Literal("prior"),
@@ -44,29 +44,29 @@ const Config = Type.Object({
     Type.RegEx(/^\d+$/),
     Type.Array(Type.RegEx(/^\d+$/)),
     Type.Null(),
-  ], {default: false}),
-  debug: Type.Boolean({default: false}),
+  ], { default: false }),
+  debug: Type.Boolean({ default: false }),
   errorChannel: Type.Union([
     Type.RegEx(/^\d+$/),
     Type.Null(),
-  ], {default: null}),
+  ], { default: null }),
   maintenance: Type.Boolean(),
   proxy: Type.Union([
     Type.RegEx(/^https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+$/),
     Type.Null(),
-  ], {default: null}),
-  prefix: Type.Optional(Type.String({minLength: 1, default: ">"})),
-  webserver: Type.Optional(Type.Boolean({default: true})),
-  bgm: Type.Optional(Type.Record(Type.RegEx(/^\d+$/), GuildBGMContainer, {default: {}})),
-  noMessageContent: Type.Optional(Type.Boolean({default: false})),
-  twentyFourSeven: Type.Optional(Type.Array(Type.RegEx(/^\d+$/), {default: []})),
-  alwaysTwentyFourSeven: Type.Optional(Type.Boolean({default: false})),
-  disabledSources: Type.Optional(Type.Array(Type.String(), {default: []})),
+  ], { default: null }),
+  prefix: Type.Optional(Type.String({ minLength: 1, default: ">" })),
+  webserver: Type.Optional(Type.Boolean({ default: true })),
+  bgm: Type.Optional(Type.Record(Type.RegEx(/^\d+$/), GuildBGMContainer, { default: {} })),
+  noMessageContent: Type.Optional(Type.Boolean({ default: false })),
+  twentyFourSeven: Type.Optional(Type.Array(Type.RegEx(/^\d+$/), { default: [] })),
+  alwaysTwentyFourSeven: Type.Optional(Type.Boolean({ default: false })),
+  disabledSources: Type.Optional(Type.Array(Type.String(), { default: [] })),
 });
 
 const checker = TypeCompiler.Compile(Config);
 
-const rawConfig = fs.readFileSync(path.join(__dirname, "../../config.json"), {encoding: "utf-8"});
+const rawConfig = fs.readFileSync(path.join(__dirname, "../../config.json"), { encoding: "utf-8" });
 
 const config = CJSON.parse(rawConfig, null, true);
 

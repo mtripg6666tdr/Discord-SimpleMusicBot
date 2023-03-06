@@ -54,7 +54,7 @@ export class CommandManager extends LogEmitter {
     super();
     this.setTag("CommandsManager");
     this.Log("Initializing");
-    this._commands = fs.readdirSync(path.join(__dirname, "../Commands/"), {withFileTypes: true})
+    this._commands = fs.readdirSync(path.join(__dirname, "../Commands/"), { withFileTypes: true })
       .filter(d => d.isFile())
       .map(d => d.name)
       .filter(n => n.endsWith(".js") && n !== "index.js")
@@ -132,21 +132,20 @@ export class CommandManager extends LogEmitter {
       const registered = registeredCommands[index];
       return target.description.replace(/\r/g, "").replace(/\n/g, "") !== registered.description
         || (target.argument || []).length !== (registered.options || []).length
-        || (target.argument && target.argument.some(
+        || target.argument && target.argument.some(
           (arg, i) => {
-            const choicesObjectMap: {[key: string]: string} = {};
-            ((registered.options[i] as ApplicationCommandOptionWithChoices).choices)?.forEach(c => choicesObjectMap[c.name] = c.value.toString());
+            const choicesObjectMap: { [key: string]: string } = {};
+            (registered.options[i] as ApplicationCommandOptionWithChoices).choices?.forEach(c => choicesObjectMap[c.name] = c.value.toString());
             return !registered.options[i]
             || registered.options[i].name !== arg.name
             || registered.options[i].description !== arg.description
             || registered.options[i].type !== CommandManager.mapCommandOptionTypeToInteger(arg.type)
             || !!(registered.options[i] as ApplicationCommandOptionsWithValue).required !== arg.required
-            || (
-              ((registered.options[i] as ApplicationCommandOptionWithChoices).choices || arg.choices)
+            || ((registered.options[i] as ApplicationCommandOptionWithChoices).choices || arg.choices)
               && [...Object.keys(choicesObjectMap), ...Object.keys(arg.choices)].some(name => choicesObjectMap[name] !== arg.choices[name])
-            );
+            ;
           }
-        ))
+        )
       ;
     });
     const commandsToAdd = this.commands.filter(target => {

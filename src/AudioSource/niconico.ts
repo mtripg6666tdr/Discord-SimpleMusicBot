@@ -82,7 +82,7 @@ export class NicoNicoS extends AudioSource {
       inline: false
     }, {
       name: ":asterisk:概要",
-      value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, (verbose ? 1000 : 300)) + "..." : this.Description,
+      value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, verbose ? 1000 : 300) + "..." : this.Description,
       inline: false
     });
     return fields;

@@ -34,11 +34,11 @@ const { isDisabledSource } = Util.general;
 
 export async function resolve(info: AudioSourceBasicInfo){
   let basicInfo = null as AudioSource.AudioSource;
-  const {type, url, knownData: gotData, forceCache: cache} = info;
-  if(!Util.general.isDisabledSource("youtube") && (type === "youtube" || (type === "unknown" && ytdl.validateURL(url)))){
+  const { type, url, knownData: gotData, forceCache: cache } = info;
+  if(!Util.general.isDisabledSource("youtube") && (type === "youtube" || type === "unknown" && ytdl.validateURL(url))){
     // youtube
     basicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.exportableYouTube, cache);
-  }else if(!isDisabledSource("custom") && (type === "custom" || (type === "unknown" && Util.fs.isAvailableRawAudioURL(url)))){
+  }else if(!isDisabledSource("custom") && (type === "custom" || type === "unknown" && Util.fs.isAvailableRawAudioURL(url))){
     // カスタムストリーム
     basicInfo = await new AudioSource.CustomStream().init(url, info.knownData);
   }else if(!isDisabledSource("soundcloud") && (type === "soundcloud" || AudioSource.SoundCloudS.validateUrl(url))){
