@@ -1,3 +1,6 @@
-.env.sample linguist-language=Shell
-config.json.sample linguist-language=jsonc
-config*.json linguist-language=jsonc
+.env.sample         linguist-language=Shell
+config.json.sample  linguist-language=jsonc
+config*.json        linguist-language=jsonc
+*                   text=auto
+*.yml               text eol=lf
+*.ts                text eol=crlf
