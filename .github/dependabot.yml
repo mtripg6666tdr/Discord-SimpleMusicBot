@@ -9,7 +9,7 @@ updates:
       timezone: "Asia/Tokyo"
     commit-message:
       prefix: "Update:"
-    target-branch: "master"
+    target-branch: "v3"
     labels:
       - "dependencies"
       - "javascript"
@@ -40,7 +40,7 @@ updates:
       timezone: "Asia/Tokyo"
     commit-message:
       prefix: "Update(docs):"
-    target-branch: "master"
+    target-branch: "v3"
     labels:
       - "dependencies"
       - "javascript"
@@ -64,7 +64,7 @@ updates:
       timezone: "Asia/Tokyo"
     commit-message:
       prefix: "Update(action):"
-    target-branch: "master"
+    target-branch: "v3"
     labels:
       - "dependencies"
       - "github_actions"
