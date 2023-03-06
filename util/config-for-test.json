@@ -1,6 +1,7 @@
 {
   "adminId": null,
-  "debug": false,
+  // TODO: set to false when releasing v4
+  "debug": true,
   "maintenance": false,
   "errorChannel": null,
   "proxy": null,

@@ -18,7 +18,7 @@ const sampleJson = `
 {
   "adminId": "123456", // 管理ユーザーのユーザーID (任意)、なければnull
 
-  "debug": false, // デバッグ可能かどうか
+  "debug": true, // デバッグ可能かどうか
   
   "maintenance": true, // メンテナンス中かどうか
   // ボットの操作を全封鎖するときのみ設定してください。
@@ -46,7 +46,7 @@ describe("Config", function() {
     /** @type {[string, string|boolean][]} */
     const tests = [
       ["adminId", "123456"],
-      ["debug", false],
+      ["debug", true],
       ["maintenance", true],
       ["errorChannel", "987654"],
       ["proxy", "https://example.com"],
