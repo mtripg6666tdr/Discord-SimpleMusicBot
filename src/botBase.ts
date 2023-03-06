@@ -89,6 +89,18 @@ export abstract class MusicBotBase extends LogEmitter {
     return this.guildData.size;
   }
 
+  get connectingGuildCount(){
+    return [...this.guildData.values()].filter(guild => guild.player.isConnecting).length;
+  }
+
+  get playingGuildCount(){
+    return [...this.guildData.values()].filter(guild => guild.player.isPlaying).length;
+  }
+
+  get pausedGuildCount(){
+    return [...this.guildData.values()].filter(guild => guild.player.isPaused).length;
+  }
+
   get totalTransformingCost(){
     return [...this.guildData.values()]
       .map(d => d.player.cost)
@@ -205,6 +217,10 @@ export abstract class MusicBotBase extends LogEmitter {
   resetData(guildId: string){
     this.guildData.delete(guildId);
     this.emit("guildDataRemoved", guildId);
+  }
+
+  getData(guildId: string){
+    return this.guildData.get(guildId);
   }
 
   override emit<T extends keyof BotBaseEvents>(eventName: T, ...args: BotBaseEvents[T]){

@@ -108,6 +108,46 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
+    if(Util.general.isBotAdmin(message.member.id) && (options.args.includes("servers") || options.args.length === 0)){
+      embeds.push(
+        new Helper.MessageEmbedBuilder()
+          .setColor(getColor("UPTIME"))
+          .setTitle("Server Info")
+          .setDescription(
+            "サーバー名(NSFW LEVEL,ID)\r\n"
+            + options.client.guilds.map(guild => `${guild.name.length > 17 ? guild.name.substring(0, 17) + "…" : guild.name} (${guild.nsfwLevel},${guild.id})`).join("\r\n")
+          )
+          .addField("参加サーバー数", options.bot.client.guilds.size.toString(), true)
+          .addField("データが保持されているサーバー数", options.bot.databaseCount.toString(), true)
+          .addField("接続中サーバー数", options.bot.connectingGuildCount.toString(), true)
+          .addField("再生中サーバー数(一時停止含む)", options.bot.playingGuildCount.toString(), true)
+          .addField("一時停止サーバー数", options.bot.pausedGuildCount.toString(), true)
+          .toEris()
+      );
+    }
+
+    if(Util.general.isBotAdmin(message.member.id) && (options.args[0] === "server" && options.args[1] && options.client.guilds.has(options.args[1]))){
+      const target = options.client.guilds.get(options.args[1]);
+      const data = options.bot.getData(options.args[1]);
+      embeds.push(
+        new Helper.MessageEmbedBuilder()
+          .setColor(getColor("HELP"))
+          .setTitle("(秘)サーバー照会結果")
+          .addField("サーバー名", target.name, true)
+          .addField("サーバーID", target.id)
+          .addField("サーバーアイコン", target.icon)
+          .addField("チャンネル数(キャッシュによる)", target.channels.size.toString(), true)
+          .addField("メンバー数(概算)", target.approximateMemberCount?.toString() || "不明", true)
+          .addField("接続中", data?.player.isConnecting ? "はい" : "いいえ", true)
+          .addField("再生/一時停止中", data?.player.isPaused ? "はい" : "いいえ", true)
+          .addField("一時停止中", data?.player.isPaused ? "はい" : "いいえ", true)
+          .addField("キュー内のアイテム数", data?.queue.length.toString() || "0", true)
+          .addField("現在の変換コスト", data?.player.cost.toString() || "0", true)
+          .addField("ライブストリーム", data?.player.currentAudioInfo?.isYouTube() && data?.player.currentAudioInfo.LiveStream ? "はい" : "いいえ", true)
+          .toEris()
+      );
+    }
+
     if(options.args.includes("cpu") || options.args.length === 0){
       // Process CPU Info
       const cpuInfoEmbed = new Helper.MessageEmbedBuilder();
@@ -158,6 +198,8 @@ export default class SystemInfo extends BaseCommand {
       );
     }
     
-    await message.channel.createMessage({embeds}).catch(e => Util.logger.log(e, "error"));
+    if(embeds.length > 0){
+      await message.channel.createMessage({embeds}).catch(e => Util.logger.log(e, "error"));
+    }
   }
 }
