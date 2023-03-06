@@ -37,11 +37,11 @@ export default class End extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if(!options.server.player.isPlaying) {
+    if(!options.server.player.isPlaying){
       message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    if(options.server.queue.length <= 1) {
+    if(options.server.queue.length <= 1){
       message
         .reply("キューが空、もしくは一曲しかないため削除されませんでした。")
         .catch(e => Util.logger.log(e, "error"));

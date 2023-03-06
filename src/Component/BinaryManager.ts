@@ -58,18 +58,18 @@ export class BinaryManager extends LogEmitter {
   constructor(protected options: Readonly<BinaryManagerOptions>) {
     super();
     this.setTag(`BinaryManager(${options.localBinaryName})`);
-    if(!fs.existsSync(this.baseUrl)) {
+    if(!fs.existsSync(this.baseUrl)){
       try{
         fs.mkdirSync(this.baseUrl);
-      } catch(e) {
+      } catch(e){
         this.Log(e, "warn");
         this.Log("Fallbacking to the root directory");
         this.baseUrl = path.join(__dirname, "../../");
       }
     }
-    if(options.checkImmediately) {
+    if(options.checkImmediately){
       const latest = this.checkIsLatestVersion();
-      if(!latest) {
+      if(!latest){
         this.downloadBinary();
       }
     }
@@ -78,7 +78,7 @@ export class BinaryManager extends LogEmitter {
   private readonly getReleaseInfoLocker = new LockObj();
   protected async getReleaseInfo() {
     return lock(this.getReleaseInfoLocker, async () => {
-      if(this.releaseInfo && !this.isStaleInfo) {
+      if(this.releaseInfo && !this.isStaleInfo){
         this.Log("Skipping the binary info fetching due to valid info cache found");
         return this.releaseInfo;
       }
@@ -98,7 +98,7 @@ export class BinaryManager extends LogEmitter {
 
   protected async checkIsLatestVersion() {
     this.lastChecked = Date.now();
-    if(!fs.existsSync(this.binaryPath)) {
+    if(!fs.existsSync(this.binaryPath)){
       return false;
     }else{
       this.Log("Checking the latest version");
@@ -113,14 +113,14 @@ export class BinaryManager extends LogEmitter {
   }
 
   protected async downloadBinary() {
-    if(!this.releaseInfo) {
+    if(!this.releaseInfo){
       await this.getReleaseInfo();
     }
     const binaryUrl = this.releaseInfo.assets.find(
       asset =>
         asset.name === `${this.options.binaryName}${process.platform === "win32" ? ".exe" : ""}`,
     )?.browser_download_url;
-    if(!binaryUrl) {
+    if(!binaryUrl){
       throw new Error("No binary url detected");
     }else{
       this.Log("Start downloading the binary");
@@ -141,9 +141,9 @@ export class BinaryManager extends LogEmitter {
   }
 
   async exec(args: readonly string[]): Promise<string> {
-    if(!fs.existsSync(this.binaryPath) || this.isStaleInfo) {
+    if(!fs.existsSync(this.binaryPath) || this.isStaleInfo){
       const latest = await this.checkIsLatestVersion();
-      if(!latest) {
+      if(!latest){
         await this.downloadBinary();
       }
     }
@@ -161,7 +161,7 @@ export class BinaryManager extends LogEmitter {
           if(ended) return;
           ended = true;
           resolve(Buffer.concat(bufs).toString().trim());
-          if(process.connected) {
+          if(process.connected){
             process.kill("SIGTERM");
           }
         };
@@ -173,7 +173,7 @@ export class BinaryManager extends LogEmitter {
           reject(err);
         });
         process.stderr.on("data", (chunk: Buffer) => this.Log(`[Child] ${chunk.toString()}`));
-      } catch(e) {
+      } catch(e){
         reject(e);
       }
     });

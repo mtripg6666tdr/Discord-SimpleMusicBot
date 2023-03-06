@@ -19,7 +19,7 @@
 import * as fs from "fs";
 import * as path from "path";
 
-if(!fs.existsSync(path.join(__dirname, "../.data"))) {
+if(!fs.existsSync(path.join(__dirname, "../.data"))){
   fs.mkdirSync(path.join(__dirname, "../.data"));
 }
 const statusesPath = path.join(__dirname, "../.data/status.json");
@@ -42,9 +42,9 @@ export function setStatus(data: { [guildid: string]: string }) {
       : {}
   ) as { [guildid: string]: string };
   Object.keys(data).forEach(key => {
-    if(data[key]) {
+    if(data[key]){
       statuses[key] = data[key];
-    }else if(statuses[key]) {
+    }else if(statuses[key]){
       delete statuses[key];
     }
   });
@@ -55,7 +55,7 @@ export function getQueue(guildids: string[]) {
   const result = {} as { [guildid: string]: string };
   guildids.forEach(id => {
     const jsonPath = path.join(__dirname, `../.data/${id}.json`);
-    if(fs.existsSync(jsonPath)) {
+    if(fs.existsSync(jsonPath)){
       result[id] = fs.readFileSync(jsonPath, { encoding: "utf-8" });
     }
   });

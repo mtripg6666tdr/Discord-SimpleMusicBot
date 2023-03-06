@@ -33,7 +33,7 @@ export class Twitter extends AudioSource {
   async init(url: string, prefetched?: exportableTwitter) {
     this.Url = url;
     if(!Twitter.validateUrl(url)) throw new Error("Invalid streamable url");
-    if(prefetched) {
+    if(prefetched){
       this._lengthSeconds = prefetched.length;
       this.Title = prefetched.title;
       this.streamUrl = prefetched.streamUrl;
@@ -42,7 +42,7 @@ export class Twitter extends AudioSource {
       if(!streamInfo.found) throw new Error("error" in streamInfo && streamInfo.error);
       this._lengthSeconds = Math.floor(streamInfo.duration);
       this.Title = `${streamInfo.tweet_user.name}(@${streamInfo.tweet_user.username})のツイート`;
-      if(!streamInfo.download) {
+      if(!streamInfo.download){
         throw new Error("No media found");
       }
       this.streamUrl = streamInfo.download.sort((a, b) => {
@@ -51,7 +51,7 @@ export class Twitter extends AudioSource {
         return getDimensionFactor(b.dimension) - getDimensionFactor(a.dimension);
       })[0]?.url;
       this.Description = streamInfo.tweet_user.text;
-      if(!this.streamUrl) {
+      if(!this.streamUrl){
         throw new Error("No format found");
       }
     }

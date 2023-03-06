@@ -116,13 +116,13 @@ export abstract class MusicBotBase extends LogEmitter {
     this.setTag("Main");
     this._instantiatedTime = new Date();
     this.Log("bot is instantiated");
-    if(maintenance) {
+    if(maintenance){
       this.Log("bot is now maintainance mode");
     }
 
     const versionObtainStrategies = [
       () => {
-        if(fs.existsSync(path.join(__dirname, "../DOCKER_BUILD_IMAGE"))) {
+        if(fs.existsSync(path.join(__dirname, "../DOCKER_BUILD_IMAGE"))){
           return require("../package.json").version;
         }
       },
@@ -133,7 +133,7 @@ export abstract class MusicBotBase extends LogEmitter {
         return execSync("git log -n 1 --pretty=format:%h").toString().trim();
       },
     ];
-    for(let i = 0; i < versionObtainStrategies.length; i++) {
+    for(let i = 0; i < versionObtainStrategies.length; i++){
       try{
         this._versionInfo = versionObtainStrategies[i]();
       } catch{
@@ -141,7 +141,7 @@ export abstract class MusicBotBase extends LogEmitter {
       }
       if(this._versionInfo) break;
     }
-    if(!this._versionInfo) {
+    if(!this._versionInfo){
       this._versionInfo = "Could not get version";
     }
     this.Log(`Version: ${this._versionInfo}`);
@@ -149,9 +149,9 @@ export abstract class MusicBotBase extends LogEmitter {
   }
 
   private initializeBackupper() {
-    if(MongoBackupper.backuppable) {
+    if(MongoBackupper.backuppable){
       this._backupper = new MongoBackupper(this, () => this.guildData);
-    }else if(HttpBackupper.backuppable) {
+    }else if(HttpBackupper.backuppable){
       this._backupper = new HttpBackupper(this, () => this.guildData);
     }
   }
@@ -204,7 +204,7 @@ export abstract class MusicBotBase extends LogEmitter {
    */
   protected initData(guildid: string, boundChannelId: string) {
     const prev = this.guildData.get(guildid);
-    if(!prev) {
+    if(!prev){
       const server = new GuildDataContainer(guildid, boundChannelId, this);
       this.guildData.set(guildid, server);
       this.emit("guildDataAdded", server);

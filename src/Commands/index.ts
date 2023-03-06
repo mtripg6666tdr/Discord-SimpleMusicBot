@@ -101,7 +101,7 @@ export abstract class BaseCommand {
 
   get permissionDescription() {
     const perms = this.requiredPermissionsOr.filter(perm => perm !== "admin");
-    if(perms.length === 0) {
+    if(perms.length === 0){
       return "なし";
     }else{
       return `${perms.map(permission => permissionDescriptionParts[permission]).join("、")}${
@@ -115,7 +115,7 @@ export abstract class BaseCommand {
     this._alias = opts.alias;
     this._unlist = opts.unlist;
     this._shouldDefer = opts.shouldDefer;
-    if(!this._unlist) {
+    if(!this._unlist){
       if(!this.asciiName) throw new Error("Command has not ascii name");
       const { description, examples, usage, category, argument, requiredPermissionsOr } =
         opts as ListCommandWithArgumentsInitializeOptions;
@@ -130,19 +130,19 @@ export abstract class BaseCommand {
 
   async checkAndRun(message: CommandMessage, options: Readonly<CommandArgs>) {
     const judgeIfPermissionMeeted = (perm: CommandPermission) => {
-      if(perm === "admin") {
+      if(perm === "admin"){
         return Util.eris.user.isPrivileged(message.member);
-      }else if(perm === "dj") {
+      }else if(perm === "dj"){
         return Util.eris.user.isDJ(message.member, options);
-      }else if(perm === "manageGuild") {
+      }else if(perm === "manageGuild"){
         return message.member.permissions.has("manageGuild");
-      }else if(perm === "manageMessages") {
+      }else if(perm === "manageMessages"){
         return message.channel.permissionsOf(message.member).has("manageMessages");
-      }else if(perm === "noConnection") {
+      }else if(perm === "noConnection"){
         return !options.server.player.isConnecting;
-      }else if(perm === "onlyListener") {
+      }else if(perm === "onlyListener"){
         return Util.eris.channel.isOnlyListener(message.member, options);
-      }else if(perm === "sameVc") {
+      }else if(perm === "sameVc"){
         return Util.eris.channel.sameVC(message.member, options);
       }else{
         return false;
@@ -151,7 +151,7 @@ export abstract class BaseCommand {
     if(
       this.requiredPermissionsOr.length !== 0 &&
       !this.requiredPermissionsOr.some(judgeIfPermissionMeeted)
-    ) {
+    ){
       await message.reply({
         content: `この操作を実行するには、${this.permissionDescription}が必要です。`,
         ephemeral: true,
@@ -182,7 +182,7 @@ export abstract class BaseCommand {
         | ApplicationCommandOptionsInteger
         | ApplicationCommandOptionsBoolean;
     });
-    if(options && options.length > 0) {
+    if(options && options.length > 0){
       return {
         type: Constants.ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,

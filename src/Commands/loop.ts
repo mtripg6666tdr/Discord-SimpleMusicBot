@@ -37,7 +37,7 @@ export default class Loop extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if(options.server.queue.loopEnabled) {
+    if(options.server.queue.loopEnabled){
       options.server.queue.loopEnabled = false;
       message
         .reply(":repeat_one:トラックリピートを無効にしました:x:")

@@ -51,7 +51,7 @@ export default class NowPlaying extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
-    if(!options.server.player.isPlaying) {
+    if(!options.server.player.isPlaying){
       message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -61,13 +61,13 @@ export default class NowPlaying extends BaseCommand {
     const [tmin, tsec] = Util.time.CalcMinSec(_t);
     const info = options.server.player.currentAudioInfo;
     let progressBar = "";
-    if(_t > 0) {
+    if(_t > 0){
       const progress = Math.floor((_s / _t) * 20);
-      for(let i = 1; i < progress; i++) {
+      for(let i = 1; i < progress; i++){
         progressBar += "=";
       }
       progressBar += "●";
-      for(let i = progress + 1; i <= 20; i++) {
+      for(let i = progress + 1; i <= 20; i++){
         progressBar += "=";
       }
     }
@@ -85,7 +85,7 @@ export default class NowPlaying extends BaseCommand {
         ...info.toField(["long", "l", "verbose", "l", "true"].some(arg => options.args[0] === arg)),
       )
       .addField(":link:URL", info.Url);
-    if(typeof info.Thumbnail === "string") {
+    if(typeof info.Thumbnail === "string"){
       embed.setThumbnail(info.Thumbnail);
       await message.reply({ embeds: [embed.toEris()] }).catch(e => Util.logger.log(e, "error"));
     }else{

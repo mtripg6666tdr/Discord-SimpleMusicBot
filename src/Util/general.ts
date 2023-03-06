@@ -51,11 +51,11 @@ export function btoa(txt: string) {
  * @returns 文字列。JSON、またはその他の文字列、および空の文字列の場合があります
  */
 export function StringifyObject(obj: any): string {
-  if(typeof obj === "string") {
+  if(typeof obj === "string"){
     return obj;
-  }else if(obj instanceof Error) {
+  }else if(obj instanceof Error){
     return `${obj.name}: ${obj.message}\n${obj.stack || "no stacks"}`;
-  }else if(obj["message"]) {
+  }else if(obj["message"]){
     return obj.message;
   }else{
     try{
@@ -75,7 +75,7 @@ const projectRoot = path.join(__dirname, "../../").slice(0, -1);
  */
 export function FilterContent(original: string) {
   let result = original;
-  while(result.includes(projectRoot)) {
+  while(result.includes(projectRoot)){
     result = result.replace(projectRoot, "***");
   }
   result = result.replace(/https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+/g, "http:***");
@@ -140,19 +140,19 @@ export function waitForEnteringState(
   return new Promise<number>((resolve, reject) => {
     let count = 0;
     const startTime = Date.now();
-    if(predicate()) {
+    if(predicate()){
       resolve(0);
-    }else if(timeout < 50) {
+    }else if(timeout < 50){
       reject("timed out");
     }
     const ticker = setInterval(() => {
       count++;
-      if(predicate()) {
+      if(predicate()){
         clearInterval(ticker);
         resolve(Date.now() - startTime);
-      }else if(timeout <= timeStep * count) {
+      }else if(timeout <= timeStep * count){
         clearInterval(ticker);
-        if(rejectOnTimeout) {
+        if(rejectOnTimeout){
           reject(`target predicate has not return true in time (${timeout}ms) and timed out`);
         }else{
           resolve(Date.now() - startTime);
@@ -176,7 +176,7 @@ const UUID_TEMPLATE = "10000000-1000-4000-8000-100000000000";
  * @returns 生成されたUUID
  */
 export function generateUUID() {
-  if(typeof crypto.randomUUID === "function") {
+  if(typeof crypto.randomUUID === "function"){
     return crypto.randomUUID();
   }else{
     // ref: https://www.30secondsofcode.org/js/s/uuid-generator-node
@@ -188,7 +188,7 @@ export function generateUUID() {
 }
 
 export function isBotAdmin(userId: string) {
-  if(!config.adminId) {
+  if(!config.adminId){
     return userId === "593758391395155978";
   }
   return typeof config.adminId === "string"

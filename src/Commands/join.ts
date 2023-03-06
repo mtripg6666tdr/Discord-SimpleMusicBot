@@ -44,7 +44,7 @@ export default class Join extends BaseCommand {
         options.client.getChannel(message.member.voiceState.channelID) as VoiceChannel
       ).voiceMembers.has(options.client.user.id) &&
       options.server.connection
-    ) {
+    ){
       message
         .reply("✘すでにボイスチャンネルに接続中です。")
         .catch(e => Util.logger.log(e, "error"));

@@ -41,7 +41,7 @@ export default class News extends BaseCommand {
     options.server.updateBoundChannel(message);
     options.server.joinVoiceChannel(message);
     const url = "https://www.youtube.com/playlist?list=PL3ZQ5CpNulQk8-p0CWo9ufI81IdrGoyNZ";
-    if(options.server.hasSearchPanel(message.member.id)) {
+    if(options.server.hasSearchPanel(message.member.id)){
       message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -63,7 +63,7 @@ export default class News extends BaseCommand {
           url: item.url,
         })),
     );
-    if(result) {
+    if(result){
       options.server.bindSearchPanel(searchPanel);
     }
   }

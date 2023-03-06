@@ -60,7 +60,7 @@ export default class Thumbnail extends BaseCommand {
       userSearchPanel &&
       0 < rawArgNumber &&
       rawArgNumber <= userSearchPanel.options.length
-    ) {
+    ){
       const opt = userSearchPanel.options[rawArgNumber - 1];
       embed
         .setImage(opt.thumbnail)
@@ -70,10 +70,10 @@ export default class Thumbnail extends BaseCommand {
       !options.rawArgs &&
       options.server.player.isPlaying &&
       options.server.queue.length >= 1
-    ) {
+    ){
       const info = options.server.queue.get(0).basicInfo;
       embed.setTitle(info.Title).setDescription("URL: " + info.Url);
-      if(typeof info.Thumbnail === "string") {
+      if(typeof info.Thumbnail === "string"){
         embed.setImage(info.Thumbnail);
         await message
           .reply({

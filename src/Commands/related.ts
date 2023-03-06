@@ -41,7 +41,7 @@ export default class Related extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if(options.server.addRelated) {
+    if(options.server.addRelated){
       options.server.addRelated = false;
       message.reply("❌関連曲自動再生をオフにしました").catch(e => Util.logger.log(e, "error"));
     }else{

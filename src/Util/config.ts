@@ -63,7 +63,7 @@ const rawConfig = fs.readFileSync(path.join(__dirname, "../../config.json"), {
 const config = CJSON.parse(rawConfig, null, true);
 
 const errs = [...checker.Errors(config)];
-if(errs.length > 0) {
+if(errs.length > 0){
   const er = new Error("Invalid config.json");
   console.log(errs);
   Object.defineProperty(er, "errors", {
@@ -72,7 +72,7 @@ if(errs.length > 0) {
   throw er;
 }
 
-if(typeof config !== "object" || !("debug" in config) || !config.debug) {
+if(typeof config !== "object" || !("debug" in config) || !config.debug){
   console.error(
     "This is still a development phase, and running without debug mode is currently disabled.",
   );

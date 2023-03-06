@@ -37,7 +37,7 @@ export default class Rewind extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if(!options.server.player.isPlaying) {
+    if(!options.server.player.isPlaying){
       message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
     }else{
       options.server.player.rewind();

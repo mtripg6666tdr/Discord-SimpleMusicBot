@@ -72,7 +72,7 @@ export function transformThroughFFmpeg(
   ffmpeg.process.once("exit", () => {
     ffmpeg.emit("close");
   });
-  if(readable.type === "readable") {
+  if(readable.type === "readable"){
     readable.stream
       .on("error", e => destroyStream(ffmpeg, e))
       .pipe(ffmpeg)

@@ -66,7 +66,7 @@ export default class SystemInfo extends BaseCommand {
 
     const embeds = [] as EmbedOptions[];
 
-    if(options.args.includes("basic") || options.args.length === 0) {
+    if(options.args.includes("basic") || options.args.length === 0){
       embeds.push(
         new Helper.MessageEmbedBuilder()
           .setTitle("Discord-SimpleMusicBot")
@@ -94,10 +94,10 @@ export default class SystemInfo extends BaseCommand {
     if(
       Util.general.isBotAdmin(message.member.id) &&
       (options.args.includes("log") || options.args.length === 0)
-    ) {
+    ){
       let logs: string[] = [...Util.logger.logStore.data];
       logs.reverse();
-      for(let i = 0; i < logs.length; i++) {
+      for(let i = 0; i < logs.length; i++){
         if(logs.join("\r\n").length < 1950) break;
         logs = logs.slice(0, -1);
       }
@@ -115,7 +115,7 @@ export default class SystemInfo extends BaseCommand {
     if(
       Util.general.isBotAdmin(message.member.id) &&
       (options.args.includes("servers") || options.args.length === 0)
-    ) {
+    ){
       embeds.push(
         new Helper.MessageEmbedBuilder()
           .setColor(getColor("UPTIME"))
@@ -149,7 +149,7 @@ export default class SystemInfo extends BaseCommand {
       options.args[0] === "server" &&
       options.args[1] &&
       options.client.guilds.has(options.args[1])
-    ) {
+    ){
       const target = options.client.guilds.get(options.args[1]);
       const data = options.bot.getData(options.args[1]);
       embeds.push(
@@ -177,12 +177,12 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(options.args.includes("cpu") || options.args.length === 0) {
+    if(options.args.includes("cpu") || options.args.length === 0){
       // Process CPU Info
       const cpuInfoEmbed = new Helper.MessageEmbedBuilder();
       cpuInfoEmbed.setColor(getColor("UPTIME")).setTitle("CPU Info");
       const cpus = os.cpus();
-      for(let i = 0; i < cpus.length; i++) {
+      for(let i = 0; i < cpus.length; i++){
         const all =
           cpus[i].times.user +
           cpus[i].times.sys +
@@ -228,7 +228,7 @@ export default class SystemInfo extends BaseCommand {
       embeds.push(cpuInfoEmbed.toEris());
     }
 
-    if(options.args.includes("mem") || options.args.length === 0) {
+    if(options.args.includes("mem") || options.args.length === 0){
       // Process Mem Info
       const memory = Util.system.GetMemInfo();
       const nMem = process.memoryUsage();
@@ -280,7 +280,7 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(embeds.length > 0) {
+    if(embeds.length > 0){
       await message.channel.createMessage({ embeds }).catch(e => Util.logger.log(e, "error"));
     }
   }

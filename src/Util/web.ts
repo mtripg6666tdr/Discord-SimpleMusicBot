@@ -90,7 +90,7 @@ export function RetriveLengthSeconds(url: string) {
     }).on("exit", () => {
       if(data.length === 0) reject("zero");
       const match = data.match(/Duration: (?<length>(\d+:)*\d+(\.\d+)?),/i);
-      if(match) {
+      if(match){
         const lengthSec = match.groups.length
           .split(":")
           .map(n => Number(n))

@@ -31,7 +31,7 @@ export abstract class SearchBase<T> extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
     options.server.joinVoiceChannel(message);
-    if(this.urlCheck(options.rawArgs)) {
+    if(this.urlCheck(options.rawArgs)){
       await options.server.playFromURL(
         message,
         options.args as string[],
@@ -39,7 +39,7 @@ export abstract class SearchBase<T> extends BaseCommand {
       );
       return;
     }
-    if(options.server.hasSearchPanel(message.member.id)) {
+    if(options.server.hasSearchPanel(message.member.id)){
       const responseMessage = await message
         .reply({
           content: "✘既に開かれている検索窓があります",
@@ -55,7 +55,7 @@ export abstract class SearchBase<T> extends BaseCommand {
           ],
         })
         .catch(e => Util.logger.log(e, "error"));
-      if(responseMessage) {
+      if(responseMessage){
         options.server.getSearchPanel(message.member.id).once("destroy", () => {
           responseMessage.edit({
             components: [],
@@ -64,14 +64,14 @@ export abstract class SearchBase<T> extends BaseCommand {
       }
       return;
     }
-    if(options.rawArgs !== "") {
+    if(options.rawArgs !== ""){
       const searchPanel = options.server.createSearchPanel(message, options.rawArgs);
       if(!searchPanel) return;
       const result = await searchPanel.consumeSearchResult(
         this.searchContent(options.rawArgs),
         this.consumer,
       );
-      if(result) {
+      if(result){
         options.server.bindSearchPanel(searchPanel);
       }
     }else{

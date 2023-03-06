@@ -63,9 +63,9 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
    * BGM設定が存在する場合に、BGM設定を完了します
    */
   async initBgmTracks() {
-    if(this.bgmConfig) {
+    if(this.bgmConfig){
       const { items } = this.bgmConfig;
-      for(let i = 0; i < items.length; i++) {
+      for(let i = 0; i < items.length; i++){
         await this.queue.addQueue(
           items[i],
           {
@@ -88,7 +88,7 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
 
   playBgmTracks() {
     if(!this.bgmConfig) throw new Error("no bgm configuration found!");
-    if(!this.bgmConfig.enableQueueLoop) {
+    if(!this.bgmConfig.enableQueueLoop){
       this.queue.resetBgmTracks();
     }
     return this._joinVoiceChannel(this.bgmConfig.voiceChannelId)

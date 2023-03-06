@@ -78,11 +78,11 @@ class _timerStore {
   }
 
   end(key: string, logger?: (content: string) => void) {
-    if(this.timers.get(key)) {
+    if(this.timers.get(key)){
       const content = `[TimeLogger] Elapsed ${
         Math.floor((performance.now() - this.timers.get(key)) * 100) / 100
       }ms. (${key})`;
-      if(logger) {
+      if(logger){
         logger(content);
       }else{
         log(content);

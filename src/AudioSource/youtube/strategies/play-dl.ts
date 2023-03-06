@@ -72,7 +72,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
       info: this.mapToExportable(url, info),
       relatedVideos: null as exportableYouTube[],
     };
-    if(info.LiveStreamData.isLive) {
+    if(info.LiveStreamData.isLive){
       return {
         ...partialResult,
         stream: {

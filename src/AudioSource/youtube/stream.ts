@@ -33,7 +33,7 @@ export function createChunkedYTStream(
   const stream = Util.general.createPassThrough();
   let current = -1;
   const contentLength = Number(format.contentLength);
-  if(contentLength < chunkSize) {
+  if(contentLength < chunkSize){
     ytdl
       .downloadFromInfo(info, { format, ...options })
       .on("error", er => (!stream.destroyed ? stream.destroy(er) : stream.emit("error", er)))
@@ -56,7 +56,7 @@ export function createChunkedYTStream(
       nextStream
         .on("error", er => (!stream.destroyed ? stream.destroy(er) : stream.emit("error", er)))
         .pipe(stream, { end: end === undefined });
-      if(end !== undefined) {
+      if(end !== undefined){
         nextStream.on("end", () => {
           pipeNextStream();
         });
@@ -95,7 +95,7 @@ export function createRefreshableYTLiveStream(
 
   // start to download the live stream from the provided information (info object or url string)
   const downloadLiveStream = async (targetInfo: ytdl.videoInfo | string) => {
-    if(typeof targetInfo === "string") {
+    if(typeof targetInfo === "string"){
       targetInfo = await ytdl.getInfo(targetInfo);
       options.format = ytdl.chooseFormat(targetInfo.formats, {
         isHLS: true,
@@ -115,7 +115,7 @@ export function createRefreshableYTLiveStream(
   // handle errors occurred by the current live stream
   const onError = (er: Error) => {
     console.error(er);
-    if(er.message === "ENOTFOUND") {
+    if(er.message === "ENOTFOUND"){
       refreshStream();
     }else{
       destroyCurrentStream(er);
@@ -152,7 +152,7 @@ export function createRefreshableYTLiveStream(
       });
       if(Util.config.debug) Util.logger.log("piped new stream", "debug");
       refreshing = false;
-    } catch(e) {
+    } catch(e){
       stream.destroy(e);
     }
   };

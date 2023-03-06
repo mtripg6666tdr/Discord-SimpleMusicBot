@@ -214,6 +214,11 @@
     "prefer-numeric-literals": "warn",
     "prefer-rest-params": "warn",
     "prefer-spread": "warn",
+    "space-before-blocks": ["warn", {
+      "functions": "off",
+      "keywords": "never",
+      "classes": "off" 
+    }],
 
     // superseded by @typescript-eslint
     "semi": "off",

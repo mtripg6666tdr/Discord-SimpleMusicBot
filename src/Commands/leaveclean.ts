@@ -38,11 +38,11 @@ export default class LeaveClean extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if(!options.server.player.isConnecting) {
+    if(!options.server.player.isConnecting){
       options.server.queue.removeAll();
       message.reply("✅すべて削除しました").catch(e => Util.logger.log(e, "error"));
       return;
-    }else if(options.server.queue.length === 0) {
+    }else if(options.server.queue.length === 0){
       message.reply("キューが空です").catch(e => Util.logger.log(e, "error"));
       return;
     }

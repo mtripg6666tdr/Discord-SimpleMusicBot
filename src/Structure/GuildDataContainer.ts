@@ -104,12 +104,12 @@ export class GuildDataContainer extends LogEmitter {
     super();
     this.setTag("GuildDataContainer");
     this.setGuildId(guildid);
-    if(!guildid) {
+    if(!guildid){
       throw new Error("invalid guild id was given");
     }
     this._searchPanels = new Map<string, SearchPanel>();
     this.boundTextChannel = boundchannelid;
-    if(!this.boundTextChannel) {
+    if(!this.boundTextChannel){
       throw new Error("invalid bound textchannel id was given");
     }
     this.bot = bot;
@@ -145,7 +145,7 @@ export class GuildDataContainer extends LogEmitter {
    * @param message 更新元となるメッセージ
    */
   updateBoundChannel(message: CommandMessage | string) {
-    if(typeof message === "string") {
+    if(typeof message === "string"){
       this.boundTextChannel = message;
       return;
     }
@@ -156,7 +156,7 @@ export class GuildDataContainer extends LogEmitter {
           this.bot.client.getChannel(message.member.voiceState.channelID) as VoiceChannel
         ).voiceMembers.has(this.bot.client.user.id)) ||
       message.content.includes("join")
-    ) {
+    ){
       if(message.content !== this.prefix) this.boundTextChannel = message.channelId;
     }
   }
@@ -181,9 +181,9 @@ export class GuildDataContainer extends LogEmitter {
    * @returns 成功したかどうか
    */
   async importQueue(exportedQueue: YmxFormat) {
-    if(exportedQueue.version === YmxVersion) {
+    if(exportedQueue.version === YmxVersion){
       const { data } = exportedQueue;
-      for(let i = 0; i < data.length; i++) {
+      for(let i = 0; i < data.length; i++){
         const item = data[i];
         await this.queue.addQueue(item.url, item.addBy, "push", "unknown", item);
       }
@@ -221,7 +221,7 @@ export class GuildDataContainer extends LogEmitter {
     this.addRelated = statuses.addRelatedSongs;
     this.equallyPlayback = statuses.equallyPlayback;
     this.player.setVolume(statuses.volume);
-    if(statuses.voiceChannelId !== "0") {
+    if(statuses.voiceChannelId !== "0"){
       this._joinVoiceChannel(statuses.voiceChannelId)
         .then(() => this.player.play())
         .catch(er => this.Log(er, "warn"));
@@ -233,7 +233,7 @@ export class GuildDataContainer extends LogEmitter {
    * @param cancellation キャンセルマネージャー
    */
   bindCancellation(cancellation: TaskCancellationManager) {
-    if(!this.cancellations.includes(cancellation)) {
+    if(!this.cancellations.includes(cancellation)){
       this._cancellations.push(cancellation);
     }
     return cancellation;
@@ -278,7 +278,7 @@ export class GuildDataContainer extends LogEmitter {
       .on("end", this.player.onStreamFinishedBindThis)
       .on("pong", ping => (this.vcPing = ping));
     this.connection = connection;
-    if(Util.config.debug) {
+    if(Util.config.debug){
       connection.on("debug", mes => this.Log("[Connection] " + mes, "debug"));
     }
     this.Log(`Connected to ${channelId}`);
@@ -299,20 +299,20 @@ export class GuildDataContainer extends LogEmitter {
     return lock(this.joinVoiceChannelLocker, async () => {
       const t = Util.time.timer.start("MusicBot#Join");
       try{
-        if(message.member.voiceState.channelID) {
+        if(message.member.voiceState.channelID){
           const targetVC = this.bot.client.getChannel(
             message.member.voiceState.channelID,
           ) as VoiceChannel;
           // すでにそのにVC入ってるよ～
-          if(targetVC.voiceMembers.has(this.bot.client.user.id)) {
-            if(this.connection) {
+          if(targetVC.voiceMembers.has(this.bot.client.user.id)){
+            if(this.connection){
               return true;
             }
             // すでになにかしらのVCに参加している場合
-          }else if(this.connection && !message.member.permissions.has("voiceMoveMembers")) {
+          }else if(this.connection && !message.member.permissions.has("voiceMoveMembers")){
             const failedMsg =
               ":warning:既にほかのボイスチャンネルに接続中です。この操作を実行する権限がありません。";
-            if(reply || replyOnFail) {
+            if(reply || replyOnFail){
               await message.reply(failedMsg).catch(er => this.Log(er, "error"));
             }else{
               await message.channel.createMessage(failedMsg).catch(er => this.Log(er, "error"));
@@ -322,7 +322,7 @@ export class GuildDataContainer extends LogEmitter {
 
           // 入ってないね～参加しよう
           const msg = await ((mes: string) => {
-            if(reply) {
+            if(reply){
               return message.reply(mes);
             }else{
               return message.channel.createMessage(mes);
@@ -334,12 +334,12 @@ export class GuildDataContainer extends LogEmitter {
             await this._joinVoiceChannel(targetVC.id);
             await msg.edit(`:+1:ボイスチャンネル:speaker:\`${targetVC.name}\`に接続しました!`);
             return true;
-          } catch(e) {
+          } catch(e){
             Util.logger.log(e, "error");
             const failedMsg =
               "😑接続に失敗しました…もう一度お試しください: " +
               (typeof e === "object" && "message" in e ? `${e.message}` : e);
-            if(!reply && replyOnFail) {
+            if(!reply && replyOnFail){
               await msg.delete().catch(er => this.Log(er, "error"));
               await message.reply(failedMsg).catch(er => this.Log(er, "error"));
             }else{
@@ -351,7 +351,7 @@ export class GuildDataContainer extends LogEmitter {
         }else{
           // あらメッセージの送信者さんはボイチャ入ってないん…
           const msg = "ボイスチャンネルに参加してからコマンドを送信してください:relieved:";
-          if(reply || replyOnFail) {
+          if(reply || replyOnFail){
             await message.reply(msg).catch(e => this.Log(e, "error"));
           }else{
             await message.channel.createMessage(msg).catch(e => this.Log(e, "error"));
@@ -374,14 +374,14 @@ export class GuildDataContainer extends LogEmitter {
     first: boolean = true,
     cancellable: boolean = false,
   ) {
-    if(Array.isArray(rawArg)) {
+    if(Array.isArray(rawArg)){
       const [firstUrl, ...restUrls] = rawArg
         .flatMap(fragment => Util.string.NormalizeText(fragment).split(" "))
         .filter(url => url.startsWith("http"));
-      if(firstUrl) {
+      if(firstUrl){
         await this.playFromURL(message, firstUrl, first, false);
-        if(restUrls) {
-          for(let i = 0; i < restUrls.length; i++) {
+        if(restUrls){
+          for(let i = 0; i < restUrls.length; i++){
             await this.queue.autoAddQueue(
               restUrls[i],
               message.member,
@@ -409,7 +409,7 @@ export class GuildDataContainer extends LogEmitter {
       rawArg.match(
         /^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/,
       )
-    ) {
+    ){
       // Discordメッセへのリンクならば
       const smsg = await message.reply("🔍メッセージを取得しています...");
       try{
@@ -436,7 +436,7 @@ export class GuildDataContainer extends LogEmitter {
         );
         await this.player.play();
         return;
-      } catch(e) {
+      } catch(e){
         Util.logger.log(e, "error");
         await smsg
           .edit(
@@ -444,7 +444,7 @@ export class GuildDataContainer extends LogEmitter {
           )
           .catch(er => this.Log(er, "error"));
       }
-    }else if(!Util.general.isDisabledSource("custom") && Util.fs.isAvailableRawAudioURL(rawArg)) {
+    }else if(!Util.general.isDisabledSource("custom") && Util.fs.isAvailableRawAudioURL(rawArg)){
       // オーディオファイルへの直リンク？
       await this.queue.autoAddQueue(
         rawArg,
@@ -461,7 +461,7 @@ export class GuildDataContainer extends LogEmitter {
       !rawArg.includes("v=") &&
       !rawArg.includes("/channel/") &&
       ytpl.validateID(rawArg)
-    ) {
+    ){
       //違うならYouTubeプレイリストの直リンクか？
       const msg = await message.reply(
         ":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。",
@@ -493,7 +493,7 @@ export class GuildDataContainer extends LogEmitter {
               title: c.title,
             } as exportableCustom),
         );
-        if(cancellation.Cancelled) {
+        if(cancellation.Cancelled){
           await msg.edit("✅キャンセルされました。");
         }else{
           const embed = new Helper.MessageEmbedBuilder()
@@ -504,7 +504,7 @@ export class GuildDataContainer extends LogEmitter {
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({ content: "", embeds: [embed.toEris()] });
         }
-      } catch(e) {
+      } catch(e){
         Util.logger.log(e, "error");
         await msg
           .edit(
@@ -518,7 +518,7 @@ export class GuildDataContainer extends LogEmitter {
     }else if(
       !Util.general.isDisabledSource("soundcloud") &&
       SoundCloudS.validatePlaylistUrl(rawArg)
-    ) {
+    ){
       const msg = await message.reply(
         ":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。",
       );
@@ -546,7 +546,7 @@ export class GuildDataContainer extends LogEmitter {
             } as exportableCustom;
           },
         );
-        if(cancellation.Cancelled) {
+        if(cancellation.Cancelled){
           await msg.edit("✅キャンセルされました。");
         }else{
           const embed = new Helper.MessageEmbedBuilder()
@@ -558,7 +558,7 @@ export class GuildDataContainer extends LogEmitter {
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({ content: "", embeds: [embed.toEris()] });
         }
-      } catch(e) {
+      } catch(e){
         Util.logger.log(e, "error");
         await msg
           .edit(
@@ -573,7 +573,7 @@ export class GuildDataContainer extends LogEmitter {
       !Util.general.isDisabledSource("spotify") &&
       Spotify.validatePlaylistUrl(rawArg) &&
       Spotify.available
-    ) {
+    ){
       const msg = await message.reply(
         ":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。",
       );
@@ -598,7 +598,7 @@ export class GuildDataContainer extends LogEmitter {
             } as exportableSpotify;
           },
         );
-        if(cancellation.Cancelled) {
+        if(cancellation.Cancelled){
           await msg.edit("✅キャンセルされました。");
         }else{
           const embed = new Helper.MessageEmbedBuilder()
@@ -616,7 +616,7 @@ export class GuildDataContainer extends LogEmitter {
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({ content: "", embeds: [embed.toEris()] });
         }
-      } catch(e) {
+      } catch(e){
         Util.logger.log(e, "error");
         await msg
           .edit(
@@ -642,7 +642,7 @@ export class GuildDataContainer extends LogEmitter {
         );
         if(success) this.player.play();
         return;
-      } catch(er) {
+      } catch(er){
         this.Log(er, "error");
         // なに指定したし…
         await message
@@ -667,14 +667,14 @@ export class GuildDataContainer extends LogEmitter {
     const pmatch = (member.nick || member.username).match(
       /^(\[(?<prefix0>[a-zA-Z!?_-]+)\]|【(?<prefix1>[a-zA-Z!?_-]+)】)/,
     );
-    if(pmatch) {
-      if(this.prefix !== (pmatch.groups.prefix0 || pmatch.groups.prefix1)) {
+    if(pmatch){
+      if(this.prefix !== (pmatch.groups.prefix0 || pmatch.groups.prefix1)){
         this.prefix = Util.string.NormalizeText(pmatch.groups.prefix0 || pmatch.groups.prefix1);
       }
-    }else if(this.prefix !== Util.config.prefix) {
+    }else if(this.prefix !== Util.config.prefix){
       this.prefix = Util.config.prefix;
     }
-    if(this.prefix !== oldPrefix) {
+    if(this.prefix !== oldPrefix){
       this.Log(`Prefix was set to '${this.prefix}'`);
     }
   }
@@ -701,15 +701,15 @@ export class GuildDataContainer extends LogEmitter {
       /* cancellable */ this.queue.length >= 1,
     );
     // 現在の状態を確認してVCに接続中なら接続試行
-    if(panel.commandMessage.member.voiceState.channelID) {
+    if(panel.commandMessage.member.voiceState.channelID){
       await this.joinVoiceChannel(panel.commandMessage, false, false);
     }
     // 接続中なら再生を開始
-    if(this.player.isConnecting && !this.player.isPlaying) {
+    if(this.player.isConnecting && !this.player.isPlaying){
       this.player.play();
     }
     // 二個目以上を処理
-    for(let i = 0; i < rest.length; i++) {
+    for(let i = 0; i < rest.length; i++){
       await this.queue.autoAddQueue(
         /* url */ rest[i],
         /* added by */ panel.commandMessage.member,
@@ -742,7 +742,7 @@ export class GuildDataContainer extends LogEmitter {
   }
 
   createSearchPanel(_commandMessage: CommandMessage, query: string, isRawTitle: boolean = false) {
-    if(this._searchPanels.size >= 3) {
+    if(this._searchPanels.size >= 3){
       _commandMessage
         .reply(":cry:すでに開いている検索パネルが上限を超えています")
         .catch(er => this.Log(er, "error"));

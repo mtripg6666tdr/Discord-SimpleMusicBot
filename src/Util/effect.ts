@@ -35,7 +35,7 @@ export function getFFmpegEffectArgs(data: GuildDataContainer) {
   if(data.effectPrefs.Reverb) effect.push("aecho=1.0:0.7:20:0.5");
   if(data.effectPrefs.LoudnessEqualization) effect.push("loudnorm");
 
-  if(effect.length >= 1) {
+  if(effect.length >= 1){
     return ["-af", effect.join(",")];
   }else{
     return [];

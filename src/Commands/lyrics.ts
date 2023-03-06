@@ -58,7 +58,7 @@ export default class Lyrics extends BaseCommand {
       const embeds = [] as MessageEmbedBuilder[];
       if(!songInfo.lyric) throw new Error("取得した歌詞が空でした");
       const chunkLength = Math.ceil(songInfo.lyric.length / 4000);
-      for(let i = 0; i < chunkLength; i++) {
+      for(let i = 0; i < chunkLength; i++){
         const partial = songInfo.lyric.substring(4000 * i, 4000 * (i + 1) - 1);
         embeds.push(
           new Helper.MessageEmbedBuilder().setDescription(partial).setColor(getColor("LYRIC")),
@@ -76,7 +76,7 @@ export default class Lyrics extends BaseCommand {
         content: "",
         embeds: embeds.map(embed => embed.toEris()),
       });
-    } catch(e) {
+    } catch(e){
       Util.logger.log(e, "error");
       await msg
         .edit(":confounded:失敗しました。曲名を確認してもう一度試してみてください。")

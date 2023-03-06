@@ -136,7 +136,7 @@ export class PlayManager extends ServerManagerBase {
 
   setVolume(val: number) {
     this._volume = val;
-    if((this.server.connection?.piper as any)?.["volume"]) {
+    if((this.server.connection?.piper as any)?.["volume"]){
       this.server.connection.setVolume(val / 100);
       return true;
     }
@@ -150,7 +150,7 @@ export class PlayManager extends ServerManagerBase {
     this.emit("playCalled", time);
     // 再生できる状態か確認
     const badCondition = this.getIsBadCondition();
-    if(badCondition) {
+    if(badCondition){
       this.Log("Play called but operated nothing", "warn");
       return this;
     }
@@ -159,10 +159,10 @@ export class PlayManager extends ServerManagerBase {
     this.preparing = true;
     let mes: Message = null;
     this._currentAudioInfo = this.server.queue.get(0).basicInfo;
-    if(this.getNoticeNeeded() && !quiet) {
+    if(this.getNoticeNeeded() && !quiet){
       const [min, sec] = Util.time.CalcMinSec(this.currentAudioInfo.LengthSeconds);
       const isLive = this.currentAudioInfo.isYouTube() && this.currentAudioInfo.LiveStream;
-      if(this._currentAudioInfo.isYouTube() && this._currentAudioInfo.availableAfter) {
+      if(this._currentAudioInfo.isYouTube() && this._currentAudioInfo.availableAfter){
         mes = await this.server.bot.client.createMessage(
           this.server.boundTextChannel,
           `:stopwatch: \`${this.currentAudioInfo.Title}\` \`(ライブストリーム)\`の開始を待機中...`,
@@ -185,7 +185,7 @@ export class PlayManager extends ServerManagerBase {
             this.Log(`Retrying after ${waitTime}ms`);
             timeout = setTimeout(async () => {
               if(waitTarget !== this._currentAudioInfo) return;
-              if(this._currentAudioInfo.isYouTube()) {
+              if(this._currentAudioInfo.isYouTube()){
                 this._currentAudioInfo.disableCache();
                 await this._currentAudioInfo.init(this._currentAudioInfo.Url, null);
               }
@@ -194,7 +194,7 @@ export class PlayManager extends ServerManagerBase {
           };
           checkForLive();
         });
-        if(!this.waitForLive) {
+        if(!this.waitForLive){
           await mes.edit(":white_check_mark: 待機をキャンセルしました");
           return this;
         }
@@ -214,7 +214,7 @@ export class PlayManager extends ServerManagerBase {
     let connection = this.server.connection;
     this.csvLog = [];
     const filename = `stream-${Date.now()}.csv`;
-    if(this.detailedLog) {
+    if(this.detailedLog){
       this.Log("CSV based detailed log enabled. Be careful of heavy memory usage.", "warn");
       this.Log(`CSV filename will be ${filename}`);
       this.csvLogFilename = filename;
@@ -225,7 +225,7 @@ export class PlayManager extends ServerManagerBase {
         now.getMonth() + 1
       }/${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`;
     };
-    if(this.detailedLog && !fs.existsSync(path.join(__dirname, "../../logs"))) {
+    if(this.detailedLog && !fs.existsSync(path.join(__dirname, "../../logs"))){
       try{
         fs.mkdirSync(path.join(__dirname, "../../logs"));
       } catch{
@@ -254,10 +254,10 @@ export class PlayManager extends ServerManagerBase {
         readable.off("end", onClose);
         log(`total,${getNow()},${i},${total}`);
         const inx = logStreams.findIndex(s => s === readable);
-        if(inx >= 0) {
+        if(inx >= 0){
           logStreams.splice(inx, 1);
           console.log(logStreams);
-          if(logStreams.length === 0 && !logStream.destroyed) {
+          if(logStreams.length === 0 && !logStream.destroyed){
             logStream.destroy();
             this.Log("CSV log saved successfully");
           }
@@ -298,7 +298,7 @@ export class PlayManager extends ServerManagerBase {
         channel.bitrate,
       );
       this._currentAudioStream = stream;
-      if(this.detailedLog) {
+      if(this.detailedLog){
         streams.forEach(setReadableCsvLog);
         stream.pause();
       }
@@ -321,7 +321,7 @@ export class PlayManager extends ServerManagerBase {
           erisStreams.forEach((readable, i) => setReadableCsvLog(readable, i + streams.length));
         const volumeTransformer = erisStreams.find(r => r.constructor.name === "VolumeTransformer");
         volumeTransformer?.on("data", () => {
-          if(volumeTransformer.readableLength < 128 * 1024) {
+          if(volumeTransformer.readableLength < 128 * 1024){
             normalizer.resumeOrigin();
           }else{
             normalizer.pauseOrigin();
@@ -337,7 +337,7 @@ export class PlayManager extends ServerManagerBase {
         u.end();
       }
       this.Log("Play started successfully");
-      if(mes && !quiet) {
+      if(mes && !quiet){
         // 再生開始メッセージ
         const _t = Number(this.currentAudioInfo.LengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
@@ -385,12 +385,12 @@ export class PlayManager extends ServerManagerBase {
                   ")",
             true,
           );
-        if(typeof this.currentAudioInfo.Thumbnail === "string") {
+        if(typeof this.currentAudioInfo.Thumbnail === "string"){
           embed.setThumbnail(this.currentAudioInfo.Thumbnail);
         }else{
           embed.setThumbnail("attachment://thumbnail." + this.currentAudioInfo.Thumbnail.ext);
         }
-        if(this.currentAudioInfo.isYouTube() && this.currentAudioInfo.IsFallbacked) {
+        if(this.currentAudioInfo.isYouTube() && this.currentAudioInfo.IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
         this.emit("playStartUIPrepared", embed);
@@ -420,7 +420,7 @@ export class PlayManager extends ServerManagerBase {
             )
             .toEris(),
         ];
-        if(typeof this.currentAudioInfo.Thumbnail === "string") {
+        if(typeof this.currentAudioInfo.Thumbnail === "string"){
           mes
             .edit({
               content: "",
@@ -455,11 +455,11 @@ export class PlayManager extends ServerManagerBase {
         this.once("handledError", removeControls);
         this.once("stop", removeControls);
       }
-    } catch(e) {
+    } catch(e){
       Util.logger.log(e, "error");
       try{
         const t = typeof e === "string" ? e : Util.general.StringifyObject(e);
-        if(t.includes("429")) {
+        if(t.includes("429")){
           mes
             ?.edit(":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。")
             .catch(er => Util.logger.log(er, "error"));
@@ -471,7 +471,7 @@ export class PlayManager extends ServerManagerBase {
       } catch{
         /* empty */
       }
-      if(mes) {
+      if(mes){
         mes.edit(
           `:tired_face:曲の再生に失敗しました...。${
             e ? `(${typeof e === "object" && "message" in e ? e.message : e})` : ""
@@ -506,7 +506,7 @@ export class PlayManager extends ServerManagerBase {
    */
   stop(): PlayManager {
     this.Log("Stop called");
-    if(this.server.connection) {
+    if(this.server.connection){
       this.server.connection.off("end", this.onStreamFinishedBindThis);
       this.server.connection.stopPlaying();
       this.server.connection.on("end", this.onStreamFinishedBindThis);
@@ -523,7 +523,7 @@ export class PlayManager extends ServerManagerBase {
   disconnect(): PlayManager {
     this.stop();
     this.emit("disconnectAttempt");
-    if(this.isConnecting) {
+    if(this.isConnecting){
       const connection = this.server.connection;
       this.Log("Disconnected from " + connection.channelID);
       connection.disconnect();
@@ -534,7 +534,7 @@ export class PlayManager extends ServerManagerBase {
       this.server.connection = null;
       this.Log("Disconnect called but no connection", "warn");
     }
-    if(typeof global.gc === "function") {
+    if(typeof global.gc === "function"){
       global.gc();
       this.Log("Called exposed gc");
     }
@@ -542,10 +542,10 @@ export class PlayManager extends ServerManagerBase {
   }
 
   destroyStream() {
-    if(this._currentAudioStream) {
+    if(this._currentAudioStream){
       setImmediate(() => {
-        if(this._currentAudioStream) {
-          if(!this._currentAudioStream.destroyed) {
+        if(this._currentAudioStream){
+          if(!this._currentAudioStream.destroyed){
             this._currentAudioStream.destroy();
           }
           this._currentAudioStream = null;
@@ -590,14 +590,14 @@ export class PlayManager extends ServerManagerBase {
   handleError(er: any) {
     Util.logger.log("Error", "error");
     this.emit("handledError", er);
-    if(er) {
+    if(er){
       Util.logger.log(Util.general.StringifyObject(er), "error");
-      if(Util.config.debug) {
+      if(Util.config.debug){
         console.error(er);
       }
     }
-    if(er instanceof Error) {
-      if(er.message.includes("1006")) {
+    if(er instanceof Error){
+      if(er.message.includes("1006")){
         setImmediate(() => {
           this.server._joinVoiceChannel(this.server.connection.channelID).then(() => {
             this._errorReportChannel?.createMessage(
@@ -608,7 +608,7 @@ export class PlayManager extends ServerManagerBase {
           });
         }).unref();
         return;
-      }else if("type" in er && er.type === "workaround") {
+      }else if("type" in er && er.type === "workaround"){
         this.onStreamFailed(/* quiet */ true);
         return;
       }
@@ -626,11 +626,11 @@ export class PlayManager extends ServerManagerBase {
   }
 
   async onStreamFinished() {
-    if(!this.currentAudioUrl) {
+    if(!this.currentAudioUrl){
       return;
     }
     this.Log("onStreamFinished called");
-    if(this.server.connection && this.server.connection.playing) {
+    if(this.server.connection && this.server.connection.playing){
       await Util.general
         .waitForEnteringState(
           () => !this.server.connection || !this.server.connection.playing,
@@ -649,11 +649,11 @@ export class PlayManager extends ServerManagerBase {
     this._errorUrl = "";
     this._cost = 0;
     this.destroyStream();
-    if(this.server.queue.loopEnabled) {
+    if(this.server.queue.loopEnabled){
       // 曲ループオンならばもう一度再生
       this.play();
       return;
-    }else if(this.server.queue.onceLoopEnabled) {
+    }else if(this.server.queue.onceLoopEnabled){
       // ワンスループが有効ならもう一度同じものを再生
       this.server.queue.onceLoopEnabled = false;
       this.play();
@@ -663,7 +663,7 @@ export class PlayManager extends ServerManagerBase {
       await this.server.queue.next();
     }
     // キューがなくなったら接続終了
-    if(this.server.queue.isEmpty) {
+    if(this.server.queue.isEmpty){
       await this.onQueueEmpty();
       // なくなってないなら再生開始！
     }else{
@@ -674,7 +674,7 @@ export class PlayManager extends ServerManagerBase {
   async onQueueEmpty() {
     this.Log("Queue empty");
     this.destroyStream();
-    if(this.server.boundTextChannel) {
+    if(this.server.boundTextChannel){
       await this.server.bot.client
         .createMessage(this.server.boundTextChannel, ":upside_down: キューが空になりました")
         .catch(e => Util.logger.log(e, "error"));
@@ -683,7 +683,7 @@ export class PlayManager extends ServerManagerBase {
       this.off("playCalled", playHandler);
       this.off("disconnectAttempt", playHandler);
       this._finishTimeout = false;
-      if(!this.isPlaying && this.server.boundTextChannel) {
+      if(!this.isPlaying && this.server.boundTextChannel){
         this.server.bot.client
           .createMessage(this.server.boundTextChannel, ":wave:キューが空になったため終了します")
           .catch(e => Util.logger.log(e, "error"));
@@ -703,7 +703,7 @@ export class PlayManager extends ServerManagerBase {
     this.Log("onStreamFailed called");
     this._cost = 0;
     this.destroyStream();
-    if(this._errorUrl === this.currentAudioInfo?.Url && !quiet) {
+    if(this._errorUrl === this.currentAudioInfo?.Url && !quiet){
       this._errorCount++;
     }else{
       this._errorCount = 1;
@@ -713,7 +713,7 @@ export class PlayManager extends ServerManagerBase {
     this.Log(`Play failed, (${this._errorCount}times)`, "warn");
     this.preparing = false;
     this.stop();
-    if(this._errorCount >= this.retryLimit) {
+    if(this._errorCount >= this.retryLimit){
       if(this.server.queue.loopEnabled) this.server.queue.loopEnabled = false;
       if(this.server.queue.length === 1 && this.server.queue.queueLoopEnabled)
         this.server.queue.queueLoopEnabled = false;

@@ -34,7 +34,7 @@ export class SoundCloudS extends AudioSource {
 
   async init(url: string, prefetched?: exportableSoundCloud) {
     this.Url = url;
-    if(prefetched) {
+    if(prefetched){
       this.Title = prefetched.title;
       this.Description = prefetched.description;
       this._lengthSeconds = prefetched.length;

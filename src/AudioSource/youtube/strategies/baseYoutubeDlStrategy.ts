@@ -83,7 +83,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<
       info: this.mapToExportable(url, info),
       relatedVideos: null as exportableYouTube[],
     };
-    if(info.is_live) {
+    if(info.is_live){
       const format = info.formats.filter(f => f.format_id === info.format_id);
       return {
         ...partialResult,
@@ -104,7 +104,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<
           ...format.http_headers,
         },
       });
-      if(forceUrl) {
+      if(forceUrl){
         return {
           ...partialResult,
           stream: {

@@ -49,7 +49,7 @@ export default class Effect extends BaseCommand {
         components: [messageActions],
       });
       setTimeout(() => reply.edit({ components: [] }), 5 * 60 * 1000).unref();
-    } catch(e) {
+    } catch(e){
       Util.logger.log(e, "error");
       message.reply(":cry:エラーが発生しました").catch(er => Util.logger.log(er, "error"));
     }

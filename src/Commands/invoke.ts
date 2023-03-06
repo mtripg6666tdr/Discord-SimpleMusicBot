@@ -47,25 +47,25 @@ export default class Invoke extends BaseCommand {
   }
 
   async run(message: CommandMessage, options: CommandArgs) {
-    if(options.rawArgs.startsWith("sp;") && Util.general.isBotAdmin(message.member.id)) {
+    if(options.rawArgs.startsWith("sp;") && Util.general.isBotAdmin(message.member.id)){
       this.evaluateSpecialCommands(options.rawArgs.substring(3), message, options)
         .then(result => message.reply(result))
         .catch(er => Util.logger.log(er, "error"));
       return;
     }
     const commandInfo = CommandMessage.resolveCommandMessage(options.rawArgs, 0);
-    if(commandInfo.command === "invoke") {
+    if(commandInfo.command === "invoke"){
       await message
         .reply("invokeコマンドをinvokeコマンドで実行することはできません")
         .catch(er => Util.logger.log(er, "error"));
       return;
     }
     const ci = CommandManager.instance.resolve(commandInfo.command);
-    if(ci) {
+    if(ci){
       options.args = commandInfo.options;
       options.rawArgs = commandInfo.rawOptions;
       await ci.checkAndRun(message, options).catch(er => Util.logger.log(er, "error"));
-      if(!message["isMessage"] && !message["_interactionReplied"]) {
+      if(!message["isMessage"] && !message["_interactionReplied"]){
         await message.reply("実行しました").catch(er => Util.logger.log(er, "error"));
       }
     }else{
@@ -80,7 +80,7 @@ export default class Invoke extends BaseCommand {
     message: CommandMessage,
     options: CommandArgs,
   ) {
-    switch(specialCommand) {
+    switch(specialCommand){
       case "cleanupsc":
         await CommandManager.instance.sync(options.client, true);
         break;
@@ -115,7 +115,7 @@ export default class Invoke extends BaseCommand {
           .catch(er => Util.logger.log(er));
         break;
       case "obtaindsl":
-        if(options.server.player.csvLog.length === 0) {
+        if(options.server.player.csvLog.length === 0){
           message
             .reply(
               `データが見つかりません。最後のファイル名: ${

@@ -37,7 +37,7 @@ export default class Mltf extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if(options.server.queue.length <= 2) {
+    if(options.server.queue.length <= 2){
       message
         .reply("キューに3曲以上追加されているときに使用できます。")
         .catch(e => Util.logger.log(e, "error"));

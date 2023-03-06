@@ -25,10 +25,10 @@ import { parseQuery } from "./util";
 http
   .createServer((req, res) => {
     console.log(req.url);
-    if(req.method === "GET" && req.url.startsWith("/?")) {
+    if(req.method === "GET" && req.url.startsWith("/?")){
       const { type, token, guildid } = parseQuery(req.url.substring(2));
-      if(type && token === process.env.TOKEN && guildid) {
-        if(type === "j") {
+      if(type && token === process.env.TOKEN && guildid){
+        if(type === "j"){
           res.writeHead(200, { "Content-Type": "application/json" });
           res.end(
             JSON.stringify({
@@ -36,7 +36,7 @@ http
               data: getStatus(guildid.split(",")),
             }),
           );
-        }else if(type === "queue") {
+        }else if(type === "queue"){
           res.writeHead(200, { "Content-Type": "application/json" });
           res.end(
             JSON.stringify({
@@ -52,7 +52,7 @@ http
         res.writeHead(400);
         res.end();
       }
-    }else if(req.method === "POST" && req.url === "/") {
+    }else if(req.method === "POST" && req.url === "/"){
       const bufs = [] as Buffer[];
       req.on("data", chunk => bufs.push(chunk));
       req.on("end", () => {
@@ -65,7 +65,7 @@ http
           };
           // eslint-disable-next-line @typescript-eslint/no-throw-literal
           if(body.token !== process.env.TOKEN) throw "";
-          if(body.type === "j") {
+          if(body.type === "j"){
             setStatus(JSON.parse(body.data));
             res.writeHead(200);
             res.end(
@@ -73,7 +73,7 @@ http
                 status: 200,
               }),
             );
-          }else if(body.type === "queue") {
+          }else if(body.type === "queue"){
             setQueue(JSON.parse(body.data));
             res.writeHead(200);
             res.end(
@@ -89,7 +89,7 @@ http
               }),
             );
           }
-        } catch(e) {
+        } catch(e){
           res.writeHead(400);
           res.end(
             JSON.stringify({

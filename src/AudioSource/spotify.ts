@@ -51,7 +51,7 @@ export class Spotify extends AudioSource {
 
   override async init(url: string, prefetched: exportableSpotify): Promise<Spotify> {
     if(!Spotify.validateTrackUrl(url)) throw new Error("Invalid url");
-    if(prefetched) {
+    if(prefetched){
       this.Url = prefetched.url;
       this._lengthSeconds = prefetched.length;
       this.Title = prefetched.title;

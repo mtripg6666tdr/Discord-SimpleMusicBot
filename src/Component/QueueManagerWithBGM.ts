@@ -82,7 +82,7 @@ export class QueueManagerWithBgm extends QueueManager {
       !url.startsWith("http://") &&
       !url.startsWith("https://") &&
       fs.existsSync(path.join(__dirname, "../../", url))
-    ) {
+    ){
       const result = {
         basicInfo: await new AudioSource.FsStream().init(url),
         additionalInfo: {
@@ -101,9 +101,9 @@ export class QueueManagerWithBgm extends QueueManager {
   }
 
   override async next() {
-    if(this.isBGM) {
+    if(this.isBGM){
       this.server.player.resetError();
-      if(this.server.bgmConfig.enableQueueLoop) {
+      if(this.server.bgmConfig.enableQueueLoop){
         this._bgmDefault.push(this._bgmDefault[0]);
       }
       this._bgmDefault.shift();

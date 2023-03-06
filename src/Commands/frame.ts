@@ -55,17 +55,17 @@ export default class Frame extends BaseCommand {
     options.server.updateBoundChannel(message);
     const server = options.server;
     // そもそも再生状態じゃないよ...
-    if(!server.player.isConnecting || !server.player.isPlaying) {
+    if(!server.player.isConnecting || !server.player.isPlaying){
       await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const vinfo = server.player.currentAudioInfo;
-    if(!vinfo.isYouTube()) {
+    if(!vinfo.isYouTube()){
       await message
         .reply(":warning:フレームのキャプチャ機能に非対応のソースです。")
         .catch(e => Util.logger.log(e, "error"));
       return;
-    }else if(vinfo["cache"] && vinfo["cache"].type !== ytdlCore) {
+    }else if(vinfo["cache"] && vinfo["cache"].type !== ytdlCore){
       await message
         .reply(":warning:フォールバックしているため、現在この機能を使用できません。")
         .catch(e => Util.logger.log(e, "error"));
@@ -80,11 +80,11 @@ export default class Frame extends BaseCommand {
           .reduce((prev, current) => prev * 60 + current);
       else return NaN;
     })(options.rawArgs);
-    if(options.rawArgs !== "" && vinfo.LiveStream) {
+    if(options.rawArgs !== "" && vinfo.LiveStream){
       await message.channel.createMessage("ライブストリームでは時間指定できません");
       return;
     }
-    if(!vinfo.LiveStream && (isNaN(time) || time > vinfo.LengthSeconds)) {
+    if(!vinfo.LiveStream && (isNaN(time) || time > vinfo.LengthSeconds)){
       await message
         .reply(":warning:時間の指定が正しくありません。")
         .catch(e => Util.logger.log(e, "error"));
@@ -103,7 +103,7 @@ export default class Frame extends BaseCommand {
         content:
           ":white_check_mark:完了!" + (vinfo.LiveStream ? "" : `(${hour}:${min}:${sec}時点)`),
       });
-    } catch(e) {
+    } catch(e){
       Util.logger.log(e, "error");
       await message.channel
         .createMessage(":sob:失敗しました...")

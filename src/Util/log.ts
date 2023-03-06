@@ -31,9 +31,9 @@ class LogStore {
   private destroyed = false;
 
   constructor() {
-    if(config.debug && isMainThread) {
+    if(config.debug && isMainThread){
       const dirPath = "../../logs";
-      if(!fs.existsSync(path.join(__dirname, dirPath))) {
+      if(!fs.existsSync(path.join(__dirname, dirPath))){
         fs.mkdirSync(path.join(__dirname, dirPath));
       }
       this.loggingStream = fs.createWriteStream(
@@ -53,16 +53,16 @@ class LogStore {
   // eslint-disable-next-line @typescript-eslint/no-shadow
   addLog(level: LogLevels, log: string) {
     if(this.destroyed) return;
-    if(level !== "debug") {
+    if(level !== "debug"){
       this._data.push(`${level[0].toUpperCase()}:${log}`);
-      if(this.data.length > this.maxLength) {
+      if(this.data.length > this.maxLength){
         this._data.shift();
       }
     }
-    if(typeof log !== "string") {
+    if(typeof log !== "string"){
       log = StringifyObject(log);
     }
-    if(this.loggingStream && !this.loggingStream.destroyed) {
+    if(this.loggingStream && !this.loggingStream.destroyed){
       this.loggingStream.write(
         Buffer.from(
           `${
@@ -84,7 +84,7 @@ class LogStore {
   destroy() {
     if(!this || this.destroyed) return;
     this.destroyed = true;
-    if(this.loggingStream && !this.loggingStream.destroyed) {
+    if(this.loggingStream && !this.loggingStream.destroyed){
       this.loggingStream.write(
         Buffer.from(
           `INFO  ${new Date().toISOString()} [Logger] detect process exiting, closing stream...`,
@@ -101,7 +101,7 @@ export function log(content: any, level: LogLevels = "log") {
   if(content instanceof Error) console[level](content);
   const text = StringifyObject(content);
   if(!logStore.log && level === "log") return;
-  if(text.length < 200) {
+  if(text.length < 200){
     console[level](text);
   }else{
     console.warn("[Logger] truncated; see log file if in debug mode");

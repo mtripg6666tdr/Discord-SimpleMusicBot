@@ -67,7 +67,7 @@ export class YouTube extends AudioSource {
 
   async init(url: string, prefetched: exportableYouTube, forceCache?: boolean) {
     this.Url = "https://www.youtube.com/watch?v=" + ytdl.getVideoID(url);
-    if(prefetched) {
+    if(prefetched){
       this.importData(prefetched);
     }else{
       const { result, resolved } = await attemptGetInfoForStrategies(this.logger, url);
@@ -83,7 +83,7 @@ export class YouTube extends AudioSource {
         videoDetails.liveBroadcastDetails.startTimestamp &&
         !videoDetails.liveBroadcastDetails.isLiveNow &&
         !videoDetails.liveBroadcastDetails.endTimestamp
-      ) {
+      ){
         this.upcomingTimestamp = videoDetails.liveBroadcastDetails.startTimestamp;
       }else{
         this.upcomingTimestamp = null;

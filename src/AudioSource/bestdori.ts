@@ -43,7 +43,7 @@ export class BestdoriS extends AudioSource {
     this.Type = data.tag;
     this.Thumbnail = BestdoriApi.getThumbnail(this.id, data.jacketImage[0]);
     this.Artist = bestdori.allbandinfo[data.bandId].bandName[0];
-    if(prefetched) {
+    if(prefetched){
       this._lengthSeconds = prefetched.length;
       this.lyricist = prefetched.lyricist;
       this.composer = prefetched.composer;
@@ -133,7 +133,7 @@ export abstract class BestdoriApi {
    */
   static getAudioId(url: string): number {
     const match = url.match(/^https?:\/\/bestdori\.com\/info\/songs\/(?<Id>\d+)(\/.*)?$/);
-    if(match) {
+    if(match){
       return Number(match.groups.Id);
     }else{
       return null;
@@ -141,10 +141,10 @@ export abstract class BestdoriApi {
   }
 
   static async setupData() {
-    if(!bestdori.allbandinfo) {
+    if(!bestdori.allbandinfo){
       bestdori.allbandinfo = JSON.parse(await Util.web.DownloadText(BestdoriAllBandInfoEndPoint));
     }
-    if(!bestdori.allsonginfo) {
+    if(!bestdori.allsonginfo){
       bestdori.allsonginfo = JSON.parse(await Util.web.DownloadText(BestdoriAllSongInfoEndPoint));
     }
   }

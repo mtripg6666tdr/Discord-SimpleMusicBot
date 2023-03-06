@@ -64,7 +64,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
   async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>) {
     this.useLog();
     const info = await (async () => {
-      if(cache && cache.type === "ytdlCore") {
+      if(cache && cache.type === "ytdlCore"){
         this.logger("[AudioSource:youtube] using cache without obtaining");
         return cache.data as ytdl.videoInfo;
       }else{
@@ -116,7 +116,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
         }))
         .filter(v => !v.isLive),
     };
-    if(forceUrl) {
+    if(forceUrl){
       return {
         ...partialResult,
         stream: {
@@ -130,7 +130,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
       if(
         info.videoDetails.liveBroadcastDetails &&
         info.videoDetails.liveBroadcastDetails.isLiveNow
-      ) {
+      ){
         readable = createRefreshableYTLiveStream(info, url, {
           format,
           lang: "ja",

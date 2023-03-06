@@ -65,7 +65,7 @@ export class HttpBackupper extends Backupper {
   }
 
   backup(): Promise<any> | void {
-    if(HttpBackupper.backuppable) {
+    if(HttpBackupper.backuppable){
       return this.backupQueue().then(() => this.backupStatus());
     }
   }
@@ -79,9 +79,9 @@ export class HttpBackupper extends Backupper {
         guildid: id,
         queue: JSON.stringify(this.data.get(id).exportQueue()),
       }));
-      if(queue.length > 0) {
+      if(queue.length > 0){
         this.Log("Backing up modified queue...");
-        if(await this._backupQueueData(queue)) {
+        if(await this._backupQueueData(queue)){
           this._queueModifiedGuilds = [];
         }else{
           this.Log("Something went wrong while backing up queue", "warn");
@@ -89,7 +89,7 @@ export class HttpBackupper extends Backupper {
       }else{
         this.Log("No modified queue found, skipping", "debug");
       }
-    } catch(e) {
+    } catch(e){
       this.Log(e, "error");
     }
   }
@@ -118,7 +118,7 @@ export class HttpBackupper extends Backupper {
         if(
           !this._previousStatuses[container.guildId] ||
           this._previousStatuses[container.guildId] !== currentStatus
-        ) {
+        ){
           speaking.push({
             guildid: container.guildId,
             value: currentStatus,
@@ -126,9 +126,9 @@ export class HttpBackupper extends Backupper {
           currentStatuses[container.guildId] = currentStatus;
         }
       });
-      if(speaking.length > 0) {
+      if(speaking.length > 0){
         this.Log("Backing up modified status..");
-        if(await this._backupStatusData(speaking)) {
+        if(await this._backupStatusData(speaking)){
           this._previousStatuses = currentStatuses;
         }else{
           this.Log("Something went wrong while backing up statuses", "warn");
@@ -136,13 +136,13 @@ export class HttpBackupper extends Backupper {
       }else{
         this.Log("No modified status found, skipping", "debug");
       }
-    } catch(e) {
+    } catch(e){
       this.Log(e, "warn");
     }
   }
 
   async getStatusFromBackup(guildids: string[]) {
-    if(HttpBackupper.backuppable) {
+    if(HttpBackupper.backuppable){
       const t = Util.time.timer.start("GetIsSpeking");
       try{
         const result = await this._requestHttp(
@@ -155,7 +155,7 @@ export class HttpBackupper extends Backupper {
           } as requestBody,
           MIME_JSON,
         );
-        if(result.status === 200) {
+        if(result.status === 200){
           const frozenGuildStatuses = result.data as {
             [guildid: string]: string,
           };
@@ -186,7 +186,7 @@ export class HttpBackupper extends Backupper {
         }else{
           return null;
         }
-      } catch(er) {
+      } catch(er){
         this.Log(er, "error");
         this.Log("Status restoring failed!", "warn");
         return null;
@@ -199,7 +199,7 @@ export class HttpBackupper extends Backupper {
   }
 
   async getQueueDataFromBackup(guildids: string[]) {
-    if(HttpBackupper.backuppable) {
+    if(HttpBackupper.backuppable){
       const t = Util.time.timer.start("GetQueueData");
       try{
         const result = await this._requestHttp(
@@ -212,7 +212,7 @@ export class HttpBackupper extends Backupper {
           } as requestBody,
           MIME_JSON,
         );
-        if(result.status === 200) {
+        if(result.status === 200){
           const frozenQueues = result.data as { [guildid: string]: string };
           const res = new Map<string, YmxFormat>();
           Object.keys(frozenQueues).forEach(key => {
@@ -227,7 +227,7 @@ export class HttpBackupper extends Backupper {
         }else{
           return null;
         }
-      } catch(er) {
+      } catch(er){
         this.Log(er, "error");
         this.Log("Queue restoring failed!", "warn");
         return null;
@@ -243,7 +243,7 @@ export class HttpBackupper extends Backupper {
    * ステータス情報をサーバーへバックアップする
    */
   private async _backupStatusData(data: { guildid: string, value: string }[]) {
-    if(HttpBackupper.backuppable) {
+    if(HttpBackupper.backuppable){
       const t = Util.time.timer.start("backupStatusData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as { [key: string]: string };
@@ -260,12 +260,12 @@ export class HttpBackupper extends Backupper {
           } as requestBody,
           MIME_JSON,
         );
-        if(result.status === 200) {
+        if(result.status === 200){
           return true;
         }else{
           return false;
         }
-      } catch(er) {
+      } catch(er){
         this.Log(er, "error");
         this.Log("Status backup failed!", "warn");
         return false;
@@ -281,7 +281,7 @@ export class HttpBackupper extends Backupper {
    * キューのデータをサーバーへバックアップする
    */
   private async _backupQueueData(data: { guildid: string, queue: string }[]) {
-    if(HttpBackupper.backuppable) {
+    if(HttpBackupper.backuppable){
       const t = Util.time.timer.start("SetQueueData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as { [guildid: string]: string };
@@ -299,7 +299,7 @@ export class HttpBackupper extends Backupper {
           MIME_JSON,
         );
         return result.status === 200;
-      } catch(er) {
+      } catch(er){
         this.Log(er, "error");
         this.Log("Queue backup failed!", "warn");
         return false;
@@ -321,7 +321,7 @@ export class HttpBackupper extends Backupper {
     mimeType?: string,
   ) {
     return new Promise<postResult>((resolve, reject) => {
-      if(method === "GET") {
+      if(method === "GET"){
         url +=
           "?" +
           (Object.keys(data) as (keyof requestBody)[])
@@ -339,7 +339,7 @@ export class HttpBackupper extends Backupper {
         body: method === "POST" ? data : undefined,
       })
         .then(result => {
-          if(typeof result.body === "string") {
+          if(typeof result.body === "string"){
             reject(result.body);
           }else{
             resolve(result.body);

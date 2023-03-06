@@ -37,7 +37,7 @@ export default class OnceLoop extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if(options.server.queue.onceLoopEnabled) {
+    if(options.server.queue.onceLoopEnabled){
       options.server.queue.onceLoopEnabled = false;
       message
         .reply({

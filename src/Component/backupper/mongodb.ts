@@ -126,7 +126,7 @@ export class MongoBackupper extends Backupper {
           upsert: true,
         },
       );
-    } catch(er) {
+    } catch(er){
       this.Log(er, "error");
       this.Log("Something went wrong while backing up status");
     }
@@ -149,7 +149,7 @@ export class MongoBackupper extends Backupper {
           upsert: true,
         },
       );
-    } catch(er) {
+    } catch(er){
       this.Log(er, "error");
       this.Log("Something went wrong while backing up queue");
     }
@@ -161,7 +161,7 @@ export class MongoBackupper extends Backupper {
         () => this.dbConnectionReady || !!this.dbError,
         Infinity,
       );
-    if(this.dbError) {
+    if(this.dbError){
       this.Log("Database connecting failed!!", "warn");
       return null;
     }
@@ -176,7 +176,7 @@ export class MongoBackupper extends Backupper {
         result.set(doc.guildId, doc);
       });
       return result;
-    } catch(er) {
+    } catch(er){
       this.Log(er, "error");
       this.Log("Status restoring failed!", "error");
       return null;
@@ -189,7 +189,7 @@ export class MongoBackupper extends Backupper {
         () => this.dbConnectionReady || !!this.dbError,
         Infinity,
       );
-    if(this.dbError) {
+    if(this.dbError){
       this.Log("Database connecting failed!!", "warn");
       return null;
     }
@@ -204,7 +204,7 @@ export class MongoBackupper extends Backupper {
         result.set(doc.guildId, doc);
       });
       return result;
-    } catch(er) {
+    } catch(er){
       this.Log(er, "error");
       this.Log("Queue restoring failed!", "error");
       return null;

@@ -60,7 +60,7 @@ export class SearchPanel extends EventEmitter {
     protected readonly isRawTitle: boolean = false,
   ) {
     super();
-    if(!_commandMessage) {
+    if(!_commandMessage){
       throw new Error("Invalid arguments passed");
     }
   }
@@ -84,7 +84,7 @@ export class SearchPanel extends EventEmitter {
           ? (waitedPromiseResult as { result: T, transformedQuery: string }).result
           : (waitedPromiseResult as T),
       ).slice(0, 20));
-      if(songResult.length <= 0) {
+      if(songResult.length <= 0){
         await reply.edit(":pensive:見つかりませんでした。");
         return false;
       }
@@ -139,9 +139,9 @@ export class SearchPanel extends EventEmitter {
         ],
       });
       return true;
-    } catch(e) {
+    } catch(e){
       Util.logger.log(e, "error");
-      if(reply) {
+      if(reply){
         reply.edit("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
       }else{
         this._commandMessage

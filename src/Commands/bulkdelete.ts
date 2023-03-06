@@ -50,7 +50,7 @@ export default class BulkDelete extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     const count = Number(options.args[0]);
-    if(isNaN(count)) {
+    if(isNaN(count)){
       message.reply(":warning:指定されたメッセージ数が無効です。");
       return;
     }
@@ -92,9 +92,9 @@ export default class BulkDelete extends BaseCommand {
       );
       await reply.edit(":sparkles:完了!(このメッセージは自動的に消去されます)");
       setTimeout(() => reply.delete().catch(() => {}), 10 * 1000).unref();
-    } catch(er) {
+    } catch(er){
       Util.logger.log(er, "error");
-      if(reply) {
+      if(reply){
         await reply.edit("失敗しました...").catch(e => Util.logger.log(e, "error"));
       }
     }

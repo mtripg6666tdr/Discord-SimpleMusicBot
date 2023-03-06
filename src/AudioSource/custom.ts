@@ -29,7 +29,7 @@ export class CustomStream extends AudioSource {
   Thumbnail: string = DefaultAudioThumbnailURL;
 
   async init(url: string, prefetched: exportableCustom) {
-    if(prefetched) {
+    if(prefetched){
       this.Title = prefetched.title || "カスタムストリーム";
       this.Url = url;
       this._lengthSeconds = prefetched.length;
