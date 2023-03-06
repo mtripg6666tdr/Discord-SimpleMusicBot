@@ -2,5 +2,6 @@
   "trailingComma": "all",
   "quoteProps": "consistent",
   "bracketSpacing": false,
-  "arrowParens": "avoid"
+  "arrowParens": "avoid",
+  "rangeStart": 968
 }
