@@ -79,11 +79,11 @@ export class SearchPanel extends EventEmitter {
         this.query = (
           waitedPromiseResult as { result: T, transformedQuery: string }
         ).transformedQuery;
-      const songResult = (this._options = consumer(
+      const songResult = this._options = consumer(
         "transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string })
           ? (waitedPromiseResult as { result: T, transformedQuery: string }).result
           : (waitedPromiseResult as T),
-      ).slice(0, 20));
+      ).slice(0, 20);
       if(songResult.length <= 0){
         await reply.edit(":pensive:見つかりませんでした。");
         return false;

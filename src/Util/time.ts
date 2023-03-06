@@ -39,7 +39,7 @@ export function CalcMinSec(_t: number) {
  */
 export function CalcHourMinSec(seconds: number) {
   const sec = seconds % 60;
-  const min = ((seconds - sec) / 60) % 60;
+  const min = (seconds - sec) / 60 % 60;
   const hor = ((seconds - sec) / 60 - min) / 60;
   return [hor.toString(), padZero(min.toString(), 2), padZero(sec.toString(), 2)];
 }

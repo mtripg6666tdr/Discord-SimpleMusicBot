@@ -37,13 +37,13 @@ export async function resolve(info: AudioSourceBasicInfo) {
   const { type, url, knownData: gotData, forceCache: cache } = info;
   if(
     !Util.general.isDisabledSource("youtube") &&
-    (type === "youtube" || (type === "unknown" && ytdl.validateURL(url)))
+    (type === "youtube" || type === "unknown" && ytdl.validateURL(url))
   ){
     // youtube
     basicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.exportableYouTube, cache);
   }else if(
     !isDisabledSource("custom") &&
-    (type === "custom" || (type === "unknown" && Util.fs.isAvailableRawAudioURL(url)))
+    (type === "custom" || type === "unknown" && Util.fs.isAvailableRawAudioURL(url))
   ){
     // カスタムストリーム
     basicInfo = await new AudioSource.CustomStream().init(url, info.knownData);

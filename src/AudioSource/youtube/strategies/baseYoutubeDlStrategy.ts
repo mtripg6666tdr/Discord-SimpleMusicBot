@@ -95,7 +95,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<
       };
     }else{
       const formats = info.formats.filter(
-        f => f.format_note === "tiny" || (f.video_ext === "none" && f.abr),
+        f => f.format_note === "tiny" || f.video_ext === "none" && f.abr,
       );
       if(formats.length === 0) throw new Error("no format found!");
       const [format] = formats.sort((fa, fb) => fb.abr - fa.abr);

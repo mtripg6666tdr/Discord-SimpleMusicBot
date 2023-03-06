@@ -31,7 +31,7 @@ export function getStatus(guildids: string[]) {
       : {}
   ) as { [guildid: string]: string };
   const result = {} as { [guildid: string]: string };
-  guildids.forEach(id => (statuses[id] ? (result[id] = statuses[id]) : null));
+  guildids.forEach(id => statuses[id] ? result[id] = statuses[id] : null);
   return result;
 }
 

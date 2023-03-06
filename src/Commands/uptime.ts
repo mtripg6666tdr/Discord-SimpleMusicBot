@@ -54,7 +54,7 @@ export default class Uptime extends BaseCommand {
             message.guild.shard.latency === Infinity ? "-" : message.guild.shard.latency
           }ミリ秒(ボットWebSocket接続取得値)\r\n` +
           `${
-            (options.server.player.isConnecting && options.server.vcPing) || "-"
+            options.server.player.isConnecting && options.server.vcPing || "-"
           }ミリ秒(ボイスチャンネルUDP接続取得値)`,
       )
       .addField("データが保持されているサーバー数", `${options.bot.databaseCount}サーバー`)

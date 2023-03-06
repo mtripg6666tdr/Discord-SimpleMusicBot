@@ -63,11 +63,11 @@ export default class Play extends BaseCommand {
     const wasConnected = server.player.isConnecting;
     // VCに入れない
     if(
-      !(await options.server.joinVoiceChannel(
+      !await options.server.joinVoiceChannel(
         message,
         /* reply */ false,
         /* reply when failed */ true,
-      ))
+      )
     )
       return;
     // 一時停止されてるね

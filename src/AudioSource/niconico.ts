@@ -61,7 +61,7 @@ export class NicoNicoS extends AudioSource {
     const stream = Util.general.createPassThrough();
     const source = (await this.nico.download()) as Readable;
     source
-      .on("error", e => (!stream.destroyed ? stream.destroy(e) : stream.emit("error", e)))
+      .on("error", e => !stream.destroyed ? stream.destroy(e) : stream.emit("error", e))
       .pipe(stream)
       .on("close", () => !source.destroyed && source.destroy?.());
     return {

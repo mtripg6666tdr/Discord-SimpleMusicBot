@@ -61,7 +61,7 @@ export function transformThroughFFmpeg(
   ];
   Util.logger.log(
     "[FFmpeg] Passing arguments: " +
-      args.map(arg => (arg.startsWith("http") ? "<URL>" : arg)).join(" "),
+      args.map(arg => arg.startsWith("http") ? "<URL>" : arg).join(" "),
     "debug",
   );
   const ffmpeg = new FFmpeg({ args });

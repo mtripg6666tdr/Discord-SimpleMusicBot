@@ -53,5 +53,5 @@ export function GetMemInfo(): MemoryUsageInfo {
  * @returns 返還後のメガバイト数
  */
 export function GetMBytes(bytes: number) {
-  return Math.round((bytes / 1024 /*KB*/ / 1024) /*MB*/ * 100) / 100;
+  return Math.round(bytes / 1024 /*KB*/ / 1024 /*MB*/ * 100) / 100;
 }

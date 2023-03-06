@@ -64,7 +64,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
           cacheAvailable ? "using cache without obtaining" : "obtaining info"
         }`,
       );
-      info = cacheAvailable || (await video_info(url));
+      info = cacheAvailable || await video_info(url);
     } finally{
       t.end(this.logger);
     }

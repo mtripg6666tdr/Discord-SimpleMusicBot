@@ -225,8 +225,8 @@ export class QueueManager extends ServerManagerBase {
           }),
           additionalInfo: {
             addedBy: {
-              userId: (addedBy && this.getUserIdFromMember(addedBy)) || "0",
-              displayName: (addedBy && this.getDisplayNameFromMember(addedBy)) || "不明",
+              userId: addedBy && this.getUserIdFromMember(addedBy) || "0",
+              displayName: addedBy && this.getDisplayNameFromMember(addedBy) || "不明",
             },
           },
         } as QueueContent;
@@ -467,8 +467,8 @@ export class QueueManager extends ServerManagerBase {
         if(_result) index++;
         if(
           index % 50 === 0 ||
-          (totalCount <= 50 && index % 10 === 0) ||
-          (totalCount <= 10 && index % 4 === 0)
+          totalCount <= 50 && index % 10 === 0 ||
+          totalCount <= 10 && index % 4 === 0
         ){
           await msg.edit(
             `:hourglass_flowing_sand:プレイリスト\`${title}\`を処理しています。お待ちください。${totalCount}曲中${index}曲処理済み。`,

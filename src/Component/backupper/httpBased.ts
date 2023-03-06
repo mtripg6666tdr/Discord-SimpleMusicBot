@@ -247,7 +247,7 @@ export class HttpBackupper extends Backupper {
       const t = Util.time.timer.start("backupStatusData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as { [key: string]: string };
-      data.forEach(d => (rawData[d.guildid] = d.value));
+      data.forEach(d => rawData[d.guildid] = d.value);
       try{
         const result = await this._requestHttp(
           "POST",
@@ -285,7 +285,7 @@ export class HttpBackupper extends Backupper {
       const t = Util.time.timer.start("SetQueueData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as { [guildid: string]: string };
-      data.forEach(d => (rawData[d.guildid] = encodeURIComponent(d.queue)));
+      data.forEach(d => rawData[d.guildid] = encodeURIComponent(d.queue));
       try{
         const result = await this._requestHttp(
           "POST",

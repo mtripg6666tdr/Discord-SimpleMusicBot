@@ -151,10 +151,10 @@ export class GuildDataContainer extends LogEmitter {
     }
     if(
       !this.player.isConnecting ||
-      (message.member.voiceState.channelID &&
+      message.member.voiceState.channelID &&
         (
           this.bot.client.getChannel(message.member.voiceState.channelID) as VoiceChannel
-        ).voiceMembers.has(this.bot.client.user.id)) ||
+        ).voiceMembers.has(this.bot.client.user.id) ||
       message.content.includes("join")
     ){
       if(message.content !== this.prefix) this.boundTextChannel = message.channelId;
@@ -276,7 +276,7 @@ export class GuildDataContainer extends LogEmitter {
         this.player.handleError(err);
       })
       .on("end", this.player.onStreamFinishedBindThis)
-      .on("pong", ping => (this.vcPing = ping));
+      .on("pong", ping => this.vcPing = ping);
     this.connection = connection;
     if(Util.config.debug){
       connection.on("debug", mes => this.Log("[Connection] " + mes, "debug"));

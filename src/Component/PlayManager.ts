@@ -267,7 +267,7 @@ export class PlayManager extends ServerManagerBase {
         // @ts-expect-error 7053
         const dataPackets: Buffer[] = connection.piper["_dataPackets"];
         log(
-          `flow,${getNow()},${i},${(total += chunk.length)},${chunk.length},${
+          `flow,${getNow()},${i},${total += chunk.length},${chunk.length},${
             dataPackets?.reduce((a, b) => a + b.length, 0) || ""
           }`,
         );

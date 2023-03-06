@@ -62,7 +62,7 @@ export default class NowPlaying extends BaseCommand {
     const info = options.server.player.currentAudioInfo;
     let progressBar = "";
     if(_t > 0){
-      const progress = Math.floor((_s / _t) * 20);
+      const progress = Math.floor(_s / _t * 20);
       for(let i = 1; i < progress; i++){
         progressBar += "=";
       }

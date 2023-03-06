@@ -44,7 +44,7 @@ export class PlayManagerWithBgm extends PlayManager {
   override async play(time?: number, bgm: boolean = false) {
     if(this.server instanceof GuildDataContainerWithBgm){
       if(
-        ((this.server.queue.isBGM && !bgm) || (!this.server.queue.isBgmEmpty && bgm)) &&
+        (this.server.queue.isBGM && !bgm || !this.server.queue.isBgmEmpty && bgm) &&
         this.server.connection?.playing
       ){
         this.stop();
@@ -62,7 +62,7 @@ export class PlayManagerWithBgm extends PlayManager {
       // なにかしら再生中
       this.isPlaying ||
       // キューが空
-      (this.server.queue.isEmpty && (!bgm || this.server.queue.isBgmEmpty)) ||
+      this.server.queue.isEmpty && (!bgm || this.server.queue.isBgmEmpty) ||
       // 準備中
       this.preparing
     );

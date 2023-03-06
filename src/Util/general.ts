@@ -182,7 +182,7 @@ export function generateUUID() {
     // ref: https://www.30secondsofcode.org/js/s/uuid-generator-node
     return UUID_TEMPLATE.replace(/[018]/g, c => {
       const cn = Number(c);
-      return (cn ^ (crypto.randomBytes(1)[0] & (15 >> (cn / 4)))).toString(16);
+      return (cn ^ crypto.randomBytes(1)[0] & 15 >> cn / 4).toString(16);
     });
   }
 }

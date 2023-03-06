@@ -203,9 +203,9 @@ export class MusicBot extends MusicBotBase {
       if(
         // BGM構成が存在するサーバー
         server instanceof GuildDataContainerWithBgm && // いまBGM再生中
-        ((server.queue.isBGM &&
+        (server.queue.isBGM &&
           // キューの編集を許可していない、またはBGM優先モード
-          (!server.bgmConfig.allowEditQueue || server.bgmConfig.mode === "prior")) ||
+          (!server.bgmConfig.allowEditQueue || server.bgmConfig.mode === "prior") ||
           // BGMが再生していなければ、BGMオンリーモードであれば
           server.bgmConfig.mode === "only") &&
         // かつBGM構成で制限があるときに実行できないコマンドならば
@@ -316,9 +316,9 @@ export class MusicBot extends MusicBotBase {
         if(
           // BGM構成が存在するサーバー
           server instanceof GuildDataContainerWithBgm && // いまBGM再生中
-          ((server.queue.isBGM &&
+          (server.queue.isBGM &&
             // キューの編集を許可していない、またはBGM優先モード
-            (!server.bgmConfig.allowEditQueue || server.bgmConfig.mode === "prior")) ||
+            (!server.bgmConfig.allowEditQueue || server.bgmConfig.mode === "prior") ||
             // BGMが再生していなければ、BGMオンリーモードであれば
             server.bgmConfig.mode === "only") &&
           // かつBGM構成で制限があるときに実行できないコマンドならば
@@ -553,10 +553,10 @@ export class MusicBot extends MusicBotBase {
       if(
         server instanceof GuildDataContainerWithBgm &&
         newChannel.id === server.bgmConfig.voiceChannelId &&
-        (((!server.connection ||
-          (server.bgmConfig.mode === "prior" &&
-            server.connection.channelID !== server.bgmConfig.voiceChannelId)) &&
-          !server.queue.isBGM) ||
+        ((!server.connection ||
+          server.bgmConfig.mode === "prior" &&
+            server.connection.channelID !== server.bgmConfig.voiceChannelId) &&
+          !server.queue.isBGM ||
           server.player.finishTimeout)
       ){
         // BGMターゲット

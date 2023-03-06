@@ -80,7 +80,7 @@ export class SkipManager extends ServerManagerBase {
     if(!this.inited || this.destroyed) return;
     if(this.agreeUsers.size * 2 >= this.getVoiceMembers().size - 1){
       try{
-        const response = (this.reply = await this.reply.edit(":ok: スキップしています"));
+        const response = this.reply = await this.reply.edit(":ok: スキップしています");
         const title = this.server.queue.get(0).basicInfo.Title;
         this.server.player.stop();
         await this.server.queue.next();

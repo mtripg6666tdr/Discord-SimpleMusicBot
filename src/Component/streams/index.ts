@@ -90,7 +90,7 @@ export function resolveStreamToPlayable(
       }) --(FFmpeg)--> Webm/Opus (cost: 3)`,
     );
     const info =
-      seek > 0 || (streamInfo.type === "url" && streamInfo.url.split("?")[0].endsWith(".m3u8"))
+      seek > 0 || streamInfo.type === "url" && streamInfo.url.split("?")[0].endsWith(".m3u8")
         ? streamInfo
         : convertStreamInfoToReadableStreamInfo(streamInfo);
     const ffmpeg = transformThroughFFmpeg(info, bitrate, effects, seek, "webm");

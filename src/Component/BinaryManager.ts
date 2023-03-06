@@ -92,7 +92,7 @@ export class BinaryManager extends LogEmitter {
           validator: (res): res is GitHubRelease => true,
         },
       );
-      return (this.releaseInfo = body);
+      return this.releaseInfo = body;
     });
   }
 

@@ -37,7 +37,7 @@ export class GoogleDrive extends AudioSource {
     }else{
       this.Title = "Googleドライブストリーム";
       this.Url = url;
-      if((await Util.web.RetriveHttpStatusCode(this.Url)) !== 200)
+      if(await Util.web.RetriveHttpStatusCode(this.Url) !== 200)
         throw new Error("URLがみつかりません");
       try{
         this._lengthSeconds = await Util.web.RetriveLengthSeconds((await this.fetch()).url);

@@ -107,9 +107,9 @@ export class PageToggle {
     for(let i = 0; i < toggles.length; i++){
       if(
         new Date().getTime() - toggles[i].Message.createdTimestamp >= min * 60 * 1000 ||
-        (forceRemovingUnfresh &&
+        forceRemovingUnfresh &&
           toggles[i].IsFreshNecessary &&
-          toggles[i].Message.guild.id === forceRemovingUnfresh)
+          toggles[i].Message.guild.id === forceRemovingUnfresh
       ){
         delIndex.push(i);
       }
