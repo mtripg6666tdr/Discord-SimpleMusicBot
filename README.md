@@ -1,3 +1,6 @@
+> # :warning: このブランチは、v4の開発用ブランチです
+> 開発用に使用されており、このブランチからボットをホストすることは推奨されていません。
+
 # Discord-SimpleMusicBot 
 [![GitHub package.json dynamic](https://img.shields.io/github/package-json/version/mtripg6666tdr/Discord-SimpleMusicBot)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/package.json)
 [![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/mtripg6666tdr/Discord-SimpleMusicBot/eris)](https://github.com/abalabahaha/eris)
