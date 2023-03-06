@@ -1,0 +1,8 @@
+{
+  "label": "インストール＆実行",
+  "position": 3,
+  "link": {
+    "type": "doc",
+    "id": "setup/installation/overview"
+  }
+}
