@@ -178,25 +178,6 @@
     "prefer-rest-params": "warn",
     "prefer-spread": "warn",
 
-    // disabled
-    "brace-style": "off",
-    "dot-notation": "off",
-    "no-duplicate-imports": "off",
-    "object-curly-spacing": "off",
-    "curly": "off",
-    "func-style": "off",
-    "max-depth": "off",
-    "no-console": "off",
-    "no-inline-comments": "off",
-    "no-restricted-syntax": "off",
-    "no-return-assign": "off",
-    "no-warning-comments": "off",
-    "prefer-promise-reject-errors": "off",
-    "prefer-template": "off",
-    "require-await": "off",
-    "spaced-comment": "off",
-    "yoda": "off",
-
     // superseded by @typescript-eslint
     "semi": "off",
     "quotes": "off",
@@ -204,7 +185,6 @@
     "comma-spacing": "off",
     "lines-between-class-members": "off",
     "no-shadow": "off",
-    "comma-dangle": "off",
     "no-dupe-class-members": "off",
     "no-extra-parens": "off",
     "no-invalid-this": "off",
@@ -216,9 +196,7 @@
     "no-array-constructor": "off",
     "no-implied-eval": "off",
     "default-param-last": "off",
-    "init-declarations": "off",
-    "no-extra-semi": "off",
-    "indent": "off"
+    "init-declarations": "off"
   },
   "overrides": [
     {
