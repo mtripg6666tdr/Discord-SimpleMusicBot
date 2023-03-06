@@ -8,7 +8,6 @@ dist
 typings
 *.env
 *.exe
-youtube-dl
 node
 !util/**/node
 *.template.*
