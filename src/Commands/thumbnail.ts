@@ -55,7 +55,7 @@ export default class Thumbnail extends BaseCommand {
     embed.setColor(getColor("THUMB"));
     const userSearchPanel = options.server.getSearchPanel(message.member.id);
     const rawArgNumber = Number(options.rawArgs);
-    if (
+    if(
       options.rawArgs &&
       userSearchPanel &&
       0 < rawArgNumber &&
@@ -66,21 +66,21 @@ export default class Thumbnail extends BaseCommand {
         .setImage(opt.thumbnail)
         .setTitle(opt.title)
         .setDescription("URL: " + opt.url);
-    } else if (
+    }else if(
       !options.rawArgs &&
       options.server.player.isPlaying &&
       options.server.queue.length >= 1
     ) {
       const info = options.server.queue.get(0).basicInfo;
       embed.setTitle(info.Title).setDescription("URL: " + info.Url);
-      if (typeof info.Thumbnail === "string") {
+      if(typeof info.Thumbnail === "string") {
         embed.setImage(info.Thumbnail);
         await message
           .reply({
             embeds: [embed.toEris()],
           })
           .catch(e => Util.logger.log(e, "error"));
-      } else {
+      }else{
         embed.setImage("attachment://thumbnail." + info.Thumbnail.ext);
         await message
           .reply({
@@ -94,7 +94,7 @@ export default class Thumbnail extends BaseCommand {
           })
           .catch(e => Util.logger.log(e, "error"));
       }
-    } else {
+    }else{
       message.reply("✘検索結果が見つかりません").catch(e => Util.logger.log(e, "error"));
       return;
     }

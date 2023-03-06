@@ -51,7 +51,7 @@ export default class Searchq extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if (options.server.queue.length === 0) {
+    if(options.server.queue.length === 0) {
       message.reply("✘キューが空です").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -61,11 +61,11 @@ export default class Searchq extends BaseCommand {
         c.basicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase()) ||
         c.basicInfo.Description.toLowerCase().includes(options.rawArgs.toLowerCase()),
     );
-    if (qsresult.length === 0) {
+    if(qsresult.length === 0) {
       message.reply(":confused:見つかりませんでした").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    if (qsresult.length > 20) qsresult.splice(20);
+    if(qsresult.length > 20) qsresult.splice(20);
     const fields = qsresult.map(c => {
       const index = options.server.queue
         .findIndex(d => d.basicInfo.Title === c.basicInfo.Title)

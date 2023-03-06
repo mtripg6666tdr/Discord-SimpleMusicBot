@@ -35,9 +35,9 @@ export class FsStream extends AudioSource {
   async init(url: string) {
     this.Url = url;
     this.Title = "カスタムストリーム";
-    try {
+    try{
       this._lengthSeconds = await Util.web.RetriveLengthSeconds(url);
-    } catch {
+    } catch{
       /* empty */
     }
     return this;

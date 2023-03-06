@@ -41,9 +41,9 @@ export default class RmDuplicated extends BaseCommand {
     const indexes: number[] = [];
     const itemUrl: string[] = [];
     q.forEach((item, i) => {
-      if (itemUrl.includes(item.basicInfo.Url)) {
+      if(itemUrl.includes(item.basicInfo.Url)) {
         indexes.push(i);
-      } else {
+      }else{
         itemUrl.push(item.basicInfo.Url);
       }
     });
@@ -51,15 +51,15 @@ export default class RmDuplicated extends BaseCommand {
     const actualDeleted = [] as number[];
     const failed = [] as number[];
     let firstItemTitle = null;
-    for (let i = 0; i < dels.length; i++) {
+    for(let i = 0; i < dels.length; i++) {
       const item = q.get(dels[i]);
       q.removeAt(dels[i]);
       actualDeleted.push(dels[i]);
-      if (actualDeleted.length === 1) {
+      if(actualDeleted.length === 1) {
         firstItemTitle = item.basicInfo.Title;
       }
     }
-    if (actualDeleted.length > 0) {
+    if(actualDeleted.length > 0) {
       const title = actualDeleted.length === 1 ? firstItemTitle : null;
       const resultStr = actualDeleted.sort((a, b) => a - b).join(",");
       const failedStr = failed.sort((a, b) => a - b).join(",");
@@ -76,7 +76,7 @@ export default class RmDuplicated extends BaseCommand {
           }`,
         )
         .catch(e => Util.logger.log(e, "error"));
-    } else {
+    }else{
       message.reply("削除できる楽曲がありませんでした。").catch(e => Util.logger.log(e, "error"));
     }
   }

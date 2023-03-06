@@ -29,17 +29,17 @@ export class CustomStream extends AudioSource {
   Thumbnail: string = DefaultAudioThumbnailURL;
 
   async init(url: string, prefetched: exportableCustom) {
-    if (prefetched) {
+    if(prefetched) {
       this.Title = prefetched.title || "カスタムストリーム";
       this.Url = url;
       this._lengthSeconds = prefetched.length;
-    } else {
-      if (!Util.fs.isAvailableRawAudioURL(url)) throw new Error("正しいストリームではありません");
+    }else{
+      if(!Util.fs.isAvailableRawAudioURL(url)) throw new Error("正しいストリームではありません");
       this.Url = url;
       this.Title = this.extractFilename() || "カスタムストリーム";
-      try {
+      try{
         this._lengthSeconds = await Util.web.RetriveLengthSeconds(url);
-      } catch {
+      } catch{
         /* empty */
       }
     }

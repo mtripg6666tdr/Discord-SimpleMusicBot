@@ -37,18 +37,18 @@ export class BestdoriS extends AudioSource {
     this.Url = url;
     await BestdoriApi.setupData();
     this.id = BestdoriApi.getAudioId(url);
-    if (!this.id) throw new Error("Invalid streamable url");
+    if(!this.id) throw new Error("Invalid streamable url");
     const data = bestdori.allsonginfo[this.id];
     this.Title = data.musicTitle[0];
     this.Type = data.tag;
     this.Thumbnail = BestdoriApi.getThumbnail(this.id, data.jacketImage[0]);
     this.Artist = bestdori.allbandinfo[data.bandId].bandName[0];
-    if (prefetched) {
+    if(prefetched) {
       this._lengthSeconds = prefetched.length;
       this.lyricist = prefetched.lyricist;
       this.composer = prefetched.composer;
       this.arranger = prefetched.arranger;
-    } else {
+    }else{
       const detailed = await BestdoriApi.getDetailedInfo(this.id);
       this._lengthSeconds = Math.floor(detailed.length);
       this.lyricist = detailed.lyricist[0];
@@ -133,18 +133,18 @@ export abstract class BestdoriApi {
    */
   static getAudioId(url: string): number {
     const match = url.match(/^https?:\/\/bestdori\.com\/info\/songs\/(?<Id>\d+)(\/.*)?$/);
-    if (match) {
+    if(match) {
       return Number(match.groups.Id);
-    } else {
+    }else{
       return null;
     }
   }
 
   static async setupData() {
-    if (!bestdori.allbandinfo) {
+    if(!bestdori.allbandinfo) {
       bestdori.allbandinfo = JSON.parse(await Util.web.DownloadText(BestdoriAllBandInfoEndPoint));
     }
-    if (!bestdori.allsonginfo) {
+    if(!bestdori.allsonginfo) {
       bestdori.allsonginfo = JSON.parse(await Util.web.DownloadText(BestdoriAllSongInfoEndPoint));
     }
   }

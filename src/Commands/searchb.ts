@@ -35,7 +35,7 @@ export default class Searchb extends SearchBase<string[]> {
     const q = query.toLowerCase();
     return keys.filter(k => {
       const info = bestdori.allsonginfo[Number(k)];
-      if (!info.musicTitle[0]) return false;
+      if(!info.musicTitle[0]) return false;
       return (info.musicTitle[0] + bestdori.allbandinfo[info.bandId].bandName[0])
         .toLowerCase()
         .includes(q);

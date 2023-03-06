@@ -51,7 +51,7 @@ export abstract class LogEmitter extends EventEmitter {
    * @param message メッセージ
    */
   Log(message: any, level?: LogLevels) {
-    if (this._tag === "") throw new Error("Tag has not been specified");
+    if(this._tag === "") throw new Error("Tag has not been specified");
     Util.logger.log(
       `[${this._tag}${this._guildId !== "" ? `/${this._guildId}` : ""}] ${
         typeof message === "string" ? message : Util.general.StringifyObject(message)

@@ -67,9 +67,9 @@ export class YouTube extends AudioSource {
 
   async init(url: string, prefetched: exportableYouTube, forceCache?: boolean) {
     this.Url = "https://www.youtube.com/watch?v=" + ytdl.getVideoID(url);
-    if (prefetched) {
+    if(prefetched) {
       this.importData(prefetched);
-    } else {
+    }else{
       const { result, resolved } = await attemptGetInfoForStrategies(this.logger, url);
 
       // check if fallbacked
@@ -77,7 +77,7 @@ export class YouTube extends AudioSource {
 
       // check if upcoming
       const videoDetails = "videoDetails" in result.cache.data && result.cache.data.videoDetails;
-      if (
+      if(
         videoDetails &&
         videoDetails.liveBroadcastDetails &&
         videoDetails.liveBroadcastDetails.startTimestamp &&
@@ -85,12 +85,12 @@ export class YouTube extends AudioSource {
         !videoDetails.liveBroadcastDetails.endTimestamp
       ) {
         this.upcomingTimestamp = videoDetails.liveBroadcastDetails.startTimestamp;
-      } else {
+      }else{
         this.upcomingTimestamp = null;
       }
 
       // store data as cache if requested
-      if (forceCache) this.cache = result.cache;
+      if(forceCache) this.cache = result.cache;
 
       // import data to the current instance
       this.importData(result.data);
@@ -109,13 +109,13 @@ export class YouTube extends AudioSource {
     // store related videos
     this.relatedVideos = result.relatedVideos;
     this.importData(result.info);
-    if (forceUrl) this.logger("[AudioSource:youtube]Returning a url instead of stream");
+    if(forceUrl) this.logger("[AudioSource:youtube]Returning a url instead of stream");
     return result.stream;
   }
 
   async fetchVideo() {
     let info = (this.cache?.type === ytdlCore && (this.cache.data as ytdl.videoInfo)) || null;
-    if (!info)
+    if(!info)
       info = await (strategies[0] as ytdlCoreStrategy)
         .getInfo(this.Url)
         .then(result => (this.cache = result.cache).data);

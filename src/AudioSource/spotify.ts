@@ -31,10 +31,10 @@ import Util from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
 
 const spotifyUrlInfo = (() => {
-  try {
+  try{
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     return require("spotify-url-info") as typeof import("spotify-url-info");
-  } catch {
+  } catch{
     return null;
   }
 })();
@@ -50,13 +50,13 @@ export class Spotify extends AudioSource {
   Thumbnail: string = null;
 
   override async init(url: string, prefetched: exportableSpotify): Promise<Spotify> {
-    if (!Spotify.validateTrackUrl(url)) throw new Error("Invalid url");
-    if (prefetched) {
+    if(!Spotify.validateTrackUrl(url)) throw new Error("Invalid url");
+    if(prefetched) {
       this.Url = prefetched.url;
       this._lengthSeconds = prefetched.length;
       this.Title = prefetched.title;
       this.artist = prefetched.artist;
-    } else {
+    }else{
       this.Url = url;
       const track = (await client.getData(url)) as Track;
       this._lengthSeconds = Math.floor(track.duration / 1000);
@@ -72,7 +72,7 @@ export class Spotify extends AudioSource {
       .split(",")
       .map(artist => artist.trim())
       .join(" ")}`;
-    if (Util.config.debug)
+    if(Util.config.debug)
       Util.logger.log(
         `Searching the keyword: ${`${this.Title} ${this.artist
           .split(",")
@@ -80,10 +80,10 @@ export class Spotify extends AudioSource {
         "debug",
       );
     const searchResult = await searchYouTube(keyword);
-    if (Util.config.debug) Util.logger.log("Extracting the valid item...");
+    if(Util.config.debug) Util.logger.log("Extracting the valid item...");
     const items = searchResult.items.filter(({ type }) => type === "video") as ytsr.Video[];
     const target = this.extractBestItem(items);
-    if (!target) throw new Error("Not Found");
+    if(!target) throw new Error("Not Found");
     const { result } = await attemptFetchForStrategies(
       Util.logger.log.bind(Util.logger),
       target.url,
@@ -135,8 +135,8 @@ export class Spotify extends AudioSource {
       );
     };
     const validItems = items.filter(validate);
-    if (Util.config.debug) console.log("valid", validItems);
-    if (validItems.length === 0) return items[0];
+    if(Util.config.debug) console.log("valid", validItems);
+    if(validItems.length === 0) return items[0];
     // official channel
     let filtered = validItems.filter(
       item =>
@@ -145,26 +145,26 @@ export class Spotify extends AudioSource {
         item.author.name.endsWith("Topic") ||
         item.author.name.endsWith("トピック"),
     );
-    if (Util.config.debug) console.log("official ch", filtered);
-    if (filtered[0]) return filtered[0];
+    if(Util.config.debug) console.log("official ch", filtered);
+    if(filtered[0]) return filtered[0];
     // official item
     filtered = validItems.filter(
       item => includes(item.title, "official") || includes(item.title, "公式"),
     );
-    if (Util.config.debug) console.log("official item", filtered);
-    if (filtered[0]) return filtered[0];
+    if(Util.config.debug) console.log("official item", filtered);
+    if(filtered[0]) return filtered[0];
     // pv /mv
     filtered = validItems.filter(item => includes(item.title, "pv") || includes(item.title, "mv"));
-    if (Util.config.debug) console.log("PV/MV", filtered);
-    if (filtered[0]) return filtered[0];
+    if(Util.config.debug) console.log("PV/MV", filtered);
+    if(filtered[0]) return filtered[0];
     // no live
     filtered = validItems.filter(
       item => !includes(item.title, "live") && !includes(item.title, "ライブ"),
     );
-    if (Util.config.debug) console.log("no live", filtered);
-    if (filtered[0]) return filtered[0];
+    if(Util.config.debug) console.log("no live", filtered);
+    if(filtered[0]) return filtered[0];
     // other
-    if (validItems[0]) return validItems[0];
+    if(validItems[0]) return validItems[0];
     return items[0];
   }
 

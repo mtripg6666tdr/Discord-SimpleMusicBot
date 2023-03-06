@@ -50,18 +50,18 @@ export default class BulkDelete extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     const count = Number(options.args[0]);
-    if (isNaN(count)) {
+    if(isNaN(count)) {
       message.reply(":warning:指定されたメッセージ数が無効です。");
       return;
     }
     const reply = (await message
       .reply(":mag:取得中...")
       .catch(e => Util.logger.log(e, "error"))) as ResponseMessage;
-    try {
+    try{
       let before = "";
       const messages = [] as Message[];
       let i = 0;
-      do {
+      do{
         const allMsgs = await options.client.getMessages(
           message.channel.id,
           before
@@ -73,7 +73,7 @@ export default class BulkDelete extends BaseCommand {
                 limit: 100,
               },
         );
-        if (allMsgs.length === 0) break;
+        if(allMsgs.length === 0) break;
         const msgs = allMsgs.filter(
           _msg => _msg.author.id === options.client.user.id && _msg.id !== reply.id,
         );
@@ -82,8 +82,8 @@ export default class BulkDelete extends BaseCommand {
         before = allMsgs.at(-1).id;
         i++;
         await reply.edit(`:mag:取得中(${messages.length}件ヒット/取得した${i * 100}件中)...`);
-      } while (messages.length < count && i <= 10);
-      if (messages.length > count) messages.splice(count);
+      } while(messages.length < count && i <= 10);
+      if(messages.length > count) messages.splice(count);
       await reply.edit(messages.length + "件見つかりました。削除を実行します。");
       await options.client.deleteMessages(
         message.channel.id,
@@ -92,9 +92,9 @@ export default class BulkDelete extends BaseCommand {
       );
       await reply.edit(":sparkles:完了!(このメッセージは自動的に消去されます)");
       setTimeout(() => reply.delete().catch(() => {}), 10 * 1000).unref();
-    } catch (er) {
+    } catch(er) {
       Util.logger.log(er, "error");
-      if (reply) {
+      if(reply) {
         await reply.edit("失敗しました...").catch(e => Util.logger.log(e, "error"));
       }
     }

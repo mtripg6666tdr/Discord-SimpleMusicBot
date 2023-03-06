@@ -40,7 +40,7 @@ export default class Bgm extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if (
+    if(
       !(await options.server.joinVoiceChannel(
         message,
         /* reply */ false,
@@ -49,12 +49,12 @@ export default class Bgm extends BaseCommand {
     )
       return;
     const url = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
-    if (options.server.hasSearchPanel(message.member.id)) {
+    if(options.server.hasSearchPanel(message.member.id)) {
       message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
     const searchPanel = options.server.createSearchPanel(message, "プリセットBGM一覧", true);
-    if (!searchPanel) return;
+    if(!searchPanel) return;
     const result = await searchPanel.consumeSearchResult(
       ytpl.default(url, {
         gl: "JP",
@@ -70,7 +70,7 @@ export default class Bgm extends BaseCommand {
           url: item.url,
         })),
     );
-    if (result) {
+    if(result) {
       options.server.bindSearchPanel(searchPanel);
     }
   }

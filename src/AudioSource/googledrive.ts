@@ -30,18 +30,18 @@ export class GoogleDrive extends AudioSource {
   Thumbnail: string = DefaultAudioThumbnailURL;
 
   async init(url: string, prefetched: exportableCustom) {
-    if (prefetched) {
+    if(prefetched) {
       this.Title = prefetched.title || "Googleドライブストリーム";
       this.Url = url;
       this._lengthSeconds = prefetched.length;
-    } else {
+    }else{
       this.Title = "Googleドライブストリーム";
       this.Url = url;
-      if ((await Util.web.RetriveHttpStatusCode(this.Url)) !== 200)
+      if((await Util.web.RetriveHttpStatusCode(this.Url)) !== 200)
         throw new Error("URLがみつかりません");
-      try {
+      try{
         this._lengthSeconds = await Util.web.RetriveLengthSeconds((await this.fetch()).url);
-      } catch {
+      } catch{
         /* empty */
       }
     }

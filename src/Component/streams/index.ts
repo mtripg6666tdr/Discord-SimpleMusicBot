@@ -63,7 +63,7 @@ export function resolveStreamToPlayable(
   bitrate: number,
 ): PlayableStreamInfo {
   const effectEnabled = effects.length !== 0;
-  if (streamInfo.streamType === "webm" && seek <= 0 && !effectEnabled && !volumeTransform) {
+  if(streamInfo.streamType === "webm" && seek <= 0 && !effectEnabled && !volumeTransform) {
     // 1. effect is off, volume is off, stream is webm
     // Webm --(Demuxer)--> Opus
     //                1
@@ -79,7 +79,7 @@ export function resolveStreamToPlayable(
       cost: 1,
       streams: [info.stream],
     };
-  } else if (!volumeTransform) {
+  }else if(!volumeTransform) {
     // 2. volume is off and stream is unknown
     // Unknown --(FFmpeg)--> Webm/Opus or Webm/Vorbis --(Demuxer)--> Opus
     //               2                      1
@@ -109,7 +109,7 @@ export function resolveStreamToPlayable(
         passThrough,
       ].filter(d => d),
     };
-  } else if (
+  }else if(
     (streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") &&
     !effectEnabled &&
     seek <= 0
@@ -149,7 +149,7 @@ export function resolveStreamToPlayable(
       cost: 4.5,
       streams: [rawStream.stream, demuxer, decoder, passThrough],
     };
-  } else {
+  }else{
     // 4. volume is on and stream is unknown
     // Unknown --(FFmpeg)--> PCM --(VolumeTransformer)--> PCM --(Encoder)--> Opus
     //              2                     0.5                      1.5
@@ -182,7 +182,7 @@ export function resolveStreamToPlayable(
 function convertStreamInfoToReadableStreamInfo(
   streamInfo: UrlStreamInfo | ReadableStreamInfo,
 ): ReadableStreamInfo {
-  if (streamInfo.type === "readable") {
+  if(streamInfo.type === "readable") {
     return streamInfo;
   }
   return {
@@ -202,7 +202,7 @@ function convertStreamInfoToReadableStreamInfo(
 }
 
 export function destroyStream(stream: Readable, error?: Error) {
-  if (!stream.destroyed) {
+  if(!stream.destroyed) {
     // if stream._destroy was overwritten, callback might not be called so make sure to be called.
     const originalDestroy = stream._destroy;
     stream._destroy = function (er, callback) {
@@ -210,7 +210,7 @@ export function destroyStream(stream: Readable, error?: Error) {
       callback.apply(this, [er]);
     };
     stream.destroy(error);
-  } else if (error) {
+  }else if(error) {
     stream.emit("error", error);
   }
 }

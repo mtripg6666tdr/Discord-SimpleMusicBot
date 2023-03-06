@@ -101,9 +101,9 @@ export abstract class BaseCommand {
 
   get permissionDescription() {
     const perms = this.requiredPermissionsOr.filter(perm => perm !== "admin");
-    if (perms.length === 0) {
+    if(perms.length === 0) {
       return "なし";
-    } else {
+    }else{
       return `${perms.map(permission => permissionDescriptionParts[permission]).join("、")}${
         perms.length > 1 ? "のいずれか" : ""
       }`;
@@ -115,8 +115,8 @@ export abstract class BaseCommand {
     this._alias = opts.alias;
     this._unlist = opts.unlist;
     this._shouldDefer = opts.shouldDefer;
-    if (!this._unlist) {
-      if (!this.asciiName) throw new Error("Command has not ascii name");
+    if(!this._unlist) {
+      if(!this.asciiName) throw new Error("Command has not ascii name");
       const { description, examples, usage, category, argument, requiredPermissionsOr } =
         opts as ListCommandWithArgumentsInitializeOptions;
       this._description = description;
@@ -130,25 +130,25 @@ export abstract class BaseCommand {
 
   async checkAndRun(message: CommandMessage, options: Readonly<CommandArgs>) {
     const judgeIfPermissionMeeted = (perm: CommandPermission) => {
-      if (perm === "admin") {
+      if(perm === "admin") {
         return Util.eris.user.isPrivileged(message.member);
-      } else if (perm === "dj") {
+      }else if(perm === "dj") {
         return Util.eris.user.isDJ(message.member, options);
-      } else if (perm === "manageGuild") {
+      }else if(perm === "manageGuild") {
         return message.member.permissions.has("manageGuild");
-      } else if (perm === "manageMessages") {
+      }else if(perm === "manageMessages") {
         return message.channel.permissionsOf(message.member).has("manageMessages");
-      } else if (perm === "noConnection") {
+      }else if(perm === "noConnection") {
         return !options.server.player.isConnecting;
-      } else if (perm === "onlyListener") {
+      }else if(perm === "onlyListener") {
         return Util.eris.channel.isOnlyListener(message.member, options);
-      } else if (perm === "sameVc") {
+      }else if(perm === "sameVc") {
         return Util.eris.channel.sameVC(message.member, options);
-      } else {
+      }else{
         return false;
       }
     };
-    if (
+    if(
       this.requiredPermissionsOr.length !== 0 &&
       !this.requiredPermissionsOr.some(judgeIfPermissionMeeted)
     ) {
@@ -162,7 +162,7 @@ export abstract class BaseCommand {
   }
 
   toApplicationCommandStructure() {
-    if (this.unlist) throw new Error("This command cannot be listed due to private command!");
+    if(this.unlist) throw new Error("This command cannot be listed due to private command!");
     const options = this.argument?.map(arg => {
       const erisCommandStruct = {
         type: CommandManager.mapCommandOptionTypeToInteger(arg.type),
@@ -176,20 +176,20 @@ export abstract class BaseCommand {
               value: arg.choices[name],
             })),
       };
-      if (!erisCommandStruct.choices) delete erisCommandStruct.choices;
+      if(!erisCommandStruct.choices) delete erisCommandStruct.choices;
       return erisCommandStruct as
         | ApplicationCommandOptionsString
         | ApplicationCommandOptionsInteger
         | ApplicationCommandOptionsBoolean;
     });
-    if (options && options.length > 0) {
+    if(options && options.length > 0) {
       return {
         type: Constants.ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
         description: this.description,
         options,
       };
-    } else {
+    }else{
       return {
         type: Constants.ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,

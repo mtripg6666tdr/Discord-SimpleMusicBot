@@ -38,11 +38,11 @@ export default class Cancel extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
     const result = options.server.cancelAll();
-    if (result) {
+    if(result) {
       message
         .reply("処理中の処理をすべてキャンセルしています....")
         .catch(e => Util.logger.log(e, "error"));
-    } else {
+    }else{
       message
         .reply("キャンセルできる処理がありませんでした")
         .catch(e => Util.logger.log(e, "error"));

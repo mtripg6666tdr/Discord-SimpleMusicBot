@@ -71,17 +71,17 @@ type jobQueueContent = {
 };
 const jobQueue = worker && new Map<string, jobQueueContent>();
 
-if (worker) {
+if(worker) {
   worker.unref();
   worker.on("message", (message: WithId<workerMessage>) => {
-    if (message.type === "log") {
+    if(message.type === "log") {
       Util.logger.log(message.data, message.level);
-    } else if (jobQueue.has(message.id)) {
+    }else if(jobQueue.has(message.id)) {
       const { callback, start } = jobQueue.get(message.id);
       Util.logger.log(`[Spawner] Job(${message.id}) Finished (${Date.now() - start}ms)`);
       callback(message);
       jobQueue.delete(message.id);
-    } else {
+    }else{
       Util.logger.log(`[Spawner] Invalid message received: ${message}`, "warn");
     }
   });
@@ -109,9 +109,9 @@ function doJob(message: spawnerJobMessage): Promise<workerSuccessMessage> {
         jobQueue.set(uuid, {
           start: Date.now(),
           callback: result => {
-            if (result.type === "error") {
+            if(result.type === "error") {
               reject(result.data);
-            } else {
+            }else{
               resolve(result as workerSuccessMessage);
             }
           },

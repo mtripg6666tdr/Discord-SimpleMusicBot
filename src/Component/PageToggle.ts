@@ -74,10 +74,10 @@ export class PageToggle {
   ): Promise<PageToggle> {
     const n = new PageToggle();
     n._embeds = embeds;
-    if (total) {
+    if(total) {
       n._total = total;
     }
-    if (current) {
+    if(current) {
       n._current = current;
     }
     const apply: CommandMessage["reply"] | ResponseMessage["edit"] =
@@ -104,8 +104,8 @@ export class PageToggle {
 
   static organize(toggles: PageToggle[], min: number, forceRemovingUnfresh: string = null) {
     const delIndex = [] as number[];
-    for (let i = 0; i < toggles.length; i++) {
-      if (
+    for(let i = 0; i < toggles.length; i++) {
+      if(
         new Date().getTime() - toggles[i].Message.createdTimestamp >= min * 60 * 1000 ||
         (forceRemovingUnfresh &&
           toggles[i].IsFreshNecessary &&
@@ -126,12 +126,12 @@ export class PageToggle {
   async flipPage(page: number, interaction?: ComponentInteraction) {
     this._current = page;
     const embed = await this.getEmbed(page);
-    if (interaction) {
+    if(interaction) {
       await interaction.editOriginalMessage({
         content: this.Message.content,
         embeds: [embed],
       });
-    } else {
+    }else{
       await this.Message.edit({
         content: this.Message.content,
         embeds: [embed],
@@ -140,9 +140,9 @@ export class PageToggle {
   }
 
   protected getEmbed(page: number) {
-    if (Array.isArray(this._embeds)) {
+    if(Array.isArray(this._embeds)) {
       return this._embeds[page];
-    } else if (typeof this._embeds === "function") {
+    }else if(typeof this._embeds === "function") {
       return this._embeds(page);
     }
     return null;

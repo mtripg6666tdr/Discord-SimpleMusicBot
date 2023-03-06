@@ -44,12 +44,12 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
     const requestOptions = agent ? { agent } : undefined;
     const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#getInfo`);
     let info = null as ytdl.videoInfo;
-    try {
+    try{
       info = await ytdl.getInfo(url, {
         lang: "ja",
         requestOptions,
       });
-    } finally {
+    } finally{
       t.end(this.logger);
     }
     return {
@@ -64,22 +64,22 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
   async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>) {
     this.useLog();
     const info = await (async () => {
-      if (cache && cache.type === "ytdlCore") {
+      if(cache && cache.type === "ytdlCore") {
         this.logger("[AudioSource:youtube] using cache without obtaining");
         return cache.data as ytdl.videoInfo;
-      } else {
+      }else{
         this.logger("[AudioSource:youtube] obtaining info");
         const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
         const requestOptions = agent ? { agent } : undefined;
         const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch`);
         // eslint-disable-next-line @typescript-eslint/no-shadow
         let info = null as ytdl.videoInfo;
-        try {
+        try{
           info = await ytdl.getInfo(url, {
             lang: "ja",
             requestOptions,
           });
-        } finally {
+        } finally{
           t.end(this.logger);
         }
         return info;
@@ -116,7 +116,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
         }))
         .filter(v => !v.isLive),
     };
-    if (forceUrl) {
+    if(forceUrl) {
       return {
         ...partialResult,
         stream: {
@@ -125,9 +125,9 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
           userAgent: ua,
         } as UrlStreamInfo,
       };
-    } else {
+    }else{
       let readable = null as Readable;
-      if (
+      if(
         info.videoDetails.liveBroadcastDetails &&
         info.videoDetails.liveBroadcastDetails.isLiveNow
       ) {
@@ -135,7 +135,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
           format,
           lang: "ja",
         });
-      } else {
+      }else{
         readable = createChunkedYTStream(info, format, { lang: "ja" }, 1 * 1024 * 1024);
       }
       return {

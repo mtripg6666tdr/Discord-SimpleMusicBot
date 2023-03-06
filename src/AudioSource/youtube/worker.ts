@@ -41,10 +41,10 @@ function logger(content: any, loglevel: LogLevels) {
 }
 
 function onMessage(message: WithId<spawnerJobMessage>) {
-  if (!message) {
+  if(!message) {
     return;
   }
-  if (message.type === "init") {
+  if(message.type === "init") {
     const { id, url, prefetched, forceCache } = message;
     const youtube = new YouTube(/* logger */ logger);
     youtube
@@ -65,7 +65,7 @@ function onMessage(message: WithId<spawnerJobMessage>) {
           id,
         });
       });
-  } else if (message.type === "search") {
+  }else if(message.type === "search") {
     const id = message.id;
     ytsr
       .default(message.keyword, {

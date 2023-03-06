@@ -37,16 +37,16 @@ export class Normalizer extends Readable {
 
     setImmediate(() => {
       this.on("data", () => {
-        if (this.readableLength < this.readableHighWaterMark) {
-          if (!this.inlineVolume) {
+        if(this.readableLength < this.readableHighWaterMark) {
+          if(!this.inlineVolume) {
             this.resumeOrigin();
           }
-        } else {
+        }else{
           this.pauseOrigin();
         }
       });
       this.origin.on("data", chunk => {
-        if (!this.push(chunk)) {
+        if(!this.push(chunk)) {
           this.pauseOrigin();
         }
       });
@@ -60,19 +60,19 @@ export class Normalizer extends Readable {
   }
 
   override _read() {
-    if (this.readableLength < this.readableHighWaterMark) {
+    if(this.readableLength < this.readableHighWaterMark) {
       this.origin.resume();
     }
   }
 
   pauseOrigin() {
-    if (this.origin && !this.origin.destroyed) {
+    if(this.origin && !this.origin.destroyed) {
       this.origin.pause();
     }
   }
 
   resumeOrigin() {
-    if (this.origin && !this.origin.destroyed) {
+    if(this.origin && !this.origin.destroyed) {
       this.origin.resume();
     }
   }
@@ -80,17 +80,17 @@ export class Normalizer extends Readable {
   protected _onDestroy() {
     this.off("close", this._onDestroy);
     this.off("end", this._onDestroy);
-    if (this.origin) {
-      if (!this.origin.destroyed) {
+    if(this.origin) {
+      if(!this.origin.destroyed) {
         this.origin.destroy();
       }
       this.origin = null;
-      try {
+      try{
         // @ts-expect-error 2339
         this._readableState?.buffer.clear();
         // @ts-expect-error 2339
         this._readableState?.length = 0;
-      } catch {
+      } catch{
         /* empty */
       }
     }

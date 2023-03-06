@@ -36,7 +36,7 @@ export class SearchPanel extends EventEmitter {
   }
   protected set status(val: status) {
     this._status = val;
-    if (val === "destroyed") this.emit("destroy");
+    if(val === "destroyed") this.emit("destroy");
   }
 
   protected _options: SongInfo[] = null;
@@ -60,7 +60,7 @@ export class SearchPanel extends EventEmitter {
     protected readonly isRawTitle: boolean = false,
   ) {
     super();
-    if (!_commandMessage) {
+    if(!_commandMessage) {
       throw new Error("Invalid arguments passed");
     }
   }
@@ -69,13 +69,13 @@ export class SearchPanel extends EventEmitter {
     searchPromise: Promise<T | { result: T, transformedQuery: string }>,
     consumer: (result: T) => SongInfo[],
   ) {
-    if (this.status !== "init") return false;
+    if(this.status !== "init") return false;
     this.status = "consumed";
     let reply: ResponseMessage = null;
-    try {
+    try{
       reply = await this._commandMessage.reply("🔍検索中...");
       const waitedPromiseResult = await searchPromise;
-      if ("transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string }))
+      if("transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string }))
         this.query = (
           waitedPromiseResult as { result: T, transformedQuery: string }
         ).transformedQuery;
@@ -84,7 +84,7 @@ export class SearchPanel extends EventEmitter {
           ? (waitedPromiseResult as { result: T, transformedQuery: string }).result
           : (waitedPromiseResult as T),
       ).slice(0, 20));
-      if (songResult.length <= 0) {
+      if(songResult.length <= 0) {
         await reply.edit(":pensive:見つかりませんでした。");
         return false;
       }
@@ -139,11 +139,11 @@ export class SearchPanel extends EventEmitter {
         ],
       });
       return true;
-    } catch (e) {
+    } catch(e) {
       Util.logger.log(e, "error");
-      if (reply) {
+      if(reply) {
         reply.edit("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
-      } else {
+      }else{
         this._commandMessage
           .reply("✘内部エラーが発生しました")
           .catch(er => Util.logger.log(er, "error"));
@@ -165,8 +165,8 @@ export class SearchPanel extends EventEmitter {
   }
 
   async destroy(quiet: boolean = false) {
-    if (this.status !== "consumed") return;
-    if (!quiet)
+    if(this.status !== "consumed") return;
+    if(!quiet)
       await this._responseMessage.channel
         .createMessage("✅キャンセルしました")
         .catch(er => Util.logger.log(er, "error"));

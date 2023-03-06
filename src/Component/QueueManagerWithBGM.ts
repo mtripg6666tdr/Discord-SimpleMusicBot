@@ -78,7 +78,7 @@ export class QueueManagerWithBgm extends QueueManager {
     gotData: AudioSource.exportableCustom = null,
     preventCache: boolean = false,
   ): Promise<QueueContent & { index: number }> {
-    if (
+    if(
       !url.startsWith("http://") &&
       !url.startsWith("https://") &&
       fs.existsSync(path.join(__dirname, "../../", url))
@@ -93,7 +93,7 @@ export class QueueManagerWithBgm extends QueueManager {
         },
       } as QueueContent;
       this._default[method](result);
-      if (this.server.equallyPlayback) this.sortWithAddedBy();
+      if(this.server.equallyPlayback) this.sortWithAddedBy();
       const index = this._default.findIndex(q => q === result);
       return { ...result, index };
     }
@@ -101,13 +101,13 @@ export class QueueManagerWithBgm extends QueueManager {
   }
 
   override async next() {
-    if (this.isBGM) {
+    if(this.isBGM) {
       this.server.player.resetError();
-      if (this.server.bgmConfig.enableQueueLoop) {
+      if(this.server.bgmConfig.enableQueueLoop) {
         this._bgmDefault.push(this._bgmDefault[0]);
       }
       this._bgmDefault.shift();
-    } else {
+    }else{
       return super.next();
     }
   }

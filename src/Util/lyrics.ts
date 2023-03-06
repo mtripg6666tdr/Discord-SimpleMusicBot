@@ -24,7 +24,7 @@ import { DownloadText } from "./web";
 import { DefaultAudioThumbnailURL } from "../definition";
 
 export async function GetLyrics(keyword: string): Promise<songInfo> {
-  try {
+  try{
     const client = new Genius.Client();
     const song = (await client.songs.search(keyword))[0];
     return {
@@ -34,9 +34,9 @@ export async function GetLyrics(keyword: string): Promise<songInfo> {
       title: song.title,
       url: song.url,
     };
-  } catch (e) {
+  } catch(e) {
     // Fallback to utaten
-    if (!process.env.CSE_KEY) throw e;
+    if(!process.env.CSE_KEY) throw e;
     const data = JSON.parse(
       await DownloadText(
         "https://customsearch.googleapis.com/customsearch/v1?cx=89ebccacdc32461f2&key=" +
@@ -46,7 +46,7 @@ export async function GetLyrics(keyword: string): Promise<songInfo> {
       ),
     ) as CSE_Result;
     const items = data.items?.filter(i => new URL(i.link).pathname.startsWith("/lyric/"));
-    if (!items || items.length === 0) {
+    if(!items || items.length === 0) {
       throw new Error("No lyric was found");
     }
     const url = items[0].link;

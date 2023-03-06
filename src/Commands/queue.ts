@@ -51,7 +51,7 @@ export default class Queue extends BaseCommand {
     options.server.updateBoundChannel(message);
     const msg = await message.reply(":eyes: キューを確認しています。お待ちください...");
     const queue = options.server.queue;
-    if (queue.length === 0) {
+    if(queue.length === 0) {
       msg
         .edit(":face_with_raised_eyebrow:キューは空です。")
         .catch(e => Util.logger.log(e, "error"));
@@ -60,8 +60,8 @@ export default class Queue extends BaseCommand {
     // 合計所要時間の計算
     const totalLength = queue.lengthSecondsActual;
     let _page = options.rawArgs === "" ? 1 : Number(options.rawArgs);
-    if (isNaN(_page)) _page = 1;
-    if (queue.length > 0 && _page > Math.ceil(queue.length / 10)) {
+    if(isNaN(_page)) _page = 1;
+    if(queue.length > 0 && _page > Math.ceil(queue.length / 10)) {
       msg.edit(":warning:指定されたページは範囲外です").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -70,8 +70,8 @@ export default class Queue extends BaseCommand {
     // ページのキューを割り出す
     const getQueueEmbed = (page: number) => {
       const fields: { name: string, value: string }[] = [];
-      for (let i = 10 * (page - 1); i < 10 * page; i++) {
-        if (queue.length <= i) {
+      for(let i = 10 * (page - 1); i < 10 * page; i++) {
+        if(queue.length <= i) {
           break;
         }
         const q = queue.get(i);
@@ -117,7 +117,7 @@ export default class Queue extends BaseCommand {
     await msg
       .edit({ content: "", embeds: [getQueueEmbed(_page)] })
       .catch(e => Util.logger.log(e, "error"));
-    if (totalpage > 1) {
+    if(totalpage > 1) {
       options.embedPageToggle.push(
         (await PageToggle.init(msg, n => getQueueEmbed(n + 1), totalpage, _page - 1)).setFresh(
           true,

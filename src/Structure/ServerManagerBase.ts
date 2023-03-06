@@ -32,7 +32,7 @@ export abstract class ServerManagerBase extends LogEmitter {
    * @param data 親のGuildVoiceInfo
    */
   setBinding(data: GuildDataContainer) {
-    if (this.server) throw new Error("すでに設定されています");
+    if(this.server) throw new Error("すでに設定されています");
     this.server = data;
     this.setGuildId(this.server.guildId);
   }

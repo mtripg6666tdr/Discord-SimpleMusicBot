@@ -28,10 +28,10 @@ export class PlayManagerWithBgm extends PlayManager {
     return this._bgm;
   }
   protected set bgm(value: boolean) {
-    if (value && !this._bgm) {
+    if(value && !this._bgm) {
       this._originalVolume = this.volume;
       this.setVolume(this.server.bgmConfig.volume);
-    } else if (!value && this._bgm) {
+    }else if(!value && this._bgm) {
       this.setVolume(this._originalVolume);
     }
     this._bgm = value;
@@ -42,8 +42,8 @@ export class PlayManagerWithBgm extends PlayManager {
   }
 
   override async play(time?: number, bgm: boolean = false) {
-    if (this.server instanceof GuildDataContainerWithBgm) {
-      if (
+    if(this.server instanceof GuildDataContainerWithBgm) {
+      if(
         ((this.server.queue.isBGM && !bgm) || (!this.server.queue.isBgmEmpty && bgm)) &&
         this.server.connection?.playing
       ) {
@@ -51,7 +51,7 @@ export class PlayManagerWithBgm extends PlayManager {
       }
       this.server.queue.setToPlayBgm(bgm);
     }
-    if (!this.getIsBadCondition(bgm)) this.bgm = bgm;
+    if(!this.getIsBadCondition(bgm)) this.bgm = bgm;
     return super.play(time);
   }
 
@@ -79,7 +79,7 @@ export class PlayManagerWithBgm extends PlayManager {
   }
 
   override async onStreamFinished() {
-    if (this.server.connection && this.server.connection.playing) {
+    if(this.server.connection && this.server.connection.playing) {
       await Util.general
         .waitForEnteringState(
           () => !this.server.connection || !this.server.connection.playing,
@@ -94,15 +94,15 @@ export class PlayManagerWithBgm extends PlayManager {
     this._errorCount = 0;
     this._errorUrl = "";
     this._cost = 0;
-    if (this.bgm) {
+    if(this.bgm) {
       this.server.queue.next();
-      if (this.server.queue.isBgmEmpty) {
+      if(this.server.queue.isBgmEmpty) {
         this.Log("Queue empty");
         this.disconnect();
-      } else {
+      }else{
         this.play(0, true);
       }
-    } else {
+    }else{
       return super.onStreamFinished();
     }
   }

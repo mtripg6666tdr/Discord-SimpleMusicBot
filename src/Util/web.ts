@@ -88,15 +88,15 @@ export function RetriveLengthSeconds(url: string) {
       windowsHide: true,
       stdio: ["ignore", "ignore", "pipe"],
     }).on("exit", () => {
-      if (data.length === 0) reject("zero");
+      if(data.length === 0) reject("zero");
       const match = data.match(/Duration: (?<length>(\d+:)*\d+(\.\d+)?),/i);
-      if (match) {
+      if(match) {
         const lengthSec = match.groups.length
           .split(":")
           .map(n => Number(n))
           .reduce((prev, current) => prev * 60 + current);
         resolve(Math.ceil(lengthSec));
-      } else {
+      }else{
         reject("not match");
       }
     });

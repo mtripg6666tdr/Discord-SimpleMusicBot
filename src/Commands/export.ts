@@ -38,7 +38,7 @@ export default class Export extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if (options.server.queue.length === 0) {
+    if(options.server.queue.length === 0) {
       message.reply("キューが空です。").catch(e => Util.logger.log(e, "error"));
       return;
     }

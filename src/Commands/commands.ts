@@ -63,7 +63,7 @@ export default class Commands extends BaseCommand {
   }
 
   async run(message: CommandMessage, options: CommandArgs) {
-    if (options.rawArgs === "") {
+    if(options.rawArgs === "") {
       // 引数がない場合は全コマンドの一覧を表示
       const embed = [] as MessageEmbedBuilder[];
       const getCategoryText = (label: string) => {
@@ -73,15 +73,15 @@ export default class Commands extends BaseCommand {
       const rawcommands = CommandManager.instance.commands.filter(ci => !ci.unlist);
       const commands = {} as { [category: string]: BaseCommand[] };
       // Generate command list
-      for (let i = 0; i < rawcommands.length; i++) {
-        if (commands[rawcommands[i].category]) {
+      for(let i = 0; i < rawcommands.length; i++) {
+        if(commands[rawcommands[i].category]) {
           commands[rawcommands[i].category].push(rawcommands[i]);
-        } else {
+        }else{
           commands[rawcommands[i].category] = [rawcommands[i]];
         }
       }
       // Generate embed
-      for (let i = 0; i < categoriesList.length; i++) {
+      for(let i = 0; i < categoriesList.length; i++) {
         embed.push(
           new Helper.MessageEmbedBuilder().setTitle(getCategoryText(categoriesList[i])).addFields(
             ...commands[categoriesList[i]].map(
@@ -95,7 +95,7 @@ export default class Commands extends BaseCommand {
           ),
         );
       }
-      for (let i = 0; i < embed.length; i++) {
+      for(let i = 0; i < embed.length; i++) {
         embed[i]
           .setTitle("コマンド一覧(" + embed[i].title + ")")
           .setDescription(
@@ -113,9 +113,9 @@ export default class Commands extends BaseCommand {
         embed.map(_panel => _panel.toEris()),
       );
       options.embedPageToggle.push(toggle);
-    } else {
+    }else{
       const ci = CommandManager.instance.resolve(options.rawArgs);
-      if (ci && !ci.unlist) {
+      if(ci && !ci.unlist) {
         const prefix = options.server ? options.server.prefix : ">";
         const embed = new Helper.MessageEmbedBuilder()
           .setTitle(`コマンド \`${ci.name}\` の詳細`)
@@ -123,17 +123,17 @@ export default class Commands extends BaseCommand {
           .setColor(getColor("COMMAND"))
           .addField("エイリアス", `\`${ci.alias.join("`, `")}\``)
           .addField("実行に必要な権限", ci.permissionDescription);
-        if (ci.usage) {
+        if(ci.usage) {
           embed.addField(
             "使い方",
             `\`${prefix}${ci.usage}\` \r\n\`<>\` 内の引数は必須の引数、\`[]\`内の引数は任意の引数です。`,
           );
         }
-        if (ci.examples) {
+        if(ci.examples) {
           embed.addField("使用例", `\`${prefix + ci.examples}\``);
         }
         await message.reply({ embeds: [embed.toEris()] });
-      } else {
+      }else{
         await message.reply(":face_with_raised_eyebrow: コマンドが見つかりませんでした");
       }
     }

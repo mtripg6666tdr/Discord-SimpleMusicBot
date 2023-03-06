@@ -73,7 +73,7 @@ export class AddOn extends EventEmitter {
     super({
       captureRejections: false,
     });
-    try {
+    try{
       fs.readdirSync(path.join(__dirname, "../../addon/"), {
         withFileTypes: true,
       })
@@ -81,13 +81,13 @@ export class AddOn extends EventEmitter {
         .map(d => require("../../addon/" + d.name.slice(0, -3)))
         .filter(d => typeof d === "function")
         .forEach(d => {
-          try {
+          try{
             d(this);
-          } catch {
+          } catch{
             /* empty */
           }
         });
-    } catch {
+    } catch{
       /* empty */
     }
   }

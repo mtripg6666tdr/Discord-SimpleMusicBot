@@ -48,14 +48,14 @@ export default class Volume extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if (options.rawArgs === "") {
+    if(options.rawArgs === "") {
       await message
         .reply(`:loud_sound:現在の音量は**${options.server.player.volume}**です(デフォルト:100)`)
         .catch(e => Util.logger.log(e, "error"));
       return;
     }
     const newval = Number(options.rawArgs);
-    if (isNaN(newval) || newval < 1 || newval > 200) {
+    if(isNaN(newval) || newval < 1 || newval > 200) {
       message
         .reply(":bangbang:音量を変更する際は1から200の数字で指定してください。")
         .catch(e => Util.logger.log(e, "error"));

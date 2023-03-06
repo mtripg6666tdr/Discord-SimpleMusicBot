@@ -116,13 +116,13 @@ export abstract class MusicBotBase extends LogEmitter {
     this.setTag("Main");
     this._instantiatedTime = new Date();
     this.Log("bot is instantiated");
-    if (maintenance) {
+    if(maintenance) {
       this.Log("bot is now maintainance mode");
     }
 
     const versionObtainStrategies = [
       () => {
-        if (fs.existsSync(path.join(__dirname, "../DOCKER_BUILD_IMAGE"))) {
+        if(fs.existsSync(path.join(__dirname, "../DOCKER_BUILD_IMAGE"))) {
           return require("../package.json").version;
         }
       },
@@ -133,15 +133,15 @@ export abstract class MusicBotBase extends LogEmitter {
         return execSync("git log -n 1 --pretty=format:%h").toString().trim();
       },
     ];
-    for (let i = 0; i < versionObtainStrategies.length; i++) {
-      try {
+    for(let i = 0; i < versionObtainStrategies.length; i++) {
+      try{
         this._versionInfo = versionObtainStrategies[i]();
-      } catch {
+      } catch{
         /* empty */
       }
-      if (this._versionInfo) break;
+      if(this._versionInfo) break;
     }
-    if (!this._versionInfo) {
+    if(!this._versionInfo) {
       this._versionInfo = "Could not get version";
     }
     this.Log(`Version: ${this._versionInfo}`);
@@ -149,9 +149,9 @@ export abstract class MusicBotBase extends LogEmitter {
   }
 
   private initializeBackupper() {
-    if (MongoBackupper.backuppable) {
+    if(MongoBackupper.backuppable) {
       this._backupper = new MongoBackupper(this, () => this.guildData);
-    } else if (HttpBackupper.backuppable) {
+    }else if(HttpBackupper.backuppable) {
       this._backupper = new HttpBackupper(this, () => this.guildData);
     }
   }
@@ -161,12 +161,12 @@ export abstract class MusicBotBase extends LogEmitter {
    */
   protected maintenanceTick() {
     this.maintenanceTickCount++;
-    if (Util.config.debug) Util.logger.log(`[Tick] #${this.maintenanceTickCount}`, "debug");
+    if(Util.config.debug) Util.logger.log(`[Tick] #${this.maintenanceTickCount}`, "debug");
     this.emit("tick", this.maintenanceTickCount);
     // ページトグルの整理
     PageToggle.organize(this._embedPageToggle, 5);
     // 4分ごとに主要情報を出力
-    if (this.maintenanceTickCount % 4 === 1) this.logGeneralInfo();
+    if(this.maintenanceTickCount % 4 === 1) this.logGeneralInfo();
   }
 
   /**
@@ -204,12 +204,12 @@ export abstract class MusicBotBase extends LogEmitter {
    */
   protected initData(guildid: string, boundChannelId: string) {
     const prev = this.guildData.get(guildid);
-    if (!prev) {
+    if(!prev) {
       const server = new GuildDataContainer(guildid, boundChannelId, this);
       this.guildData.set(guildid, server);
       this.emit("guildDataAdded", server);
       return server;
-    } else {
+    }else{
       return prev;
     }
   }
@@ -219,7 +219,7 @@ export abstract class MusicBotBase extends LogEmitter {
     boundChannelId: string,
     bgmConfig: GuildBGMContainerType,
   ) {
-    if (this.guildData.has(guildid)) throw new Error("guild data was already set");
+    if(this.guildData.has(guildid)) throw new Error("guild data was already set");
     const server = new GuildDataContainerWithBgm(guildid, boundChannelId, this, bgmConfig);
     this.guildData.set(guildid, server);
     this.emit("guildDataAdded", server);

@@ -44,11 +44,11 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<
     this.useLog();
     const t = Util.time.timer.start(`YouTube(Strategy${this.priority})#getInfo`);
     let info = null as YoutubeDlInfo;
-    try {
+    try{
       info = JSON.parse(
         await this.binaryManager.exec(["--skip-download", "--print-json", url]),
       ) as YoutubeDlInfo;
-    } finally {
+    } finally{
       t.end(this.logger);
     }
     return {
@@ -64,7 +64,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<
     this.useLog();
     const t = Util.time.timer.start(`YouTube(Strategy${this.priority})#fetch`);
     let info = null as YoutubeDlInfo;
-    try {
+    try{
       const availableCache = cache?.type === this.id && (cache.data as YoutubeDlInfo);
       this.logger(
         `[AudioSource:youtube] ${
@@ -76,14 +76,14 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<
         (JSON.parse(
           await this.binaryManager.exec(["--skip-download", "--print-json", url]),
         ) as YoutubeDlInfo);
-    } finally {
+    } finally{
       t.end(this.logger);
     }
     const partialResult = {
       info: this.mapToExportable(url, info),
       relatedVideos: null as exportableYouTube[],
     };
-    if (info.is_live) {
+    if(info.is_live) {
       const format = info.formats.filter(f => f.format_id === info.format_id);
       return {
         ...partialResult,
@@ -93,18 +93,18 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<
           userAgent: format[0].http_headers["User-Agent"],
         } as UrlStreamInfo,
       };
-    } else {
+    }else{
       const formats = info.formats.filter(
         f => f.format_note === "tiny" || (f.video_ext === "none" && f.abr),
       );
-      if (formats.length === 0) throw new Error("no format found!");
+      if(formats.length === 0) throw new Error("no format found!");
       const [format] = formats.sort((fa, fb) => fb.abr - fa.abr);
       const stream = miniget(format.url, {
         headers: {
           ...format.http_headers,
         },
       });
-      if (forceUrl) {
+      if(forceUrl) {
         return {
           ...partialResult,
           stream: {

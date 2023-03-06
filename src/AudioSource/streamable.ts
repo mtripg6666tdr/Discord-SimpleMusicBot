@@ -32,13 +32,13 @@ export class Streamable extends AudioSource {
   async init(url: string, prefetched?: exportableStreamable) {
     this.Url = url;
     const id = StreamableApi.getVideoId(url);
-    if (!id) throw new Error("Invalid streamable url");
-    if (prefetched) {
+    if(!id) throw new Error("Invalid streamable url");
+    if(prefetched) {
       this._lengthSeconds = prefetched.length;
       this.Thumbnail = prefetched.thumbnail;
       this.Title = prefetched.title;
       this.streamUrl = prefetched.streamUrl;
-    } else {
+    }else{
       const streamInfo = await StreamableApi.getVideoDetails(id);
       this._lengthSeconds = Math.floor(streamInfo.files["mp4-mobile"].duration);
       this.Thumbnail = "https:" + streamInfo.thumbnail_url;
@@ -99,9 +99,9 @@ export abstract class StreamableApi {
    */
   static getVideoId(url: string): string {
     const match = url.match(/^https?:\/\/streamable.com\/(?<Id>.+)$/);
-    if (match) {
+    if(match) {
       return match.groups.Id;
-    } else {
+    }else{
       return null;
     }
   }

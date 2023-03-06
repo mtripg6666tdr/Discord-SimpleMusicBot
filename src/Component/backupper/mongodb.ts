@@ -27,10 +27,10 @@ import { Backupper } from ".";
 import Util from "../../Util";
 
 const MongoClient = (() => {
-  try {
+  try{
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     return require("mongodb") as typeof import("mongodb");
-  } catch {
+  } catch{
     return null;
   }
 })()?.MongoClient;
@@ -110,8 +110,8 @@ export class MongoBackupper extends Backupper {
   }
 
   async backupStatus(guildId: string) {
-    if (!MongoBackupper.backuppable || !this.dbConnectionReady) return;
-    try {
+    if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
+    try{
       this.Log(`Backing up status...(${guildId})`);
       const status = this.data.get(guildId).exportStatus();
       await this.collections.status.updateOne(
@@ -126,15 +126,15 @@ export class MongoBackupper extends Backupper {
           upsert: true,
         },
       );
-    } catch (er) {
+    } catch(er) {
       this.Log(er, "error");
       this.Log("Something went wrong while backing up status");
     }
   }
 
   backupQueue(guildId: string) {
-    if (!MongoBackupper.backuppable || !this.dbConnectionReady) return;
-    try {
+    if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
+    try{
       const queue = this.data.get(guildId).exportQueue();
       this.Log(`Backing up queue...(${guildId})`);
       this.collections.queue.updateOne(
@@ -149,23 +149,23 @@ export class MongoBackupper extends Backupper {
           upsert: true,
         },
       );
-    } catch (er) {
+    } catch(er) {
       this.Log(er, "error");
       this.Log("Something went wrong while backing up queue");
     }
   }
 
   override async getStatusFromBackup(guildIds: string[]): Promise<Map<string, exportableStatuses>> {
-    if (!this.dbConnectionReady && !this.dbError)
+    if(!this.dbConnectionReady && !this.dbError)
       await Util.general.waitForEnteringState(
         () => this.dbConnectionReady || !!this.dbError,
         Infinity,
       );
-    if (this.dbError) {
+    if(this.dbError) {
       this.Log("Database connecting failed!!", "warn");
       return null;
     }
-    try {
+    try{
       const dbResult = this.collections.status.find({
         $or: guildIds.map(id => ({
           guildId: id,
@@ -176,7 +176,7 @@ export class MongoBackupper extends Backupper {
         result.set(doc.guildId, doc);
       });
       return result;
-    } catch (er) {
+    } catch(er) {
       this.Log(er, "error");
       this.Log("Status restoring failed!", "error");
       return null;
@@ -184,16 +184,16 @@ export class MongoBackupper extends Backupper {
   }
 
   override async getQueueDataFromBackup(guildids: string[]): Promise<Map<string, YmxFormat>> {
-    if (!this.dbConnectionReady && !this.dbError)
+    if(!this.dbConnectionReady && !this.dbError)
       await Util.general.waitForEnteringState(
         () => this.dbConnectionReady || !!this.dbError,
         Infinity,
       );
-    if (this.dbError) {
+    if(this.dbError) {
       this.Log("Database connecting failed!!", "warn");
       return null;
     }
-    try {
+    try{
       const dbResult = this.collections.queue.find({
         $or: guildids.map(id => ({
           guildId: id,
@@ -204,7 +204,7 @@ export class MongoBackupper extends Backupper {
         result.set(doc.guildId, doc);
       });
       return result;
-    } catch (er) {
+    } catch(er) {
       this.Log(er, "error");
       this.Log("Queue restoring failed!", "error");
       return null;

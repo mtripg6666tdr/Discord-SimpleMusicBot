@@ -37,7 +37,7 @@ export class SkipManager extends ServerManagerBase {
   private issuer: string = null;
 
   async init(message: CommandMessage) {
-    if (this.inited || this.destroyed)
+    if(this.inited || this.destroyed)
       throw new Error("This manager has already initialized or destroyed");
     this.inited = true;
     this.currentSong = this.server.queue.get(0);
@@ -48,11 +48,11 @@ export class SkipManager extends ServerManagerBase {
   }
 
   private organize() {
-    if (!this.inited || this.destroyed) return;
+    if(!this.inited || this.destroyed) return;
     [...this.agreeUsers].forEach(userId => {
-      if (!this.server.connection) {
+      if(!this.server.connection) {
         return false;
-      } else if (!this.getVoiceMembers().has(userId)) {
+      }else if(!this.getVoiceMembers().has(userId)) {
         return false;
       }
       return true;
@@ -60,16 +60,16 @@ export class SkipManager extends ServerManagerBase {
   }
 
   vote(user: Member): voteResult {
-    if (!this.inited || this.destroyed) return "ignored";
+    if(!this.inited || this.destroyed) return "ignored";
     this.organize();
-    if (!user.voiceState.channelID || !this.getVoiceMembers().has(user.id)) {
+    if(!user.voiceState.channelID || !this.getVoiceMembers().has(user.id)) {
       return "ignored";
     }
-    if (this.agreeUsers.has(user.id)) {
+    if(this.agreeUsers.has(user.id)) {
       this.agreeUsers.delete(user.id);
       this.checkThreshold();
       return "cancelled";
-    } else {
+    }else{
       this.agreeUsers.add(user.id);
       this.checkThreshold();
       return "voted";
@@ -77,9 +77,9 @@ export class SkipManager extends ServerManagerBase {
   }
 
   async checkThreshold() {
-    if (!this.inited || this.destroyed) return;
-    if (this.agreeUsers.size * 2 >= this.getVoiceMembers().size - 1) {
-      try {
+    if(!this.inited || this.destroyed) return;
+    if(this.agreeUsers.size * 2 >= this.getVoiceMembers().size - 1) {
+      try{
         const response = (this.reply = await this.reply.edit(":ok: スキップしています"));
         const title = this.server.queue.get(0).basicInfo.Title;
         this.server.player.stop();
@@ -88,15 +88,15 @@ export class SkipManager extends ServerManagerBase {
         response
           .edit(":track_next: `" + title + "`をスキップしました:white_check_mark:")
           .catch(e => Util.logger.log(e, "error"));
-      } catch (e) {
+      } catch(e) {
         Util.logger.log(e, "error");
         this.reply
           .edit(":astonished:スキップに失敗しました")
           .catch(er => Util.logger.log(er, "error"));
       }
-    } else {
+    }else{
       const content = this.createMessageContent();
-      if (content.embeds[0].description !== this.reply.embeds[0].description) {
+      if(content.embeds[0].description !== this.reply.embeds[0].description) {
         this.reply.edit(content);
       }
     }

@@ -40,10 +40,10 @@ export default class EquallyPlayback extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs) {
     options.server.updateBoundChannel(message);
-    if (options.server.equallyPlayback) {
+    if(options.server.equallyPlayback) {
       options.server.equallyPlayback = false;
       message.reply("❌均等再生をオフにしました").catch(e => Util.logger.log(e, "error"));
-    } else {
+    }else{
       options.server.equallyPlayback = true;
       const embed = new Helper.MessageEmbedBuilder()
         .setTitle("⭕均等再生をオンにしました")

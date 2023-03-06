@@ -38,9 +38,9 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
     this.useLog();
     const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#getInfo`);
     let info = null as InfoData;
-    try {
+    try{
       info = await video_info(url);
-    } finally {
+    } finally{
       t.end(this.logger);
     }
     return {
@@ -57,7 +57,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
     this.useLog();
     const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch`);
     let info = null as InfoData;
-    try {
+    try{
       const cacheAvailable = cache?.type === playDl && cache.data;
       this.logger(
         `[AudioSource:youtube] ${
@@ -65,14 +65,14 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
         }`,
       );
       info = cacheAvailable || (await video_info(url));
-    } finally {
+    } finally{
       t.end(this.logger);
     }
     const partialResult = {
       info: this.mapToExportable(url, info),
       relatedVideos: null as exportableYouTube[],
     };
-    if (info.LiveStreamData.isLive) {
+    if(info.LiveStreamData.isLive) {
       return {
         ...partialResult,
         stream: {
@@ -80,9 +80,9 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
           url: info.LiveStreamData.hlsManifestUrl,
         } as UrlStreamInfo,
       };
-    } else {
+    }else{
       const format = info.format.filter(f => f.mimeType.startsWith("audio"));
-      if (format.length === 0) throw new Error("no format found!");
+      if(format.length === 0) throw new Error("no format found!");
       format.sort((fa, fb) => fb.bitrate - fa.bitrate);
       return {
         ...partialResult,
@@ -99,7 +99,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
   }
 
   protected mapToExportable(url: string, info: InfoData): exportableYouTube {
-    if (info.video_details.upcoming) throw new Error("This video is still in upcoming");
+    if(info.video_details.upcoming) throw new Error("This video is still in upcoming");
     return {
       url,
       title: info.video_details.title,

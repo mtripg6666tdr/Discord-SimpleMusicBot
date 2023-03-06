@@ -142,6 +142,43 @@
     // eslint rules
     "eqeqeq": "error",
     "no-var": "error",
+    "keyword-spacing": ["warn", {
+      "before": true,
+      "after": false,
+      "overrides": {
+        "import": {
+          "before": false,
+          "after": true
+        },
+        "export": {
+          "after": true
+        },
+        "from": {
+          "after": true
+        },
+        "let": {
+          "after": true
+        },
+        "const": {
+          "after": true
+        },
+        "else": {
+          "before": false
+        },
+        "return": {
+          "after": true
+        },
+        "throw": {
+          "after": true
+        },
+        "do": {
+          "after": false
+        },
+        "case": {
+          "after": true
+        }
+      }
+    }],
     "no-return-await": "warn",
     "max-nested-callbacks": ["warn", {
       "max": 4

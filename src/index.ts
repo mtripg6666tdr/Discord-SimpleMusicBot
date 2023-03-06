@@ -46,17 +46,17 @@ const bot = new MusicBot(process.env.TOKEN, Boolean(Util.config.maintenance));
 let server: http.Server = null;
 
 // Webサーバーのインスタンス化
-if (Util.config.webserver) {
+if(Util.config.webserver) {
   server = createServer(bot.client, Number(process.env.PORT) || 8081, Util.logger.log);
-} else {
+}else{
   logger("Skipping to start server");
 }
 
-if (!Util.config.debug) {
+if(!Util.config.debug) {
   // ハンドルされなかったエラーのハンドル
   process.on("uncaughtException", async error => {
     logger(error, "error");
-    if (bot.client && Util.config.errorChannel) {
+    if(bot.client && Util.config.errorChannel) {
       await reportError(error);
     }
   });
@@ -64,20 +64,20 @@ if (!Util.config.debug) {
 
 let terminating = false;
 const onTerminated = async function (code: string) {
-  if (terminating) return;
+  if(terminating) return;
   terminating = true;
   logger(`${code} detected`);
   logger("Shutting down the bot...");
   await bot.stop();
-  if (server && server.listening) {
+  if(server && server.listening) {
     logger("Shutting down the server...");
     await new Promise(resolve => server.close(resolve));
   }
   // 強制終了を報告
-  if (bot.client && Util.config.errorChannel) {
+  if(bot.client && Util.config.errorChannel) {
     bot.client.createMessage(Util.config.errorChannel, "Process terminated").catch(() => {});
   }
-  if (global.workerThread) {
+  if(global.workerThread) {
     logger("Shutting down worker...");
     await global.workerThread.terminate();
   }
@@ -96,11 +96,11 @@ const onTerminated = async function (code: string) {
 bot.run(true, 40);
 
 async function reportError(err: any) {
-  try {
+  try{
     await bot.client
       .createMessage(Util.config.errorChannel, Util.general.StringifyObject(err))
       .catch(() => {});
-  } catch (e) {
+  } catch(e) {
     logger(e, "error");
   }
 }

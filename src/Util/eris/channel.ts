@@ -34,11 +34,11 @@ export const channelUtil = {
     return requirePermissions.every(permission => permissions.has(permission));
   },
   getVoiceMember(options: CommandArgs) {
-    if (!options.server.player.isConnecting) return null;
+    if(!options.server.player.isConnecting) return null;
     const voiceChannel = options.bot.client.getChannel(
       options.server.connection.channelID,
     ) as VoiceChannel;
-    if (!voiceChannel) return null;
+    if(!voiceChannel) return null;
     return voiceChannel.voiceMembers;
   },
   sameVC(member: Member, options: CommandArgs) {
@@ -49,8 +49,8 @@ export const channelUtil = {
   },
   isOnlyListener(member: Member, options: CommandArgs) {
     const vcMember = this.getVoiceMember(options);
-    if (!vcMember) return false;
-    if (vcMember.size > 2) return false;
+    if(!vcMember) return false;
+    if(vcMember.size > 2) return false;
     return vcMember.has(member.id);
   },
 } as const;

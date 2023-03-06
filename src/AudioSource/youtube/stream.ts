@@ -33,17 +33,17 @@ export function createChunkedYTStream(
   const stream = Util.general.createPassThrough();
   let current = -1;
   const contentLength = Number(format.contentLength);
-  if (contentLength < chunkSize) {
+  if(contentLength < chunkSize) {
     ytdl
       .downloadFromInfo(info, { format, ...options })
       .on("error", er => (!stream.destroyed ? stream.destroy(er) : stream.emit("error", er)))
       .pipe(stream);
     Util.logger.log("[AudioSource:youtube]Stream was created as single stream");
-  } else {
+  }else{
     const pipeNextStream = () => {
       current++;
       let end = chunkSize * (current + 1) - 1;
-      if (end >= contentLength) end = undefined;
+      if(end >= contentLength) end = undefined;
       const nextStream = ytdl.downloadFromInfo(info, {
         format,
         ...options,
@@ -56,11 +56,11 @@ export function createChunkedYTStream(
       nextStream
         .on("error", er => (!stream.destroyed ? stream.destroy(er) : stream.emit("error", er)))
         .pipe(stream, { end: end === undefined });
-      if (end !== undefined) {
+      if(end !== undefined) {
         nextStream.on("end", () => {
           pipeNextStream();
         });
-      } else {
+      }else{
         Util.logger.log(`[AudioSource:youtube]Last stream (total:${current + 1})`);
       }
     };
@@ -95,7 +95,7 @@ export function createRefreshableYTLiveStream(
 
   // start to download the live stream from the provided information (info object or url string)
   const downloadLiveStream = async (targetInfo: ytdl.videoInfo | string) => {
-    if (typeof targetInfo === "string") {
+    if(typeof targetInfo === "string") {
       targetInfo = await ytdl.getInfo(targetInfo);
       options.format = ytdl.chooseFormat(targetInfo.formats, {
         isHLS: true,
@@ -115,9 +115,9 @@ export function createRefreshableYTLiveStream(
   // handle errors occurred by the current live stream
   const onError = (er: Error) => {
     console.error(er);
-    if (er.message === "ENOTFOUND") {
+    if(er.message === "ENOTFOUND") {
       refreshStream();
-    } else {
+    }else{
       destroyCurrentStream(er);
       stream.destroy(er);
     }
@@ -134,10 +134,10 @@ export function createRefreshableYTLiveStream(
   let refreshing = false;
   // re-create new stream to refresh instance
   const refreshStream = async () => {
-    if (refreshing) return;
-    try {
+    if(refreshing) return;
+    try{
       refreshing = true;
-      if (Util.config.debug) Util.logger.log("preparing new stream", "debug");
+      if(Util.config.debug) Util.logger.log("preparing new stream", "debug");
       const newStream = await downloadLiveStream(url);
       newStream.on("error", onError);
       setStreamNetworkTimeout(newStream);
@@ -150,9 +150,9 @@ export function createRefreshableYTLiveStream(
       currentStream.pipe(stream, {
         end: false,
       });
-      if (Util.config.debug) Util.logger.log("piped new stream", "debug");
+      if(Util.config.debug) Util.logger.log("piped new stream", "debug");
       refreshing = false;
-    } catch (e) {
+    } catch(e) {
       stream.destroy(e);
     }
   };

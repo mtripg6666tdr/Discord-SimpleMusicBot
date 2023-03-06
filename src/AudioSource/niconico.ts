@@ -37,16 +37,16 @@ export class NicoNicoS extends AudioSource {
   async init(url: string, prefetched: exportableNicoNico) {
     this.Url = url;
     this.nico = new NiconicoDL(url, /* quality */ "high");
-    if (prefetched) {
+    if(prefetched) {
       this.Title = prefetched.title;
       this.Description = htmlToText(prefetched.description);
       this._lengthSeconds = prefetched.length;
       this.Author = prefetched.author;
       this.Thumbnail = prefetched.thumbnail;
       this.Views = prefetched.views;
-    } else {
+    }else{
       const info = await this.nico.getVideoInfo();
-      if (info.isDeleted || info.isPrivate) throw new Error("動画が再生できません");
+      if(info.isDeleted || info.isPrivate) throw new Error("動画が再生できません");
       this.Title = info.title;
       this.Description = htmlToText(info.description);
       this._lengthSeconds = info.duration;

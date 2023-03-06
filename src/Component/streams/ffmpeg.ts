@@ -65,14 +65,14 @@ export function transformThroughFFmpeg(
     "debug",
   );
   const ffmpeg = new FFmpeg({ args });
-  if (Util.config.debug)
+  if(Util.config.debug)
     ffmpeg.process.stderr.on("data", chunk =>
       Util.logger.log("[FFmpeg]" + chunk.toString(), "debug"),
     );
   ffmpeg.process.once("exit", () => {
     ffmpeg.emit("close");
   });
-  if (readable.type === "readable") {
+  if(readable.type === "readable") {
     readable.stream
       .on("error", e => destroyStream(ffmpeg, e))
       .pipe(ffmpeg)

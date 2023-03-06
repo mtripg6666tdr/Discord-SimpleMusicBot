@@ -38,30 +38,30 @@ export default class Skip extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs) {
     const server = options.server;
     // そもそも再生状態じゃないよ...
-    if (server.player.preparing) {
+    if(server.player.preparing) {
       message
         .reply("再生準備中です")
         .catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"));
       return;
-    } else if (!server.player.isPlaying) {
+    }else if(!server.player.isPlaying) {
       message
         .reply("再生中ではありません")
         .catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"));
       return;
     }
-    try {
+    try{
       const item = server.queue.get(0);
       const members = Util.eris.channel.getVoiceMember(options);
       options.server.updateBoundChannel(message);
-      if (
+      if(
         item.additionalInfo.addedBy.userId !== message.member.id &&
         !Util.eris.user.isDJ(message.member, options) &&
         !Util.eris.user.isPrivileged(message.member) &&
         members.size > 3
       ) {
-        if (!server.skipSession) {
+        if(!server.skipSession) {
           await server.createSkipSession(message);
-        } else {
+        }else{
           message.reply(":red_circle: すでに開かれている投票パネルがあります");
         }
         return;
@@ -80,16 +80,16 @@ export default class Skip extends BaseCommand {
           },
         })
         .catch(e => Util.logger.log(e, "error"));
-      if (server.queue.isEmpty) {
+      if(server.queue.isEmpty) {
         await server.player.onQueueEmpty();
       }
-    } catch (e) {
+    } catch(e) {
       Util.logger.log(e, "error");
-      if (message.response) {
+      if(message.response) {
         message.response
           .edit(":astonished:スキップに失敗しました")
           .catch(er => Util.logger.log(er, "error"));
-      } else {
+      }else{
         message.channel
           .createMessage(":astonished:スキップに失敗しました")
           .catch(er => Util.logger.log(er, "error"));

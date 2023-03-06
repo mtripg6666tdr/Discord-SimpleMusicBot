@@ -54,7 +54,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
   protected override async searchContent(query: string) {
     let result: SoundcloudTrackV2[] = [];
     let transformedQuery = query;
-    if (query.match(/^https:\/\/soundcloud.com\/[^/]+$/)) {
+    if(query.match(/^https:\/\/soundcloud.com\/[^/]+$/)) {
       // ユーザーの楽曲検索
       const user = await this.soundcloud.users.getV2(query);
       transformedQuery = user.username;
@@ -64,7 +64,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
       )) as SoundCloudTrackCollection;
       result.push(...rawResult.collection);
       nextUrl = rawResult.next_href + "&client_id=" + (await this.soundcloud.api.getClientID());
-      while (nextUrl && result.length < 10) {
+      while(nextUrl && result.length < 10) {
         const data = await Util.web.DownloadText(nextUrl, {
           "User-Agent": DefaultUserAgent,
         });
@@ -74,11 +74,11 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
           ? rawResult.next_href + "&client_id=" + (await this.soundcloud.api.getClientID())
           : rawResult.next_href;
       }
-    } else {
+    }else{
       // 楽曲検索
       result = (await this.soundcloud.tracks.searchV2({ q: query })).collection;
     }
-    if (result.length > 12) result = result.splice(0, 11);
+    if(result.length > 12) result = result.splice(0, 11);
     return {
       result,
       transformedQuery,
