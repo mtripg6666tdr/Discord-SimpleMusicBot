@@ -143,7 +143,6 @@
     "no-self-compare": "warn",
     "no-sequences": "warn",
     "no-undef-init": "warn",
-    "no-unexpected-multiline": "warn",
     "no-unmodified-loop-condition": "error",
     "no-unneeded-ternary": "error",
     "no-unreachable": "warn",
