@@ -46,7 +46,7 @@ describe("Config", function() {
     /** @type {[string, string|boolean][]} */
     const tests = [
       ["adminId", "123456"],
-      ["debug", false],
+      ["debug", true],
       ["maintenance", true],
       ["errorChannel", "987654"],
       ["proxy", "https://example.com"],
