@@ -151,7 +151,7 @@ export class GuildDataContainer extends LogEmitter {
     }
     if(
       !this.player.isConnecting
-      || (message.member.voiceState.channelID && (this.bot.client.getChannel(message.member.voiceState.channelID) as VoiceChannel).voiceMembers.has(this.bot.client.user.id))
+      || message.member.voiceState.channelID && (this.bot.client.getChannel(message.member.voiceState.channelID) as VoiceChannel).voiceMembers.has(this.bot.client.user.id)
       || message.content.includes("join")
     ){
       if(message.content !== this.prefix) this.boundTextChannel = message.channelId;
@@ -440,7 +440,7 @@ export class GuildDataContainer extends LogEmitter {
             .setDescription(`[${result.title}](${result.url}) \r\n${index}曲が追加されました`)
             .setThumbnail(result.bestThumbnail.url)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-          await msg.edit({content: "", embeds: [embed.toEris()]});
+          await msg.edit({ content: "", embeds: [embed.toEris()] });
         }
       }
       catch(e){
@@ -485,7 +485,7 @@ export class GuildDataContainer extends LogEmitter {
             .setDescription(`[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n${index}曲が追加されました`)
             .setThumbnail(playlist.artwork_url)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-          await msg.edit({content: "", embeds: [embed.toEris()]});
+          await msg.edit({ content: "", embeds: [embed.toEris()] });
         }
       }
       catch(e){
@@ -531,7 +531,7 @@ export class GuildDataContainer extends LogEmitter {
               value: "Spotifyのタイトルは、正しく再生されない場合があります"
             })
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-          await msg.edit({content: "", embeds: [embed.toEris()]});
+          await msg.edit({ content: "", embeds: [embed.toEris()] });
         }
       }
       catch(e){

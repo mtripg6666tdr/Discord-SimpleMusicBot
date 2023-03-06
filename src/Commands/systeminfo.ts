@@ -199,7 +199,7 @@ export default class SystemInfo extends BaseCommand {
     }
     
     if(embeds.length > 0){
-      await message.channel.createMessage({embeds}).catch(e => Util.logger.log(e, "error"));
+      await message.channel.createMessage({ embeds }).catch(e => Util.logger.log(e, "error"));
     }
   }
 }

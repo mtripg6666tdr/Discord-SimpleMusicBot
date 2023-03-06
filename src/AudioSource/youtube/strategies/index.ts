@@ -89,7 +89,7 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(l
         logger(`[AudioSource:youtube] fetch in strategy#${i} failed: ${e}`, "warn");
       }
     }
-    logger((i + 1) === strategies.length ? "[AudioSource:youtube] All strategies failed" : "[AudioSource:youtube] Fallbacking to the next strategy", "warn");
+    logger(i + 1 === strategies.length ? "[AudioSource:youtube] All strategies failed" : "[AudioSource:youtube] Fallbacking to the next strategy", "warn");
   }
   throw new Error("All strategies failed");
 }
@@ -109,7 +109,7 @@ export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>
     catch(e){
       logger(e, "error");
       logger(`[AudioSource:youtube] getInfo in strategy#${i} failed: ${e}`, "warn");
-      logger((i + 1) === strategies.length ? "[AudioSource:youtube] All strategies failed" : "[AudioSource:youtube] Fallbacking to the next strategy", "warn");
+      logger(i + 1 === strategies.length ? "[AudioSource:youtube] All strategies failed" : "[AudioSource:youtube] Fallbacking to the next strategy", "warn");
     }
   }
   throw new Error("All strategies failed");

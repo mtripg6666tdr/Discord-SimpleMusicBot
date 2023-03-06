@@ -57,7 +57,7 @@ export function transformThroughFFmpeg(readable: StreamInfo, bitrate: number, ef
     ...bitrateArgs,
   ];
   Util.logger.log("[FFmpeg] Passing arguments: " + args.map(arg => arg.startsWith("http") ? "<URL>" : arg).join(" "), "debug");
-  const ffmpeg = new FFmpeg({args});
+  const ffmpeg = new FFmpeg({ args });
   if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log("[FFmpeg]" + chunk.toString(), "debug"));
   ffmpeg.process.once("exit", () => {
     ffmpeg.emit("close");

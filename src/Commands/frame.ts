@@ -112,7 +112,7 @@ function getFrame(url: string, time: number, ua: string){
     ];
     Util.logger.log(`[FFmpeg] Passing args: ${args.join(" ")}`, "debug");
     const bufs = [] as Buffer[];
-    const ffmpeg = new FFmpeg({args});
+    const ffmpeg = new FFmpeg({ args });
     if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log(`[FFmpeg] ${chunk.toString()}`, "debug"));
     ffmpeg
       .on("error", (er) => {

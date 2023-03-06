@@ -65,7 +65,7 @@ export default class Queue extends BaseCommand {
     const totalpage = Math.ceil(queue.length / 10);
     // ページのキューを割り出す
     const getQueueEmbed = (page: number) => {
-      const fields: {name: string, value: string}[] = [];
+      const fields: { name: string, value: string }[] = [];
       for(let i = 10 * (page - 1); i < 10 * page; i++){
         if(queue.length <= i){
           break;
@@ -102,7 +102,7 @@ export default class Queue extends BaseCommand {
     };
 
     // 送信
-    await msg.edit({content: "", embeds: [getQueueEmbed(_page)]}).catch(e => Util.logger.log(e, "error"));
+    await msg.edit({ content: "", embeds: [getQueueEmbed(_page)] }).catch(e => Util.logger.log(e, "error"));
     if(totalpage > 1){
       options.embedPageToggle.push((await PageToggle.init(msg, n => getQueueEmbed(n + 1), totalpage, _page - 1)).setFresh(true));
     }

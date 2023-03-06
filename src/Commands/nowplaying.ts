@@ -73,7 +73,7 @@ export default class NowPlaying extends BaseCommand {
       .setTitle("現在再生中の曲:musical_note:")
       .setDescription(
         `[${info.Title}](${info.Url})\r\n${progressBar}${
-          (info.ServiceIdentifer === "youtube" && (info as YouTube).LiveStream) ? "(ライブストリーム)" : ` \`${min}:${sec}/${(_t === 0 ? "(不明)" : `${tmin}:${tsec}\``)}`
+          info.ServiceIdentifer === "youtube" && (info as YouTube).LiveStream ? "(ライブストリーム)" : ` \`${min}:${sec}/${_t === 0 ? "(不明)" : `${tmin}:${tsec}\``}`
         }`
       )
       .setFields(
@@ -85,7 +85,7 @@ export default class NowPlaying extends BaseCommand {
     ;
     if(typeof info.Thumbnail === "string"){
       embed.setThumbnail(info.Thumbnail);
-      await message.reply({embeds: [embed.toEris()]}).catch(e => Util.logger.log(e, "error"));
+      await message.reply({ embeds: [embed.toEris()] }).catch(e => Util.logger.log(e, "error"));
     }else{
       embed.setThumbnail("attachment://thumbnail." + info.Thumbnail.ext);
       await message.reply({

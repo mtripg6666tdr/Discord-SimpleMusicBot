@@ -198,14 +198,14 @@ export class MusicBot extends MusicBotBase {
         // BGM構成が存在するサーバー
         server instanceof GuildDataContainerWithBgm
         && (
-          (
-            // いまBGM再生中
-            server.queue.isBGM
+          
+        // いまBGM再生中
+          server.queue.isBGM
             && (
               // キューの編集を許可していない、またはBGM優先モード
               !server.bgmConfig.allowEditQueue || server.bgmConfig.mode === "prior"
             )
-          )
+          
           // BGMが再生していなければ、BGMオンリーモードであれば
           || server.bgmConfig.mode === "only"
         )
@@ -302,14 +302,14 @@ export class MusicBot extends MusicBotBase {
           // BGM構成が存在するサーバー
           server instanceof GuildDataContainerWithBgm
           && (
-            (
-              // いまBGM再生中
-              server.queue.isBGM
+            
+          // いまBGM再生中
+            server.queue.isBGM
               && (
                 // キューの編集を許可していない、またはBGM優先モード
                 !server.bgmConfig.allowEditQueue || server.bgmConfig.mode === "prior"
               )
-            )
+            
             // BGMが再生していなければ、BGMオンリーモードであれば
             || server.bgmConfig.mode === "only"
           )
@@ -345,8 +345,8 @@ export class MusicBot extends MusicBotBase {
           if(l.length >= 1){
             // ページめくり
             await l[0].flipPage(
-              interaction.data.custom_id === PageToggle.arrowLeft ? (l[0].Current >= 1 ? l[0].Current - 1 : 0) :
-                interaction.data.custom_id === PageToggle.arrowRight ? (l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current) : 0
+              interaction.data.custom_id === PageToggle.arrowLeft ? l[0].Current >= 1 ? l[0].Current - 1 : 0 :
+                interaction.data.custom_id === PageToggle.arrowRight ? l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current : 0
               ,
               interaction
             );
@@ -486,10 +486,10 @@ export class MusicBot extends MusicBotBase {
           && (
             newChannel.id === server.bgmConfig.voiceChannelId
             && (
-              (
-                (!server.connection || (server.bgmConfig.mode === "prior" && server.connection.channelID !== server.bgmConfig.voiceChannelId))
+              
+              (!server.connection || server.bgmConfig.mode === "prior" && server.connection.channelID !== server.bgmConfig.voiceChannelId)
                 && !server.queue.isBGM
-              )
+              
               || server.player.finishTimeout
             )
           )
@@ -513,7 +513,7 @@ export class MusicBot extends MusicBotBase {
         server.player.disconnect();
       }else if(server.player.isPlaying && !Util.config.twentyFourSeven.includes(oldChannel.id) && !Util.config.alwaysTwentyFourSeven){
         // 誰も聞いてる人がいない場合一時停止
-        if(server.player.currentAudioInfo.LengthSeconds > 60 && server.player.currentAudioInfo.LengthSeconds - (server.player.currentTime / 1000) < 10){
+        if(server.player.currentAudioInfo.LengthSeconds > 60 && server.player.currentAudioInfo.LengthSeconds - server.player.currentTime / 1000 < 10){
           this.Log(`audio left less than 10sec; automatically disconnected from VC (${server.connection?.channelID})`);
           server.player.disconnect();
           if(!server.queue.onceLoopEnabled && !server.queue.loopEnabled) server.queue.next();

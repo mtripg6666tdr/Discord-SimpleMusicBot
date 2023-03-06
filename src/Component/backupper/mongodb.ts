@@ -36,7 +36,7 @@ const MongoClient = (() => {
   }
 })()?.MongoClient;
 
-type Collectionate<T> = T & {guildId: string};
+type Collectionate<T> = T & { guildId: string };
 
 export class MongoBackupper extends Backupper {
   private readonly client: mongo.MongoClient = null;
@@ -99,7 +99,7 @@ export class MongoBackupper extends Backupper {
     try{
       this.Log(`Backing up status...(${guildId})`);
       const status = this.data.get(guildId).exportStatus();
-      await this.collections.status.updateOne({guildId}, {
+      await this.collections.status.updateOne({ guildId }, {
         "$set": {
           guildId,
           ...status
@@ -119,7 +119,7 @@ export class MongoBackupper extends Backupper {
     try{
       const queue = this.data.get(guildId).exportQueue();
       this.Log(`Backing up queue...(${guildId})`);
-      this.collections.queue.updateOne({guildId}, {
+      this.collections.queue.updateOne({ guildId }, {
         "$set": {
           guildId,
           ...queue

@@ -76,7 +76,7 @@ export function resolveStreamToPlayable(streamInfo: StreamInfo, effects: string[
     //               2                      1
     // Total: 3
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Webm/Opus (cost: 3)`);
-    const info = seek > 0 || (streamInfo.type === "url" && streamInfo.url.split("?")[0].endsWith(".m3u8")) ? streamInfo : convertStreamInfoToReadableStreamInfo(streamInfo);
+    const info = seek > 0 || streamInfo.type === "url" && streamInfo.url.split("?")[0].endsWith(".m3u8") ? streamInfo : convertStreamInfoToReadableStreamInfo(streamInfo);
     const ffmpeg = transformThroughFFmpeg(info, bitrate, effects, seek, "webm");
     const passThrough = createPassThrough();
     ffmpeg

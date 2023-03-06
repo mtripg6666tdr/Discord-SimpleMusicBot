@@ -39,7 +39,7 @@ export default class Bgm extends BaseCommand {
   
   async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
-    if(!(await options.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true))) return;
+    if(!await options.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true)) return;
     const url = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
     if(options.server.hasSearchPanel(message.member.id)){
       message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
@@ -49,7 +49,7 @@ export default class Bgm extends BaseCommand {
     if(!searchPanel) return;
     const result = await searchPanel.consumeSearchResult(ytpl.default(url, {
       gl: "JP", hl: "ja"
-    }), ({items}) => items.map(item => ({
+    }), ({ items }) => items.map(item => ({
       title: item.title,
       author: item.author.name,
       description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`,

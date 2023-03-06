@@ -41,7 +41,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
   async getInfo(url: string){
     this.useLog();
     const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
-    const requestOptions = agent ? {agent} : undefined;
+    const requestOptions = agent ? { agent } : undefined;
     const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#getInfo`);
     let info = null as ytdl.videoInfo;
     try{
@@ -71,7 +71,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
       }else{
         this.logger("[AudioSource:youtube] obtaining info");
         const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
-        const requestOptions = agent ? {agent} : undefined;
+        const requestOptions = agent ? { agent } : undefined;
         const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch`);
         // eslint-disable-next-line @typescript-eslint/no-shadow
         let info = null as ytdl.videoInfo;
@@ -121,9 +121,9 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
     }else{
       let readable = null as Readable;
       if(info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow){
-        readable = createRefreshableYTLiveStream(info, url, {format, lang: "ja"});
+        readable = createRefreshableYTLiveStream(info, url, { format, lang: "ja" });
       }else{
-        readable = createChunkedYTStream(info, format, {lang: "ja"}, 1 * 1024 * 1024);
+        readable = createChunkedYTStream(info, format, { lang: "ja" }, 1 * 1024 * 1024);
       }
       return {
         ...partialResult,

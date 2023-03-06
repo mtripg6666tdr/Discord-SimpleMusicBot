@@ -43,7 +43,7 @@ export class PlayManagerWithBgm extends PlayManager {
 
   override async play(time?: number, bgm: boolean = false){
     if(this.server instanceof GuildDataContainerWithBgm){
-      if(((this.server.queue.isBGM && !bgm) || (!this.server.queue.isBgmEmpty && bgm)) && this.server.connection?.playing){
+      if((this.server.queue.isBGM && !bgm || !this.server.queue.isBgmEmpty && bgm) && this.server.connection?.playing){
         this.stop();
       }
       this.server.queue.setToPlayBgm(bgm);

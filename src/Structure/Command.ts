@@ -38,7 +38,7 @@ export type CommandPermission =
   | "noConnection"
 ;
 
-export const permissionDescriptionParts: Readonly<{[key in CommandPermission]: string}> = {
+export const permissionDescriptionParts: Readonly<{ [key in CommandPermission]: string }> = {
   admin: "サーバー/チャンネルの管理権限を持っていること",
   dj: "同じボイスチャンネルに接続していてかつDJロールを保持していること",
   sameVc: "同じボイスチャンネルに接続していること",
@@ -84,7 +84,7 @@ export interface SlashCommandArgument {
   name: string;
   description: string;
   required: boolean;
-  choices?: {[key: string]: string|number};
+  choices?: { [key: string]: string|number };
 }
 
 /**

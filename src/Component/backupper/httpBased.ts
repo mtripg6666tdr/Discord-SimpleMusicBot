@@ -29,7 +29,7 @@ const MIME_JSON = "application/json";
 
 export class HttpBackupper extends Backupper {
   private _queueModifiedGuilds: string[] = [];
-  private _previousStatuses: {[guildId: string]: string} = {};
+  private _previousStatuses: { [guildId: string]: string } = {};
 
   constructor(bot: MusicBotBase, getData: () => DataType){
     super(bot, getData);
@@ -98,8 +98,8 @@ export class HttpBackupper extends Backupper {
   private async backupStatus(){
     try{
       // 参加ステータスの送信
-      const speaking = [] as {guildid: string, value: string}[];
-      const currentStatuses = Object.assign({}, this._previousStatuses) as {[guildId: string]: string};
+      const speaking = [] as { guildid: string, value: string }[];
+      const currentStatuses = Object.assign({}, this._previousStatuses) as { [guildId: string]: string };
       this.data.forEach(container => {
         const currentStatus = ((status: exportableStatuses) => [
           status.voiceChannelId,
@@ -144,7 +144,7 @@ export class HttpBackupper extends Backupper {
           type: "j"
         } as requestBody, MIME_JSON);
         if(result.status === 200){
-          const frozenGuildStatuses = result.data as {[guildid: string]: string};
+          const frozenGuildStatuses = result.data as { [guildid: string]: string };
           const map = new Map<string, exportableStatuses>();
           Object.keys(frozenGuildStatuses).forEach(key => {
             const [
@@ -196,7 +196,7 @@ export class HttpBackupper extends Backupper {
           type: "queue"
         } as requestBody, MIME_JSON);
         if(result.status === 200){
-          const frozenQueues = result.data as {[guildid: string]: string};
+          const frozenQueues = result.data as { [guildid: string]: string };
           const res = new Map<string, YmxFormat>();
           Object.keys(frozenQueues).forEach(key => {
             try{
@@ -226,11 +226,11 @@ export class HttpBackupper extends Backupper {
   /**
    * ステータス情報をサーバーへバックアップする
    */
-  private async _backupStatusData(data: {guildid: string, value: string}[]){
+  private async _backupStatusData(data: { guildid: string, value: string }[]){
     if(HttpBackupper.backuppable){
       const t = Util.time.timer.start("backupStatusData");
       const ids = data.map(d => d.guildid).join(",");
-      const rawData = {} as {[key: string]: string};
+      const rawData = {} as { [key: string]: string };
       data.forEach(d => rawData[d.guildid] = d.value);
       try{
         const result = await this._requestHttp("POST", process.env.GAS_URL, {
@@ -261,11 +261,11 @@ export class HttpBackupper extends Backupper {
   /**
    * キューのデータをサーバーへバックアップする
    */
-  private async _backupQueueData(data: {guildid: string, queue: string}[]){
+  private async _backupQueueData(data: { guildid: string, queue: string }[]){
     if(HttpBackupper.backuppable){
       const t = Util.time.timer.start("SetQueueData");
       const ids = data.map(d => d.guildid).join(",");
-      const rawData = {} as {[guildid: string]: string};
+      const rawData = {} as { [guildid: string]: string };
       data.forEach(d => rawData[d.guildid] = encodeURIComponent(d.queue));
       try{
         const result = await this._requestHttp("POST", process.env.GAS_URL, {

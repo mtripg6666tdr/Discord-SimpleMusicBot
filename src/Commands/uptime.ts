@@ -50,11 +50,11 @@ export default class Uptime extends BaseCommand {
       .addField("レイテンシ",
         `${now - message.createdTimestamp}ミリ秒(ボット接続実測値)\r\n`
         + `${message.guild.shard.latency === Infinity ? "-" : message.guild.shard.latency}ミリ秒(ボットWebSocket接続取得値)\r\n`
-        + `${(options.server.player.isConnecting && options.server.vcPing) || "-"}ミリ秒(ボイスチャンネルUDP接続取得値)`
+        + `${options.server.player.isConnecting && options.server.vcPing || "-"}ミリ秒(ボイスチャンネルUDP接続取得値)`
       )
       .addField("データが保持されているサーバー数", `${options.bot.databaseCount}サーバー`)
       .toEris()
     ;
-    message.reply({embeds: [embed]}).catch(e => Util.logger.log(e, "error"));
+    message.reply({ embeds: [embed] }).catch(e => Util.logger.log(e, "error"));
   }
 }

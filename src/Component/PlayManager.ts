@@ -293,7 +293,7 @@ export class PlayManager extends ServerManagerBase {
           voiceDataTimeout: 40 * 1000
         });
         // @ts-expect-error 7053
-        const erisStreams = (connection.piper["streams"] as (Readable & Writable)[]);
+        const erisStreams = connection.piper["streams"] as (Readable & Writable)[];
         if(this.detailedLog) erisStreams.forEach((readable, i) => setReadableCsvLog(readable, i + streams.length));
         const volumeTransformer = erisStreams.find(r => r.constructor.name === "VolumeTransformer");
         volumeTransformer?.on("data", () => {
@@ -339,7 +339,7 @@ export class PlayManager extends ServerManagerBase {
             // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
             "次の曲がまだ登録されていません", true
           )
-          .addField("再生待ちの曲", this.server.queue.loopEnabled ? "ループします" : (this.server.queue.length - 1) + "曲(" + Util.time.HourMinSecToString(timeFragments) + ")", true)
+          .addField("再生待ちの曲", this.server.queue.loopEnabled ? "ループします" : this.server.queue.length - 1 + "曲(" + Util.time.HourMinSecToString(timeFragments) + ")", true)
         ;
         if(typeof this.currentAudioInfo.Thumbnail === "string"){
           embed.setThumbnail(this.currentAudioInfo.Thumbnail);

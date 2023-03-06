@@ -109,7 +109,7 @@ export class YouTube extends AudioSource {
   }
 
   async fetchVideo(){
-    let info = (this.cache?.type === ytdlCore && this.cache.data as ytdl.videoInfo) || null;
+    let info = this.cache?.type === ytdlCore && this.cache.data as ytdl.videoInfo || null;
     if(!info) info = await (strategies[0] as ytdlCoreStrategy).getInfo(this.Url).then(result => (this.cache = result.cache).data);
     const isLive = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
     const format = ytdl.chooseFormat(info.formats, {

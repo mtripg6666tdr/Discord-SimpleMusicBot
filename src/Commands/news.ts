@@ -49,7 +49,7 @@ export default class News extends BaseCommand {
     if(!searchPanel) return;
     const result = await searchPanel.consumeSearchResult(ytpl.default(url, {
       gl: "JP", hl: "ja", limit: 20
-    }), ({items}) => items.map(item => ({
+    }), ({ items }) => items.map(item => ({
       title: item.title,
       author: item.author.name,
       description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`,

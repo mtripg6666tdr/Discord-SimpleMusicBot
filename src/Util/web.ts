@@ -33,8 +33,8 @@ import { DefaultUserAgent } from "./ua";
  * @param url URL
  * @returns ダウンロードされたテキストデータ
  */
-export function DownloadText(url: string, headers?: {[key: string]: string}, requestBody?: any): Promise<string>{
-  return candyget.string(url, {headers}, requestBody).then(r => r.body);
+export function DownloadText(url: string, headers?: { [key: string]: string }, requestBody?: any): Promise<string>{
+  return candyget.string(url, { headers }, requestBody).then(r => r.body);
 }
 
 /**
@@ -43,7 +43,7 @@ export function DownloadText(url: string, headers?: {[key: string]: string}, req
  * @param headers 追加のカスタムリクエストヘッダ
  * @returns ステータスコード
  */
-export function RetriveHttpStatusCode(url: string, headers?: {[key: string]: string}){
+export function RetriveHttpStatusCode(url: string, headers?: { [key: string]: string }){
   return candyget("HEAD", url, "string", {
     headers: {
       "User-Agent": DefaultUserAgent,
@@ -52,8 +52,8 @@ export function RetriveHttpStatusCode(url: string, headers?: {[key: string]: str
   }).then(r => r.statusCode);
 }
 
-const httpAgent = new HttpAgent({keepAlive: false});
-const httpsAgent = new HttpsAgent({keepAlive: false});
+const httpAgent = new HttpAgent({ keepAlive: false });
+const httpsAgent = new HttpsAgent({ keepAlive: false });
 
 /**
  * 指定されたURLからReadable Streamを生成します

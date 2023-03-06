@@ -29,7 +29,7 @@ export function createChunkedYTStream(info: ytdl.videoInfo, format: ytdl.videoFo
   let current = -1;
   const contentLength = Number(format.contentLength);
   if(contentLength < chunkSize){
-    ytdl.downloadFromInfo(info, {format, ...options})
+    ytdl.downloadFromInfo(info, { format, ...options })
       .on("error", er => !stream.destroyed ? stream.destroy(er) : stream.emit("error", er))
       .pipe(stream)
     ;
@@ -39,20 +39,20 @@ export function createChunkedYTStream(info: ytdl.videoInfo, format: ytdl.videoFo
       current++;
       let end = chunkSize * (current + 1) - 1;
       if(end >= contentLength) end = undefined;
-      const nextStream = ytdl.downloadFromInfo(info, {format, ...options, range: {
+      const nextStream = ytdl.downloadFromInfo(info, { format, ...options, range: {
         start: chunkSize * current, end
-      }});
-      Util.logger.log(`[AudioSource:youtube]Stream #${(current + 1)} was created.`);
+      } });
+      Util.logger.log(`[AudioSource:youtube]Stream #${current + 1} was created.`);
       nextStream
         .on("error", er => !stream.destroyed ? stream.destroy(er) : stream.emit("error", er))
-        .pipe(stream, {end: end === undefined})
+        .pipe(stream, { end: end === undefined })
       ;
       if(end !== undefined){
         nextStream.on("end", () => {
           pipeNextStream();
         });
       }else{
-        Util.logger.log(`[AudioSource:youtube]Last stream (total:${(current + 1)})`);
+        Util.logger.log(`[AudioSource:youtube]Last stream (total:${current + 1})`);
       }
     };
     pipeNextStream();
@@ -80,7 +80,7 @@ export function createRefreshableYTLiveStream(info: ytdl.videoInfo, url: string,
   const downloadLiveStream = async (targetInfo: ytdl.videoInfo|string) => {
     if(typeof targetInfo === "string"){
       targetInfo = await ytdl.getInfo(targetInfo);
-      options.format = ytdl.chooseFormat(targetInfo.formats, {isHLS: true} as ytdl.chooseFormatOptions);
+      options.format = ytdl.chooseFormat(targetInfo.formats, { isHLS: true } as ytdl.chooseFormatOptions);
     }
     return ytdl.downloadFromInfo(targetInfo, Object.assign({
       liveBuffer: 10000,

@@ -175,7 +175,7 @@ export type BestdoriAllSongInfo = {
     musicTitle: [string, string, string, string, string],
     publishedAt: [string, string, string, string, string],
     closedAt: [string, string, string, string, string],
-    difficulty: {[key in "0"|"1"|"2"|"3"|"4"]: {playLevel: number}},
+    difficulty: { [key in "0"|"1"|"2"|"3"|"4"]: { playLevel: number } },
   },
 };
 export type BestdoriAllBandInfo = {

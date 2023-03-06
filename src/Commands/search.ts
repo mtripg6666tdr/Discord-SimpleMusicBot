@@ -70,7 +70,7 @@ export abstract class SearchBase<T> extends BaseCommand {
     }
   }
 
-  protected abstract searchContent(query: string): Promise<T|{result: T, transformedQuery: string}>;
+  protected abstract searchContent(query: string): Promise<T|{ result: T, transformedQuery: string }>;
 
   protected abstract consumer(result: T): SongInfo[];
 
@@ -105,7 +105,7 @@ export default class Search extends SearchBase<ytsr.Result> {
     return searchYouTube(query);
   }
 
-  protected override consumer({items}: ytsr.Result){
+  protected override consumer({ items }: ytsr.Result){
     return items.map(item => item.type !== "video" ? null : {
       url: item.url,
       title: item.title,

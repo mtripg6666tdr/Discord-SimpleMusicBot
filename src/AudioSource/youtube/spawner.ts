@@ -30,7 +30,7 @@ import Util from "../../Util";
 const worker = isMainThread ? new Worker(path.join(__dirname, "./worker.js")).on("error", console.error) : null;
 global.workerThread = worker;
 
-export type WithId<T> = T & {id: string};
+export type WithId<T> = T & { id: string };
 export type spawnerJobMessage = spawnerGetInfoMessage | spawnerSearchMessage;
 export type spawnerGetInfoMessage = {
   type: "init",
@@ -62,7 +62,7 @@ export type workerLoggingMessage = {
   data: string,
 };
 
-type jobCallback = (callback: workerMessage & {id: string}) => void;
+type jobCallback = (callback: workerMessage & { id: string }) => void;
 type jobQueueContent = {
   callback: jobCallback,
   start: number,

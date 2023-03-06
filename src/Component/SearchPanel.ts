@@ -61,24 +61,24 @@ export class SearchPanel extends EventEmitter {
     }
   }
 
-  async consumeSearchResult<T>(searchPromise: Promise<T|{result: T, transformedQuery: string}>, consumer: (result: T) => SongInfo[]){
+  async consumeSearchResult<T>(searchPromise: Promise<T|{ result: T, transformedQuery: string }>, consumer: (result: T) => SongInfo[]){
     if(this.status !== "init") return false;
     this.status = "consumed";
     let reply: ResponseMessage = null;
     try{
       reply = await this._commandMessage.reply("🔍検索中...");
       const waitedPromiseResult = await searchPromise;
-      if("transformedQuery" in (waitedPromiseResult as {result: T, transformedQuery: string})) this.query = (waitedPromiseResult as {result: T, transformedQuery: string}).transformedQuery;
-      const songResult = this._options = consumer("transformedQuery" in (waitedPromiseResult as {result: T, transformedQuery: string}) ? (waitedPromiseResult as {result: T, transformedQuery: string}).result : waitedPromiseResult as T).slice(0, 20);
+      if("transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string })) this.query = (waitedPromiseResult as { result: T, transformedQuery: string }).transformedQuery;
+      const songResult = this._options = consumer("transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string }) ? (waitedPromiseResult as { result: T, transformedQuery: string }).result : waitedPromiseResult as T).slice(0, 20);
       if(songResult.length <= 0){
         await reply.edit(":pensive:見つかりませんでした。");
         return false;
       }
       let searchPanelDescription = "";
-      const selectOpts: SelectMenuOptions[] = songResult.map(({url, title, author, duration, description}, j) => {
+      const selectOpts: SelectMenuOptions[] = songResult.map(({ url, title, author, duration, description }, j) => {
         searchPanelDescription += `\`${j + 1}.\` [${title}](${url}) \`${duration}\` - \`${author}\` \r\n\r\n`;
         return {
-          label: `${(j + 1).toString()}. ${(title.length > 90 ? title.substring(0, 90) + "…" : title)}`,
+          label: `${(j + 1).toString()}. ${title.length > 90 ? title.substring(0, 90) + "…" : title}`,
           description,
           value: (j + 1).toString()
         };
@@ -92,11 +92,11 @@ export class SearchPanel extends EventEmitter {
             .setDescription(searchPanelDescription)
             .setFooter({
               icon_url: this._commandMessage.member.avatarURL,
-              text: (
+              text:
                 Util.config.noMessageContent
                   ? "再生したい項目を選択して数字を送信するか、下から選択してください。キャンセルするには「キャンセル」または「cancel」と選択/入力します。また、サムネイルコマンドを使用してサムネイルを確認できます。" :
                   "再生したい項目を、下から選択してください。キャンセルするには、下から\"キャンセル\"を選択してください。また、サムネイルコマンドを使用してサムネイルを確認することもできます。"
-              ),
+              ,
             })
             .toEris(),
         ],

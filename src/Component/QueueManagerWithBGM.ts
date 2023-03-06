@@ -75,10 +75,10 @@ export class QueueManagerWithBgm extends QueueManager {
     type: KnownAudioSourceIdentifer = "unknown",
     gotData: AudioSource.exportableCustom = null,
     preventCache: boolean = false,
-  ): Promise<QueueContent & {index: number}>{
+  ): Promise<QueueContent & { index: number }>{
     if(!url.startsWith("http://") && !url.startsWith("https://") && fs.existsSync(path.join(__dirname, "../../", url))){
       const result = {
-        basicInfo: await (new AudioSource.FsStream().init(url)),
+        basicInfo: await new AudioSource.FsStream().init(url),
         additionalInfo: {
           addedBy: {
             userId: this.getUserIdFromMember(addedBy) ?? "0",
@@ -89,7 +89,7 @@ export class QueueManagerWithBgm extends QueueManager {
       this._default[method](result);
       if(this.server.equallyPlayback) this.sortWithAddedBy();
       const index = this._default.findIndex(q => q === result);
-      return {...result, index};
+      return { ...result, index };
     }
     return super.addQueue(url, addedBy, method, type, gotData, preventCache);
   }
