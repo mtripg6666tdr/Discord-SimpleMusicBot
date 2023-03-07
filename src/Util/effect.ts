@@ -52,7 +52,7 @@ export function getCurrentEffectPanel(avatarUrl: string, data: GuildDataContaine
     .setColor(getColor("EFFECT"))
     .setFooter({
       icon_url: avatarUrl,
-      text: "エフェクトを選択してボタンを押してください"
+      text: "エフェクトを選択してボタンを押してください",
     })
   ;
   const messageActions = new Helper.MessageActionRowBuilder()

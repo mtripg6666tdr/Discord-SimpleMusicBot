@@ -36,12 +36,12 @@ export default class Mv extends BaseCommand {
         type: "integer",
         name: "from",
         description: "移動元のインデックス。キューに併記されているものです",
-        required: true
+        required: true,
       }, {
         type: "integer",
         name: "to",
         description: "移動先のインデックス。キューに併記されているものです",
-        required: true
+        required: true,
       }],
       requiredPermissionsOr: ["admin", "onlyListener", "dj"],
       shouldDefer: false,

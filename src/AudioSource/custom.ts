@@ -48,17 +48,17 @@ export class CustomStream extends AudioSource {
   async fetch(): Promise<UrlStreamInfo>{
     return {
       type: "url",
-      url: this.Url
+      url: this.Url,
     };
   }
 
   toField(){
     return [{
       name: ":link:URL",
-      value: this.Url
+      value: this.Url,
     }, {
       name: ":asterisk:詳細",
-      value: "カスタムストリーム"
+      value: "カスタムストリーム",
     }] as EmbedField[];
   }
 

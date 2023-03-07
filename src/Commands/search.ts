@@ -46,8 +46,8 @@ export abstract class SearchBase<T> extends BaseCommand {
                 .setLabel("以前の検索結果を破棄")
                 .setStyle("DANGER")
             )
-            .toEris()
-        ]
+            .toEris(),
+        ],
       }).catch(e => Util.logger.log(e, "error"));
       if(responseMessage){
         options.server.getSearchPanel(message.member.id).once("destroy", () => {
@@ -94,7 +94,7 @@ export default class Search extends SearchBase<ytsr.Result> {
         type: "string",
         name: "keyword",
         description: "検索したい動画のキーワードまたはURL。",
-        required: true
+        required: true,
       }],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
@@ -112,7 +112,7 @@ export default class Search extends SearchBase<ytsr.Result> {
       duration: item.duration,
       thumbnail: item.bestThumbnail.url,
       author: item.author.name,
-      description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`
+      description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`,
     }).filter(n => n);
   }
 

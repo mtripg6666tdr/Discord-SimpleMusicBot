@@ -35,7 +35,7 @@ export default class Invoke extends BaseCommand {
         name: "command",
         description: "実行するコマンド",
         type: "string",
-        required: true
+        required: true,
       }],
       usage: "invoke <コマンド>",
       examples: "invoke play 夜に駆ける",
@@ -98,9 +98,9 @@ export default class Invoke extends BaseCommand {
           files: [
             {
               file: Buffer.from(Util.logger.logStore.data.join("\r\n")),
-              name: "log.txt"
-            }
-          ]
+              name: "log.txt",
+            },
+          ],
         }).catch(er => Util.logger.log(er));
         break;
       case "obtaindsl":
@@ -111,9 +111,9 @@ export default class Invoke extends BaseCommand {
             files: [
               {
                 file: Buffer.from(options.server.player.csvLog.join("\r\n")),
-                name: "detailed_log.csv"
-              }
-            ]
+                name: "detailed_log.csv",
+              },
+            ],
           }).catch(er => Util.logger.log(er, "error"));
         }
         break;

@@ -61,32 +61,32 @@ export class BestdoriS extends AudioSource {
   async fetch(): Promise<UrlStreamInfo>{
     return {
       type: "url",
-      url: "https://bestdori.com/assets/jp/sound/bgm" + Util.general.padZero(this.id.toString(), 3) + "_rip/bgm" + Util.general.padZero(this.id.toString(), 3) + ".mp3"
+      url: "https://bestdori.com/assets/jp/sound/bgm" + Util.general.padZero(this.id.toString(), 3) + "_rip/bgm" + Util.general.padZero(this.id.toString(), 3) + ".mp3",
     };
   }
 
   toField(){
     const typeMap = {
       anime: "カバー",
-      normal: "アニメ"
+      normal: "アニメ",
     };
     return [
       {
         name: "バンド名",
         value: this.Artist,
-        inline: false
+        inline: false,
       },
       {
         name: "ジャンル",
-        value: typeMap[this.Type]
+        value: typeMap[this.Type],
       },
       {
         name: "楽曲情報",
         value: "作詞: `" + (this.lyricist ?? "情報なし")
           + "` \r\n作曲: `" + (this.composer ?? "情報なし")
           + "` \r\n編曲: `" + (this.arranger ?? "情報なし") + "`",
-        inline: false
-      }
+        inline: false,
+      },
     ] as EmbedField[];
   }
 

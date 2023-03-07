@@ -71,7 +71,7 @@ export class PageToggle {
     const apply:(CommandMessage["reply"]|ResponseMessage["edit"]) = msg instanceof CommandMessage ? msg.reply.bind(msg) : msg.edit.bind(msg);
     n._message = await apply({
       embeds: [
-        await n.getEmbed(current || 0)
+        await n.getEmbed(current || 0),
       ],
       components: [
         new Helper.MessageActionRowBuilder()
@@ -85,8 +85,8 @@ export class PageToggle {
               .setEmoji(this.arrowRightEmoji)
               .setStyle("PRIMARY")
           )
-          .toEris()
-      ]
+          .toEris(),
+      ],
     });
     return n;
   }
@@ -101,7 +101,7 @@ export class PageToggle {
     delIndex.sort((a, b)=>b - a);
     delIndex.forEach(i => {
       toggles[i].Message.edit({
-        components: []
+        components: [],
       });
       toggles.splice(i, 1);
     });

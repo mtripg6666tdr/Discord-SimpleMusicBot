@@ -82,9 +82,9 @@ export class QueueManagerWithBgm extends QueueManager {
         additionalInfo: {
           addedBy: {
             userId: this.getUserIdFromMember(addedBy) ?? "0",
-            displayName: this.getDisplayNameFromMember(addedBy) ?? "不明"
-          }
-        }
+            displayName: this.getDisplayNameFromMember(addedBy) ?? "不明",
+          },
+        },
       } as QueueContent;
       this._default[method](result);
       if(this.server.equallyPlayback) this.sortWithAddedBy();

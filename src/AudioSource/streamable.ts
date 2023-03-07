@@ -51,17 +51,17 @@ export class Streamable extends AudioSource {
   async fetch(): Promise<UrlStreamInfo>{
     return {
       type: "url",
-      url: this.streamUrl
+      url: this.streamUrl,
     };
   }
 
   toField(){
     return [{
       name: ":link:URL",
-      value: this.Url
+      value: this.Url,
     }, {
       name: ":asterisk:詳細",
-      value: "Streamableにて共有されたファイル"
+      value: "Streamableにて共有されたファイル",
     }] as EmbedField[];
   }
 
@@ -73,7 +73,7 @@ export class Streamable extends AudioSource {
       length: this.LengthSeconds,
       thumbnail: this.Thumbnail,
       title: this.Title,
-      streamUrl: this.streamUrl
+      streamUrl: this.streamUrl,
     };
   }
 }

@@ -32,7 +32,7 @@ export async function GetLyrics(keyword: string): Promise<songInfo>{
       artwork: song.image,
       lyric: await song.lyrics(),
       title: song.title,
-      url: song.url
+      url: song.url,
     };
   }
   catch(e){
@@ -47,7 +47,7 @@ export async function GetLyrics(keyword: string): Promise<songInfo>{
     let lyric = await DownloadText(url, {
       "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
       "Cookie": "lyric_ruby=off;",
-      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36",
     });
     let doc = "";
     [doc, lyric] = lyric.split("<div class=\"hiragana\" >");
@@ -65,7 +65,7 @@ export async function GetLyrics(keyword: string): Promise<songInfo>{
       artist: decode(match.groups.artist),
       title: decode(match.groups.title),
       artwork: artwork.startsWith("http") ? artwork : DefaultAudioThumbnailURL,
-      url: url
+      url: url,
     };
   }
 }

@@ -63,7 +63,7 @@ export class SoundCloudS extends AudioSource {
     ;
     return {
       type: "readable",
-      stream
+      stream,
     };
   }
 
@@ -72,11 +72,11 @@ export class SoundCloudS extends AudioSource {
     fields.push({
       name: ":musical_note:ユーザー",
       value: this.Author,
-      inline: false
+      inline: false,
     }, {
       name: ":asterisk:概要",
       value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, verbose ? 1000 : 300) + "..." : this.Description,
-      inline: false
+      inline: false,
     });
     return fields;
   }
@@ -92,7 +92,7 @@ export class SoundCloudS extends AudioSource {
       description: this.Description,
       length: this._lengthSeconds,
       author: this.Author,
-      thumbnail: this.Thumbnail
+      thumbnail: this.Thumbnail,
     };
   }
 

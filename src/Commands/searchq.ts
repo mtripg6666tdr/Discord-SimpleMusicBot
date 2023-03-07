@@ -40,7 +40,7 @@ export default class Searchq extends BaseCommand {
         type: "string",
         name: "keyword",
         description: "検索したい楽曲のキーワード",
-        required: true
+        required: true,
       }],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
@@ -74,7 +74,7 @@ export default class Searchq extends BaseCommand {
         value: `[${c.basicInfo.Title}](${c.basicInfo.Url})\r\nリクエスト: \`${c.additionalInfo.addedBy.displayName}\` \r\n長さ: ${
           c.basicInfo.isYouTube() && c.basicInfo.LiveStream ? "(ライブストリーム)" : ` \`${_t === 0 ? "(不明)" : `${min}:${sec}`}\`)`
         }`,
-        inline: false
+        inline: false,
       } as EmbedField;
     });
     const embed = new Helper.MessageEmbedBuilder()

@@ -36,7 +36,7 @@ export default class Volume extends BaseCommand {
         type: "integer",
         name: "volume",
         description: "変更先の音量。1~200までが指定できます。",
-        required: false
+        required: false,
       }],
       requiredPermissionsOr: ["admin", "sameVc"],
       shouldDefer: false,

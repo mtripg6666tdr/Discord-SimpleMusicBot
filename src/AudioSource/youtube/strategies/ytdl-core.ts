@@ -58,7 +58,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
       cache: {
         type: ytdlCore,
         data: info,
-      }
+      },
     };
   }
 
@@ -90,7 +90,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
     const format = ytdl.chooseFormat(info.formats, info.videoDetails.liveBroadcastDetails?.isLiveNow ? {
       filter: null,
       quality: null,
-      isHLS: false
+      isHLS: false,
     } as ytdl.chooseFormatOptions : {
       filter: "audioonly",
       quality: "highestaudio",
@@ -106,7 +106,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
         channel: (video.author as ytdl.Author)?.name,
         channelUrl: (video.author as ytdl.Author)?.channel_url,
         thumbnail: video.thumbnails[0].url,
-        isLive: video.isLive
+        isLive: video.isLive,
       })).filter(v => !v.isLive),
     };
     if(forceUrl){
@@ -116,7 +116,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
           type: "url",
           url: format.url,
           userAgent: ua,
-        } as UrlStreamInfo
+        } as UrlStreamInfo,
       };
     }else{
       let readable = null as Readable;
@@ -130,8 +130,8 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
         stream: {
           type: "readable",
           stream: readable,
-          streamType: format.container === "webm" && format.audioCodec === "opus" ? "webm" : undefined
-        } as ReadableStreamInfo
+          streamType: format.container === "webm" && format.audioCodec === "opus" ? "webm" : undefined,
+        } as ReadableStreamInfo,
       };
     }
   }

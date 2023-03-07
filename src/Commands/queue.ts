@@ -38,7 +38,7 @@ export default class Queue extends BaseCommand {
         type: "integer",
         name: "page",
         description: "表示するキューのページを指定することができます",
-        required: false
+        required: false,
       }],
       requiredPermissionsOr: [],
       shouldDefer: false,
@@ -80,7 +80,7 @@ export default class Queue extends BaseCommand {
             `長さ: \`${q.basicInfo.isYouTube() && q.basicInfo.LiveStream ? "ライブストリーム" : `${min}:${sec}`} \``,
             `リクエスト: \`${q.additionalInfo.addedBy.displayName}\` `,
             q.basicInfo.npAdditional(),
-          ].join("\r\n")
+          ].join("\r\n"),
         });
       }
       const [thour, tmin, tsec] = Util.time.CalcHourMinSec(totalLength);
@@ -93,7 +93,7 @@ export default class Queue extends BaseCommand {
           icon_url: options.client.user.avatarURL,
         })
         .setFooter({
-          text: `${queue.length}曲 | 合計:${thour}:${tmin}:${tsec} | トラックループ:${queue.loopEnabled ? "⭕" : "❌"} | キューループ:${queue.queueLoopEnabled ? "⭕" : "❌"} | 関連曲自動再生:${options.server.addRelated ? "⭕" : "❌"} | 均等再生:${options.server.equallyPlayback ? "⭕" : "❌"}`
+          text: `${queue.length}曲 | 合計:${thour}:${tmin}:${tsec} | トラックループ:${queue.loopEnabled ? "⭕" : "❌"} | キューループ:${queue.queueLoopEnabled ? "⭕" : "❌"} | 関連曲自動再生:${options.server.addRelated ? "⭕" : "❌"} | 均等再生:${options.server.equallyPlayback ? "⭕" : "❌"}`,
         })
         .setThumbnail(message.guild.iconURL)
         .setColor(getColor("QUEUE"))

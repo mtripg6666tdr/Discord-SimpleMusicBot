@@ -138,7 +138,7 @@ export abstract class MusicBotBase extends LogEmitter {
           .toString()
           .trim()
         ;
-      }
+      },
     ];
     for(let i = 0; i < versionObtainStrategies.length; i++){
       try{

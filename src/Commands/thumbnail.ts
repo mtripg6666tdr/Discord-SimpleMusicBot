@@ -39,7 +39,7 @@ export default class Thumbnail extends BaseCommand {
         type: "integer",
         name: "index",
         description: "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します",
-        required: false
+        required: false,
       }],
       requiredPermissionsOr: [],
       shouldDefer: false,
@@ -68,7 +68,7 @@ export default class Thumbnail extends BaseCommand {
       if(typeof info.Thumbnail === "string"){
         embed.setImage(info.Thumbnail);
         await message.reply({
-          embeds: [embed.toEris()]
+          embeds: [embed.toEris()],
         }).catch(e => Util.logger.log(e, "error"));
       }else{
         embed.setImage("attachment://thumbnail." + info.Thumbnail.ext);
@@ -88,7 +88,7 @@ export default class Thumbnail extends BaseCommand {
     }
     
     await message.reply({
-      embeds: [embed.toEris()]
+      embeds: [embed.toEris()],
     }).catch(e => Util.logger.log(e, "error"));
   }
 }

@@ -40,7 +40,7 @@ export default class Import extends BaseCommand {
         type: "string",
         name: "url",
         description: "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURL、もしくはキューの埋め込みが添付されたURLを指定できます。",
-        required: true
+        required: true,
       }],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: false,

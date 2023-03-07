@@ -41,7 +41,7 @@ export default class Lyrics extends BaseCommand {
         type: "string",
         name: "keyword",
         description: "楽曲を検索するキーワード",
-        required: true
+        required: true,
       }],
       requiredPermissionsOr: [],
       shouldDefer: false,
@@ -72,12 +72,12 @@ export default class Lyrics extends BaseCommand {
       embeds[embeds.length - 1]
         .setFooter({
           text: Util.eris.user.getDisplayName(message.member),
-          icon_url: message.member.avatarURL
+          icon_url: message.member.avatarURL,
         })
       ;
       msg.edit({
         content: "",
-        embeds: embeds.map(embed => embed.toEris())
+        embeds: embeds.map(embed => embed.toEris()),
       });
     }
     catch(e){

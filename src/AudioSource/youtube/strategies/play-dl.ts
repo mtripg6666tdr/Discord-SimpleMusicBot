@@ -49,7 +49,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
       cache: {
         type: playDl,
         data: info,
-      }
+      },
     };
   }
 
@@ -76,7 +76,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
         stream: {
           type: "url",
           url: info.LiveStreamData.hlsManifestUrl,
-        } as UrlStreamInfo
+        } as UrlStreamInfo,
       };
     }else{
       const format = info.format.filter(f => f.mimeType.startsWith("audio"));
@@ -88,7 +88,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
           type: "url",
           url: format[0].url,
           streamType: (format[0] as any)["container"] === "webm" && (format[0] as any)["codec"] === "opus" ? "webm" : undefined,
-        } as UrlStreamInfo
+        } as UrlStreamInfo,
       };
     }
   }

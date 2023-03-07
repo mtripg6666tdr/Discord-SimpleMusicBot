@@ -82,10 +82,10 @@ export function RetriveLengthSeconds(url: string){
     let data = "";
     const proc = spawn(require("ffmpeg-static"), [
       "-i", url,
-      "-user_agent", DefaultUserAgent
+      "-user_agent", DefaultUserAgent,
     ], {
       windowsHide: true,
-      stdio: ["ignore", "ignore", "pipe"]
+      stdio: ["ignore", "ignore", "pipe"],
     })
       .on("exit", () => {
         if(data.length === 0) reject("zero");

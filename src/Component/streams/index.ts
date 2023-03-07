@@ -152,8 +152,8 @@ function convertStreamInfoToReadableStreamInfo(streamInfo: UrlStreamInfo|Readabl
     type: "readable",
     stream: Util.web.DownloadAsReadable(streamInfo.url, streamInfo.userAgent ? {
       headers: {
-        "User-Agent": streamInfo.userAgent
-      }
+        "User-Agent": streamInfo.userAgent,
+      },
     } : {}),
     streamType: streamInfo.streamType,
   };

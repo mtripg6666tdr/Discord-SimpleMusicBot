@@ -63,11 +63,11 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
       for(let i = 0; i < items.length; i++){
         await this.queue.addQueue(items[i], {
           displayName: "システム",
-          userId: "0"
+          userId: "0",
         }, "push", "unknown", {
           title: "BGM",
           url: items[i],
-          length: -1
+          length: -1,
         }, /* preventCache */ true);
       }
       this.queue.moveCurrentTracksToBGM();

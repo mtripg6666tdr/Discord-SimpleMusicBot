@@ -48,7 +48,7 @@ export default class SystemInfo extends BaseCommand {
           "メモリ": "mem",
           "CPU": "cpu",
           "ログ(管理者のみ)": "log",
-        }
+        },
       }],
       requiredPermissionsOr: [],
       shouldDefer: false,

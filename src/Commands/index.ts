@@ -155,7 +155,7 @@ export abstract class BaseCommand {
         choices: !arg.choices ? undefined : Object.keys(arg.choices).map(name => ({
           name,
           value: arg.choices[name],
-        }))
+        })),
       };
       if(!erisCommandStruct.choices) delete erisCommandStruct.choices;
       return erisCommandStruct as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean;

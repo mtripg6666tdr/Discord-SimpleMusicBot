@@ -48,7 +48,7 @@ export default class Bgm extends BaseCommand {
     const searchPanel = options.server.createSearchPanel(message, "プリセットBGM一覧", true);
     if(!searchPanel) return;
     const result = await searchPanel.consumeSearchResult(ytpl.default(url, {
-      gl: "JP", hl: "ja"
+      gl: "JP", hl: "ja",
     }), ({ items }) => items.map(item => ({
       title: item.title,
       author: item.author.name,

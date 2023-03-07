@@ -57,7 +57,7 @@ export class GoogleDrive extends AudioSource {
   toField(){
     return [{
       name: ":asterisk:詳細",
-      value: "Googleドライブにて共有されたファイル"
+      value: "Googleドライブにて共有されたファイル",
     }] as EmbedField[];
   }
 

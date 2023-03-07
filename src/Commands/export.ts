@@ -48,7 +48,7 @@ export default class Export extends BaseCommand {
       files: [{
         file: Buffer.from(JSON.stringify(ymxFile)),
         name: "exported_queue.ymx",
-      }]
+      }],
     })
       .then(msg => msg.edit(`✅エクスポートしました (バージョン: v${YmxVersion}互換)\r\nインポート時は、「<${msg.url}>」をimportコマンドの引数に指定してください`))
       .catch(e => Util.logger.log(e, "error"))
