@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: '16.x'
+          node-version: '18.x'
 
       - name: Get npm cache directory
         id: npm-cache
@@ -38,7 +38,7 @@ jobs:
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-16.x-${{ hashFiles('package-lock.json') }}
+          key: npm-18.x-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
 
       - name: Install dependencies
@@ -59,7 +59,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: '16.x'
+          node-version: '18.x'
 
       - name: Get npm cache directory
         id: npm-cache
@@ -71,7 +71,7 @@ jobs:
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-16.x-${{ hashFiles('package-lock.json') }}
+          key: npm-18.x-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
 
       - name: Install dependencies
@@ -87,8 +87,6 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - '12.x'
-          - '14.x'
           - '16.x'
           - '18.x'
     steps:
@@ -137,7 +135,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: '16.x'
+          node-version: '18.x'
 
       - name: Get npm cache directory
         id: npm-cache
@@ -149,7 +147,7 @@ jobs:
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-16.x-${{ hashFiles('package-lock.json') }}
+          key: npm-18.x-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
 
       - name: Install dependencies
