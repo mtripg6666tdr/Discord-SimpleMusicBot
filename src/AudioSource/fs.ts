@@ -45,14 +45,14 @@ export class FsStream extends AudioSource {
   async fetch(): Promise<ReadableStreamInfo>{
     return {
       type: "readable",
-      stream: fs.createReadStream(path.join(__dirname, "../../", this.Url))
+      stream: fs.createReadStream(path.join(__dirname, "../../", this.Url)),
     };
   }
 
   toField(){
     return [{
       name: ":asterisk:詳細",
-      value: "カスタムストリーム"
+      value: "カスタムストリーム",
     }] as EmbedField[];
   }
 

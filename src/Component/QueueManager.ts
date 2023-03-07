@@ -198,14 +198,14 @@ export class QueueManager extends ServerManagerBase {
           basicInfo: await AudioSource.resolve({
             url, type,
             knownData: gotData,
-            forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000)
+            forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000),
           }),
           additionalInfo: {
             addedBy: {
               userId: addedBy && this.getUserIdFromMember(addedBy) || "0",
               displayName: addedBy && this.getDisplayNameFromMember(addedBy) || "不明",
-            }
-          }
+            },
+          },
         } as QueueContent;
         if(result.basicInfo){
           this._default[method](result);
@@ -262,12 +262,12 @@ export class QueueManager extends ServerManagerBase {
             new Helper.MessageEmbedBuilder()
               .setTitle("お待ちください")
               .setDescription("情報を取得しています...")
-              .toEris()
+              .toEris(),
           ],
           allowedMentions: {
-            repliedUser: false
+            repliedUser: false,
           },
-          components: []
+          components: [],
         });
       }else if(message){
         // すでに処理中メッセージがある
@@ -317,7 +317,7 @@ export class QueueManager extends ServerManagerBase {
                 .setLabel("キャンセル")
                 .setStyle("DANGER")
             )
-            .toEris()
+            .toEris(),
         ] : [];
         if(typeof info.basicInfo.Thumbnail === "string"){
           embed.setThumbnail(info.basicInfo.Thumbnail);
@@ -336,7 +336,7 @@ export class QueueManager extends ServerManagerBase {
               {
                 name: "thumbnail." + info.basicInfo.Thumbnail.ext,
                 file: info.basicInfo.Thumbnail.data,
-              }
+              },
             ],
           });
         }
@@ -361,7 +361,7 @@ export class QueueManager extends ServerManagerBase {
       if(msg){
         msg.edit({
           content: `:weary: キューの追加に失敗しました。追加できませんでした。${typeof e === "object" && "message" in e ? `(${e.message})` : ""}`,
-          embeds: null
+          embeds: null,
         })
           .catch(er => Util.logger.log(er, "error"))
         ;

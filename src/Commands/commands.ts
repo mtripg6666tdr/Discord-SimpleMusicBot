@@ -34,7 +34,7 @@ export const categories = {
   "player": "音楽プレイヤー制御系",
   "playlist": "プレイリスト操作系",
   "utility": "ユーティリティ系",
-  "bot": "ボット操作全般"
+  "bot": "ボット操作全般",
 };
 
 export const categoriesList = ["voice", "player", "playlist", "utility", "bot"];
@@ -53,7 +53,7 @@ export default class Commands extends BaseCommand {
         type: "string",
         description: "詳細表示するするコマンド名",
         name: "command",
-        required: false
+        required: false,
       }],
       requiredPermissionsOr: [],
       shouldDefer: false,
@@ -87,7 +87,7 @@ export default class Commands extends BaseCommand {
               ...commands[categoriesList[i]].map(ci => ({
                 name: ci.name + ", " + ci.alias.join(", "),
                 value: ci.description,
-                inline: true
+                inline: true,
               } as EmbedField))
             )
         );

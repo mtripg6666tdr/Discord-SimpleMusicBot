@@ -114,12 +114,12 @@ export class YouTube extends AudioSource {
     const isLive = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
     const format = ytdl.chooseFormat(info.formats, {
       quality: isLive ? null : "highestvideo",
-      isHLS: isLive
+      isHLS: isLive,
     } as ytdl.chooseFormatOptions);
     const { url } = format;
     return {
       url,
-      ua
+      ua,
     };
   }
 
@@ -128,11 +128,11 @@ export class YouTube extends AudioSource {
     fields.push({
       name: ":cinema:チャンネル名",
       value: this.ChannelUrl ? `[${this.ChannelName}](${this.ChannelUrl})` : this.ChannelName,
-      inline: false
+      inline: false,
     }, {
       name: ":asterisk:概要",
       value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, verbose ? 1000 : 300) + "..." : this.Description || "*概要欄なし*",
-      inline: false
+      inline: false,
     });
     return fields;
   }

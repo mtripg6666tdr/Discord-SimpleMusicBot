@@ -41,7 +41,7 @@ export default class Frame extends BaseCommand {
         type: "string",
         name: "time",
         description: "指定された場合その時点でのフレームを取得します",
-        required: false
+        required: false,
       }],
       requiredPermissionsOr: ["admin", "sameVc"],
       shouldDefer: false,
@@ -108,7 +108,7 @@ function getFrame(url: string, time: number, ua: string){
       "-i", url,
       "-frames:v", "1",
       "-f", "image2pipe",
-      "-vcodec", "png"
+      "-vcodec", "png",
     ];
     Util.logger.log(`[FFmpeg] Passing args: ${args.join(" ")}`, "debug");
     const bufs = [] as Buffer[];

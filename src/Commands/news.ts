@@ -48,7 +48,7 @@ export default class News extends BaseCommand {
     const searchPanel = options.server.createSearchPanel(message, "ニューストピックス", true);
     if(!searchPanel) return;
     const result = await searchPanel.consumeSearchResult(ytpl.default(url, {
-      gl: "JP", hl: "ja", limit: 20
+      gl: "JP", hl: "ja", limit: 20,
     }), ({ items }) => items.map(item => ({
       title: item.title,
       author: item.author.name,

@@ -102,7 +102,7 @@ export class MongoBackupper extends Backupper {
       await this.collections.status.updateOne({ guildId }, {
         "$set": {
           guildId,
-          ...status
+          ...status,
         },
       }, {
         upsert: true,
@@ -122,7 +122,7 @@ export class MongoBackupper extends Backupper {
       this.collections.queue.updateOne({ guildId }, {
         "$set": {
           guildId,
-          ...queue
+          ...queue,
         },
       }, {
         upsert: true,
@@ -143,7 +143,7 @@ export class MongoBackupper extends Backupper {
     try{
       const dbResult = this.collections.status.find({
         "$or": guildIds.map(id => ({
-          guildId: id
+          guildId: id,
         })),
       });
       const result = new Map<string, exportableStatuses>();
@@ -168,7 +168,7 @@ export class MongoBackupper extends Backupper {
     try{
       const dbResult = this.collections.queue.find({
         "$or": guildids.map(id => ({
-          guildId: id
+          guildId: id,
         })),
       });
       const result = new Map<string, YmxFormat>();

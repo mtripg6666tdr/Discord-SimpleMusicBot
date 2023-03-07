@@ -80,7 +80,7 @@ export class SearchPanel extends EventEmitter {
         return {
           label: `${(j + 1).toString()}. ${title.length > 90 ? title.substring(0, 90) + "…" : title}`,
           description,
-          value: (j + 1).toString()
+          value: (j + 1).toString(),
         };
       });
       this._responseMessage = await reply.edit({
@@ -121,7 +121,7 @@ export class SearchPanel extends EventEmitter {
                 )
             )
             .toEris(),
-        ]
+        ],
       });
       return true;
     }

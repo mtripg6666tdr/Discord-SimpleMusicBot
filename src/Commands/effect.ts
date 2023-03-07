@@ -43,7 +43,7 @@ export default class Effect extends BaseCommand {
       const reply = await message.reply({
         content: "",
         embeds: [embed.toEris()],
-        components: [messageActions]
+        components: [messageActions],
       });
       setTimeout(() => reply.edit({ components: [] }), 5 * 60 * 1000).unref();
     }

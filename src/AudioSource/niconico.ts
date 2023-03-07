@@ -66,7 +66,7 @@ export class NicoNicoS extends AudioSource {
       .on("close", () => !source.destroyed && source.destroy?.())
     ;
     return {
-      type: "readable", stream
+      type: "readable", stream,
     };
   }
 
@@ -75,15 +75,15 @@ export class NicoNicoS extends AudioSource {
     fields.push({
       name: ":cinema:投稿者",
       value: this.Author,
-      inline: false
+      inline: false,
     }, {
       name: ":eyes:視聴回数",
       value: this.Views + "回",
-      inline: false
+      inline: false,
     }, {
       name: ":asterisk:概要",
       value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, verbose ? 1000 : 300) + "..." : this.Description,
-      inline: false
+      inline: false,
     });
     return fields;
   }
@@ -100,7 +100,7 @@ export class NicoNicoS extends AudioSource {
       description: this.Description,
       author: this.Author,
       thumbnail: this.Thumbnail,
-      views: this.Views
+      views: this.Views,
     };
   }
 

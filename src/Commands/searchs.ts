@@ -42,7 +42,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
         type: "string",
         name: "keyword",
         description: "検索したい楽曲のキーワードまたはURL。",
-        required: true
+        required: true,
       }],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
@@ -62,7 +62,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
       nextUrl = rawResult.next_href + "&client_id=" + await this.soundcloud.api.getClientID();
       while(nextUrl && result.length < 10){
         const data = await Util.web.DownloadText(nextUrl, {
-          "User-Agent": DefaultUserAgent
+          "User-Agent": DefaultUserAgent,
         });
         rawResult = JSON.parse(data) as SoundCloudTrackCollection;
         result.push(...rawResult.collection);

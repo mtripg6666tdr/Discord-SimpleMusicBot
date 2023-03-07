@@ -1,0 +1,109 @@
+/*
+ * Copyright 2021-2023 mtripg6666tdr
+ * 
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
+ * 
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
+ * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * If not, see <https://www.gnu.org/licenses/>.
+ */
+
+import type { MusicBot } from "../bot";
+
+import * as discord from "eris";
+
+import { CommandManager } from "../Component/CommandManager";
+import Util from "../Util";
+
+export async function onReady(this: MusicBot){
+  const client = this._client;
+  this["_addOn"].emit("ready", client);
+  this.Log("Socket connection is ready now");
+  if(this["_isReadyFinished"]) return;
+
+  this.Log("Starting environment checking and preparation now");
+
+  // Set activity as booting
+  if(!this.maintenance){
+    client.editStatus({
+      type: discord.Constants.ActivityTypes.GAME,
+      name: "起動中...",
+    });
+  }else{
+    client.editStatus("dnd", {
+      type: discord.Constants.ActivityTypes.GAME,
+      name: "メンテナンス中...",
+    });
+  }
+
+  // add bgm tracks
+  if(Util.config.bgm){
+    const guildIds = Object.keys(Util.config.bgm);
+    for(let i = 0; i < guildIds.length; i++){
+      if(!this.client.guilds.get(guildIds[i])) continue;
+      await this
+        .initDataWithBgm(guildIds[i], "0", Util.config.bgm[guildIds[i]])
+        .initBgmTracks()
+      ;
+    }
+  }
+
+  // Recover queues
+  if(this.backupper){
+    const joinedGuildIds = [...client.guilds.values()].map(guild => guild.id);
+    const guildQueues = await this.backupper.getQueueDataFromBackup(joinedGuildIds);
+    const guildStatuses = await this.backupper.getStatusFromBackup(joinedGuildIds);
+    if(guildQueues && guildStatuses){
+      const guildQueueIds = [...guildQueues.keys()];
+      const guildStatusIds = [...guildStatuses.keys()];
+      for(let i = 0; i < guildQueueIds.length; i++){
+        const id = guildQueueIds[i];
+        if(guildStatusIds.includes(id)){
+          try{
+            const server = this.initData(id, guildStatuses.get(id).boundChannelId);
+            await server.importQueue(guildQueues.get(id));
+            server.importStatus(guildStatuses.get(id));
+          }
+          catch(e){
+            this.Log(e, "warn");
+          }
+        }
+      }
+      this.Log("Finish recovery of queues and statuses.");
+    }
+  }else{
+    this.Log("Cannot perform recovery of queues and statuses. Check .env file to perform this. See README for more info", "warn");
+  }
+
+  // Set activity
+  if(!this.maintenance){
+    client.editStatus({
+      type: discord.Constants.ActivityTypes.LISTENING,
+      name: "音楽",
+    });
+  }
+  // Set main tick
+  setTimeout(() => {
+    this.maintenanceTick();
+    setInterval(this.maintenanceTick.bind(this), 1 * 60 * 1000).unref();
+  }, 10 * 1000).unref();
+  this.Log("Interval jobs set up successfully");
+
+  // Command instance preparing
+  await CommandManager.instance.sync(this.client);
+
+  this.emit("beforeReady");
+
+  // Finish initializing
+  this["_isReadyFinished"] = true;
+  this.Log("Bot is ready now");
+  this.emit("ready");
+}

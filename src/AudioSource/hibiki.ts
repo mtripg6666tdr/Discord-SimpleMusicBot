@@ -47,8 +47,8 @@ export class Hibiki extends AudioSource {
       data: (await candyget.buffer(thumbnail, {
         headers: {
           "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36",
-        }
-      })).body
+        },
+      })).body,
     };
     this.Title = this.radioInfo.episode.program_name + "(" + this.radioInfo.episode.name + ")";
     this._lengthSeconds = Math.floor(this.radioInfo.episode.video.duration);
@@ -62,7 +62,7 @@ export class Hibiki extends AudioSource {
     const playcheck = await HibikiApi.playCheck(this.radioInfo.episode.video.id.toString());
     return {
       type: "url",
-      url: playcheck.playlist_url
+      url: playcheck.playlist_url,
     };
   }
 
@@ -71,13 +71,13 @@ export class Hibiki extends AudioSource {
       {
         name: "アップロード日時",
         value: this.uploadedAt,
-        inline: false
+        inline: false,
       },
       {
         name: "キャスト",
         value: this.casts,
-        inline: false
-      }
+        inline: false,
+      },
     ];
   }
 
@@ -105,7 +105,7 @@ export abstract class HibikiApi {
       "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36",
       "Referer": "https://hibiki-radio.jp/",
-      "X-Requested-With": "XMLHttpRequest"
+      "X-Requested-With": "XMLHttpRequest",
     })) as HibikiAPIResult;
   }
 
@@ -114,7 +114,7 @@ export abstract class HibikiApi {
     return JSON.parse(await Util.web.DownloadText(playCheckURL, {
       "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36",
-      "X-Requested-With": "XMLHttpRequest"
+      "X-Requested-With": "XMLHttpRequest",
     })) as playCheckResult;
   }
 }

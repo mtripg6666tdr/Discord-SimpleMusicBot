@@ -40,7 +40,7 @@ export default class BulkDelete extends BaseCommand {
           name: "count",
           description: "削除するメッセージの上限数。100以下で設定してください。",
           required: true,
-        }
+        },
       ],
       requiredPermissionsOr: ["admin", "manageMessages"],
       shouldDefer: false,

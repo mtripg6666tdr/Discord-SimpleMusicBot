@@ -267,8 +267,11 @@ export class PlayManager extends ServerManagerBase {
       if(this.currentAudioInfo.LengthSeconds <= time) time = 0;
       this._seek = time;
       const t = Util.time.timer.start("PlayManager#Play->FetchAudioSource");
+
       // QueueContentからストリーム情報を取得
       const rawStream = await this.currentAudioInfo.fetch(time > 0);
+
+
       // 情報からストリームを作成
       connection = this.server.connection;
       if(!connection) return this;
@@ -279,19 +282,24 @@ export class PlayManager extends ServerManagerBase {
         streams.forEach(setReadableCsvLog);
         stream.pause();
       }
+
+
       // 各種準備
       this._errorReportChannel = mes?.channel as TextChannel;
       this._cost = cost;
       t.end();
+
       // 再生
       const u = Util.time.timer.start("PlayManager#Play->EnterPlayingState");
       const normalizer = new Normalizer(stream, this.volume !== 100);
+
       try{
         connection.play(normalizer, {
           format: streamType,
           inlineVolume: this.volume !== 100,
-          voiceDataTimeout: 40 * 1000
+          voiceDataTimeout: 40 * 1000,
         });
+
         // @ts-expect-error 7053
         const erisStreams = connection.piper["streams"] as (Readable & Writable)[];
         if(this.detailedLog) erisStreams.forEach((readable, i) => setReadableCsvLog(readable, i + streams.length));
@@ -303,8 +311,10 @@ export class PlayManager extends ServerManagerBase {
             normalizer.pauseOrigin();
           }
         });
+
         // setup volume
         this.setVolume(this.volume);
+
         // wait for entering playing state
         await Util.general.waitForEnteringState(() => this.server.connection.playing);
         this.preparing = false;
@@ -313,7 +323,9 @@ export class PlayManager extends ServerManagerBase {
       finally{
         u.end();
       }
+
       this.Log("Play started successfully");
+
       if(mes && !quiet){
         // 再生開始メッセージ
         const _t = Number(this.currentAudioInfo.LengthSeconds);
@@ -350,7 +362,9 @@ export class PlayManager extends ServerManagerBase {
         if(this.currentAudioInfo.isYouTube() && this.currentAudioInfo.IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
         }
+
         this.emit("playStartUIPrepared", embed);
+
         const components = [
           new Helper.MessageActionRowBuilder()
             .addComponents(
@@ -375,8 +389,9 @@ export class PlayManager extends ServerManagerBase {
                 .setLabel("ワンスループ")
                 .setStyle("SECONDARY"),
             )
-            .toEris()
+            .toEris(),
         ];
+
         if(typeof this.currentAudioInfo.Thumbnail === "string"){
           mes.edit({
             content: "",
@@ -391,19 +406,21 @@ export class PlayManager extends ServerManagerBase {
             file: [
               {
                 name: "thumbnail." + this.currentAudioInfo.Thumbnail.ext,
-                file: this.currentAudioInfo.Thumbnail.data
-              }
-            ]
+                file: this.currentAudioInfo.Thumbnail.data,
+              },
+            ],
           });
         }
+
         const removeControls = () => {
           this.off("playCompleted", removeControls);
           this.off("handledError", removeControls);
           this.off("stop", removeControls);
           mes.edit({
-            components: []
+            components: [],
           }).catch(er => this.Log(er, "error"));
         };
+
         this.once("playCompleted", removeControls);
         this.once("handledError", removeControls);
         this.once("stop", removeControls);
@@ -571,6 +588,7 @@ export class PlayManager extends ServerManagerBase {
       return;
     }
     this.Log("onStreamFinished called");
+
     if(this.server.connection && this.server.connection.playing){
       await Util.general.waitForEnteringState(() => !this.server.connection || !this.server.connection.playing, 20 * 1000)
         .catch(() => {
@@ -579,9 +597,11 @@ export class PlayManager extends ServerManagerBase {
         })
       ;
     }
+
     // ストリームが終了したら時間を確認しつつ次の曲へ移行
     this.Log("Stream finished");
     this.emit("playCompleted");
+
     // 再生が終わったら
     this._errorCount = 0;
     this._errorUrl = "";
@@ -612,12 +632,14 @@ export class PlayManager extends ServerManagerBase {
   async onQueueEmpty(){
     this.Log("Queue empty");
     this.destroyStream();
+
     if(this.server.boundTextChannel){
       await this.server.bot.client
         .createMessage(this.server.boundTextChannel, ":upside_down: キューが空になりました")
         .catch(e => Util.logger.log(e, "error"))
       ;
     }
+
     const timer = setTimeout(() => {
       this.off("playCalled", playHandler);
       this.off("disconnectAttempt", playHandler);
@@ -643,6 +665,7 @@ export class PlayManager extends ServerManagerBase {
     this.Log("onStreamFailed called");
     this._cost = 0;
     this.destroyStream();
+    
     if(this._errorUrl === this.currentAudioInfo?.Url && !quiet){
       this._errorCount++;
     }else{

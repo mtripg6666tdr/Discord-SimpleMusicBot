@@ -36,7 +36,7 @@ export default class Seek extends BaseCommand {
         type: "string",
         name: "keyword",
         description: "シーク先の時間",
-        required: true
+        required: true,
       }],
       requiredPermissionsOr: ["admin", "dj"],
       shouldDefer: false,

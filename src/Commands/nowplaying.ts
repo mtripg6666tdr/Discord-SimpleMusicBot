@@ -38,7 +38,7 @@ export default class NowPlaying extends BaseCommand {
         type: "bool",
         name: "detailed",
         description: "Trueが指定された場合、可能な場合より長く詳細を表示します",
-        required: false
+        required: false,
       }],
       requiredPermissionsOr: [],
       shouldDefer: false,
@@ -94,7 +94,7 @@ export default class NowPlaying extends BaseCommand {
           {
             name: "thumbnail." + info.Thumbnail.ext,
             file: info.Thumbnail.data,
-          }
+          },
         ],
       }).catch(e => Util.logger.log(e, "error"));
     }

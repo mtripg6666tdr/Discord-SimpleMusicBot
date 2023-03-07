@@ -167,7 +167,7 @@ export class GuildDataContainer extends LogEmitter {
       version: YmxVersion,
       data: this.queue.map(q => ({
         ...q.basicInfo.exportData(),
-        addBy: q.additionalInfo.addedBy
+        addBy: q.additionalInfo.addedBy,
       })),
     };
   }
@@ -411,7 +411,7 @@ export class GuildDataContainer extends LogEmitter {
         const result = await ytpl.default(id, {
           gl: "JP",
           hl: "ja",
-          limit: 999 - this.queue.length
+          limit: 999 - this.queue.length,
         });
         const index = await this.queue.processPlaylist(
           msg,
@@ -428,7 +428,7 @@ export class GuildDataContainer extends LogEmitter {
             isLive: c.isLive,
             length: c.durationSec,
             thumbnail: c.thumbnails[0].url,
-            title: c.title
+            title: c.title,
           } as exportableCustom)
         );
         if(cancellation.Cancelled){
@@ -473,7 +473,7 @@ export class GuildDataContainer extends LogEmitter {
               description: item.description,
               length: Math.floor(item.duration / 1000),
               author: item.user.username,
-              thumbnail: item.artwork_url
+              thumbnail: item.artwork_url,
             } as exportableCustom;
           }
         );
@@ -528,7 +528,7 @@ export class GuildDataContainer extends LogEmitter {
             .setThumbnail(playlist.coverArt.sources[0].url)
             .setFields({
               name: ":warning:注意",
-              value: "Spotifyのタイトルは、正しく再生されない場合があります"
+              value: "Spotifyのタイトルは、正しく再生されない場合があります",
             })
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({ content: "", embeds: [embed.toEris()] });

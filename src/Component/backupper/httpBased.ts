@@ -74,7 +74,7 @@ export class HttpBackupper extends Backupper {
     try{
       const queue = this._queueModifiedGuilds.map(id => ({
         guildid: id,
-        queue: JSON.stringify(this.data.get(id).exportQueue())
+        queue: JSON.stringify(this.data.get(id).exportQueue()),
       }));
       if(queue.length > 0){
         this.Log("Backing up modified queue...");
@@ -141,7 +141,7 @@ export class HttpBackupper extends Backupper {
         const result = await this._requestHttp("GET", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
           guildid: guildids.join(","),
-          type: "j"
+          type: "j",
         } as requestBody, MIME_JSON);
         if(result.status === 200){
           const frozenGuildStatuses = result.data as { [guildid: string]: string };
@@ -193,7 +193,7 @@ export class HttpBackupper extends Backupper {
         const result = await this._requestHttp("GET", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
           guildid: guildids.join(","),
-          type: "queue"
+          type: "queue",
         } as requestBody, MIME_JSON);
         if(result.status === 200){
           const frozenQueues = result.data as { [guildid: string]: string };
@@ -237,7 +237,7 @@ export class HttpBackupper extends Backupper {
           token: process.env.GAS_TOKEN,
           guildid: ids,
           data: JSON.stringify(rawData),
-          type: "j"
+          type: "j",
         } as requestBody, MIME_JSON);
         if(result.status === 200){
           return true;
@@ -272,7 +272,7 @@ export class HttpBackupper extends Backupper {
           token: process.env.GAS_TOKEN,
           guildid: ids,
           data: JSON.stringify(rawData),
-          type: "queue"
+          type: "queue",
         } as requestBody, MIME_JSON);
         return result.status === 200;
       }
@@ -301,7 +301,7 @@ export class HttpBackupper extends Backupper {
       candyget(method, url, "json", {
         headers: {
           "Content-Type": mimeType,
-          "User-Agent": `mtripg6666tdr/Discord-SimpleMusicBot#${this.bot.version || "unknown"} http based backup server adapter`
+          "User-Agent": `mtripg6666tdr/Discord-SimpleMusicBot#${this.bot.version || "unknown"} http based backup server adapter`,
         },
         body: method === "POST" ? data : undefined,
       })

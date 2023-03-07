@@ -102,7 +102,7 @@ export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>
         const result = await strategies[i].getInfo(...parameters);
         return {
           result,
-          resolved: i
+          resolved: i,
         };
       }
     }

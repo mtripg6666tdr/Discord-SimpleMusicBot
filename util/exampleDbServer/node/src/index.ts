@@ -31,13 +31,13 @@ http.createServer((req, res) => {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({
           status: 200,
-          data: getStatus(guildid.split(","))
+          data: getStatus(guildid.split(",")),
         }));
       }else if(type === "queue"){
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({
           status: 200,
-          data: getQueue(guildid.split(","))
+          data: getQueue(guildid.split(",")),
         }));
       }else{
         res.writeHead(400);

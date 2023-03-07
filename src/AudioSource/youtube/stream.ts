@@ -40,7 +40,7 @@ export function createChunkedYTStream(info: ytdl.videoInfo, format: ytdl.videoFo
       let end = chunkSize * (current + 1) - 1;
       if(end >= contentLength) end = undefined;
       const nextStream = ytdl.downloadFromInfo(info, { format, ...options, range: {
-        start: chunkSize * current, end
+        start: chunkSize * current, end,
       } });
       Util.logger.log(`[AudioSource:youtube]Stream #${current + 1} was created.`);
       nextStream

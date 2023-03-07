@@ -52,7 +52,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
       cache: {
         type: this.id,
         data: info,
-      }
+      },
     };
   }
 
@@ -79,8 +79,8 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
         stream: {
           type: "url",
           url: format[0].url,
-          userAgent: format[0].http_headers["User-Agent"]
-        } as UrlStreamInfo
+          userAgent: format[0].http_headers["User-Agent"],
+        } as UrlStreamInfo,
       };
     }else{
       const formats = info.formats.filter(f => f.format_note === "tiny" || f.video_ext === "none" && f.abr);
@@ -89,7 +89,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
       const stream = miniget(format.url, {
         headers: {
           ...format.http_headers,
-        }
+        },
       });
       if(forceUrl){
         return {
@@ -99,7 +99,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
             url: format.url,
             streamType: format.ext === "webm" && format.acodec === "opus" ? "webm" : undefined,
             userAgent: format.http_headers["User-Agent"],
-          } as UrlStreamInfo
+          } as UrlStreamInfo,
         };
       }
       return {

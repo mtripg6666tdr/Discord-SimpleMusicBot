@@ -50,5 +50,5 @@ export const channelUtil = {
     if(!vcMember) return false;
     if(vcMember.size > 2) return false;
     return vcMember.has(member.id);
-  }
+  },
 } as const;

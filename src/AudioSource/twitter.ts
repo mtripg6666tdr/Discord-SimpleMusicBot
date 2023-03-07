@@ -60,20 +60,20 @@ export class Twitter extends AudioSource {
   async fetch(): Promise<UrlStreamInfo>{
     return {
       type: "url",
-      url: this.streamUrl
+      url: this.streamUrl,
     };
   }
 
   toField(){
     return [{
       name: ":link:URL",
-      value: this.Url
+      value: this.Url,
     }, {
       name: "ツイートの内容",
       value: this.Description.substring(0, 1950),
     }, {
       name: ":asterisk:詳細",
-      value: "Twitterにて共有されたファイル"
+      value: "Twitterにて共有されたファイル",
     }] as EmbedField[];
   }
 

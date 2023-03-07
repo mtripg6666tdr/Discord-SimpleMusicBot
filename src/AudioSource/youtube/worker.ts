@@ -69,20 +69,20 @@ function onMessage(message: WithId<spawnerJobMessage>){
     ytsr.default(message.keyword, {
       limit: 12,
       gl: "JP",
-      hl: "ja"
+      hl: "ja",
     })
       .then((result) => {
         postMessage({
           type: "searchOk",
           data: result,
-          id
+          id,
         });
       })
       .catch((er) => {
         postMessage({
           type: "error",
           data: Util.general.StringifyObject(er),
-          id
+          id,
         });
       })
     ;

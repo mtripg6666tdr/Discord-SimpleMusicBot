@@ -81,7 +81,7 @@ export class BinaryManager extends LogEmitter {
       const { body } = await candyget.json<GitHubRelease>(`https://api.github.com/repos/${this.options.binaryRepo}/releases/latest`, {
         headers: {
           "Accept": "application/vnd.github.v3+json",
-          "User-Agent": "mtripg6666tdr/Discord-SimpleMusicBot"
+          "User-Agent": "mtripg6666tdr/Discord-SimpleMusicBot",
         },
         validator: (res): res is GitHubRelease => true,
       });
@@ -117,8 +117,8 @@ export class BinaryManager extends LogEmitter {
       const result = await candyget.stream(binaryUrl, {
         headers: {
           "Accept": "*/*",
-          "User-Agent": "mtripg6666tdr/Discord-SimpleMusicBot"
-        }
+          "User-Agent": "mtripg6666tdr/Discord-SimpleMusicBot",
+        },
       });
       const fileStream = result.body.pipe(fs.createWriteStream(this.binaryPath, {
         mode: 0o777,
@@ -131,7 +131,7 @@ export class BinaryManager extends LogEmitter {
         pEvent(
           fileStream,
           "close",
-        )
+        ),
       ]);
       this.Log("Finish downloading the binary");
     }
