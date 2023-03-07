@@ -13,6 +13,7 @@ updates:
     labels:
       - "dependencies"
       - "javascript"
+      - "target:v3"
     allow:
       - dependency-type: "direct"
     ignore:
@@ -45,6 +46,7 @@ updates:
       - "dependencies"
       - "javascript"
       - "scope:docs"
+      - "target:v3"
     allow:
       - dependency-type: "direct"
     ignore:
@@ -68,3 +70,4 @@ updates:
     labels:
       - "dependencies"
       - "github_actions"
+      - "target:v3"
