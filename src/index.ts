@@ -67,7 +67,9 @@ const onTerminated = async function(code: string){
   }
   // 強制終了を報告
   if(bot.client && Util.config.errorChannel){
-    bot.client.createMessage(Util.config.errorChannel, "Process terminated").catch(() => {});
+    bot.client.rest.channels.createMessage(Util.config.errorChannel, {
+      content: "Process terminated",
+    }).catch(() => {});
   }
   if(global.workerThread){
     logger("Shutting down worker...");
@@ -89,7 +91,9 @@ bot.run(true, 40);
 
 async function reportError(err: any){
   try{
-    await bot.client.createMessage(Util.config.errorChannel, Util.general.StringifyObject(err)).catch(() => {});
+    await bot.client.rest.channels.createMessage(Util.config.errorChannel, {
+      content: Util.general.StringifyObject(err),
+    }).catch(() => {});
   }
   catch(e){
     logger(e, "error");

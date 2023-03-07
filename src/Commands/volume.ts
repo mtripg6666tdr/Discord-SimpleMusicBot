@@ -17,7 +17,7 @@
  */
 
 import type { CommandArgs } from ".";
-import type { CommandMessage } from "@mtripg6666tdr/eris-command-resolver";
+import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
 import Util from "../Util";

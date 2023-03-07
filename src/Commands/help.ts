@@ -19,7 +19,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
 import { Spotify } from "../AudioSource";
@@ -42,13 +42,14 @@ export default class Help extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs){
     const developerId = "593758391395155978";
     const cachedUser = options.client.users.get(developerId);
-    const developer = cachedUser ? cachedUser.username :
-      await options.client.getRESTUser(developerId)
+    const developer = cachedUser
+      ? cachedUser.username
+      : await options.client.rest.users.get(developerId)
         .then(user => user.username)
         .catch(() => null as string)
       ;
     const { isDisabledSource } = Util.general;
-    const embed = new Helper.MessageEmbedBuilder()
+    const embed = new MessageEmbedBuilder()
       .setTitle(options.client.user.username + ":notes:")
       .setDescription(
         "高音質な音楽で、Discordで最高のエクスペリエンスを得るために作られました:robot:\r\n"
@@ -72,7 +73,7 @@ export default class Help extends BaseCommand {
         !isDisabledSource("custom") && "・オーディオファイルへの直URL",
       ].filter(d => d).join("\r\n"))
       .setColor(getColor("HELP"))
-      .toEris()
+      .toOceanic()
     ;
     await message.reply({ embeds: [embed] }).catch(e => Util.logger.log(e, "error"));
   }

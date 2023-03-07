@@ -59,10 +59,10 @@ export async function onInteractionCreate(this: MusicBot, interaction: discord.A
       return;
     }
 
-    if(Util.eris.interaction.componentInteractionDataIsButtonData(interaction.data)){
+    if(interaction.data.componentType === discord.ComponentTypes.BUTTON){
       // ボタンインタラクション
       handlers.handleButtonInteraction.call(this, server, interaction);
-    }else if(Util.eris.interaction.componentInteractionDataIsSelectMenuData(interaction.data)){
+    }else if(interaction.data.componentType === discord.ComponentTypes.STRING_SELECT){
       // セレクトメニューインタラクション
       handlers.handleSelectMenuInteraction.call(this, server, interaction);
     }

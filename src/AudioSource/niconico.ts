@@ -17,7 +17,7 @@
  */
 
 import type { exportableCustom, ReadableStreamInfo } from ".";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 import type { Readable } from "stream";
 
 import { convert as htmlToText } from "html-to-text";

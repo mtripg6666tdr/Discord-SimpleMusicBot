@@ -19,7 +19,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -45,11 +45,11 @@ export default class Related extends BaseCommand {
       message.reply("❌関連曲自動再生をオフにしました").catch(e => Util.logger.log(e, "error"));
     }else{
       options.server.addRelated = true;
-      const embed = new Helper.MessageEmbedBuilder()
+      const embed = new MessageEmbedBuilder()
         .setTitle("⭕関連曲自動再生をオンにしました")
         .setDescription("YouTubeからの楽曲再生終了時に、関連曲をキューの末尾に自動追加する機能です。\r\n※YouTube以外のソースからの再生時、ループ有効時には追加されません")
         .setColor(getColor("RELATIVE_SETUP"))
-        .toEris()
+        .toOceanic()
       ;
       message.reply({ embeds: [embed] });
     }

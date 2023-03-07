@@ -22,13 +22,15 @@ import type { exportableCustom, exportableSpotify } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { exportableStatuses } from "../Component/backupper";
 import type { MusicBotBase } from "../botBase";
-import type { Message, VoiceChannel, VoiceConnection } from "eris";
+import type { VoiceConnection } from "@discordjs/voice";
+import type { AnyGuildTextChannel, Message, StageChannel, VoiceChannel } from "oceanic.js";
 import type { Playlist } from "spotify-url-info";
 
 import { LockObj, lock } from "@mtripg6666tdr/async-lock";
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
-import { TextChannel } from "eris";
+import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
+import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
+import { TextChannel } from "oceanic.js";
 import Soundcloud from "soundcloud.ts";
 import * as ytpl from "ytpl";
 
@@ -97,6 +99,8 @@ export class GuildDataContainer extends LogEmitter {
   equallyPlayback: boolean;
   /** VCへの接続 */
   connection: VoiceConnection;
+  /** VC */
+  connectingVoiceChannel: VoiceChannel | StageChannel;
   /** VCのping */
   vcPing: number;
 
@@ -151,7 +155,9 @@ export class GuildDataContainer extends LogEmitter {
     }
     if(
       !this.player.isConnecting
-      || message.member.voiceState.channelID && (this.bot.client.getChannel(message.member.voiceState.channelID) as VoiceChannel).voiceMembers.has(this.bot.client.user.id)
+      || (
+        message.member.voiceState.channelID && this.bot.client.getChannel<VoiceChannel|StageChannel>(message.member.voiceState.channelID).voiceMembers.has(this.bot.client.user.id)
+      )
       || message.content.includes("join")
     ){
       if(message.content !== this.prefix) this.boundTextChannel = message.channelId;
@@ -196,7 +202,7 @@ export class GuildDataContainer extends LogEmitter {
   exportStatus(): exportableStatuses{
     // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
     return {
-      voiceChannelId: this.player.isPlaying && !this.player.isPaused ? this.connection.channelID : "0",
+      voiceChannelId: this.player.isPlaying && !this.player.isPaused ? this.connectingVoiceChannel.id : "0",
       boundChannelId: this.boundTextChannel,
       loopEnabled: this.queue.loopEnabled,
       queueLoopEnabled: this.queue.queueLoopEnabled,
@@ -218,7 +224,7 @@ export class GuildDataContainer extends LogEmitter {
     this.equallyPlayback = statuses.equallyPlayback;
     this.player.setVolume(statuses.volume);
     if(statuses.voiceChannelId !== "0"){
-      this._joinVoiceChannel(statuses.voiceChannelId)
+      this.joinVoiceChannelOnly(statuses.voiceChannelId)
         .then(() => this.player.play())
         .catch(er => this.Log(er, "warn"))
       ;
@@ -262,18 +268,18 @@ export class GuildDataContainer extends LogEmitter {
    * @param channelId 接続先のボイスチャンネルのID
    * @internal
    */
-  async _joinVoiceChannel(channelId: string){
-    const connection = await this.bot.client.joinVoiceChannel(channelId, {
+  async joinVoiceChannelOnly(channelId: string){
+    const targetChannel = this.bot.client.getChannel<VoiceChannel | StageChannel>(channelId);
+    const connection = targetChannel.join({
       selfDeaf: true,
     });
     if(this.connection === connection) return;
+    await entersState(connection, VoiceConnectionStatus.Ready, 10e3);
     connection
       .on("error", err => {
         this.Log("[Connection] " + Util.general.StringifyObject(err), "error");
         this.player.handleError(err);
       })
-      .on("end", this.player.onStreamFinishedBindThis)
-      .on("pong", ping => this.vcPing = ping)
     ;
     this.connection = connection;
     if(Util.config.debug){
@@ -294,50 +300,53 @@ export class GuildDataContainer extends LogEmitter {
       const t = Util.time.timer.start("MusicBot#Join");
       try{
         if(message.member.voiceState.channelID){
-          const targetVC = this.bot.client.getChannel(message.member.voiceState.channelID) as VoiceChannel;
-          // すでにそのにVC入ってるよ～
+          const targetVC = this.bot.client.getChannel<VoiceChannel | StageChannel>(message.member.voiceState.channelID);
+
           if(targetVC.voiceMembers.has(this.bot.client.user.id)){
+            // すでにそのにVC入ってるよ～
             if(this.connection){
               return true;
             }
-          // すでになにかしらのVCに参加している場合
-          }else if(this.connection && !message.member.permissions.has("voiceMoveMembers")){
-            const failedMsg = ":warning:既にほかのボイスチャンネルに接続中です。この操作を実行する権限がありません。";
-            if(reply || replyOnFail){
-              await message.reply(failedMsg)
-                .catch(er => this.Log(er, "error"));
-            }else{
-              await message.channel.createMessage(failedMsg)
-                .catch(er => this.Log(er, "error"));
-            }
+          }else if(this.connection && !message.member.permissions.has("MOVE_MEMBERS")){
+            // すでになにかしらのVCに参加している場合
+            const replyFailMessage = reply || replyOnFail
+              ? message.reply.bind(message)
+              : message.channel.createMessage.bind(message.channel);
+            await replyFailMessage({
+              content: ":warning:既にほかのボイスチャンネルに接続中です。この操作を実行する権限がありません。",
+            }).catch(er => this.Log(er, "error"));
             return false;
           }
 
           // 入ってないね～参加しよう
-          const msg = await ((mes: string) => {
-            if(reply){
-              return message.reply(mes);
-            }
-            else{
-              return message.channel.createMessage(mes);
-            }
-          })(":electric_plug:接続中...");
+          const replyMessage = reply ? message.reply.bind(message) : message.channel.createMessage.bind(message.channel);
+          const connectingMessage = await replyMessage({
+            content: ":electric_plug:接続中...",
+          });
           try{
-            if(!targetVC.permissionsOf(this.bot.client.user.id).has("voiceConnect")) throw new Error("ボイスチャンネルに参加できません。権限を確認してください。");
-            await this._joinVoiceChannel(targetVC.id);
-            await msg.edit(`:+1:ボイスチャンネル:speaker:\`${targetVC.name}\`に接続しました!`);
+            if(!targetVC.permissionsOf(this.bot.client.user.id).has("CONNECT")){
+              throw new Error("ボイスチャンネルに参加できません。権限を確認してください。");
+            }
+            await this.joinVoiceChannelOnly(targetVC.id);
+            await connectingMessage.edit({
+              content: `:+1:ボイスチャンネル:speaker:\`${targetVC.name}\`に接続しました!`,
+            });
             return true;
           }
           catch(e){
             Util.logger.log(e, "error");
-            const failedMsg = "😑接続に失敗しました…もう一度お試しください: " + (typeof e === "object" && "message" in e ? `${e.message}` : e);
+            const failedMsg = `😑接続に失敗しました…もう一度お試しください: ${typeof e === "object" && "message" in e ? `${e.message}` : e}`;
             if(!reply && replyOnFail){
-              await msg.delete()
+              await connectingMessage.delete()
                 .catch(er => this.Log(er, "error"));
-              await message.reply(failedMsg)
+              await message.reply({
+                content: failedMsg,
+              })
                 .catch(er => this.Log(er, "error"));
             }else{
-              await msg?.edit(failedMsg)
+              await connectingMessage?.edit({
+                content: failedMsg,
+              })
                 .catch(er => this.Log(er, "error"));
             }
             this.player.disconnect();
@@ -345,12 +354,10 @@ export class GuildDataContainer extends LogEmitter {
           }
         }else{
           // あらメッセージの送信者さんはボイチャ入ってないん…
-          const msg = "ボイスチャンネルに参加してからコマンドを送信してください:relieved:";
-          if(reply || replyOnFail){
-            await message.reply(msg).catch(e => this.Log(e, "error"));
-          }else{
-            await message.channel.createMessage(msg).catch(e => this.Log(e, "error"));
-          }
+          const replyFailedMessage = reply || replyOnFail ? message.reply.bind(message) : message.channel.createMessage.bind(message.channel);
+          await replyFailedMessage({
+            content: "ボイスチャンネルに参加してからコマンドを送信してください:relieved:",
+          }).catch(e => this.Log(e, "error"));
           return false;
         }
       }
@@ -366,12 +373,26 @@ export class GuildDataContainer extends LogEmitter {
    */
   async playFromURL(message: CommandMessage, rawArg: string|string[], first: boolean = true, cancellable: boolean = false){
     if(Array.isArray(rawArg)){
-      const [firstUrl, ...restUrls] = rawArg.flatMap(fragment => Util.string.NormalizeText(fragment).split(" ")).filter(url => url.startsWith("http"));
+      const [firstUrl, ...restUrls] = rawArg
+        .flatMap(fragment => Util.string.NormalizeText(fragment).split(" "))
+        .filter(url => url.startsWith("http"));
+
       if(firstUrl){
         await this.playFromURL(message, firstUrl, first, false);
+
         if(restUrls){
           for(let i = 0; i < restUrls.length; i++){
-            await this.queue.autoAddQueue(restUrls[i], message.member, "unknown", false, null, message.channel as TextChannel, null, null, false);
+            await this.queue.autoAddQueue(
+              restUrls[i],
+              message.member,
+              "unknown",
+              false,
+              null,
+              message.channel as TextChannel,
+              null,
+              null,
+              false
+            );
           }
         }
       }
@@ -383,19 +404,38 @@ export class GuildDataContainer extends LogEmitter {
       // Discordメッセへのリンクならば
       const smsg = await message.reply("🔍メッセージを取得しています...");
       try{
+        // URLを分析してチャンネルIDとメッセージIDを抽出
         const ids = rawArg.split("/");
         const ch = this.bot.client.getChannel(ids[ids.length - 2]);
-        if(!(ch instanceof TextChannel)) throw new Error("サーバーのテキストチャンネルではありません");
-        const msg = await this.bot.client.getMessage(ch.id, ids[ids.length - 1]) as Message<TextChannel>;
-        if(ch.guild.id !== msg.channel.guild.id) throw new Error("異なるサーバーのコンテンツは再生できません");
-        if(msg.attachments.length <= 0 || !Util.fs.isAvailableRawAudioURL(msg.attachments[0]?.url)) throw new Error("添付ファイルが見つかりません");
-        await this.queue.autoAddQueue(msg.attachments[0].url, message.member, "custom", first, false, message.channel as TextChannel, smsg);
+
+        if(!(ch instanceof TextChannel)){
+          throw new Error("サーバーのテキストチャンネルではありません");
+        }
+
+        const msg = await ch.getMessage(ids[ids.length - 1]);
+
+        if(ch.guild.id !== msg.channel.guild.id){
+          throw new Error("異なるサーバーのコンテンツは再生できません");
+        }else if(msg.attachments.size <= 0 || !Util.fs.isAvailableRawAudioURL(msg.attachments.first()?.url)){
+          throw new Error("添付ファイルが見つかりません");
+        }
+
+        await this.queue.autoAddQueue(
+          msg.attachments.first().url,
+          message.member,
+          "custom",
+          first,
+          false,
+          message.channel as TextChannel,
+          smsg
+        );
         await this.player.play();
         return;
       }
       catch(e){
         Util.logger.log(e, "error");
-        await smsg.edit(`✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`).catch(er => this.Log(er, "error"));
+        await smsg.edit(`✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`)
+          .catch(er => this.Log(er, "error"));
       }
     }else if(!Util.general.isDisabledSource("custom") && Util.fs.isAvailableRawAudioURL(rawArg)){
       // オーディオファイルへの直リンク？
@@ -434,13 +474,16 @@ export class GuildDataContainer extends LogEmitter {
         if(cancellation.Cancelled){
           await msg.edit("✅キャンセルされました。");
         }else{
-          const embed = new Helper.MessageEmbedBuilder()
+          const embed = new MessageEmbedBuilder()
             .setTitle("✅プレイリストが処理されました")
             // \`(${result.author.name})\` author has been null lately
             .setDescription(`[${result.title}](${result.url}) \r\n${index}曲が追加されました`)
             .setThumbnail(result.bestThumbnail.url)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-          await msg.edit({ content: "", embeds: [embed.toEris()] });
+          await msg.edit({
+            content: "",
+            embeds: [embed.toOceanic()],
+          });
         }
       }
       catch(e){
@@ -480,12 +523,12 @@ export class GuildDataContainer extends LogEmitter {
         if(cancellation.Cancelled){
           await msg.edit("✅キャンセルされました。");
         }else{
-          const embed = new Helper.MessageEmbedBuilder()
+          const embed = new MessageEmbedBuilder()
             .setTitle("✅プレイリストが処理されました")
             .setDescription(`[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n${index}曲が追加されました`)
             .setThumbnail(playlist.artwork_url)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-          await msg.edit({ content: "", embeds: [embed.toEris()] });
+          await msg.edit({ content: "", embeds: [embed.toOceanic()] });
         }
       }
       catch(e){
@@ -522,7 +565,7 @@ export class GuildDataContainer extends LogEmitter {
         if(cancellation.Cancelled){
           await msg.edit("✅キャンセルされました。");
         }else{
-          const embed = new Helper.MessageEmbedBuilder()
+          const embed = new MessageEmbedBuilder()
             .setTitle("✅プレイリストが処理されました")
             .setDescription(`[${playlist.title}](${Spotify.getPlaylistUrl(playlist.uri, playlist.type)}) \`(${playlist.subtitle})\` \r\n${index}曲が追加されました`)
             .setThumbnail(playlist.coverArt.sources[0].url)
@@ -531,7 +574,7 @@ export class GuildDataContainer extends LogEmitter {
               value: "Spotifyのタイトルは、正しく再生されない場合があります",
             })
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
-          await msg.edit({ content: "", embeds: [embed.toEris()] });
+          await msg.edit({ content: "", embeds: [embed.toOceanic()] });
         }
       }
       catch(e){
@@ -563,10 +606,9 @@ export class GuildDataContainer extends LogEmitter {
    * プレフィックス更新します
    * @param message 更新元となるメッセージ
    */
-  updatePrefix(message: CommandMessage|Message<TextChannel>): void{
-    const guild = "guild" in message ? message.guild : message.channel.guild;
+  updatePrefix(message: CommandMessage|Message<AnyGuildTextChannel>): void{
     const oldPrefix = this.prefix;
-    const member = guild.members.get(this.bot.client.user.id);
+    const member = message.guild.members.get(this.bot.client.user.id);
     const pmatch = (member.nick || member.username).match(/^(\[(?<prefix0>[a-zA-Z!?_-]+)\]|【(?<prefix1>[a-zA-Z!?_-]+)】)/);
     if(pmatch){
       if(this.prefix !== (pmatch.groups.prefix0 || pmatch.groups.prefix1)){

@@ -18,8 +18,8 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { ResponseMessage } from "@mtripg6666tdr/eris-command-resolver";
-import type { Message } from "eris";
+import type { ResponseMessage } from "../Component/ResponseMessage";
+import type { AnyGuildTextChannel, Message } from "oceanic.js";
 
 import { BaseCommand } from ".";
 import Util from "../Util";
@@ -59,7 +59,7 @@ export default class BulkDelete extends BaseCommand {
       const messages = [] as Message[];
       let i = 0;
       do{
-        const allMsgs = await options.client.getMessages(message.channel.id, before ? {
+        const allMsgs: Message<AnyGuildTextChannel>[] = await message.channel.getMessages(before ? {
           limit: 100,
           before,
         } : {
@@ -67,7 +67,7 @@ export default class BulkDelete extends BaseCommand {
         });
         if(allMsgs.length === 0) break;
         const msgs = allMsgs.filter(_msg => _msg.author.id === options.client.user.id && _msg.id !== reply.id);
-        msgs.sort((a, b) => b.createdAt - a.createdAt);
+        msgs.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
         messages.push(...msgs);
         before = allMsgs.at(-1).id;
         i++;
@@ -75,7 +75,10 @@ export default class BulkDelete extends BaseCommand {
       } while(messages.length < count && i <= 10);
       if(messages.length > count) messages.splice(count);
       await reply.edit(messages.length + "件見つかりました。削除を実行します。");
-      await options.client.deleteMessages(message.channel.id, messages.map(msg => msg.id), `${message.member.username}#${message.member.discriminator}により${count}件のメッセージの削除が要求されたため。`);
+      await message.channel.deleteMessages(
+        messages.map(msg => msg.id),
+        `${message.member.username}#${message.member.discriminator}により${count}件のメッセージの削除が要求されたため。`
+      );
       await reply.edit(":sparkles:完了!(このメッセージは自動的に消去されます)");
       setTimeout(() => reply.delete().catch(() => {}), 10 * 1000).unref();
     }

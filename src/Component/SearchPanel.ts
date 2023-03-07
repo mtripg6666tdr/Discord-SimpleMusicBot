@@ -18,9 +18,9 @@
 
 import type { CommandMessage } from "./CommandMessage";
 import type { ResponseMessage } from "./ResponseMessage";
-import type { SelectMenuOptions } from "eris";
+import type { SelectOption } from "oceanic.js";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageActionRowBuilder, MessageEmbedBuilder, MessageStringSelectMenuBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { EventEmitter } from "stream";
 
@@ -75,7 +75,7 @@ export class SearchPanel extends EventEmitter {
         return false;
       }
       let searchPanelDescription = "";
-      const selectOpts: SelectMenuOptions[] = songResult.map(({ url, title, author, duration, description }, j) => {
+      const selectOpts: SelectOption[] = songResult.map(({ url, title, author, duration, description }, j) => {
         searchPanelDescription += `\`${j + 1}.\` [${title}](${url}) \`${duration}\` - \`${author}\` \r\n\r\n`;
         return {
           label: `${(j + 1).toString()}. ${title.length > 90 ? title.substring(0, 90) + "…" : title}`,
@@ -86,29 +86,29 @@ export class SearchPanel extends EventEmitter {
       this._responseMessage = await reply.edit({
         content: "",
         embeds: [
-          new Helper.MessageEmbedBuilder()
+          new MessageEmbedBuilder()
             .setTitle(this.isRawTitle ? this.query : `"${this.query}"の検索結果✨`)
             .setColor(getColor("SEARCH"))
             .setDescription(searchPanelDescription)
             .setFooter({
-              icon_url: this._commandMessage.member.avatarURL,
+              iconURL: this._commandMessage.member.avatarURL(),
               text:
                 Util.config.noMessageContent
-                  ? "再生したい項目を選択して数字を送信するか、下から選択してください。キャンセルするには「キャンセル」または「cancel」と選択/入力します。また、サムネイルコマンドを使用してサムネイルを確認できます。" :
-                  "再生したい項目を、下から選択してください。キャンセルするには、下から\"キャンセル\"を選択してください。また、サムネイルコマンドを使用してサムネイルを確認することもできます。"
+                  ? "再生したい項目を選択して数字を送信するか、下から選択してください。キャンセルするには「キャンセル」または「cancel」と選択/入力します。また、サムネイルコマンドを使用してサムネイルを確認できます。"
+                  : "再生したい項目を、下から選択してください。キャンセルするには、下から\"キャンセル\"を選択してください。また、サムネイルコマンドを使用してサムネイルを確認することもできます。"
               ,
             })
-            .toEris(),
+            .toOceanic(),
         ],
         components: [
-          new Helper.MessageActionRowBuilder()
+          new MessageActionRowBuilder()
             .addComponents(
-              new Helper.MessageSelectMenuBuilder()
+              new MessageStringSelectMenuBuilder()
                 .setCustomId("search")
                 .setPlaceholder(
                   Util.config.noMessageContent
-                    ? "ここから選択..." :
-                    "数字を直接送信するか、ここから選択..."
+                    ? "ここから選択..."
+                    : "数字を直接送信するか、ここから選択..."
                 )
                 .setMinValues(1)
                 .setMaxValues(songResult.length - 1)
@@ -120,7 +120,7 @@ export class SearchPanel extends EventEmitter {
                   }
                 )
             )
-            .toEris(),
+            .toOceanic(),
         ],
       });
       return true;
@@ -150,7 +150,11 @@ export class SearchPanel extends EventEmitter {
 
   async destroy(quiet: boolean = false){
     if(this.status !== "consumed") return;
-    if(!quiet) await this._responseMessage.channel.createMessage("✅キャンセルしました").catch(er => Util.logger.log(er, "error"));
+    if(!quiet){
+      await this._responseMessage.channel.createMessage({
+        content: "✅キャンセルしました",
+      }).catch(er => Util.logger.log(er, "error"));
+    }
     await this._responseMessage.delete().catch(er => Util.logger.log(er, "error"));
     this.status = "destroyed";
   }

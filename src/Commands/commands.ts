@@ -18,10 +18,9 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { MessageEmbedBuilder } from "@mtripg6666tdr/eris-command-resolver";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
 import { CommandManager } from "../Component/CommandManager";
@@ -81,7 +80,7 @@ export default class Commands extends BaseCommand {
       // Generate embed
       for(let i = 0; i < categoriesList.length; i++){
         embed.push(
-          new Helper.MessageEmbedBuilder()
+          new MessageEmbedBuilder()
             .setTitle(getCategoryText(categoriesList[i]))
             .addFields(
               ...commands[categoriesList[i]].map(ci => ({
@@ -100,21 +99,20 @@ export default class Commands extends BaseCommand {
             + `\`${i + 1}ページ目(${embed.length}ページ中)\`\r\n`
             + (
               Util.config.noMessageContent
-                ? "`/コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。" :
-                `コマンドプレフィックスは、\`${options.server.prefix}\`です。\r\n\``
+                ? "`/コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。"
+                : `コマンドプレフィックスは、\`${options.server.prefix}\`です。\r\n\``
                   + `\`${options.server.prefix}コマンド 再生\`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。`
-                
             )
           )
           .setColor(getColor("COMMAND"));
       }
-      const toggle = await PageToggle.init(message, embed.map(_panel => _panel.toEris()));
+      const toggle = await PageToggle.init(message, embed.map(_panel => _panel.toOceanic()));
       options.embedPageToggle.push(toggle);
     }else{
       const ci = CommandManager.instance.resolve(options.rawArgs);
       if(ci && !ci.unlist){
         const prefix = options.server ? options.server.prefix : ">";
-        const embed = new Helper.MessageEmbedBuilder()
+        const embed = new MessageEmbedBuilder()
           .setTitle(`コマンド \`${ci.name}\` の詳細`)
           .setDescription(ci.description)
           .setColor(getColor("COMMAND"))
@@ -127,7 +125,7 @@ export default class Commands extends BaseCommand {
         if(ci.examples){
           embed.addField("使用例", `\`${prefix + ci.examples}\``);
         }
-        await message.reply({ embeds: [embed.toEris()] });
+        await message.reply({ embeds: [embed.toOceanic()] });
       }else{
         await message.reply(":face_with_raised_eyebrow: コマンドが見つかりませんでした");
       }

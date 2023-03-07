@@ -19,7 +19,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
 import { PageToggle } from "../Component/PageToggle";
@@ -84,20 +84,20 @@ export default class Queue extends BaseCommand {
         });
       }
       const [thour, tmin, tsec] = Util.time.CalcHourMinSec(totalLength);
-      return new Helper.MessageEmbedBuilder()
+      return new MessageEmbedBuilder()
         .setTitle(`${message.guild.name}のキュー`)
         .setDescription(`\`${page}ページ目(${totalpage}ページ中)\``)
         .addFields(...fields)
         .setAuthor({
           name: options.client.user.username,
-          icon_url: options.client.user.avatarURL,
+          iconURL: options.client.user.avatarURL(),
         })
         .setFooter({
           text: `${queue.length}曲 | 合計:${thour}:${tmin}:${tsec} | トラックループ:${queue.loopEnabled ? "⭕" : "❌"} | キューループ:${queue.queueLoopEnabled ? "⭕" : "❌"} | 関連曲自動再生:${options.server.addRelated ? "⭕" : "❌"} | 均等再生:${options.server.equallyPlayback ? "⭕" : "❌"}`,
         })
-        .setThumbnail(message.guild.iconURL)
+        .setThumbnail(message.guild.iconURL())
         .setColor(getColor("QUEUE"))
-        .toEris()
+        .toOceanic()
       ;
     };
 

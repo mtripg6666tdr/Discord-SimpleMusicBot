@@ -81,41 +81,15 @@ export default class Invoke extends BaseCommand {
       case "removescg":
         CommandManager.instance.removeAllGuildCommand(options.client, message.guild.id);
         break;
-      case "enabledsl":
-        options.server.player.detailedLog = true;
-        break;
-      case "disabledsl":
-        options.server.player.detailedLog = false;
-        break;
-      case "enabledslmemory":
-        options.server.player.disableDetailedLogMemory = false;
-        break;
-      case "disabledslmemory":
-        options.server.player.disableDetailedLogMemory = true;
-        break;
       case "obtainsyslog":
         message.reply({
           files: [
             {
-              file: Buffer.from(Util.logger.logStore.data.join("\r\n")),
+              contents: Buffer.from(Util.logger.logStore.data.join("\r\n")),
               name: "log.txt",
             },
           ],
         }).catch(er => Util.logger.log(er));
-        break;
-      case "obtaindsl":
-        if(options.server.player.csvLog.length === 0){
-          message.reply(`データが見つかりません。最後のファイル名: ${options.server.player.csvLogFilename || "なし"}`).catch(er => Util.logger.log(er, "error"));
-        }else{
-          message.reply({
-            files: [
-              {
-                file: Buffer.from(options.server.player.csvLog.join("\r\n")),
-                name: "detailed_log.csv",
-              },
-            ],
-          }).catch(er => Util.logger.log(er, "error"));
-        }
         break;
       default:
         return "特別コマンドが見つかりません。";

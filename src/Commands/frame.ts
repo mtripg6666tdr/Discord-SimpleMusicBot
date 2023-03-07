@@ -71,7 +71,9 @@ export default class Frame extends BaseCommand {
       else return NaN;
     }(options.rawArgs));
     if(options.rawArgs !== "" && vinfo.LiveStream){
-      await message.channel.createMessage("ライブストリームでは時間指定できません");
+      await message.channel.createMessage({
+        content: "ライブストリームでは時間指定できません",
+      });
       return;
     }
     if(!vinfo.LiveStream && (isNaN(time) || time > vinfo.LengthSeconds)){
@@ -83,9 +85,14 @@ export default class Frame extends BaseCommand {
       const response = await message.reply(":camera_with_flash:取得中...");
       const { url, ua } = await vinfo.fetchVideo();
       const frame = await getFrame(url, time, ua);
-      await response.channel.createMessage("", {
-        file: frame,
-        name: `capture_${ytdl.getVideoID(vinfo.Url)}-${hour}${min}${sec}.png`,
+      await response.channel.createMessage({
+        content: "",
+        files: [
+          {
+            name: `capture_${ytdl.getVideoID(vinfo.Url)}-${hour}${min}${sec}.png`,
+            contents: frame,
+          },
+        ],
       });
       await response.edit({
         content: ":white_check_mark:完了!" + (vinfo.LiveStream ? "" : `(${hour}:${min}:${sec}時点)`),
@@ -93,7 +100,9 @@ export default class Frame extends BaseCommand {
     }
     catch(e){
       Util.logger.log(e, "error");
-      await message.channel.createMessage(":sob:失敗しました...").catch(er => Util.logger.log(er, "error"));
+      await message.channel.createMessage({
+        content: ":sob:失敗しました...",
+      }).catch(er => Util.logger.log(er, "error"));
     }
   }
 }
@@ -113,7 +122,9 @@ function getFrame(url: string, time: number, ua: string){
     Util.logger.log(`[FFmpeg] Passing args: ${args.join(" ")}`, "debug");
     const bufs = [] as Buffer[];
     const ffmpeg = new FFmpeg({ args });
-    if(Util.config.debug) ffmpeg.process.stderr.on("data", chunk => Util.logger.log(`[FFmpeg] ${chunk.toString()}`, "debug"));
+    if(Util.config.debug){
+      ffmpeg.process.stderr.on("data", chunk => Util.logger.log(`[FFmpeg] ${chunk.toString()}`, "debug"));
+    }
     ffmpeg
       .on("error", (er) => {
         if(!ffmpeg.destroyed) ffmpeg.destroy(er);

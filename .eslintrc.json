@@ -258,11 +258,7 @@
     "no-whitespace-before-property": "warn",
     "nonblock-statement-body-position": "warn",
     "operator-assignment": "warn",
-    "operator-linebreak": ["warn", "before", {
-      "overrides": {
-        ":": "after"
-      }
-    }],
+    "operator-linebreak": ["warn", "before"],
     "padded-blocks": ["warn", "never"],
     "prefer-arrow-callback": "warn",
     "prefer-const": "warn",

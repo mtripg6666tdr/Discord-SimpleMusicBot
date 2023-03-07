@@ -46,7 +46,7 @@ export default class Export extends BaseCommand {
     message.reply({
       content: "✅エクスポートしました",
       files: [{
-        file: Buffer.from(JSON.stringify(ymxFile)),
+        contents: Buffer.from(JSON.stringify(ymxFile)),
         name: "exported_queue.ymx",
       }],
     })

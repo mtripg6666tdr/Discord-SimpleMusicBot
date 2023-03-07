@@ -21,17 +21,20 @@ import type { TaskCancellationManager } from "./TaskCancellationManager";
 import type { exportableCustom } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { AddedBy, QueueContent } from "../Structure/QueueContent";
-import type { Message, TextableChannel, TextChannel } from "eris";
+import type { AnyGuildTextChannel, Message } from "oceanic.js";
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
-import { Member } from "eris";
+import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
+
+import { Member } from "oceanic.js";
+
 
 import * as AudioSource from "../AudioSource";
 import { ServerManagerBase } from "../Structure";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
 import { FallBackNotice } from "../definition";
+
 
 export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"spotify"|"unknown";
 /**
@@ -243,14 +246,14 @@ export class QueueManager extends ServerManagerBase {
     type: KnownAudioSourceIdentifer,
     first: boolean = false,
     fromSearch: false|ResponseMessage = false,
-    channel: TextChannel = null,
+    channel: AnyGuildTextChannel = null,
     message: ResponseMessage = null,
     gotData: AudioSource.exportableCustom = null,
     cancellable: boolean = false,
   ): Promise<boolean>{
     this.Log("AutoAddQueue Called");
     const t = Util.time.timer.start("AutoAddQueue");
-    let msg: Message<TextChannel>|ResponseMessage = null;
+    let msg: Message<AnyGuildTextChannel>|ResponseMessage = null;
     try{
       if(fromSearch){
         // 検索パネルから
@@ -259,10 +262,10 @@ export class QueueManager extends ServerManagerBase {
         await msg.edit({
           content: "",
           embeds: [
-            new Helper.MessageEmbedBuilder()
+            new MessageEmbedBuilder()
               .setTitle("お待ちください")
               .setDescription("情報を取得しています...")
-              .toEris(),
+              .toOceanic(),
           ],
           allowedMentions: {
             repliedUser: false,
@@ -276,7 +279,9 @@ export class QueueManager extends ServerManagerBase {
       }else if(channel){
         // まだないので生成
         this.Log("AutoAddQueue will make a message that will be used to report statuses");
-        msg = await channel.createMessage("情報を取得しています。お待ちください...");
+        msg = await channel.createMessage({
+          content: "情報を取得しています。お待ちください...",
+        });
       }
       if(this.server.queue.length > 999){
         // キュー上限
@@ -294,7 +299,7 @@ export class QueueManager extends ServerManagerBase {
         const index = info.index.toString();
         // ETAの計算
         const timeFragments = Util.time.CalcHourMinSec(this.getLengthSecondsTo(info.index) - _t - Math.floor(this.server.player.currentTime / 1000));
-        const embed = new Helper.MessageEmbedBuilder()
+        const embed = new MessageEmbedBuilder()
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
           .setDescription(`[${info.basicInfo.Title}](${info.basicInfo.Url})`)
@@ -308,34 +313,34 @@ export class QueueManager extends ServerManagerBase {
         }else if(info.basicInfo.isSpotify()){
           embed.addField(":warning:注意", "Spotifyのタイトルは正しく再生されない場合があります");
         }
-        let lastReply: Message<TextableChannel>|ResponseMessage = null;
+        let lastReply: Message<AnyGuildTextChannel>|ResponseMessage = null;
         const components = !first && cancellable ? [
-          new Helper.MessageActionRowBuilder()
+          new MessageActionRowBuilder()
             .addComponents(
-              new Helper.MessageButtonBuilder()
+              new MessageButtonBuilder()
                 .setCustomId(`cancel-last-${this.getUserIdFromMember(addedBy)}`)
                 .setLabel("キャンセル")
                 .setStyle("DANGER")
             )
-            .toEris(),
+            .toOceanic(),
         ] : [];
         if(typeof info.basicInfo.Thumbnail === "string"){
           embed.setThumbnail(info.basicInfo.Thumbnail);
           lastReply = await msg.edit({
             content: "",
-            embeds: [embed.toEris()],
+            embeds: [embed.toOceanic()],
             components,
           });
         }else{
           embed.setThumbnail("attachment://thumbnail." + info.basicInfo.Thumbnail.ext);
-          lastReply = await this.server.bot.client.editMessage(msg.channel.id, msg.id, {
+          lastReply = await msg.edit({
             content: "",
-            embeds: [embed.toEris()],
+            embeds: [embed.toOceanic()],
             components,
-            file: [
+            files: [
               {
                 name: "thumbnail." + info.basicInfo.Thumbnail.ext,
-                file: info.basicInfo.Thumbnail.data,
+                contents: info.basicInfo.Thumbnail.data,
               },
             ],
           });

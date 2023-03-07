@@ -25,7 +25,7 @@ const videoExtensions = [".mov", ".mp4"] as const;
  * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
  */
 export function isAvailableRawAudioURL(str: string){
-  return audioExtensions.some(ext => str.endsWith(ext));
+  return str && audioExtensions.some(ext => str.endsWith(ext));
 }
 
 export function isAvailableRawVideoURL(str: string){

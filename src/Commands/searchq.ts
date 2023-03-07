@@ -18,9 +18,9 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -77,12 +77,12 @@ export default class Searchq extends BaseCommand {
         inline: false,
       } as EmbedField;
     });
-    const embed = new Helper.MessageEmbedBuilder()
+    const embed = new MessageEmbedBuilder()
       .setTitle(`"${options.rawArgs}"の検索結果✨`)
       .setDescription("キュー内での検索結果です。最大20件表示されます。")
       .setFields(...fields)
       .setColor(getColor("SEARCH"))
-      .toEris()
+      .toOceanic()
     ;
     message.reply({ embeds: [embed] });
   }

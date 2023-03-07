@@ -18,9 +18,8 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { MessageEmbedBuilder } from "@mtripg6666tdr/eris-command-resolver";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -59,7 +58,7 @@ export default class Lyrics extends BaseCommand {
       for(let i = 0; i < chunkLength; i++){
         const partial = songInfo.lyric.substring(4000 * i, 4000 * (i + 1) - 1);
         embeds.push(
-          new Helper.MessageEmbedBuilder()
+          new MessageEmbedBuilder()
             .setDescription(partial)
             .setColor(getColor("LYRIC"))
         );
@@ -72,12 +71,12 @@ export default class Lyrics extends BaseCommand {
       embeds[embeds.length - 1]
         .setFooter({
           text: Util.eris.user.getDisplayName(message.member),
-          icon_url: message.member.avatarURL,
+          iconURL: message.member.avatarURL(),
         })
       ;
       msg.edit({
         content: "",
-        embeds: embeds.map(embed => embed.toEris()),
+        embeds: embeds.map(embed => embed.toOceanic()),
       });
     }
     catch(e){

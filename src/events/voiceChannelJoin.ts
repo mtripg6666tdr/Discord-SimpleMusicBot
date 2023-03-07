@@ -65,7 +65,7 @@ export async function onVoiceChannelJoin(
             (
               (
                 !server.connection
-                || (server.bgmConfig.mode === "prior" && server.connection.channelID !== server.bgmConfig.voiceChannelId))
+                || (server.bgmConfig.mode === "prior" && server.connectingVoiceChannel.id !== server.bgmConfig.voiceChannelId))
               && !server.queue.isBGM
             )
             || server.player.finishTimeout

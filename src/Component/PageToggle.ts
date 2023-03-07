@@ -17,9 +17,11 @@
  */
 
 import type { ResponseMessage } from "./ResponseMessage";
-import type { ComponentInteraction, EmbedOptions } from "eris";
+import type { ComponentInteraction, EmbedOptions } from "oceanic.js";
 
-import { CommandMessage, Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
+
+import { CommandMessage } from "./CommandMessage";
 
 /**
  * 最終的にメッセージの埋め込みに解決されるデータ
@@ -74,18 +76,18 @@ export class PageToggle {
         await n.getEmbed(current || 0),
       ],
       components: [
-        new Helper.MessageActionRowBuilder()
+        new MessageActionRowBuilder()
           .addComponents(
-            new Helper.MessageButtonBuilder()
+            new MessageButtonBuilder()
               .setCustomId(this.arrowLeft)
               .setEmoji(this.arrowLeftEmoji)
               .setStyle("PRIMARY"),
-            new Helper.MessageButtonBuilder()
+            new MessageButtonBuilder()
               .setCustomId(this.arrowRight)
               .setEmoji(this.arrowRightEmoji)
               .setStyle("PRIMARY")
           )
-          .toEris(),
+          .toOceanic(),
       ],
     });
     return n;
@@ -94,7 +96,7 @@ export class PageToggle {
   static organize(toggles: PageToggle[], min: number, forceRemovingUnfresh: string = null){
     const delIndex = [] as number[];
     for(let i = 0; i < toggles.length; i++){
-      if(new Date().getTime() - toggles[i].Message.createdTimestamp >= min * 60 * 1000 || forceRemovingUnfresh && toggles[i].IsFreshNecessary && toggles[i].Message.guild.id === forceRemovingUnfresh){
+      if(new Date().getTime() - toggles[i].Message.createdTimestamp.getTime() >= min * 60 * 1000 || forceRemovingUnfresh && toggles[i].IsFreshNecessary && toggles[i].Message.guild.id === forceRemovingUnfresh){
         delIndex.push(i);
       }
     }
@@ -111,7 +113,7 @@ export class PageToggle {
     this._current = page;
     const embed = await this.getEmbed(page);
     if(interaction){
-      await interaction.editOriginalMessage({
+      await interaction.editOriginal({
         content: this.Message.content,
         embeds: [embed],
       });

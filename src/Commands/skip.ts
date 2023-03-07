@@ -76,7 +76,9 @@ export default class Skip extends BaseCommand {
       if(message.response){
         message.response.edit(":astonished:スキップに失敗しました").catch(er => Util.logger.log(er, "error"));
       }else{
-        message.channel.createMessage(":astonished:スキップに失敗しました").catch(er => Util.logger.log(er, "error"));
+        message.channel.createMessage({
+          content: ":astonished:スキップに失敗しました",
+        }).catch(er => Util.logger.log(er, "error"));
       }
     }
   }

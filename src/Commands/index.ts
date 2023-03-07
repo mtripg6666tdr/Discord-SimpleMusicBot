@@ -18,9 +18,9 @@
 
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { ListCommandInitializeOptions, UnlistCommandInitializeOptions, ListCommandWithArgumentsInitializeOptions, CommandArgs, SlashCommandArgument, CommandPermission } from "../Structure/Command";
-import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString } from "eris";
+import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString } from "oceanic.js";
 
-import { Constants } from "eris";
+import { ApplicationCommandTypes } from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
 import { permissionDescriptionParts } from "../Structure/Command";
@@ -121,9 +121,9 @@ export abstract class BaseCommand {
       }else if(perm === "dj"){
         return Util.eris.user.isDJ(message.member, options);
       }else if(perm === "manageGuild"){
-        return message.member.permissions.has("manageGuild");
+        return message.member.permissions.has("MANAGE_GUILD");
       }else if(perm === "manageMessages"){
-        return message.channel.permissionsOf(message.member).has("manageMessages");
+        return message.channel.permissionsOf(message.member).has("MANAGE_MESSAGES");
       }else if(perm === "noConnection"){
         return !options.server.player.isConnecting;
       }else if(perm === "onlyListener"){
@@ -162,14 +162,14 @@ export abstract class BaseCommand {
     });
     if(options && options.length > 0){
       return {
-        type: Constants.ApplicationCommandTypes.CHAT_INPUT,
+        type: ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
         description: this.description,
         options,
       };
     }else{
       return {
-        type: Constants.ApplicationCommandTypes.CHAT_INPUT,
+        type: ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
         description: this.description,
       };

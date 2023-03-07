@@ -18,7 +18,7 @@
 
 import type * as Sources from ".";
 import type { exportableCustom } from "./custom";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 import type { Readable } from "stream";
 
 export type StreamType =

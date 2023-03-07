@@ -18,7 +18,7 @@
 
 import type { UrlStreamInfo } from ".";
 import type { exportableCustom } from "./custom";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 
 import { AudioSource } from "./audiosource";
 import { Util } from "../Util";

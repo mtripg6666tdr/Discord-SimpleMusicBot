@@ -19,7 +19,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -48,7 +48,7 @@ export default class Thumbnail extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
-    const embed = new Helper.MessageEmbedBuilder();
+    const embed = new MessageEmbedBuilder();
     embed.setColor(getColor("THUMB"));
     const userSearchPanel = options.server.getSearchPanel(message.member.id);
     const rawArgNumber = Number(options.rawArgs);
@@ -68,16 +68,16 @@ export default class Thumbnail extends BaseCommand {
       if(typeof info.Thumbnail === "string"){
         embed.setImage(info.Thumbnail);
         await message.reply({
-          embeds: [embed.toEris()],
+          embeds: [embed.toOceanic()],
         }).catch(e => Util.logger.log(e, "error"));
       }else{
         embed.setImage("attachment://thumbnail." + info.Thumbnail.ext);
         await message.reply({
-          embeds: [embed.toEris()],
+          embeds: [embed.toOceanic()],
           files: [
             {
               name: "thumbnail." + info.Thumbnail.ext,
-              file: info.Thumbnail.data,
+              contents: info.Thumbnail.data,
             },
           ],
         }).catch(e => Util.logger.log(e, "error"));
@@ -88,7 +88,7 @@ export default class Thumbnail extends BaseCommand {
     }
     
     await message.reply({
-      embeds: [embed.toEris()],
+      embeds: [embed.toOceanic()],
     }).catch(e => Util.logger.log(e, "error"));
   }
 }

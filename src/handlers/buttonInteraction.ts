@@ -41,8 +41,8 @@ export async function handleButtonInteraction(
     if(l.length >= 1){
       // ページめくり
       await l[0].flipPage(
-        interaction.data.customID === PageToggle.arrowLeft ? l[0].Current >= 1 ? l[0].Current - 1 : 0 :
-          interaction.data.customID === PageToggle.arrowRight ? l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current : 0
+        interaction.data.customID === PageToggle.arrowLeft ? l[0].Current >= 1 ? l[0].Current - 1 : 0
+          : interaction.data.customID === PageToggle.arrowRight ? l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current : 0
         ,
         interaction
       );
@@ -121,7 +121,7 @@ export async function handleButtonInteraction(
       );
       mes.edit({
         content: "",
-        embeds: [embed.toEris()],
+        embeds: [embed.toOceanic()],
         components: [messageActions],
       }).catch(er => Util.logger.log(er, "error"));
     };

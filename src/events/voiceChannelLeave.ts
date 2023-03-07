@@ -33,7 +33,7 @@ export async function onVoiceChannelLeave(
 
   if(member.id === this._client.user.id){
     // サーバー側からのボットの切断
-    this.Log(`forced to disconnect from VC (${server.connection?.channelID})`);
+    this.Log(`forced to disconnect from VC (${server.connectingVoiceChannel?.id})`);
     server.player.disconnect();
     await this._client.rest.channels.createMessage(
       server.boundTextChannel,
@@ -53,7 +53,7 @@ export async function onVoiceChannelLeave(
         // かつ、楽曲の長さが60秒以上
         // かつ、残り時間が10秒以内
         // ならば、切断。
-        this.Log(`audio left less than 10sec; automatically disconnected from VC (${server.connection?.channelID})`);
+        this.Log(`audio left less than 10sec; automatically disconnected from VC (${server.connectingVoiceChannel?.id})`);
         server.player.disconnect();
         if(!server.queue.onceLoopEnabled && !server.queue.loopEnabled) server.queue.next();
         await this._client.rest.channels.createMessage(
