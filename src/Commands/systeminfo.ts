@@ -135,7 +135,7 @@ export default class SystemInfo extends BaseCommand {
           .setTitle("(秘)サーバー照会結果")
           .addField("サーバー名", target.name, true)
           .addField("サーバーID", target.id)
-          .addField("サーバーアイコン", target.icon)
+          .addField("サーバーアイコン", target.icon || "なし")
           .addField("チャンネル数(キャッシュによる)", target.channels.size.toString(), true)
           .addField("メンバー数(概算)", target.approximateMemberCount?.toString() || "不明", true)
           .addField("接続中", data?.player.isConnecting ? "はい" : "いいえ", true)
