@@ -8,6 +8,15 @@
   "engines": {
     "node": ">=12.4.0"
   },
+  "scripts": {
+    "test": "mocha",
+    "start": "npm run build && npm run onlystart",
+    "onlystart": "node util/exec dist",
+    "build": "rimraf dist/ typings/ && tsc",
+    "lint": "eslint .",
+    "cleanup": "rimraf dist/ typings/ logs/",
+    "generatecommandlist": "node util/generateCommandList"
+  },
   "dependencies": {
     "@mtripg6666tdr/async-lock": "^1.1.0",
     "@mtripg6666tdr/eris-command-resolver": "^2.0.0",
@@ -63,15 +72,6 @@
     "play-dl": "^1.9.6",
     "sodium-native": "^3.4.1",
     "zlib-sync": "^0.1.8"
-  },
-  "scripts": {
-    "test": "mocha",
-    "start": "npm run build && npm run onlystart",
-    "onlystart": "node util/exec dist",
-    "build": "rimraf dist/ typings/ && tsc",
-    "lint": "eslint .",
-    "cleanup": "rimraf dist/ typings/ logs/",
-    "generatecommandlist": "node util/generateCommandList"
   },
   "keywords": [],
   "author": "mtripg6666tdr",
