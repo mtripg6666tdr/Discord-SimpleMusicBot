@@ -18,7 +18,7 @@
 
 import type { MusicBot } from "../bot";
 
-import * as discord from "eris";
+import * as discord from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
 import Util from "../Util";
@@ -33,15 +33,19 @@ export async function onReady(this: MusicBot){
 
   // Set activity as booting
   if(!this.maintenance){
-    client.editStatus({
-      type: discord.Constants.ActivityTypes.GAME,
-      name: "起動中...",
-    });
+    client.editStatus("dnd", [
+      {
+        type: discord.ActivityTypes.GAME,
+        name: "起動中...",
+      },
+    ]);
   }else{
-    client.editStatus("dnd", {
-      type: discord.Constants.ActivityTypes.GAME,
-      name: "メンテナンス中...",
-    });
+    client.editStatus("dnd", [
+      {
+        type: discord.ActivityTypes.GAME,
+        name: "メンテナンス中...",
+      },
+    ]);
   }
 
   // add bgm tracks
@@ -85,10 +89,12 @@ export async function onReady(this: MusicBot){
 
   // Set activity
   if(!this.maintenance){
-    client.editStatus({
-      type: discord.Constants.ActivityTypes.LISTENING,
-      name: "音楽",
-    });
+    client.editStatus("online", [
+      {
+        type: discord.ActivityTypes.GAME,
+        name: "音楽",
+      },
+    ]);
   }
   // Set main tick
   setTimeout(() => {

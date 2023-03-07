@@ -16,63 +16,77 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { BaseCommand } from "../Commands";
 import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
 
-import { CommandMessage } from "@mtripg6666tdr/eris-command-resolver";
-import * as discord from "eris";
+import * as discord from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
+import { CommandMessage } from "../Component/CommandMessage";
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 import Util from "../Util";
 import { NotSendableMessage } from "../definition";
 
 export async function handleCommandInteraction(this: MusicBot, server: GuildDataContainer, interaction: discord.CommandInteraction){
   this.Log("reveived command interaction");
+  if(!interaction.inCachedGuildChannel()) return;
+
   if(!(interaction.channel instanceof discord.TextChannel)){
-    await interaction.createMessage("テキストチャンネルで実行してください");
+    await interaction.createMessage({
+      content: "テキストチャンネルで実行してください",
+    });
     return;
   }
+
   // 送信可能か確認
   if(!Util.eris.channel.checkSendable(interaction.channel, this._client.user.id)){
-    await interaction.createMessage(NotSendableMessage);
+    await interaction.createMessage({
+      content: NotSendableMessage,
+    });
     return;
   }
+
   // コマンドを解決
   const command = CommandManager.instance.resolve(interaction.data.name);
-  if(command){
-    if(
-      // BGM構成が存在するサーバー
-      server instanceof GuildDataContainerWithBgm
-      && (
-        
-      // いまBGM再生中
-        server.queue.isBGM
-          && (
-            // キューの編集を許可していない、またはBGM優先モード
-            !server.bgmConfig.allowEditQueue || server.bgmConfig.mode === "prior"
-          )
-        
-        // BGMが再生していなければ、BGMオンリーモードであれば
-        || server.bgmConfig.mode === "only"
-      )
-      // かつBGM構成で制限があるときに実行できないコマンドならば
-      && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"
-    ){
-      // 無視して返却
-      return;
-    }
-    // 応答遅延するべきコマンドならば遅延
-    if(command.shouldDefer){
-      await interaction.defer();
-    }
-    // メッセージライクに解決してコマンドメッセージに 
-    const commandMessage = CommandMessage.createFromInteraction(interaction as discord.CommandInteraction<discord.GuildTextableWithThread>);
-    // プレフィックス更新
-    server.updatePrefix(commandMessage);
-    // コマンドを実行
-    await command.checkAndRun(commandMessage, this["createCommandRunnerArgs"](commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
-  }else{
-    await interaction.createMessage("おっと！なにかが間違ってしまったようです。\r\nコマンドが見つかりませんでした。 :sob:");
+  if(!command){
+    await interaction.createMessage({
+      content: "おっと！なにかが間違ってしまったようです。\r\nコマンドが見つかりませんでした。 :sob:",
+    });
+    return;
   }
+
+  if(shouldIgnoreInteractionByBgmConfig(server, command)){
+    // BGM設定上コマンドが使えない場合、無視して返却
+    return;
+  }
+
+  // 応答遅延するべきコマンドならば遅延
+  if(command.shouldDefer){
+    await interaction.defer();
+  }
+
+  // メッセージライクに解決してコマンドメッセージに
+  const commandMessage = CommandMessage.createFromInteraction(interaction);
+  // プレフィックス更新
+  server.updatePrefix(commandMessage);
+  // コマンドを実行
+  await command.checkAndRun(commandMessage, this["createCommandRunnerArgs"](commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
+}
+
+function shouldIgnoreInteractionByBgmConfig(server: GuildDataContainer, command: BaseCommand){
+  // BGM構成が存在するサーバー
+  return server instanceof GuildDataContainerWithBgm
+    && (
+      // いまBGM再生中
+      server.queue.isBGM
+        && (
+          // キューの編集を許可していない、またはBGM優先モード
+          !server.bgmConfig.allowEditQueue || server.bgmConfig.mode === "prior"
+        )
+      // BGMが再生していなければ、BGMオンリーモードであれば
+      || server.bgmConfig.mode === "only"
+    )
+    // かつBGM構成で制限があるときに実行できないコマンドならば
+    && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム";
 }

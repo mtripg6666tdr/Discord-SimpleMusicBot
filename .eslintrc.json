@@ -40,7 +40,9 @@
       "functions": "only-multiline"
     }],
     "@typescript-eslint/no-dupe-class-members": "error",
-    "@typescript-eslint/no-extra-parens": ["warn", "all"],
+    "@typescript-eslint/no-extra-parens": ["warn", "all", {
+      "nestedBinaryExpressions": false
+    }],
     "@typescript-eslint/no-loop-func": "warn",
     "@typescript-eslint/no-loss-of-precision": "error",
     "@typescript-eslint/no-throw-literal": "warn",

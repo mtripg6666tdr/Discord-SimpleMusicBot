@@ -17,11 +17,18 @@
  */
 
 import type { MusicBot } from "../bot";
-import type * as discord from "eris";
+import type * as discord from "oceanic.js";
 
 import { onVoiceChannelJoin, onVoiceChannelLeave } from ".";
 
-export async function onVoiceChannelSwitch(this: MusicBot, member: discord.Member, newChannel: discord.TextVoiceChannel, oldChannel: discord.TextVoiceChannel){
+export async function onVoiceChannelSwitch(
+  this: MusicBot,
+  member: discord.Member,
+  newChannel: discord.VoiceChannel | discord.StageChannel | discord.Uncached,
+  oldChannel: discord.VoiceChannel | discord.StageChannel | discord.Uncached
+){
   onVoiceChannelJoin.call(this, member, newChannel);
-  if(member.id !== this.client.user.id) onVoiceChannelLeave.call(this, member, oldChannel);
+  if(member.id !== this.client.user.id){
+    onVoiceChannelLeave.call(this, member, oldChannel);
+  }
 }

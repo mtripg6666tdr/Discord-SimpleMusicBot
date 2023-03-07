@@ -17,27 +17,38 @@
  */
 
 import type { MusicBot } from "../bot";
-import type * as discord from "eris";
+import type * as discord from "oceanic.js";
 
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 
-export async function onVoiceChannelJoin(this: MusicBot, member: discord.Member, newChannel: discord.TextVoiceChannel){
+export async function onVoiceChannelJoin(
+  this: MusicBot,
+  member: discord.Member,
+  newChannel: discord.VoiceChannel | discord.StageChannel | discord.Uncached
+){
   if(member.id === this._client.user.id){
     // ボットが参加した際
     // ミュート状態/抑制状態なら自分で解除を試みる
     if(member.voiceState.suppress || member.voiceState.mute){
-      // VC参加
-      const voiceChannel = this._client.getChannel(newChannel.id) as discord.VoiceChannel;
-      voiceChannel.guild.editVoiceState({
+      // VC参加 => 抑制状態ならそれの解除を試みる
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+      const voiceChannel = this._client.getChannel(newChannel.id) as discord.VoiceChannel | discord.StageChannel;
+      if(!("guild" in voiceChannel)) return;
+      voiceChannel.guild.editCurrentUserVoiceState({
         channelID: newChannel.id,
         suppress: false,
       }).catch(() => {
-        voiceChannel.guild.members.get(this._client.user.id)
-          .edit({
-            mute: false,
-          })
+        voiceChannel.guild.editUserVoiceState(this._client.user.id, {
+          channelID: newChannel.id,
+          suppress: false,
+        })
           .catch(() => {
-            this._client.createMessage(this.guildData.get(newChannel.guild.id).boundTextChannel, ":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。")
+            this._client.rest.channels.createMessage(
+              this.guildData.get((newChannel as discord.VoiceChannel).guild.id).boundTextChannel,
+              {
+                content: ":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。",
+              }
+            )
               .catch(e => this.Log(e));
           });
       });
@@ -51,15 +62,17 @@ export async function onVoiceChannelJoin(this: MusicBot, member: discord.Member,
         && (
           newChannel.id === server.bgmConfig.voiceChannelId
           && (
-            
-            (!server.connection || server.bgmConfig.mode === "prior" && server.connection.channelID !== server.bgmConfig.voiceChannelId)
+            (
+              (
+                !server.connection
+                || (server.bgmConfig.mode === "prior" && server.connection.channelID !== server.bgmConfig.voiceChannelId))
               && !server.queue.isBGM
-            
+            )
             || server.player.finishTimeout
           )
         )
     ){
-      // BGMターゲット
+      // BGMを再生する条件が整っている
       server.playBgmTracks();
     }
   }

@@ -19,7 +19,7 @@
 import type { BaseCommand, CommandArgs } from "./Commands";
 import type { Backupper } from "./Component/backupper";
 import type { GuildBGMContainerType } from "./Util/config";
-import type * as discord from "eris";
+import type * as discord from "oceanic.js";
 
 import { execSync } from "child_process";
 import * as fs from "fs";
@@ -246,7 +246,7 @@ interface BotBaseEvents {
   onMessageCreate: [message:discord.Message];
   onInteractionCreate: [interaction:discord.Interaction];
   onCommandHandler: [command:BaseCommand, args:CommandArgs];
-  onBotVoiceChannelJoin: [channel:discord.VoiceChannel];
+  onBotVoiceChannelJoin: [channel:discord.VoiceChannel|discord.StageChannel];
   guildDataAdded: [container:GuildDataContainer];
   guildDataRemoved: [guildId:string];
   tick: [count:number];

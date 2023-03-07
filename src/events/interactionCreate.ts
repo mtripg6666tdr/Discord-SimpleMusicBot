@@ -18,17 +18,18 @@
 
 import type { MusicBot } from "../bot";
 
-import * as discord from "eris";
+import * as discord from "oceanic.js";
+import { InteractionTypes } from "oceanic.js";
 
 import Util from "../Util";
 import * as handlers from "../handlers";
 
-export async function onInteractionCreate(this: MusicBot, interaction: discord.Interaction){
+export async function onInteractionCreate(this: MusicBot, interaction: discord.AnyInteractionGateway){
   // イベント発生させる
   this["_addOn"].emit("interactionCreate", interaction);
 
   // コマンドインタラクションおよびコンポーネントインタラクション以外は処理せず終了
-  if(!Util.eris.interaction.interactionIsCommandOrComponent(interaction)){
+  if(interaction.type !== InteractionTypes.APPLICATION_COMMAND && interaction.type !== InteractionTypes.MESSAGE_COMPONENT){
     this.Log(`Unknown interaction received: ${interaction.type}`, "debug");
     return;
   }
