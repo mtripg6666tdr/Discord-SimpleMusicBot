@@ -1,4 +1,4 @@
-# v3.10.0
+# v3.11.0
 ## 機能追加
 * 検索結果から再生した場合もキャンセルボタンを表示する(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1102)
 * Spotifyのアルバムを解決できるようになりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1103)
@@ -23,5 +23,17 @@
 - Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 [**マイルストーン**](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/milestone/12?closed=1)
+
+---
+
+# v3.11.1
+## バグ修正
+* `システム情報`コマンドを使用すると、場合によってはエラーが発生する問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1123)
+* デバッグモードでも、エラーレポート用のチャンネルが指定された場合、エラーを書き込む(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1127, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1135)
+## その他の変更
+* v4の開発開始に伴う変更・ドキュメントの更新等(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1114, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1115, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1116, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1125)
+
+### その他の特記事項
+- Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
