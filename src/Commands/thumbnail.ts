@@ -62,22 +62,22 @@ export default class Thumbnail extends BaseCommand {
     }else if(!options.rawArgs && options.server.player.isPlaying && options.server.queue.length >= 1){
       const info = options.server.queue.get(0).basicInfo;
       embed
-        .setTitle(info.Title)
-        .setDescription("URL: " + info.Url)
+        .setTitle(info.title)
+        .setDescription("URL: " + info.url)
       ;
-      if(typeof info.Thumbnail === "string"){
-        embed.setImage(info.Thumbnail);
+      if(typeof info.thumbnail === "string"){
+        embed.setImage(info.thumbnail);
         await message.reply({
           embeds: [embed.toOceanic()],
         }).catch(e => Util.logger.log(e, "error"));
       }else{
-        embed.setImage("attachment://thumbnail." + info.Thumbnail.ext);
+        embed.setImage("attachment://thumbnail." + info.thumbnail.ext);
         await message.reply({
           embeds: [embed.toOceanic()],
           files: [
             {
-              name: "thumbnail." + info.Thumbnail.ext,
-              contents: info.Thumbnail.data,
+              name: "thumbnail." + info.thumbnail.ext,
+              contents: info.thumbnail.data,
             },
           ],
         }).catch(e => Util.logger.log(e, "error"));

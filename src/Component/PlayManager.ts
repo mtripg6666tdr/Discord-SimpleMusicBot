@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { AudioSource, YouTube } from "../AudioSource";
+import type { AudioSource } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { AudioPlayer, AudioResource } from "@discordjs/voice";
 import type { Message, TextChannel } from "oceanic.js";
@@ -46,7 +46,7 @@ export class PlayManager extends ServerManagerBase {
   protected _errorCount = 0;
   protected _errorUrl = "";
   protected _preparing = false;
-  protected _currentAudioInfo: AudioSource = null;
+  protected _currentAudioInfo: AudioSource<any> = null;
   protected _currentAudioStream: Readable = null;
   protected _cost = 0;
   protected _finishTimeout = false;
@@ -62,12 +62,12 @@ export class PlayManager extends ServerManagerBase {
     this._preparing = val;
   }
 
-  get currentAudioInfo(): Readonly<AudioSource>{
+  get currentAudioInfo(): Readonly<AudioSource<any>>{
     return this._currentAudioInfo;
   }
 
   get currentAudioUrl(): string{
-    if(this.currentAudioInfo) return this.currentAudioInfo.Url;
+    if(this.currentAudioInfo) return this.currentAudioInfo.url;
     else return "";
   }
 
@@ -160,14 +160,14 @@ export class PlayManager extends ServerManagerBase {
 
     // 通知メッセージを送信する（可能なら）
     if(this.getNoticeNeeded() && !quiet){
-      const [min, sec] = Util.time.CalcMinSec(this.currentAudioInfo.LengthSeconds);
-      const isLive = this.currentAudioInfo.isYouTube() && this.currentAudioInfo.LiveStream;
+      const [min, sec] = Util.time.CalcMinSec(this.currentAudioInfo.lengthSeconds);
+      const isLive = this.currentAudioInfo.isYouTube() && this.currentAudioInfo.isLiveStream;
       if(this._currentAudioInfo.isYouTube() && this._currentAudioInfo.availableAfter){
         // まだ始まっていないライブを待機する
         mes = await this.server.bot.client.rest.channels.createMessage(
           this.server.boundTextChannel,
           {
-            content: `:stopwatch: \`${this.currentAudioInfo.Title}\` \`(ライブストリーム)\`の開始を待機中...`,
+            content: `:stopwatch: \`${this.currentAudioInfo.title}\` \`(ライブストリーム)\`の開始を待機中...`,
           }
         );
         this.waitForLive = true;
@@ -189,7 +189,7 @@ export class PlayManager extends ServerManagerBase {
               if(waitTarget !== this._currentAudioInfo) return;
               if(this._currentAudioInfo.isYouTube()){
                 this._currentAudioInfo.disableCache();
-                await this._currentAudioInfo.init(this._currentAudioInfo.Url, null);
+                await this._currentAudioInfo.init(this._currentAudioInfo.url, null);
               }
               checkForLive();
             }, waitTime).unref();
@@ -208,7 +208,7 @@ export class PlayManager extends ServerManagerBase {
         mes = await this.server.bot.client.rest.channels.createMessage(
           this.server.boundTextChannel,
           {
-            content: `:hourglass_flowing_sand: \`${this.currentAudioInfo.Title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`,
+            content: `:hourglass_flowing_sand: \`${this.currentAudioInfo.title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`,
           }
         );
       }
@@ -216,7 +216,7 @@ export class PlayManager extends ServerManagerBase {
 
     try{
       // シーク位置を確認
-      if(this.currentAudioInfo.LengthSeconds <= time) time = 0;
+      if(this.currentAudioInfo.lengthSeconds <= time) time = 0;
       this._seek = time;
       const t = Util.time.timer.start("PlayManager#Play->FetchAudioSource");
 
@@ -277,35 +277,35 @@ export class PlayManager extends ServerManagerBase {
 
       if(mes && !quiet){
         // 再生開始メッセージ
-        const _t = Number(this.currentAudioInfo.LengthSeconds);
+        const _t = Number(this.currentAudioInfo.lengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
-        const timeFragments = Util.time.CalcHourMinSec(this.server.queue.lengthSecondsActual - (this.currentAudioInfo.LengthSeconds || 0));
+        const timeFragments = Util.time.CalcHourMinSec(this.server.queue.lengthSecondsActual - (this.currentAudioInfo.lengthSeconds || 0));
         /* eslint-disable @typescript-eslint/indent */
         const embed = new MessageEmbedBuilder()
           .setTitle(":cd:現在再生中:musical_note:")
           .setDescription(
-              `[${this.currentAudioInfo.Title}](${this.currentAudioUrl}) \``
-            + (this.currentAudioInfo.ServiceIdentifer === "youtube" && (this.currentAudioInfo as YouTube).LiveStream ? "(ライブストリーム)" : _t === 0 ? "(不明)" : min + ":" + sec)
+              `[${this.currentAudioInfo.title}](${this.currentAudioUrl}) \``
+            + (this.currentAudioInfo.isYouTube() && this.currentAudioInfo.isLiveStream ? "(ライブストリーム)" : _t === 0 ? "(不明)" : min + ":" + sec)
             + "`"
           )
           .setColor(getColor("AUTO_NP"))
           .addField("リクエスト", this.server.queue.get(0).additionalInfo.addedBy.displayName, true)
           .addField("次の曲",
             // トラックループオンなら現在の曲
-            this.server.queue.loopEnabled ? this.server.queue.get(0).basicInfo.Title
+            this.server.queue.loopEnabled ? this.server.queue.get(0).basicInfo.title
             // (トラックループはオフ)長さが2以上ならオフセット1の曲
-            : this.server.queue.length >= 2 ? this.server.queue.get(1).basicInfo.Title
+            : this.server.queue.length >= 2 ? this.server.queue.get(1).basicInfo.title
             // (トラックループオフ,長さ1)キューループがオンなら現在の曲
-            : this.server.queue.queueLoopEnabled ? this.server.queue.get(0).basicInfo.Title
+            : this.server.queue.queueLoopEnabled ? this.server.queue.get(0).basicInfo.title
             // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
             : "次の曲がまだ登録されていません", true
           )
           .addField("再生待ちの曲", this.server.queue.loopEnabled ? "ループします" : this.server.queue.length - 1 + "曲(" + Util.time.HourMinSecToString(timeFragments) + ")", true)
         ;
-        if(typeof this.currentAudioInfo.Thumbnail === "string"){
-          embed.setThumbnail(this.currentAudioInfo.Thumbnail);
+        if(typeof this.currentAudioInfo.thumbnail === "string"){
+          embed.setThumbnail(this.currentAudioInfo.thumbnail);
         }else{
-          embed.setThumbnail("attachment://thumbnail." + this.currentAudioInfo.Thumbnail.ext);
+          embed.setThumbnail("attachment://thumbnail." + this.currentAudioInfo.thumbnail.ext);
         }
         /* eslint-enable @typescript-eslint/indent */
         if(this.currentAudioInfo.isYouTube() && this.currentAudioInfo.IsFallbacked){
@@ -341,7 +341,7 @@ export class PlayManager extends ServerManagerBase {
             .toOceanic(),
         ];
 
-        if(typeof this.currentAudioInfo.Thumbnail === "string"){
+        if(typeof this.currentAudioInfo.thumbnail === "string"){
           mes.edit({
             content: "",
             embeds: [embed.toOceanic()],
@@ -354,8 +354,8 @@ export class PlayManager extends ServerManagerBase {
             components,
             files: [
               {
-                name: "thumbnail." + this.currentAudioInfo.Thumbnail.ext,
-                contents: this.currentAudioInfo.Thumbnail.data,
+                name: "thumbnail." + this.currentAudioInfo.thumbnail.ext,
+                contents: this.currentAudioInfo.thumbnail.data,
               },
             ],
           });
@@ -638,11 +638,11 @@ export class PlayManager extends ServerManagerBase {
     this._cost = 0;
     this.destroyStream();
     
-    if(this._errorUrl === this.currentAudioInfo?.Url && !quiet){
+    if(this._errorUrl === this.currentAudioInfo?.url && !quiet){
       this._errorCount++;
     }else{
       this._errorCount = 1;
-      this._errorUrl = this.currentAudioInfo.Url;
+      this._errorUrl = this.currentAudioInfo.url;
       if(this.currentAudioInfo.isYouTube()) this.currentAudioInfo.disableCache();
     }
     this.Log(`Play failed, (${this._errorCount}times)`, "warn");

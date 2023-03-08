@@ -55,9 +55,9 @@ export default class Searchq extends BaseCommand {
     }
     const qsresult = options.server.queue
       .filter(c =>
-        c.basicInfo.Title.toLowerCase().includes(options.rawArgs.toLowerCase())
-        || c.basicInfo.Url.toLowerCase().includes(options.rawArgs.toLowerCase())
-        || c.basicInfo.Description.toLowerCase().includes(options.rawArgs.toLowerCase())
+        c.basicInfo.title.toLowerCase().includes(options.rawArgs.toLowerCase())
+        || c.basicInfo.url.toLowerCase().includes(options.rawArgs.toLowerCase())
+        || c.basicInfo.description.toLowerCase().includes(options.rawArgs.toLowerCase())
       )
     ;
     if(qsresult.length === 0){
@@ -66,13 +66,13 @@ export default class Searchq extends BaseCommand {
     }
     if(qsresult.length > 20) qsresult.splice(20);
     const fields = qsresult.map(c => {
-      const index = options.server.queue.findIndex(d => d.basicInfo.Title === c.basicInfo.Title).toString();
-      const _t = c.basicInfo.LengthSeconds;
+      const index = options.server.queue.findIndex(d => d.basicInfo.title === c.basicInfo.title).toString();
+      const _t = c.basicInfo.lengthSeconds;
       const [min, sec] = Util.time.CalcMinSec(_t);
       return {
         name: index === "0" ? "現在再生中/再生待ち" : index,
-        value: `[${c.basicInfo.Title}](${c.basicInfo.Url})\r\nリクエスト: \`${c.additionalInfo.addedBy.displayName}\` \r\n長さ: ${
-          c.basicInfo.isYouTube() && c.basicInfo.LiveStream ? "(ライブストリーム)" : ` \`${_t === 0 ? "(不明)" : `${min}:${sec}`}\`)`
+        value: `[${c.basicInfo.title}](${c.basicInfo.url})\r\nリクエスト: \`${c.additionalInfo.addedBy.displayName}\` \r\n長さ: ${
+          c.basicInfo.isYouTube() && c.basicInfo.isLiveStream ? "(ライブストリーム)" : ` \`${_t === 0 ? "(不明)" : `${min}:${sec}`}\`)`
         }`,
         inline: false,
       } as EmbedField;

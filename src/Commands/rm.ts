@@ -111,7 +111,7 @@ export default class Rm extends BaseCommand {
         q.removeAt(dels[i]);
         actualDeleted.push(dels[i]);
         if(actualDeleted.length === 1){
-          firstItemTitle = item.basicInfo.Title;
+          firstItemTitle = item.basicInfo.title;
         }
       }else{
         failed.push(dels[i]);

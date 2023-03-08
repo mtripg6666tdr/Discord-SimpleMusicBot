@@ -68,14 +68,21 @@ export class QueueManagerWithBgm extends QueueManager {
     return this.isBGM ? this._bgmDefault[index] : super.get(index);
   }
 
-  override async addQueue(
+  override async addQueueOnly({
+    url,
+    addedBy,
+    method,
+    sourceType,
+    gotData,
+    preventCache,
+  }: {
     url: string,
-    addedBy: Member|AddedBy,
-    method: "push"|"unshift" = "push",
-    type: KnownAudioSourceIdentifer = "unknown",
-    gotData: AudioSource.exportableCustom = null,
-    preventCache: boolean = false,
-  ): Promise<QueueContent & { index: number }>{
+    addedBy: Member | AddedBy,
+    method?: "push" | "unshift",
+    sourceType?: KnownAudioSourceIdentifer,
+    gotData?: AudioSource.exportableCustom,
+    preventCache?: boolean,
+  }): Promise<QueueContent & { index: number }> {
     if(!url.startsWith("http://") && !url.startsWith("https://") && fs.existsSync(path.join(__dirname, "../../", url))){
       const result = {
         basicInfo: await new AudioSource.FsStream().init(url),
@@ -91,7 +98,7 @@ export class QueueManagerWithBgm extends QueueManager {
       const index = this._default.findIndex(q => q === result);
       return { ...result, index };
     }
-    return super.addQueue(url, addedBy, method, type, gotData, preventCache);
+    return super.addQueueOnly({ url, addedBy, method, sourceType, gotData, preventCache });
   }
 
   override async next(){

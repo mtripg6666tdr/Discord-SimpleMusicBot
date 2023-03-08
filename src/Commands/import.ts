@@ -84,7 +84,10 @@ export default class Import extends BaseCommand {
           for(let i = 0; i < fields.length; i++){
             const lines = fields[i].value.split("\r\n");
             const tMatch = lines[0].match(/\[(?<title>.+)\]\((?<url>.+)\)/);
-            await options.server.queue.autoAddQueue(tMatch.groups.url, message.member, "unknown");
+            await options.server.queue.addQueueOnly({
+              url: tMatch.groups.url,
+              addedBy: message.member,
+            });
             await smsg.edit(fields.length + "曲中" + (i + 1) + "曲処理しました。");
             if(cancellation.Cancelled) break;
           }
@@ -101,7 +104,11 @@ export default class Import extends BaseCommand {
           }
           const qs = raw.data;
           for(let i = 0; i < qs.length; i++){
-            await options.server.queue.autoAddQueue(qs[i].url, message.member, "unknown", false, false, null, null, qs[i]);
+            await options.server.queue.addQueueOnly({
+              url: qs[i].url,
+              addedBy: message.member,
+              gotData: qs[i],
+            });
             if(qs.length <= 10 || i % 10 === 9){
               await smsg.edit(qs.length + "曲中" + (i + 1) + "曲処理しました。");
             }

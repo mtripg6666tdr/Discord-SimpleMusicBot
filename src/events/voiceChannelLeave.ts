@@ -47,8 +47,8 @@ export async function onVoiceChannelLeave(
     }else if(server.player.isPlaying && !Util.config.twentyFourSeven.includes(oldChannel.id) && !Util.config.alwaysTwentyFourSeven){
       // 誰も聞いてる人がいない
       if(
-        server.player.currentAudioInfo.LengthSeconds > 60
-        && server.player.currentAudioInfo.LengthSeconds - server.player.currentTime / 1000 < 10
+        server.player.currentAudioInfo.lengthSeconds > 60
+        && server.player.currentAudioInfo.lengthSeconds - server.player.currentTime / 1000 < 10
       ){
         // かつ、楽曲の長さが60秒以上
         // かつ、残り時間が10秒以内

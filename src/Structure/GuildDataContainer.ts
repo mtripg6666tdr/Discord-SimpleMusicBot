@@ -188,7 +188,11 @@ export class GuildDataContainer extends LogEmitter {
       const { data } = exportedQueue;
       for(let i = 0; i < data.length; i++){
         const item = data[i];
-        await this.queue.addQueue(item.url, item.addBy, "push", "unknown", item);
+        await this.queue.addQueueOnly({
+          url: item.url,
+          addedBy: item.addBy,
+          gotData: item,
+        });
       }
       return true;
     }
@@ -383,17 +387,11 @@ export class GuildDataContainer extends LogEmitter {
 
         if(restUrls){
           for(let i = 0; i < restUrls.length; i++){
-            await this.queue.autoAddQueue(
-              restUrls[i],
-              message.member,
-              "unknown",
-              false,
-              null,
-              message.channel as TextChannel,
-              null,
-              null,
-              false
-            );
+            await this.queue.addQueue({
+              url: restUrls[i],
+              addedBy: message.member,
+              channel: message.channel,
+            });
           }
         }
       }
@@ -421,15 +419,12 @@ export class GuildDataContainer extends LogEmitter {
           throw new Error("添付ファイルが見つかりません");
         }
 
-        await this.queue.autoAddQueue(
-          msg.attachments.first().url,
-          message.member,
-          "custom",
+        await this.queue.addQueue({
+          url: msg.attachments.first().url,
+          addedBy: message.member,
           first,
-          false,
-          message.channel as TextChannel,
-          smsg
-        );
+          message: smsg,
+        });
         await this.player.play();
         return;
       }
@@ -440,7 +435,13 @@ export class GuildDataContainer extends LogEmitter {
       }
     }else if(!Util.general.isDisabledSource("custom") && Util.fs.isAvailableRawAudioURL(rawArg)){
       // オーディオファイルへの直リンク？
-      await this.queue.autoAddQueue(rawArg, message.member, "custom", first, false, message.channel as TextChannel);
+      await this.queue.addQueue({
+        url: rawArg,
+        addedBy: message.member,
+        sourceType: "custom",
+        first,
+        channel: message.channel,
+      });
       await this.player.play();
       return;
     }else if(!Util.general.isDisabledSource("youtube") && !rawArg.includes("v=") && !rawArg.includes("/channel/") && ytpl.validateID(rawArg)){
@@ -588,7 +589,13 @@ export class GuildDataContainer extends LogEmitter {
       await this.player.play();
     }else{
       try{
-        const success = await this.queue.autoAddQueue(rawArg, message.member, "unknown", first, false, message.channel as TextChannel, await message.reply("お待ちください..."), null, cancellable);
+        const success = await this.queue.addQueue({
+          url: rawArg,
+          addedBy: message.member,
+          first,
+          message: await message.reply("お待ちください..."),
+          cancellable,
+        });
         if(success) this.player.play();
         return;
       }
@@ -636,15 +643,12 @@ export class GuildDataContainer extends LogEmitter {
     } = panel.decideItems(includingNums);
     const [first, ...rest] = items;
     // いっこめをしょり
-    await this.queue.autoAddQueue(
-      /* url */ first,
-      /* added by */ panel.commandMessage.member,
-      /* known source type */ "unknown",
-      /* add the item at the first or not */ false,
-      /* search panel */ responseMessage,
-      null, null, null,
-      /* cancellable */ this.queue.length >= 1
-    );
+    await this.queue.addQueue({
+      url: first,
+      addedBy: panel.commandMessage.member,
+      fromSearch: responseMessage,
+      cancellable: this.queue.length >= 1,
+    });
     // 現在の状態を確認してVCに接続中なら接続試行
     if(panel.commandMessage.member.voiceState.channelID){
       await this.joinVoiceChannel(panel.commandMessage, false, false);
@@ -655,16 +659,11 @@ export class GuildDataContainer extends LogEmitter {
     }
     // 二個目以上を処理
     for(let i = 0; i < rest.length; i++){
-      await this.queue.autoAddQueue(
-        /* url */ rest[i],
-        /* added by */ panel.commandMessage.member,
-        /* known source type */ "unknown",
-        /* add the item at the first or not */ false,
-        /* from search panel or not */ false,
-        /* the channel at which interaction should happen */ panel.commandMessage.channel as TextChannel,
-        null, null,
-        /* cancellable */ true
-      );
+      await this.queue.addQueue({
+        url: rest[i],
+        addedBy: panel.commandMessage.member,
+        channel: panel.commandMessage.channel,
+      });
     }
   }
 

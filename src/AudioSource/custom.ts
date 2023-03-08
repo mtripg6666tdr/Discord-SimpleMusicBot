@@ -21,24 +21,23 @@ import type { EmbedField } from "oceanic.js";
 
 import { AudioSource } from "./audiosource";
 import { Util } from "../Util";
-import { DefaultAudioThumbnailURL } from "../definition";
 
-export class CustomStream extends AudioSource {
-  protected _lengthSeconds = 0;
-  protected readonly _serviceIdentifer = "custom";
-  Thumbnail: string = DefaultAudioThumbnailURL;
+export class CustomStream extends AudioSource<string> {
+  constructor(){
+    super("custom");
+  }
 
   async init(url: string, prefetched: exportableCustom){
     if(prefetched){
-      this.Title = prefetched.title || "カスタムストリーム";
-      this.Url = url;
-      this._lengthSeconds = prefetched.length;
+      this.title = prefetched.title || "カスタムストリーム";
+      this.url = url;
+      this.lengthSeconds = prefetched.length;
     }else{
       if(!Util.fs.isAvailableRawAudioURL(url)) throw new Error("正しいストリームではありません");
-      this.Url = url;
-      this.Title = this.extractFilename() || "カスタムストリーム";
+      this.url = url;
+      this.title = this.extractFilename() || "カスタムストリーム";
       try{
-        this._lengthSeconds = await Util.web.RetriveLengthSeconds(url);
+        this.lengthSeconds = await Util.web.RetriveLengthSeconds(url);
       }
       catch{ /* empty */ }
     }
@@ -48,7 +47,7 @@ export class CustomStream extends AudioSource {
   async fetch(): Promise<UrlStreamInfo>{
     return {
       type: "url",
-      url: this.Url,
+      url: this.url,
       streamType: "unknown",
     };
   }
@@ -56,25 +55,27 @@ export class CustomStream extends AudioSource {
   toField(){
     return [{
       name: ":link:URL",
-      value: this.Url,
+      value: this.url,
     }, {
       name: ":asterisk:詳細",
       value: "カスタムストリーム",
     }] as EmbedField[];
   }
 
-  npAdditional(){return "";}
+  npAdditional(){
+    return "";
+  }
 
   exportData(): exportableCustom{
     return {
-      url: this.Url,
-      length: this._lengthSeconds,
-      title: this.Title,
+      url: this.url,
+      length: this.lengthSeconds,
+      title: this.title,
     };
   }
 
   private extractFilename(){
-    const paths = this.Url.split("/");
+    const paths = this.url.split("/");
     return paths[paths.length - 1];
   }
 }

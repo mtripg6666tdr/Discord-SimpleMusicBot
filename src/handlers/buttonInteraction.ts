@@ -70,7 +70,7 @@ export async function handleButtonInteraction(
     if(interaction.member.id === userId){
       server.queue.removeAt(server.queue.length - 1);
       interaction.createMessage({
-        content: `🚮\`${item.basicInfo.Title}\`の追加を取り消しました`,
+        content: `🚮\`${item.basicInfo.title}\`の追加を取り消しました`,
       }).catch(er => this.Log(er, "error"));
       interaction.message.edit({
         components: [],

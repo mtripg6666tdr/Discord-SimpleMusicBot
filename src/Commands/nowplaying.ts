@@ -17,7 +17,6 @@
  */
 
 import type { CommandArgs } from ".";
-import type { YouTube } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
@@ -53,7 +52,7 @@ export default class NowPlaying extends BaseCommand {
       return;
     }
     const _s = Math.floor(options.server.player.currentTime / 1000);
-    const _t = Number(options.server.player.currentAudioInfo.LengthSeconds);
+    const _t = Number(options.server.player.currentAudioInfo.lengthSeconds);
     const [min, sec] = Util.time.CalcMinSec(_s);
     const [tmin, tsec] = Util.time.CalcMinSec(_t);
     const info = options.server.player.currentAudioInfo;
@@ -72,8 +71,8 @@ export default class NowPlaying extends BaseCommand {
       .setColor(getColor("NP"))
       .setTitle("現在再生中の曲:musical_note:")
       .setDescription(
-        `[${info.Title}](${info.Url})\r\n${progressBar}${
-          info.ServiceIdentifer === "youtube" && (info as YouTube).LiveStream ? "(ライブストリーム)" : ` \`${min}:${sec}/${_t === 0 ? "(不明)" : `${tmin}:${tsec}\``}`
+        `[${info.title}](${info.url})\r\n${progressBar}${
+          info.isYouTube() && info.isLiveStream ? "(ライブストリーム)" : ` \`${min}:${sec}/${_t === 0 ? "(不明)" : `${tmin}:${tsec}\``}`
         }`
       )
       .setFields(
@@ -81,19 +80,19 @@ export default class NowPlaying extends BaseCommand {
           ["long", "l", "verbose", "l", "true"].some(arg => options.args[0] === arg)
         )
       )
-      .addField(":link:URL", info.Url)
+      .addField(":link:URL", info.url)
     ;
-    if(typeof info.Thumbnail === "string"){
-      embed.setThumbnail(info.Thumbnail);
+    if(typeof info.thumbnail === "string"){
+      embed.setThumbnail(info.thumbnail);
       await message.reply({ embeds: [embed.toOceanic()] }).catch(e => Util.logger.log(e, "error"));
     }else{
-      embed.setThumbnail("attachment://thumbnail." + info.Thumbnail.ext);
+      embed.setThumbnail("attachment://thumbnail." + info.thumbnail.ext);
       await message.reply({
         embeds: [embed.toOceanic()],
         files: [
           {
-            name: "thumbnail." + info.Thumbnail.ext,
-            contents: info.Thumbnail.data,
+            name: "thumbnail." + info.thumbnail.ext,
+            contents: info.thumbnail.data,
           },
         ],
       }).catch(e => Util.logger.log(e, "error"));

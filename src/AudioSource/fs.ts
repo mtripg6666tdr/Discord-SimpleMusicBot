@@ -25,18 +25,17 @@ import * as path from "path";
 
 import { AudioSource } from "./audiosource";
 import { Util } from "../Util";
-import { DefaultAudioThumbnailURL } from "../definition";
 
-export class FsStream extends AudioSource {
-  protected _lengthSeconds = 0;
-  protected readonly _serviceIdentifer = "fs";
-  Thumbnail: string = DefaultAudioThumbnailURL;
+export class FsStream extends AudioSource<string> {
+  constructor(){
+    super("fs");
+  }
 
   async init(url: string){
-    this.Url = url;
-    this.Title = "カスタムストリーム";
+    this.url = url;
+    this.title = "カスタムストリーム";
     try{
-      this._lengthSeconds = await Util.web.RetriveLengthSeconds(url);
+      this.lengthSeconds = await Util.web.RetriveLengthSeconds(url);
     }
     catch{ /* empty */ }
     return this;
@@ -45,7 +44,7 @@ export class FsStream extends AudioSource {
   async fetch(): Promise<ReadableStreamInfo>{
     return {
       type: "readable",
-      stream: fs.createReadStream(path.join(__dirname, "../../", this.Url)),
+      stream: fs.createReadStream(path.join(__dirname, "../../", this.url)),
       streamType: "unknown",
     };
   }
@@ -63,9 +62,9 @@ export class FsStream extends AudioSource {
 
   exportData(): exportableCustom{
     return {
-      url: this.Url,
-      length: this._lengthSeconds,
-      title: this.Title,
+      url: this.url,
+      length: this.lengthSeconds,
+      title: this.title,
     };
   }
 }

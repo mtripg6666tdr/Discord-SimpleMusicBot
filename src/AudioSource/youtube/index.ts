@@ -34,22 +34,41 @@ export * from "./spawner";
 
 const ua = SecondaryUserAgent;
 
-export class YouTube extends AudioSource {
+export class YouTube extends AudioSource<string> {
   // サービス識別子（固定）
-  protected readonly _serviceIdentifer = "youtube";
-  protected _lengthSeconds = 0;
-  private fallback = false;
-  private cache: Cache<any, any> = null;
-  ChannelName: string;
-  ChannelUrl: string;
-  Thumbnail: string;
-  LiveStream: boolean;
-  relatedVideos: exportableYouTube[] = [];
-  upcomingTimestamp: string = null;
+  protected cache: Cache<any, any> = null;
+  protected channelName: string;
+  protected channelUrl: string;
+  protected upcomingTimestamp: string = null;
+
+  protected _fallback = false;
+  get fallback(){
+    return this._fallback;
+  }
+  protected set fallback(value: boolean){
+    this._fallback = value;
+  }
+
+  protected _isLiveStream: boolean;
+  get isLiveStream(){
+    return this._isLiveStream;
+  }
+  protected set isLiveStream(value: boolean){
+    this._isLiveStream = value;
+  }
+  
+  _relatedVideos: readonly exportableYouTube[] = [];
+  get relatedVideos(): readonly exportableYouTube[] {
+    return this._relatedVideos;
+  }
+  protected set relatedVideos(value: readonly exportableYouTube[]){
+    this._relatedVideos = value;
+  }
+
   logger: LoggerType;
 
   constructor(logger?: typeof YouTube.prototype.logger){
-    super();
+    super("youtube");
     this.logger = logger || Util.logger.log.bind(Util.logger);
   }
 
@@ -66,7 +85,7 @@ export class YouTube extends AudioSource {
   }
 
   async init(url: string, prefetched: exportableYouTube, forceCache?: boolean){
-    this.Url = "https://www.youtube.com/watch?v=" + ytdl.getVideoID(url);
+    this.url = "https://www.youtube.com/watch?v=" + ytdl.getVideoID(url);
     if(prefetched){
       this.importData(prefetched);
     }else{
@@ -99,7 +118,7 @@ export class YouTube extends AudioSource {
   }
 
   async fetch(forceUrl?: boolean): Promise<StreamInfo>{
-    const { result, resolved } = await attemptFetchForStrategies(this.logger, this.Url, forceUrl, this.cache);
+    const { result, resolved } = await attemptFetchForStrategies(this.logger, this.url, forceUrl, this.cache);
     this.fallback = resolved !== 0;
     // store related videos
     this.relatedVideos = result.relatedVideos;
@@ -110,7 +129,7 @@ export class YouTube extends AudioSource {
 
   async fetchVideo(){
     let info = this.cache?.type === ytdlCore && this.cache.data as ytdl.videoInfo || null;
-    if(!info) info = await (strategies[0] as ytdlCoreStrategy).getInfo(this.Url).then(result => (this.cache = result.cache).data);
+    if(!info) info = await (strategies[0] as ytdlCoreStrategy).getInfo(this.url).then(result => (this.cache = result.cache).data);
     const isLive = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
     const format = ytdl.chooseFormat(info.formats, {
       quality: isLive ? null : "highestvideo",
@@ -127,41 +146,41 @@ export class YouTube extends AudioSource {
     const fields = [] as EmbedField[];
     fields.push({
       name: ":cinema:チャンネル名",
-      value: this.ChannelUrl ? `[${this.ChannelName}](${this.ChannelUrl})` : this.ChannelName,
+      value: this.channelUrl ? `[${this.channelName}](${this.channelUrl})` : this.channelName,
       inline: false,
     }, {
       name: ":asterisk:概要",
-      value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, verbose ? 1000 : 300) + "..." : this.Description || "*概要欄なし*",
+      value: this.description.length > (verbose ? 1000 : 350) ? this.description.substring(0, verbose ? 1000 : 300) + "..." : this.description || "*概要欄なし*",
       inline: false,
     });
     return fields;
   }
 
   npAdditional(){
-    return "\r\nチャンネル名:`" + this.ChannelName + "`";
+    return "\r\nチャンネル名:`" + this.channelName + "`";
   }
 
   exportData(): exportableYouTube{
     return {
-      url: this.Url,
-      title: this.Title,
-      description: this.Description,
-      length: this.LengthSeconds,
-      channel: this.ChannelName,
-      channelUrl: this.ChannelUrl,
-      thumbnail: this.Thumbnail,
-      isLive: this.LiveStream,
+      url: this.url,
+      title: this.title,
+      description: this.description,
+      length: this.lengthSeconds,
+      channel: this.channelName,
+      channelUrl: this.channelUrl,
+      thumbnail: this.thumbnail,
+      isLive: this.isLiveStream,
     };
   }
 
   private importData(exportable: exportableYouTube){
-    this.Title = exportable.title;
-    this.Description = exportable.description || "";
-    this._lengthSeconds = exportable.isLive ? NaN : exportable.length;
-    this.ChannelName = exportable.channel;
-    this.ChannelUrl = exportable.channelUrl;
-    this.Thumbnail = exportable.thumbnail;
-    this.LiveStream = exportable.isLive;
+    this.title = exportable.title;
+    this.description = exportable.description || "";
+    this.lengthSeconds = exportable.isLive ? NaN : exportable.length;
+    this.channelName = exportable.channel;
+    this.channelUrl = exportable.channelUrl;
+    this.thumbnail = exportable.thumbnail;
+    this.isLiveStream = exportable.isLive;
   }
 
   disableCache(){

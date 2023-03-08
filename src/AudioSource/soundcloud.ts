@@ -26,35 +26,36 @@ import SoundCloud from "soundcloud.ts";
 import { AudioSource } from "./audiosource";
 import { Util } from "../Util";
 
-export class SoundCloudS extends AudioSource {
-  protected _lengthSeconds = 0;
-  protected readonly _serviceIdentifer = "soundcloud";
-  Author: string;
-  Thumbnail: string;
-  
+export class SoundCloudS extends AudioSource<string> {
+  protected author: string;
+
+  constructor(){
+    super("soundcloud");
+  }
+
   async init(url: string, prefetched?: exportableSoundCloud){
-    this.Url = url;
+    this.url = url;
     if(prefetched){
-      this.Title = prefetched.title;
-      this.Description = prefetched.description;
-      this._lengthSeconds = prefetched.length;
-      this.Author = prefetched.author;
-      this.Thumbnail = prefetched.thumbnail;
+      this.title = prefetched.title;
+      this.description = prefetched.description;
+      this.lengthSeconds = prefetched.length;
+      this.author = prefetched.author;
+      this.thumbnail = prefetched.thumbnail;
     }else{
       const sc = new SoundCloud();
       const info = await sc.tracks.getV2(url);
-      this.Title = info.title;
-      this.Description = info.description;
-      this._lengthSeconds = Math.floor(info.duration / 1000);
-      this.Author = info.user.username;
-      this.Thumbnail = info.artwork_url;
+      this.title = info.title;
+      this.description = info.description;
+      this.lengthSeconds = Math.floor(info.duration / 1000);
+      this.author = info.user.username;
+      this.thumbnail = info.artwork_url;
     }
     return this;
   }
 
   async fetch(): Promise<ReadableStreamInfo>{
     const sc = new SoundCloud();
-    const source = await sc.util.streamTrack(this.Url) as Readable;
+    const source = await sc.util.streamTrack(this.url) as Readable;
     const stream = Util.general.createPassThrough();
     source
       .on("error", e => !stream.destroyed ? stream.destroy(e) : stream.emit("error", e))
@@ -72,28 +73,28 @@ export class SoundCloudS extends AudioSource {
     const fields = [] as EmbedField[];
     fields.push({
       name: ":musical_note:ユーザー",
-      value: this.Author,
+      value: this.author,
       inline: false,
     }, {
       name: ":asterisk:概要",
-      value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, verbose ? 1000 : 300) + "..." : this.Description,
+      value: this.description.length > (verbose ? 1000 : 350) ? this.description.substring(0, verbose ? 1000 : 300) + "..." : this.description,
       inline: false,
     });
     return fields;
   }
 
   npAdditional(){
-    return "\r\nアーティスト:`" + this.Author + "`";
+    return "\r\nアーティスト:`" + this.author + "`";
   }
 
   exportData(): exportableSoundCloud{
     return {
-      url: this.Url,
-      title: this.Title,
-      description: this.Description,
-      length: this._lengthSeconds,
-      author: this.Author,
-      thumbnail: this.Thumbnail,
+      url: this.url,
+      title: this.title,
+      description: this.description,
+      length: this.lengthSeconds,
+      author: this.author,
+      thumbnail: this.thumbnail,
     };
   }
 

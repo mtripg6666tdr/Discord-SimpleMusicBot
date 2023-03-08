@@ -21,6 +21,8 @@ import type { exportableCustom } from "./custom";
 import type { EmbedField } from "oceanic.js";
 import type { Readable } from "stream";
 
+import { DefaultAudioThumbnailURL } from "../definition";
+
 export type StreamTypeIdentifer =
   | "webm/opus"
   | "ogg/opus"
@@ -30,55 +32,102 @@ export type StreamTypeIdentifer =
   | "m3u8"
   | "unknown";
 
-export abstract class AudioSource {
-  // ソースのURL
-  Url: string;
-  // サービス識別子
-  protected abstract _serviceIdentifer: string;
-  get ServiceIdentifer(): "youtube"|string{
+export type AudioSourceTypeIdentifer =
+  | "youtube"
+  | "bestdori"
+  | "custom"
+  | "fs"
+  | "googledrive"
+  | "hibiki"
+  | "niconico"
+  | "soundcloud"
+  | "spotify"
+  | "streamable"
+  | "twitter";
+
+export type DynamicThumbnail = {
+  ext: string,
+  fetcher: () => Promise<Buffer>,
+};
+
+type ThumbnailType = string | DynamicThumbnail;
+
+export abstract class AudioSource<T extends ThumbnailType> {
+  private _url: string;
+  get url(){
+    return this._url;
+  }
+  protected set url(value: string) {
+    this._url = value;
+  }
+
+  private _title: string;
+  get title(){
+    return this._title;
+  }
+  protected set title(value: string){
+    this._title = value;
+  }
+
+  private _lengthSeconds: number = 0;
+  get lengthSeconds(): number{
+    return this._lengthSeconds;
+  }
+  protected set lengthSeconds(value: number){
+    this._lengthSeconds = value;
+  }
+
+  private _description: string;
+  get description(){
+    return this._description;
+  }
+  protected set description(value: string){
+    this._description = value;
+  }
+
+  // サムネイル
+  private _thumbnail: T;
+  get thumbnail(){
+    return this._thumbnail || DefaultAudioThumbnailURL as T;
+  }
+  protected set thumbnail(value: T){
+    this._thumbnail = value;
+  }
+
+  private readonly _serviceIdentifer: AudioSourceTypeIdentifer;
+  protected get serviceIdentifer(): AudioSourceTypeIdentifer{
     return this._serviceIdentifer;
   }
 
-  // タイトル(曲名)
-  Title: string;
-  // 曲の長さ(秒)
-  protected abstract _lengthSeconds: number;
-  get LengthSeconds(): number{
-    return this._lengthSeconds;
+  constructor(serviceType: AudioSourceTypeIdentifer){
+    this._serviceIdentifer = serviceType;
   }
 
-  // 曲の説明
-  Description: string;
-  // サムネイル
-  abstract Thumbnail: string|{
-    ext: string,
-    data: Buffer,
-  };
   // 現在再生中の曲を示すEmbedField
   abstract toField(verbose: boolean): EmbedField[];
   // 再生するためのストリームをフェッチ
   abstract fetch(url?: boolean): Promise<StreamInfo>;
   // クラスを初期化する非同期メソッド
-  abstract init(url: string, prefetched: exportableCustom): Promise<AudioSource>;
+  abstract init(url: string, prefetched: exportableCustom): Promise<AudioSource<T>>;
   // 現在再生中の曲に関する追加データ
   abstract npAdditional(): string;
   // データをエクスポート
   abstract exportData(): exportableCustom;
 
   isYouTube(): this is Sources.YouTube{
-    return this.ServiceIdentifer === "youtube";
+    return this.serviceIdentifer === "youtube";
   }
 
   isSoundCloudS(): this is Sources.SoundCloudS{
-    return this.ServiceIdentifer === "soundcloud";
+    return this.serviceIdentifer === "soundcloud";
   }
-  
+
   isNicoNicoS(): this is Sources.NicoNicoS{
-    return this.ServiceIdentifer === "niconico";
+    return this.serviceIdentifer === "niconico";
   }
 
   isSpotify(): this is Sources.Spotify{
-    return this.ServiceIdentifer === "spotify";
+    return this.serviceIdentifer === "spotify";
   }
 
   isUnseekable(){

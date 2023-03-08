@@ -22,26 +22,26 @@ import type { EmbedField } from "oceanic.js";
 import twitterDl from "twitter-url-direct";
 
 import { AudioSource } from "./audiosource";
-import { DefaultAudioThumbnailURL } from "../definition";
 
-export class Twitter extends AudioSource {
-  protected _lengthSeconds = 0;
-  protected readonly _serviceIdentifer = "twitter";
-  Thumbnail = DefaultAudioThumbnailURL;
+export class Twitter extends AudioSource<string> {
   private streamUrl = "";
 
+  constructor(){
+    super("twitter");
+  }
+
   async init(url: string, prefetched?: exportableTwitter){
-    this.Url = url;
+    this.url = url;
     if(!Twitter.validateUrl(url)) throw new Error("Invalid streamable url");
     if(prefetched){
-      this._lengthSeconds = prefetched.length;
-      this.Title = prefetched.title;
+      this.lengthSeconds = prefetched.length;
+      this.title = prefetched.title;
       this.streamUrl = prefetched.streamUrl;
     }else{
       const streamInfo = await twitterDl(url.split("?")[0]);
       if(!streamInfo.found) throw new Error("error" in streamInfo && streamInfo.error);
-      this._lengthSeconds = Math.floor(streamInfo.duration);
-      this.Title = `${streamInfo.tweet_user.name}(@${streamInfo.tweet_user.username})のツイート`;
+      this.lengthSeconds = Math.floor(streamInfo.duration);
+      this.title = `${streamInfo.tweet_user.name}(@${streamInfo.tweet_user.username})のツイート`;
       if(!streamInfo.download){
         throw new Error("No media found");
       }
@@ -49,7 +49,7 @@ export class Twitter extends AudioSource {
         const getDimensionFactor = (dimension: string) => dimension.split("x").reduce((prev, current) => prev + Number(current), 1);
         return getDimensionFactor(b.dimension) - getDimensionFactor(a.dimension);
       })[0]?.url;
-      this.Description = streamInfo.tweet_user.text;
+      this.description = streamInfo.tweet_user.text;
       if(!this.streamUrl){
         throw new Error("No format found");
       }
@@ -68,10 +68,10 @@ export class Twitter extends AudioSource {
   toField(){
     return [{
       name: ":link:URL",
-      value: this.Url,
+      value: this.url,
     }, {
       name: "ツイートの内容",
-      value: this.Description.substring(0, 1950),
+      value: this.description.substring(0, 1950),
     }, {
       name: ":asterisk:詳細",
       value: "Twitterにて共有されたファイル",
@@ -82,9 +82,9 @@ export class Twitter extends AudioSource {
 
   exportData(): exportableTwitter{
     return {
-      url: this.Url,
-      length: this.LengthSeconds,
-      title: this.Title,
+      url: this.url,
+      length: this.lengthSeconds,
+      title: this.title,
       streamUrl: this.streamUrl,
     };
   }

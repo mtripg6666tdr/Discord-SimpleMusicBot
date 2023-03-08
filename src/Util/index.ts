@@ -19,8 +19,8 @@
 import * as addOn from "./addon";
 import * as color from "./color";
 import config from "./config";
+import { erisUtil as discord } from "./discord";
 import * as effects from "./effect";
-import { erisUtil as eris } from "./eris";
 import * as fs from "./fs";
 import * as general from "./general";
 import * as logger from "./log";
@@ -46,7 +46,7 @@ export const Util = {
   time,
   ua,
   web,
-  eris,
+  eris: discord,
 } as const;
 export default Util;
 export type LoggerType = logger.LoggerType;

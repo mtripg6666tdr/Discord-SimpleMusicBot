@@ -143,7 +143,11 @@ export default class SystemInfo extends BaseCommand {
           .addField("一時停止中", data?.player.isPaused ? "はい" : "いいえ", true)
           .addField("キュー内のアイテム数", data?.queue.length.toString() || "0", true)
           .addField("現在の変換コスト", data?.player.cost.toString() || "0", true)
-          .addField("ライブストリーム", data?.player.currentAudioInfo?.isYouTube() && data?.player.currentAudioInfo.LiveStream ? "はい" : "いいえ", true)
+          .addField(
+            "ライブストリーム",
+            data?.player.currentAudioInfo?.isYouTube() && data?.player.currentAudioInfo.isLiveStream ? "はい" : "いいえ",
+            true
+          )
           .toOceanic()
       );
     }
