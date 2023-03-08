@@ -52,6 +52,14 @@ if(!Util.config.debug){
       await reportError(error);
     }
   });
+}else{
+  process.on("uncaughtException", async (error)=>{
+    if(bot.client && Util.config.errorChannel){
+      await reportError(error);
+    }
+    console.error(error);
+    process.exit(1);
+  });
 }
 
 let terminating = false;
