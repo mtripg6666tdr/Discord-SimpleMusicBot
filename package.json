@@ -20,7 +20,7 @@
   "dependencies": {
     "@discordjs/voice": "^0.14.0",
     "@mtripg6666tdr/async-lock": "^1.1.0",
-    "@mtripg6666tdr/oceanic-command-resolver": "^1.0.0-alpha.4",
+    "@mtripg6666tdr/oceanic-command-resolver": "^1.0.0-alpha.7",
     "@sinclair/typebox": "^0.25.24",
     "candyget": "^0.5.3",
     "comment-json": "^4.2.3",
