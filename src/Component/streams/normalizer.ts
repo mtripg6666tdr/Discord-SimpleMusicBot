@@ -23,17 +23,19 @@ import { Readable } from "stream";
 import Util from "../../Util";
 
 export class Normalizer extends Readable {
+  protected resumeHighWaterMark: number;
+
   constructor(protected origin: Readable, protected inlineVolume: boolean, options: ReadableOptions = {}){
     super(Object.assign({
-      highWaterMark: 64 * 4 * 1024,
+      highWaterMark: 64 * 4 * 1024 * (inlineVolume ? 5 : 1),
     }, options));
+
+    this.resumeHighWaterMark = this.readableHighWaterMark * 0.6;
 
     setImmediate(() => {
       this.on("data", () => {
-        if(this.readableLength < this.readableHighWaterMark){
-          if(!this.inlineVolume){
-            this.resumeOrigin();
-          }
+        if(this.readableLength < this.resumeHighWaterMark){
+          this.resumeOrigin();
         }else{
           this.pauseOrigin();
         }
@@ -56,12 +58,12 @@ export class Normalizer extends Readable {
 
   override _read(){
     if(this.readableLength < this.readableHighWaterMark){
-      this.origin.resume();
+      this.resumeOrigin();
     }
   }
 
   pauseOrigin(){
-    if(this.origin && !this.origin.destroyed){
+    if(this.origin && !this.origin.destroyed && !this.origin.isPaused()){
       if(Util.config.debug){
         Util.logger.log(`[Normalizer] Origin paused (${this.readableLength}/${this.readableHighWaterMark})`, "debug");
       }
@@ -70,7 +72,7 @@ export class Normalizer extends Readable {
   }
 
   resumeOrigin(){
-    if(this.origin && !this.origin.destroyed){
+    if(this.origin && !this.origin.destroyed && this.origin.isPaused()){
       if(Util.config.debug){
         Util.logger.log(`[Normalizer] Origin resumed (${this.readableLength}/${this.readableHighWaterMark})`, "debug");
       }
@@ -79,7 +81,7 @@ export class Normalizer extends Readable {
   }
 
   protected _onDestroy(){
-    Util.logger.log("[Normalizer] Destroy hool called");
+    Util.logger.log("[Normalizer] Destroy hook called");
     this.off("close", this._onDestroy);
     this.off("end", this._onDestroy);
     if(this.origin){
