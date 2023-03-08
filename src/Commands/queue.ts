@@ -71,13 +71,13 @@ export default class Queue extends BaseCommand {
           break;
         }
         const q = queue.get(i);
-        const _t = Number(q.basicInfo.LengthSeconds);
+        const _t = Number(q.basicInfo.lengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
         fields.push({
           name: i !== 0 ? i.toString() : options.server.player.isPlaying ? "現在再生中" : "再生待ち",
           value: [
-            `[${q.basicInfo.Title}](${q.basicInfo.Url})`,
-            `長さ: \`${q.basicInfo.isYouTube() && q.basicInfo.LiveStream ? "ライブストリーム" : `${min}:${sec}`} \``,
+            `[${q.basicInfo.title}](${q.basicInfo.url})`,
+            `長さ: \`${q.basicInfo.isYouTube() && q.basicInfo.isLiveStream ? "ライブストリーム" : `${min}:${sec}`} \``,
             `リクエスト: \`${q.additionalInfo.addedBy.displayName}\` `,
             q.basicInfo.npAdditional(),
           ].join("\r\n"),

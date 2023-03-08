@@ -22,35 +22,36 @@ import type { EmbedField } from "oceanic.js";
 import { AudioSource } from "./audiosource";
 import { Util } from "../Util";
 
-export class BestdoriS extends AudioSource {
-  protected _lengthSeconds = 0;
-  protected readonly _serviceIdentifer = "bestdori";
-  Thumbnail = "";
-  Artist = "";
-  Type: "anime"|"normal"|null = null;
-  lyricist: string;
-  composer: string;
-  arranger: string;
+export class BestdoriS extends AudioSource<string> {
+  protected artist = "";
+  protected type: "anime"|"normal"|null = null;
+  protected lyricist: string;
+  protected composer: string;
+  protected arranger: string;
   private id: number;
 
+  constructor(){
+    super("bestdori");
+  }
+
   async init(url: string, prefetched: exportableBestdori){
-    this.Url = url;
+    this.url = url;
     await BestdoriApi.setupData();
     this.id = BestdoriApi.getAudioId(url);
     if(!this.id) throw new Error("Invalid streamable url");
     const data = bestdori.allsonginfo[this.id];
-    this.Title = data.musicTitle[0];
-    this.Type = data.tag;
-    this.Thumbnail = BestdoriApi.getThumbnail(this.id, data.jacketImage[0]);
-    this.Artist = bestdori.allbandinfo[data.bandId].bandName[0];
+    this.title = data.musicTitle[0];
+    this.type = data.tag;
+    this.thumbnail = BestdoriApi.getThumbnail(this.id, data.jacketImage[0]);
+    this.artist = bestdori.allbandinfo[data.bandId].bandName[0];
     if(prefetched){
-      this._lengthSeconds = prefetched.length;
+      this.lengthSeconds = prefetched.length;
       this.lyricist = prefetched.lyricist;
       this.composer = prefetched.composer;
       this.arranger = prefetched.arranger;
     }else{
       const detailed = await BestdoriApi.getDetailedInfo(this.id);
-      this._lengthSeconds = Math.floor(detailed.length);
+      this.lengthSeconds = Math.floor(detailed.length);
       this.lyricist = detailed.lyricist[0];
       this.composer = detailed.composer[0];
       this.arranger = detailed.arranger[0];
@@ -74,12 +75,12 @@ export class BestdoriS extends AudioSource {
     return [
       {
         name: "バンド名",
-        value: this.Artist,
+        value: this.artist,
         inline: false,
       },
       {
         name: "ジャンル",
-        value: typeMap[this.Type],
+        value: typeMap[this.type],
       },
       {
         name: "楽曲情報",
@@ -91,16 +92,16 @@ export class BestdoriS extends AudioSource {
     ] as EmbedField[];
   }
 
-  npAdditional(){return "\r\nアーティスト:`" + this.Artist + "`";}
+  npAdditional(){return "\r\nアーティスト:`" + this.artist + "`";}
 
   exportData(): exportableBestdori{
     return {
-      url: this.Url,
-      length: this.LengthSeconds,
+      url: this.url,
+      length: this.lengthSeconds,
       lyricist: this.lyricist,
       composer: this.composer,
       arranger: this.arranger,
-      title: this.Title,
+      title: this.title,
     };
   }
 }

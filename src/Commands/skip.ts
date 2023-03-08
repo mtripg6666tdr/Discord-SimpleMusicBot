@@ -57,7 +57,7 @@ export default class Skip extends BaseCommand {
         }
         return;
       }
-      const title = item.basicInfo.Title;
+      const title = item.basicInfo.title;
       server.player.stop();
       await server.queue.next();
       await server.player.play();

@@ -42,43 +42,44 @@ const spotifyUrlInfo = (() => {
 
 const client = spotifyUrlInfo?.((url, opts) => candyget(url, "string", opts).then(res => ({ text: () => res.body })));
 
-export class Spotify extends AudioSource {
-  protected readonly _serviceIdentifer = "spotify";
-  protected _lengthSeconds = 0;
+export class Spotify extends AudioSource<string> {
   protected artist = "";
-  Thumbnail: string = null;
+  
+  constructor(){
+    super("spotify");
+  }
 
   override async init(url: string, prefetched: exportableSpotify): Promise<Spotify>{
     if(!Spotify.validateTrackUrl(url)) throw new Error("Invalid url");
     if(prefetched){
-      this.Url = prefetched.url;
-      this._lengthSeconds = prefetched.length;
-      this.Title = prefetched.title;
+      this.url = prefetched.url;
+      this.lengthSeconds = prefetched.length;
+      this.title = prefetched.title;
       this.artist = prefetched.artist;
     }else{
-      this.Url = url;
+      this.url = url;
       const track = await client.getData(url) as Track;
-      this._lengthSeconds = Math.floor(track.duration / 1000);
-      this.Title = track.name;
+      this.lengthSeconds = Math.floor(track.duration / 1000);
+      this.title = track.name;
       this.artist = track.artists.map(artist => artist.name).join(", ");
-      this.Thumbnail = track.coverArt.sources[0]?.url || DefaultAudioThumbnailURL;
+      this.thumbnail = track.coverArt.sources[0]?.url || DefaultAudioThumbnailURL;
     }
     return this;
   }
 
   override async fetch(forceUrl?: boolean): Promise<StreamInfo>{
     // eslint-disable-next-line newline-per-chained-call
-    const keyword = `${this.Title} ${this.artist.split(",").map(artist => artist.trim()).join(" ")}`;
-    if(Util.config.debug) Util.logger.log(`Searching the keyword: ${`${this.Title} ${this.artist.split(",").map(artist => artist.trim())}`}`, "debug");
+    const keyword = `${this.title} ${this.artist.split(",").map(artist => artist.trim()).join(" ")}`;
+    if(Util.config.debug) Util.logger.log(`Searching the keyword: ${`${this.title} ${this.artist.split(",").map(artist => artist.trim())}`}`, "debug");
     const searchResult = await searchYouTube(keyword);
     if(Util.config.debug) Util.logger.log("Extracting the valid item...");
     const items = searchResult.items.filter(({ type }) => type === "video") as ytsr.Video[];
     const target = this.extractBestItem(items);
     if(!target) throw new Error("Not Found");
     const { result } = await attemptFetchForStrategies(Util.logger.log.bind(Util.logger), target.url, forceUrl);
-    this.Title = result.info.title;
-    this._lengthSeconds = result.info.length;
-    this.Thumbnail = result.info.thumbnail;
+    this.title = result.info.title;
+    this.lengthSeconds = result.info.length;
+    this.thumbnail = result.info.thumbnail;
     return result.stream;
   }
 
@@ -105,7 +106,7 @@ export class Spotify extends AudioSource {
     const validate = (item: ytsr.Video) => {
       return (
         // 関連のないタイトルを除外
-        includes(item.title, this.Title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase()) || includes(this.Title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase(), item.title.toLowerCase())
+        includes(item.title, this.title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase()) || includes(this.title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase(), item.title.toLowerCase())
       )
       // カバー曲を除外
       && !includes(item.title.toLowerCase(), "cover")
@@ -113,7 +114,7 @@ export class Spotify extends AudioSource {
       && !includes(item.title, "歌ってみた")
       && !includes(item.title, "弾いてみた")
       && !includes(item.title.toLowerCase(), "#shorts")
-      && (this.Title.toLowerCase().includes("remix") || !includes(item.title.toLowerCase(), "remix"));
+      && (this.title.toLowerCase().includes("remix") || !includes(item.title.toLowerCase(), "remix"));
     };
     const validItems = items.filter(validate);
     if(Util.config.debug) console.log("valid", validItems);
@@ -141,9 +142,9 @@ export class Spotify extends AudioSource {
 
   override exportData(): exportableSpotify{
     return {
-      url: this.Url,
-      title: this.Title,
-      length: this.LengthSeconds,
+      url: this.url,
+      title: this.title,
+      length: this.lengthSeconds,
       artist: this.artist,
     };
   }

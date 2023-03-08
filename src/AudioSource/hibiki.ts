@@ -17,6 +17,7 @@
  */
 
 import type { UrlStreamInfo } from ".";
+import type { DynamicThumbnail } from "./audiosource";
 import type { exportableCustom } from "./custom";
 import type { EmbedField } from "oceanic.js";
 
@@ -25,35 +26,36 @@ import candyget from "candyget";
 import { AudioSource } from "./audiosource";
 import { Util } from "../Util";
 
-export class Hibiki extends AudioSource {
-  protected _lengthSeconds = 0;
-  protected readonly _serviceIdentifer = "hibiki";
-  override Thumbnail: { ext: string, data: Buffer };
-  private programId = "";
-  private radioInfo: HibikiAPIResult;
-  private uploadedAt = "";
-  private casts = "";
+export class Hibiki extends AudioSource<DynamicThumbnail> {
+  protected programId = "";
+  protected radioInfo: HibikiAPIResult;
+  protected uploadedAt = "";
+  protected casts = "";
+
+  constructor(){
+    super("hibiki");
+  }
   
   async init(url: string){
-    this.Url = url;
-    const match = this.Url.match(/^https?:\/\/hibiki-radio.jp\/description\/(?<id>.+)\/detail([/#].+)?$/);
+    this.url = url;
+    const match = this.url.match(/^https?:\/\/hibiki-radio.jp\/description\/(?<id>.+)\/detail([/#].+)?$/);
     this.programId = match.groups.id;
     this.radioInfo = await HibikiApi.getBasicData(this.programId);
     const thumbnail = this.radioInfo.sp_image_url;
     const fragments = thumbnail.split("?")[0].split(".");
     const ext = fragments[fragments.length - 1];
-    this.Thumbnail = {
+    this.thumbnail = {
       ext,
-      data: (await candyget.buffer(thumbnail, {
+      fetcher: () => candyget.buffer(thumbnail, {
         headers: {
           "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36",
         },
-      })).body,
+      }).then(({ body }) => body),
     };
-    this.Title = this.radioInfo.episode.program_name + "(" + this.radioInfo.episode.name + ")";
-    this._lengthSeconds = Math.floor(this.radioInfo.episode.video.duration);
+    this.title = this.radioInfo.episode.program_name + "(" + this.radioInfo.episode.name + ")";
+    this.lengthSeconds = Math.floor(this.radioInfo.episode.video.duration);
     this.uploadedAt = this.radioInfo.episode.updated_at;
-    this.Description = this.radioInfo.description;
+    this.description = this.radioInfo.description;
     this.casts = this.radioInfo.cast;
     return this;
   }
@@ -88,9 +90,9 @@ export class Hibiki extends AudioSource {
 
   exportData(): exportableCustom{
     return {
-      url: this.Url,
-      length: this._lengthSeconds,
-      title: this.Title,
+      url: this.url,
+      length: this.lengthSeconds,
+      title: this.title,
     };
   }
 }

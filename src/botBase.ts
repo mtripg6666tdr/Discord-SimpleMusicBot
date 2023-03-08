@@ -154,6 +154,9 @@ export abstract class MusicBotBase extends LogEmitter {
     this.initializeBackupper();
   }
 
+  /**
+   * バックアップ用のコンポーネントを、環境設定から初期化します。
+   */
   private initializeBackupper(){
     if(MongoBackupper.backuppable){
       this._backupper = new MongoBackupper(this, () => this.guildData);

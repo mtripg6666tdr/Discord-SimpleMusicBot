@@ -23,7 +23,6 @@ import { FFmpeg } from "prism-media";
 import * as ytdl from "ytdl-core";
 
 import { BaseCommand } from ".";
-import { ytdlCore } from "../AudioSource/youtube/strategies/ytdl-core";
 import { Util } from "../Util";
 import { FFmpegDefaultNetworkArgs } from "../definition";
 
@@ -51,37 +50,43 @@ export default class Frame extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     const server = options.server;
-    // そもそも再生状態じゃないよ...
+
+    // そもそも再生状態ではない場合
     if(!server.player.isConnecting || !server.player.isPlaying){
       await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
+
     const vinfo = server.player.currentAudioInfo;
     if(!vinfo.isYouTube()){
       await message.reply(":warning:フレームのキャプチャ機能に非対応のソースです。").catch(e => Util.logger.log(e, "error"));
       return;
-    }else if(vinfo["cache"] && vinfo["cache"].type !== ytdlCore){
+    }else if(vinfo.fallback){
       await message.reply(":warning:フォールバックしているため、現在この機能を使用できません。").catch(e => Util.logger.log(e, "error"));
       return;
     }
+
     const time = (function(rawTime){
-      if(rawTime === "" || vinfo.LiveStream) return server.player.currentTime / 1000;
+      if(rawTime === "" || vinfo.isLiveStream) return server.player.currentTime / 1000;
       else if(rawTime.match(/^(\d+:)*\d+(\.\d+)?$/)) return rawTime.split(":").map(n => Number(n))
         .reduce((prev, current) => prev * 60 + current);
       else return NaN;
     }(options.rawArgs));
-    if(options.rawArgs !== "" && vinfo.LiveStream){
+
+    if(options.rawArgs !== "" && vinfo.isLiveStream){
       await message.channel.createMessage({
         content: "ライブストリームでは時間指定できません",
       });
       return;
     }
-    if(!vinfo.LiveStream && (isNaN(time) || time > vinfo.LengthSeconds)){
+
+    if(!vinfo.isLiveStream && (isNaN(time) || time > vinfo.lengthSeconds)){
       await message.reply(":warning:時間の指定が正しくありません。").catch(e => Util.logger.log(e, "error"));
       return;
     }
+
     try{
-      const [hour, min, sec] = Util.time.CalcHourMinSec(Math.round(time * 100) / 100);
+      const [hour, min, sec] = Util.time.CalcHourMinSec(Math.floor(time * 100) / 100);
       const response = await message.reply(":camera_with_flash:取得中...");
       const { url, ua } = await vinfo.fetchVideo();
       const frame = await getFrame(url, time, ua);
@@ -89,13 +94,13 @@ export default class Frame extends BaseCommand {
         content: "",
         files: [
           {
-            name: `capture_${ytdl.getVideoID(vinfo.Url)}-${hour}${min}${sec}.png`,
+            name: `capture_${ytdl.getVideoID(vinfo.url)}-${hour}${min}${sec}.png`,
             contents: frame,
           },
         ],
       });
       await response.edit({
-        content: ":white_check_mark:完了!" + (vinfo.LiveStream ? "" : `(${hour}:${min}:${sec}時点)`),
+        content: ":white_check_mark:完了!" + (vinfo.isLiveStream ? "" : `(${hour}:${min}:${sec}時点)`),
       });
     }
     catch(e){

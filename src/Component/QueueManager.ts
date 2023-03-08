@@ -28,13 +28,11 @@ import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } fr
 
 import { Member } from "oceanic.js";
 
-
 import * as AudioSource from "../AudioSource";
 import { ServerManagerBase } from "../Structure";
 import { Util } from "../Util";
 import { getColor } from "../Util/color";
 import { FallBackNotice } from "../definition";
-
 
 export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"spotify"|"unknown";
 /**
@@ -104,14 +102,14 @@ export class QueueManager extends ServerManagerBase {
    * ライブストリームが含まれていた場合、NaNとなります
    */
   get lengthSeconds(): number{
-    return this.default.reduce((prev, current) => prev + Number(current.basicInfo.LengthSeconds), 0);
+    return this.default.reduce((prev, current) => prev + Number(current.basicInfo.lengthSeconds), 0);
   }
 
   /**
    * 現在取得できる限りのキューの長さ(時間秒)
    */
   get lengthSecondsActual(): number{
-    return this.default.reduce((prev, current) => prev + Number(current.basicInfo.LengthSeconds || 0), 0);
+    return this.default.reduce((prev, current) => prev + Number(current.basicInfo.lengthSeconds || 0), 0);
   }
 
   get isEmpty(): boolean{
@@ -178,28 +176,36 @@ export class QueueManager extends ServerManagerBase {
     if(index < 0) throw new Error("Invalid argument: " + index);
     const target = Math.min(index, this.length);
     for(let i = 0; i <= target; i++){
-      sec += this.get(i).basicInfo.LengthSeconds;
+      sec += this.get(i).basicInfo.lengthSeconds;
     }
     return sec;
   }
 
   private readonly addQueueLocker = new LockObj();
 
-  async addQueue(
+  async addQueueOnly({
+    url,
+    addedBy,
+    method = "push",
+    sourceType = "unknown",
+    gotData = null,
+    preventCache = false,
+  }: {
     url: string,
     addedBy: Member|AddedBy,
-    method: "push"|"unshift" = "push",
-    type: KnownAudioSourceIdentifer = "unknown",
-    gotData: AudioSource.exportableCustom = null,
-    preventCache: boolean = false,
-  ): Promise<QueueContent & { index: number }>{
+    method?: "push"|"unshift",
+    sourceType?: KnownAudioSourceIdentifer,
+    gotData?: AudioSource.exportableCustom,
+    preventCache?: boolean,
+  }): Promise<QueueContent & { index: number }>{
     return lock(this.addQueueLocker, async () => {
       this.Log("AddQueue called");
       const t = Util.time.timer.start("AddQueue");
       try{
         const result = {
           basicInfo: await AudioSource.resolve({
-            url, type,
+            url,
+            type: sourceType,
             knownData: gotData,
             forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000),
           }),
@@ -229,36 +235,39 @@ export class QueueManager extends ServerManagerBase {
 
   /**
    * ユーザーへのインタラクションやキュー追加までを一括して行います
-   * @param url 追加するソースのURL
-   * @param addedBy 追加したユーザー
-   * @param type 追加するURLのソースが判明している場合にはyoutubeまたはcustom、不明な場合はunknownを指定
-   * @param first 最初に追加する場合はtrue、末尾に追加する場合はfalse
-   * @param fromSearch 検索パネルの破棄を行うかどうか。検索パネルからのキュー追加の場合にはその検索パネル、それ以外はfalse
-   * @param channel 検索パネルからのキュー追加でない場合に、ユーザーへのインタラクションメッセージを送信するチャンネル。送信しない場合はnull
-   * @param message 各インタラクションを上書きするメッセージが既にある場合はここにメッセージを指定します。それ以外の場合はnull
-   * @param gotData すでにデータを取得していて新たにフェッチする必要がなくローカルでキューコンテンツをインスタンス化する場合はここにデータを指定します
-   * @param cancellable キャンセルするためのボタンを表示する場合はtrue、それ以外の場合はfalse
    * @returns 成功した場合はtrue、それ以外の場合はfalse
    */
-  async autoAddQueue(
+  async addQueue(options: {
     url: string,
     addedBy: Member|AddedBy|null|undefined,
-    type: KnownAudioSourceIdentifer,
-    first: boolean = false,
-    fromSearch: false|ResponseMessage = false,
-    channel: AnyGuildTextChannel = null,
-    message: ResponseMessage = null,
-    gotData: AudioSource.exportableCustom = null,
-    cancellable: boolean = false,
+    sourceType?: KnownAudioSourceIdentifer,
+    first?: boolean,
+    gotData?: AudioSource.exportableCustom,
+    cancellable?: boolean,
+  } & (
+    {
+      fromSearch: ResponseMessage,
+      message?: undefined,
+      channel?: undefined,
+    } | {
+      fromSearch?: undefined,
+      message: ResponseMessage,
+      channel?: undefined,
+    } | {
+      fromSearch?: undefined,
+      message?: undefined,
+      channel: AnyGuildTextChannel,
+    })
   ): Promise<boolean>{
     this.Log("AutoAddQueue Called");
     const t = Util.time.timer.start("AutoAddQueue");
     let msg: Message<AnyGuildTextChannel>|ResponseMessage = null;
+
     try{
-      if(fromSearch){
+      if(options.fromSearch){
         // 検索パネルから
         this.Log("AutoAddQueue from search panel");
-        msg = fromSearch;
+        msg = options.fromSearch;
         await msg.edit({
           content: "",
           embeds: [
@@ -272,39 +281,50 @@ export class QueueManager extends ServerManagerBase {
           },
           components: [],
         });
-      }else if(message){
+      }else if(options.message){
         // すでに処理中メッセージがある
         this.Log("AutoAddQueue will report statuses to the specified message");
-        msg = message;
-      }else if(channel){
+        msg = options.message;
+      }else if(options.channel){
         // まだないので生成
         this.Log("AutoAddQueue will make a message that will be used to report statuses");
-        msg = await channel.createMessage({
+        msg = await options.channel.createMessage({
           content: "情報を取得しています。お待ちください...",
         });
       }
+
       if(this.server.queue.length > 999){
         // キュー上限
         this.Log("AutoAddQueue failed due to too long queue", "warn");
         // eslint-disable-next-line @typescript-eslint/no-throw-literal
         throw "キューの上限を超えています";
       }
-      const info = await this.server.queue.addQueue(url, addedBy, first ? "unshift" : "push", type, gotData ?? null);
+
+      const info = await this.server.queue.addQueueOnly({
+        url: options.url,
+        addedBy: options.addedBy,
+        method: options.first ? "unshift" : "push",
+        sourceType: options.sourceType || "unknown",
+        gotData: options.gotData || null,
+      });
       this.Log("AutoAddQueue worked successfully");
+
       if(msg){
         // 曲の時間取得＆計算
-        const _t = Number(info.basicInfo.LengthSeconds);
+        const _t = Number(info.basicInfo.lengthSeconds);
         const [min, sec] = Util.time.CalcMinSec(_t);
         // キュー内のオフセット取得
         const index = info.index.toString();
         // ETAの計算
-        const timeFragments = Util.time.CalcHourMinSec(this.getLengthSecondsTo(info.index) - _t - Math.floor(this.server.player.currentTime / 1000));
+        const timeFragments = Util.time.CalcHourMinSec(
+          this.getLengthSecondsTo(info.index) - _t - Math.floor(this.server.player.currentTime / 1000)
+        );
         const embed = new MessageEmbedBuilder()
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
-          .setDescription(`[${info.basicInfo.Title}](${info.basicInfo.Url})`)
-          .addField("長さ", info.basicInfo.ServiceIdentifer === "youtube" && (info.basicInfo as AudioSource.YouTube).LiveStream ? "ライブストリーム" : _t !== 0 ? min + ":" + sec : "不明", true)
-          .addField("リクエスト", this.getDisplayNameFromMember(addedBy) ?? "不明", true)
+          .setDescription(`[${info.basicInfo.title}](${info.basicInfo.url})`)
+          .addField("長さ", info.basicInfo.isYouTube() && info.basicInfo.isLiveStream ? "ライブストリーム" : _t !== 0 ? min + ":" + sec : "不明", true)
+          .addField("リクエスト", this.getDisplayNameFromMember(options.addedBy) ?? "不明", true)
           .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
           .addField("再生されるまでの予想時間", index === "0" ? "-" : Util.time.HourMinSecToString(timeFragments), true)
         ;
@@ -314,38 +334,39 @@ export class QueueManager extends ServerManagerBase {
           embed.addField(":warning:注意", "Spotifyのタイトルは正しく再生されない場合があります");
         }
         let lastReply: Message<AnyGuildTextChannel>|ResponseMessage = null;
-        const components = !first && cancellable ? [
+        const components = !options.first && options.cancellable ? [
           new MessageActionRowBuilder()
             .addComponents(
               new MessageButtonBuilder()
-                .setCustomId(`cancel-last-${this.getUserIdFromMember(addedBy)}`)
+                .setCustomId(`cancel-last-${this.getUserIdFromMember(options.addedBy)}`)
                 .setLabel("キャンセル")
                 .setStyle("DANGER")
             )
             .toOceanic(),
         ] : [];
-        if(typeof info.basicInfo.Thumbnail === "string"){
-          embed.setThumbnail(info.basicInfo.Thumbnail);
+        if(typeof info.basicInfo.thumbnail === "string"){
+          embed.setThumbnail(info.basicInfo.thumbnail);
           lastReply = await msg.edit({
             content: "",
             embeds: [embed.toOceanic()],
             components,
           });
         }else{
-          embed.setThumbnail("attachment://thumbnail." + info.basicInfo.Thumbnail.ext);
+          embed.setThumbnail("attachment://thumbnail." + info.basicInfo.thumbnail.ext);
           lastReply = await msg.edit({
             content: "",
             embeds: [embed.toOceanic()],
             components,
             files: [
               {
-                name: "thumbnail." + info.basicInfo.Thumbnail.ext,
-                contents: info.basicInfo.Thumbnail.data,
+                name: "thumbnail." + info.basicInfo.thumbnail.ext,
+                contents: info.basicInfo.thumbnail.data,
               },
             ],
           });
         }
-        if(!first && cancellable){
+
+        if(!options.first && options.cancellable){
           let componentDeleted = false;
           (["change", "changeWithoutCurrent"] as const).forEach(event => this.once(event, () => {
             if(!componentDeleted){
@@ -410,7 +431,13 @@ export class QueueManager extends ServerManagerBase {
         const item = playlist[i];
         if(!item) continue;
         const exportable = await exportableConsumer(item);
-        const _result = await this.autoAddQueue(exportable.url, msg.command.member, identifer, first, false, null, null, exportable);
+        const _result = await this.addQueueOnly({
+          url: exportable.url,
+          addedBy: msg.command.member,
+          sourceType: identifer,
+          method: first ? "unshift" : "push",
+          gotData: exportable,
+        });
         if(_result) index++;
         if(
           index % 50 === 0
@@ -433,15 +460,23 @@ export class QueueManager extends ServerManagerBase {
    */
   async next(){
     this.Log("Next Called");
+
     this.onceLoopEnabled = false;
     this.server.player.resetError();
+
     if(this.queueLoopEnabled){
       this._default.push(this.default[0]);
-    }else if(this.server.addRelated && this.server.player.currentAudioInfo.ServiceIdentifer === "youtube"){
-      const relatedVideos = (this.server.player.currentAudioInfo as AudioSource.YouTube).relatedVideos;
+    }else if(this.server.addRelated && this.server.player.currentAudioInfo.isYouTube()){
+      const relatedVideos = this.server.player.currentAudioInfo.relatedVideos;
       if(relatedVideos.length >= 1){
         const video = relatedVideos[0];
-        await this.server.queue.addQueue(video.url, null, "push", "youtube", video);
+        await this.addQueueOnly({
+          url: video.url,
+          addedBy: null,
+          method: "push",
+          sourceType: "youtube",
+          gotData: video,
+        });
       }
     }
     this._default.shift();
@@ -482,18 +517,22 @@ export class QueueManager extends ServerManagerBase {
   shuffle(){
     this.Log("Shuffle Called");
     if(this._default.length === 0) return;
+
     const addedByOrder: string[] = [];
     this._default.forEach(item => {
       if(!addedByOrder.includes(item.additionalInfo.addedBy.userId)){
         addedByOrder.push(item.additionalInfo.addedBy.userId);
       }
     });
+
     if(this.server.player.isPlaying || this.server.player.preparing){
+      // 再生中/準備中には、キューの一番最初のアイテムの位置を変えずにそれ以外をシャッフルする
       const first = this._default.shift();
       this._default.sort(() => Math.random() - 0.5);
       this._default.unshift(first);
       this.emit("changeWithoutCurrent");
     }else{
+      // キュー内のすべてのアイテムをシャッフルする
       this._default.sort(() => Math.random() - 0.5);
       this.emit("change");
     }

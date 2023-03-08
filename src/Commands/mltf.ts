@@ -45,6 +45,6 @@ export default class Mltf extends BaseCommand {
     const to = options.server.player.isPlaying ? 1 : 0;
     q.move(q.length - 1, to);
     const info = q.get(to);
-    message.reply("✅`" + info.basicInfo.Title + "`を一番最後からキューの先頭に移動しました").catch(e => Util.logger.log(e, "error"));
+    message.reply("✅`" + info.basicInfo.title + "`を一番最後からキューの先頭に移動しました").catch(e => Util.logger.log(e, "error"));
   }
 }

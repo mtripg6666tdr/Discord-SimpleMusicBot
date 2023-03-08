@@ -21,28 +21,28 @@ import type { EmbedField } from "oceanic.js";
 
 import { AudioSource } from "./audiosource";
 import { Util } from "../Util";
-import { DefaultAudioThumbnailURL } from "../definition";
 
-export class Streamable extends AudioSource {
-  protected _lengthSeconds = 0;
-  protected readonly _serviceIdentifer = "streamable";
-  Thumbnail = DefaultAudioThumbnailURL;
-  private streamUrl = "";
+export class Streamable extends AudioSource<string> {
+  protected streamUrl = "";
+
+  constructor(){
+    super("streamable");
+  }
 
   async init(url: string, prefetched?: exportableStreamable){
-    this.Url = url;
+    this.url = url;
     const id = StreamableApi.getVideoId(url);
     if(!id) throw new Error("Invalid streamable url");
     if(prefetched){
-      this._lengthSeconds = prefetched.length;
-      this.Thumbnail = prefetched.thumbnail;
-      this.Title = prefetched.title;
+      this.lengthSeconds = prefetched.length;
+      this.thumbnail = prefetched.thumbnail;
+      this.title = prefetched.title;
       this.streamUrl = prefetched.streamUrl;
     }else{
       const streamInfo = await StreamableApi.getVideoDetails(id);
-      this._lengthSeconds = Math.floor(streamInfo.files["mp4-mobile"].duration);
-      this.Thumbnail = "https:" + streamInfo.thumbnail_url;
-      this.Title = streamInfo.title;
+      this.lengthSeconds = Math.floor(streamInfo.files["mp4-mobile"].duration);
+      this.thumbnail = "https:" + streamInfo.thumbnail_url;
+      this.title = streamInfo.title;
       this.streamUrl = streamInfo.files["mp4-mobile"].url;
     }
     return this;
@@ -59,7 +59,7 @@ export class Streamable extends AudioSource {
   toField(){
     return [{
       name: ":link:URL",
-      value: this.Url,
+      value: this.url,
     }, {
       name: ":asterisk:詳細",
       value: "Streamableにて共有されたファイル",
@@ -70,10 +70,10 @@ export class Streamable extends AudioSource {
 
   exportData(): exportableStreamable{
     return {
-      url: this.Url,
-      length: this.LengthSeconds,
-      thumbnail: this.Thumbnail,
-      title: this.Title,
+      url: this.url,
+      length: this.lengthSeconds,
+      thumbnail: this.thumbnail,
+      title: this.title,
       streamUrl: this.streamUrl,
     };
   }

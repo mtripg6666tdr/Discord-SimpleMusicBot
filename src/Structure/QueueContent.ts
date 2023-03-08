@@ -25,7 +25,7 @@ export type QueueContent = {
   /**
    * 曲自体のメタ情報
    */
-  basicInfo: AudioSource,
+  basicInfo: AudioSource<any>,
   /**
    * 曲の情報とは別の追加情報
    */

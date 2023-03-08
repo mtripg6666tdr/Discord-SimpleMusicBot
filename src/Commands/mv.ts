@@ -64,7 +64,7 @@ export default class Mv extends BaseCommand {
       from >= 0 && from <= q.length
       && to >= 0 && to <= q.length
     ){
-      const title = q.get(from).basicInfo.Title;
+      const title = q.get(from).basicInfo.title;
       if(from !== to){
         q.move(from, to);
         message.reply("✅ `" + title + "`を`" + from + "`番目から`" + to + "`番目に移動しました").catch(e => Util.logger.log(e, "error"));

@@ -22,24 +22,23 @@ import type { EmbedField } from "oceanic.js";
 
 import { AudioSource } from "./audiosource";
 import { Util } from "../Util";
-import { DefaultAudioThumbnailURL } from "../definition";
 
-export class GoogleDrive extends AudioSource {
-  protected _lengthSeconds = 0;
-  protected readonly _serviceIdentifer = "googledrive";
-  Thumbnail: string = DefaultAudioThumbnailURL;
+export class GoogleDrive extends AudioSource<string> {
+  constructor(){
+    super("googledrive");
+  }
 
   async init(url: string, prefetched: exportableCustom){
     if(prefetched){
-      this.Title = prefetched.title || "Googleドライブストリーム";
-      this.Url = url;
-      this._lengthSeconds = prefetched.length;
+      this.title = prefetched.title || "Googleドライブストリーム";
+      this.url = url;
+      this.lengthSeconds = prefetched.length;
     }else{
-      this.Title = "Googleドライブストリーム";
-      this.Url = url;
-      if(await Util.web.RetriveHttpStatusCode(this.Url) !== 200) throw new Error("URLがみつかりません");
+      this.title = "Googleドライブストリーム";
+      this.url = url;
+      if(await Util.web.RetriveHttpStatusCode(this.url) !== 200) throw new Error("URLがみつかりません");
       try{
-        this._lengthSeconds = await Util.web.RetriveLengthSeconds((await this.fetch()).url);
+        this.lengthSeconds = await Util.web.RetriveLengthSeconds((await this.fetch()).url);
       }
       catch{ /* empty */ }
     }
@@ -47,7 +46,7 @@ export class GoogleDrive extends AudioSource {
   }
 
   async fetch(): Promise<UrlStreamInfo>{
-    const id = GoogleDrive.getId(this.Url);
+    const id = GoogleDrive.getId(this.url);
     return {
       type: "url",
       streamType: "unknown",
@@ -66,9 +65,9 @@ export class GoogleDrive extends AudioSource {
 
   exportData(): exportableCustom{
     return {
-      url: this.Url,
-      length: this._lengthSeconds,
-      title: this.Title,
+      url: this.url,
+      length: this.lengthSeconds,
+      title: this.title,
     };
   }
 

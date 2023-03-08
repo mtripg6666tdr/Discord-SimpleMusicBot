@@ -61,14 +61,20 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
     if(this.bgmConfig){
       const { items } = this.bgmConfig;
       for(let i = 0; i < items.length; i++){
-        await this.queue.addQueue(items[i], {
-          displayName: "システム",
-          userId: "0",
-        }, "push", "unknown", {
-          title: "BGM",
+        await this.queue.addQueueOnly({
           url: items[i],
-          length: -1,
-        }, /* preventCache */ true);
+          addedBy: {
+            displayName: "システム",
+            userId: "0",
+          },
+          gotData: {
+            // 情報の取得を回避するためにダミーのデータを渡す
+            title: "BGM",
+            url: items[i],
+            length: -1,
+          },
+          preventCache: true,
+        });
       }
       this.queue.moveCurrentTracksToBGM();
     }

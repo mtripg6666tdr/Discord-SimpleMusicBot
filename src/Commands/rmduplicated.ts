@@ -41,10 +41,10 @@ export default class RmDuplicated extends BaseCommand {
     const indexes: number[] = [];
     const itemUrl: string[] = [];
     q.forEach((item, i) => {
-      if(itemUrl.includes(item.basicInfo.Url)){
+      if(itemUrl.includes(item.basicInfo.url)){
         indexes.push(i);
       }else{
-        itemUrl.push(item.basicInfo.Url);
+        itemUrl.push(item.basicInfo.url);
       }
     });
     const dels = Array.from(
@@ -62,7 +62,7 @@ export default class RmDuplicated extends BaseCommand {
       q.removeAt(dels[i]);
       actualDeleted.push(dels[i]);
       if(actualDeleted.length === 1){
-        firstItemTitle = item.basicInfo.Title;
+        firstItemTitle = item.basicInfo.title;
       }
     }
     if(actualDeleted.length > 0){

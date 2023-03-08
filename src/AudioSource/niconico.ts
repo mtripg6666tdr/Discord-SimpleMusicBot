@@ -26,33 +26,34 @@ import NiconicoDL, { isValidURL } from "niconico-dl.js";
 import { AudioSource } from "./audiosource";
 import { Util } from "../Util";
 
-export class NicoNicoS extends AudioSource {
-  protected _lengthSeconds = 0;
-  protected readonly _serviceIdentifer = "niconico";
+export class NicoNicoS extends AudioSource<string> {
   private nico = null as NiconicoDL;
-  Thumbnail = "";
-  Author = "";
-  Views = 0;
+  protected author = "";
+  protected views = 0;
+
+  constructor(){
+    super("niconico");
+  }
 
   async init(url: string, prefetched: exportableNicoNico){
-    this.Url = url;
+    this.url = url;
     this.nico = new NiconicoDL(url, /* quality */ "high");
     if(prefetched){
-      this.Title = prefetched.title;
-      this.Description = htmlToText(prefetched.description);
-      this._lengthSeconds = prefetched.length;
-      this.Author = prefetched.author;
-      this.Thumbnail = prefetched.thumbnail;
-      this.Views = prefetched.views;
+      this.title = prefetched.title;
+      this.description = htmlToText(prefetched.description);
+      this.lengthSeconds = prefetched.length;
+      this.author = prefetched.author;
+      this.thumbnail = prefetched.thumbnail;
+      this.views = prefetched.views;
     }else{
       const info = await this.nico.getVideoInfo();
       if(info.isDeleted || info.isPrivate) throw new Error("動画が再生できません");
-      this.Title = info.title;
-      this.Description = htmlToText(info.description);
-      this._lengthSeconds = info.duration;
-      this.Author = info.owner.nickname;
-      this.Thumbnail = info.thumbnail.url;
-      this.Views = info.count.view;
+      this.title = info.title;
+      this.description = htmlToText(info.description);
+      this.lengthSeconds = info.duration;
+      this.author = info.owner.nickname;
+      this.thumbnail = info.thumbnail.url;
+      this.views = info.count.view;
     }
     return this;
   }
@@ -76,33 +77,33 @@ export class NicoNicoS extends AudioSource {
     const fields = [] as EmbedField[];
     fields.push({
       name: ":cinema:投稿者",
-      value: this.Author,
+      value: this.author,
       inline: false,
     }, {
       name: ":eyes:視聴回数",
-      value: this.Views + "回",
+      value: this.views + "回",
       inline: false,
     }, {
       name: ":asterisk:概要",
-      value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, verbose ? 1000 : 300) + "..." : this.Description,
+      value: this.description.length > (verbose ? 1000 : 350) ? this.description.substring(0, verbose ? 1000 : 300) + "..." : this.description,
       inline: false,
     });
     return fields;
   }
 
   npAdditional(){
-    return "投稿者: " + this.Author;
+    return "投稿者: " + this.author;
   }
 
   exportData(): exportableNicoNico{
     return {
-      url: this.Url,
-      length: this.LengthSeconds,
-      title: this.Title,
-      description: this.Description,
-      author: this.Author,
-      thumbnail: this.Thumbnail,
-      views: this.Views,
+      url: this.url,
+      length: this.lengthSeconds,
+      title: this.title,
+      description: this.description,
+      author: this.author,
+      thumbnail: this.thumbnail,
+      views: this.views,
     };
   }
 
