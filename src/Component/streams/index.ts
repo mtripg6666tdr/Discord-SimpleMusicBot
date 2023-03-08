@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { ReadableStreamInfo, StreamInfo, StreamType, UrlStreamInfo } from "../../AudioSource";
+import type { ReadableStreamInfo, StreamInfo, StreamTypeIdentifer, UrlStreamInfo } from "../../AudioSource";
 import type { Readable } from "stream";
 
 import { opus } from "prism-media";
@@ -29,7 +29,7 @@ type PlayableStreamInfo = {
   cost: number,
   streams: Readable[],
   stream: Readable,
-  streamType: StreamType,
+  streamType: StreamTypeIdentifer,
 };
 
 /*
@@ -57,26 +57,26 @@ so we decided to pass the strean if it is just Webm/Opus stream.
  */
 export function resolveStreamToPlayable(streamInfo: StreamInfo, effects: string[], seek: number, volumeTransform: boolean, bitrate: number): PlayableStreamInfo{
   const effectEnabled = effects.length !== 0;
-  if(streamInfo.streamType === "webm" && seek <= 0 && !effectEnabled && !volumeTransform){
+  if((streamInfo.streamType === "webm/opus" || streamInfo.streamType === "ogg/opus") && seek <= 0 && !effectEnabled && !volumeTransform){
     // 1. effect is off, volume is off, stream is webm
-    // Webm --(Demuxer)--> Opus
+    // Ogg / Webm --(Demuxer)--> Opus
     //                1
     // Total: 1
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType}) (no conversion/cost: 1)`);
     const info = streamInfo.type === "url" ? convertStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
     return {
       stream: info.stream,
-      streamType: "webm",
+      streamType: streamInfo.streamType,
       cost: 1,
       streams: [info.stream],
     };
   }else if(!volumeTransform){
     // 2. volume is off and stream is unknown
-    // Unknown --(FFmpeg)--> Webm/Opus or Webm/Vorbis --(Demuxer)--> Opus
-    //               2                      1
+    // Unknown --(FFmpeg)--> Webm/Opus or Webm --(Demuxer)--> Opus
+    //               2                   1
     // Total: 3
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Webm/Opus (cost: 3)`);
-    const info = seek > 0 || streamInfo.type === "url" && streamInfo.url.split("?")[0].endsWith(".m3u8") ? streamInfo : convertStreamInfoToReadableStreamInfo(streamInfo);
+    const info = seek > 0 || streamInfo.streamType === "m3u8" ? streamInfo : convertStreamInfoToReadableStreamInfo(streamInfo);
     const ffmpeg = transformThroughFFmpeg(info, bitrate, effects, seek, "webm");
     const passThrough = createPassThrough();
     ffmpeg
@@ -86,18 +86,18 @@ export function resolveStreamToPlayable(streamInfo: StreamInfo, effects: string[
     ;
     return {
       stream: passThrough,
-      streamType: "webm",
+      streamType: "webm/opus",
       cost: 3,
       streams: [streamInfo.type === "readable" ? streamInfo.stream : undefined, ffmpeg, passThrough].filter(d => d),
     };
-  }else if((streamInfo.streamType === "webm" || streamInfo.streamType === "ogg") && !effectEnabled && seek <= 0){
+  }else if((streamInfo.streamType === "webm/opus" || streamInfo.streamType === "ogg/opus") && !effectEnabled && seek <= 0){
     // 3. volume is on and stream is webm or ogg
     // Webm/Ogg --(Demuxer)--> Opus --(Decoder)--> PCM --(VolumeTransformer)--> PCM --(Encoder)--> Opus
     //                1                  1.5                    0.5                      1.5
     // Total: 4.5
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(Demuxer)--(Decoder) --> PCM (cost: 4.5)`);
     const rawStream = streamInfo.type === "url" ? convertStreamInfoToReadableStreamInfo(streamInfo) : streamInfo;
-    const demuxer = streamInfo.streamType === "webm" ? new opus.WebmDemuxer() : new opus.OggDemuxer();
+    const demuxer = streamInfo.streamType === "webm/opus" ? new opus.WebmDemuxer() : new opus.OggDemuxer();
     const decoder = new opus.Decoder({
       rate: 48000,
       channels: 2,
@@ -117,7 +117,7 @@ export function resolveStreamToPlayable(streamInfo: StreamInfo, effects: string[
     ;
     return {
       stream: passThrough,
-      streamType: "pcm",
+      streamType: "raw",
       cost: 4.5,
       streams: [rawStream.stream, demuxer, decoder, passThrough],
     };
@@ -127,7 +127,7 @@ export function resolveStreamToPlayable(streamInfo: StreamInfo, effects: string[
     //              2                     0.5                      1.5
     // Total: 5
     Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM (cost: 5)`);
-    const info = seek > 0 ? streamInfo : convertStreamInfoToReadableStreamInfo(streamInfo);
+    const info = seek > 0 || streamInfo.streamType === "m3u8" ? streamInfo : convertStreamInfoToReadableStreamInfo(streamInfo);
     const ffmpegPCM = transformThroughFFmpeg(info, bitrate, effects, seek, "pcm");
     const passThrough = createPassThrough();
     ffmpegPCM
@@ -137,7 +137,7 @@ export function resolveStreamToPlayable(streamInfo: StreamInfo, effects: string[
     ;
     return {
       stream: passThrough,
-      streamType: "pcm",
+      streamType: "raw",
       cost: 5,
       streams: [streamInfo.type === "readable" ? streamInfo.stream : undefined, ffmpegPCM, passThrough].filter(d => d),
     };

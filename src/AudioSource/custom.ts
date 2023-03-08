@@ -49,6 +49,7 @@ export class CustomStream extends AudioSource {
     return {
       type: "url",
       url: this.Url,
+      streamType: "unknown",
     };
   }
 

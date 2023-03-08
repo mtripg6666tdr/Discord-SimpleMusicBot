@@ -64,6 +64,7 @@ export class SoundCloudS extends AudioSource {
     return {
       type: "readable",
       stream,
+      streamType: "mp3",
     };
   }
 

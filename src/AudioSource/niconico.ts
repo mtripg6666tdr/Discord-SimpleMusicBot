@@ -66,7 +66,9 @@ export class NicoNicoS extends AudioSource {
       .on("close", () => !source.destroyed && source.destroy?.())
     ;
     return {
-      type: "readable", stream,
+      type: "readable",
+      streamType: "unknown",
+      stream,
     };
   }
 

@@ -273,6 +273,7 @@ export class GuildDataContainer extends LogEmitter {
     const connection = targetChannel.join({
       selfDeaf: true,
     });
+    this.connectingVoiceChannel = targetChannel;
     if(this.connection === connection) return;
     await entersState(connection, VoiceConnectionStatus.Ready, 10e3);
     connection

@@ -26,6 +26,7 @@ export async function onVoiceChannelJoin(
   member: discord.Member,
   newChannel: discord.VoiceChannel | discord.StageChannel | discord.Uncached
 ){
+  if(!("guild" in newChannel)) return;
   if(member.id === this._client.user.id){
     // ボットが参加した際
     // ミュート状態/抑制状態なら自分で解除を試みる

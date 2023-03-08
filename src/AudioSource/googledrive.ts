@@ -50,6 +50,7 @@ export class GoogleDrive extends AudioSource {
     const id = GoogleDrive.getId(this.Url);
     return {
       type: "url",
+      streamType: "unknown",
       url: "https://drive.google.com/uc?id=" + id,
     };
   }

@@ -46,6 +46,7 @@ export class FsStream extends AudioSource {
     return {
       type: "readable",
       stream: fs.createReadStream(path.join(__dirname, "../../", this.Url)),
+      streamType: "unknown",
     };
   }
 

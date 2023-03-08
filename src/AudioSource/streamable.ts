@@ -51,6 +51,7 @@ export class Streamable extends AudioSource {
   async fetch(): Promise<UrlStreamInfo>{
     return {
       type: "url",
+      streamType: "mp4",
       url: this.streamUrl,
     };
   }
