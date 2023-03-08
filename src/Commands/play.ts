@@ -46,8 +46,14 @@ export default class Play extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     const server = options.server;
+    const firstAttachment = Array.isArray(message.attachments) ? message.attachments[0] : message.attachments.first();
     // キューが空だし引数もないし添付ファイルもない
-    if(server.queue.length === 0 && options.rawArgs === "" && message.attachments.length === 0 && !(message["_message"] && message["_message"].referencedMessage)){
+    if(
+      server.queue.length === 0
+      && options.rawArgs === ""
+      && !firstAttachment
+      && !(message["_message"] && message["_message"].referencedMessage)
+    ){
       await message.reply("再生するコンテンツがありません").catch(e => Util.logger.log(e, "error"));
       return;
     }
@@ -70,7 +76,9 @@ export default class Play extends BaseCommand {
       if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){
         await options.server.playFromURL(message, options.args as string[], !wasConnected);
       }else{
-        const msg = await message.channel.createMessage("🔍検索中...");
+        const msg = await message.channel.createMessage({
+          content: "🔍検索中...",
+        });
         try{
           const result = (await searchYouTube(options.rawArgs)).items.filter(it => it.type === "video") as ytsr.Video[];
           if(result.length === 0){
@@ -88,8 +96,12 @@ export default class Play extends BaseCommand {
         }
       }
     // 添付ファイルを確認
-    }else if(message.attachments.length > 0){
-      await options.server.playFromURL(message, message.attachments[0].url, !wasConnected);
+    }else if(firstAttachment){
+      await options.server.playFromURL(
+        message,
+        firstAttachment.url,
+        !wasConnected
+      );
     // 返信先のメッセージを確認
     }else if(message["_message"]?.referencedMessage){
       const messageReference = message["_message"].referencedMessage;
@@ -101,8 +113,8 @@ export default class Play extends BaseCommand {
       }else if(messageReference.content.substring(prefixLength).startsWith("http://") || messageReference.content.substring(prefixLength).startsWith("https://")){
         await options.server.playFromURL(message, messageReference.content.substring(prefixLength), !wasConnected);
       // 添付ファイル付きか？
-      }else if(messageReference.attachments.length > 0){
-        await options.server.playFromURL(message, messageReference.attachments[0].url, !wasConnected);
+      }else if(messageReference.attachments.size > 0){
+        await options.server.playFromURL(message, messageReference.attachments.first().url, !wasConnected);
       // ボットのメッセージなら
       }else if(messageReference.author.id === options.client.user.id){
         const embed = messageReference.embeds[0];

@@ -18,9 +18,9 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
-import type { EmbedOptions } from "eris";
+import type { EmbedOptions } from "oceanic.js";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import * as os from "os";
 
@@ -65,7 +65,7 @@ export default class SystemInfo extends BaseCommand {
 
     if(options.args.includes("basic") || options.args.length === 0){
       embeds.push(
-        new Helper.MessageEmbedBuilder()
+        new MessageEmbedBuilder()
           .setTitle("Discord-SimpleMusicBot")
           .setDescription("Basic info")
           .addField("Version", `\`${options.bot.version}\``, true)
@@ -86,7 +86,7 @@ export default class SystemInfo extends BaseCommand {
             .join("\r\n")
           )
           .setColor(getColor("UPTIME"))
-          .toEris()
+          .toOceanic()
       );
     }
 
@@ -100,17 +100,17 @@ export default class SystemInfo extends BaseCommand {
       logs.reverse();
       // Process Logs
       embeds.push(
-        new Helper.MessageEmbedBuilder()
+        new MessageEmbedBuilder()
           .setColor(getColor("UPTIME"))
           .setTitle("Log")
           .setDescription(`Last ${logs.length}bot logs\r\n\`\`\`\r\n${logs.join("\r\n")}\r\n\`\`\``)
-          .toEris()
+          .toOceanic()
       );
     }
 
     if(Util.general.isBotAdmin(message.member.id) && (options.args.includes("servers") || options.args.length === 0)){
       embeds.push(
-        new Helper.MessageEmbedBuilder()
+        new MessageEmbedBuilder()
           .setColor(getColor("UPTIME"))
           .setTitle("Server Info")
           .setDescription(
@@ -122,7 +122,7 @@ export default class SystemInfo extends BaseCommand {
           .addField("接続中サーバー数", options.bot.connectingGuildCount.toString(), true)
           .addField("再生中サーバー数(一時停止含む)", options.bot.playingGuildCount.toString(), true)
           .addField("一時停止サーバー数", options.bot.pausedGuildCount.toString(), true)
-          .toEris()
+          .toOceanic()
       );
     }
 
@@ -130,12 +130,12 @@ export default class SystemInfo extends BaseCommand {
       const target = options.client.guilds.get(options.args[1]);
       const data = options.bot.getData(options.args[1]);
       embeds.push(
-        new Helper.MessageEmbedBuilder()
+        new MessageEmbedBuilder()
           .setColor(getColor("HELP"))
           .setTitle("(秘)サーバー照会結果")
           .addField("サーバー名", target.name, true)
           .addField("サーバーID", target.id)
-          .addField("サーバーアイコン", target.icon)
+          .addField("サーバーアイコン", target.icon || "なし")
           .addField("チャンネル数(キャッシュによる)", target.channels.size.toString(), true)
           .addField("メンバー数(概算)", target.approximateMemberCount?.toString() || "不明", true)
           .addField("接続中", data?.player.isConnecting ? "はい" : "いいえ", true)
@@ -144,13 +144,13 @@ export default class SystemInfo extends BaseCommand {
           .addField("キュー内のアイテム数", data?.queue.length.toString() || "0", true)
           .addField("現在の変換コスト", data?.player.cost.toString() || "0", true)
           .addField("ライブストリーム", data?.player.currentAudioInfo?.isYouTube() && data?.player.currentAudioInfo.LiveStream ? "はい" : "いいえ", true)
-          .toEris()
+          .toOceanic()
       );
     }
 
     if(options.args.includes("cpu") || options.args.length === 0){
       // Process CPU Info
-      const cpuInfoEmbed = new Helper.MessageEmbedBuilder();
+      const cpuInfoEmbed = new MessageEmbedBuilder();
       cpuInfoEmbed.setColor(getColor("UPTIME")).setTitle("CPU Info");
       const cpus = os.cpus();
       for(let i = 0; i < cpus.length; i++){
@@ -165,7 +165,7 @@ export default class SystemInfo extends BaseCommand {
         + "Times(idle): `" + Math.round(cpus[i].times.idle / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.idle, all) + "%)`"
           , true);
       }
-      embeds.push(cpuInfoEmbed.toEris());
+      embeds.push(cpuInfoEmbed.toOceanic());
     }
 
     if(options.args.includes("mem") || options.args.length === 0){
@@ -175,7 +175,7 @@ export default class SystemInfo extends BaseCommand {
       const rss = Util.system.GetMBytes(nMem.rss);
       const ext = Util.system.GetMBytes(nMem.external);
       embeds.push(
-        new Helper.MessageEmbedBuilder()
+        new MessageEmbedBuilder()
           .setColor(getColor("UPTIME"))
           .setTitle("Memory Info")
           .addField("Total Memory",
@@ -194,7 +194,7 @@ export default class SystemInfo extends BaseCommand {
             + "Total: `" + Util.math.GetPercentage(rss + ext, memory.total) + "%`",
             true
           )
-          .toEris()
+          .toOceanic()
       );
     }
     

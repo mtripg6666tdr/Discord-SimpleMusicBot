@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Client } from "eris";
+import type { Client } from "oceanic.js";
 
 import * as http from "http";
 

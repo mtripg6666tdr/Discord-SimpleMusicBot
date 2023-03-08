@@ -17,16 +17,16 @@
  */
 
 import type { CommandArgs } from "../../Commands";
-import type { Member, TextChannel, VoiceChannel } from "eris";
+import type { Member, PermissionName, TextChannel } from "oceanic.js";
 
 const requirePermissions = [
-  "sendMessages",
-  "embedLinks",
-  "manageMessages",
-  "attachFiles",
-  "readMessageHistory",
-  "viewChannel",
-] as const;
+  "SEND_MESSAGES",
+  "EMBED_LINKS",
+  "MANAGE_MESSAGES",
+  "ATTACH_FILES",
+  "READ_MESSAGE_HISTORY",
+  "VIEW_CHANNEL",
+] as Readonly<PermissionName[]>;
 
 export const channelUtil = {
   checkSendable(channel: TextChannel, userId: string){
@@ -35,9 +35,7 @@ export const channelUtil = {
   },
   getVoiceMember(options: CommandArgs){
     if(!options.server.player.isConnecting) return null;
-    const voiceChannel = options.bot.client.getChannel(options.server.connection.channelID) as VoiceChannel;
-    if(!voiceChannel) return null;
-    return voiceChannel.voiceMembers;
+    return options.server.connectingVoiceChannel.voiceMembers || null;
   },
   sameVC(member: Member, options: CommandArgs){
     return this.getVoiceMember(options)?.has(member.id) || false;

@@ -19,7 +19,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -45,11 +45,11 @@ export default class EquallyPlayback extends BaseCommand {
       message.reply("❌均等再生をオフにしました").catch(e => Util.logger.log(e, "error"));
     }else{
       options.server.equallyPlayback = true;
-      const embed = new Helper.MessageEmbedBuilder()
+      const embed = new MessageEmbedBuilder()
         .setTitle("⭕均等再生をオンにしました")
         .setDescription("楽曲追加時に、楽曲を追加したユーザーごとにできるだけ均等になるようにする機能です。")
         .setColor(getColor("EQUALLY"))
-        .toEris()
+        .toOceanic()
       ;
       message.reply({ embeds: [embed] }).catch(er => Util.logger.log(er, "error"));
     }

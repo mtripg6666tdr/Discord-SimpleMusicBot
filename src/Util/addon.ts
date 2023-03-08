@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Client, Interaction, Message } from "eris";
+import type { Client, Interaction, Message } from "oceanic.js";
 
 import * as fs from "fs";
 import * as path from "path";

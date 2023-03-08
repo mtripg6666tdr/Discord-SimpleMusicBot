@@ -17,7 +17,7 @@
  */
 
 import type { exportableCustom, UrlStreamInfo } from ".";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 
 import twitterDl from "twitter-url-direct";
 
@@ -60,6 +60,7 @@ export class Twitter extends AudioSource {
   async fetch(): Promise<UrlStreamInfo>{
     return {
       type: "url",
+      streamType: "unknown",
       url: this.streamUrl,
     };
   }

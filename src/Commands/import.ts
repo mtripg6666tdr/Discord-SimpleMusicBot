@@ -20,6 +20,7 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { ResponseMessage } from "../Component/ResponseMessage";
 import type { YmxFormat } from "../Structure";
+import type { AnyGuildTextChannel } from "oceanic.js";
 
 import { BaseCommand } from ".";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
@@ -68,15 +69,16 @@ export default class Import extends BaseCommand {
         if(ids.length < 2){
           await smsg.edit("🔗指定されたURLは無効です");
         }
-        const msgId = ids[ids.length - 1];
-        const chId = ids[ids.length - 2];
-        const msg = await options.client.getMessage(chId, msgId);
+        const targetChannelId = ids[ids.length - 2];
+        const targetMessageId = ids[ids.length - 1];
+        const channel = await options.client.rest.channels.get<AnyGuildTextChannel>(targetChannelId);
+        const msg = channel.guild && await channel.getMessage(targetMessageId);
         if(msg.author.id !== options.client.user.id && !force){
           await smsg.edit("❌ボットのメッセージではありません");
           return;
         }
         const embed = msg.embeds.length > 0 ? msg.embeds[0] : null;
-        const attac = msg.attachments.length > 0 ? msg.attachments[0] : null;
+        const attac = msg.attachments.size > 0 ? msg.attachments.first() : null;
         if(embed && embed.title.endsWith("のキュー")){
           const fields = embed.fields;
           for(let i = 0; i < fields.length; i++){

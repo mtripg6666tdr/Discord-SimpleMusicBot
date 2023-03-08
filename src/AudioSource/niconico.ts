@@ -17,7 +17,7 @@
  */
 
 import type { exportableCustom, ReadableStreamInfo } from ".";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 import type { Readable } from "stream";
 
 import { convert as htmlToText } from "html-to-text";
@@ -66,7 +66,9 @@ export class NicoNicoS extends AudioSource {
       .on("close", () => !source.destroyed && source.destroy?.())
     ;
     return {
-      type: "readable", stream,
+      type: "readable",
+      streamType: "unknown",
+      stream,
     };
   }
 

@@ -19,7 +19,7 @@
 import type { KnownAudioSourceIdentifer } from "./QueueManager";
 import type { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 import type { AddedBy, QueueContent } from "../Structure/QueueContent";
-import type { Member } from "eris";
+import type { Member } from "oceanic.js";
 
 import * as fs from "fs";
 import * as path from "path";

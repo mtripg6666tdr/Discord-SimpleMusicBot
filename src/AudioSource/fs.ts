@@ -18,7 +18,7 @@
 
 import type { exportableCustom } from ".";
 import type { ReadableStreamInfo } from "./audiosource";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 
 import * as fs from "fs";
 import * as path from "path";
@@ -46,6 +46,7 @@ export class FsStream extends AudioSource {
     return {
       type: "readable",
       stream: fs.createReadStream(path.join(__dirname, "../../", this.Url)),
+      streamType: "unknown",
     };
   }
 

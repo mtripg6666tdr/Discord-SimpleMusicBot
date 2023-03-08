@@ -18,7 +18,7 @@
 
 import type { CommandArgs } from "./Structure";
 
-import * as discord from "eris";
+import * as discord from "oceanic.js";
 
 import { Util } from "./Util";
 import { MusicBotBase } from "./botBase";
@@ -45,28 +45,18 @@ export class MusicBot extends MusicBotBase {
   constructor(token: string, maintenance: boolean = false){
     super(maintenance);
 
-    this._client = new discord.Client(token, {
-      intents: [
-        // サーバーを認識する
-        "guilds",
-        // サーバーのメッセージを認識する
-        "guildMessages",
-        // サーバーのボイスチャンネルのステータスを確認する
-        "guildVoiceStates",
-      ],
-      restMode: true,
-      compress: true,
-      disableEvents: {
-        CHANNEL_PINS_UPDATE: true,
-        THREAD_CREATE: true,
-        THREAD_UPDATE: true,
-        THREAD_DELETE: true,
-        THREAD_LIST_SYNC: true,
-        THREAD_MEMBER_UPDATE: true,
-        THREAD_MEMBERS_UPDATE: true,
-        STAGE_INSTANCE_CREATE: true,
-        STAGE_INSTANCE_UPDATE: true,
-        STAGE_INSTANCE_DELETE: true,
+    this._client = new discord.Client({
+      auth: `Bot ${token}`,
+      gateway: {
+        intents: [
+          // サーバーを認識する
+          "GUILDS",
+          // サーバーのメッセージを認識する
+          "GUILD_MESSAGES",
+          // サーバーのボイスチャンネルのステータスを確認する
+          "GUILD_VOICE_STATES",
+        ],
+        compress: true,
       },
     });
 
@@ -94,9 +84,7 @@ export class MusicBot extends MusicBotBase {
       process.exit(1);
     }else{
       this.Log("Attempt reconnecting after waiting for a while...");
-      this._client.disconnect({
-        reconnect: "auto",
-      });
+      this._client.disconnect(true);
     }
   }
 
@@ -127,9 +115,7 @@ export class MusicBot extends MusicBotBase {
       this.Log("Shutting down the db...");
       await this._backupper.destroy();
     }
-    this._client.disconnect({
-      reconnect: false,
-    });
+    this._client.disconnect(false);
   }
 
   /**

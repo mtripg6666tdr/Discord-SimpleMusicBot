@@ -18,7 +18,7 @@
 
 import type { StreamInfo } from "./audiosource";
 import type { exportableCustom } from "./custom";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 import type { Track } from "spotify-url-info";
 import type ytsr from "ytsr";
 

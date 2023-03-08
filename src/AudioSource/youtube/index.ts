@@ -20,7 +20,7 @@ import type { Cache } from "./strategies/base";
 import type { ytdlCoreStrategy } from "./strategies/ytdl-core";
 import type { StreamInfo } from "..";
 import type { LoggerType } from "../../Util";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 
 import * as ytdl from "ytdl-core";
 

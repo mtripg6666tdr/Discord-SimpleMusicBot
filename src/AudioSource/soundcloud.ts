@@ -17,7 +17,7 @@
  */
 
 import type { exportableCustom, ReadableStreamInfo } from ".";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 import type { Readable } from "stream";
 
@@ -64,6 +64,7 @@ export class SoundCloudS extends AudioSource {
     return {
       type: "readable",
       stream,
+      streamType: "mp3",
     };
   }
 

@@ -18,15 +18,17 @@
 
 import type * as Sources from ".";
 import type { exportableCustom } from "./custom";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 import type { Readable } from "stream";
 
-export type StreamType =
-  | "dca"
-  | "ogg"
-  | "webm"
-  | "pcm"
-;
+export type StreamTypeIdentifer =
+  | "webm/opus"
+  | "ogg/opus"
+  | "mp3"
+  | "mp4"
+  | "raw"
+  | "m3u8"
+  | "unknown";
 
 export abstract class AudioSource {
   // ソースのURL
@@ -88,11 +90,11 @@ export type StreamInfo = ReadableStreamInfo|UrlStreamInfo;
 export type ReadableStreamInfo = {
   type: "readable",
   stream: Readable,
-  streamType?: StreamType,
+  streamType: StreamTypeIdentifer,
 };
 export type UrlStreamInfo = {
   type: "url",
   url: string,
-  streamType?: StreamType,
+  streamType: StreamTypeIdentifer,
   userAgent?: string,
 };

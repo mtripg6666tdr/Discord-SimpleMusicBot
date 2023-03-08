@@ -18,7 +18,7 @@
 
 import type { MusicBot } from "../bot";
 
-import * as discord from "eris";
+import * as discord from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
 import { CommandMessage } from "../Component/CommandMessage";
@@ -40,7 +40,9 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
   server.updatePrefix(message as discord.Message<discord.TextChannel>);
   if(message.content === `<@${this._client.user.id}>`){
     // メンションならば
-    await message.channel.createMessage(`コマンドの一覧は、\`/command\`で確認できます。\r\nメッセージでコマンドを送信する場合のプレフィックスは\`${server.prefix}\`です。`)
+    await message.channel.createMessage({
+      content: `コマンドの一覧は、\`/command\`で確認できます。\r\nメッセージでコマンドを送信する場合のプレフィックスは\`${server.prefix}\`です。`,
+    })
       .catch(e => this.Log(e, "error"));
     return;
   }
@@ -56,14 +58,12 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
       // BGM構成が存在するサーバー
       server instanceof GuildDataContainerWithBgm
       && (
-        
       // いまBGM再生中
         server.queue.isBGM
           && (
             // キューの編集を許可していない、またはBGM優先モード
             !server.bgmConfig.allowEditQueue || server.bgmConfig.mode === "prior"
           )
-        
         // BGMが再生していなければ、BGMオンリーモードであれば
         || server.bgmConfig.mode === "only"
       )
@@ -74,7 +74,7 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
       return;
     }
     // 送信可能か確認
-    if(!Util.eris.channel.checkSendable(message.channel as discord.TextChannel, this._client.user.id)){
+    if(!Util.eris.channel.checkSendable(message.channel, this._client.user.id)){
       try{
         await message.channel.createMessage({
           messageReference: {

@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CommandMessage as LibCommandMessage } from "@mtripg6666tdr/eris-command-resolver";
+import { CommandMessage as LibCommandMessage } from "@mtripg6666tdr/oceanic-command-resolver";
 
 import { Util } from "../Util";
 

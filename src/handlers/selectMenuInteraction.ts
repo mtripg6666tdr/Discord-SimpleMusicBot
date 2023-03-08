@@ -18,24 +18,29 @@
 
 import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
-import type * as discord from "eris";
+import type * as discord from "oceanic.js";
+import type { ComponentTypes } from "oceanic.js";
 
 export async function handleSelectMenuInteraction(
   this: MusicBot,
   server: GuildDataContainer,
-  interaction: Omit<discord.ComponentInteraction<discord.TextChannel>, "data"> & { data: discord.ComponentInteractionSelectMenuData }
+  interaction: discord.ComponentInteraction<ComponentTypes.STRING_SELECT>
 ){
+  if(!interaction.inCachedGuildChannel()) return;
   this.Log("received selectmenu interaction");
+
   // 検索パネル取得
   const panel = this.guildData.get(interaction.channel.guild.id).getSearchPanel(interaction.member.id);
+
   // なければ返却
   if(!panel) return;
   await interaction.deferUpdate();
-  if(interaction.data.custom_id === "search"){
-    if(interaction.data.values.includes("cancel")){
+
+  if(interaction.data.customID === "search"){
+    if(interaction.data.values.getStrings().includes("cancel")){
       await panel.destroy();
     }else{
-      await server.playFromSearchPanelOptions(interaction.data.values, panel);
+      await server.playFromSearchPanelOptions(interaction.data.values.getStrings(), panel);
     }
   }
 }

@@ -17,7 +17,7 @@
  */
 
 import type { exportableCustom, UrlStreamInfo } from ".";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 
 import { AudioSource } from "./audiosource";
 import { Util } from "../Util";
@@ -61,6 +61,7 @@ export class BestdoriS extends AudioSource {
   async fetch(): Promise<UrlStreamInfo>{
     return {
       type: "url",
+      streamType: "mp3",
       url: "https://bestdori.com/assets/jp/sound/bgm" + Util.general.padZero(this.id.toString(), 3) + "_rip/bgm" + Util.general.padZero(this.id.toString(), 3) + ".mp3",
     };
   }

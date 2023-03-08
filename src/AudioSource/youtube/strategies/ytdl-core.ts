@@ -130,7 +130,10 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
         stream: {
           type: "readable",
           stream: readable,
-          streamType: format.container === "webm" && format.audioCodec === "opus" ? "webm" : undefined,
+          streamType:
+            format.container === "webm" && format.audioCodec === "opus"
+              ? "webm/opus"
+              : format.container === "mp4" && format.audioCodec === "",
         } as ReadableStreamInfo,
       };
     }

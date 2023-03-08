@@ -17,7 +17,7 @@
  */
 
 import type { exportableCustom, UrlStreamInfo } from ".";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 
 import { AudioSource } from "./audiosource";
 import { Util } from "../Util";
@@ -51,6 +51,7 @@ export class Streamable extends AudioSource {
   async fetch(): Promise<UrlStreamInfo>{
     return {
       type: "url",
+      streamType: "mp4",
       url: this.streamUrl,
     };
   }

@@ -20,7 +20,7 @@ import type { CommandArgs } from ".";
 import type { YouTube } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -68,7 +68,7 @@ export default class NowPlaying extends BaseCommand {
         progressBar += "=";
       }
     }
-    const embed = new Helper.MessageEmbedBuilder()
+    const embed = new MessageEmbedBuilder()
       .setColor(getColor("NP"))
       .setTitle("現在再生中の曲:musical_note:")
       .setDescription(
@@ -85,15 +85,15 @@ export default class NowPlaying extends BaseCommand {
     ;
     if(typeof info.Thumbnail === "string"){
       embed.setThumbnail(info.Thumbnail);
-      await message.reply({ embeds: [embed.toEris()] }).catch(e => Util.logger.log(e, "error"));
+      await message.reply({ embeds: [embed.toOceanic()] }).catch(e => Util.logger.log(e, "error"));
     }else{
       embed.setThumbnail("attachment://thumbnail." + info.Thumbnail.ext);
       await message.reply({
-        embeds: [embed.toEris()],
+        embeds: [embed.toOceanic()],
         files: [
           {
             name: "thumbnail." + info.Thumbnail.ext,
-            file: info.Thumbnail.data,
+            contents: info.Thumbnail.data,
           },
         ],
       }).catch(e => Util.logger.log(e, "error"));

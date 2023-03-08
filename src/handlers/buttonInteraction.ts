@@ -18,8 +18,9 @@
 
 import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
+import type { ComponentTypes } from "oceanic.js";
 
-import * as discord from "eris";
+import * as discord from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
 import { CommandMessage } from "../Component/CommandMessage";
@@ -29,63 +30,69 @@ import Util from "../Util";
 export async function handleButtonInteraction(
   this: MusicBot,
   server: GuildDataContainer,
-  interaction: Omit<discord.ComponentInteraction<discord.TextChannel>, "data"> & { data: discord.ComponentInteractionButtonData }
+  interaction: discord.ComponentInteraction<ComponentTypes.BUTTON, discord.AnyGuildTextChannel>,
 ){
   this.Log("received button interaction");
   await interaction.deferUpdate();
-  if(interaction.data.custom_id === PageToggle.arrowLeft || interaction.data.custom_id === PageToggle.arrowRight){
+  if(interaction.data.customID === PageToggle.arrowLeft || interaction.data.customID === PageToggle.arrowRight){
     const l = this._embedPageToggle.filter(t =>
       t.Message.channelId === interaction.channel.id
       && t.Message.id === interaction.message.id);
     if(l.length >= 1){
       // ページめくり
       await l[0].flipPage(
-        interaction.data.custom_id === PageToggle.arrowLeft ? l[0].Current >= 1 ? l[0].Current - 1 : 0 :
-          interaction.data.custom_id === PageToggle.arrowRight ? l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current : 0
+        interaction.data.customID === PageToggle.arrowLeft ? l[0].Current >= 1 ? l[0].Current - 1 : 0
+          : interaction.data.customID === PageToggle.arrowRight ? l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current : 0
         ,
         interaction
       );
     }else{
-      await interaction.editOriginalMessage("失敗しました!");
+      await interaction.editOriginal({
+        content: "失敗しました!",
+      });
     }
-  }else if(interaction.data.custom_id.startsWith("skip_vote")){
+  }else if(interaction.data.customID.startsWith("skip_vote")){
     const result = server.skipSession?.vote(interaction.member);
     if(result === "voted"){
       interaction.createMessage({
         content: "投票しました",
-        flags: discord.Constants.MessageFlags.EPHEMERAL,
+        flags: discord.MessageFlags.EPHEMERAL,
       });
     }else if(result === "cancelled"){
       interaction.createMessage({
         content: "投票を取り消しました",
-        flags: discord.Constants.MessageFlags.EPHEMERAL,
+        flags: discord.MessageFlags.EPHEMERAL,
       });
     }
-  }else if(interaction.data.custom_id.startsWith("cancel-last-")){
+  }else if(interaction.data.customID.startsWith("cancel-last-")){
     const item = server.queue.get(server.queue.length - 1);
-    const userId = interaction.data.custom_id.substring("cancel-last-".length);
+    const userId = interaction.data.customID.substring("cancel-last-".length);
     if(interaction.member.id === userId){
       server.queue.removeAt(server.queue.length - 1);
-      interaction.createMessage(`🚮\`${item.basicInfo.Title}\`の追加を取り消しました`).catch(er => this.Log(er, "error"));
+      interaction.createMessage({
+        content: `🚮\`${item.basicInfo.Title}\`の追加を取り消しました`,
+      }).catch(er => this.Log(er, "error"));
       interaction.message.edit({
         components: [],
       }).catch(er => this.Log(er, "error"));
     }
-  }else if(interaction.data.custom_id.startsWith("cancel-search-")){
-    const userId = interaction.data.custom_id.substring("cancel-search-".length);
+  }else if(interaction.data.customID.startsWith("cancel-search-")){
+    const userId = interaction.data.customID.substring("cancel-search-".length);
     if(interaction.member.id === userId && this.guildData.get(interaction.guildID)?.hasSearchPanel(userId)){
       this.guildData.get(interaction.guildID)
         .getSearchPanel(userId)
         .destroy(/* quiet */ true)
       ;
-      interaction.createMessage("🚮検索パネルを破棄しました:white_check_mark:").catch(er => this.Log(er, "error"));
+      interaction.createMessage({
+        content: "🚮検索パネルを破棄しました:white_check_mark:",
+      }).catch(er => this.Log(er, "error"));
       interaction.message.edit({
         components: [],
       }).catch(er => this.Log(er, "error"));
     }
-  }else if(interaction.data.custom_id.startsWith("control_")){
+  }else if(interaction.data.customID.startsWith("control_")){
     let command: string = null;
-    switch(interaction.data.custom_id){
+    switch(interaction.data.customID){
       case "control_rewind":
         command = "rewind";
         break;
@@ -101,21 +108,24 @@ export async function handleButtonInteraction(
       default:
         return;
     }
-    const commandMessage = CommandMessage.createFromInteraction(interaction as discord.ComponentInteraction<discord.GuildTextableWithThread>, command, [], "") as CommandMessage;
+    const commandMessage = CommandMessage.createFromInteraction(interaction, command, [], "");
     const args = this["createCommandRunnerArgs"](commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions);
     args.includeMention = true;
     CommandManager.instance.resolve(command)?.checkAndRun(commandMessage, args);
   }else{
     const updateEffectPanel = () => {
       const mes = interaction.message;
-      const { embed, messageActions } = Util.effects.getCurrentEffectPanel(interaction.member.avatarURL, this.guildData.get(interaction.channel.guild.id));
+      const { embed, messageActions } = Util.effects.getCurrentEffectPanel(
+        interaction.member.avatarURL(),
+        this.guildData.get(interaction.channel.guild.id)
+      );
       mes.edit({
         content: "",
-        embeds: [embed.toEris()],
+        embeds: [embed.toOceanic()],
         components: [messageActions],
       }).catch(er => Util.logger.log(er, "error"));
     };
-    switch(interaction.data.custom_id){
+    switch(interaction.data.customID){
       case Util.effects.EffectsCustomIds.Reload:
         updateEffectPanel();
         break;

@@ -20,6 +20,8 @@ import type { ReadableOptions } from "stream";
 
 import { Readable } from "stream";
 
+import Util from "../../Util";
+
 export class Normalizer extends Readable {
   constructor(protected origin: Readable, protected inlineVolume: boolean, options: ReadableOptions = {}){
     super(Object.assign({
@@ -48,6 +50,8 @@ export class Normalizer extends Readable {
     this._onDestroy = this._onDestroy.bind(this);
     this.once("close", this._onDestroy);
     this.once("end", this._onDestroy);
+
+    Util.logger.log("[Normalizer] initialized");
   }
 
   override _read(){
@@ -58,20 +62,28 @@ export class Normalizer extends Readable {
 
   pauseOrigin(){
     if(this.origin && !this.origin.destroyed){
+      if(Util.config.debug){
+        Util.logger.log(`[Normalizer] Origin paused (${this.readableLength}/${this.readableHighWaterMark})`, "debug");
+      }
       this.origin.pause();
     }
   }
 
   resumeOrigin(){
     if(this.origin && !this.origin.destroyed){
+      if(Util.config.debug){
+        Util.logger.log(`[Normalizer] Origin resumed (${this.readableLength}/${this.readableHighWaterMark})`, "debug");
+      }
       this.origin.resume();
     }
   }
 
   protected _onDestroy(){
+    Util.logger.log("[Normalizer] Destroy hool called");
     this.off("close", this._onDestroy);
     this.off("end", this._onDestroy);
     if(this.origin){
+      Util.logger.log("[Normalizer] Attempting to destroy origin");
       if(!this.origin.destroyed){
         this.origin.destroy();
       }

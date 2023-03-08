@@ -40,7 +40,9 @@
       "functions": "only-multiline"
     }],
     "@typescript-eslint/no-dupe-class-members": "error",
-    "@typescript-eslint/no-extra-parens": ["warn", "all"],
+    "@typescript-eslint/no-extra-parens": ["warn", "all", {
+      "nestedBinaryExpressions": false
+    }],
     "@typescript-eslint/no-loop-func": "warn",
     "@typescript-eslint/no-loss-of-precision": "error",
     "@typescript-eslint/no-throw-literal": "warn",
@@ -256,11 +258,7 @@
     "no-whitespace-before-property": "warn",
     "nonblock-statement-body-position": "warn",
     "operator-assignment": "warn",
-    "operator-linebreak": ["warn", "before", {
-      "overrides": {
-        ":": "after"
-      }
-    }],
+    "operator-linebreak": ["warn", "before"],
     "padded-blocks": ["warn", "never"],
     "prefer-arrow-callback": "warn",
     "prefer-const": "warn",

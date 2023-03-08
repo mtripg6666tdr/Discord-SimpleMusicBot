@@ -39,10 +39,10 @@ export default class Effect extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     try{
-      const { embed, messageActions } = getCurrentEffectPanel(message.member.avatarURL, options.server);
+      const { embed, messageActions } = getCurrentEffectPanel(message.member.avatarURL(), options.server);
       const reply = await message.reply({
         content: "",
-        embeds: [embed.toEris()],
+        embeds: [embed.toOceanic()],
         components: [messageActions],
       });
       setTimeout(() => reply.edit({ components: [] }), 5 * 60 * 1000).unref();

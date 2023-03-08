@@ -97,7 +97,12 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
           stream: {
             type: "url",
             url: format.url,
-            streamType: format.ext === "webm" && format.acodec === "opus" ? "webm" : undefined,
+            streamType:
+              format.ext === "webm" && format.acodec === "opus"
+                ? "webm/opus"
+                : format.ext === "ogg" && format.acodec === "opus"
+                  ? "ogg/opus"
+                  : "unknown",
             userAgent: format.http_headers["User-Agent"],
           } as UrlStreamInfo,
         };
@@ -107,7 +112,12 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
         stream: {
           type: "readable",
           stream,
-          streamType: format.ext === "webm" && format.acodec === "opus" ? "webm" : undefined,
+          streamType:
+            format.ext === "webm" && format.acodec === "opus"
+              ? "webm/opus"
+              : format.ext === "ogg" && format.acodec === "opus"
+                ? "ogg/opus"
+                : "unknown",
         } as ReadableStreamInfo,
       };
     }
@@ -192,7 +202,8 @@ enum Acodec {
 enum TempEXT {
   M4A = "m4a",
   Mp4 = "mp4",
-  Webm = "webm"
+  Webm = "webm",
+  Ogg = "ogg"
 }
 
 interface Format {

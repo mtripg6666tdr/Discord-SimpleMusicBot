@@ -8,20 +8,30 @@
   "engines": {
     "node": ">=12.4.0"
   },
+  "scripts": {
+    "test": "mocha",
+    "start": "npm run build && npm run onlystart",
+    "onlystart": "node util/exec dist",
+    "build": "rimraf dist/ typings/ && tsc",
+    "lint": "eslint .",
+    "cleanup": "rimraf dist/ typings/ logs/",
+    "generatecommandlist": "node util/generateCommandList"
+  },
   "dependencies": {
+    "@discordjs/voice": "^0.14.0",
     "@mtripg6666tdr/async-lock": "^1.1.0",
-    "@mtripg6666tdr/eris-command-resolver": "^2.0.0",
+    "@mtripg6666tdr/oceanic-command-resolver": "^1.0.0-alpha.4",
     "@sinclair/typebox": "^0.25.24",
     "candyget": "^0.5.3",
     "comment-json": "^4.2.3",
     "dotenv": "^16.0.3",
-    "eris": "^0.17.1",
     "genius-lyrics": "^4.4.3",
     "html-entities": "^2.3.3",
     "html-to-text": "^8.2.1",
     "https-proxy-agent": "^5.0.1",
     "miniget": "^4.2.2",
     "niconico-dl.js": "^1.1.3",
+    "oceanic.js": "^1.5.0",
     "p-event": "^4.2.0",
     "p-queue": "^6.6.2",
     "prism-media": "^1.3.5",
@@ -63,15 +73,6 @@
     "play-dl": "^1.9.6",
     "sodium-native": "^3.4.1",
     "zlib-sync": "^0.1.8"
-  },
-  "scripts": {
-    "test": "mocha",
-    "start": "npm run build && npm run onlystart",
-    "onlystart": "node util/exec dist",
-    "build": "rimraf dist/ typings/ && tsc",
-    "lint": "eslint .",
-    "cleanup": "rimraf dist/ typings/ logs/",
-    "generatecommandlist": "node util/generateCommandList"
   },
   "keywords": [],
   "author": "mtripg6666tdr",

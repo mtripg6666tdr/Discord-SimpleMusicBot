@@ -18,7 +18,7 @@
 
 import type { UrlStreamInfo } from ".";
 import type { exportableCustom } from "./custom";
-import type { EmbedField } from "eris";
+import type { EmbedField } from "oceanic.js";
 
 import candyget from "candyget";
 
@@ -62,6 +62,7 @@ export class Hibiki extends AudioSource {
     const playcheck = await HibikiApi.playCheck(this.radioInfo.episode.video.id.toString());
     return {
       type: "url",
+      streamType: "m3u8",
       url: playcheck.playlist_url,
     };
   }

@@ -21,7 +21,7 @@ import type { CommandMessage } from "../Component/CommandMessage";
 import type { SongInfo } from "../Component/SearchPanel";
 import type * as ytsr from "ytsr";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
@@ -39,14 +39,14 @@ export abstract class SearchBase<T> extends BaseCommand {
       const responseMessage = await message.reply({
         content: "✘既に開かれている検索窓があります",
         components: [
-          new Helper.MessageActionRowBuilder()
+          new MessageActionRowBuilder()
             .addComponents(
-              new Helper.MessageButtonBuilder()
+              new MessageButtonBuilder()
                 .setCustomId(`cancel-search-${message.member.id}`)
                 .setLabel("以前の検索結果を破棄")
                 .setStyle("DANGER")
             )
-            .toEris(),
+            .toOceanic(),
         ],
       }).catch(e => Util.logger.log(e, "error"));
       if(responseMessage){

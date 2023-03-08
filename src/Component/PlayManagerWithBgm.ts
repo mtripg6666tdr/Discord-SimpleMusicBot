@@ -16,9 +16,10 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { AudioPlayerStatus, entersState } from "@discordjs/voice";
+
 import { PlayManager } from "./PlayManager";
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
-import Util from "../Util";
 
 export class PlayManagerWithBgm extends PlayManager {
   protected override server: GuildDataContainerWithBgm;
@@ -38,12 +39,12 @@ export class PlayManagerWithBgm extends PlayManager {
   }
 
   override get isPlaying(): boolean{
-    return this.isConnecting && this.server.connection.playing && !this.server.queue.isBGM;
+    return super.isPlaying && !this.server.queue.isBGM;
   }
 
   override async play(time?: number, bgm: boolean = false){
     if(this.server instanceof GuildDataContainerWithBgm){
-      if((this.server.queue.isBGM && !bgm || !this.server.queue.isBgmEmpty && bgm) && this.server.connection?.playing){
+      if((this.server.queue.isBGM && !bgm || !this.server.queue.isBgmEmpty && bgm) && this._player.state.status === AudioPlayerStatus.Playing){
         this.stop();
       }
       this.server.queue.setToPlayBgm(bgm);
@@ -75,8 +76,8 @@ export class PlayManagerWithBgm extends PlayManager {
   }
 
   override async onStreamFinished(){
-    if(this.server.connection && this.server.connection.playing){
-      await Util.general.waitForEnteringState(() => !this.server.connection || !this.server.connection.playing, 20 * 1000)
+    if(this._player.state.status === AudioPlayerStatus.Playing){
+      await entersState(this._player, AudioPlayerStatus.Idle, 20e3)
         .catch(() => {
           this.Log("Stream has not ended in time and will force stream into destroying", "warn");
           this.stop();

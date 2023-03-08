@@ -19,9 +19,9 @@
 import type { CommandMessage } from "./CommandMessage";
 import type { ResponseMessage } from "./ResponseMessage";
 import type { QueueContent } from "../Structure/QueueContent";
-import type { Member, VoiceChannel } from "eris";
+import type { Member } from "oceanic.js";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { ServerManagerBase } from "../Structure";
 import Util from "../Util";
@@ -99,31 +99,31 @@ export class SkipManager extends ServerManagerBase {
   }
 
   private getVoiceMembers(){
-    return (this.server.bot.client.getChannel(this.server.connection.channelID) as VoiceChannel).voiceMembers;
+    return this.server.connectingVoiceChannel.voiceMembers;
   }
 
   private createMessageContent(){
     const voiceSize = this.getVoiceMembers().size - 1;
     return {
       embeds: [
-        new Helper.MessageEmbedBuilder()
+        new MessageEmbedBuilder()
           .setTitle(":person_raising_hand: スキップの投票")
           .setDescription(`\`${this.currentSong.basicInfo.Title}\`のスキップに賛成する場合は以下のボタンを押してください。賛成がボイスチャンネルに参加している人数の過半数を超えると、スキップされます。\r\n\r\n現在の状況: ${this.agreeUsers.size}/${voiceSize}\r\nあと${Math.ceil(voiceSize / 2) - this.agreeUsers.size}人の賛成が必要です。`)
           .setFooter({
             text: `${this.issuer}が、楽曲のスキップを提案しました。`,
           })
-          .toEris(),
+          .toOceanic(),
       ],
       components: [
-        new Helper.MessageActionRowBuilder()
+        new MessageActionRowBuilder()
           .addComponents(
-            new Helper.MessageButtonBuilder()
+            new MessageButtonBuilder()
               .setCustomId(`skip_vote_${this.server.guildId}`)
               .setEmoji("⏩")
               .setLabel("賛成")
               .setStyle("PRIMARY")
           )
-          .toEris(),
+          .toOceanic(),
       ],
     };
   }

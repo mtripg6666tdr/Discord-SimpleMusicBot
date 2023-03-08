@@ -17,7 +17,7 @@
  */
 
 import type { CommandArgs } from "../../Commands";
-import type { Member } from "eris";
+import type { Member } from "oceanic.js";
 
 import { channelUtil } from "./channel";
 
@@ -29,8 +29,8 @@ export const userUtil = {
     return channelUtil.sameVC(member, options) && member.roles.some(roleId => member.guild.roles.get(roleId).name === "DJ");
   },
   isPrivileged(member: Member){
-    return member.permissions.has("manageGuild")
-      || member.permissions.has("manageChannels")
-      || member.permissions.has("administrator");
+    return member.permissions.has("MANAGE_GUILD")
+      || member.permissions.has("MANAGE_CHANNELS")
+      || member.permissions.has("ADMINISTRATOR");
   },
 } as const;

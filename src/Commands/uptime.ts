@@ -19,7 +19,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
-import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
 import { Util } from "../Util";
@@ -42,18 +42,18 @@ export default class Uptime extends BaseCommand {
     const now = Date.now();
     const insta = Util.time.CalcTime(now - options.bot.instantiatedTime.getTime());
     const ready = Util.time.CalcTime(options.client.uptime);
-    const embed = new Helper.MessageEmbedBuilder()
+    const embed = new MessageEmbedBuilder()
       .setColor(getColor("UPTIME"))
       .setTitle(options.client.user.username + "のアップタイム")
       .addField("インスタンス作成からの経過時間", `${insta[0]}時間${insta[1]}分${insta[2]}秒`)
       .addField("Discordに接続してからの経過時間", `${ready[0]}時間${ready[1]}分${ready[2]}秒`)
       .addField("レイテンシ",
-        `${now - message.createdTimestamp}ミリ秒(ボット接続実測値)\r\n`
+        `${now - message.createdTimestamp.getTime()}ミリ秒(ボット接続実測値)\r\n`
         + `${message.guild.shard.latency === Infinity ? "-" : message.guild.shard.latency}ミリ秒(ボットWebSocket接続取得値)\r\n`
         + `${options.server.player.isConnecting && options.server.vcPing || "-"}ミリ秒(ボイスチャンネルUDP接続取得値)`
       )
       .addField("データが保持されているサーバー数", `${options.bot.databaseCount}サーバー`)
-      .toEris()
+      .toOceanic()
     ;
     message.reply({ embeds: [embed] }).catch(e => Util.logger.log(e, "error"));
   }
