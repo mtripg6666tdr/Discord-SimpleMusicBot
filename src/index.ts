@@ -57,7 +57,7 @@ if(!Util.config.debug){
     if(bot.client && Util.config.errorChannel){
       await reportError(error);
     }
-    console.error(error);
+    logger(error, "error");
     process.exit(1);
   });
 }
