@@ -28,7 +28,17 @@ const sampleJson = `
 
   "proxy": "https://example.com", // HTTPプロキシのアドレス、なければnull
 
-  "prefix": "<" // デフォルトプレフィックス、一文字。省略されたりnullなら\`>\`
+  "prefix": "<", // デフォルトプレフィックス、一文字。省略されたりnullなら\`>\`
+
+  "webserver": false,
+
+  "bgm": {},
+
+  "noMessageContent": false,
+
+  "twentyFourSeven": [],
+
+  "alwaysTwentyFourSeven": false,
 }`;
 fs.writeFileSync(configPath, sampleJson, {encoding: "utf-8"});
 console.log("Successfully wrote the config for test");
@@ -43,7 +53,7 @@ describe("Config", function() {
 
   describe("#CheckValues", function(){
     const config = (mod => "default" in mod ? mod.default : mod)(require(configLoaderPath));
-    /** @type {[string, string|boolean][]} */
+    /** @type {[string, string|boolean|{}][]} */
     const tests = [
       ["adminId", "123456"],
       ["debug", true],
@@ -51,11 +61,16 @@ describe("Config", function() {
       ["errorChannel", "987654"],
       ["proxy", "https://example.com"],
       ["prefix", "<"],
+      ["webserver", false],
+      ["bgm", {}],
+      ["noMessageContent", false],
+      ["twentyFourSeven", []],
+      ["alwaysTwentyFourSeven", false],
     ];
 
     tests.forEach(([prop, expected]) => {
       it(`${prop} is same as expected`, function(){
-        assert.equal(config[prop], expected)
+        assert.deepEqual(config[prop], expected)
       });
     });
   })

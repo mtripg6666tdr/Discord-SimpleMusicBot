@@ -6,5 +6,10 @@
   "errorChannel": null,
   "proxy": null,
   "prefix": ">",
-  "webserver": true
+  "webserver": true,
+  "bgm": {},
+  "noMessageContent": false,
+  "twentyFourSeven": [],
+  "alwaysTwentyFourSeven": false,
+  "disabledSources": [],
 }

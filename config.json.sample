@@ -4,7 +4,7 @@
 
   // デバッグ可能かどうか
   "debug": false,
-  
+
   // メンテナンス中かどうか
   // ボットの操作を全封鎖するときのみ設定してください。
   "maintenance": false,
@@ -20,6 +20,9 @@
 
   // HTTPサーバーをたてるかどうか。trueにすると8081番で開かれます。
   "webserver": true,
+
+  // BGM機能の設定。何も設定しない場合は、{}（このまま）にします
+  "bgm": {},
 
   // MessageContent IntentがDiscord Developers Portalでオフになっている場合はtrueにします。
   // それ以外の場合はfalse
