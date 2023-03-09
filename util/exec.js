@@ -14,7 +14,7 @@ const result = spawnSync(nodePath, ["--version"]);
 const version = result.stdout.toString().trim();
 console.log("Node.js " + version + " detected");
 const nodeOptions = [];
-const nodeMajor = Number(version.substring(1));
+const nodeMajor = Number(version.substring(1).split(".")[0]);
 if(nodeMajor >= 17){
   nodeOptions.push("--dns-result-order=ipv4first");
 }
