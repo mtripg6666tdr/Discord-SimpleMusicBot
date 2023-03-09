@@ -78,9 +78,9 @@ export async function handleButtonInteraction(
     }
   }else if(interaction.data.customID.startsWith("cancel-search-")){
     const userId = interaction.data.customID.substring("cancel-search-".length);
-    if(interaction.member.id === userId && this.guildData.get(interaction.guildID)?.hasSearchPanel(userId)){
-      this.guildData.get(interaction.guildID)
-        .getSearchPanel(userId)
+    if(interaction.member.id === userId && this.guildData.get(interaction.guildID)?.searchPanel.has(userId)){
+      this.guildData.get(interaction.guildID).searchPanel
+        .get(userId)
         .destroy(/* quiet */ true)
       ;
       interaction.createMessage({

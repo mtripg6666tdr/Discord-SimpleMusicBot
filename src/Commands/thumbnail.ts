@@ -50,7 +50,7 @@ export default class Thumbnail extends BaseCommand {
     options.server.updateBoundChannel(message);
     const embed = new MessageEmbedBuilder();
     embed.setColor(getColor("THUMB"));
-    const userSearchPanel = options.server.getSearchPanel(message.member.id);
+    const userSearchPanel = options.server.searchPanel.get(message.member.id);
     const rawArgNumber = Number(options.rawArgs);
     if(options.rawArgs && userSearchPanel && 0 < rawArgNumber && rawArgNumber <= userSearchPanel.options.length){
       const opt = userSearchPanel.options[rawArgNumber - 1];

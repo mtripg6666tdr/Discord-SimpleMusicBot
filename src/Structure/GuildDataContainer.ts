@@ -20,6 +20,7 @@ import type { AudioEffect } from "./AudioEffect";
 import type { YmxFormat } from "./YmxFormat";
 import type { exportableCustom, exportableSpotify } from "../AudioSource";
 import type { CommandMessage } from "../Component/CommandMessage";
+import type { SearchPanel } from "../Component/SearchPanel";
 import type { exportableStatuses } from "../Component/backupper";
 import type { MusicBotBase } from "../botBase";
 import type { VoiceConnection } from "@discordjs/voice";
@@ -41,7 +42,7 @@ import { SoundCloudS } from "../AudioSource";
 import { PageToggle } from "../Component/PageToggle";
 import { PlayManager } from "../Component/PlayManager";
 import { QueueManager } from "../Component/QueueManager";
-import { SearchPanel } from "../Component/SearchPanel";
+import { SearchPanelManager } from "../Component/SearchPanelManager";
 import { SkipManager } from "../Component/SkipManager";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
 import Util from "../Util";
@@ -58,9 +59,6 @@ export class GuildDataContainer extends LogEmitter {
   /** プレフィックス */
   prefix: string;
 
-  /** 検索窓の格納します */
-  protected _searchPanels: Map<string, SearchPanel>;
-
   protected _queue: QueueManager;
   /** キューマネジャ */
   get queue(){
@@ -71,6 +69,12 @@ export class GuildDataContainer extends LogEmitter {
   /** 再生マネジャ */
   get player(){
     return this._player;
+  }
+
+  protected _searchPanel: SearchPanelManager;
+  /** 検索窓の格納します */
+  get searchPanel(){
+    return this._searchPanel;
   }
 
   protected _skipSession: SkipManager;
@@ -111,7 +115,6 @@ export class GuildDataContainer extends LogEmitter {
     if(!guildid){
       throw new Error("invalid guild id was given");
     }
-    this._searchPanels = new Map<string, SearchPanel>();
     this.boundTextChannel = boundchannelid;
     if(!this.boundTextChannel){
       throw new Error("invalid bound textchannel id was given");
@@ -142,6 +145,11 @@ export class GuildDataContainer extends LogEmitter {
     const pageToggleOrganizer = () => PageToggle.organize(this.bot.toggles, 5, this.guildId);
     this._queue.on("change", pageToggleOrganizer);
     this._queue.on("changeWithoutCurrent", pageToggleOrganizer);
+  }
+
+  protected initSearchPanelManager(){
+    this._searchPanel = new SearchPanelManager();
+    this._searchPanel.setBinding(this);
   }
 
   /**
@@ -686,31 +694,5 @@ export class GuildDataContainer extends LogEmitter {
     };
     this.queue.once("change", destroy);
     this.player.once("disconnect", destroy);
-  }
-
-  createSearchPanel(_commandMessage: CommandMessage, query: string, isRawTitle: boolean = false){
-    if(this._searchPanels.size >= 3){
-      _commandMessage.reply(":cry:すでに開いている検索パネルが上限を超えています").catch(er => this.Log(er, "error"));
-      return null;
-    }
-    return new SearchPanel(_commandMessage, query, isRawTitle);
-  }
-
-  getSearchPanel(userId: string){
-    return this._searchPanels.get(userId);
-  }
-
-  hasSearchPanel(userId: string){
-    return this._searchPanels.has(userId);
-  }
-
-  bindSearchPanel(panel: SearchPanel){
-    this._searchPanels.set(panel.commandMessage.member.id, panel);
-    const destroyPanel = panel.destroy.bind(panel);
-    const timeout = setTimeout(destroyPanel, 10 * 60 * 1000).unref();
-    panel.once("destroy", () => {
-      clearTimeout(timeout);
-      this._searchPanels.delete(panel.commandMessage.member.id);
-    });
   }
 }

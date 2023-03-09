@@ -123,6 +123,7 @@ export class SearchPanel extends EventEmitter {
             .toOceanic(),
         ],
       });
+      this.emit("open", this._responseMessage);
       return true;
     }
     catch(e){
@@ -178,6 +179,7 @@ export class SearchPanel extends EventEmitter {
 
 interface SearchPanelEvents {
   destroy: [];
+  open: [reply: ResponseMessage];
 }
 
 export type SongInfo = {

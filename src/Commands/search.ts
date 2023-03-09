@@ -35,7 +35,7 @@ export abstract class SearchBase<T> extends BaseCommand {
       await options.server.playFromURL(message, options.args as string[], !options.server.player.isConnecting);
       return;
     }
-    if(options.server.hasSearchPanel(message.member.id)){
+    if(options.server.searchPanel.has(message.member.id)){
       const responseMessage = await message.reply({
         content: "✘既に開かれている検索窓があります",
         components: [
@@ -50,7 +50,7 @@ export abstract class SearchBase<T> extends BaseCommand {
         ],
       }).catch(e => Util.logger.log(e, "error"));
       if(responseMessage){
-        options.server.getSearchPanel(message.member.id).once("destroy", () => {
+        options.server.searchPanel.get(message.member.id).once("destroy", () => {
           responseMessage.edit({
             components: [],
           });
@@ -59,12 +59,11 @@ export abstract class SearchBase<T> extends BaseCommand {
       return;
     }
     if(options.rawArgs !== ""){
-      const searchPanel = options.server.createSearchPanel(message, options.rawArgs);
-      if(!searchPanel) return;
-      const result = await searchPanel.consumeSearchResult(this.searchContent(options.rawArgs), this.consumer);
-      if(result){
-        options.server.bindSearchPanel(searchPanel);
+      const searchPanel = options.server.searchPanel.create(message, options.rawArgs);
+      if(!searchPanel){
+        return;
       }
+      await searchPanel.consumeSearchResult(this.searchContent(options.rawArgs), this.consumer);
     }else{
       await message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));
     }
