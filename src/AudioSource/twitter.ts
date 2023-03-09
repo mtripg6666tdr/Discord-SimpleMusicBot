@@ -60,7 +60,7 @@ export class Twitter extends AudioSource<string> {
   async fetch(): Promise<UrlStreamInfo>{
     return {
       type: "url",
-      streamType: "unknown",
+      streamType: "mp4",
       url: this.streamUrl,
     };
   }

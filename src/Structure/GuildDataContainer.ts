@@ -276,9 +276,23 @@ export class GuildDataContainer extends LogEmitter {
     const targetChannel = this.bot.client.getChannel<VoiceChannel | StageChannel>(channelId);
     const connection = targetChannel.join({
       selfDeaf: true,
+      debug: Util.config.debug,
     });
     this.connectingVoiceChannel = targetChannel;
     if(this.connection === connection) return;
+
+    // Temporary fix for voice stucking
+    // remove below code after the @discordjs/voice fixed and updated
+    // ref: https://github.com/discordjs/discord.js/issues/9185#issuecomment-1459083216
+    const networkStateChangeHandler = (oldState: any, newState: any) => {
+      const newUdp = Reflect.get(newState, "udp");
+      clearInterval(newUdp?.keepAliveInterval);
+    };
+    connection.on("stateChange", (oldState, newState) => {
+      Reflect.get(oldState, "networking")?.off("stateChange", networkStateChangeHandler);
+      Reflect.get(newState, "networking")?.on("stateChange", networkStateChangeHandler);
+    });
+
     await entersState(connection, VoiceConnectionStatus.Ready, 10e3);
     connection
       .on("error", err => {
@@ -290,6 +304,7 @@ export class GuildDataContainer extends LogEmitter {
     if(Util.config.debug){
       connection.on("debug", mes => this.Log("[Connection] " + mes, "debug"));
     }
+
     this.Log(`Connected to ${channelId}`);
   }
 

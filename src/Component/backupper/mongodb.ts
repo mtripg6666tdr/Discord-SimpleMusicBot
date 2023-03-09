@@ -21,20 +21,11 @@ import type { GuildDataContainer, YmxFormat } from "../../Structure";
 import type { DataType, MusicBotBase } from "../../botBase";
 import type * as mongo from "mongodb";
 
+import { MongoClient } from "mongodb";
 import { debounce } from "throttle-debounce";
 
 import { Backupper } from ".";
 import Util from "../../Util";
-
-const MongoClient = (() => {
-  try{
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    return require("mongodb") as typeof import("mongodb");
-  }
-  catch{
-    return null;
-  }
-})()?.MongoClient;
 
 type Collectionate<T> = T & { guildId: string };
 

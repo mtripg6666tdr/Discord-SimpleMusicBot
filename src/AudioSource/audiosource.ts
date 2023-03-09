@@ -30,7 +30,8 @@ export type StreamTypeIdentifer =
   | "mp4"
   | "raw"
   | "m3u8"
-  | "unknown";
+  | "unknown"
+  | "opus";
 
 export type AudioSourceTypeIdentifer =
   | "youtube"

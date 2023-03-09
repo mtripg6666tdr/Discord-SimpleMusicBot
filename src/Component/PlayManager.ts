@@ -226,14 +226,12 @@ export class PlayManager extends ServerManagerBase {
       // 情報からストリームを作成
       const voiceChannel = this.server.connectingVoiceChannel;
       if(!voiceChannel) return this;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { stream, streamType, cost, streams } = resolveStreamToPlayable(
-        rawStream,
-        getFFmpegEffectArgs(this.server),
-        this._seek,
-        this.volume !== 100,
-        voiceChannel.bitrate
-      );
+      const { stream, streamType, cost } = await resolveStreamToPlayable(rawStream, {
+        effectArgs: getFFmpegEffectArgs(this.server),
+        seek: this._seek,
+        volumeTransformEnabled: this.volume !== 100,
+        bitrate: voiceChannel.bitrate,
+      });
       this._currentAudioStream = stream;
 
       // 各種準備
@@ -253,7 +251,9 @@ export class PlayManager extends ServerManagerBase {
               ? StreamType.OggOpus
               : streamType === "raw"
                 ? StreamType.Raw
-                : StreamType.Arbitrary,
+                : streamType === "opus"
+                  ? StreamType.Opus
+                  : StreamType.Arbitrary,
         inlineVolume: this.volume !== 100,
       });
 
@@ -390,7 +390,7 @@ export class PlayManager extends ServerManagerBase {
         }
       }
       catch{ /* empty */ }
-      
+
       if(mes){
         mes.edit({
           content: `:tired_face:曲の再生に失敗しました...。${

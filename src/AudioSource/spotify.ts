@@ -68,15 +68,24 @@ export class Spotify extends AudioSource<string> {
   }
 
   override async fetch(forceUrl?: boolean): Promise<StreamInfo>{
+    // construct search keyword
     // eslint-disable-next-line newline-per-chained-call
     const keyword = `${this.title} ${this.artist.split(",").map(artist => artist.trim()).join(" ")}`;
+
+    // search youtube
     if(Util.config.debug) Util.logger.log(`Searching the keyword: ${`${this.title} ${this.artist.split(",").map(artist => artist.trim())}`}`, "debug");
     const searchResult = await searchYouTube(keyword);
+
+    // extract videos that seem to be ok
     if(Util.config.debug) Util.logger.log("Extracting the valid item...");
     const items = searchResult.items.filter(({ type }) => type === "video") as ytsr.Video[];
     const target = this.extractBestItem(items);
+
     if(!target) throw new Error("Not Found");
+
+    // fetch the video
     const { result } = await attemptFetchForStrategies(Util.logger.log.bind(Util.logger), target.url, forceUrl);
+
     this.title = result.info.title;
     this.lengthSeconds = result.info.length;
     this.thumbnail = result.info.thumbnail;
@@ -106,7 +115,8 @@ export class Spotify extends AudioSource<string> {
     const validate = (item: ytsr.Video) => {
       return (
         // 関連のないタイトルを除外
-        includes(item.title, this.title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase()) || includes(this.title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase(), item.title.toLowerCase())
+        includes(item.title, this.title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase())
+        || includes(this.title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase(), item.title.toLowerCase())
       )
       // カバー曲を除外
       && !includes(item.title.toLowerCase(), "cover")
