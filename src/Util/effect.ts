@@ -31,10 +31,16 @@ export const EffectsCustomIds = {
 
 export function getFFmpegEffectArgs(data: GuildDataContainer){
   const effect = [];
-  if(data.effectPrefs.BassBoost) effect.push("firequalizer=gain_entry='entry(75,2)'");
-  if(data.effectPrefs.Reverb) effect.push("aecho=1.0:0.7:20:0.5");
-  if(data.effectPrefs.LoudnessEqualization) effect.push("loudnorm");
-  
+  if(data.effectPrefs.BassBoost){
+    effect.push("firequalizer=gain_entry='entry(31,4);entry(62,2.7);entry(125,0.6)'");
+  }
+  if(data.effectPrefs.Reverb){
+    effect.push("aecho=1.0:0.7:20:0.5");
+  }
+  if(data.effectPrefs.LoudnessEqualization){
+    effect.push("loudnorm");
+  }
+
   if(effect.length >= 1){
     return ["-af", effect.join(",")];
   }else{
