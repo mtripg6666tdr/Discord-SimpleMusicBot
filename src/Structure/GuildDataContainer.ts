@@ -45,12 +45,20 @@ import { QueueManager } from "../Component/QueueManager";
 import { SearchPanelManager } from "../Component/SearchPanelManager";
 import { SkipManager } from "../Component/SkipManager";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
-import Util from "../Util";
+import * as Util from "../Util";
+import { useConfig } from "../config";
+import { getLogger } from "../logger";
+
+interface GuildDataContainerEvents {
+  updateBoundChannel: [string];
+}
+
+const config = useConfig();
 
 /**
  * サーバーごとデータを保存するコンテナ
  */
-export class GuildDataContainer extends LogEmitter {
+export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   private readonly _cancellations = [] as TaskCancellationManager[];
   private get cancellations(): Readonly<TaskCancellationManager[]>{
     return this._cancellations;
@@ -108,11 +116,9 @@ export class GuildDataContainer extends LogEmitter {
   /** VCのping */
   vcPing: number;
 
-  constructor(guildid: string, boundchannelid: string, bot: MusicBotBase){
-    super();
-    this.setTag("GuildDataContainer");
-    this.setGuildId(guildid);
-    if(!guildid){
+  constructor(guildId: string, boundchannelid: string, bot: MusicBotBase){
+    super("GuildDataContainer", guildId);
+    if(!guildId){
       throw new Error("invalid guild id was given");
     }
     this.boundTextChannel = boundchannelid;
@@ -132,24 +138,22 @@ export class GuildDataContainer extends LogEmitter {
     this.vcPing = null;
     this.initPlayManager();
     this.initQueueManager();
+    this.initSearchPanelManager();
   }
 
   protected initPlayManager(){
-    this._player = new PlayManager();
-    this._player.setBinding(this);
+    this._player = new PlayManager(this);
   }
 
   protected initQueueManager(){
-    this._queue = new QueueManager();
-    this._queue.setBinding(this);
-    const pageToggleOrganizer = () => PageToggle.organize(this.bot.toggles, 5, this.guildId);
+    this._queue = new QueueManager(this);
+    const pageToggleOrganizer = () => PageToggle.organize(this.bot.toggles, 5, this.getGuildId());
     this._queue.on("change", pageToggleOrganizer);
     this._queue.on("changeWithoutCurrent", pageToggleOrganizer);
   }
 
   protected initSearchPanelManager(){
-    this._searchPanel = new SearchPanelManager();
-    this._searchPanel.setBinding(this);
+    this._searchPanel = new SearchPanelManager(this);
   }
 
   /**
@@ -238,7 +242,7 @@ export class GuildDataContainer extends LogEmitter {
     if(statuses.voiceChannelId !== "0"){
       this.joinVoiceChannelOnly(statuses.voiceChannelId)
         .then(() => this.player.play())
-        .catch(er => this.Log(er, "warn"))
+        .catch(this.logger.error)
       ;
     }
   }
@@ -284,7 +288,7 @@ export class GuildDataContainer extends LogEmitter {
     const targetChannel = this.bot.client.getChannel<VoiceChannel | StageChannel>(channelId);
     const connection = targetChannel.join({
       selfDeaf: true,
-      debug: Util.config.debug,
+      debug: config.debug,
     });
     this.connectingVoiceChannel = targetChannel;
     if(this.connection === connection) return;
@@ -302,18 +306,21 @@ export class GuildDataContainer extends LogEmitter {
     });
 
     await entersState(connection, VoiceConnectionStatus.Ready, 10e3);
+
+    const connectionLogger = getLogger("Connection");
+    connectionLogger.addContext("guildId", this.getGuildId());
+
     connection
       .on("error", err => {
-        this.Log("[Connection] " + Util.general.StringifyObject(err), "error");
-        this.player.handleError(err);
+        connectionLogger.error(err);
       })
     ;
     this.connection = connection;
-    if(Util.config.debug){
-      connection.on("debug", mes => this.Log("[Connection] " + mes, "debug"));
+    if(config.debug){
+      connection.on("debug", connectionLogger.debug);
     }
 
-    this.Log(`Connected to ${channelId}`);
+    this.logger.info(`Connected to ${channelId}`);
   }
 
   private readonly joinVoiceChannelLocker: LockObj = new LockObj();
@@ -340,7 +347,7 @@ export class GuildDataContainer extends LogEmitter {
             : message.channel.createMessage.bind(message.channel);
           await replyFailMessage({
             content: ":warning:既にほかのボイスチャンネルに接続中です。この操作を実行する権限がありません。",
-          }).catch(er => this.Log(er, "error"));
+          }).catch(this.logger.error);
           return false;
         }
 
@@ -360,20 +367,20 @@ export class GuildDataContainer extends LogEmitter {
           return true;
         }
         catch(e){
-          Util.logger.log(e, "error");
+          this.logger.error(e);
           const failedMsg = `😑接続に失敗しました…もう一度お試しください: ${typeof e === "object" && "message" in e ? `${e.message}` : e}`;
           if(!reply && replyOnFail){
             await connectingMessage.delete()
-              .catch(er => this.Log(er, "error"));
+              .catch(this.logger.error);
             await message.reply({
               content: failedMsg,
             })
-              .catch(er => this.Log(er, "error"));
+              .catch(this.logger.error);
           }else{
             await connectingMessage?.edit({
               content: failedMsg,
             })
-              .catch(er => this.Log(er, "error"));
+              .catch(this.logger.error);
           }
           this.player.disconnect();
           return false;
@@ -383,7 +390,7 @@ export class GuildDataContainer extends LogEmitter {
         const replyFailedMessage = reply || replyOnFail ? message.reply.bind(message) : message.channel.createMessage.bind(message.channel);
         await replyFailedMessage({
           content: "ボイスチャンネルに参加してからコマンドを送信してください:relieved:",
-        }).catch(e => this.Log(e, "error"));
+        }).catch(this.logger.error);
         return false;
       }
     });
@@ -396,7 +403,7 @@ export class GuildDataContainer extends LogEmitter {
   async playFromURL(message: CommandMessage, rawArg: string|string[], first: boolean = true, cancellable: boolean = false){
     if(Array.isArray(rawArg)){
       const [firstUrl, ...restUrls] = rawArg
-        .flatMap(fragment => Util.string.NormalizeText(fragment).split(" "))
+        .flatMap(fragment => Util.normalizeText(fragment).split(" "))
         .filter(url => url.startsWith("http"));
 
       if(firstUrl){
@@ -414,8 +421,8 @@ export class GuildDataContainer extends LogEmitter {
       }
       return;
     }
-    setTimeout(() => message.suppressEmbeds(true).catch(e => this.Log(Util.general.StringifyObject(e), "warn")), 4000).unref();
-    if(!Util.general.isDisabledSource("custom") && rawArg.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){
+    setTimeout(() => message.suppressEmbeds(true).catch(this.logger.error), 4000).unref();
+    if(!config.isDisabledSource("custom") && rawArg.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){
       // Discordメッセへのリンクならば
       const smsg = await message.reply("🔍メッセージを取得しています...");
       try{
@@ -431,7 +438,7 @@ export class GuildDataContainer extends LogEmitter {
 
         if(ch.guild.id !== msg.channel.guild.id){
           throw new Error("異なるサーバーのコンテンツは再生できません");
-        }else if(msg.attachments.size <= 0 || !Util.fs.isAvailableRawAudioURL(msg.attachments.first()?.url)){
+        }else if(msg.attachments.size <= 0 || !Util.isAvailableRawAudioURL(msg.attachments.first()?.url)){
           throw new Error("添付ファイルが見つかりません");
         }
 
@@ -445,11 +452,11 @@ export class GuildDataContainer extends LogEmitter {
         return;
       }
       catch(e){
-        Util.logger.log(e, "error");
-        await smsg.edit(`✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`)
-          .catch(er => this.Log(er, "error"));
+        this.logger.error(e);
+        await smsg.edit("✘追加できませんでした")
+          .catch(this.logger.error);
       }
-    }else if(!Util.general.isDisabledSource("custom") && Util.fs.isAvailableRawAudioURL(rawArg)){
+    }else if(!config.isDisabledSource("custom") && Util.isAvailableRawAudioURL(rawArg)){
       // オーディオファイルへの直リンク？
       await this.queue.addQueue({
         url: rawArg,
@@ -459,7 +466,7 @@ export class GuildDataContainer extends LogEmitter {
         channel: message.channel,
       });
       await this.player.play();
-    }else if(!Util.general.isDisabledSource("youtube") && !rawArg.includes("v=") && !rawArg.includes("/channel/") && ytpl.validateID(rawArg)){
+    }else if(!config.isDisabledSource("youtube") && !rawArg.includes("v=") && !rawArg.includes("/channel/") && ytpl.validateID(rawArg)){
       //違うならYouTubeプレイリストの直リンクか？
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const cancellation = this.bindCancellation(new TaskCancellationManager());
@@ -504,14 +511,16 @@ export class GuildDataContainer extends LogEmitter {
         }
       }
       catch(e){
-        Util.logger.log(e, "error");
-        await msg.edit(`✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`).catch(er => this.Log(er, "error"));
+        this.logger.error(e);
+        await msg.edit(
+          "✘追加できませんでした"
+        ).catch(this.logger.error);
       }
       finally{
         this.unbindCancellation(cancellation);
       }
       await this.player.play();
-    }else if(!Util.general.isDisabledSource("soundcloud") && SoundCloudS.validatePlaylistUrl(rawArg)){
+    }else if(!config.isDisabledSource("soundcloud") && SoundCloudS.validatePlaylistUrl(rawArg)){
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const sc = new Soundcloud();
       const playlist = await sc.playlists.getV2(rawArg);
@@ -542,21 +551,25 @@ export class GuildDataContainer extends LogEmitter {
         }else{
           const embed = new MessageEmbedBuilder()
             .setTitle("✅プレイリストが処理されました")
-            .setDescription(`[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n${index}曲が追加されました`)
+            .setDescription(
+              `[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n${index}曲が追加されました`
+            )
             .setThumbnail(playlist.artwork_url)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({ content: "", embeds: [embed.toOceanic()] });
         }
       }
       catch(e){
-        Util.logger.log(e, "error");
-        await msg.edit(`✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`).catch(er => this.Log(er, "error"));
+        this.logger.error(e);
+        await msg.edit(
+          "✘追加できませんでした"
+        ).catch(this.logger.error);
       }
       finally{
         this.unbindCancellation(cancellation);
       }
       await this.player.play();
-    }else if(!Util.general.isDisabledSource("spotify") && Spotify.validatePlaylistUrl(rawArg) && Spotify.available){
+    }else if(!config.isDisabledSource("spotify") && Spotify.validatePlaylistUrl(rawArg) && Spotify.available){
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const cancellation = this.bindCancellation(new TaskCancellationManager());
       try{
@@ -584,7 +597,9 @@ export class GuildDataContainer extends LogEmitter {
         }else{
           const embed = new MessageEmbedBuilder()
             .setTitle("✅プレイリストが処理されました")
-            .setDescription(`[${playlist.title}](${Spotify.getPlaylistUrl(playlist.uri, playlist.type)}) \`(${playlist.subtitle})\` \r\n${index}曲が追加されました`)
+            .setDescription(
+              `[${playlist.title}](${Spotify.getPlaylistUrl(playlist.uri, playlist.type)}) \`(${playlist.subtitle})\` \r\n${index}曲が追加されました`
+            )
             .setThumbnail(playlist.coverArt.sources[0].url)
             .setFields({
               name: ":warning:注意",
@@ -595,8 +610,9 @@ export class GuildDataContainer extends LogEmitter {
         }
       }
       catch(e){
-        Util.logger.log(e, "error");
-        await msg.edit(`✘追加できませんでした(${Util.general.FilterContent(Util.general.StringifyObject(e))})`).catch(er => this.Log(er, "error"));
+        this.logger.error(e);
+        await msg.edit("✘追加できませんでした")
+          .catch(this.logger.error);
       }
       finally{
         this.unbindCancellation(cancellation);
@@ -615,10 +631,10 @@ export class GuildDataContainer extends LogEmitter {
         return;
       }
       catch(er){
-        this.Log(er, "error");
+        this.logger.error(er);
         // なに指定したし…
         await message.reply("🔭有効なURLを指定してください。キーワードで再生する場合はsearchコマンドを使用してください。")
-          .catch(e => this.Log(e, "error"));
+          .catch(this.logger.error);
       }
     }
   }
@@ -627,19 +643,19 @@ export class GuildDataContainer extends LogEmitter {
    * プレフィックス更新します
    * @param message 更新元となるメッセージ
    */
-  updatePrefix(message: CommandMessage|Message<AnyGuildTextChannel>): void{
+  updatePrefix(message: CommandMessage|Message<AnyGuildTextChannel>){
     const oldPrefix = this.prefix;
     const member = message.guild.members.get(this.bot.client.user.id);
     const pmatch = (member.nick || member.username).match(/^(\[(?<prefix0>[a-zA-Z!?_-]+)\]|【(?<prefix1>[a-zA-Z!?_-]+)】)/);
     if(pmatch){
       if(this.prefix !== (pmatch.groups.prefix0 || pmatch.groups.prefix1)){
-        this.prefix = Util.string.NormalizeText(pmatch.groups.prefix0 || pmatch.groups.prefix1);
+        this.prefix = Util.normalizeText(pmatch.groups.prefix0 || pmatch.groups.prefix1);
       }
-    }else if(this.prefix !== Util.config.prefix){
-      this.prefix = Util.config.prefix;
+    }else if(this.prefix !== config.prefix){
+      this.prefix = config.prefix;
     }
     if(this.prefix !== oldPrefix){
-      this.Log(`Prefix was set to '${this.prefix}'`);
+      this.logger.info(`Prefix was set to '${this.prefix}'`);
     }
   }
 
@@ -685,8 +701,7 @@ export class GuildDataContainer extends LogEmitter {
    * @param message ベースとなるコマンドメッセージ
    */
   async createSkipSession(message: CommandMessage){
-    this._skipSession = new SkipManager();
-    this._skipSession.setBinding(this);
+    this._skipSession = new SkipManager(this);
     await this._skipSession.init(message);
     const destroy = () => {
       this._skipSession?.destroy();

@@ -18,11 +18,11 @@
 
 import { CommandMessage as LibCommandMessage } from "@mtripg6666tdr/oceanic-command-resolver";
 
-import { Util } from "../Util";
+import { normalizeText } from "../Util";
 
 export class CommandMessage extends LibCommandMessage {
   protected static override parseCommand(content: string, prefixLength: number){
-    const resolved = super.parseCommand(content, prefixLength, Util.string.NormalizeText);
+    const resolved = super.parseCommand(content, prefixLength, normalizeText);
     // 超省略形を捕捉
     if(resolved.command.startsWith("http")){
       resolved.options.push(resolved.command);

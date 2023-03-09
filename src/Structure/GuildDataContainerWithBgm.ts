@@ -16,8 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { GuildBGMContainerType } from "../Util/config";
 import type { MusicBotBase } from "../botBase";
+import type { GuildBGMContainerType } from "../config";
 
 import { GuildDataContainer } from "./GuildDataContainer";
 import { PlayManagerWithBgm } from "../Component/PlayManagerWithBgm";
@@ -40,13 +40,11 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
   }
 
   protected override initPlayManager(){
-    this._player = new PlayManagerWithBgm();
-    this._player.setBinding(this);
+    this._player = new PlayManagerWithBgm(this);
   }
 
   protected override initQueueManager(){
-    this._queue = new QueueManagerWithBgm();
-    this._queue.setBinding(this);
+    this._queue = new QueueManagerWithBgm(this);
   }
 
   constructor(guildid: string, boundchannelid: string, bot: MusicBotBase, bgmConfig: GuildBGMContainerType){
@@ -89,7 +87,7 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
       .then(() => {
         this.player.play(0, /* BGM */ true);
       })
-      .catch(er => this.Log(er, "error"))
+      .catch(this.logger.error)
     ;
   }
 }

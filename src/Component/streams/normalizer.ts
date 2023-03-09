@@ -20,10 +20,11 @@ import type { ReadableOptions } from "stream";
 
 import { Readable } from "stream";
 
-import Util from "../../Util";
+import { getLogger } from "../../logger";
 
 export class Normalizer extends Readable {
   protected resumeHighWaterMark: number;
+  protected logger = getLogger("Normalizer");
 
   constructor(protected origin: Readable, protected inlineVolume: boolean, options: ReadableOptions = {}){
     super(Object.assign({
@@ -53,7 +54,7 @@ export class Normalizer extends Readable {
     this.once("close", this._onDestroy);
     this.once("end", this._onDestroy);
 
-    Util.logger.log("[Normalizer] initialized");
+    this.logger.info("initialized");
   }
 
   override _read(){
@@ -64,28 +65,24 @@ export class Normalizer extends Readable {
 
   pauseOrigin(){
     if(this.origin && !this.origin.destroyed && !this.origin.isPaused()){
-      if(Util.config.debug){
-        Util.logger.log(`[Normalizer] Origin paused (${this.readableLength}/${this.readableHighWaterMark})`, "debug");
-      }
+      this.logger.debug(`Origin paused (${this.readableLength}/${this.readableHighWaterMark})`);
       this.origin.pause();
     }
   }
 
   resumeOrigin(){
     if(this.origin && !this.origin.destroyed && this.origin.isPaused()){
-      if(Util.config.debug){
-        Util.logger.log(`[Normalizer] Origin resumed (${this.readableLength}/${this.readableHighWaterMark})`, "debug");
-      }
+      this.logger.debug(`Origin resumed (${this.readableLength}/${this.readableHighWaterMark})`);
       this.origin.resume();
     }
   }
 
   protected _onDestroy(){
-    Util.logger.log("[Normalizer] Destroy hook called");
+    this.logger.debug("Destroy hook called");
     this.off("close", this._onDestroy);
     this.off("end", this._onDestroy);
     if(this.origin){
-      Util.logger.log("[Normalizer] Attempting to destroy origin");
+      this.logger.info("Attempting to destroy origin");
       if(!this.origin.destroyed){
         this.origin.destroy();
       }

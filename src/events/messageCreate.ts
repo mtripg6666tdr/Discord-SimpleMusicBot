@@ -23,13 +23,15 @@ import * as discord from "oceanic.js";
 import { CommandManager } from "../Component/CommandManager";
 import { CommandMessage } from "../Component/CommandMessage";
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
-import Util from "../Util";
+import { discordUtil, normalizeText } from "../Util";
+import { useConfig } from "../config";
 import { NotSendableMessage } from "../definition";
 
+const config = useConfig();
+
 export async function onMessageCreate(this: MusicBot, message: discord.Message){
-  this["_addOn"].emit("messageCreate", message);
   if(this.maintenance){
-    if(!Util.general.isBotAdmin(message.author.id)) return;
+    if(!config.isBotAdmin(message.author.id)) return;
   }
   // botのメッセやdm、およびnewsは無視
   if(!this["_isReadyFinished"] || message.author.bot || !(message.channel instanceof discord.TextChannel)) return;
@@ -43,11 +45,11 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
     await message.channel.createMessage({
       content: `コマンドの一覧は、\`/command\`で確認できます。\r\nメッセージでコマンドを送信する場合のプレフィックスは\`${server.prefix}\`です。`,
     })
-      .catch(e => this.Log(e, "error"));
+      .catch(this.logger.error);
     return;
   }
   const prefix = server.prefix;
-  const messageContent = Util.string.NormalizeText(message.content);
+  const messageContent = normalizeText(message.content);
   if(messageContent.startsWith(prefix) && messageContent.length > prefix.length){
     // コマンドメッセージを作成
     const commandMessage = CommandMessage.createFromMessage(message as discord.Message<discord.TextChannel>, prefix.length);
@@ -74,7 +76,7 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
       return;
     }
     // 送信可能か確認
-    if(!Util.eris.channel.checkSendable(message.channel, this._client.user.id)){
+    if(!discordUtil.channels.checkSendable(message.channel, this._client.user.id)){
       try{
         await message.channel.createMessage({
           messageReference: {
@@ -94,7 +96,7 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
   }else if(server.searchPanel.has(message.member.id)){
     // searchコマンドのキャンセルを捕捉
     const panel = server.searchPanel.get(message.member.id);
-    const content = Util.string.NormalizeText(message.content);
+    const content = normalizeText(message.content);
     if(message.content === "キャンセル" || message.content === "cancel"){
       panel.destroy();
     }
@@ -113,6 +115,6 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
       },
       content: "処理中の処理をすべてキャンセルしています....",
     })
-      .catch(e => this.Log(e, "error"));
+      .catch(this.logger.error);
   }
 }

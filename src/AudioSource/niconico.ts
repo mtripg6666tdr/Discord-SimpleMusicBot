@@ -24,7 +24,7 @@ import { convert as htmlToText } from "html-to-text";
 import NiconicoDL, { isValidURL } from "niconico-dl.js";
 
 import { AudioSource } from "./audiosource";
-import { Util } from "../Util";
+import { createPassThrough } from "../Util";
 
 export class NicoNicoS extends AudioSource<string> {
   private nico = null as NiconicoDL;
@@ -59,7 +59,7 @@ export class NicoNicoS extends AudioSource<string> {
   }
 
   async fetch(): Promise<ReadableStreamInfo>{
-    const stream = Util.general.createPassThrough();
+    const stream = createPassThrough();
     const source = await this.nico.download() as Readable;
     source
       .on("error", e => !stream.destroyed ? stream.destroy(e) : stream.emit("error", e))

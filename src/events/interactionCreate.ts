@@ -21,21 +21,20 @@ import type { MusicBot } from "../bot";
 import * as discord from "oceanic.js";
 import { InteractionTypes } from "oceanic.js";
 
-import Util from "../Util";
+import { useConfig } from "../config";
 import * as handlers from "../handlers";
 
-export async function onInteractionCreate(this: MusicBot, interaction: discord.AnyInteractionGateway){
-  // イベント発生させる
-  this["_addOn"].emit("interactionCreate", interaction);
+const config = useConfig();
 
+export async function onInteractionCreate(this: MusicBot, interaction: discord.AnyInteractionGateway){
   // コマンドインタラクションおよびコンポーネントインタラクション以外は処理せず終了
   if(interaction.type !== InteractionTypes.APPLICATION_COMMAND && interaction.type !== InteractionTypes.MESSAGE_COMPONENT){
-    this.Log(`Unknown interaction received: ${interaction.type}`, "debug");
+    this.logger.debug(`Unknown interaction received: ${interaction.type}`);
     return;
   }
   // メンテナンスモードでかつボット管理者以外なら終了
-  if(this.maintenance && !Util.general.isBotAdmin(interaction.member.id)){
-    if(Util.config.debug) this.Log("Interaction ignored due to mentenance mode", "debug");
+  if(this.maintenance && !config.isBotAdmin(interaction.member.id)){
+    this.logger.debug("Interaction ignored due to mentenance mode");
     return;
   }
   // ボットによるインタラクション（の可能性があるのかは知らないけど）なら終了

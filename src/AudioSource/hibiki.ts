@@ -24,7 +24,6 @@ import type { EmbedField } from "oceanic.js";
 import candyget from "candyget";
 
 import { AudioSource } from "./audiosource";
-import { Util } from "../Util";
 
 export class Hibiki extends AudioSource<DynamicThumbnail> {
   protected programId = "";
@@ -104,21 +103,25 @@ export abstract class HibikiApi {
 
   static async getBasicData(programId: string): Promise<HibikiAPIResult>{
     const api = "https://vcms-api.hibiki-radio.jp/api/v1/programs/" + programId;
-    return JSON.parse(await Util.web.DownloadText(api, {
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36",
-      "Referer": "https://hibiki-radio.jp/",
-      "X-Requested-With": "XMLHttpRequest",
-    })) as HibikiAPIResult;
+    return candyget.json(api, {
+      headers: {
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36",
+        "Referer": "https://hibiki-radio.jp/",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    }).then(({ body }) => body as HibikiAPIResult);
   }
 
   static async playCheck(videoId: string): Promise<playCheckResult>{
     const playCheckURL = "https://vcms-api.hibiki-radio.jp/api/v1/videos/play_check?video_id=" + videoId;
-    return JSON.parse(await Util.web.DownloadText(playCheckURL, {
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36",
-      "X-Requested-With": "XMLHttpRequest",
-    })) as playCheckResult;
+    return candyget.json(playCheckURL, {
+      headers: {
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    }).then(({ body }) => body as playCheckResult);
   }
 }
 

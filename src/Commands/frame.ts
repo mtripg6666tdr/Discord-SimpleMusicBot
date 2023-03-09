@@ -23,8 +23,9 @@ import { FFmpeg } from "prism-media";
 import * as ytdl from "ytdl-core";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
+import * as Util from "../Util";
 import { FFmpegDefaultNetworkArgs } from "../definition";
+import { getLogger } from "../logger";
 
 export default class Frame extends BaseCommand {
   constructor(){
@@ -53,16 +54,16 @@ export default class Frame extends BaseCommand {
 
     // そもそも再生状態ではない場合
     if(!server.player.isConnecting || !server.player.isPlaying){
-      await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
+      await message.reply("再生中ではありません").catch(this.logger.error);
       return;
     }
 
     const vinfo = server.player.currentAudioInfo;
     if(!vinfo.isYouTube()){
-      await message.reply(":warning:フレームのキャプチャ機能に非対応のソースです。").catch(e => Util.logger.log(e, "error"));
+      await message.reply(":warning:フレームのキャプチャ機能に非対応のソースです。").catch(this.logger.error);
       return;
     }else if(vinfo.fallback){
-      await message.reply(":warning:フォールバックしているため、現在この機能を使用できません。").catch(e => Util.logger.log(e, "error"));
+      await message.reply(":warning:フォールバックしているため、現在この機能を使用できません。").catch(this.logger.error);
       return;
     }
 
@@ -81,12 +82,12 @@ export default class Frame extends BaseCommand {
     }
 
     if(!vinfo.isLiveStream && (isNaN(time) || time > vinfo.lengthSeconds)){
-      await message.reply(":warning:時間の指定が正しくありません。").catch(e => Util.logger.log(e, "error"));
+      await message.reply(":warning:時間の指定が正しくありません。").catch(this.logger.error);
       return;
     }
 
     try{
-      const [hour, min, sec] = Util.time.CalcHourMinSec(Math.floor(time * 100) / 100);
+      const [hour, min, sec] = Util.time.calcHourMinSec(Math.floor(time * 100) / 100);
       const response = await message.reply(":camera_with_flash:取得中...");
       const { url, ua } = await vinfo.fetchVideo();
       const frame = await getFrame(url, time, ua);
@@ -104,15 +105,16 @@ export default class Frame extends BaseCommand {
       });
     }
     catch(e){
-      Util.logger.log(e, "error");
+      this.logger.error(e);
       await message.channel.createMessage({
         content: ":sob:失敗しました...",
-      }).catch(er => Util.logger.log(er, "error"));
+      }).catch(this.logger.error);
     }
   }
 }
 
 function getFrame(url: string, time: number, ua: string){
+  const logger = getLogger("FFmpeg");
   return new Promise<Buffer>((resolve, reject) => {
     const args = [
       "-analyzeduration", "0",
@@ -124,12 +126,10 @@ function getFrame(url: string, time: number, ua: string){
       "-f", "image2pipe",
       "-vcodec", "png",
     ];
-    Util.logger.log(`[FFmpeg] Passing args: ${args.join(" ")}`, "debug");
+    logger.debug(`Passing args: ${args.join(" ")}`);
     const bufs = [] as Buffer[];
     const ffmpeg = new FFmpeg({ args });
-    if(Util.config.debug){
-      ffmpeg.process.stderr.on("data", chunk => Util.logger.log(`[FFmpeg] ${chunk.toString()}`, "debug"));
-    }
+    ffmpeg.process.stderr.on("data", logger.debug);
     ffmpeg
       .on("error", (er) => {
         if(!ffmpeg.destroyed) ffmpeg.destroy(er);

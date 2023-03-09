@@ -25,14 +25,14 @@ import * as discord from "oceanic.js";
 import { CommandManager } from "../Component/CommandManager";
 import { CommandMessage } from "../Component/CommandMessage";
 import { PageToggle } from "../Component/PageToggle";
-import Util from "../Util";
+import { effectUtil } from "../Util";
 
 export async function handleButtonInteraction(
   this: MusicBot,
   server: GuildDataContainer,
   interaction: discord.ComponentInteraction<ComponentTypes.BUTTON, discord.AnyGuildTextChannel>,
 ){
-  this.Log("received button interaction");
+  this.logger.info("received button interaction");
   await interaction.deferUpdate();
   if(interaction.data.customID === PageToggle.arrowLeft || interaction.data.customID === PageToggle.arrowRight){
     const l = this._embedPageToggle.filter(t =>
@@ -71,10 +71,10 @@ export async function handleButtonInteraction(
       server.queue.removeAt(server.queue.length - 1);
       interaction.createMessage({
         content: `🚮\`${item.basicInfo.title}\`の追加を取り消しました`,
-      }).catch(er => this.Log(er, "error"));
+      }).catch(this.logger.error);
       interaction.message.edit({
         components: [],
-      }).catch(er => this.Log(er, "error"));
+      }).catch(this.logger.error);
     }
   }else if(interaction.data.customID.startsWith("cancel-search-")){
     const userId = interaction.data.customID.substring("cancel-search-".length);
@@ -85,10 +85,10 @@ export async function handleButtonInteraction(
       ;
       interaction.createMessage({
         content: "🚮検索パネルを破棄しました:white_check_mark:",
-      }).catch(er => this.Log(er, "error"));
+      }).catch(this.logger.error);
       interaction.message.edit({
         components: [],
-      }).catch(er => this.Log(er, "error"));
+      }).catch(this.logger.error);
     }
   }else if(interaction.data.customID.startsWith("control_")){
     let command: string = null;
@@ -115,7 +115,7 @@ export async function handleButtonInteraction(
   }else{
     const updateEffectPanel = () => {
       const mes = interaction.message;
-      const { embed, messageActions } = Util.effects.getCurrentEffectPanel(
+      const { embed, messageActions } = effectUtil.getCurrentEffectPanel(
         interaction.member.avatarURL(),
         this.guildData.get(interaction.channel.guild.id)
       );
@@ -123,21 +123,21 @@ export async function handleButtonInteraction(
         content: "",
         embeds: [embed.toOceanic()],
         components: [messageActions],
-      }).catch(er => Util.logger.log(er, "error"));
+      }).catch(this.logger.error);
     };
     switch(interaction.data.customID){
-      case Util.effects.EffectsCustomIds.Reload:
+      case effectUtil.EffectsCustomIds.Reload:
         updateEffectPanel();
         break;
-      case Util.effects.EffectsCustomIds.BassBoost:
+      case effectUtil.EffectsCustomIds.BassBoost:
         this.guildData.get(interaction.channel.guild.id).effectPrefs.BassBoost = !server.effectPrefs.BassBoost;
         updateEffectPanel();
         break;
-      case Util.effects.EffectsCustomIds.Reverb:
+      case effectUtil.EffectsCustomIds.Reverb:
         this.guildData.get(interaction.channel.guild.id).effectPrefs.Reverb = !server.effectPrefs.Reverb;
         updateEffectPanel();
         break;
-      case Util.effects.EffectsCustomIds.LoudnessEqualization:
+      case effectUtil.EffectsCustomIds.LoudnessEqualization:
         this.guildData.get(interaction.channel.guild.id).effectPrefs.LoudnessEqualization = !server.effectPrefs.LoudnessEqualization;
         updateEffectPanel();
         break;

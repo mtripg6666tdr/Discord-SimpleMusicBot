@@ -19,8 +19,10 @@
 import type { exportableCustom, UrlStreamInfo } from ".";
 import type { EmbedField } from "oceanic.js";
 
+import candyget from "candyget";
+
 import { AudioSource } from "./audiosource";
-import { Util } from "../Util";
+import { padZero } from "../Util";
 
 export class BestdoriS extends AudioSource<string> {
   protected artist = "";
@@ -63,7 +65,7 @@ export class BestdoriS extends AudioSource<string> {
     return {
       type: "url",
       streamType: "mp3",
-      url: "https://bestdori.com/assets/jp/sound/bgm" + Util.general.padZero(this.id.toString(), 3) + "_rip/bgm" + Util.general.padZero(this.id.toString(), 3) + ".mp3",
+      url: "https://bestdori.com/assets/jp/sound/bgm" + padZero(this.id.toString(), 3) + "_rip/bgm" + padZero(this.id.toString(), 3) + ".mp3",
     };
   }
 
@@ -132,10 +134,10 @@ export abstract class BestdoriApi {
 
   static async setupData(){
     if(!bestdori.allbandinfo){
-      bestdori.allbandinfo = JSON.parse(await Util.web.DownloadText(BestdoriAllBandInfoEndPoint));
+      bestdori.allbandinfo = await candyget.json(BestdoriAllBandInfoEndPoint).then(({ body }) => body);
     }
     if(!bestdori.allsonginfo){
-      bestdori.allsonginfo = JSON.parse(await Util.web.DownloadText(BestdoriAllSongInfoEndPoint));
+      bestdori.allsonginfo = await candyget.json(BestdoriAllSongInfoEndPoint).then(({ body }) => body);
     }
   }
 
@@ -143,9 +145,9 @@ export abstract class BestdoriApi {
     return "https://bestdori.com/info/songs/" + id;
   }
 
-  static async getDetailedInfo(id: number){
+  static async getDetailedInfo(id: number): Promise<BestdoriDetailedSongInfo>{
     const apiUrl = `https://bestdori.com/api/songs/${id.toString()}.json`;
-    return JSON.parse(await Util.web.DownloadText(apiUrl)) as BestdoriDetailedSongInfo;
+    return candyget.json(apiUrl).then(({ body }) => body);
   }
 
   static getThumbnail(id: number, jacketimage: string){

@@ -24,7 +24,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { AudioSource } from "./audiosource";
-import { Util } from "../Util";
+import { retriveLengthSeconds } from "../Util";
 
 export class FsStream extends AudioSource<string> {
   constructor(){
@@ -35,7 +35,7 @@ export class FsStream extends AudioSource<string> {
     this.url = url;
     this.title = "カスタムストリーム";
     try{
-      this.lengthSeconds = await Util.web.RetriveLengthSeconds(url);
+      this.lengthSeconds = await retriveLengthSeconds(url);
     }
     catch{ /* empty */ }
     return this;

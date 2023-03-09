@@ -20,28 +20,29 @@ import type { Cache } from "./base";
 import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Readable } from "stream";
 
-import * as HttpsProxyAgent from "https-proxy-agent";
+import HttpsProxyAgent from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 
 import { Strategy } from "./base";
-import Util from "../../../Util";
-import { SecondaryUserAgent } from "../../../Util/ua";
+import { useConfig } from "../../../config";
+import { SecondaryUserAgent } from "../../../definition";
 import { createChunkedYTStream, createRefreshableYTLiveStream } from "../stream";
-
-const ua = SecondaryUserAgent;
 
 type ytdlCore = "ytdlCore";
 export const ytdlCore: ytdlCore = "ytdlCore";
 
+const config = useConfig();
+
 export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, ytdl.videoInfo> {
+  protected agent = config.proxy ? HttpsProxyAgent(config.proxy) : undefined;
+
   get cacheType(){
     return ytdlCore;
   }
 
   async getInfo(url: string){
-    this.useLog();
-    const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
-    const requestOptions = agent ? { agent } : undefined;
+    this.logStrategyUsed();
+    const requestOptions = this.agent ? { agent: this.agent } : undefined;
     let info = null as ytdl.videoInfo;
     info = await ytdl.getInfo(url, {
       lang: "ja",
@@ -57,15 +58,14 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
   }
 
   async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
-    this.useLog();
+    this.logStrategyUsed();
     const info = await (async () => {
       if(cache && cache.type === "ytdlCore"){
-        this.logger("[AudioSource:youtube] using cache without obtaining");
+        this.logger.info("using cache without obtaining");
         return cache.data as ytdl.videoInfo;
       }else{
-        this.logger("[AudioSource:youtube] obtaining info");
-        const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
-        const requestOptions = agent ? { agent } : undefined;
+        this.logger.info("obtaining info");
+        const requestOptions = this.agent ? { agent: this.agent } : undefined;
         // eslint-disable-next-line @typescript-eslint/no-shadow
         let info = null as ytdl.videoInfo;
         info = await ytdl.getInfo(url, {
@@ -83,7 +83,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
       filter: "audioonly",
       quality: "highestaudio",
     });
-    this.logger(`[AudioSource:youtube]Format: ${format.itag}, Bitrate: ${format.bitrate}bps, Audio codec:${format.audioCodec}, Container: ${format.container}`);
+    this.logger.info(`format: ${format.itag}, bitrate: ${format.bitrate}bps, audio codec:${format.audioCodec}, container: ${format.container}`);
     const partialResult = {
       info: this.mapToExportable(url, info),
       relatedVideos: info.related_videos.map(video => ({
@@ -103,7 +103,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
         stream: {
           type: "url",
           url: format.url,
-          userAgent: ua,
+          userAgent: SecondaryUserAgent,
         } as UrlStreamInfo,
       };
     }else{

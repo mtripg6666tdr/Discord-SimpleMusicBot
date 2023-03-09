@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/CommandMessage";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
+import * as Util from "../Util";
 import { getColor } from "../Util/color";
 
 export default class Uptime extends BaseCommand {
@@ -40,8 +40,8 @@ export default class Uptime extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs){
     const now = Date.now();
-    const insta = Util.time.CalcTime(now - options.bot.instantiatedTime.getTime());
-    const ready = Util.time.CalcTime(options.client.uptime);
+    const insta = Util.time.calcTime(now - options.bot.instantiatedTime.getTime());
+    const ready = Util.time.calcTime(options.client.uptime);
     const embed = new MessageEmbedBuilder()
       .setColor(getColor("UPTIME"))
       .setTitle(options.client.user.username + "のアップタイム")
@@ -55,6 +55,6 @@ export default class Uptime extends BaseCommand {
       .addField("データが保持されているサーバー数", `${options.bot.databaseCount}サーバー`)
       .toOceanic()
     ;
-    message.reply({ embeds: [embed] }).catch(e => Util.logger.log(e, "error"));
+    message.reply({ embeds: [embed] }).catch(this.logger.error);
   }
 }

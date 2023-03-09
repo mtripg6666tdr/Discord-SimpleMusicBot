@@ -25,7 +25,6 @@ import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oc
 
 import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
-import { Util } from "../Util";
 
 export abstract class SearchBase<T> extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs){
@@ -48,7 +47,7 @@ export abstract class SearchBase<T> extends BaseCommand {
             )
             .toOceanic(),
         ],
-      }).catch(e => Util.logger.log(e, "error"));
+      }).catch(this.logger.error);
       if(responseMessage){
         options.server.searchPanel.get(message.member.id).once("destroy", () => {
           responseMessage.edit({
@@ -65,7 +64,7 @@ export abstract class SearchBase<T> extends BaseCommand {
       }
       await searchPanel.consumeSearchResult(this.searchContent(options.rawArgs), this.consumer);
     }else{
-      await message.reply("引数を指定してください").catch(e => Util.logger.log(e, "error"));
+      await message.reply("引数を指定してください").catch(this.logger.error);
     }
   }
 

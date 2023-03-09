@@ -20,7 +20,11 @@ import type { Client } from "oceanic.js";
 
 import * as http from "http";
 
-export function createServer(client: Client, port: number, logger: (content: string) => void){
+import { getLogger } from "./logger";
+
+const logger = getLogger("Server");
+
+export function createServer(client: Client, port: number){
   return http.createServer((_, res) => {
     res.writeHead(200, { "Content-Type": "application/json" });
     const data = {
@@ -30,7 +34,7 @@ export function createServer(client: Client, port: number, logger: (content: str
       readyAt: client?.uptime ? Buffer.from(client.uptime.toString()).toString("base64") : null,
       guilds: client?.guilds.size || null,
     };
-    logger("[Server]Received a http request");
+    logger.info("Received a http request");
     res.end(JSON.stringify(data));
   }).listen(port);
 }

@@ -22,7 +22,6 @@ import type { CommandMessage } from "../Component/CommandMessage";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 import { getColor } from "../Util/color";
 
 export default class Thumbnail extends BaseCommand {
@@ -69,7 +68,7 @@ export default class Thumbnail extends BaseCommand {
         embed.setImage(info.thumbnail);
         await message.reply({
           embeds: [embed.toOceanic()],
-        }).catch(e => Util.logger.log(e, "error"));
+        }).catch(this.logger.error);
       }else{
         embed.setImage("attachment://thumbnail." + info.thumbnail.ext);
         await message.reply({
@@ -80,15 +79,15 @@ export default class Thumbnail extends BaseCommand {
               contents: info.thumbnail.data,
             },
           ],
-        }).catch(e => Util.logger.log(e, "error"));
+        }).catch(this.logger.error);
       }
     }else{
-      message.reply("✘検索結果が見つかりません").catch(e => Util.logger.log(e, "error"));
+      message.reply("✘検索結果が見つかりません").catch(this.logger.error);
       return;
     }
     
     await message.reply({
       embeds: [embed.toOceanic()],
-    }).catch(e => Util.logger.log(e, "error"));
+    }).catch(this.logger.error);
   }
 }

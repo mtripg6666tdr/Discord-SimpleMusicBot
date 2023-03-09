@@ -34,7 +34,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
   }
 
   async getInfo(url: string){
-    this.useLog();
+    this.logStrategyUsed();
     let info = null as InfoData;
     info = await video_info(url);
     return {
@@ -48,10 +48,10 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
-    this.useLog();
+    this.logStrategyUsed();
     let info = null as InfoData;
     const cacheAvailable = cache?.type === playDl && cache.data;
-    this.logger(`[AudioSource:youtube] ${cacheAvailable ? "using cache without obtaining" : "obtaining info"}`);
+    this.logger.info(cacheAvailable ? "using cache without obtaining" : "obtaining info");
     info = cacheAvailable || await video_info(url);
     const partialResult = {
       info: this.mapToExportable(url, info),

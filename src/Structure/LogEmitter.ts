@@ -16,42 +16,33 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { LogLevels } from "../Util/log";
+import type { EventDictionary } from "./TypedEmitter";
+import type { LoggerObject } from "../logger";
 
-import { EventEmitter } from "stream";
+import TypedEventEmitter from "./TypedEmitter";
+import { getLogger } from "../logger";
 
-import { Util } from "../Util";
+export abstract class LogEmitter<Events extends EventDictionary> extends TypedEventEmitter<Events> {
+  protected logger: LoggerObject;
+  private guildId: string = null;
 
-export abstract class LogEmitter extends EventEmitter {
-  private _tag: string = "";
-  private _guildId: string = "";
-
-  get guildId(){
-    return this._guildId;
+  constructor(tag: string, guildId?: string){
+    super();
+    this.logger = getLogger(tag);
+    if(guildId){
+      this.setGuildId(guildId);
+    }
   }
 
-  /**
-   * ログに使用するタグを設定します
-   * @param tag タグ
-   */
-  setTag(tag: string){
-    this._tag = tag;
-  }
-  
-  /**
-   * ログに使用するサーバーIDを設定します（存在する場合）
-   * @param id id
-   */
-  setGuildId(id: string){
-    this._guildId = id;
+  protected setGuildId(guildId: string){
+    if(!this.logger){
+      throw new Error("Logger is not defined");
+    }
+    this.logger.addContext("guildId", guildId);
+    this.guildId = guildId;
   }
 
-  /**
-   * ログを出力します
-   * @param message メッセージ
-   */
-  Log(message: any, level?: LogLevels){
-    if(this._tag === "") throw new Error("Tag has not been specified");
-    Util.logger.log(`[${this._tag}${this._guildId !== "" ? `/${this._guildId}` : ""}] ${typeof message === "string" ? message : Util.general.StringifyObject(message)}`, level);
+  getGuildId(){
+    return this.guildId;
   }
 }

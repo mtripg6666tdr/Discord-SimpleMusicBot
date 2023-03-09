@@ -22,8 +22,8 @@ import type { Readable } from "stream";
 import { opus } from "prism-media";
 
 import { transformThroughFFmpeg } from "./ffmpeg";
-import Util from "../../Util";
-import { createPassThrough } from "../../Util/general";
+import { createPassThrough, downloadAsReadable } from "../../Util";
+import { getLogger } from "../../logger";
 
 type PlayableStreamInfo = {
   cost: number,
@@ -31,6 +31,8 @@ type PlayableStreamInfo = {
   stream: Readable,
   streamType: StreamTypeIdentifer,
 };
+
+const logger = getLogger("StreamResolver");
 
 /**
  * Resolve various streams into playable stream
@@ -70,7 +72,7 @@ export async function resolveStreamToPlayable(
     && !volumeTransformEnabled
   ){
     // Ogg / Webm --(Demuxer)--> Opus
-    Util.logger.log(`[StreamResolver] stream edges: raw(${originalStreamInfo.streamType}) (no conversion/cost: 1)`);
+    logger.info(`stream edges: raw(${originalStreamInfo.streamType}) (no conversion)`);
     return {
       stream: (streamInfo as ReadableStreamInfo).stream,
       streamType: streamInfo.streamType,
@@ -91,7 +93,7 @@ export async function resolveStreamToPlayable(
       // Webm/Ogg --(Demuxer)--> Opus --(Decoder)--> PCM
       //                1                  1.5
       // Total: 2.5
-      Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"})--(Demuxer)--(Decoder) --> PCM`);
+      logger.info(`stream edges: raw(${streamInfo.streamType || "unknown"})--(Demuxer)--(Decoder) --> PCM`);
       const demuxer = streamInfo.streamType === "webm/opus" ? new opus.WebmDemuxer() : new opus.OggDemuxer();
       const decoder = new opus.Decoder({
         rate: 48000,
@@ -117,7 +119,7 @@ export async function resolveStreamToPlayable(
     }else{
       // Unknown --(FFmpeg)--> PCM
       //              2
-      Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM`);
+      logger.info(`stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM`);
       const ffmpeg = transformThroughFFmpeg(streamInfo, { bitrate, effectArgs, seek, output: "pcm" });
 
       ffmpeg
@@ -141,7 +143,7 @@ export async function resolveStreamToPlayable(
     };
   }else{
     // Unknown --(FFmpeg)--> Ogg/Opus
-    Util.logger.log(`[StreamResolver] stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Webm/Opus`);
+    logger.info(`stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Webm/Opus`);
     const ffmpeg = transformThroughFFmpeg(streamInfo, { bitrate, effectArgs, seek, output: "ogg" });
     const passThrough = createPassThrough();
     ffmpeg
@@ -179,7 +181,7 @@ function convertStreamInfoToReadableStreamInfo(streamInfo: UrlStreamInfo|Readabl
   }
   return {
     type: "readable",
-    stream: Util.web.DownloadAsReadable(streamInfo.url, streamInfo.userAgent ? {
+    stream: downloadAsReadable(streamInfo.url, streamInfo.userAgent ? {
       headers: {
         "User-Agent": streamInfo.userAgent,
       },

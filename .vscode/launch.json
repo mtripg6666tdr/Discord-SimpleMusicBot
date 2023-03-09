@@ -15,7 +15,8 @@
         "skipFiles": [
             "<node_internals>/**"
         ],
-        "program": "${workspaceFolder}/dist/index.js"
+        "program": "${workspaceFolder}/dist/index.js",
+        "outputCapture": "std"
     },
     {
       "type": "node",
@@ -30,7 +31,8 @@
       "skipFiles": [
           "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}/dist/index.js"
+      "program": "${workspaceFolder}/dist/index.js",
+      "outputCapture": "std"
     }
   ]
 }

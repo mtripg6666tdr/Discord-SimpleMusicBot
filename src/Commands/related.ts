@@ -22,7 +22,6 @@ import type { CommandMessage } from "../Component/CommandMessage";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 import { getColor } from "../Util/color";
 
 export default class Related extends BaseCommand {
@@ -42,7 +41,7 @@ export default class Related extends BaseCommand {
     options.server.updateBoundChannel(message);
     if(options.server.addRelated){
       options.server.addRelated = false;
-      message.reply("❌関連曲自動再生をオフにしました").catch(e => Util.logger.log(e, "error"));
+      message.reply("❌関連曲自動再生をオフにしました").catch(this.logger.error);
     }else{
       options.server.addRelated = true;
       const embed = new MessageEmbedBuilder()

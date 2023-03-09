@@ -21,7 +21,7 @@ import type { exportableCustom } from "./custom";
 import type { EmbedField } from "oceanic.js";
 
 import { AudioSource } from "./audiosource";
-import { Util } from "../Util";
+import { retriveHttpStatusCode, retriveLengthSeconds } from "../Util";
 
 export class GoogleDrive extends AudioSource<string> {
   constructor(){
@@ -36,9 +36,11 @@ export class GoogleDrive extends AudioSource<string> {
     }else{
       this.title = "Googleドライブストリーム";
       this.url = url;
-      if(await Util.web.RetriveHttpStatusCode(this.url) !== 200) throw new Error("URLがみつかりません");
+      if(await retriveHttpStatusCode(this.url) !== 200){
+        throw new Error("URLがみつかりません");
+      }
       try{
-        this.lengthSeconds = await Util.web.RetriveLengthSeconds((await this.fetch()).url);
+        this.lengthSeconds = await retriveLengthSeconds((await this.fetch()).url);
       }
       catch{ /* empty */ }
     }
@@ -50,7 +52,7 @@ export class GoogleDrive extends AudioSource<string> {
     return {
       type: "url",
       streamType: "unknown",
-      url: "https://drive.google.com/uc?id=" + id,
+      url: `https://drive.google.com/uc?id=${id}`,
     };
   }
 

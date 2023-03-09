@@ -17,10 +17,11 @@
  */
 
 import type { exportableYouTube } from "..";
-import type { LoggerType } from "../../../Util";
+import type { LoggerObject } from "../../../logger";
 import type { StreamInfo } from "../../audiosource";
 
-import { Util } from "../../../Util";
+import { getLogger } from "../../../logger";
+
 
 export type Cache<T extends string, U> = {
   type: T,
@@ -28,26 +29,26 @@ export type Cache<T extends string, U> = {
 };
 
 export abstract class Strategy<T extends Cache<any, U>, U> {
-  public logger: LoggerType;
   abstract get cacheType(): string;
+  protected logger: LoggerObject;
 
   constructor(protected priority: number){
-    this.logger = Util.logger.log.bind(Util.logger);
+    this.logger = getLogger(this.constructor.name);
   }
 
   abstract getInfo(url: string): Promise<{
     data: exportableYouTube,
     cache: T,
   }>;
-  
+
   abstract fetch(url: string, forceCache?: boolean, cache?: Cache<any, any>): Promise<{
     stream: StreamInfo,
     info: exportableYouTube,
     relatedVideos: exportableYouTube[],
   }>;
-  
-  protected useLog(){
-    this.logger("[AudioSource:youtube] using strategy #" + this.priority);
+
+  protected logStrategyUsed(){
+    this.logger.info("using strategy #" + this.priority);
   }
 
   protected abstract mapToExportable(url: string, info: U): exportableYouTube;

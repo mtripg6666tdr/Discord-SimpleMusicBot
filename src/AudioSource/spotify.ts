@@ -27,7 +27,6 @@ import candyget from "candyget";
 import { AudioSource } from "./audiosource";
 import { searchYouTube } from "./youtube/spawner";
 import { attemptFetchForStrategies } from "./youtube/strategies";
-import Util from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
 
 const spotifyUrlInfo = (() => {
@@ -73,18 +72,18 @@ export class Spotify extends AudioSource<string> {
     const keyword = `${this.title} ${this.artist.split(",").map(artist => artist.trim()).join(" ")}`;
 
     // search youtube
-    if(Util.config.debug) Util.logger.log(`Searching the keyword: ${`${this.title} ${this.artist.split(",").map(artist => artist.trim())}`}`, "debug");
+    this.logger.debug(`Searching the keyword: ${`${this.title} ${this.artist.split(",").map(artist => artist.trim())}`}`);
     const searchResult = await searchYouTube(keyword);
 
     // extract videos that seem to be ok
-    if(Util.config.debug) Util.logger.log("Extracting the valid item...");
+    this.logger.debug("Extracting the valid item...");
     const items = searchResult.items.filter(({ type }) => type === "video") as ytsr.Video[];
     const target = this.extractBestItem(items);
 
     if(!target) throw new Error("Not Found");
 
     // fetch the video
-    const { result } = await attemptFetchForStrategies(Util.logger.log.bind(Util.logger), target.url, forceUrl);
+    const { result } = await attemptFetchForStrategies(target.url, forceUrl);
 
     this.title = result.info.title;
     this.lengthSeconds = result.info.length;
@@ -127,23 +126,23 @@ export class Spotify extends AudioSource<string> {
       && (this.title.toLowerCase().includes("remix") || !includes(item.title.toLowerCase(), "remix"));
     };
     const validItems = items.filter(validate);
-    if(Util.config.debug) console.log("valid", validItems);
+    this.logger.debug("valid", validItems);
     if(validItems.length === 0) return items[0];
     // official channel
     let filtered = validItems.filter(item => item.author.ownerBadges.length > 0 || item.author.verified || item.author.name.endsWith("Topic") || item.author.name.endsWith("トピック"));
-    if(Util.config.debug) console.log("official ch", filtered);
+    this.logger.debug("official ch", filtered);
     if(filtered[0]) return filtered[0];
-    // official item 
+    // official item
     filtered = validItems.filter(item => includes(item.title, "official") || includes(item.title, "公式"));
-    if(Util.config.debug) console.log("official item", filtered);
+    this.logger.debug("official item", filtered);
     if(filtered[0]) return filtered[0];
     // pv /mv
     filtered = validItems.filter(item => includes(item.title, "pv") || includes(item.title, "mv"));
-    if(Util.config.debug) console.log("PV/MV", filtered);
+    this.logger.debug("PV/MV", filtered);
     if(filtered[0]) return filtered[0];
     // no live
     filtered = validItems.filter(item => !includes(item.title, "live") && !includes(item.title, "ライブ"));
-    if(Util.config.debug) console.log("no live", filtered);
+    this.logger.debug("no live", filtered);
     if(filtered[0]) return filtered[0];
     // other
     if(validItems[0]) return validItems[0];

@@ -25,8 +25,12 @@ import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/hel
 import * as os from "os";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
+import * as Util from "../Util";
 import { getColor } from "../Util/color";
+import { useConfig } from "../config";
+import { getLogs } from "../logger";
+
+const config = useConfig();
 
 export default class SystemInfo extends BaseCommand {
   constructor(){
@@ -96,8 +100,8 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(Util.general.isBotAdmin(message.member.id) && (options.args.includes("log") || options.args.length === 0)){
-      let logs: string[] = [...Util.logger.logStore.data];
+    if(config.isBotAdmin(message.member.id) && (options.args.includes("log") || options.args.length === 0)){
+      let logs: string[] = [...getLogs()];
       logs.reverse();
       for(let i = 0; i < logs.length; i++){
         if(logs.join("\r\n").length < 1950) break;
@@ -114,7 +118,7 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(Util.general.isBotAdmin(message.member.id) && (options.args.includes("servers") || options.args.length === 0)){
+    if(config.isBotAdmin(message.member.id) && (options.args.includes("servers") || options.args.length === 0)){
       embeds.push(
         new MessageEmbedBuilder()
           .setColor(getColor("UPTIME"))
@@ -132,7 +136,7 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(Util.general.isBotAdmin(message.member.id) && (options.args[0] === "server" && options.args[1] && options.client.guilds.has(options.args[1]))){
+    if(config.isBotAdmin(message.member.id) && (options.args[0] === "server" && options.args[1] && options.client.guilds.has(options.args[1]))){
       const target = options.client.guilds.get(options.args[1]);
       const data = options.bot.getData(options.args[1]);
       embeds.push(
@@ -168,11 +172,11 @@ export default class SystemInfo extends BaseCommand {
         cpuInfoEmbed.addField(
           "CPU" + (i + 1), "Model: `" + cpus[i].model + "`\r\n"
         + "Speed: `" + cpus[i].speed + "MHz`\r\n"
-        + "Times(user): `" + Math.round(cpus[i].times.user / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.user, all) + "%)`\r\n"
-        + "Times(sys): `" + Math.round(cpus[i].times.sys / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.sys, all) + "%)`\r\n"
-        + "Times(nice): `" + Math.round(cpus[i].times.nice / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.nice, all) + "%)`\r\n"
-        + "Times(irq): `" + Math.round(cpus[i].times.irq / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.irq, all) + "%)`\r\n"
-        + "Times(idle): `" + Math.round(cpus[i].times.idle / 1000) + "s(" + Util.math.GetPercentage(cpus[i].times.idle, all) + "%)`"
+        + "Times(user): `" + Math.round(cpus[i].times.user / 1000) + "s(" + Util.getPercentage(cpus[i].times.user, all) + "%)`\r\n"
+        + "Times(sys): `" + Math.round(cpus[i].times.sys / 1000) + "s(" + Util.getPercentage(cpus[i].times.sys, all) + "%)`\r\n"
+        + "Times(nice): `" + Math.round(cpus[i].times.nice / 1000) + "s(" + Util.getPercentage(cpus[i].times.nice, all) + "%)`\r\n"
+        + "Times(irq): `" + Math.round(cpus[i].times.irq / 1000) + "s(" + Util.getPercentage(cpus[i].times.irq, all) + "%)`\r\n"
+        + "Times(idle): `" + Math.round(cpus[i].times.idle / 1000) + "s(" + Util.getPercentage(cpus[i].times.idle, all) + "%)`"
           , true);
       }
       embeds.push(cpuInfoEmbed.toOceanic());
@@ -180,10 +184,10 @@ export default class SystemInfo extends BaseCommand {
 
     if(options.args.includes("mem") || options.args.length === 0){
       // Process Mem Info
-      const memory = Util.system.GetMemInfo();
+      const memory = Util.system.getMemoryInfo();
       const nMem = process.memoryUsage();
-      const rss = Util.system.GetMBytes(nMem.rss);
-      const ext = Util.system.GetMBytes(nMem.external);
+      const rss = Util.system.getMBytes(nMem.rss);
+      const ext = Util.system.getMBytes(nMem.external);
       embeds.push(
         new MessageEmbedBuilder()
           .setColor(getColor("UPTIME"))
@@ -197,11 +201,11 @@ export default class SystemInfo extends BaseCommand {
           )
           .addField("Main Process Memory",
             "RSS: `" + rss + "MB`\r\n"
-            + "Heap total: `" + Util.system.GetMBytes(nMem.heapTotal) + "MB`\r\n"
-            + "Heap used: `" + Util.system.GetMBytes(nMem.heapUsed) + "MB`\r\n"
-            + "Array buffers: `" + Util.system.GetMBytes(nMem.arrayBuffers) + "MB`\r\n"
+            + "Heap total: `" + Util.system.getMBytes(nMem.heapTotal) + "MB`\r\n"
+            + "Heap used: `" + Util.system.getMBytes(nMem.heapUsed) + "MB`\r\n"
+            + "Array buffers: `" + Util.system.getMBytes(nMem.arrayBuffers) + "MB`\r\n"
             + "External: `" + ext + "MB`\r\n"
-            + "Total: `" + Util.math.GetPercentage(rss + ext, memory.total) + "%`",
+            + "Total: `" + Util.getPercentage(rss + ext, memory.total) + "%`",
             true
           )
           .toOceanic()
@@ -209,7 +213,7 @@ export default class SystemInfo extends BaseCommand {
     }
     
     if(embeds.length > 0){
-      await message.channel.createMessage({ embeds }).catch(e => Util.logger.log(e, "error"));
+      await message.channel.createMessage({ embeds }).catch(this.logger.error);
     }
   }
 }

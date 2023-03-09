@@ -32,19 +32,21 @@ export class HttpBackupper extends Backupper {
 
   constructor(bot: MusicBotBase, getData: () => DataType){
     super(bot, getData);
-    this.Log("Initializing http based backup server adapter...");
+    this.logger.info("Initializing http based backup server adapter...");
     // ボットの準備完了直前に実行する
     this.bot.once("beforeReady", () => {
       // コンテナにイベントハンドラを設定する関数
-      const setContainerEvent = (container: GuildDataContainer) => (["change", "changeWithoutCurrent"] as const).forEach(event => container.queue.on(event, () => this.addModifiedGuild(container.guildId)));
+      const setContainerEvent = (container: GuildDataContainer) =>
+        (["change", "changeWithoutCurrent"] as const).forEach(
+          event => container.queue.on(event, () => this.addModifiedGuild(container.getGuildId()))
+        );
       // すでに登録されているコンテナにイベントハンドラを登録する
       this.data.forEach(setContainerEvent);
       // これから登録されるコンテナにイベントハンドラを登録する
       this.bot.on("guildDataAdded", setContainerEvent);
       // バックアップのタイマーをセット
       this.bot.on("tick", (count) => count % 2 === 0 && this.backup());
-      
-      this.Log("Hook was set up successfully");
+      this.logger.info("Hook was set up successfully");
     });
   }
 
@@ -76,18 +78,18 @@ export class HttpBackupper extends Backupper {
         queue: JSON.stringify(this.data.get(id).exportQueue()),
       }));
       if(queue.length > 0){
-        this.Log("Backing up modified queue...");
+        this.logger.info("Backing up modified queue...");
         if(await this._backupQueueData(queue)){
           this._queueModifiedGuilds = [];
         }else{
-          this.Log("Something went wrong while backing up queue", "warn");
+          this.logger.warn("Something went wrong while backing up queue");
         }
       }else{
-        this.Log("No modified queue found, skipping", "debug");
+        this.logger.debug("No modified queue found, skipping");
       }
     }
     catch(e){
-      this.Log(e, "error");
+      this.logger.error(e);
     }
   }
 
@@ -109,27 +111,28 @@ export class HttpBackupper extends Backupper {
           status.equallyPlayback ? "1" : "0",
           status.volume,
         ].join(":"))(container.exportStatus());
-        if(!this._previousStatuses[container.guildId] || this._previousStatuses[container.guildId] !== currentStatus){
+        const guildId = container.getGuildId();
+        if(!this._previousStatuses[guildId] || this._previousStatuses[guildId] !== currentStatus){
           speaking.push({
-            guildid: container.guildId,
+            guildid: guildId,
             value: currentStatus,
           });
-          currentStatuses[container.guildId] = currentStatus;
+          currentStatuses[guildId] = currentStatus;
         }
       });
       if(speaking.length > 0){
-        this.Log("Backing up modified status..");
+        this.logger.info("Backing up modified status..");
         if(await this._backupStatusData(speaking)){
           this._previousStatuses = currentStatuses;
         }else{
-          this.Log("Something went wrong while backing up statuses", "warn");
+          this.logger.warn("Something went wrong while backing up statuses");
         }
       }else{
-        this.Log("No modified status found, skipping", "debug");
+        this.logger.debug("No modified status found, skipping");
       }
     }
     catch(e){
-      this.Log(e, "warn");
+      this.logger.warn(e);
     }
   }
 
@@ -172,8 +175,8 @@ export class HttpBackupper extends Backupper {
         }
       }
       catch(er){
-        this.Log(er, "error");
-        this.Log("Status restoring failed!", "warn");
+        this.logger.error(er);
+        this.logger.warn("Status restoring failed!");
         return null;
       }
     }else{
@@ -205,8 +208,8 @@ export class HttpBackupper extends Backupper {
         }
       }
       catch(er){
-        this.Log(er, "error");
-        this.Log("Queue restoring failed!", "warn");
+        this.logger.error(er);
+        this.logger.warn("Queue restoring failed!");
         return null;
       }
     }else{
@@ -236,8 +239,8 @@ export class HttpBackupper extends Backupper {
         }
       }
       catch(er){
-        this.Log(er, "error");
-        this.Log("Status backup failed!", "warn");
+        this.logger.error(er);
+        this.logger.warn("Status backup failed!");
         return false;
       }
     }else{
@@ -263,8 +266,8 @@ export class HttpBackupper extends Backupper {
         return result.status === 200;
       }
       catch(er){
-        this.Log(er, "error");
-        this.Log("Queue backup failed!", "warn");
+        this.logger.error(er);
+        this.logger.warn("Queue backup failed!");
         return false;
       }
     }else{

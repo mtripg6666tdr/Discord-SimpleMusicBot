@@ -20,7 +20,7 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
+import { discordUtil } from "../Util";
 
 export default class Skip extends BaseCommand {
   constructor(){
@@ -39,17 +39,20 @@ export default class Skip extends BaseCommand {
     const server = options.server;
     // そもそも再生状態じゃないよ...
     if(server.player.preparing){
-      message.reply("再生準備中です").catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"));
+      message.reply("再生準備中です").catch(this.logger.error);
       return;
     }else if(!server.player.isPlaying){
-      message.reply("再生中ではありません").catch(e => Util.logger.log(Util.general.StringifyObject(e), "error"));
+      message.reply("再生中ではありません").catch(this.logger.error);
       return;
     }
     try{
       const item = server.queue.get(0);
-      const members = Util.eris.channel.getVoiceMember(options);
+      const members = discordUtil.channels.getVoiceMember(options);
       options.server.updateBoundChannel(message);
-      if(item.additionalInfo.addedBy.userId !== message.member.id && !Util.eris.user.isDJ(message.member, options) && !Util.eris.user.isPrivileged(message.member) && members.size > 3){
+      if(
+        item.additionalInfo.addedBy.userId !== message.member.id
+        && !discordUtil.users.isDJ(message.member, options)
+        && !discordUtil.users.isPrivileged(message.member) && members.size > 3){
         if(!server.skipSession){
           await server.createSkipSession(message);
         }else{
@@ -66,19 +69,19 @@ export default class Skip extends BaseCommand {
         allowedMentions: {
           users: false,
         },
-      }).catch(e => Util.logger.log(e, "error"));
+      }).catch(this.logger.error);
       if(server.queue.isEmpty){
         await server.player.onQueueEmpty();
       }
     }
     catch(e){
-      Util.logger.log(e, "error");
+      this.logger.error(e);
       if(message.response){
-        message.response.edit(":astonished:スキップに失敗しました").catch(er => Util.logger.log(er, "error"));
+        message.response.edit(":astonished:スキップに失敗しました").catch(this.logger.error);
       }else{
         message.channel.createMessage({
           content: ":astonished:スキップに失敗しました",
-        }).catch(er => Util.logger.log(er, "error"));
+        }).catch(this.logger.error);
       }
     }
   }

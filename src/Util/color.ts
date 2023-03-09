@@ -33,8 +33,8 @@ const cmap = {
   "EQUALLY": 0xF8D53E,
 } as const;
 
-export function getColor(key: colorkey): number{
+export function getColor(key: Colorkey): number{
   return cmap[key];
 }
 
-type colorkey = keyof typeof cmap;
+type Colorkey = keyof typeof cmap;

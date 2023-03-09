@@ -16,10 +16,11 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import Util from "../Util";
+import { getLogger } from "../logger";
 
 export class RateLimitController {
-  private readonly store = new Map<string, number[]>();
+  protected readonly store = new Map<string, number[]>();
+  protected logger = getLogger("RateLimitController");
 
   isRateLimited(key: string){
     if(!this.store.has(key)){
@@ -37,7 +38,7 @@ export class RateLimitController {
       if(Date.now() - currentStore[currentStore.length - 1] < 2 * 1000){
         currentStore.push(Date.now());
       }
-      Util.logger.log(`[RateLimitController] Key ${key} hit the ratelimit.`);
+      this.logger.info(`Key ${key} hit the ratelimit.`);
       return true;
     }else{
       currentStore.push(Date.now());

@@ -20,7 +20,6 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 
 export default class Join extends BaseCommand {
   constructor(){
@@ -38,7 +37,7 @@ export default class Join extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(message.member.voiceState.channel?.voiceMembers.has(options.client.user.id) && options.server.connection){
-      message.reply("✘すでにボイスチャンネルに接続中です。").catch(e => Util.logger.log(e, "error"));
+      message.reply("✘すでにボイスチャンネルに接続中です。").catch(this.logger.error);
     }else{
       await options.server.joinVoiceChannel(message, /* reply result to user inside this method  */ true);
     }

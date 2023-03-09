@@ -20,7 +20,6 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 
 export default class LeaveClean extends BaseCommand {
   constructor(){
@@ -39,14 +38,14 @@ export default class LeaveClean extends BaseCommand {
     options.server.updateBoundChannel(message);
     if(!options.server.player.isConnecting){
       options.server.queue.removeAll();
-      message.reply("✅すべて削除しました").catch(e => Util.logger.log(e, "error"));
+      message.reply("✅すべて削除しました").catch(this.logger.error);
       return;
     }else if(options.server.queue.length === 0){
-      message.reply("キューが空です").catch(e => Util.logger.log(e, "error"));
+      message.reply("キューが空です").catch(this.logger.error);
       return;
     }
     const members = options.server.connectingVoiceChannel.voiceMembers.map(member => member.id);
     const number = options.server.queue.removeIf(q => !members.includes(q.additionalInfo.addedBy.userId)).length;
-    await message.reply(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(e => Util.logger.log(e, "error"));
+    await message.reply(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(this.logger.error);
   }
 }

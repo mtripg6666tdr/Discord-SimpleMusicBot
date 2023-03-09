@@ -22,7 +22,7 @@ import type * as ytsr from "ytsr";
 
 import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
-import { Util } from "../Util";
+import { color } from "../Util";
 
 export default class Play extends BaseCommand {
   constructor(){
@@ -54,7 +54,7 @@ export default class Play extends BaseCommand {
       && !firstAttachment
       && !(message["_message"] && message["_message"].referencedMessage)
     ){
-      await message.reply("再生するコンテンツがありません").catch(e => Util.logger.log(e, "error"));
+      await message.reply("再生するコンテンツがありません").catch(this.logger.error);
       return;
     }
     const wasConnected = server.player.isConnecting;
@@ -68,7 +68,7 @@ export default class Play extends BaseCommand {
         allowedMentions: {
           users: false,
         },
-      }).catch(e => Util.logger.log(e, "error"));
+      }).catch(this.logger.error);
       return;
     }
     // 引数ついてたらそれ優先
@@ -90,9 +90,9 @@ export default class Play extends BaseCommand {
           await msg.delete();
         }
         catch(e){
-          Util.logger.log(e, "error");
-          message.reply("✗内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
-          msg.delete().catch(er => Util.logger.log(er, "error"));
+          this.logger.error(e);
+          message.reply("✗内部エラーが発生しました").catch(this.logger.error);
+          msg.delete().catch(this.logger.error);
         }
       }
     // 添付ファイルを確認
@@ -110,7 +110,10 @@ export default class Play extends BaseCommand {
       if(messageReference.content.startsWith("http://") || messageReference.content.startsWith("https://")){
         await options.server.playFromURL(message, messageReference.content, !wasConnected);
       // プレフィックス+URLのメッセージか？
-      }else if(messageReference.content.substring(prefixLength).startsWith("http://") || messageReference.content.substring(prefixLength).startsWith("https://")){
+      }else if(
+        messageReference.content.substring(prefixLength).startsWith("http://")
+        || messageReference.content.substring(prefixLength).startsWith("https://")
+      ){
         await options.server.playFromURL(message, messageReference.content.substring(prefixLength), !wasConnected);
       // 添付ファイル付きか？
       }else if(messageReference.attachments.size > 0){
@@ -119,25 +122,31 @@ export default class Play extends BaseCommand {
       }else if(messageReference.author.id === options.client.user.id){
         const embed = messageReference.embeds[0];
         // 曲関連のメッセージならそれをキューに追加
-        if(embed.color === Util.color.getColor("SONG_ADDED") || embed.color === Util.color.getColor("AUTO_NP") || embed.color === Util.color.getColor("NP")){
+        if(
+          embed.color === color.getColor("SONG_ADDED")
+          || embed.color === color.getColor("AUTO_NP")
+          || embed.color === color.getColor("NP")
+        ){
           const url = embed.description.match(/^\[.+\]\((?<url>https?.+)\)/)?.groups.url;
           await options.server.playFromURL(message, url, !wasConnected);
         }else{
-          await message.reply(":face_with_raised_eyebrow:返信先のメッセージに再生できるコンテンツが見つかりません").catch(e => Util.logger.log(e, "error"));
+          await message.reply(":face_with_raised_eyebrow:返信先のメッセージに再生できるコンテンツが見つかりません")
+            .catch(this.logger.error);
         }
       }else{
-        await message.reply(":face_with_raised_eyebrow:返信先のメッセージに再生できるコンテンツが見つかりません").catch(e => Util.logger.log(e, "error"));
+        await message.reply(":face_with_raised_eyebrow:返信先のメッセージに再生できるコンテンツが見つかりません")
+          .catch(this.logger.error);
       }
     // なにもないからキューから再生
     }else if(server.queue.length >= 1){
       if(!server.player.isPlaying && !server.player.preparing){
-        await message.reply("再生します").catch(e => Util.logger.log(e, "error"));
+        await message.reply("再生します").catch(this.logger.error);
         await server.player.play();
       }else{
-        await message.reply("すでに再生中です").catch(e => Util.logger.log(e, "error"));
+        await message.reply("すでに再生中です").catch(this.logger.error);
       }
     }else{
-      await message.reply("✘キューが空です").catch(e => Util.logger.log(e, "error"));
+      await message.reply("✘キューが空です").catch(this.logger.error);
     }
   }
 }

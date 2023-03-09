@@ -19,20 +19,16 @@
 import type { Cache } from "./strategies/base";
 import type { ytdlCoreStrategy } from "./strategies/ytdl-core";
 import type { StreamInfo } from "..";
-import type { LoggerType } from "../../Util";
 import type { EmbedField } from "oceanic.js";
 
 import * as ytdl from "ytdl-core";
 
 import { attemptGetInfoForStrategies, attemptFetchForStrategies, strategies } from "./strategies";
 import { ytdlCore } from "./strategies/ytdl-core";
-import { Util } from "../../Util";
-import { SecondaryUserAgent } from "../../Util/ua";
+import { SecondaryUserAgent } from "../../definition";
 import { AudioSource } from "../audiosource";
 
 export * from "./spawner";
-
-const ua = SecondaryUserAgent;
 
 export class YouTube extends AudioSource<string> {
   // サービス識別子（固定）
@@ -65,11 +61,8 @@ export class YouTube extends AudioSource<string> {
     this._relatedVideos = value;
   }
 
-  logger: LoggerType;
-
-  constructor(logger?: typeof YouTube.prototype.logger){
+  constructor(){
     super("youtube");
-    this.logger = logger || Util.logger.log.bind(Util.logger);
   }
 
   get IsFallbacked(){
@@ -89,7 +82,7 @@ export class YouTube extends AudioSource<string> {
     if(prefetched){
       this.importData(prefetched);
     }else{
-      const { result, resolved } = await attemptGetInfoForStrategies(this.logger, url);
+      const { result, resolved } = await attemptGetInfoForStrategies(url);
 
       // check if fallbacked
       this.fallback = resolved !== 0;
@@ -118,12 +111,14 @@ export class YouTube extends AudioSource<string> {
   }
 
   async fetch(forceUrl?: boolean): Promise<StreamInfo>{
-    const { result, resolved } = await attemptFetchForStrategies(this.logger, this.url, forceUrl, this.cache);
+    const { result, resolved } = await attemptFetchForStrategies(this.url, forceUrl, this.cache);
     this.fallback = resolved !== 0;
     // store related videos
     this.relatedVideos = result.relatedVideos;
     this.importData(result.info);
-    if(forceUrl) this.logger("[AudioSource:youtube]Returning a url instead of stream");
+    if(forceUrl){
+      this.logger.info("Returning a url instead of stream");
+    }
     return result.stream;
   }
 
@@ -138,7 +133,7 @@ export class YouTube extends AudioSource<string> {
     const { url } = format;
     return {
       url,
-      ua,
+      ua: SecondaryUserAgent,
     };
   }
 

@@ -19,12 +19,12 @@
 import type { SoundCloudTrackCollection } from "../AudioSource";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 
+import candyget from "candyget";
 import Soundcloud from "soundcloud.ts";
 
 import { SearchBase } from "./search";
-import { Util } from "../Util";
-
-const { DefaultUserAgent } = Util.ua;
+import * as Util from "../Util";
+import { DefaultUserAgent } from "../definition";
 
 export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
   private readonly soundcloud = new Soundcloud();
@@ -57,16 +57,17 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
       const user = await this.soundcloud.users.getV2(query);
       transformedQuery = user.username;
       let nextUrl = "";
-      let rawResult = await this.soundcloud.api.getV2("users/" + user.id + "/tracks") as SoundCloudTrackCollection;
+      let rawResult = await this.soundcloud.api.getV2(`users/${user.id}/tracks`) as SoundCloudTrackCollection;
       result.push(...rawResult.collection);
       nextUrl = rawResult.next_href + "&client_id=" + await this.soundcloud.api.getClientID();
       while(nextUrl && result.length < 10){
-        const data = await Util.web.DownloadText(nextUrl, {
-          "User-Agent": DefaultUserAgent,
-        });
-        rawResult = JSON.parse(data) as SoundCloudTrackCollection;
+        rawResult = await candyget.json(nextUrl, {
+          headers: {
+            "User-Agent": DefaultUserAgent,
+          },
+        }).then(({ body }) => body as SoundCloudTrackCollection);
         result.push(...rawResult.collection);
-        nextUrl = rawResult.next_href ? rawResult.next_href + "&client_id=" + await this.soundcloud.api.getClientID() : rawResult.next_href;
+        nextUrl = rawResult.next_href ? `${rawResult.next_href}&client_id=${await this.soundcloud.api.getClientID()}` : rawResult.next_href;
       }
     }else{
       // 楽曲検索
@@ -81,7 +82,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
 
   protected override consumer(result: SoundcloudTrackV2[]){
     return result.map(item => {
-      const [min, sec] = Util.time.CalcMinSec(Math.floor(item.duration / 1000));
+      const [min, sec] = Util.time.calcMinSec(Math.floor(item.duration / 1000));
       return {
         url: item.permalink_url,
         title: item.title,

@@ -16,8 +16,22 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CommandArgs } from "../../Commands";
+import type { CommandArgs } from "../Commands";
 import type { Member, PermissionName, TextChannel } from "oceanic.js";
+
+export const users = {
+  getDisplayName(member: Member){
+    return member.nick || member.username;
+  },
+  isDJ(member: Member, options: CommandArgs){
+    return channels.sameVC(member, options) && member.roles.some(roleId => member.guild.roles.get(roleId).name === "DJ");
+  },
+  isPrivileged(member: Member){
+    return member.permissions.has("MANAGE_GUILD")
+      || member.permissions.has("MANAGE_CHANNELS")
+      || member.permissions.has("ADMINISTRATOR");
+  },
+} as const;
 
 const requirePermissions = [
   "SEND_MESSAGES",
@@ -28,7 +42,7 @@ const requirePermissions = [
   "VIEW_CHANNEL",
 ] as Readonly<PermissionName[]>;
 
-export const channelUtil = {
+export const channels = {
   checkSendable(channel: TextChannel, userId: string){
     const permissions = channel.permissionsOf(userId);
     return requirePermissions.every(permission => permissions.has(permission));

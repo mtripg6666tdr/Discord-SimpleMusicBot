@@ -18,7 +18,7 @@
 
 import * as os from "os";
 
-import { GetPercentage } from "./math";
+import { getPercentage } from ".";
 
 /**
  * メモリ使用情報
@@ -29,11 +29,11 @@ type MemoryUsageInfo = { free: number, total: number, used: number, usage: numbe
   * メモリ使用情報を取得します
   * @returns メモリ使用情報
   */
-export function GetMemInfo(): MemoryUsageInfo{
-  const free = GetMBytes(os.freemem());
-  const total = GetMBytes(os.totalmem());
+export function getMemoryInfo(): MemoryUsageInfo{
+  const free = getMBytes(os.freemem());
+  const total = getMBytes(os.totalmem());
   const used = total - free;
-  const usage = GetPercentage(used, total);
+  const usage = getPercentage(used, total);
   return {
     free,
     total,
@@ -47,6 +47,6 @@ export function GetMemInfo(): MemoryUsageInfo{
   * @param bytes 指定されたバイト
   * @returns 返還後のメガバイト数
   */
-export function GetMBytes(bytes: number){
+export function getMBytes(bytes: number){
   return Math.round(bytes / 1024/*KB*/ / 1024/*MB*/ * 100) / 100;
 }
