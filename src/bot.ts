@@ -56,7 +56,14 @@ export class MusicBot extends MusicBotBase {
           // サーバーのボイスチャンネルのステータスを確認する
           "GUILD_VOICE_STATES",
         ],
-        compress: true,
+        compress: (() => {
+          try{
+            return !!require("zlib-sync");
+          }
+          catch{
+            return false;
+          }
+        })(),
       },
     });
 
