@@ -218,7 +218,6 @@ export class PlayManager extends ServerManagerBase {
       // シーク位置を確認
       if(this.currentAudioInfo.lengthSeconds <= time) time = 0;
       this._seek = time;
-      const t = Util.time.timer.start("PlayManager#Play->FetchAudioSource");
 
       // QueueContentからストリーム情報を取得
       const rawStream = await this.currentAudioInfo.fetch(time > 0);
@@ -237,7 +236,6 @@ export class PlayManager extends ServerManagerBase {
       // 各種準備
       this._errorReportChannel = mes?.channel as TextChannel;
       this._cost = cost;
-      t.end();
 
       // 再生
       this.prepareAudioPlayer();

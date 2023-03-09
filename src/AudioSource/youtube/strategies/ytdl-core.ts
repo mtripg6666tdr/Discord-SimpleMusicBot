@@ -42,17 +42,11 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
     this.useLog();
     const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
     const requestOptions = agent ? { agent } : undefined;
-    const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#getInfo`);
     let info = null as ytdl.videoInfo;
-    try{
-      info = await ytdl.getInfo(url, {
-        lang: "ja",
-        requestOptions,
-      });
-    }
-    finally{
-      t.end(this.logger);
-    }
+    info = await ytdl.getInfo(url, {
+      lang: "ja",
+      requestOptions,
+    });
     return {
       data: this.mapToExportable(url, info),
       cache: {
@@ -72,18 +66,12 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
         this.logger("[AudioSource:youtube] obtaining info");
         const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
         const requestOptions = agent ? { agent } : undefined;
-        const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch`);
         // eslint-disable-next-line @typescript-eslint/no-shadow
         let info = null as ytdl.videoInfo;
-        try{
-          info = await ytdl.getInfo(url, {
-            lang: "ja",
-            requestOptions,
-          });
-        }
-        finally{
-          t.end(this.logger);
-        }
+        info = await ytdl.getInfo(url, {
+          lang: "ja",
+          requestOptions,
+        });
         return info;
       }
     })();

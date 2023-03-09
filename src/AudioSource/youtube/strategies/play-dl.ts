@@ -24,7 +24,6 @@ import type { InfoData } from "play-dl";
 import { video_info } from "play-dl";
 
 import { Strategy } from "./base";
-import { Util } from "../../../Util";
 
 type playDl = "playDl";
 const playDl: playDl = "playDl";
@@ -36,14 +35,8 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
 
   async getInfo(url: string){
     this.useLog();
-    const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#getInfo`);
     let info = null as InfoData;
-    try{
-      info = await video_info(url);
-    }
-    finally{
-      t.end(this.logger);
-    }
+    info = await video_info(url);
     return {
       data: this.mapToExportable(url, info),
       cache: {
@@ -56,16 +49,10 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
     this.useLog();
-    const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch`);
     let info = null as InfoData;
-    try{
-      const cacheAvailable = cache?.type === playDl && cache.data;
-      this.logger(`[AudioSource:youtube] ${cacheAvailable ? "using cache without obtaining" : "obtaining info"}`);
-      info = cacheAvailable || await video_info(url);
-    }
-    finally{
-      t.end(this.logger);
-    }
+    const cacheAvailable = cache?.type === playDl && cache.data;
+    this.logger(`[AudioSource:youtube] ${cacheAvailable ? "using cache without obtaining" : "obtaining info"}`);
+    info = cacheAvailable || await video_info(url);
     const partialResult = {
       info: this.mapToExportable(url, info),
       relatedVideos: null as exportableYouTube[],

@@ -24,7 +24,6 @@ import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 import miniget from "miniget";
 
 import { Strategy } from "./base";
-import { Util } from "../../../Util";
 
 export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, YoutubeDlInfo>, YoutubeDlInfo> {
   constructor(priority: number, protected id: T, protected binaryManager: BinaryManager){
@@ -39,14 +38,8 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
 
   async getInfo(url: string){
     this.useLog();
-    const t = Util.time.timer.start(`YouTube(Strategy${this.priority})#getInfo`);
     let info = null as YoutubeDlInfo;
-    try{
-      info = JSON.parse(await this.binaryManager.exec(["--skip-download", "--print-json", url])) as YoutubeDlInfo;
-    }
-    finally{
-      t.end(this.logger);
-    }
+    info = JSON.parse(await this.binaryManager.exec(["--skip-download", "--print-json", url])) as YoutubeDlInfo;
     return {
       data: this.mapToExportable(url, info),
       cache: {
@@ -58,16 +51,9 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
 
   async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
     this.useLog();
-    const t = Util.time.timer.start(`YouTube(Strategy${this.priority})#fetch`);
-    let info = null as YoutubeDlInfo;
-    try{
-      const availableCache = cache?.type === this.id && cache.data as YoutubeDlInfo;
-      this.logger(`[AudioSource:youtube] ${availableCache ? "using cache without obtaining" : "obtaining info"}`);
-      info = availableCache || JSON.parse(await this.binaryManager.exec(["--skip-download", "--print-json", url])) as YoutubeDlInfo;
-    }
-    finally{
-      t.end(this.logger);
-    }
+    const availableCache = cache?.type === this.id && cache.data as YoutubeDlInfo;
+    this.logger(`[AudioSource:youtube] ${availableCache ? "using cache without obtaining" : "obtaining info"}`);
+    const info = availableCache || JSON.parse(await this.binaryManager.exec(["--skip-download", "--print-json", url])) as YoutubeDlInfo;
     const partialResult = {
       info: this.mapToExportable(url, info),
       relatedVideos: null as exportableYouTube[],
