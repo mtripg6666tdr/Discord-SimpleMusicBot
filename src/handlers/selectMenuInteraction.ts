@@ -30,7 +30,7 @@ export async function handleSelectMenuInteraction(
   this.Log("received selectmenu interaction");
 
   // 検索パネル取得
-  const panel = this.guildData.get(interaction.channel.guild.id).getSearchPanel(interaction.member.id);
+  const panel = this.guildData.get(interaction.channel.guild.id).searchPanel.get(interaction.member.id);
 
   // なければ返却
   if(!panel) return;

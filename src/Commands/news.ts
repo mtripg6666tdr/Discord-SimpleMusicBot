@@ -41,13 +41,13 @@ export default class News extends BaseCommand {
     options.server.updateBoundChannel(message);
     options.server.joinVoiceChannel(message);
     const url = "https://www.youtube.com/playlist?list=PL3ZQ5CpNulQk8-p0CWo9ufI81IdrGoyNZ";
-    if(options.server.hasSearchPanel(message.member.id)){
+    if(options.server.searchPanel.has(message.member.id)){
       message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const searchPanel = options.server.createSearchPanel(message, "ニューストピックス", true);
+    const searchPanel = options.server.searchPanel.create(message, "ニューストピックス", true);
     if(!searchPanel) return;
-    const result = await searchPanel.consumeSearchResult(ytpl.default(url, {
+    await searchPanel.consumeSearchResult(ytpl.default(url, {
       gl: "JP", hl: "ja", limit: 20,
     }), ({ items }) => items.map(item => ({
       title: item.title,
@@ -57,8 +57,5 @@ export default class News extends BaseCommand {
       thumbnail: item.thumbnails[0].url,
       url: item.url,
     })));
-    if(result){
-      options.server.bindSearchPanel(searchPanel);
-    }
   }
 }

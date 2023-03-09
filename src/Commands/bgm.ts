@@ -41,13 +41,13 @@ export default class Bgm extends BaseCommand {
     options.server.updateBoundChannel(message);
     if(!await options.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true)) return;
     const url = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
-    if(options.server.hasSearchPanel(message.member.id)){
+    if(options.server.searchPanel.has(message.member.id)){
       message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
       return;
     }
-    const searchPanel = options.server.createSearchPanel(message, "プリセットBGM一覧", true);
+    const searchPanel = options.server.searchPanel.create(message, "プリセットBGM一覧", true);
     if(!searchPanel) return;
-    const result = await searchPanel.consumeSearchResult(ytpl.default(url, {
+    await searchPanel.consumeSearchResult(ytpl.default(url, {
       gl: "JP", hl: "ja",
     }), ({ items }) => items.map(item => ({
       title: item.title,
@@ -57,8 +57,5 @@ export default class Bgm extends BaseCommand {
       thumbnail: item.thumbnails[0].url,
       url: item.url,
     })));
-    if(result){
-      options.server.bindSearchPanel(searchPanel);
-    }
   }
 }
