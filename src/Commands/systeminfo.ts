@@ -72,15 +72,21 @@ export default class SystemInfo extends BaseCommand {
           .addField("Managed embed toggles", `\`${options.embedPageToggle.length}\``, true)
           .addField("Current total transforming costs", `\`${options.bot.totalTransformingCost}\``)
           .addField("Modules", [
-            "eris",
-            "@mtripg6666tdr/eris-command-resolver",
+            "oceanic.js",
+            "@mtripg6666tdr/oceanic-command-resolver",
+            "@discordjs/voice",
+            "prism-media",
+            "@discordjs/opus",
+            "opusscript",
+            "zlib-sync",
+            "pako",
           ]
             .map(mod => {
               try{
                 return `\`${mod}\`@v${require(`../../node_modules/${mod}/package.json`).version}`;
               }
               catch{
-                return "unknown";
+                return `\`${mod}\`@unknown`;
               }
             })
             .join("\r\n")
