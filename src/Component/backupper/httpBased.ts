@@ -23,7 +23,6 @@ import type { DataType, MusicBotBase } from "../../botBase";
 import candyget from "candyget";
 
 import { Backupper } from ".";
-import Util from "../../Util";
 
 const MIME_JSON = "application/json";
 
@@ -136,7 +135,6 @@ export class HttpBackupper extends Backupper {
 
   async getStatusFromBackup(guildids: string[]){
     if(HttpBackupper.backuppable){
-      const t = Util.time.timer.start("GetIsSpeking");
       try{
         const result = await this._requestHttp("GET", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
@@ -178,9 +176,6 @@ export class HttpBackupper extends Backupper {
         this.Log("Status restoring failed!", "warn");
         return null;
       }
-      finally{
-        t.end();
-      }
     }else{
       return null;
     }
@@ -188,7 +183,6 @@ export class HttpBackupper extends Backupper {
 
   async getQueueDataFromBackup(guildids: string[]){
     if(HttpBackupper.backuppable){
-      const t = Util.time.timer.start("GetQueueData");
       try{
         const result = await this._requestHttp("GET", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
@@ -215,9 +209,6 @@ export class HttpBackupper extends Backupper {
         this.Log("Queue restoring failed!", "warn");
         return null;
       }
-      finally{
-        t.end();
-      }
     }else{
       return null;
     }
@@ -228,7 +219,6 @@ export class HttpBackupper extends Backupper {
    */
   private async _backupStatusData(data: { guildid: string, value: string }[]){
     if(HttpBackupper.backuppable){
-      const t = Util.time.timer.start("backupStatusData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as { [key: string]: string };
       data.forEach(d => rawData[d.guildid] = d.value);
@@ -250,9 +240,6 @@ export class HttpBackupper extends Backupper {
         this.Log("Status backup failed!", "warn");
         return false;
       }
-      finally{
-        t.end();
-      }
     }else{
       return false;
     }
@@ -263,7 +250,6 @@ export class HttpBackupper extends Backupper {
    */
   private async _backupQueueData(data: { guildid: string, queue: string }[]){
     if(HttpBackupper.backuppable){
-      const t = Util.time.timer.start("SetQueueData");
       const ids = data.map(d => d.guildid).join(",");
       const rawData = {} as { [guildid: string]: string };
       data.forEach(d => rawData[d.guildid] = encodeURIComponent(d.queue));
@@ -280,9 +266,6 @@ export class HttpBackupper extends Backupper {
         this.Log(er, "error");
         this.Log("Queue backup failed!", "warn");
         return false;
-      }
-      finally{
-        t.end();
       }
     }else{
       return false;

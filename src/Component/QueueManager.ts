@@ -200,34 +200,28 @@ export class QueueManager extends ServerManagerBase {
   }): Promise<QueueContent & { index: number }>{
     return lock(this.addQueueLocker, async () => {
       this.Log("AddQueue called");
-      const t = Util.time.timer.start("AddQueue");
-      try{
-        const result = {
-          basicInfo: await AudioSource.resolve({
-            url,
-            type: sourceType,
-            knownData: gotData,
-            forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000),
-          }),
-          additionalInfo: {
-            addedBy: {
-              userId: addedBy && this.getUserIdFromMember(addedBy) || "0",
-              displayName: addedBy && this.getDisplayNameFromMember(addedBy) || "不明",
-            },
+      const result = {
+        basicInfo: await AudioSource.resolve({
+          url,
+          type: sourceType,
+          knownData: gotData,
+          forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000),
+        }),
+        additionalInfo: {
+          addedBy: {
+            userId: addedBy && this.getUserIdFromMember(addedBy) || "0",
+            displayName: addedBy && this.getDisplayNameFromMember(addedBy) || "不明",
           },
-        } as QueueContent;
-        if(result.basicInfo){
-          this._default[method](result);
-          if(this.server.equallyPlayback) this.sortWithAddedBy();
-          this.emit(method === "push" ? "changeWithoutCurrent" : "change");
-          this.emit("add", result);
-          const index = this._default.findIndex(q => q === result);
-          this.Log("queue content added in position " + index);
-          return { ...result, index };
-        }
-      }
-      finally{
-        t.end();
+        },
+      } as QueueContent;
+      if(result.basicInfo){
+        this._default[method](result);
+        if(this.server.equallyPlayback) this.sortWithAddedBy();
+        this.emit(method === "push" ? "changeWithoutCurrent" : "change");
+        this.emit("add", result);
+        const index = this._default.findIndex(q => q === result);
+        this.Log("queue content added in position " + index);
+        return { ...result, index };
       }
       throw new Error("Provided URL was not resolved as available service");
     });
@@ -260,7 +254,6 @@ export class QueueManager extends ServerManagerBase {
     })
   ): Promise<boolean>{
     this.Log("AutoAddQueue Called");
-    const t = Util.time.timer.start("AutoAddQueue");
     let msg: Message<AnyGuildTextChannel>|ResponseMessage = null;
 
     try{
@@ -394,9 +387,6 @@ export class QueueManager extends ServerManagerBase {
       }
       return false;
     }
-    finally{
-      t.end();
-    }
     return true;
   }
 
@@ -424,35 +414,31 @@ export class QueueManager extends ServerManagerBase {
     totalCount: number,
     exportableConsumer: (track: T) => Promise<exportableCustom>|exportableCustom
   ): Promise<number>{
-    const t = Util.time.timer.start("ProcessPlaylist");
-    try{
-      let index = 0;
-      for(let i = 0; i < totalCount; i++){
-        const item = playlist[i];
-        if(!item) continue;
-        const exportable = await exportableConsumer(item);
-        const _result = await this.addQueueOnly({
-          url: exportable.url,
-          addedBy: msg.command.member,
-          sourceType: identifer,
-          method: first ? "unshift" : "push",
-          gotData: exportable,
-        });
-        if(_result) index++;
-        if(
-          index % 50 === 0
-          || totalCount <= 50 && index % 10 === 0
-          || totalCount <= 10 && index % 4 === 0
-        ){
-          await msg.edit(`:hourglass_flowing_sand:プレイリスト\`${title}\`を処理しています。お待ちください。${totalCount}曲中${index}曲処理済み。`);
-        }
-        if(cancellation.Cancelled) break;
+    let index = 0;
+    for(let i = 0; i < totalCount; i++){
+      const item = playlist[i];
+      if(!item) continue;
+      const exportable = await exportableConsumer(item);
+      const _result = await this.addQueueOnly({
+        url: exportable.url,
+        addedBy: msg.command.member,
+        sourceType: identifer,
+        method: first ? "unshift" : "push",
+        gotData: exportable,
+      });
+      if(_result) index++;
+      if(
+        index % 50 === 0
+        || totalCount <= 50 && index % 10 === 0
+        || totalCount <= 10 && index % 4 === 0
+      ){
+        await msg.edit(`:hourglass_flowing_sand:プレイリスト\`${title}\`を処理しています。お待ちください。${totalCount}曲中${index}曲処理済み。`);
       }
-      return index;
+      if(cancellation.Cancelled){
+        break;
+      }
     }
-    finally{
-      t.end();
-    }
+    return index;
   }
 
   /**

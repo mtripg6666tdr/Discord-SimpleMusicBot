@@ -16,10 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { performance } from "perf_hooks";
-
 import { padZero } from "./general";
-import { log } from "./log";
 
 /**
  * 合計時間(秒)からゼロ補完された分および秒を計算します。
@@ -68,36 +65,3 @@ export function CalcTime(date: number): number[]{
   const hour = (ato - min) / 60;
   return [hour, min, sec, millisec];
 }
-
-class _timerStore {
-  private readonly timers = new Map<string, number>();
-
-  start(key: string){
-    this.timers.set(key, performance.now());
-    return new TimerStopper(this, key);
-  }
-
-  end(key: string, logger?: (content: string) => void){
-    if(this.timers.get(key)){
-      const content = `[TimeLogger] Elapsed ${Math.floor((performance.now() - this.timers.get(key)) * 100) / 100}ms. (${key})`;
-      if(logger){
-        logger(content);
-      }else{
-        log(content);
-      }
-      this.timers.delete(key);
-    }
-  }
-}
-
-class TimerStopper {
-  constructor(private readonly parent: _timerStore, private readonly key: string){
-    //
-  }
-
-  end(logger?: (content: string) => void){
-    this.parent.end(this.key, logger);
-  }
-}
-
-export const timer = new _timerStore();
