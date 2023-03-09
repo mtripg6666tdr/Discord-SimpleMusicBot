@@ -16,9 +16,7 @@
             "<node_internals>/**"
         ],
         "program": "${workspaceFolder}/dist/index.js",
-        "env": {
-          "CONSOLE_ENABLE": "1"
-        }
+        "outputCapture": "std"
     },
     {
       "type": "node",
@@ -34,9 +32,7 @@
           "<node_internals>/**"
       ],
       "program": "${workspaceFolder}/dist/index.js",
-      "env": {
-        "CONSOLE_ENABLE": "1",
-      }
+      "outputCapture": "std"
     }
   ]
 }
