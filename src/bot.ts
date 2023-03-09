@@ -48,13 +48,15 @@ export class MusicBot extends MusicBotBase {
     this._client = new discord.Client({
       auth: `Bot ${token}`,
       gateway: {
-        intents: [
-          // サーバーを認識する
+        intents: Util.config.noMessageContent ? [
           "GUILDS",
-          // サーバーのメッセージを認識する
           "GUILD_MESSAGES",
-          // サーバーのボイスチャンネルのステータスを確認する
           "GUILD_VOICE_STATES",
+        ] : [
+          "GUILDS",
+          "GUILD_MESSAGES",
+          "GUILD_VOICE_STATES",
+          "MESSAGE_CONTENT",
         ],
         compress: (() => {
           try{
