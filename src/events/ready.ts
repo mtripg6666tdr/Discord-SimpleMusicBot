@@ -91,7 +91,7 @@ export async function onReady(this: MusicBot){
   if(!this.maintenance){
     client.editStatus("online", [
       {
-        type: discord.ActivityTypes.GAME,
+        type: discord.ActivityTypes.LISTENING,
         name: "音楽",
       },
     ]);
