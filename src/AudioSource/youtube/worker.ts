@@ -17,27 +17,18 @@
  */
 
 import type { WithId, spawnerJobMessage, workerMessage } from "./spawner";
-import type { LogLevels } from "../../Util/log";
 
 import { parentPort } from "worker_threads";
 
 import * as ytsr from "ytsr";
 
 import { YouTube } from ".";
-import Util from "../../Util";
+import { stringifyObject } from "../../Util";
 
 parentPort.unref();
 
 function postMessage(message: workerMessage|WithId<workerMessage>){
   parentPort.postMessage(message);
-}
-
-function logger(content: any, loglevel: LogLevels){
-  postMessage({
-    type: "log",
-    data: content,
-    level: loglevel,
-  });
 }
 
 function onMessage(message: WithId<spawnerJobMessage>){
@@ -46,11 +37,11 @@ function onMessage(message: WithId<spawnerJobMessage>){
   }
   if(message.type === "init"){
     const { id, url, prefetched, forceCache } = message;
-    const youtube = new YouTube(/* logger */ logger);
+    const youtube = new YouTube();
     youtube.init(url, prefetched, forceCache)
       .then(() => {
         const data = Object.assign({}, youtube);
-        delete data.logger;
+        delete data["logger"];
         postMessage({
           type: "initOk",
           data,
@@ -60,7 +51,7 @@ function onMessage(message: WithId<spawnerJobMessage>){
       .catch((er) => {
         postMessage({
           type: "error",
-          data: Util.general.StringifyObject(er),
+          data: stringifyObject(er),
           id,
         });
       });
@@ -81,7 +72,7 @@ function onMessage(message: WithId<spawnerJobMessage>){
       .catch((er) => {
         postMessage({
           type: "error",
-          data: Util.general.StringifyObject(er),
+          data: stringifyObject(er),
           id,
         });
       })

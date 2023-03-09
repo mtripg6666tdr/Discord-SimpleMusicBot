@@ -20,7 +20,6 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 
 export default class Dc extends BaseCommand {
   constructor(){
@@ -39,11 +38,11 @@ export default class Dc extends BaseCommand {
     options.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.server.player.isConnecting){
-      message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
+      message.reply("再生中ではありません").catch(this.logger.error);
       return;
     }
     // 停止しま～す
     options.server.player.disconnect();
-    message.reply(":postbox: 正常に切断しました").catch(e => Util.logger.log(e, "error"));
+    message.reply(":postbox: 正常に切断しました").catch(this.logger.error);
   }
 }

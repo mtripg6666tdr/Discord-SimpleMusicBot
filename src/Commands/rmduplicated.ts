@@ -20,7 +20,6 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 
 export default class RmDuplicated extends BaseCommand {
   constructor(){
@@ -69,9 +68,9 @@ export default class RmDuplicated extends BaseCommand {
       const title = actualDeleted.length === 1 ? firstItemTitle : null;
       const resultStr = actualDeleted.sort((a, b) => a - b).join(",");
       const failedStr = failed.sort((a, b) => a - b).join(",");
-      message.reply(`🚮${resultStr.length > 100 ? "重複していた" : `${resultStr}番目の`}曲${title ? "(`" + title + "`)" : ""}を削除しました${failed.length > 0 ? `\r\n:warning:${failed.length > 100 ? "一部" : `${failedStr}番目`}の曲は権限がないため削除できませんでした。` : ""}`).catch(e => Util.logger.log(e, "error"));
+      message.reply(`🚮${resultStr.length > 100 ? "重複していた" : `${resultStr}番目の`}曲${title ? "(`" + title + "`)" : ""}を削除しました${failed.length > 0 ? `\r\n:warning:${failed.length > 100 ? "一部" : `${failedStr}番目`}の曲は権限がないため削除できませんでした。` : ""}`).catch(this.logger.error);
     }else{
-      message.reply("削除できる楽曲がありませんでした。").catch(e => Util.logger.log(e, "error"));
+      message.reply("削除できる楽曲がありませんでした。").catch(this.logger.error);
     }
   }
 }

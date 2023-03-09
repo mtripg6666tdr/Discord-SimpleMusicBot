@@ -23,7 +23,7 @@ import type { EmbedField } from "oceanic.js";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
+import * as Util from "../Util";
 import { getColor } from "../Util/color";
 
 export default class Searchq extends BaseCommand {
@@ -50,7 +50,7 @@ export default class Searchq extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(options.server.queue.length === 0){
-      message.reply("✘キューが空です").catch(e => Util.logger.log(e, "error"));
+      message.reply("✘キューが空です").catch(this.logger.error);
       return;
     }
     const qsresult = options.server.queue
@@ -61,14 +61,14 @@ export default class Searchq extends BaseCommand {
       )
     ;
     if(qsresult.length === 0){
-      message.reply(":confused:見つかりませんでした").catch(e => Util.logger.log(e, "error"));
+      message.reply(":confused:見つかりませんでした").catch(this.logger.error);
       return;
     }
     if(qsresult.length > 20) qsresult.splice(20);
     const fields = qsresult.map(c => {
       const index = options.server.queue.findIndex(d => d.basicInfo.title === c.basicInfo.title).toString();
       const _t = c.basicInfo.lengthSeconds;
-      const [min, sec] = Util.time.CalcMinSec(_t);
+      const [min, sec] = Util.time.calcMinSec(_t);
       return {
         name: index === "0" ? "現在再生中/再生待ち" : index,
         value: `[${c.basicInfo.title}](${c.basicInfo.url})\r\nリクエスト: \`${c.additionalInfo.addedBy.displayName}\` \r\n長さ: ${

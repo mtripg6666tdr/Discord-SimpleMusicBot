@@ -20,7 +20,6 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 import { getCurrentEffectPanel } from "../Util/effect";
 
 export default class Effect extends BaseCommand {
@@ -48,8 +47,8 @@ export default class Effect extends BaseCommand {
       setTimeout(() => reply.edit({ components: [] }), 5 * 60 * 1000).unref();
     }
     catch(e){
-      Util.logger.log(e, "error");
-      message.reply(":cry:エラーが発生しました").catch(er => Util.logger.log(er, "error"));
+      this.logger.error(e);
+      message.reply(":cry:エラーが発生しました").catch(this.logger.error);
     }
   }
 }

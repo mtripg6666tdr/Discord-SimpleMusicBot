@@ -22,14 +22,20 @@ import type { SelectOption } from "oceanic.js";
 
 import { MessageActionRowBuilder, MessageEmbedBuilder, MessageStringSelectMenuBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
-import { EventEmitter } from "stream";
-
-import Util from "../Util";
+import { LogEmitter } from "../Structure";
 import { getColor } from "../Util/color";
+import { useConfig } from "../config";
 
 type status = "init"|"consumed"|"destroyed";
 
-export class SearchPanel extends EventEmitter {
+interface SearchPanelEvents {
+  destroy: [];
+  open: [reply: ResponseMessage];
+}
+
+const config = useConfig();
+
+export class SearchPanel extends LogEmitter<SearchPanelEvents> {
   protected _status: status = "init";
   protected get status(){
     return this._status;
@@ -55,7 +61,7 @@ export class SearchPanel extends EventEmitter {
   }
 
   constructor(protected readonly _commandMessage: CommandMessage, protected query: string, protected readonly isRawTitle: boolean = false){
-    super();
+    super("SearchPanel");
     if(!_commandMessage){
       throw new Error("Invalid arguments passed");
     }
@@ -93,7 +99,7 @@ export class SearchPanel extends EventEmitter {
             .setFooter({
               iconURL: this._commandMessage.member.avatarURL(),
               text:
-                Util.config.noMessageContent
+                config.noMessageContent
                   ? "再生したい項目を選択して数字を送信するか、下から選択してください。キャンセルするには「キャンセル」または「cancel」と選択/入力します。また、サムネイルコマンドを使用してサムネイルを確認できます。"
                   : "再生したい項目を、下から選択してください。キャンセルするには、下から\"キャンセル\"を選択してください。また、サムネイルコマンドを使用してサムネイルを確認することもできます。"
               ,
@@ -106,7 +112,7 @@ export class SearchPanel extends EventEmitter {
               new MessageStringSelectMenuBuilder()
                 .setCustomId("search")
                 .setPlaceholder(
-                  Util.config.noMessageContent
+                  config.noMessageContent
                     ? "ここから選択..."
                     : "数字を直接送信するか、ここから選択..."
                 )
@@ -127,11 +133,13 @@ export class SearchPanel extends EventEmitter {
       return true;
     }
     catch(e){
-      Util.logger.log(e, "error");
+      this.logger.error(e);
       if(reply){
-        reply.edit("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
+        reply.edit("✘内部エラーが発生しました")
+          .catch(this.logger.error);
       }else{
-        this._commandMessage.reply("✘内部エラーが発生しました").catch(er => Util.logger.log(er, "error"));
+        this._commandMessage.reply("✘内部エラーが発生しました")
+          .catch(this.logger.error);
       }
       return false;
     }
@@ -154,32 +162,11 @@ export class SearchPanel extends EventEmitter {
     if(!quiet){
       await this._responseMessage.channel.createMessage({
         content: "✅キャンセルしました",
-      }).catch(er => Util.logger.log(er, "error"));
+      }).catch(this.logger.error);
     }
-    await this._responseMessage.delete().catch(er => Util.logger.log(er, "error"));
+    await this._responseMessage.delete().catch(this.logger.error);
     this.status = "destroyed";
   }
-
-  override emit<T extends keyof SearchPanelEvents>(eventName: T, ...args: SearchPanelEvents[T]){
-    return super.emit(eventName, ...args);
-  }
-
-  override on<T extends keyof SearchPanelEvents>(eventName: T, listener: (...args: SearchPanelEvents[T]) => void){
-    return super.on(eventName, listener);
-  }
-
-  override once<T extends keyof SearchPanelEvents>(eventName: T, listener: (...args: SearchPanelEvents[T]) => void){
-    return super.on(eventName, listener);
-  }
-
-  override off<T extends keyof SearchPanelEvents>(eventName: T, listener: (...args: SearchPanelEvents[T]) => void){
-    return super.off(eventName, listener);
-  }
-}
-
-interface SearchPanelEvents {
-  destroy: [];
-  open: [reply: ResponseMessage];
 }
 
 export type SongInfo = {

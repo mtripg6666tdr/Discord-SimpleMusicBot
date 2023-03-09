@@ -20,7 +20,7 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
+import { discordUtil } from "../Util";
 
 export default class Rm extends BaseCommand {
   constructor(){
@@ -45,7 +45,7 @@ export default class Rm extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs){
     if(options.args.length === 0){
-      message.reply("引数に消去する曲のオフセット(番号)を入力してください。").catch(e => Util.logger.log(e, "error"));
+      message.reply("引数に消去する曲のオフセット(番号)を入力してください。").catch(this.logger.error);
       return;
     }
     if(options.args.includes("0") && options.server.player.isPlaying){
@@ -102,11 +102,11 @@ export default class Rm extends BaseCommand {
     for(let i = 0; i < dels.length; i++){
       const item = q.get(dels[i]);
       if(
-        Util.eris.user.isDJ(message.member, options)
+        discordUtil.users.isDJ(message.member, options)
         || item.additionalInfo.addedBy.userId === message.member.id
-        || !Util.eris.channel.getVoiceMember(options).has(item.additionalInfo.addedBy.userId)
-        || Util.eris.channel.isOnlyListener(message.member, options)
-        || Util.eris.user.isPrivileged(message.member)
+        || !discordUtil.channels.getVoiceMember(options).has(item.additionalInfo.addedBy.userId)
+        || discordUtil.channels.isOnlyListener(message.member, options)
+        || discordUtil.users.isPrivileged(message.member)
       ){
         q.removeAt(dels[i]);
         actualDeleted.push(dels[i]);
@@ -121,9 +121,9 @@ export default class Rm extends BaseCommand {
       const title = actualDeleted.length === 1 ? firstItemTitle : null;
       const resultStr = actualDeleted.sort((a, b) => a - b).join(",");
       const failedStr = failed.sort((a, b) => a - b).join(",");
-      message.reply(`🚮${resultStr.length > 100 ? "指定された" : `${resultStr}番目の`}曲${title ? "(`" + title + "`)" : ""}を削除しました${failed.length > 0 ? `\r\n:warning:${failed.length > 100 ? "一部" : `${failedStr}番目`}の曲は権限がないため削除できませんでした。` : ""}`).catch(e => Util.logger.log(e, "error"));
+      message.reply(`🚮${resultStr.length > 100 ? "指定された" : `${resultStr}番目の`}曲${title ? "(`" + title + "`)" : ""}を削除しました${failed.length > 0 ? `\r\n:warning:${failed.length > 100 ? "一部" : `${failedStr}番目`}の曲は権限がないため削除できませんでした。` : ""}`).catch(this.logger.error);
     }else{
-      message.reply("削除できませんでした。権限が不足している可能性があります。").catch(e => Util.logger.log(e, "error"));
+      message.reply("削除できませんでした。権限が不足している可能性があります。").catch(this.logger.error);
     }
   }
 }

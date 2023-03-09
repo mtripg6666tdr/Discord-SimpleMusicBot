@@ -20,7 +20,6 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 
 export default class Shuffle extends BaseCommand {
   constructor(){
@@ -34,14 +33,14 @@ export default class Shuffle extends BaseCommand {
       shouldDefer: false,
     });
   }
-  
+
   async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(options.server.queue.length === 0){
-      message.reply("キューが空です。").catch(e => Util.logger.log(e, "error"));
+      message.reply("キューが空です。").catch(this.logger.error);
       return;
     }
     options.server.queue.shuffle();
-    message.reply(":twisted_rightwards_arrows:シャッフルしました✅").catch(e => Util.logger.log(e, "error"));
+    message.reply(":twisted_rightwards_arrows:シャッフルしました✅").catch(this.logger.error);
   }
 }

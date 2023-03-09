@@ -17,23 +17,19 @@
  */
 
 import type { GuildDataContainer } from "./GuildDataContainer";
+import type { EventDictionary } from "./TypedEmitter";
 
 import { LogEmitter } from ".";
 
 /**
  * すべてのマネージャークラスの基底クラスです
  */
-export abstract class ServerManagerBase extends LogEmitter {
-  // 親ノード
+export abstract class ServerManagerBase<T extends EventDictionary> extends LogEmitter<T> {
   protected server: GuildDataContainer = null;
-
-  /**
-   * 親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
-   * @param data 親のGuildVoiceInfo
-   */
-  setBinding(data: GuildDataContainer){
-    if(this.server) throw new Error("すでに設定されています");
-    this.server = data;
-    this.setGuildId(this.server.guildId);
+  
+  constructor(tag: string, parent: GuildDataContainer){
+    super(tag, parent.getGuildId());
+    this.logger.info("Set data of guild id " + parent.getGuildId());
+    this.server = parent;
   }
 }

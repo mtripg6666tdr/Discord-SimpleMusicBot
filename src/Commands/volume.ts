@@ -20,7 +20,6 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
-import Util from "../Util";
 
 export default class Volume extends BaseCommand {
   constructor(){
@@ -47,18 +46,18 @@ export default class Volume extends BaseCommand {
     options.server.updateBoundChannel(message);
     if(options.rawArgs === ""){
       await message.reply(`:loud_sound:現在の音量は**${options.server.player.volume}**です(デフォルト:100)`)
-        .catch(e => Util.logger.log(e, "error"))
+        .catch(this.logger.error)
       ;
       return;
     }
     const newval = Number(options.rawArgs);
     if(isNaN(newval) || newval < 1 || newval > 200){
       message.reply(":bangbang:音量を変更する際は1から200の数字で指定してください。")
-        .catch(e => Util.logger.log(e, "error"));
+        .catch(this.logger.error);
       return;
     }
     const result = options.server.player.setVolume(newval);
     await message.reply(`:loud_sound:音量を**${newval}**に変更しました。\r\n${options.server.player.isPlaying && !result ? "次の曲から適用されます。現在再生中の曲に設定を適用するには、`頭出し`コマンドなどを使用してください。" : ""}`)
-      .catch(e => Util.logger.log(e, "error"));
+      .catch(this.logger.error);
   }
 }

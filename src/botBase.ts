@@ -18,7 +18,7 @@
 
 import type { BaseCommand, CommandArgs } from "./Commands";
 import type { Backupper } from "./Component/backupper";
-import type { GuildBGMContainerType } from "./Util/config";
+import type { GuildBGMContainerType } from "./config";
 import type * as discord from "oceanic.js";
 
 import { execSync } from "child_process";
@@ -32,14 +32,26 @@ import { MongoBackupper } from "./Component/backupper/mongodb";
 import { GuildDataContainer } from "./Structure";
 import { LogEmitter } from "./Structure";
 import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";
-import { Util } from "./Util";
+import * as Util from "./Util";
 
 export type DataType = Map<string, GuildDataContainer>;
+
+interface BotBaseEvents {
+  beforeReady: [];
+  ready: [];
+  onMessageCreate: [message:discord.Message];
+  onInteractionCreate: [interaction:discord.Interaction];
+  onCommandHandler: [command:BaseCommand, args:CommandArgs];
+  onBotVoiceChannelJoin: [channel:discord.VoiceChannel|discord.StageChannel];
+  guildDataAdded: [container:GuildDataContainer];
+  guildDataRemoved: [guildId:string];
+  tick: [count:number];
+}
 
 /**
  * 音楽ボットの本体のうち、カスタムデータ構造を実装します
  */
-export abstract class MusicBotBase extends LogEmitter {
+export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
   // クライアントの初期化
   protected readonly abstract _client: discord.Client;
   protected readonly _instantiatedTime: Date = null;
@@ -113,14 +125,13 @@ export abstract class MusicBotBase extends LogEmitter {
   }
 
   constructor(protected readonly maintenance: boolean = false){
-    super();
-    this.setTag("Main");
+    super("Main");
     this._instantiatedTime = new Date();
-    this.Log("bot is instantiated");
+    this.logger.info("bot is instantiated");
     if(maintenance){
-      this.Log("bot is now maintainance mode");
+      this.logger.info("bot is now maintainance mode");
     }
-    
+
     const versionObtainStrategies = [
       () => {
         if(fs.existsSync(path.join(__dirname, "../DOCKER_BUILD_IMAGE"))){
@@ -150,7 +161,7 @@ export abstract class MusicBotBase extends LogEmitter {
     if(!this._versionInfo){
       this._versionInfo = "Could not get version";
     }
-    this.Log(`Version: ${this._versionInfo}`);
+    this.logger.info(`Version: ${this._versionInfo}`);
     this.initializeBackupper();
   }
 
@@ -170,7 +181,7 @@ export abstract class MusicBotBase extends LogEmitter {
    */
   protected maintenanceTick(){
     this.maintenanceTickCount++;
-    if(Util.config.debug) Util.logger.log(`[Tick] #${this.maintenanceTickCount}`, "debug");
+    this.logger.debug(`[Tick] #${this.maintenanceTickCount}`);
     this.emit("tick", this.maintenanceTickCount);
     // ページトグルの整理
     PageToggle.organize(this._embedPageToggle, 5);
@@ -183,13 +194,19 @@ export abstract class MusicBotBase extends LogEmitter {
    */
   logGeneralInfo(){
     const guildDataArray = [...this.guildData.values()];
-    const memory = Util.system.GetMemInfo();
-    Util.logger.log(`[Tick] [Main] Participating: ${this._client.guilds.size}, Registered: ${this.guildData.size} Connecting: ${guildDataArray.filter(d => d.player.isConnecting).length} Paused: ${guildDataArray.filter(d => d.player.isPaused).length}`);
-    Util.logger.log(`[Tick] [System] Free:${Math.floor(memory.free)}MB; Total:${Math.floor(memory.total)}MB; Usage:${memory.usage}%`);
+    const memory = Util.system.getMemoryInfo();
+    this.logger.info(
+      `[Tick] (Client) Participating: ${this._client.guilds.size}, Registered: ${this.guildData.size} Connecting: ${guildDataArray.filter(d => d.player.isConnecting).length} Paused: ${guildDataArray.filter(d => d.player.isPaused).length}`
+    );
+    this.logger.info(
+      `[Tick] (System) Free:${Math.floor(memory.free)}MB; Total:${Math.floor(memory.total)}MB; Usage:${memory.usage}%`
+    );
     const nMem = process.memoryUsage();
-    const rss = Util.system.GetMBytes(nMem.rss);
-    const ext = Util.system.GetMBytes(nMem.external);
-    Util.logger.log(`[Tick] [Main] Memory RSS: ${rss}MB, Heap total: ${Util.system.GetMBytes(nMem.heapTotal)}MB, Total: ${Util.math.GetPercentage(rss + ext, memory.total)}%`);
+    const rss = Util.system.getMBytes(nMem.rss);
+    const ext = Util.system.getMBytes(nMem.external);
+    this.logger.info(
+      `[Tick] (System) Memory RSS: ${rss}MB, Heap total: ${Util.system.getMBytes(nMem.heapTotal)}MB, Total: ${Util.getPercentage(rss + ext, memory.total)}%`
+    );
   }
 
   abstract run(debugLog: boolean, debugLogStoreLength?: number): void;
@@ -225,32 +242,4 @@ export abstract class MusicBotBase extends LogEmitter {
   getData(guildId: string){
     return this.guildData.get(guildId);
   }
-
-  override emit<T extends keyof BotBaseEvents>(eventName: T, ...args: BotBaseEvents[T]){
-    return super.emit(eventName, ...args);
-  }
-
-  override on<T extends keyof BotBaseEvents>(eventName: T, listener: (...args: BotBaseEvents[T]) => void){
-    return super.on(eventName, listener);
-  }
-
-  override once<T extends keyof BotBaseEvents>(eventName: T, listener: (...args: BotBaseEvents[T]) => void){
-    return super.on(eventName, listener);
-  }
-
-  override off<T extends keyof BotBaseEvents>(eventName: T, listener: (...args: BotBaseEvents[T]) => void){
-    return super.off(eventName, listener);
-  }
-}
-
-interface BotBaseEvents {
-  beforeReady: [];
-  ready: [];
-  onMessageCreate: [message:discord.Message];
-  onInteractionCreate: [interaction:discord.Interaction];
-  onCommandHandler: [command:BaseCommand, args:CommandArgs];
-  onBotVoiceChannelJoin: [channel:discord.VoiceChannel|discord.StageChannel];
-  guildDataAdded: [container:GuildDataContainer];
-  guildDataRemoved: [guildId:string];
-  tick: [count:number];
 }

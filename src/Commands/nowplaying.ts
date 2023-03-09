@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/CommandMessage";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
+import * as Util from "../Util";
 import { getColor } from "../Util/color";
 
 export default class NowPlaying extends BaseCommand {
@@ -48,13 +48,13 @@ export default class NowPlaying extends BaseCommand {
     options.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.server.player.isPlaying){
-      message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
+      message.reply("再生中ではありません").catch(this.logger.error);
       return;
     }
     const _s = Math.floor(options.server.player.currentTime / 1000);
     const _t = Number(options.server.player.currentAudioInfo.lengthSeconds);
-    const [min, sec] = Util.time.CalcMinSec(_s);
-    const [tmin, tsec] = Util.time.CalcMinSec(_t);
+    const [min, sec] = Util.time.calcMinSec(_s);
+    const [tmin, tsec] = Util.time.calcMinSec(_t);
     const info = options.server.player.currentAudioInfo;
     let progressBar = "";
     if(_t > 0){
@@ -84,7 +84,7 @@ export default class NowPlaying extends BaseCommand {
     ;
     if(typeof info.thumbnail === "string"){
       embed.setThumbnail(info.thumbnail);
-      await message.reply({ embeds: [embed.toOceanic()] }).catch(e => Util.logger.log(e, "error"));
+      await message.reply({ embeds: [embed.toOceanic()] }).catch(this.logger.error);
     }else{
       embed.setThumbnail("attachment://thumbnail." + info.thumbnail.ext);
       await message.reply({
@@ -95,7 +95,7 @@ export default class NowPlaying extends BaseCommand {
             contents: info.thumbnail.data,
           },
         ],
-      }).catch(e => Util.logger.log(e, "error"));
+      }).catch(this.logger.error);
     }
   }
 }

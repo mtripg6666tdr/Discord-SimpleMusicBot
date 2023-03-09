@@ -20,9 +20,11 @@ import type { CommandArgs } from "./Structure";
 
 import * as discord from "oceanic.js";
 
-import { Util } from "./Util";
 import { MusicBotBase } from "./botBase";
+import { useConfig } from "./config";
 import * as eventHandlers from "./events";
+
+const config = useConfig();
 
 /**
  * 音楽ボットの本体
@@ -30,13 +32,8 @@ import * as eventHandlers from "./events";
 export class MusicBot extends MusicBotBase {
   // クライアントの初期化
   protected readonly _client = null as discord.Client;
-  private readonly _addOn = new Util.addOn.AddOn();
   // eslint-disable-next-line @typescript-eslint/prefer-readonly
   private _isReadyFinished = false;
-
-  get addOns(){
-    return this._addOn;
-  }
 
   get readyFinished(){
     return this._isReadyFinished;
@@ -48,7 +45,7 @@ export class MusicBot extends MusicBotBase {
     this._client = new discord.Client({
       auth: `Bot ${token}`,
       gateway: {
-        intents: Util.config.noMessageContent ? [
+        intents: config.noMessageContent ? [
           "GUILDS",
           "GUILD_MESSAGES",
           "GUILD_VOICE_STATES",
@@ -78,7 +75,7 @@ export class MusicBot extends MusicBotBase {
       .on("voiceChannelSwitch", eventHandlers.onVoiceChannelSwitch.bind(this))
       .on("error", this.onError.bind(this))
     ;
-    if(Util.config.debug){
+    if(config.debug){
       this.client
         .on("debug", this.onDebug.bind(this))
         .on("warn", this.onWarn.bind(this))
@@ -87,41 +84,37 @@ export class MusicBot extends MusicBotBase {
   }
 
   private async onError(er: Error){
-    Util.logger.log(er, "error");
+    this.logger.error(er);
     if(er.message?.startsWith("Invalid token")){
-      this.Log("Invalid token detected. Please ensure that you set the correct token. You can also re-generate new token for your bot.");
+      this.logger.fatal("Invalid token detected. Please ensure that you set the correct token. You can also re-generate new token for your bot.");
       process.exit(1);
     }else{
-      this.Log("Attempt reconnecting after waiting for a while...");
+      this.logger.info("Attempt reconnecting after waiting for a while...");
       this._client.disconnect(true);
     }
   }
 
   private onDebug(message: string, id?: number){
-    this.Log(`${message} (ID: ${id || "NaN"})`, "debug");
+    this.logger.debug(`${message} (ID: ${id || "NaN"})`);
   }
 
   private onWarn(message: string, id?: number){
-    this.Log(`${message} (ID: ${id || "NaN"})`, "warn");
+    this.logger.warn(`${message} (ID: ${id || "NaN"})`);
   }
 
   /**
    * Botを開始します。
-   * @param debugLog デバッグログを出力するかどうか
-   * @param debugLogStoreLength デバッグログの保存する数
    */
-  run(debugLog: boolean = false, debugLogStoreLength?: number){
-    this._client.connect().catch(e => this.Log(e, "error"));
-    Util.logger.logStore.log = debugLog;
-    if(debugLogStoreLength) Util.logger.logStore.maxLength = debugLogStoreLength;
+  run(){
+    this._client.connect().catch(e => this.logger.error(e));
   }
 
   async stop(){
-    this.Log("Shutting down the bot...");
+    this.logger.info("Shutting down the bot...");
     this._client.removeAllListeners();
     this._client.on("error", () => {});
     if(this._backupper){
-      this.Log("Shutting down the db...");
+      this.logger.info("Shutting down the db...");
       await this._backupper.destroy();
     }
     this._client.disconnect(false);

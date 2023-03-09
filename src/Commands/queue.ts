@@ -23,7 +23,7 @@ import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/hel
 
 import { BaseCommand } from ".";
 import { PageToggle } from "../Component/PageToggle";
-import { Util } from "../Util";
+import * as Util from "../Util";
 import { getColor } from "../Util/color";
 
 export default class Queue extends BaseCommand {
@@ -50,7 +50,7 @@ export default class Queue extends BaseCommand {
     const msg = await message.reply(":eyes: キューを確認しています。お待ちください...");
     const queue = options.server.queue;
     if(queue.length === 0){
-      msg.edit(":face_with_raised_eyebrow:キューは空です。").catch(e => Util.logger.log(e, "error"));
+      msg.edit(":face_with_raised_eyebrow:キューは空です。").catch(this.logger.error);
       return;
     }
     // 合計所要時間の計算
@@ -58,7 +58,7 @@ export default class Queue extends BaseCommand {
     let _page = options.rawArgs === "" ? 1 : Number(options.rawArgs);
     if(isNaN(_page)) _page = 1;
     if(queue.length > 0 && _page > Math.ceil(queue.length / 10)){
-      msg.edit(":warning:指定されたページは範囲外です").catch(e => Util.logger.log(e, "error"));
+      msg.edit(":warning:指定されたページは範囲外です").catch(this.logger.error);
       return;
     }
     // 合計ページ数割り出し
@@ -72,7 +72,7 @@ export default class Queue extends BaseCommand {
         }
         const q = queue.get(i);
         const _t = Number(q.basicInfo.lengthSeconds);
-        const [min, sec] = Util.time.CalcMinSec(_t);
+        const [min, sec] = Util.time.calcMinSec(_t);
         fields.push({
           name: i !== 0 ? i.toString() : options.server.player.isPlaying ? "現在再生中" : "再生待ち",
           value: [
@@ -83,7 +83,7 @@ export default class Queue extends BaseCommand {
           ].join("\r\n"),
         });
       }
-      const [thour, tmin, tsec] = Util.time.CalcHourMinSec(totalLength);
+      const [thour, tmin, tsec] = Util.time.calcHourMinSec(totalLength);
       return new MessageEmbedBuilder()
         .setTitle(`${message.guild.name}のキュー`)
         .setDescription(`\`${page}ページ目(${totalpage}ページ中)\``)
@@ -102,7 +102,7 @@ export default class Queue extends BaseCommand {
     };
 
     // 送信
-    await msg.edit({ content: "", embeds: [getQueueEmbed(_page)] }).catch(e => Util.logger.log(e, "error"));
+    await msg.edit({ content: "", embeds: [getQueueEmbed(_page)] }).catch(this.logger.error);
     if(totalpage > 1){
       options.embedPageToggle.push((await PageToggle.init(msg, n => getQueueEmbed(n + 1), totalpage, _page - 1)).setFresh(true));
     }

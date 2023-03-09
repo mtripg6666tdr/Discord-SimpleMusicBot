@@ -24,7 +24,7 @@ import type { Readable } from "stream";
 import SoundCloud from "soundcloud.ts";
 
 import { AudioSource } from "./audiosource";
-import { Util } from "../Util";
+import { createPassThrough } from "../Util";
 
 export class SoundCloudS extends AudioSource<string> {
   protected author: string;
@@ -56,7 +56,7 @@ export class SoundCloudS extends AudioSource<string> {
   async fetch(): Promise<ReadableStreamInfo>{
     const sc = new SoundCloud();
     const source = await sc.util.streamTrack(this.url) as Readable;
-    const stream = Util.general.createPassThrough();
+    const stream = createPassThrough();
     source
       .on("error", e => !stream.destroyed ? stream.destroy(e) : stream.emit("error", e))
       .pipe(stream)

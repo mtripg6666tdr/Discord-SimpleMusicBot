@@ -20,7 +20,6 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 
 export default class OnceLoop extends BaseCommand {
   constructor(){
@@ -44,7 +43,7 @@ export default class OnceLoop extends BaseCommand {
         allowedMentions: {
           users: false,
         },
-      }).catch(e => Util.logger.log(e, "error"));
+      }).catch(this.logger.error);
     }else{
       options.server.queue.onceLoopEnabled = true;
       message.reply({
@@ -52,7 +51,7 @@ export default class OnceLoop extends BaseCommand {
         allowedMentions: {
           users: false,
         },
-      }).catch(e => Util.logger.log(e, "error"));
+      }).catch(this.logger.error);
     }
   }
 }

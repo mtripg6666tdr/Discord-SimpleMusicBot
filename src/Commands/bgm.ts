@@ -22,7 +22,6 @@ import type { CommandMessage } from "../Component/CommandMessage";
 import * as ytpl from "ytpl";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 
 export default class Bgm extends BaseCommand {
   constructor(){
@@ -42,7 +41,7 @@ export default class Bgm extends BaseCommand {
     if(!await options.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true)) return;
     const url = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
     if(options.server.searchPanel.has(message.member.id)){
-      message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
+      message.reply("✘既に開かれている検索窓があります").catch(this.logger.error);
       return;
     }
     const searchPanel = options.server.searchPanel.create(message, "プリセットBGM一覧", true);

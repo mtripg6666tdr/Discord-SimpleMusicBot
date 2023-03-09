@@ -36,7 +36,8 @@ type BinaryManagerOptions = {
   checkUpdateTimeout?: number,
 };
 
-export class BinaryManager extends LogEmitter {
+// eslint-disable-next-line @typescript-eslint/ban-types
+export class BinaryManager extends LogEmitter<{}> {
   protected readonly checkUpdateTimeout = this.options.checkUpdateTimeout || 1000 * 60 /* 1 min */ * 60 /* 1 hour */ * 3/* 3 hour */;
   protected baseUrl = path.join(__dirname, "../../bin");
   protected lastChecked: number = 0;
@@ -51,15 +52,14 @@ export class BinaryManager extends LogEmitter {
   }
 
   constructor(protected options: Readonly<BinaryManagerOptions>){
-    super();
-    this.setTag(`BinaryManager(${options.localBinaryName})`);
+    super(`BinaryManager(${options.localBinaryName})`);
     if(!fs.existsSync(this.baseUrl)){
       try{
         fs.mkdirSync(this.baseUrl);
       }
       catch(e){
-        this.Log(e, "warn");
-        this.Log("Fallbacking to the root directory");
+        this.logger.warn(e);
+        this.logger.info("Fallbacking to the root directory");
         this.baseUrl = path.join(__dirname, "../../");
       }
     }
@@ -75,7 +75,7 @@ export class BinaryManager extends LogEmitter {
   protected async getReleaseInfo(){
     return lock(this.getReleaseInfoLocker, async () => {
       if(this.releaseInfo && !this.isStaleInfo){
-        this.Log("Skipping the binary info fetching due to valid info cache found");
+        this.logger.info("Skipping the binary info fetching due to valid info cache found");
         return this.releaseInfo;
       }
       const { body } = await candyget.json<GitHubRelease>(`https://api.github.com/repos/${this.options.binaryRepo}/releases/latest`, {
@@ -94,13 +94,13 @@ export class BinaryManager extends LogEmitter {
     if(!fs.existsSync(this.binaryPath)){
       return false;
     }else{
-      this.Log("Checking the latest version");
+      this.logger.info("Checking the latest version");
       const [latestVersion, currentVersion] = await Promise.all([
         this.getReleaseInfo().then(info => info.tag_name),
         this.exec(this.options.checkVersionArgs || ["--version"]).then(output => output.trim()),
       ]);
       const isLatest = latestVersion === currentVersion;
-      this.Log(isLatest ? "The binary is latest" : "The binary is stale");
+      this.logger.info(isLatest ? "The binary is latest" : "The binary is stale");
       return isLatest;
     }
   }
@@ -113,7 +113,7 @@ export class BinaryManager extends LogEmitter {
     if(!binaryUrl){
       throw new Error("No binary url detected");
     }else{
-      this.Log("Start downloading the binary");
+      this.logger.info("Start downloading the binary");
       const result = await candyget.stream(binaryUrl, {
         headers: {
           "Accept": "*/*",
@@ -133,7 +133,7 @@ export class BinaryManager extends LogEmitter {
           "close",
         ),
       ]);
-      this.Log("Finish downloading the binary");
+      this.logger.info("Finish downloading the binary");
     }
   }
 
@@ -146,7 +146,7 @@ export class BinaryManager extends LogEmitter {
     }
     return new Promise((resolve, reject) => {
       try{
-        this.Log(`Passing arguments: ${args.join(" ")}`);
+        this.logger.info(`Passing arguments: ${args.join(" ")}`);
         const process = spawn(this.binaryPath, args, {
           stdio: ["ignore", "pipe", "pipe"],
           shell: false,
@@ -172,7 +172,7 @@ export class BinaryManager extends LogEmitter {
           bufs = null;
           reject(err);
         });
-        process.stderr.on("data", (chunk: Buffer) => this.Log(`[Child] ${chunk.toString()}`));
+        process.stderr.on("data", (chunk: Buffer) => this.logger.info(`[Child] ${chunk.toString()}`));
       }
       catch(e){
         reject(e);

@@ -21,7 +21,8 @@ import type { KnownAudioSourceIdentifer } from "../Component/QueueManager";
 import * as ytdl from "ytdl-core";
 
 import * as AudioSource from ".";
-import { Util } from "../Util";
+import { isAvailableRawAudioURL } from "../Util";
+import { useConfig } from "../config";
 
 type AudioSourceBasicInfo = {
   type: KnownAudioSourceIdentifer,
@@ -30,15 +31,15 @@ type AudioSourceBasicInfo = {
   forceCache: boolean,
 };
 
-const { isDisabledSource } = Util.general;
+const { isDisabledSource } = useConfig();
 
 export async function resolve(info: AudioSourceBasicInfo){
   let basicInfo = null as AudioSource.AudioSource<any>;
   const { type, url, knownData: gotData, forceCache: cache } = info;
-  if(!Util.general.isDisabledSource("youtube") && (type === "youtube" || type === "unknown" && ytdl.validateURL(url))){
+  if(!isDisabledSource("youtube") && (type === "youtube" || type === "unknown" && ytdl.validateURL(url))){
     // youtube
     basicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.exportableYouTube, cache);
-  }else if(!isDisabledSource("custom") && (type === "custom" || type === "unknown" && Util.fs.isAvailableRawAudioURL(url))){
+  }else if(!isDisabledSource("custom") && (type === "custom" || type === "unknown" && isAvailableRawAudioURL(url))){
     // カスタムストリーム
     basicInfo = await new AudioSource.CustomStream().init(url, info.knownData);
   }else if(!isDisabledSource("soundcloud") && (type === "soundcloud" || AudioSource.SoundCloudS.validateUrl(url))){

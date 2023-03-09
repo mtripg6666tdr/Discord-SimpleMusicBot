@@ -79,7 +79,7 @@ export class PlayManagerWithBgm extends PlayManager {
     if(this._player.state.status === AudioPlayerStatus.Playing){
       await entersState(this._player, AudioPlayerStatus.Idle, 20e3)
         .catch(() => {
-          this.Log("Stream has not ended in time and will force stream into destroying", "warn");
+          this.logger.warn("Stream has not ended in time and will force stream into destroying");
           this.stop();
         })
       ;
@@ -91,7 +91,7 @@ export class PlayManagerWithBgm extends PlayManager {
     if(this.bgm){
       this.server.queue.next();
       if(this.server.queue.isBgmEmpty){
-        this.Log("Queue empty");
+        this.logger.info("Queue empty");
         this.disconnect();
       }else{
         this.play(0, true);

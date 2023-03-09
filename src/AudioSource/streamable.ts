@@ -19,8 +19,9 @@
 import type { exportableCustom, UrlStreamInfo } from ".";
 import type { EmbedField } from "oceanic.js";
 
+import candyget from "candyget";
+
 import { AudioSource } from "./audiosource";
-import { Util } from "../Util";
 
 export class Streamable extends AudioSource<string> {
   protected streamUrl = "";
@@ -104,7 +105,7 @@ export abstract class StreamableApi {
 
   static async getVideoDetails(id: string): Promise<StreamableAPIResult>{
     const BASE_API = "https://api.streamable.com/videos/";
-    return JSON.parse(await Util.web.DownloadText(BASE_API + id)) as StreamableAPIResult;
+    return candyget.json(BASE_API + id).then(({ body }) => body as StreamableAPIResult);
   }
 }
 

@@ -17,11 +17,22 @@
  */
 
 import type { CommandMessage } from "./CommandMessage";
+import type { GuildDataContainer } from "../Structure";
 
 import { SearchPanel } from "./SearchPanel";
 import { ServerManagerBase } from "../Structure";
 
-export class SearchPanelManager extends ServerManagerBase {
+interface SearchPanelManagerEvents {
+  create: [panel: SearchPanel];
+  bind: [panel: SearchPanel];
+  delete: [panel: SearchPanel];
+}
+
+export class SearchPanelManager extends ServerManagerBase<SearchPanelManagerEvents> {
+  constructor(parent: GuildDataContainer){
+    super("SearchPanelManager", parent);
+  }
+  
   protected _searchPanels = new Map<string, SearchPanel>();
 
   get size(){
@@ -30,11 +41,13 @@ export class SearchPanelManager extends ServerManagerBase {
 
   create(_commandMessage: CommandMessage, query: string, isRawTitle: boolean = false){
     if(this._searchPanels.size >= 3){
-      _commandMessage.reply(":cry:すでに開いている検索パネルが上限を超えています").catch(er => this.Log(er, "error"));
+      _commandMessage.reply(":cry:すでに開いている検索パネルが上限を超えています")
+        .catch(this.logger.error);
       return null;
     }
     const panel = new SearchPanel(_commandMessage, query, isRawTitle);
     panel.once("open", this.bindSearchPanel.bind(this, panel));
+    this.emit("create", panel);
     return panel;
   }
 
@@ -53,6 +66,8 @@ export class SearchPanelManager extends ServerManagerBase {
     panel.once("destroy", () => {
       clearTimeout(timeout);
       this._searchPanels.delete(panel.commandMessage.member.id);
+      this.emit("delete", panel);
     });
+    this.emit("bind", panel);
   }
 }

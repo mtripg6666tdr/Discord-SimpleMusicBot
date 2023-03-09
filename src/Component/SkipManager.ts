@@ -18,23 +18,28 @@
 
 import type { CommandMessage } from "./CommandMessage";
 import type { ResponseMessage } from "./ResponseMessage";
+import type { GuildDataContainer } from "../Structure";
 import type { QueueContent } from "../Structure/QueueContent";
 import type { Member } from "oceanic.js";
 
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { ServerManagerBase } from "../Structure";
-import Util from "../Util";
 
 type voteResult = "voted"|"cancelled"|"ignored";
 
-export class SkipManager extends ServerManagerBase {
+// eslint-disable-next-line @typescript-eslint/ban-types
+export class SkipManager extends ServerManagerBase<{}> {
   private inited = false;
   private readonly agreeUsers = new Set<string>();
   private reply: ResponseMessage = null;
   private currentSong: QueueContent = null;
   private destroyed = false;
   private issuer: string = null;
+
+  constructor(parent: GuildDataContainer){
+    super("SkipManager", parent);
+  }
 
   async init(message: CommandMessage){
     if(this.inited || this.destroyed) throw new Error("This manager has already initialized or destroyed");
@@ -84,11 +89,13 @@ export class SkipManager extends ServerManagerBase {
         this.server.player.stop();
         await this.server.queue.next();
         await this.server.player.play();
-        response.edit(":track_next: `" + title + "`をスキップしました:white_check_mark:").catch(e => Util.logger.log(e, "error"));
+        response.edit(":track_next: `" + title + "`をスキップしました:white_check_mark:")
+          .catch(this.logger.error);
       }
       catch(e){
-        Util.logger.log(e, "error");
-        this.reply.edit(":astonished:スキップに失敗しました").catch(er => Util.logger.log(er, "error"));
+        this.logger.error(e);
+        this.reply.edit(":astonished:スキップに失敗しました")
+          .catch(this.logger.error);
       }
     }else{
       const content = this.createMessageContent();
@@ -118,7 +125,7 @@ export class SkipManager extends ServerManagerBase {
         new MessageActionRowBuilder()
           .addComponents(
             new MessageButtonBuilder()
-              .setCustomId(`skip_vote_${this.server.guildId}`)
+              .setCustomId(`skip_vote_${this.server.getGuildId()}`)
               .setEmoji("⏩")
               .setLabel("賛成")
               .setStyle("PRIMARY")

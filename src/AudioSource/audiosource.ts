@@ -18,10 +18,12 @@
 
 import type * as Sources from ".";
 import type { exportableCustom } from "./custom";
+import type { LoggerObject } from "../logger";
 import type { EmbedField } from "oceanic.js";
 import type { Readable } from "stream";
 
 import { DefaultAudioThumbnailURL } from "../definition";
+import { getLogger } from "../logger";
 
 export type StreamTypeIdentifer =
   | "webm/opus"
@@ -100,8 +102,11 @@ export abstract class AudioSource<T extends ThumbnailType> {
     return this._serviceIdentifer;
   }
 
+  protected logger: LoggerObject;
+
   constructor(serviceType: AudioSourceTypeIdentifer){
     this._serviceIdentifer = serviceType;
+    this.logger = getLogger(this.constructor.name);
   }
 
   // 現在再生中の曲を示すEmbedField

@@ -20,7 +20,9 @@ import type { MusicBot } from "../bot";
 import type * as discord from "oceanic.js";
 
 import { QueueManagerWithBgm } from "../Component/QueueManagerWithBGM";
-import Util from "../Util";
+import { useConfig } from "../config";
+
+const config = useConfig();
 
 export async function onVoiceChannelLeave(
   this: MusicBot,
@@ -33,18 +35,18 @@ export async function onVoiceChannelLeave(
 
   if(member.id === this._client.user.id){
     // サーバー側からのボットの切断
-    this.Log(`forced to disconnect from VC (${server.connectingVoiceChannel?.id})`);
+    this.logger.info(`forced to disconnect from VC (${server.connectingVoiceChannel?.id})`);
     server.player.disconnect();
     await this._client.rest.channels.createMessage(
       server.boundTextChannel,
       {
         content: ":postbox: 正常に切断しました",
       }
-    ).catch(e => this.Log(e, "error"));
+    ).catch(this.logger.error);
   }else if(oldChannel.voiceMembers.has(this._client.user.id) && oldChannel.voiceMembers.size === 1){
     if(server.queue instanceof QueueManagerWithBgm && server.queue.isBGM){
       server.player.disconnect();
-    }else if(server.player.isPlaying && !Util.config.twentyFourSeven.includes(oldChannel.id) && !Util.config.alwaysTwentyFourSeven){
+    }else if(server.player.isPlaying && !config.twentyFourSeven.includes(oldChannel.id) && !config.alwaysTwentyFourSeven){
       // 誰も聞いてる人がいない
       if(
         server.player.currentAudioInfo.lengthSeconds > 60
@@ -53,7 +55,7 @@ export async function onVoiceChannelLeave(
         // かつ、楽曲の長さが60秒以上
         // かつ、残り時間が10秒以内
         // ならば、切断。
-        this.Log(`audio left less than 10sec; automatically disconnected from VC (${server.connectingVoiceChannel?.id})`);
+        this.logger.info(`audio left less than 10sec; automatically disconnected from VC (${server.connectingVoiceChannel?.id})`);
         server.player.disconnect();
         if(!server.queue.onceLoopEnabled && !server.queue.loopEnabled) server.queue.next();
         await this._client.rest.channels.createMessage(
@@ -61,7 +63,7 @@ export async function onVoiceChannelLeave(
           {
             content: ":postbox: 正常に切断しました",
           }
-        ).catch(e => this.Log(e, "error"));
+        ).catch(this.logger.error);
       }else if(!server.player.isPaused){
         // すでに一時停止されていないならば、一時停止する
         server.player.pause();
@@ -70,7 +72,7 @@ export async function onVoiceChannelLeave(
           {
             content: ":pause_button:ボイスチャンネルから誰もいなくなったため一時停止しました。`再生`コマンドで再開できます。",
           }
-        ).catch(e => this.Log(e));
+        ).catch(this.logger.error);
         const timer = setTimeout(() => {
           server.player.off("playCalled", playHandler);
           server.player.off("disconnect", playHandler);
@@ -79,8 +81,8 @@ export async function onVoiceChannelLeave(
               server.boundTextChannel,
               {
                 content: ":postbox: 長時間使用しなかったため、終了します",
-              }).catch(e => this.Log(e, "error")
-            );
+              }
+            ).catch(this.logger.error);
             server.player.disconnect();
           }
         }, 10 * 60 * 1000).unref();
@@ -95,7 +97,7 @@ export async function onVoiceChannelLeave(
         {
           content: ":postbox: 正常に切断しました",
         }
-      ).catch(e => this.Log(e, "error"));
+      ).catch(this.logger.error);
     }
   }
   server.skipSession?.checkThreshold();

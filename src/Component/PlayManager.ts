@@ -29,16 +29,37 @@ import { AudioPlayerStatus, createAudioResource, createAudioPlayer, entersState,
 import { resolveStreamToPlayable } from "./streams";
 import { Normalizer } from "./streams/normalizer";
 import { ServerManagerBase } from "../Structure";
-import { Util } from "../Util";
+import * as Util from "../Util";
 import { getColor } from "../Util/color";
 import { getFFmpegEffectArgs } from "../Util/effect";
+import { useConfig } from "../config";
 import { FallBackNotice } from "../definition";
+
+interface PlayManagerEvents {
+  volumeChanged: [volume:string];
+  playCalled: [seek:number];
+  playPreparing: [seek:number];
+  playStarted: [];
+  playStartUIPrepared: [message:MessageEmbedBuilder];
+  playCompleted: [];
+  stop: [];
+  disconnect: [];
+  disconnectAttempt: [];
+  pause: [];
+  resume: [];
+  rewind: [];
+  empty: [];
+  handledError: [error:Error];
+  all: [...any[]];
+}
+
+const config = useConfig();
 
 /**
  * サーバーごとの再生を管理するマネージャー。
  * 再生や一時停止などの処理を行います。
  */
-export class PlayManager extends ServerManagerBase {
+export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   protected readonly retryLimit = 3;
   protected _seek = 0;
   protected _errorReportChannel: TextChannel = null;
@@ -116,18 +137,9 @@ export class PlayManager extends ServerManagerBase {
   }
 
   // コンストラクタ
-  constructor(){
-    super();
-    this.setTag("PlayManager");
-    this.Log("Play Manager instantiated");
-  }
-
-  /**
-   *  親となるGuildVoiceInfoをセットする関数（一回のみ呼び出せます）
-   */
-  override setBinding(data: GuildDataContainer){
-    this.Log("Set data of guild id " + data.guildId);
-    super.setBinding(data);
+  constructor(parent: GuildDataContainer){
+    super("PlayManager", parent);
+    this.logger.info("Play Manager instantiated");
   }
 
   setVolume(val: number){
@@ -148,11 +160,11 @@ export class PlayManager extends ServerManagerBase {
     // 再生できる状態か確認
     const badCondition = this.getIsBadCondition();
     if(badCondition){
-      this.Log("Play called but operated nothing", "warn");
+      this.logger.warn("Play called but operated nothing");
       return this;
     }
 
-    this.Log("Play called");
+    this.logger.info("Play called");
     this.emit("playPreparing", time);
     this.preparing = true;
     let mes: Message = null;
@@ -160,7 +172,7 @@ export class PlayManager extends ServerManagerBase {
 
     // 通知メッセージを送信する（可能なら）
     if(this.getNoticeNeeded() && !quiet){
-      const [min, sec] = Util.time.CalcMinSec(this.currentAudioInfo.lengthSeconds);
+      const [min, sec] = Util.time.calcMinSec(this.currentAudioInfo.lengthSeconds);
       const isLive = this.currentAudioInfo.isYouTube() && this.currentAudioInfo.isLiveStream;
       if(this._currentAudioInfo.isYouTube() && this._currentAudioInfo.availableAfter){
         // まだ始まっていないライブを待機する
@@ -184,7 +196,7 @@ export class PlayManager extends ServerManagerBase {
             const startTime = this._currentAudioInfo.isYouTube() && this._currentAudioInfo.availableAfter;
             if(!startTime) resolve();
             const waitTime = Math.max(new Date(startTime).getTime() - Date.now(), 20 * 1000);
-            this.Log(`Retrying after ${waitTime}ms`);
+            this.logger.info(`Retrying after ${waitTime}ms`);
             timeout = setTimeout(async () => {
               if(waitTarget !== this._currentAudioInfo) return;
               if(this._currentAudioInfo.isYouTube()){
@@ -271,13 +283,13 @@ export class PlayManager extends ServerManagerBase {
       this.preparing = false;
       this.emit("playStarted");
 
-      this.Log("Play started successfully");
+      this.logger.info("Play started successfully");
 
       if(mes && !quiet){
         // 再生開始メッセージ
         const _t = Number(this.currentAudioInfo.lengthSeconds);
-        const [min, sec] = Util.time.CalcMinSec(_t);
-        const timeFragments = Util.time.CalcHourMinSec(this.server.queue.lengthSecondsActual - (this.currentAudioInfo.lengthSeconds || 0));
+        const [min, sec] = Util.time.calcMinSec(_t);
+        const timeFragments = Util.time.calcHourMinSec(this.server.queue.lengthSecondsActual - (this.currentAudioInfo.lengthSeconds || 0));
         /* eslint-disable @typescript-eslint/indent */
         const embed = new MessageEmbedBuilder()
           .setTitle(":cd:現在再生中:musical_note:")
@@ -344,7 +356,7 @@ export class PlayManager extends ServerManagerBase {
             content: "",
             embeds: [embed.toOceanic()],
             components,
-          }).catch(e => Util.logger.log(e, "error"));
+          }).catch(this.logger.error);
         }else{
           mes.edit({
             content: "",
@@ -365,7 +377,7 @@ export class PlayManager extends ServerManagerBase {
           this.off("stop", removeControls);
           mes.edit({
             components: [],
-          }).catch(er => this.Log(er, "error"));
+          }).catch(this.logger.error);
         };
 
         this.once("playCompleted", removeControls);
@@ -374,14 +386,14 @@ export class PlayManager extends ServerManagerBase {
       }
     }
     catch(e){
-      Util.logger.log(e, "error");
+      this.logger.error(e);
       try{
-        const t = typeof e === "string" ? e : Util.general.StringifyObject(e);
+        const t = typeof e === "string" ? e : Util.stringifyObject(e);
         if(t.includes("429")){
           mes?.edit({
             content: ":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。",
-          }).catch(er => Util.logger.log(er, "error"));
-          this.Log("Rate limit detected", "error");
+          }).catch(this.logger.error);
+          this.logger.error("Rate limit detected");
           this.stop();
           this.preparing = false;
           return this;
@@ -405,10 +417,10 @@ export class PlayManager extends ServerManagerBase {
   protected prepareAudioPlayer(){
     if(this._player || !this.server.connection) return;
     this._player = createAudioPlayer({
-      debug: Util.config.debug,
+      debug: config.debug,
     });
-    if(Util.config.debug){
-      this._player.on("debug", message => this.Log(`[InternalAudioPlayer] ${message}`, "debug"));
+    if(config.debug){
+      this._player.on("debug", message => this.logger.debug(`[InternalAudioPlayer] ${message}`));
     }
     this._player.on("error", this.handleError.bind(this));
     this.server.connection.subscribe(this._player);
@@ -435,7 +447,7 @@ export class PlayManager extends ServerManagerBase {
    * @returns this
   */
   stop(): PlayManager{
-    this.Log("Stop called");
+    this.logger.info("Stop called");
     if(this.server.connection){
       this._player?.stop();
       this.waitForLive = false;
@@ -453,13 +465,13 @@ export class PlayManager extends ServerManagerBase {
     this.emit("disconnectAttempt");
 
     if(this.server.connection){
-      this.Log("Disconnected from " + this.server.connectingVoiceChannel.id);
+      this.logger.info("Disconnected from " + this.server.connectingVoiceChannel.id);
       this.server.connection.disconnect();
       this.server.connection.destroy();
       this.emit("disconnect");
       this.destroyStream();
     }else{
-      this.Log("Disconnect called but no connection", "warn");
+      this.logger.warn("Disconnect called but no connection");
     }
 
     this.server.connection = null;
@@ -468,7 +480,7 @@ export class PlayManager extends ServerManagerBase {
 
     if(typeof global.gc === "function"){
       global.gc();
-      this.Log("Called exposed gc");
+      this.logger.info("Called exposed gc");
     }
     return this;
   }
@@ -494,7 +506,7 @@ export class PlayManager extends ServerManagerBase {
    * @returns this
    */
   pause(): PlayManager{
-    this.Log("Pause called");
+    this.logger.info("Pause called");
     this.emit("pause");
     this._player.pause();
     return this;
@@ -505,7 +517,7 @@ export class PlayManager extends ServerManagerBase {
    * @returns this
    */
   resume(): PlayManager{
-    this.Log("Resume called");
+    this.logger.info("Resume called");
     this.emit("resume");
     this._player.unpause();
     return this;
@@ -516,21 +528,15 @@ export class PlayManager extends ServerManagerBase {
    * @returns this
    */
   rewind(): PlayManager{
-    this.Log("Rewind called");
+    this.logger.info("Rewind called");
     this.emit("rewind");
     this.stop().play();
     return this;
   }
 
   handleError(er: any){
-    Util.logger.log("Error", "error");
+    this.logger.error(er);
     this.emit("handledError", er);
-    if(er){
-      Util.logger.log(Util.general.StringifyObject(er), "error");
-      if(Util.config.debug){
-        console.error(er);
-      }
-    }
     if(er instanceof Error){
       if("type" in er && er.type === "workaround"){
         this.onStreamFailed(/* quiet */ true);
@@ -553,19 +559,19 @@ export class PlayManager extends ServerManagerBase {
     if(!this.currentAudioUrl){
       return;
     }
-    this.Log("onStreamFinished called");
+    this.logger.info("onStreamFinished called");
 
     if(this.server.connection && this._player.state.status === AudioPlayerStatus.Playing){
       await entersState(this._player, AudioPlayerStatus.Idle, 20e3)
         .catch(() => {
-          this.Log("Stream has not ended in time and will force stream into destroying", "warn");
+          this.logger.warn("Stream has not ended in time and will force stream into destroying");
           this.stop();
         })
       ;
     }
 
     // ストリームが終了したら時間を確認しつつ次の曲へ移行
-    this.Log("Stream finished");
+    this.logger.info("Stream finished");
     this.emit("playCompleted");
 
     // 再生が終わったら
@@ -596,7 +602,7 @@ export class PlayManager extends ServerManagerBase {
   }
 
   async onQueueEmpty(){
-    this.Log("Queue empty");
+    this.logger.info("Queue empty");
     this.destroyStream();
 
     if(this.server.boundTextChannel){
@@ -604,7 +610,7 @@ export class PlayManager extends ServerManagerBase {
         .createMessage(this.server.boundTextChannel, {
           content: ":upside_down: キューが空になりました",
         })
-        .catch(e => Util.logger.log(e, "error"))
+        .catch(this.logger.error)
       ;
     }
 
@@ -617,7 +623,7 @@ export class PlayManager extends ServerManagerBase {
           .createMessage(this.server.boundTextChannel, {
             content: ":wave:キューが空になったため終了します",
           })
-          .catch(e => Util.logger.log(e, "error"))
+          .catch(this.logger.error)
         ;
       }
       this.disconnect();
@@ -632,10 +638,10 @@ export class PlayManager extends ServerManagerBase {
   }
 
   async onStreamFailed(quiet: boolean = false){
-    this.Log("onStreamFailed called");
+    this.logger.info("onStreamFailed called");
     this._cost = 0;
     this.destroyStream();
-    
+
     if(this._errorUrl === this.currentAudioInfo?.url && !quiet){
       this._errorCount++;
     }else{
@@ -643,7 +649,7 @@ export class PlayManager extends ServerManagerBase {
       this._errorUrl = this.currentAudioInfo.url;
       if(this.currentAudioInfo.isYouTube()) this.currentAudioInfo.disableCache();
     }
-    this.Log(`Play failed, (${this._errorCount}times)`, "warn");
+    this.logger.warn(`Play failed, (${this._errorCount}times)`);
     this.preparing = false;
     this.stop();
     if(this._errorCount >= this.retryLimit){
@@ -653,39 +659,5 @@ export class PlayManager extends ServerManagerBase {
     }
     this.play(0, quiet);
   }
-
-  override emit<T extends keyof PlayManagerEvents>(eventName: T, ...args: PlayManagerEvents[T]){
-    super.emit("all", ...args);
-    return super.emit(eventName, ...args);
-  }
-
-  override on<T extends keyof PlayManagerEvents>(eventName: T, listener: (...args: PlayManagerEvents[T]) => void){
-    return super.on(eventName, listener);
-  }
-
-  override once<T extends keyof PlayManagerEvents>(eventName: T, listener: (...args: PlayManagerEvents[T]) => void){
-    return super.on(eventName, listener);
-  }
-
-  override off<T extends keyof PlayManagerEvents>(eventName: T, listener: (...args: PlayManagerEvents[T]) => void){
-    return super.off(eventName, listener);
-  }
 }
 
-interface PlayManagerEvents {
-  volumeChanged: [volume:string];
-  playCalled: [seek:number];
-  playPreparing: [seek:number];
-  playStarted: [];
-  playStartUIPrepared: [message:MessageEmbedBuilder];
-  playCompleted: [];
-  stop: [];
-  disconnect: [];
-  disconnectAttempt: [];
-  pause: [];
-  resume: [];
-  rewind: [];
-  empty: [];
-  handledError: [error:Error];
-  all: [...any[]];
-}

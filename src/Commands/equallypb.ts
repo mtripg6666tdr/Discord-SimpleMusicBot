@@ -22,7 +22,6 @@ import type { CommandMessage } from "../Component/CommandMessage";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 import { getColor } from "../Util/color";
 
 export default class EquallyPlayback extends BaseCommand {
@@ -42,7 +41,7 @@ export default class EquallyPlayback extends BaseCommand {
     options.server.updateBoundChannel(message);
     if(options.server.equallyPlayback){
       options.server.equallyPlayback = false;
-      message.reply("❌均等再生をオフにしました").catch(e => Util.logger.log(e, "error"));
+      message.reply("❌均等再生をオフにしました").catch(this.logger.error);
     }else{
       options.server.equallyPlayback = true;
       const embed = new MessageEmbedBuilder()
@@ -51,7 +50,7 @@ export default class EquallyPlayback extends BaseCommand {
         .setColor(getColor("EQUALLY"))
         .toOceanic()
       ;
-      message.reply({ embeds: [embed] }).catch(er => Util.logger.log(er, "error"));
+      message.reply({ embeds: [embed] }).catch(this.logger.error);
     }
   }
 }

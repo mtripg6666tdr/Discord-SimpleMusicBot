@@ -21,7 +21,8 @@ import type { CommandArgs } from ".";
 import { BaseCommand } from ".";
 import { CommandManager } from "../Component/CommandManager";
 import { CommandMessage } from "../Component/CommandMessage";
-import Util from "../Util";
+import { useConfig } from "../config";
+import { getLogs } from "../logger";
 
 export default class Invoke extends BaseCommand {
   constructor(){
@@ -45,17 +46,17 @@ export default class Invoke extends BaseCommand {
   }
 
   async run(message: CommandMessage, options: CommandArgs){
-    if(options.rawArgs.startsWith("sp;") && Util.general.isBotAdmin(message.member.id)){
+    if(options.rawArgs.startsWith("sp;") && useConfig().isBotAdmin(message.member.id)){
       this.evaluateSpecialCommands(options.rawArgs.substring(3), message, options)
         .then(result => message.reply(result))
-        .catch(er => Util.logger.log(er, "error"))
+        .catch(this.logger.error)
       ;
       return;
     }
 
     const commandInfo = CommandMessage.resolveCommandMessage(options.rawArgs, 0);
     if(commandInfo.command === "invoke"){
-      await message.reply("invokeコマンドをinvokeコマンドで実行することはできません").catch(er => Util.logger.log(er, "error"));
+      await message.reply("invokeコマンドをinvokeコマンドで実行することはできません").catch(this.logger.error);
       return;
     }
 
@@ -63,12 +64,12 @@ export default class Invoke extends BaseCommand {
     if(ci){
       options.args = commandInfo.options;
       options.rawArgs = commandInfo.rawOptions;
-      await ci.checkAndRun(message, options).catch(er => Util.logger.log(er, "error"));
+      await ci.checkAndRun(message, options).catch(this.logger.error);
       if(!message["isMessage"] && !message["_interactionReplied"]){
-        await message.reply("実行しました").catch(er => Util.logger.log(er, "error"));
+        await message.reply("実行しました").catch(this.logger.error);
       }
     }else{
-      await message.reply("コマンドが見つかりませんでした").catch(er => Util.logger.log(er, "error"));
+      await message.reply("コマンドが見つかりませんでした").catch(this.logger.error);
     }
   }
 
@@ -87,11 +88,11 @@ export default class Invoke extends BaseCommand {
         message.reply({
           files: [
             {
-              contents: Buffer.from(Util.logger.logStore.data.join("\r\n")),
+              contents: Buffer.from(getLogs().join("\r\n")),
               name: "log.txt",
             },
           ],
-        }).catch(er => Util.logger.log(er));
+        }).catch(this.logger.error);
         break;
       default:
         return "特別コマンドが見つかりません。";

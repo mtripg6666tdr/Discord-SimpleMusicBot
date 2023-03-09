@@ -38,19 +38,21 @@ export async function onVoiceChannelJoin(
       voiceChannel.guild.editCurrentUserVoiceState({
         channelID: newChannel.id,
         suppress: false,
-      }).catch(() => {
+      }).catch(er => {
+        this.logger.warn(er);
         voiceChannel.guild.editUserVoiceState(this._client.user.id, {
           channelID: newChannel.id,
           suppress: false,
         })
-          .catch(() => {
+          .catch(er2 => {
+            this.logger.warn(er2);
             this._client.rest.channels.createMessage(
               this.guildData.get((newChannel as discord.VoiceChannel).guild.id).boundTextChannel,
               {
                 content: ":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。",
               }
             )
-              .catch(e => this.Log(e));
+              .catch(this.logger.error);
           });
       });
       this.emit("onBotVoiceChannelJoin", voiceChannel);

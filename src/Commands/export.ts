@@ -21,7 +21,6 @@ import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
 import { YmxVersion } from "../Structure";
-import { Util } from "../Util";
 
 export default class Export extends BaseCommand {
   constructor(){
@@ -39,7 +38,7 @@ export default class Export extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(options.server.queue.length === 0){
-      message.reply("キューが空です。").catch(e => Util.logger.log(e, "error"));
+      message.reply("キューが空です。").catch(this.logger.error);
       return;
     }
     const ymxFile = options.server.exportQueue();
@@ -51,7 +50,7 @@ export default class Export extends BaseCommand {
       }],
     })
       .then(msg => msg.edit(`✅エクスポートしました (バージョン: v${YmxVersion}互換)\r\nインポート時は、「<${msg.url}>」をimportコマンドの引数に指定してください`))
-      .catch(e => Util.logger.log(e, "error"))
+      .catch(this.logger.error)
     ;
   }
 }

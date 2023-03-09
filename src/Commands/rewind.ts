@@ -20,7 +20,6 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 
 export default class Rewind extends BaseCommand {
   constructor(){
@@ -38,7 +37,7 @@ export default class Rewind extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
     if(!options.server.player.isPlaying){
-      message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
+      message.reply("再生中ではありません").catch(this.logger.error);
     }else{
       options.server.player.rewind();
       message.reply({
@@ -46,7 +45,7 @@ export default class Rewind extends BaseCommand {
         allowedMentions: {
           users: false,
         },
-      }).catch(e => Util.logger.log(e, "error"));
+      }).catch(this.logger.error);
     }
   }
 }

@@ -20,7 +20,6 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 
 export default class Cancel extends BaseCommand {
   constructor(){
@@ -39,9 +38,9 @@ export default class Cancel extends BaseCommand {
     options.server.updateBoundChannel(message);
     const result = options.server.cancelAll();
     if(result){
-      message.reply("処理中の処理をすべてキャンセルしています....").catch(e => Util.logger.log(e, "error"));
+      message.reply("処理中の処理をすべてキャンセルしています....").catch(this.logger.error);
     }else{
-      message.reply("キャンセルできる処理がありませんでした").catch(e => Util.logger.log(e, "error"));
+      message.reply("キャンセルできる処理がありませんでした").catch(this.logger.error);
     }
   }
 }

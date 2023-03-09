@@ -26,3 +26,5 @@ export const FFmpegDefaultNetworkArgs = [
   "-reconnect_on_http_error", "4xx,5xx",
   "-reconnect_delay_max", "30",
 ] as const;
+export const DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36";
+export const SecondaryUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36";

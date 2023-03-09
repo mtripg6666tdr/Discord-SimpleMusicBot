@@ -31,7 +31,8 @@ export type exportableStatuses = {
   volume: number,
 };
 
-export abstract class Backupper extends LogEmitter {
+// eslint-disable-next-line @typescript-eslint/ban-types
+export abstract class Backupper extends LogEmitter<{}> {
   /**
    * 初期化時に与えられたアクセサを使って、サーバーのデータを返します。
    */
@@ -40,8 +41,7 @@ export abstract class Backupper extends LogEmitter {
   }
 
   constructor(protected readonly bot: MusicBotBase, protected readonly getData:(() => DataType)){
-    super();
-    this.setTag("Backup");
+    super("Backup");
   }
   /**
    * バックアップ済みの接続ステータス等を取得します

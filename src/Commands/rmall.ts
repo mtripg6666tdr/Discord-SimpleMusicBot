@@ -20,7 +20,6 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 
 export default class Rmall extends BaseCommand {
   constructor(){
@@ -39,6 +38,6 @@ export default class Rmall extends BaseCommand {
     options.server.updateBoundChannel(message);
     options.server.player.disconnect();
     options.server.queue.removeAll();
-    await message.reply("✅すべて削除しました").catch(e => Util.logger.log(e, "error"));
+    await message.reply("✅すべて削除しました").catch(this.logger.error);
   }
 }

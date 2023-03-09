@@ -25,8 +25,10 @@ import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/hel
 import { BaseCommand } from ".";
 import { CommandManager } from "../Component/CommandManager";
 import { PageToggle } from "../Component/PageToggle";
-import Util from "../Util";
 import { getColor } from "../Util/color";
+import { useConfig } from "../config";
+
+const config = useConfig();
 
 export const categories = {
   "voice": "ボイスチャンネル操作系",
@@ -98,7 +100,7 @@ export default class Commands extends BaseCommand {
             "コマンドの一覧です。\r\n"
             + `\`${i + 1}ページ目(${embed.length}ページ中)\`\r\n`
             + (
-              Util.config.noMessageContent
+              config.noMessageContent
                 ? "`/コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。"
                 : `コマンドプレフィックスは、\`${options.server.prefix}\`です。\r\n\``
                   + `\`${options.server.prefix}コマンド 再生\`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。`

@@ -27,7 +27,7 @@ export async function handleSelectMenuInteraction(
   interaction: discord.ComponentInteraction<ComponentTypes.STRING_SELECT>
 ){
   if(!interaction.inCachedGuildChannel()) return;
-  this.Log("received selectmenu interaction");
+  this.logger.info("received selectmenu interaction");
 
   // 検索パネル取得
   const panel = this.guildData.get(interaction.channel.guild.id).searchPanel.get(interaction.member.id);

@@ -20,7 +20,6 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
-import { Util } from "../Util";
 
 export default class Seek extends BaseCommand {
   constructor(){
@@ -48,10 +47,10 @@ export default class Seek extends BaseCommand {
     const server = options.server;
     // そもそも再生状態じゃないよ...
     if(!server.player.isPlaying || server.player.preparing){
-      await message.reply("再生中ではありません").catch(e => Util.logger.log(e, "error"));
+      await message.reply("再生中ではありません").catch(this.logger.error);
       return;
     }else if(server.player.currentAudioInfo.lengthSeconds === 0 || server.player.currentAudioInfo.isUnseekable()){
-      await message.reply(":warning:シーク先に対応していない楽曲です").catch(e => Util.logger.log(e, "error"));
+      await message.reply(":warning:シーク先に対応していない楽曲です").catch(this.logger.error);
       return;
     }
     const time = (function(rawTime){
@@ -63,20 +62,20 @@ export default class Seek extends BaseCommand {
       }
     }(options.rawArgs));
     if(time > server.player.currentAudioInfo.lengthSeconds || isNaN(time)){
-      await message.reply(":warning:シーク先の時間が正しくありません").catch(e => Util.logger.log(e, "error"));
+      await message.reply(":warning:シーク先の時間が正しくありません").catch(this.logger.error);
       return;
     }
     try{
       const response = await message.reply(":rocket:シークしています...");
       server.player.stop();
       await server.player.play(time);
-      await response.edit(":white_check_mark:シークしました").catch(e => Util.logger.log(e, "error"));
+      await response.edit(":white_check_mark:シークしました").catch(this.logger.error);
     }
     catch(e){
-      Util.logger.log(e, "error");
+      this.logger.error(e);
       await message.channel.createMessage({
         content: ":astonished:シークに失敗しました",
-      }).catch(er => Util.logger.log(er, "error"));
+      }).catch(this.logger.error);
     }
   }
 }

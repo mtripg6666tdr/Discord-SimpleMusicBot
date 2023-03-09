@@ -37,11 +37,16 @@ export class QueueManagerWithBgm extends QueueManager {
     return this._isBGM;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-useless-constructor
+  constructor(parent: GuildDataContainerWithBgm){
+    super(parent);
+  }
+
   moveCurrentTracksToBGM(){
     this._bgmDefault = [...this._default];
     this._bgmInitial = [...this._default];
     this._default = [];
-    this.Log(`Moved ${this._bgmDefault.length} tracks to bgm queue, and the default queue is now empty`);
+    this.logger.info(`Moved ${this._bgmDefault.length} tracks to bgm queue, and the default queue is now empty`);
   }
 
   resetBgmTracks(){
@@ -58,10 +63,6 @@ export class QueueManagerWithBgm extends QueueManager {
 
   get isBgmEmpty(){
     return this._bgmDefault.length === 0;
-  }
-
-  override setBinding(data: GuildDataContainerWithBgm){
-    super.setBinding(data);
   }
 
   override get(index: number){

@@ -26,12 +26,15 @@ import * as path from "path";
 import { ApplicationCommandOptionTypes, ApplicationCommandTypes } from "oceanic.js";
 
 import { LogEmitter } from "../Structure";
-import Util from "../Util";
+import { useConfig } from "../config";
+
+const config = useConfig();
 
 /**
  * コマンドマネージャー
  */
-export class CommandManager extends LogEmitter {
+// eslint-disable-next-line @typescript-eslint/ban-types
+export class CommandManager extends LogEmitter<{}> {
   private static _instance = null as CommandManager;
   /**
    * コマンドマネージャーの唯一のインスタンスを返します
@@ -51,9 +54,8 @@ export class CommandManager extends LogEmitter {
   private readonly _commands = null as BaseCommand[];
 
   private constructor(){
-    super();
-    this.setTag("CommandsManager");
-    this.Log("Initializing");
+    super("CommandsManager");
+    this.logger.info("Initializing");
 
     this._commands = fs.readdirSync(path.join(__dirname, "../Commands/"), { withFileTypes: true })
       .filter(d => d.isFile())
@@ -65,25 +67,25 @@ export class CommandManager extends LogEmitter {
         return new (require(path.join(__dirname, "../Commands/", n)).default)() as BaseCommand;
       })
       .filter(n => {
-        if(n.name === "検索" && Util.general.isDisabledSource("youtube")){
+        if(n.name === "検索" && config.isDisabledSource("youtube")){
           return false;
         }else if(n.name === "searchb" && !process.env.BD_ENABLE){
           return false;
-        }else if(n.name === "サウンドクラウドを検索" && Util.general.isDisabledSource("soundcloud")){
+        }else if(n.name === "サウンドクラウドを検索" && config.isDisabledSource("soundcloud")){
           return false;
         }
         return true;
       });
 
-    if(Util.config.debug) this.checkDuplicate();
-    this.Log("Initialized");
+    if(useConfig().debug) this.checkDuplicate();
+    this.logger.info("Initialized");
   }
 
   checkDuplicate(){
     const sets = new Map<string, BaseCommand>();
     const setCommand = (name: string, command: BaseCommand) => {
       if(sets.has(name)){
-        this.Log(`Detected command ${command.name} the duplicated key ${name} with ${sets.get(name).name}; overwriting`, "warn");
+        this.logger.warn(`Detected command ${command.name} the duplicated key ${name} with ${sets.get(name).name}; overwriting`);
       }
       sets.set(name, command);
     };
@@ -99,7 +101,7 @@ export class CommandManager extends LogEmitter {
    * @returns 解決されたコマンド
    */
   resolve(command: string){
-    this.Log("Resolving command");
+    this.logger.info("Resolving command");
     let result = null;
     for(let i = 0; i < this._commands.length; i++){
       if(this._commands[i].name === command || this._commands[i].alias.includes(command)){
@@ -107,30 +109,34 @@ export class CommandManager extends LogEmitter {
         break;
       }
     }
-    if(result) this.Log(`Command "${command}" was resolved successfully`);
-    else this.Log("Command not found");
+    if(result){
+      this.logger.info(`Command "${command}" was resolved successfully`);
+    }else{
+      this.logger.info("Command not found");
+    }
+
     return result;
   }
 
   async sync(client: Client, removeOutdated: boolean = false){
-    this.Log("Start syncing application commands");
+    this.logger.info("Start syncing application commands");
 
     const registeredAppCommands = await client.application.getGlobalCommands();
 
     if(registeredAppCommands.length === 0){
-      this.Log("Detected no command registered; bulk-registering slash-commands");
+      this.logger.info("Detected no command registered; bulk-registering slash-commands");
       await client.application.bulkEditGlobalCommands(
         this.commands
           .filter(command => !command.unlist)
           .map(command => command.toApplicationCommandStructure())
       );
-      this.Log("Successfully registered");
+      this.logger.info("Successfully registered");
       return;
     }
 
     const registeredCommands = registeredAppCommands.filter(command => command.type === ApplicationCommandTypes.CHAT_INPUT);
 
-    this.Log(`Successfully get ${registeredCommands.length} commands`);
+    this.logger.info(`Successfully get ${registeredCommands.length} commands`);
     const commandsToEdit = this.commands.filter(target => {
       if(target.unlist) return false;
       const registered = registeredCommands.find(reg => reg.name === target.asciiName);
@@ -159,8 +165,8 @@ export class CommandManager extends LogEmitter {
       return index < 0;
     });
     if(commandsToEdit.length > 0 || commandsToAdd.length > 0){
-      this.Log(`Detected ${commandsToEdit.length + commandsToAdd.length} commands that should be updated; updating`);
-      this.Log(`These are ${[...commandsToEdit, ...commandsToAdd].map(command => command.name)}`);
+      this.logger.info(`Detected ${commandsToEdit.length + commandsToAdd.length} commands that should be updated; updating`);
+      this.logger.info(`These are ${[...commandsToEdit, ...commandsToAdd].map(command => command.name)}`);
       for(let i = 0; i < commandsToEdit.length; i++){
         const commandToRegister = commandsToEdit[i].toApplicationCommandStructure();
         const id = registeredCommands.find(cmd => cmd.name === commandToRegister.name).id;
@@ -170,9 +176,9 @@ export class CommandManager extends LogEmitter {
         const commandToRegister = commandsToAdd[i].toApplicationCommandStructure();
         await client.application.createGlobalCommand(commandToRegister);
       }
-      this.Log("Updating success.");
+      this.logger.info("Updating success.");
     }else{
-      this.Log("Detected no command that should be updated");
+      this.logger.info("Detected no command that should be updated");
     }
     if(removeOutdated){
       const commandsToRemove = registeredCommands.filter(registered => {
@@ -180,26 +186,26 @@ export class CommandManager extends LogEmitter {
         return index < 0 || this.commands[index].unlist;
       });
       if(commandsToRemove.length > 0){
-        this.Log(`Detected ${commandsToRemove.length} commands that should be removed; removing...`);
-        this.Log(`These are ${commandsToRemove.map(command => command.name)}`);
+        this.logger.info(`Detected ${commandsToRemove.length} commands that should be removed; removing...`);
+        this.logger.info(`These are ${commandsToRemove.map(command => command.name)}`);
         await client.application.bulkEditGlobalCommands(this.commands.filter(cmd => !cmd.unlist).map(cmd => cmd.toApplicationCommandStructure()));
-        this.Log("Removing success.");
+        this.logger.info("Removing success.");
       }else{
-        this.Log("Detected no command that should be removed");
+        this.logger.info("Detected no command that should be removed");
       }
     }
   }
 
   async removeAllApplicationCommand(client: Client){
-    this.Log("Removing all application commands");
+    this.logger.info("Removing all application commands");
     await client.application.bulkEditGlobalCommands([]);
-    this.Log("Successfully removed all application commands");
+    this.logger.info("Successfully removed all application commands");
   }
 
   async removeAllGuildCommand(client: Client, guildId: string){
-    this.Log("Removing all guild commands of " + guildId);
+    this.logger.info("Removing all guild commands of " + guildId);
     await client.application.bulkEditGuildCommands(guildId, []);
-    this.Log("Successfully removed all guild commands");
+    this.logger.info("Successfully removed all guild commands");
   }
 
   static mapCommandOptionTypeToInteger(type: CommandOptionsTypes){

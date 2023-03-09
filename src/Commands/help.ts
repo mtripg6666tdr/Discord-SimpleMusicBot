@@ -23,8 +23,10 @@ import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/hel
 
 import { BaseCommand } from ".";
 import { Spotify } from "../AudioSource";
-import { Util } from "../Util";
 import { getColor } from "../Util/color";
+import { useConfig } from "../config";
+
+const config = useConfig();
 
 export default class Help extends BaseCommand {
   constructor(){
@@ -48,12 +50,12 @@ export default class Help extends BaseCommand {
         .then(user => user.username)
         .catch(() => null as string)
       ;
-    const { isDisabledSource } = Util.general;
+    const { isDisabledSource } = config;
     const embed = new MessageEmbedBuilder()
       .setTitle(options.client.user.username + ":notes:")
       .setDescription(
         "高音質な音楽で、Discordで最高のエクスペリエンスを得るために作られました:robot:\r\n"
-      + `利用可能なコマンドを確認するには、\`${Util.config.noMessageContent ? "/" : options.server.prefix}command\`を使用してください。`)
+      + `利用可能なコマンドを確認するには、\`${config.noMessageContent ? "/" : options.server.prefix}command\`を使用してください。`)
       .addField("開発者", `[${developer || "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`)
       .addField("バージョン", "`" + options.bot.version + "`")
       .addField("レポジトリ/ソースコード", "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot")
@@ -75,6 +77,6 @@ export default class Help extends BaseCommand {
       .setColor(getColor("HELP"))
       .toOceanic()
     ;
-    await message.reply({ embeds: [embed] }).catch(e => Util.logger.log(e, "error"));
+    await message.reply({ embeds: [embed] }).catch(this.logger.error);
   }
 }

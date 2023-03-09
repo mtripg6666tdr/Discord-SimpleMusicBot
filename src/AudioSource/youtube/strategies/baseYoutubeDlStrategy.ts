@@ -33,11 +33,11 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
   get cacheType(){
     return this.id;
   }
-  
+
   last: number = 0;
 
   async getInfo(url: string){
-    this.useLog();
+    this.logStrategyUsed();
     let info = null as YoutubeDlInfo;
     info = JSON.parse(await this.binaryManager.exec(["--skip-download", "--print-json", url])) as YoutubeDlInfo;
     return {
@@ -50,9 +50,9 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
   }
 
   async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
-    this.useLog();
+    this.logStrategyUsed();
     const availableCache = cache?.type === this.id && cache.data as YoutubeDlInfo;
-    this.logger(`[AudioSource:youtube] ${availableCache ? "using cache without obtaining" : "obtaining info"}`);
+    this.logger.info(availableCache ? "using cache without obtaining" : "obtaining info");
     const info = availableCache || JSON.parse(await this.binaryManager.exec(["--skip-download", "--print-json", url])) as YoutubeDlInfo;
     const partialResult = {
       info: this.mapToExportable(url, info),

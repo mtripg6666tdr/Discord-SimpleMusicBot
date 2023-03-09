@@ -18,13 +18,7 @@
 
 import type { Static } from "@sinclair/typebox";
 
-import * as fs from "fs";
-import * as path from "path";
-
 import { Type } from "@sinclair/typebox";
-import { TypeCompiler } from "@sinclair/typebox/compiler";
-import { Value } from "@sinclair/typebox/value";
-import CJSON from "comment-json";
 
 const GuildBGMContainer = Type.Object({
   voiceChannelId: Type.RegEx(/^\d+$/),
@@ -39,7 +33,7 @@ const GuildBGMContainer = Type.Object({
   ]),
 });
 
-const Config = Type.Object({
+export const ConfigSchema = Type.Object({
   adminId: Type.Union([
     Type.RegEx(/^\d+$/),
     Type.Array(Type.RegEx(/^\d+$/)),
@@ -64,34 +58,4 @@ const Config = Type.Object({
   disabledSources: Type.Optional(Type.Array(Type.String(), { default: [] })),
 });
 
-const checker = TypeCompiler.Compile(Config);
-
-const rawConfig = fs.readFileSync(path.join(__dirname, "../../config.json"), { encoding: "utf-8" });
-
-const config = CJSON.parse(rawConfig, null, true);
-
-const errs = [...checker.Errors(config)];
-if(errs.length > 0){
-  const er = new Error("Invalid config.json");
-  console.log(errs);
-  Object.defineProperty(er, "errors", {
-    value: errs,
-  });
-  throw er;
-}
-
-if(typeof config !== "object" || !("debug" in config) || !config.debug){
-  console.error("This is still a development phase, and running without debug mode is currently disabled.");
-  console.error("You should use the latest version instead of the current branch.");
-  process.exit(1);
-}
-
-export default Object.assign(
-  Object.create(null),
-  Value.Create(Config),
-  {
-    disabledSources: [],
-  },
-  config,
-) as unknown as Static<typeof Config>;
 export type GuildBGMContainerType = Static<typeof GuildBGMContainer>;

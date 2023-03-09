@@ -25,11 +25,11 @@ import * as discord from "oceanic.js";
 import { CommandManager } from "../Component/CommandManager";
 import { CommandMessage } from "../Component/CommandMessage";
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
-import Util from "../Util";
+import { discordUtil } from "../Util";
 import { NotSendableMessage } from "../definition";
 
 export async function handleCommandInteraction(this: MusicBot, server: GuildDataContainer, interaction: discord.CommandInteraction){
-  this.Log("reveived command interaction");
+  this.logger.info("reveived command interaction");
   if(!interaction.inCachedGuildChannel()) return;
 
   if(!(interaction.channel instanceof discord.TextChannel)){
@@ -40,7 +40,7 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
   }
 
   // 送信可能か確認
-  if(!Util.eris.channel.checkSendable(interaction.channel, this._client.user.id)){
+  if(!discordUtil.channels.checkSendable(interaction.channel, this._client.user.id)){
     await interaction.createMessage({
       content: NotSendableMessage,
     });

@@ -18,13 +18,15 @@
 
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { ListCommandInitializeOptions, UnlistCommandInitializeOptions, ListCommandWithArgumentsInitializeOptions, CommandArgs, SlashCommandArgument, CommandPermission } from "../Structure/Command";
+import type { LoggerObject } from "../logger";
 import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString } from "oceanic.js";
 
 import { ApplicationCommandTypes } from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
 import { permissionDescriptionParts } from "../Structure/Command";
-import Util from "../Util";
+import { discordUtil } from "../Util";
+import { getLogger } from "../logger";
 
 export { CommandArgs } from "../Structure/Command";
 
@@ -97,6 +99,8 @@ export abstract class BaseCommand {
     }
   }
 
+  protected readonly logger: LoggerObject;
+
   constructor(opts: ListCommandInitializeOptions|UnlistCommandInitializeOptions){
     this._name = opts.name;
     this._alias = opts.alias;
@@ -112,14 +116,16 @@ export abstract class BaseCommand {
       this._argument = argument || null;
       this._requiredPermissionsOr = requiredPermissionsOr || [];
     }
+    this.logger = getLogger(`Command(${this.asciiName})`);
+    this.logger.debug(`${this.name} loaded`);
   }
 
   async checkAndRun(message: CommandMessage, options: Readonly<CommandArgs>){
     const judgeIfPermissionMeeted = (perm: CommandPermission) => {
       if(perm === "admin"){
-        return Util.eris.user.isPrivileged(message.member);
+        return discordUtil.users.isPrivileged(message.member);
       }else if(perm === "dj"){
-        return Util.eris.user.isDJ(message.member, options);
+        return discordUtil.users.isDJ(message.member, options);
       }else if(perm === "manageGuild"){
         return message.member.permissions.has("MANAGE_GUILD");
       }else if(perm === "manageMessages"){
@@ -127,9 +133,9 @@ export abstract class BaseCommand {
       }else if(perm === "noConnection"){
         return !options.server.player.isConnecting;
       }else if(perm === "onlyListener"){
-        return Util.eris.channel.isOnlyListener(message.member, options);
+        return discordUtil.channels.isOnlyListener(message.member, options);
       }else if(perm === "sameVc"){
-        return Util.eris.channel.sameVC(message.member, options);
+        return discordUtil.channels.sameVC(message.member, options);
       }else{
         return false;
       }

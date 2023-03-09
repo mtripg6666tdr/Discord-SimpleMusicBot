@@ -22,7 +22,6 @@ import type { ResponseMessage } from "../Component/ResponseMessage";
 import type { AnyGuildTextChannel, Message } from "oceanic.js";
 
 import { BaseCommand } from ".";
-import Util from "../Util";
 
 export default class BulkDelete extends BaseCommand {
   constructor(){
@@ -53,7 +52,7 @@ export default class BulkDelete extends BaseCommand {
       message.reply(":warning:指定されたメッセージ数が無効です。");
       return;
     }
-    const reply = await message.reply(":mag:取得中...").catch(e => Util.logger.log(e, "error")) as ResponseMessage;
+    const reply = await message.reply(":mag:取得中...").catch(this.logger.error) as ResponseMessage;
     try{
       let before = "";
       const messages = [] as Message[];
@@ -83,9 +82,9 @@ export default class BulkDelete extends BaseCommand {
       setTimeout(() => reply.delete().catch(() => {}), 10 * 1000).unref();
     }
     catch(er){
-      Util.logger.log(er, "error");
+      this.logger.error(er);
       if(reply){
-        await reply.edit("失敗しました...").catch(e => Util.logger.log(e, "error"));
+        await reply.edit("失敗しました...").catch(this.logger.error);
       }
     }
   }

@@ -15,7 +15,10 @@
         "skipFiles": [
             "<node_internals>/**"
         ],
-        "program": "${workspaceFolder}/dist/index.js"
+        "program": "${workspaceFolder}/dist/index.js",
+        "env": {
+          "CONSOLE_ENABLE": "1"
+        }
     },
     {
       "type": "node",
@@ -30,7 +33,10 @@
       "skipFiles": [
           "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}/dist/index.js"
+      "program": "${workspaceFolder}/dist/index.js",
+      "env": {
+        "CONSOLE_ENABLE": "1",
+      }
     }
   ]
 }

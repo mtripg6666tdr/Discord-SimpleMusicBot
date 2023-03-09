@@ -16,14 +16,14 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { padZero } from "./general";
+import { padZero } from ".";
 
 /**
  * 合計時間(秒)からゼロ補完された分および秒を計算します。
  * @param _t 合計時間(秒)
  * @returns [ゼロ補完された分,ゼロ補完された秒]
  */
-export function CalcMinSec(_t: number){
+export function calcMinSec(_t: number){
   const sec = _t % 60;
   const min = (_t - sec) / 60;
   return [padZero(min.toString(), 2), padZero(sec.toString(), 2)];
@@ -34,7 +34,7 @@ export function CalcMinSec(_t: number){
  * @param seconds 合計時間(秒)
  * @returns [時間, ゼロ補完された分, ゼロ補完された秒]
  */
-export function CalcHourMinSec(seconds: number){
+export function calcHourMinSec(seconds: number){
   const sec = seconds % 60;
   const min = (seconds - sec) / 60 % 60;
   const hor = ((seconds - sec) / 60 - min) / 60;
@@ -56,7 +56,7 @@ export function HourMinSecToString([hour, min, sec]: string[]){
  * @param date 合計時間(ミリ秒)
  * @returns [時間,分,秒,ミリ秒]
  */
-export function CalcTime(date: number): number[]{
+export function calcTime(date: number): number[]{
   const millisec = date % 1000;
   let ato = (date - millisec) / 1000;
   const sec = ato % 60;

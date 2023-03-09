@@ -16,7 +16,6 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { LogLevels } from "../../Util/log";
 import type * as ytsr from "ytsr";
 
 import * as path from "path";
@@ -25,10 +24,13 @@ import { Worker, isMainThread } from "worker_threads";
 import PQueue from "p-queue";
 
 import { type exportableYouTube, YouTube } from "..";
-import Util from "../../Util";
+import { generateUUID } from "../../Util";
+import { getLogger } from "../../logger";
 
 const worker = isMainThread ? new Worker(path.join(__dirname, "./worker.js")).on("error", console.error) : null;
 global.workerThread = worker;
+
+const logger = getLogger("Spawner");
 
 export type WithId<T> = T & { id: string };
 export type spawnerJobMessage = spawnerGetInfoMessage | spawnerSearchMessage;
@@ -42,7 +44,7 @@ export type spawnerSearchMessage = {
   type: "search",
   keyword: string,
 };
-export type workerMessage = workerSuccessMessage|workerErrorMessage|workerLoggingMessage;
+export type workerMessage = workerSuccessMessage|workerErrorMessage;
 export type workerSuccessMessage = workerGetInfoSuccessMessage | workerSearchSuccessMessage;
 export type workerGetInfoSuccessMessage = {
   type: "initOk",
@@ -56,11 +58,6 @@ export type workerErrorMessage = {
   type: "error",
   data: any,
 };
-export type workerLoggingMessage = {
-  type: "log",
-  level: LogLevels,
-  data: string,
-};
 
 type jobCallback = (callback: workerMessage & { id: string }) => void;
 type jobQueueContent = {
@@ -72,15 +69,13 @@ const jobQueue = worker && new Map<string, jobQueueContent>();
 if(worker){
   worker.unref();
   worker.on("message", (message: WithId<workerMessage>) => {
-    if(message.type === "log"){
-      Util.logger.log(message.data, message.level);
-    }else if(jobQueue.has(message.id)){
+    if(jobQueue.has(message.id)){
       const { callback, start } = jobQueue.get(message.id);
-      Util.logger.log(`[Spawner] Job(${message.id}) Finished (${Date.now() - start}ms)`);
+      logger.debug(`Job(${message.id}) Finished (${Date.now() - start}ms)`);
       callback(message);
       jobQueue.delete(message.id);
     }else{
-      Util.logger.log(`[Spawner] Invalid message received: ${message}`, "warn");
+      logger.warn(`Invalid message received: ${message}`);
     }
   });
 }
@@ -94,14 +89,14 @@ const jobTriggerQueue = new PQueue({
 function doJob(message: spawnerGetInfoMessage): Promise<workerGetInfoSuccessMessage>;
 function doJob(message: spawnerSearchMessage): Promise<workerSearchSuccessMessage>;
 function doJob(message: spawnerJobMessage): Promise<workerSuccessMessage>{
-  const uuid = Util.general.generateUUID();
-  Util.logger.log(`[Spawner] Job(${uuid}) Scheduled`);
+  const uuid = generateUUID();
+  logger.debug(`Job(${uuid}) Scheduled`);
   return jobTriggerQueue.add(() => new Promise((resolve, reject) => {
     worker.postMessage({
       ...message,
       id: uuid,
     });
-    Util.logger.log(`[Spawner] Job(${uuid}) Started`);
+    logger.debug(`Job(${uuid}) Started`);
     jobQueue.set(uuid, {
       start: Date.now(),
       callback: result => {

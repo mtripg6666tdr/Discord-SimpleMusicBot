@@ -21,15 +21,16 @@ import type { MusicBot } from "../bot";
 import * as discord from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
-import Util from "../Util";
+import { useConfig } from "../config";
+
+const config = useConfig();
 
 export async function onReady(this: MusicBot){
   const client = this._client;
-  this["_addOn"].emit("ready", client);
-  this.Log("Socket connection is ready now");
+  this.logger.info("Socket connection is ready now");
   if(this["_isReadyFinished"]) return;
 
-  this.Log("Starting environment checking and preparation now");
+  this.logger.info("Starting environment checking and preparation now");
 
   // Set activity as booting
   if(!this.maintenance){
@@ -49,12 +50,12 @@ export async function onReady(this: MusicBot){
   }
 
   // add bgm tracks
-  if(Util.config.bgm){
-    const guildIds = Object.keys(Util.config.bgm);
+  if(config.bgm){
+    const guildIds = Object.keys(config.bgm);
     for(let i = 0; i < guildIds.length; i++){
       if(!this.client.guilds.get(guildIds[i])) continue;
       await this
-        .initDataWithBgm(guildIds[i], "0", Util.config.bgm[guildIds[i]])
+        .initDataWithBgm(guildIds[i], "0", config.bgm[guildIds[i]])
         .initBgmTracks()
       ;
     }
@@ -77,14 +78,16 @@ export async function onReady(this: MusicBot){
             server.importStatus(guildStatuses.get(id));
           }
           catch(e){
-            this.Log(e, "warn");
+            this.logger.warn(e);
           }
         }
       }
-      this.Log("Finish recovery of queues and statuses.");
+      this.logger.info("Finish recovery of queues and statuses.");
     }
   }else{
-    this.Log("Cannot perform recovery of queues and statuses. Check .env file to perform this. See README for more info", "warn");
+    this.logger.warn(
+      "Cannot perform recovery of queues and statuses. Check .env file to perform this. See README for more info"
+    );
   }
 
   // Set activity
@@ -101,7 +104,7 @@ export async function onReady(this: MusicBot){
     this.maintenanceTick();
     setInterval(this.maintenanceTick.bind(this), 1 * 60 * 1000).unref();
   }, 10 * 1000).unref();
-  this.Log("Interval jobs set up successfully");
+  this.logger.info("Interval jobs set up successfully");
 
   // Command instance preparing
   await CommandManager.instance.sync(this.client);
@@ -110,6 +113,6 @@ export async function onReady(this: MusicBot){
 
   // Finish initializing
   this["_isReadyFinished"] = true;
-  this.Log("Bot is ready now");
+  this.logger.info("Bot is ready now");
   this.emit("ready");
 }

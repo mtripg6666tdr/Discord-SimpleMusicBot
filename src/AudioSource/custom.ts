@@ -20,7 +20,7 @@ import type { UrlStreamInfo } from ".";
 import type { EmbedField } from "oceanic.js";
 
 import { AudioSource } from "./audiosource";
-import { Util } from "../Util";
+import { isAvailableRawAudioURL, retriveLengthSeconds } from "../Util";
 
 export class CustomStream extends AudioSource<string> {
   constructor(){
@@ -33,11 +33,13 @@ export class CustomStream extends AudioSource<string> {
       this.url = url;
       this.lengthSeconds = prefetched.length;
     }else{
-      if(!Util.fs.isAvailableRawAudioURL(url)) throw new Error("正しいストリームではありません");
+      if(!isAvailableRawAudioURL(url)){
+        throw new Error("正しいストリームではありません");
+      }
       this.url = url;
       this.title = this.extractFilename() || "カスタムストリーム";
       try{
-        this.lengthSeconds = await Util.web.RetriveLengthSeconds(url);
+        this.lengthSeconds = await retriveLengthSeconds(url);
       }
       catch{ /* empty */ }
     }

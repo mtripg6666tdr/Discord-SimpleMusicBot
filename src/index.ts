@@ -17,47 +17,50 @@
  */
 
 import "./dotenv";
-
-import type { LogLevels } from "./Util/log";
+import "./logger";
 import type * as http from "http";
 
-import { Util } from "./Util";
+import log4js from "log4js";
+
+import { stringifyObject } from "./Util";
 import { MusicBot } from "./bot";
+import { useConfig } from "./config";
 import { createServer } from "./server";
 
-const logger = (content: any, loglevel?: LogLevels) => Util.logger.log(`[Entry]${typeof content === "string" ? content : Util.general.StringifyObject(content)}`, loglevel);
+const logger = log4js.getLogger("Entry");
+const config = useConfig();
 
-logger("Discord-SimpleMusicBot by mtripg6666tdr");
-logger("This application was originally built by mtripg6666tdr and is licensed under GPLv3 or later.");
-logger("There is no warranty for the work, both of the original and its forks.");
-logger("However if you found any bugs in the original please feel free to report them by creating an issue on GitHub.");
-logger("Thank you for using Discord-SimpleMusicBot!");
-logger(`Node.js v${process.versions.node}`);
+logger.info("Discord-SimpleMusicBot by mtripg6666tdr");
+logger.info("This application was originally built by mtripg6666tdr and is licensed under GPLv3 or later.");
+logger.info("There is no warranty for the work, both of the original and its forks.");
+logger.info("However if you found any bugs in the original please feel free to report them by creating an issue on GitHub.");
+logger.info("Thank you for using Discord-SimpleMusicBot!");
+logger.info(`Node.js v${process.versions.node}`);
 
-const bot = new MusicBot(process.env.TOKEN, Boolean(Util.config.maintenance));
+const bot = new MusicBot(process.env.TOKEN, Boolean(config.maintenance));
 let server: http.Server = null;
 
 // Webサーバーのインスタンス化
-if(Util.config.webserver){
-  server = createServer(bot.client, Number(process.env.PORT) || 8081, Util.logger.log);
+if(config.webserver){
+  server = createServer(bot.client, Number(process.env.PORT) || 8081);
 }else{
-  logger("Skipping to start server");
+  logger.info("Skipping to start server");
 }
 
-if(!Util.config.debug){
+if(!config.debug){
   // ハンドルされなかったエラーのハンドル
   process.on("uncaughtException", async (error)=>{
-    logger(error, "error");
-    if(bot.client && Util.config.errorChannel){
+    logger.fatal(error);
+    if(bot.client && config.errorChannel){
       await reportError(error);
     }
   });
 }else{
   process.on("uncaughtException", async (error)=>{
-    if(bot.client && Util.config.errorChannel){
+    if(bot.client && config.errorChannel){
       await reportError(error);
     }
-    console.error(error);
+    logger.fatal(error);
     process.exit(1);
   });
 }
@@ -66,25 +69,25 @@ let terminating = false;
 const onTerminated = async function(code: string){
   if(terminating) return;
   terminating = true;
-  logger(`${code} detected`);
-  logger("Shutting down the bot...");
+  logger.info(`${code} detected`);
+  logger.info("Shutting down the bot...");
   await bot.stop();
   if(server && server.listening){
-    logger("Shutting down the server...");
+    logger.info("Shutting down the server...");
     await new Promise(resolve => server.close(resolve));
   }
   // 強制終了を報告
-  if(bot.client && Util.config.errorChannel){
-    bot.client.rest.channels.createMessage(Util.config.errorChannel, {
+  if(bot.client && config.errorChannel){
+    bot.client.rest.channels.createMessage(config.errorChannel, {
       content: "Process terminated",
     }).catch(() => {});
   }
   if(global.workerThread){
-    logger("Shutting down worker...");
+    logger.info("Shutting down worker...");
     await global.workerThread.terminate();
   }
-  logger("Shutting down completed");
-  Util.logger.logStore?.destroy();
+  logger.info("Shutting down completed");
+  log4js.shutdown((er) => console.error(er));
   setTimeout(() => {
     console.error("Killing... (forced)");
     process.exit(1);
@@ -95,15 +98,15 @@ const onTerminated = async function(code: string){
 });
 
 // ボット開始
-bot.run(true, 40);
+bot.run();
 
 async function reportError(err: any){
   try{
-    await bot.client.rest.channels.createMessage(Util.config.errorChannel, {
-      content: Util.general.StringifyObject(err),
+    await bot.client.rest.channels.createMessage(config.errorChannel, {
+      content: stringifyObject(err),
     }).catch(() => {});
   }
   catch(e){
-    logger(e, "error");
+    logger.error(e);
   }
 }
