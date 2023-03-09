@@ -42,7 +42,7 @@ const sampleJson = `
 }`;
 fs.writeFileSync(configPath, sampleJson, {encoding: "utf-8"});
 console.log("Successfully wrote the config for test");
-const configLoaderPath = "../dist/Util/config";
+const configLoaderPath = "../dist/config";
 
 describe("Config", function() {
   describe("#Load", function(){
@@ -52,7 +52,7 @@ describe("Config", function() {
   });
 
   describe("#CheckValues", function(){
-    const config = (mod => "default" in mod ? mod.default : mod)(require(configLoaderPath));
+    const config = require(configLoaderPath).useConfig();
     /** @type {[string, string|boolean|{}][]} */
     const tests = [
       ["adminId", "123456"],
