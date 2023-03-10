@@ -29,7 +29,7 @@ export default class NowPlaying extends BaseCommand {
   constructor(){
     super({
       name: "現在再生中",
-      alias: ["今の曲", "np", "nowplaying"],
+      alias: ["今の曲", "nowplaying", "np"],
       description: "現在再生中の曲の情報を表示します。 `l`(スラッシュコマンドの場合はTrue)を引数にするとより長く概要を表示します(可能な場合)",
       unlist: false,
       category: "player",

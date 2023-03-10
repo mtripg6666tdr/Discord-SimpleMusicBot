@@ -22,15 +22,14 @@ import type { CommandMessage } from "../Component/CommandMessage";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
-import * as Util from "../Util";
 import { getColor } from "../Util/color";
 
 export default class Uptime extends BaseCommand {
   constructor(){
     super({
-      name: "アップタイム",
-      alias: ["uptime"],
-      description: "ボットのアップタイムを表示します。",
+      name: "ピング",
+      alias: ["ping", "latency"],
+      description: "ボットのping時間(レイテンシ)を表示します。",
       unlist: false,
       category: "utility",
       requiredPermissionsOr: [],
@@ -40,14 +39,21 @@ export default class Uptime extends BaseCommand {
 
   async run(message: CommandMessage, options: CommandArgs){
     const now = Date.now();
-    const insta = Util.time.calcTime(now - options.bot.instantiatedTime.getTime());
-    const ready = Util.time.calcTime(options.client.uptime);
     const embed = new MessageEmbedBuilder()
       .setColor(getColor("UPTIME"))
-      .setTitle(options.client.user.username + "のアップタイム")
-      .addField("インスタンス作成からの経過時間", `${insta[0]}時間${insta[1]}分${insta[2]}秒`)
-      .addField("Discordに接続してからの経過時間", `${ready[0]}時間${ready[1]}分${ready[2]}秒`)
-      .addField("データが保持されているサーバー数", `${options.bot.databaseCount}サーバー`)
+      .setTitle("ping情報")
+      .addField(
+        "ボット接続実測値",
+        `${now - message.createdTimestamp.getTime()}ms`
+      )
+      .addField(
+        "ボットWebSocket接続実測値",
+        `${message.guild.shard.latency === Infinity ? "-" : message.guild.shard.latency}ms`
+      )
+      .addField(
+        "ボイスチャンネルUDP接続実測値",
+        `${options.server.player.isConnecting && options.server.vcPing || "-"}ms`
+      )
       .setTimestamp(Date.now())
       .setAuthor({
         iconURL: options.client.user.avatarURL(),

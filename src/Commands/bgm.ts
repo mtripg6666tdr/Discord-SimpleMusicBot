@@ -26,8 +26,8 @@ import { BaseCommand } from ".";
 export default class Bgm extends BaseCommand {
   constructor(){
     super({
-      name: "bgm",
-      alias: ["study"],
+      name: "BGM",
+      alias: ["bgm", "study"],
       description: "開発者が勝手に作った勉強用・作業用BGMのプリセットプレイリストを表示し、聞きたいものを選択して再生することができます。",
       unlist: false,
       category: "playlist",

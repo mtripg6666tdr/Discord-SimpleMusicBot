@@ -21,7 +21,7 @@ seq <キーワード>
 
 ## 使用例
 ```
-seq milk boy
+seq pretender
 ```
 
 

@@ -21,28 +21,23 @@ import type { CommandMessage } from "../Component/CommandMessage";
 
 import { BaseCommand } from ".";
 
-export default class Dc extends BaseCommand {
+export default class Rmall extends BaseCommand {
   constructor(){
     super({
+      name: "すべて削除",
+      alias: ["removeall", "rmall", "allrm", "allremove", "clear"],
+      description: "キュー内の曲をすべて削除します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
       unlist: false,
-      name: "切断",
-      alias: ["終了", "dc", "disconnect", "leave", "quit"] as const,
-      description: "ボイスチャンネルから切断します。",
-      category: "voice",
-      requiredPermissionsOr: ["admin", "sameVc"],
+      category: "playlist",
+      requiredPermissionsOr: ["admin", "onlyListener", "dj"],
       shouldDefer: false,
     });
   }
 
   async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
-    // そもそも再生状態じゃないよ...
-    if(!options.server.player.isConnecting){
-      message.reply("再生中ではありません").catch(this.logger.error);
-      return;
-    }
-    // 停止しま～す
     options.server.player.disconnect();
-    message.reply(":postbox: 正常に切断しました").catch(this.logger.error);
+    options.server.queue.removeAll();
+    await message.reply("✅すべて削除しました").catch(this.logger.error);
   }
 }

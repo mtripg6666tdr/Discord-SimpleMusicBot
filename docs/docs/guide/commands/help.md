@@ -10,6 +10,7 @@ sidebar_label: ヘルプ
 `ヘルプ`以外にも以下の別名を使用できます。
 
 - help
+- support
 
 
 
