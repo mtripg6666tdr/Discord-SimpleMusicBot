@@ -181,6 +181,38 @@ export class YouTube extends AudioSource<string> {
   disableCache(){
     this.cache = null;
   }
+
+  waitForLive(signal: AbortSignal, tick: () => void){
+    if(!this.availableAfter){
+      throw new Error("This is not a live stream");
+    }
+
+    return new Promise<void>(resolve => {
+      let timeout: NodeJS.Timeout = null;
+      signal.addEventListener("abort", () => {
+        if(timeout){
+          clearTimeout(timeout);
+          resolve();
+        }
+      }, { once: true });
+      const checkForLive = () => {
+        if(signal.aborted) return;
+        tick();
+        const startTime = this.availableAfter;
+        if(!startTime) resolve();
+        const waitTime = Math.max(new Date(startTime).getTime() - Date.now(), 20 * 1000);
+        this.logger.info(`Retrying after ${waitTime}ms`);
+        timeout = setTimeout(async () => {
+          if(signal.aborted) return;
+          tick();
+          this.disableCache();
+          await this.init(this.url, null);
+          checkForLive();
+        }, waitTime).unref();
+      };
+      checkForLive();
+    });
+  }
 }
 
 export type exportableYouTube = {
