@@ -15,7 +15,7 @@
     "candyget": "^0.5.3",
     "comment-json": "^4.2.3",
     "dotenv": "^16.0.3",
-    "eris": "^0.17.1",
+    "eris": "^0.17.2",
     "genius-lyrics": "^4.4.3",
     "html-entities": "^2.3.3",
     "html-to-text": "^8.2.1",
