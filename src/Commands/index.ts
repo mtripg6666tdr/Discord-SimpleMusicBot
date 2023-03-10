@@ -19,7 +19,7 @@
 import type { CommandMessage } from "../Component/CommandMessage";
 import type { ListCommandInitializeOptions, UnlistCommandInitializeOptions, ListCommandWithArgumentsInitializeOptions, CommandArgs, SlashCommandArgument, CommandPermission } from "../Structure/Command";
 import type { LoggerObject } from "../logger";
-import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString } from "oceanic.js";
+import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions } from "oceanic.js";
 
 import { ApplicationCommandTypes } from "oceanic.js";
 
@@ -150,10 +150,10 @@ export abstract class BaseCommand {
     await this.run(message, options);
   }
 
-  toApplicationCommandStructure(){
+  toApplicationCommandStructure(): CreateApplicationCommandOptions {
     if(this.unlist) throw new Error("This command cannot be listed due to private command!");
     const options = this.argument?.map(arg => {
-      const erisCommandStruct = {
+      const discordCommandStruct = {
         type: CommandManager.mapCommandOptionTypeToInteger(arg.type),
         name: arg.name,
         description: arg.description.replace(/\r/g, "").replace(/\n/g, ""),
@@ -163,21 +163,21 @@ export abstract class BaseCommand {
           value: arg.choices[name],
         })),
       };
-      if(!erisCommandStruct.choices) delete erisCommandStruct.choices;
-      return erisCommandStruct as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean;
+      if(!discordCommandStruct.choices) delete discordCommandStruct.choices;
+      return discordCommandStruct as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean;
     });
     if(options && options.length > 0){
       return {
         type: ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
-        description: this.description,
+        description: this.description.replace(/\r/g, "").replace(/\n/g, ""),
         options,
       };
     }else{
       return {
         type: ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
-        description: this.description,
+        description: this.description.replace(/\r/g, "").replace(/\n/g, ""),
       };
     }
   }

@@ -18,8 +18,9 @@
 
 import type { BaseCommand } from "../Commands";
 import type { CommandOptionsTypes } from "../Structure";
-import type { ApplicationCommandOptionsString, ApplicationCommandOptionsWithValue, Client } from "oceanic.js";
+import type { AnyApplicationCommand, ChatInputApplicationCommand, Client, CreateApplicationCommandOptions } from "oceanic.js";
 
+import assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -29,6 +30,7 @@ import { LogEmitter } from "../Structure";
 import { useConfig } from "../config";
 
 const config = useConfig();
+// const commandSeparator = "_";
 
 /**
  * コマンドマネージャー
@@ -77,7 +79,9 @@ export class CommandManager extends LogEmitter<{}> {
         return true;
       });
 
-    if(useConfig().debug) this.checkDuplicate();
+    if(useConfig().debug){
+      this.checkDuplicate();
+    }
     this.logger.info("Initialized");
   }
 
@@ -121,74 +125,91 @@ export class CommandManager extends LogEmitter<{}> {
   async sync(client: Client, removeOutdated: boolean = false){
     this.logger.info("Start syncing application commands");
 
+    // format local commands into the api-compatible well-formatted ones
+    const apiCompatibleCommands: CreateApplicationCommandOptions[] = this.commands
+      .filter(command => !command.unlist)
+      .map(command => command.toApplicationCommandStructure());
+
+    // // create api compatible command structure without commands grouping
+    // const rawApiCompatibleCommands = this.commands
+    //   .filter(command => !command.unlist)
+    //   .map(command => command.toApplicationCommandStructure());
+    // // create root command map
+    // const rootCommandsMap: Map<string, CreateApplicationCommandOptions> = new Map();
+    // rawApiCompatibleCommands.forEach(command => {
+    //   if(!command.name.includes(commandSeparator)){
+    //     rootCommandsMap.set(command.name, command);
+    //     apiCompatibleCommands.push(command);
+    //   }
+    // });
+    // // finalize api-compatible commands
+    // rawApiCompatibleCommands.forEach(command => {
+    //   const commandStructure = command.name.split(commandSeparator);
+    //   const rootCommandName = commandStructure[0];
+    //   const rootCommand = rootCommandsMap.get(rootCommandName);
+    //   // TODO: group commands
+    // });
+
+    // Get registered commands
     const registeredAppCommands = await client.application.getGlobalCommands();
 
+    // no registered commands, bulk-registering them
     if(registeredAppCommands.length === 0){
       this.logger.info("Detected no command registered; bulk-registering slash-commands");
-      await client.application.bulkEditGlobalCommands(
-        this.commands
-          .filter(command => !command.unlist)
-          .map(command => command.toApplicationCommandStructure())
-      );
+      await client.application.bulkEditGlobalCommands(apiCompatibleCommands);
       this.logger.info("Successfully registered");
       return;
     }
 
-    const registeredCommands = registeredAppCommands.filter(command => command.type === ApplicationCommandTypes.CHAT_INPUT);
+    // filter slash-commands
+    const registeredCommands = registeredAppCommands
+      .filter(command => command.type === ApplicationCommandTypes.CHAT_INPUT) as ChatInputApplicationCommand[];
 
     this.logger.info(`Successfully get ${registeredCommands.length} commands`);
-    const commandsToEdit = this.commands.filter(target => {
-      if(target.unlist) return false;
-      const registered = registeredCommands.find(reg => reg.name === target.asciiName);
-      if(!registered) return false;
-      return target.description.replace(/\r/g, "").replace(/\n/g, "") !== registered.description
-        || (target.argument || []).length !== (registered.options || []).length
-        || target.argument && target.argument.some(
-          (arg, i) => {
-            const choicesObjectMap: { [key: string]: string } = {};
-            (registered.options[i] as ApplicationCommandOptionsString).choices?.forEach(c => choicesObjectMap[c.name] = c.value.toString());
-            return !registered.options[i]
-            || registered.options[i].name !== arg.name
-            || registered.options[i].description !== arg.description
-            || registered.options[i].type !== CommandManager.mapCommandOptionTypeToInteger(arg.type)
-            || !!(registered.options[i] as ApplicationCommandOptionsWithValue).required !== arg.required
-            || ((registered.options[i] as ApplicationCommandOptionsString).choices || arg.choices)
-              && [...Object.keys(choicesObjectMap), ...Object.keys(arg.choices)].some(name => choicesObjectMap[name] !== arg.choices[name])
-            ;
-          }
-        )
-      ;
+
+    // search commands that should be updated
+    const commandsToEdit = apiCompatibleCommands.filter(expected => {
+      const actual = registeredCommands.find(command => command.name === expected.name);
+      if(!actual){
+        return false;
+      }else{
+        return !this.sameCommand(actual, expected);
+      }
     });
-    const commandsToAdd = this.commands.filter(target => {
-      if(target.unlist) return false;
-      const index = registeredCommands.findIndex(reg => reg.name === target.asciiName);
-      return index < 0;
+
+    // search commands that should be added newly
+    const commandsToAdd = apiCompatibleCommands.filter(expected => {
+      return registeredCommands.findIndex(reg => reg.name === expected.name) < 0;
     });
+
+    // if there are any commands that should be added or updated
     if(commandsToEdit.length > 0 || commandsToAdd.length > 0){
       this.logger.info(`Detected ${commandsToEdit.length + commandsToAdd.length} commands that should be updated; updating`);
       this.logger.info(`These are ${[...commandsToEdit, ...commandsToAdd].map(command => command.name)}`);
       for(let i = 0; i < commandsToEdit.length; i++){
-        const commandToRegister = commandsToEdit[i].toApplicationCommandStructure();
+        const commandToRegister = commandsToEdit[i];
         const id = registeredCommands.find(cmd => cmd.name === commandToRegister.name).id;
         await client.application.editGlobalCommand(id, commandToRegister);
       }
       for(let i = 0; i < commandsToAdd.length; i++){
-        const commandToRegister = commandsToAdd[i].toApplicationCommandStructure();
+        const commandToRegister = commandsToAdd[i];
         await client.application.createGlobalCommand(commandToRegister);
       }
       this.logger.info("Updating success.");
     }else{
       this.logger.info("Detected no command that should be updated");
     }
+
+    // remove outdated commands (that doesn't recognized as the bot's command)
     if(removeOutdated){
       const commandsToRemove = registeredCommands.filter(registered => {
-        const index = this.commands.findIndex(command => registered.name === command.asciiName);
-        return index < 0 || this.commands[index].unlist;
+        const index = apiCompatibleCommands.findIndex(command => registered.name === command.name);
+        return index < 0;
       });
       if(commandsToRemove.length > 0){
         this.logger.info(`Detected ${commandsToRemove.length} commands that should be removed; removing...`);
         this.logger.info(`These are ${commandsToRemove.map(command => command.name)}`);
-        await client.application.bulkEditGlobalCommands(this.commands.filter(cmd => !cmd.unlist).map(cmd => cmd.toApplicationCommandStructure()));
+        await client.application.bulkEditGlobalCommands(apiCompatibleCommands);
         this.logger.info("Removing success.");
       }else{
         this.logger.info("Detected no command that should be removed");
@@ -206,6 +227,56 @@ export class CommandManager extends LogEmitter<{}> {
     this.logger.info("Removing all guild commands of " + guildId);
     await client.application.bulkEditGuildCommands(guildId, []);
     this.logger.info("Successfully removed all guild commands");
+  }
+
+  sameCommand(actual: ChatInputApplicationCommand, expected: CreateApplicationCommandOptions): boolean{
+    try{
+      assert.deepStrictEqual(
+        this.apiToApplicationCommand(actual),
+        expected,
+      );
+      return true;
+    }
+    catch(er){
+      return false;
+    }
+  }
+
+  protected apiToApplicationCommand(apiCommand: AnyApplicationCommand) {
+    if(apiCommand.options){
+      return {
+        type: apiCommand.type,
+        name: apiCommand.name,
+        description: apiCommand.description,
+        options: apiCommand.options.map(option => {
+          if("choices" in option && option.choices){
+            return {
+              type: option.type,
+              name: option.name,
+              description: option.description,
+              required: !!option.required,
+              choices: option.choices.map(choice => ({
+                name: choice.name,
+                value: choice.value,
+              })),
+            };
+          }else{
+            return {
+              type: option.type,
+              name: option.name,
+              description: option.description,
+              required: !!option.required,
+            };
+          }
+        }),
+      };
+    }else{
+      return {
+        type: apiCommand.type,
+        name: apiCommand.name,
+        description: apiCommand.description,
+      };
+    }
   }
 
   static mapCommandOptionTypeToInteger(type: CommandOptionsTypes){
