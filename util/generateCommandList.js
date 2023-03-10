@@ -51,7 +51,7 @@ sidebar_label: ${cmd.name}
 # \`${cmd.name}\`コマンド
 ${cmd.description}
 
-スラッシュコマンドでは、\`/${cmd.asciiName}\`を使用してください。
+スラッシュコマンドでは、\`/${cmd.asciiName.replace(/_/g, " ")}\`を使用してください。
 
 ## 別名
 \`${cmd.name}\`以外にも以下の別名を使用できます。
