@@ -27,6 +27,7 @@ import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } fr
 import { AudioPlayerStatus, createAudioResource, createAudioPlayer, entersState, StreamType, VoiceConnectionStatus } from "@discordjs/voice";
 
 import { resolveStreamToPlayable } from "./streams";
+import { DSL } from "./streams/dsl";
 import { Normalizer } from "./streams/normalizer";
 import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
@@ -73,7 +74,8 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   protected _finishTimeout = false;
   protected _player: AudioPlayer = null;
   protected _resource: AudioResource = null;
-  protected waitForLive: boolean = false;
+  protected _waitForLiveAbortController: AbortController = null;
+  protected _dsLogger: DSL = null;
 
   get preparing(){
     return this._preparing;
@@ -100,7 +102,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
    *  接続され、再生途中にあるか（たとえ一時停止されていても）
    */
   get isPlaying(): boolean{
-    return this.isConnecting && this._player && (this._player.state.status === AudioPlayerStatus.Playing || this.waitForLive);
+    return this.isConnecting
+      && this._player
+      && (this._player.state.status === AudioPlayerStatus.Playing || !!this._waitForLiveAbortController);
   }
 
   /**
@@ -158,8 +162,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.emit("playCalled", time);
 
     // 再生できる状態か確認
-    const badCondition = this.getIsBadCondition();
-    if(badCondition){
+    if(this.getIsBadCondition()){
       this.logger.warn("Play called but operated nothing");
       return this;
     }
@@ -182,39 +185,25 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
             content: `:stopwatch: \`${this.currentAudioInfo.title}\` \`(ライブストリーム)\`の開始を待機中...`,
           }
         );
-        this.waitForLive = true;
         this.preparing = false;
         const waitTarget = this._currentAudioInfo;
-        await new Promise<void>(resolve => {
-          let timeout: NodeJS.Timeout = null;
-          this.once("stop", () => {
-            if(timeout) clearTimeout(timeout);
-            resolve();
-          });
-          const checkForLive = () => {
-            if(waitTarget !== this._currentAudioInfo) return;
-            const startTime = this._currentAudioInfo.isYouTube() && this._currentAudioInfo.availableAfter;
-            if(!startTime) resolve();
-            const waitTime = Math.max(new Date(startTime).getTime() - Date.now(), 20 * 1000);
-            this.logger.info(`Retrying after ${waitTime}ms`);
-            timeout = setTimeout(async () => {
-              if(waitTarget !== this._currentAudioInfo) return;
-              if(this._currentAudioInfo.isYouTube()){
-                this._currentAudioInfo.disableCache();
-                await this._currentAudioInfo.init(this._currentAudioInfo.url, null);
-              }
-              checkForLive();
-            }, waitTime).unref();
-          };
-          checkForLive();
+        const abortController = this._waitForLiveAbortController = new AbortController();
+        this.once("stop", () => {
+          abortController.abort();
         });
-        if(!this.waitForLive){
+        await waitTarget.waitForLive(abortController.signal, () => {
+          if(waitTarget !== this._currentAudioInfo){
+            abortController.abort();
+          }
+        });
+        if(abortController.signal.aborted){
+          this._waitForLiveAbortController = null;
           await mes.edit({
             content: ":white_check_mark: 待機をキャンセルしました",
           });
           return this;
         }
-        this.waitForLive = false;
+        this._waitForLiveAbortController = null;
         this.preparing = true;
       }else{
         mes = await this.server.bot.client.rest.channels.createMessage(
@@ -237,13 +226,19 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       // 情報からストリームを作成
       const voiceChannel = this.server.connectingVoiceChannel;
       if(!voiceChannel) return this;
-      const { stream, streamType, cost } = await resolveStreamToPlayable(rawStream, {
+      const { stream, streamType, cost, streams } = await resolveStreamToPlayable(rawStream, {
         effectArgs: getFFmpegEffectArgs(this.server),
         seek: this._seek,
         volumeTransformEnabled: this.volume !== 100,
         bitrate: voiceChannel.bitrate,
       });
       this._currentAudioStream = stream;
+
+      // ログ
+      if(process.env.DSL_ENABLE){
+        this._dsLogger = new DSL({ enableFileLog: true });
+        this._dsLogger.appendReadable(...streams);
+      }
 
       // 各種準備
       this._errorReportChannel = mes?.channel as TextChannel;
@@ -266,6 +261,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
                   : StreamType.Arbitrary,
         inlineVolume: this.volume !== 100,
       });
+      this._dsLogger?.appendReadable(normalizer);
 
       // 昔はこれないとダメだったので
       // 様子を見ながら考える
@@ -386,30 +382,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       }
     }
     catch(e){
-      this.logger.error(e);
-      try{
-        const t = typeof e === "string" ? e : Util.stringifyObject(e);
-        if(t.includes("429")){
-          mes?.edit({
-            content: ":sob:レート制限が検出されました。しばらくの間YouTubeはご利用いただけません。",
-          }).catch(this.logger.error);
-          this.logger.error("Rate limit detected");
-          this.stop();
-          this.preparing = false;
-          return this;
-        }
-      }
-      catch{ /* empty */ }
-
-      if(mes){
-        mes.edit({
-          content: `:tired_face:曲の再生に失敗しました...。${
-            e ? `(${typeof e === "object" && "message" in e ? e.message : e
-            })` : ""}`
-            + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"),
-        });
-        this.onStreamFailed();
-      }
+      this.handleError(e);
     }
     return this;
   }
@@ -450,7 +423,6 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.logger.info("Stop called");
     if(this.server.connection){
       this._player?.stop();
-      this.waitForLive = false;
       this.emit("stop");
     }
     return this;
@@ -498,6 +470,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           }
         }
       });
+      this._dsLogger.destroy();
     }
   }
 
@@ -537,6 +510,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   handleError(er: any){
     this.logger.error(er);
     this.emit("handledError", er);
+
     if(er instanceof Error){
       if("type" in er && er.type === "workaround"){
         this.onStreamFailed(/* quiet */ true);
