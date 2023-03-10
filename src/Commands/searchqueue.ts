@@ -34,7 +34,7 @@ export default class Searchq extends BaseCommand {
       description: "キュー内を検索します。引数にキーワードを指定します。",
       unlist: false,
       category: "playlist",
-      examples: "seq milk boy",
+      examples: "seq pretender",
       usage: "seq <キーワード>",
       argument: [{
         type: "string",

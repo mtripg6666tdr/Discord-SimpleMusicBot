@@ -32,7 +32,7 @@ export default class Help extends BaseCommand {
   constructor(){
     super({
       name: "ヘルプ",
-      alias: ["help"],
+      alias: ["help", "support"],
       description: "ヘルプを表示します",
       unlist: false,
       category: "bot",

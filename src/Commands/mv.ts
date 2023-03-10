@@ -25,7 +25,7 @@ export default class Mv extends BaseCommand {
   constructor(){
     super({
       name: "移動",
-      alias: ["mv", "move"],
+      alias: ["move", "mv"],
       description: "曲を指定された位置から指定された位置までキュー内で移動します。2番目の曲を5番目に移動したい場合は`mv 2 5`のようにします。",
       unlist: false,
       category: "playlist",

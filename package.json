@@ -12,7 +12,7 @@
     "onlystart": "node util/exec dist",
     "build": "rimraf dist/ typings/ && tsc",
     "lint": "eslint .",
-    "cleanup": "rimraf dist/ typings/ logs/",
+    "cleanup": "rimraf dist/ typings/",
     "generatecommandlist": "node util/generateCommandList"
   },
   "dependencies": {

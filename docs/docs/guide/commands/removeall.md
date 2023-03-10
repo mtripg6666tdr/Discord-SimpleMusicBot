@@ -5,14 +5,15 @@ sidebar_label: すべて削除
 キュー内の曲をすべて削除します。
 ※接続中の場合ボイスチャンネルから離脱します。
 
-スラッシュコマンドでは、`/rmall`を使用してください。
+スラッシュコマンドでは、`/removeall`を使用してください。
 
 ## 別名
 `すべて削除`以外にも以下の別名を使用できます。
 
+- removeall
 - rmall
 - allrm
-- removeall
+- allremove
 - clear
 
 
