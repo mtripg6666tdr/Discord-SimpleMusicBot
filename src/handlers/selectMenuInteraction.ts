@@ -29,6 +29,10 @@ export async function handleSelectMenuInteraction(
   if(!interaction.inCachedGuildChannel()) return;
   this.logger.info("received selectmenu interaction");
 
+  if(this.collectors.interactionCreate(interaction)){
+    return;
+  }
+
   // 検索パネル取得
   const panel = this.guildData.get(interaction.channel.guild.id).searchPanel.get(interaction.member.id);
 

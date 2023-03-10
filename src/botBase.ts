@@ -25,6 +25,7 @@ import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 
+import { InteractionCollectorManager } from "./Component/InteractionCollector";
 import { PageToggle } from "./Component/PageToggle";
 import { RateLimitController } from "./Component/RateLimitController";
 import { HttpBackupper } from "./Component/backupper/httpBased";
@@ -59,6 +60,7 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
   protected readonly _embedPageToggle: PageToggle[] = [];
   protected readonly _rateLimitController = new RateLimitController();
   protected readonly guildData: DataType = new Map();
+  protected readonly _interactionCollectorManager: InteractionCollectorManager = new InteractionCollectorManager();
   protected _backupper: Backupper = null;
   private maintenanceTickCount = 0;
   /**
@@ -74,7 +76,14 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
   get client(){
     return this._client;
   }
-  
+
+  /**
+   * インタラクションコレクター
+   */
+  get collectors(){
+    return this._interactionCollectorManager;
+  }
+
   /**
    * バックアップ管理クラス
    */

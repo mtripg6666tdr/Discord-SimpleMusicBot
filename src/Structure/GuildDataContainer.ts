@@ -308,7 +308,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     await entersState(connection, VoiceConnectionStatus.Ready, 10e3);
 
     const connectionLogger = getLogger("Connection");
-    connectionLogger.addContext("guildId", this.getGuildId());
+    connectionLogger.addContext("id", this.getGuildId());
 
     connection
       .on("error", err => {

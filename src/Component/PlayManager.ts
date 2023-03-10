@@ -283,89 +283,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
 
       if(mes && !quiet){
         // 再生開始メッセージ
-        const _t = Number(this.currentAudioInfo.lengthSeconds);
-        const [min, sec] = Util.time.calcMinSec(_t);
-        const timeFragments = Util.time.calcHourMinSec(this.server.queue.lengthSecondsActual - (this.currentAudioInfo.lengthSeconds || 0));
-        /* eslint-disable @typescript-eslint/indent */
-        const embed = new MessageEmbedBuilder()
-          .setTitle(":cd:現在再生中:musical_note:")
-          .setDescription(
-              `[${this.currentAudioInfo.title}](${this.currentAudioUrl}) \``
-            + (this.currentAudioInfo.isYouTube() && this.currentAudioInfo.isLiveStream ? "(ライブストリーム)" : _t === 0 ? "(不明)" : min + ":" + sec)
-            + "`"
-          )
-          .setColor(getColor("AUTO_NP"))
-          .addField("リクエスト", this.server.queue.get(0).additionalInfo.addedBy.displayName, true)
-          .addField("次の曲",
-            // トラックループオンなら現在の曲
-            this.server.queue.loopEnabled ? this.server.queue.get(0).basicInfo.title
-            // (トラックループはオフ)長さが2以上ならオフセット1の曲
-            : this.server.queue.length >= 2 ? this.server.queue.get(1).basicInfo.title
-            // (トラックループオフ,長さ1)キューループがオンなら現在の曲
-            : this.server.queue.queueLoopEnabled ? this.server.queue.get(0).basicInfo.title
-            // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
-            : "次の曲がまだ登録されていません", true
-          )
-          .addField("再生待ちの曲", this.server.queue.loopEnabled ? "ループします" : this.server.queue.length - 1 + "曲(" + Util.time.HourMinSecToString(timeFragments) + ")", true)
-        ;
-        if(typeof this.currentAudioInfo.thumbnail === "string"){
-          embed.setThumbnail(this.currentAudioInfo.thumbnail);
-        }else{
-          embed.setThumbnail("attachment://thumbnail." + this.currentAudioInfo.thumbnail.ext);
-        }
-        /* eslint-enable @typescript-eslint/indent */
-        if(this.currentAudioInfo.isYouTube() && this.currentAudioInfo.IsFallbacked){
-          embed.addField(":warning:注意", FallBackNotice);
-        }
+        const messageContent = this.createNowPlayingMessage();
 
-        this.emit("playStartUIPrepared", embed);
-
-        const components = [
-          new MessageActionRowBuilder()
-            .addComponents(
-              new MessageButtonBuilder()
-                .setCustomId("control_rewind")
-                .setEmoji("⏮️")
-                .setLabel("頭出し")
-                .setStyle("SECONDARY"),
-              new MessageButtonBuilder()
-                .setCustomId("control_playpause")
-                .setEmoji("⏯️")
-                .setLabel("再生/一時停止")
-                .setStyle("PRIMARY"),
-              new MessageButtonBuilder()
-                .setCustomId("control_skip")
-                .setEmoji("⏭️")
-                .setLabel("スキップ")
-                .setStyle("SECONDARY"),
-              new MessageButtonBuilder()
-                .setCustomId("control_onceloop")
-                .setEmoji("🔂")
-                .setLabel("ワンスループ")
-                .setStyle("SECONDARY"),
-            )
-            .toOceanic(),
-        ];
-
-        if(typeof this.currentAudioInfo.thumbnail === "string"){
-          mes.edit({
-            content: "",
-            embeds: [embed.toOceanic()],
-            components,
-          }).catch(this.logger.error);
-        }else{
-          mes.edit({
-            content: "",
-            embeds: [embed.toOceanic()],
-            components,
-            files: [
-              {
-                name: "thumbnail." + this.currentAudioInfo.thumbnail.ext,
-                contents: this.currentAudioInfo.thumbnail.data,
-              },
-            ],
-          });
-        }
+        mes.edit(messageContent).catch(this.logger.error);
 
         const removeControls = () => {
           this.off("playCompleted", removeControls);
@@ -385,6 +305,92 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       this.handleError(e);
     }
     return this;
+  }
+
+  private createNowPlayingMessage(){
+    const _t = Number(this.currentAudioInfo.lengthSeconds);
+    const [min, sec] = Util.time.calcMinSec(_t);
+    const timeFragments = Util.time.calcHourMinSec(this.server.queue.lengthSecondsActual - (this.currentAudioInfo.lengthSeconds || 0));
+    /* eslint-disable @typescript-eslint/indent */
+    const embed = new MessageEmbedBuilder()
+      .setTitle(":cd:現在再生中:musical_note:")
+      .setDescription(
+          `[${this.currentAudioInfo.title}](${this.currentAudioUrl}) \``
+        + (this.currentAudioInfo.isYouTube() && this.currentAudioInfo.isLiveStream ? "(ライブストリーム)" : _t === 0 ? "(不明)" : min + ":" + sec)
+        + "`"
+      )
+      .setColor(getColor("AUTO_NP"))
+      .addField("リクエスト", this.server.queue.get(0).additionalInfo.addedBy.displayName, true)
+      .addField("次の曲",
+        // トラックループオンなら現在の曲
+        this.server.queue.loopEnabled ? this.server.queue.get(0).basicInfo.title
+        // (トラックループはオフ)長さが2以上ならオフセット1の曲
+        : this.server.queue.length >= 2 ? this.server.queue.get(1).basicInfo.title
+        // (トラックループオフ,長さ1)キューループがオンなら現在の曲
+        : this.server.queue.queueLoopEnabled ? this.server.queue.get(0).basicInfo.title
+        // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
+        : "次の曲がまだ登録されていません", true
+      )
+      .addField("再生待ちの曲", this.server.queue.loopEnabled ? "ループします" : this.server.queue.length - 1 + "曲(" + Util.time.HourMinSecToString(timeFragments) + ")", true)
+    ;
+    if(typeof this.currentAudioInfo.thumbnail === "string"){
+      embed.setThumbnail(this.currentAudioInfo.thumbnail);
+    }else{
+      embed.setThumbnail("attachment://thumbnail." + this.currentAudioInfo.thumbnail.ext);
+    }
+    /* eslint-enable @typescript-eslint/indent */
+    if(this.currentAudioInfo.isYouTube() && this.currentAudioInfo.IsFallbacked){
+      embed.addField(":warning:注意", FallBackNotice);
+    }
+
+    this.emit("playStartUIPrepared", embed);
+
+    const components = [
+      new MessageActionRowBuilder()
+        .addComponents(
+          new MessageButtonBuilder()
+            .setCustomId("control_rewind")
+            .setEmoji("⏮️")
+            .setLabel("頭出し")
+            .setStyle("SECONDARY"),
+          new MessageButtonBuilder()
+            .setCustomId("control_playpause")
+            .setEmoji("⏯️")
+            .setLabel("再生/一時停止")
+            .setStyle("PRIMARY"),
+          new MessageButtonBuilder()
+            .setCustomId("control_skip")
+            .setEmoji("⏭️")
+            .setLabel("スキップ")
+            .setStyle("SECONDARY"),
+          new MessageButtonBuilder()
+            .setCustomId("control_onceloop")
+            .setEmoji("🔂")
+            .setLabel("ワンスループ")
+            .setStyle("SECONDARY"),
+        )
+        .toOceanic(),
+    ];
+
+    if(typeof this.currentAudioInfo.thumbnail === "string"){
+      return {
+        content: "",
+        embeds: [embed.toOceanic()],
+        components,
+      };
+    }else{
+      return {
+        content: "",
+        embeds: [embed.toOceanic()],
+        components,
+        files: [
+          {
+            name: "thumbnail." + this.currentAudioInfo.thumbnail.ext,
+            contents: this.currentAudioInfo.thumbnail.data,
+          },
+        ],
+      };
+    }
   }
 
   protected prepareAudioPlayer(){

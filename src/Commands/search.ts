@@ -27,21 +27,28 @@ import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
 
 export abstract class SearchBase<T> extends BaseCommand {
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    options.server.joinVoiceChannel(message);
-    if(this.urlCheck(options.rawArgs)){
-      await options.server.playFromURL(message, options.args as string[], !options.server.player.isConnecting);
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    context.server.joinVoiceChannel(message);
+    if(this.urlCheck(context.rawArgs)){
+      await context.server.playFromURL(message, context.args as string[], !context.server.player.isConnecting);
       return;
     }
-    if(options.server.searchPanel.has(message.member.id)){
+    if(context.server.searchPanel.has(message.member.id)){
+      const { collector, customIdMap } = context.bot.collectors
+        .create()
+        .setAuthorIdFilter(message.member.id)
+        .setTimeout(1 * 60 * 1000)
+        .createCustomIds({
+          cancelSearch: "button",
+        });
       const responseMessage = await message.reply({
         content: "✘既に開かれている検索窓があります",
         components: [
           new MessageActionRowBuilder()
             .addComponents(
               new MessageButtonBuilder()
-                .setCustomId(`cancel-search-${message.member.id}`)
+                .setCustomId(customIdMap.cancelSearch)
                 .setLabel("以前の検索結果を破棄")
                 .setStyle("DANGER")
             )
@@ -49,20 +56,24 @@ export abstract class SearchBase<T> extends BaseCommand {
         ],
       }).catch(this.logger.error);
       if(responseMessage){
-        options.server.searchPanel.get(message.member.id).once("destroy", () => {
-          responseMessage.edit({
-            components: [],
-          });
+        const panel = context.server.searchPanel.get(message.member.id);
+        collector.on("cancelSearch", interaction => {
+          panel.destroy({ quiet: true });
+          interaction.createFollowup({
+            content: "🚮検索パネルを破棄しました:white_check_mark:",
+          }).catch(this.logger.error);
         });
+        collector.setMessage(responseMessage);
+        panel.once("destroy", () => collector.destroy());
       }
       return;
     }
-    if(options.rawArgs !== ""){
-      const searchPanel = options.server.searchPanel.create(message, options.rawArgs);
+    if(context.rawArgs !== ""){
+      const searchPanel = context.server.searchPanel.create(message, context.rawArgs);
       if(!searchPanel){
         return;
       }
-      await searchPanel.consumeSearchResult(this.searchContent(options.rawArgs), this.consumer);
+      await searchPanel.consumeSearchResult(this.searchContent(context.rawArgs), this.consumer);
     }else{
       await message.reply("引数を指定してください").catch(this.logger.error);
     }

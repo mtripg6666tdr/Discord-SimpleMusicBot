@@ -19,8 +19,10 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
+import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
+
 import { BaseCommand } from ".";
-import { getCurrentEffectPanel } from "../Util/effect";
+import { getColor } from "../Util/color";
 
 export default class Effect extends BaseCommand {
   constructor(){
@@ -35,16 +37,77 @@ export default class Effect extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
     try{
-      const { embed, messageActions } = getCurrentEffectPanel(message.member.avatarURL(), options.server);
+      const { collector, customIdMap } = context.server.bot.collectors.create()
+        .setAuthorIdFilter(message.member.id)
+        .setMaxInteraction(Infinity)
+        .setTimeout(5 * 60 * 1000)
+        .createCustomIds({
+          reload: "button",
+          bassBoost: "button",
+          reverb: "button",
+          loudnessEq: "button",
+        });
+      const createEffectEmbed = () => new MessageEmbedBuilder()
+        .setTitle(":cd:エフェクトコントロールパネル:microphone:")
+        .setDescription("オーディオエフェクトの設定/解除することができます。\r\n・表示は古い情報であることがありますが、エフェクトを操作したとき、更新ボタンを押したときに更新されます。\r\n・エフェクトは次の曲から適用されます\r\n現在の曲に適用したい場合は、`頭出し`コマンドを使用してください\r\n")
+        .addField("Bass Boost", context.server.effectPrefs.BassBoost ? "⭕" : "❌", true)
+        .addField("Reverb", context.server.effectPrefs.Reverb ? "⭕" : "❌", true)
+        .addField("Loudness Eq", context.server.effectPrefs.LoudnessEqualization ? "⭕" : "❌", true)
+        .setColor(getColor("EFFECT"))
+        .setFooter({
+          iconURL: message.member.avatarURL(),
+          text: "エフェクトを選択してボタンを押してください",
+        })
+        .toOceanic()
+      ;
+      const createActionRow = () => new MessageActionRowBuilder()
+        .addComponents(
+          new MessageButtonBuilder()
+            .setCustomId(customIdMap.reload)
+            .setStyle("PRIMARY")
+            .setEmoji("🔁")
+            .setLabel("更新"),
+          new MessageButtonBuilder()
+            .setCustomId(customIdMap.bassBoost)
+            .setStyle(context.server.effectPrefs.BassBoost ? "SUCCESS" : "SECONDARY")
+            .setLabel("Bass Boost"),
+          new MessageButtonBuilder()
+            .setCustomId(customIdMap.reverb)
+            .setStyle(context.server.effectPrefs.Reverb ? "SUCCESS" : "SECONDARY")
+            .setLabel("Reverb"),
+          new MessageButtonBuilder()
+            .setCustomId(customIdMap.loudnessEq)
+            .setStyle(context.server.effectPrefs.LoudnessEqualization ? "SUCCESS" : "SECONDARY")
+            .setLabel("Loudness Eq")
+        )
+        .toOceanic();
       const reply = await message.reply({
-        content: "",
-        embeds: [embed.toOceanic()],
-        components: [messageActions],
+        embeds: [createEffectEmbed()],
+        components: [createActionRow()],
       });
-      setTimeout(() => reply.edit({ components: [] }), 5 * 60 * 1000).unref();
+      const updateEffectEmbed = () => {
+        reply.edit({
+          embeds: [createEffectEmbed()],
+          components: [createActionRow()],
+        });
+      };
+      collector
+        .on("reload", updateEffectEmbed)
+        .on("bassBoost", () => {
+          context.server.effectPrefs.BassBoost = !context.server.effectPrefs.BassBoost;
+          updateEffectEmbed();
+        })
+        .on("reverb", () => {
+          context.server.effectPrefs.Reverb = !context.server.effectPrefs.Reverb;
+          updateEffectEmbed();
+        })
+        .on("loudnessEq", () => {
+          context.server.effectPrefs.LoudnessEqualization = !context.server.effectPrefs.LoudnessEqualization;
+          updateEffectEmbed();
+        });
     }
     catch(e){
       this.logger.error(e);

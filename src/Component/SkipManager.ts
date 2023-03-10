@@ -17,6 +17,7 @@
  */
 
 import type { CommandMessage } from "./CommandMessage";
+import type { InteractionCollector } from "./InteractionCollector";
 import type { ResponseMessage } from "./ResponseMessage";
 import type { GuildDataContainer } from "../Structure";
 import type { QueueContent } from "../Structure/QueueContent";
@@ -30,40 +31,59 @@ type voteResult = "voted"|"cancelled"|"ignored";
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export class SkipManager extends ServerManagerBase<{}> {
-  private inited = false;
-  private readonly agreeUsers = new Set<string>();
-  private reply: ResponseMessage = null;
-  private currentSong: QueueContent = null;
-  private destroyed = false;
-  private issuer: string = null;
+  protected inited = false;
+  protected readonly agreeUsers = new Set<string>();
+  protected reply: ResponseMessage = null;
+  protected currentSong: QueueContent = null;
+  protected destroyed = false;
+  protected issuer: string = null;
+  protected skipVoteCustomId: string;
+  protected collector: InteractionCollector = null;
 
-  constructor(parent: GuildDataContainer){
+  constructor(protected parent: GuildDataContainer){
     super("SkipManager", parent);
   }
 
   async init(message: CommandMessage){
-    if(this.inited || this.destroyed) throw new Error("This manager has already initialized or destroyed");
+    if(this.inited || this.destroyed){
+      throw new Error("This manager has already initialized or destroyed");
+    }
     this.inited = true;
+
+    // store current song
     this.currentSong = this.server.queue.get(0);
+
+    // store issuer (skip requestant)
     this.issuer = message.member.username;
     this.agreeUsers.add(message.member.id);
+
+    // prepare collector
+    const { collector, customIdMap } = this.parent.bot.collectors.create()
+      .setMaxInteraction(Infinity)
+      .createCustomIds({
+        "skip_vote": "button",
+      });
+    collector.on("skip_vote", interaction => this.vote(interaction.member));
+    this.collector = collector;
+    this.skipVoteCustomId = customIdMap.skip_vote;
+
+    // send vote pane;
     this.reply = await message.reply(this.createMessageContent());
+
+    collector.setMessage(this.reply);
     return this;
   }
 
   private organize(){
     if(!this.inited || this.destroyed) return;
-    [...this.agreeUsers].forEach(userId => {
-      if(!this.server.connection){
-        return false;
-      }else if(!this.getVoiceMembers().has(userId)){
-        return false;
+    this.agreeUsers.forEach(userId => {
+      if(!this.server.connection || !this.getVoiceMembers().has(userId)){
+        this.agreeUsers.delete(userId);
       }
-      return true;
     });
   }
 
-  vote(user: Member): voteResult{
+  protected vote(user: Member): voteResult{
     if(!this.inited || this.destroyed) return "ignored";
     this.organize();
     if(!user.voiceState.channelID || !this.getVoiceMembers().has(user.id)){
@@ -81,15 +101,19 @@ export class SkipManager extends ServerManagerBase<{}> {
   }
 
   async checkThreshold(){
-    if(!this.inited || this.destroyed) return;
-    if(this.agreeUsers.size * 2 >= this.getVoiceMembers().size - 1){
+    if(!this.inited || this.destroyed){
+      return;
+    }
+    const members = this.getVoiceMembers();
+    this.organize();
+    if(this.agreeUsers.size * 2 >= members.size - members.filter(member => member.bot).length){
       try{
         const response = this.reply = await this.reply.edit(":ok: スキップしています");
         const title = this.server.queue.get(0).basicInfo.title;
         this.server.player.stop();
         await this.server.queue.next();
         await this.server.player.play();
-        response.edit(":track_next: `" + title + "`をスキップしました:white_check_mark:")
+        response.edit(`:track_next: \`${title}\`をスキップしました:white_check_mark:`)
           .catch(this.logger.error);
       }
       catch(e){
@@ -115,7 +139,9 @@ export class SkipManager extends ServerManagerBase<{}> {
       embeds: [
         new MessageEmbedBuilder()
           .setTitle(":person_raising_hand: スキップの投票")
-          .setDescription(`\`${this.currentSong.basicInfo.title}\`のスキップに賛成する場合は以下のボタンを押してください。賛成がボイスチャンネルに参加している人数の過半数を超えると、スキップされます。\r\n\r\n現在の状況: ${this.agreeUsers.size}/${voiceSize}\r\nあと${Math.ceil(voiceSize / 2) - this.agreeUsers.size}人の賛成が必要です。`)
+          .setDescription(
+            `\`${this.currentSong.basicInfo.title}\`のスキップに賛成する場合は以下のボタンを押してください。賛成がボイスチャンネルに参加している人数の過半数を超えると、スキップされます。\r\n\r\n現在の状況: ${this.agreeUsers.size}/${voiceSize}\r\nあと${Math.ceil(voiceSize / 2) - this.agreeUsers.size}人の賛成が必要です。`
+          )
           .setFooter({
             text: `${this.issuer}が、楽曲のスキップを提案しました。`,
           })
@@ -125,7 +151,7 @@ export class SkipManager extends ServerManagerBase<{}> {
         new MessageActionRowBuilder()
           .addComponents(
             new MessageButtonBuilder()
-              .setCustomId(`skip_vote_${this.server.getGuildId()}`)
+              .setCustomId(this.skipVoteCustomId)
               .setEmoji("⏩")
               .setLabel("賛成")
               .setStyle("PRIMARY")
@@ -137,10 +163,6 @@ export class SkipManager extends ServerManagerBase<{}> {
 
   destroy(){
     this.destroyed = true;
-    this.reply.edit({
-      content: this.reply.content,
-      embeds: [],
-      components: [],
-    });
+    this.collector.destroy();
   }
 }
