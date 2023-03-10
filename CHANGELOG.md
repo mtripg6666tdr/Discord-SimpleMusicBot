@@ -37,3 +37,14 @@
 - Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
+
+# v3.11.2
+## バグ修正
+* Node.jsのバージョンを正しく取得できておらず、DNS解決の問題が起きる可能性があったバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1145)
+## 依存関係のアップデート
+* eris 0.17.1 => 0.17.2 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1154)
+
+### その他の特記事項
+- erisのアップデートが公開され、v3.11.2以前のv3.x系のすべてのバージョンで、今後数週間以内に音声接続が機能しなくなる可能性があります。そのため、v3.11.2へのアップデートを強く推奨します。
+
+---
