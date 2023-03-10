@@ -20,9 +20,9 @@ import type { BaseCommand } from "../Commands";
 import type { CommandOptionsTypes } from "../Structure";
 import type { AnyApplicationCommand, ChatInputApplicationCommand, Client, CreateApplicationCommandOptions } from "oceanic.js";
 
-import assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
+import util from "util";
 
 import { ApplicationCommandOptionTypes, ApplicationCommandTypes } from "oceanic.js";
 
@@ -230,16 +230,10 @@ export class CommandManager extends LogEmitter<{}> {
   }
 
   sameCommand(actual: ChatInputApplicationCommand, expected: CreateApplicationCommandOptions): boolean{
-    try{
-      assert.deepStrictEqual(
-        this.apiToApplicationCommand(actual),
-        expected,
-      );
-      return true;
-    }
-    catch(er){
-      return false;
-    }
+    return util.isDeepStrictEqual(
+      this.apiToApplicationCommand(actual),
+      expected,
+    );
   }
 
   protected apiToApplicationCommand(apiCommand: AnyApplicationCommand) {
