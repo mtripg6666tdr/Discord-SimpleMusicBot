@@ -28,6 +28,9 @@ type DSLOptions = {
   enableMemoryLog?: boolean,
 };
 
+/**
+ * DSL = Detailed Steram Logging = 詳細ストリームログ機能を実装します
+ */
 // eslint-disable-next-line @typescript-eslint/ban-types
 export class DSL extends LogEmitter<{}> {
   protected csvLog: string[] = null;
