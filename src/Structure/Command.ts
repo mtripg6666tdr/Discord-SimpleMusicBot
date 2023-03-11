@@ -17,7 +17,6 @@
  */
 
 import type { categories } from "../Commands/commands";
-import type { PageToggle } from "../Component/PageToggle";
 import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
 import type { Client } from "oceanic.js";
@@ -107,10 +106,6 @@ export interface CommandArgs {
    * コマンドのパース済み引数
    */
   args: readonly string[];
-  /**
-   * 生存しているPageToggleの配列
-   */
-  embedPageToggle: PageToggle[];
   /**
    * ボットのクライアント
    */

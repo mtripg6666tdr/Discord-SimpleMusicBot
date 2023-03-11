@@ -16,9 +16,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CommandMessage } from "./CommandMessage";
-import type { InteractionCollector } from "./InteractionCollector";
-import type { ResponseMessage } from "./ResponseMessage";
+import type { CommandMessage } from "./commandResolver/CommandMessage";
+import type { InteractionCollector } from "./collectors/InteractionCollector";
+import type { ResponseMessage } from "./commandResolver/ResponseMessage";
 import type { GuildDataContainer } from "../Structure";
 import type { QueueContent } from "../Structure/QueueContent";
 import type { Member } from "oceanic.js";

@@ -17,7 +17,6 @@
  */
 
 /* eslint-disable @typescript-eslint/method-signature-style */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { EventEmitter } from "stream";
 
 export type EventDictionary = Record<string|symbol, any>;
@@ -37,9 +36,16 @@ interface TypedEventEmitter<T extends EventDictionary> extends EventEmitter {
   rawListeners<U extends keyof T>(event: U): ((...args: T[U]) => void)[];
 }
 
-class TypedEventEmitter<T extends EventDictionary> extends EventEmitter {}
+class TypedEventEmitter<T extends EventDictionary> extends EventEmitter {
+  eitherOnce(events: (keyof T)[], listener: () => void){
+    const handler = () => {
+      events.forEach(event => this.off(event, handler));
+      listener();
+    };
+    events.forEach(event => this.once(event, handler));
+  }
+}
 
 export default TypedEventEmitter;
 
 /* eslint-enable @typescript-eslint/method-signature-style */
-/* eslint-enable @typescript-eslint/no-unused-vars */

@@ -19,9 +19,9 @@
 import type { AudioEffect } from "./AudioEffect";
 import type { YmxFormat } from "./YmxFormat";
 import type { exportableCustom, exportableSpotify } from "../AudioSource";
-import type { CommandMessage } from "../Component/CommandMessage";
 import type { SearchPanel } from "../Component/SearchPanel";
 import type { exportableStatuses } from "../Component/backupper";
+import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { MusicBotBase } from "../botBase";
 import type { VoiceConnection } from "@discordjs/voice";
 import type { AnyGuildTextChannel, Message, StageChannel, VoiceChannel } from "oceanic.js";
@@ -39,7 +39,6 @@ import { LogEmitter } from "./LogEmitter";
 import { YmxVersion } from "./YmxFormat";
 import { Spotify } from "../AudioSource";
 import { SoundCloudS } from "../AudioSource";
-import { PageToggle } from "../Component/PageToggle";
 import { PlayManager } from "../Component/PlayManager";
 import { QueueManager } from "../Component/QueueManager";
 import { SearchPanelManager } from "../Component/SearchPanelManager";
@@ -141,17 +140,17 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     this.initSearchPanelManager();
   }
 
+  // 子クラスでオーバーライドされる可能性があるので必要
   protected initPlayManager(){
     this._player = new PlayManager(this);
   }
 
+  // 子クラスでオーバーライドされる可能性があるので必要
   protected initQueueManager(){
     this._queue = new QueueManager(this);
-    const pageToggleOrganizer = () => PageToggle.organize(this.bot.toggles, 5, this.getGuildId());
-    this._queue.on("change", pageToggleOrganizer);
-    this._queue.on("changeWithoutCurrent", pageToggleOrganizer);
   }
 
+  // 子クラスでオーバーライドされる可能性があるので必要
   protected initSearchPanelManager(){
     this._searchPanel = new SearchPanelManager(this);
   }

@@ -17,14 +17,13 @@
  */
 
 import type { CommandArgs } from ".";
-import type { CommandMessage } from "../Component/CommandMessage";
+import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { EmbedField } from "oceanic.js";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
 import { CommandManager } from "../Component/CommandManager";
-import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/color";
 import { useConfig } from "../config";
 
@@ -61,8 +60,8 @@ export default class Commands extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    if(options.rawArgs === ""){
+  async run(message: CommandMessage, context: CommandArgs){
+    if(context.rawArgs === ""){
       // 引数がない場合は全コマンドの一覧を表示
       const embed = [] as MessageEmbedBuilder[];
       const getCategoryText = (label: string)=>{
@@ -102,18 +101,20 @@ export default class Commands extends BaseCommand {
             + (
               config.noMessageContent
                 ? "`/コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。"
-                : `コマンドプレフィックスは、\`${options.server.prefix}\`です。\r\n\``
-                  + `\`${options.server.prefix}コマンド 再生\`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。`
+                : `コマンドプレフィックスは、\`${context.server.prefix}\`です。\r\n\``
+                  + `\`${context.server.prefix}コマンド 再生\`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。`
             )
           )
           .setColor(getColor("COMMAND"));
       }
-      const toggle = await PageToggle.init(message, embed.map(_panel => _panel.toOceanic()));
-      options.embedPageToggle.push(toggle);
+      await context.bot.collectors
+        .createPagenation()
+        .setPages(embed, embed.length)
+        .send(message);
     }else{
-      const ci = CommandManager.instance.resolve(options.rawArgs);
+      const ci = CommandManager.instance.resolve(context.rawArgs);
       if(ci && !ci.unlist){
-        const prefix = options.server ? options.server.prefix : ">";
+        const prefix = context.server ? context.server.prefix : ">";
         const embed = new MessageEmbedBuilder()
           .setTitle(`コマンド \`${ci.name}\` の詳細`)
           .setDescription(ci.description)

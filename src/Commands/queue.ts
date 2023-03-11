@@ -17,12 +17,11 @@
  */
 
 import type { CommandArgs } from ".";
-import type { CommandMessage } from "../Component/CommandMessage";
+import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
-import { PageToggle } from "../Component/PageToggle";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
 
@@ -45,20 +44,19 @@ export default class Queue extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    const msg = await message.reply(":eyes: キューを確認しています。お待ちください...");
-    const queue = options.server.queue;
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    const queue = context.server.queue;
     if(queue.length === 0){
-      msg.edit(":face_with_raised_eyebrow:キューは空です。").catch(this.logger.error);
+      await message.reply(":face_with_raised_eyebrow:キューは空です。").catch(this.logger.error);
       return;
     }
     // 合計所要時間の計算
     const totalLength = queue.lengthSecondsActual;
-    let _page = options.rawArgs === "" ? 1 : Number(options.rawArgs);
+    let _page = context.rawArgs === "" ? 1 : Number(context.rawArgs);
     if(isNaN(_page)) _page = 1;
     if(queue.length > 0 && _page > Math.ceil(queue.length / 10)){
-      msg.edit(":warning:指定されたページは範囲外です").catch(this.logger.error);
+      await message.reply(":warning:指定されたページは範囲外です").catch(this.logger.error);
       return;
     }
     // 合計ページ数割り出し
@@ -66,7 +64,7 @@ export default class Queue extends BaseCommand {
     // ページのキューを割り出す
     const getQueueEmbed = (page: number) => {
       const fields: { name: string, value: string }[] = [];
-      for(let i = 10 * (page - 1); i < 10 * page; i++){
+      for(let i = 10 * page; i < 10 * (page + 1); i++){
         if(queue.length <= i){
           break;
         }
@@ -74,7 +72,7 @@ export default class Queue extends BaseCommand {
         const _t = Number(q.basicInfo.lengthSeconds);
         const [min, sec] = Util.time.calcMinSec(_t);
         fields.push({
-          name: i !== 0 ? i.toString() : options.server.player.isPlaying ? "現在再生中" : "再生待ち",
+          name: i !== 0 ? i.toString() : context.server.player.isPlaying ? "現在再生中" : "再生待ち",
           value: [
             `[${q.basicInfo.title}](${q.basicInfo.url})`,
             `長さ: \`${q.basicInfo.isYouTube() && q.basicInfo.isLiveStream ? "ライブストリーム" : `${min}:${sec}`} \``,
@@ -86,14 +84,14 @@ export default class Queue extends BaseCommand {
       const [thour, tmin, tsec] = Util.time.calcHourMinSec(totalLength);
       return new MessageEmbedBuilder()
         .setTitle(`${message.guild.name}のキュー`)
-        .setDescription(`\`${page}ページ目(${totalpage}ページ中)\``)
+        .setDescription(`\`${page + 1}ページ目(${totalpage}ページ中)\``)
         .addFields(...fields)
         .setAuthor({
-          name: options.client.user.username,
-          iconURL: options.client.user.avatarURL(),
+          name: context.client.user.username,
+          iconURL: context.client.user.avatarURL(),
         })
         .setFooter({
-          text: `${queue.length}曲 | 合計:${thour}:${tmin}:${tsec} | トラックループ:${queue.loopEnabled ? "⭕" : "❌"} | キューループ:${queue.queueLoopEnabled ? "⭕" : "❌"} | 関連曲自動再生:${options.server.addRelated ? "⭕" : "❌"} | 均等再生:${options.server.equallyPlayback ? "⭕" : "❌"}`,
+          text: `${queue.length}曲 | 合計:${thour}:${tmin}:${tsec} | トラックループ:${queue.loopEnabled ? "⭕" : "❌"} | キューループ:${queue.queueLoopEnabled ? "⭕" : "❌"} | 関連曲自動再生:${context.server.addRelated ? "⭕" : "❌"} | 均等再生:${context.server.equallyPlayback ? "⭕" : "❌"}`,
         })
         .setThumbnail(message.guild.iconURL())
         .setColor(getColor("QUEUE"))
@@ -102,9 +100,14 @@ export default class Queue extends BaseCommand {
     };
 
     // 送信
-    await msg.edit({ content: "", embeds: [getQueueEmbed(_page)] }).catch(this.logger.error);
     if(totalpage > 1){
-      options.embedPageToggle.push((await PageToggle.init(msg, n => getQueueEmbed(n + 1), totalpage, _page - 1)).setFresh(true));
+      const pagenation = await context.bot.collectors
+        .createPagenation()
+        .setPages(getQueueEmbed, totalLength)
+        .send(message);
+      context.server.queue.eitherOnce(["change", "changeWithoutCurrent"], pagenation.destroy.bind(pagenation));
+    }else{
+      await message.reply({ content: "", embeds: [getQueueEmbed(_page)] }).catch(this.logger.error);
     }
   }
 }

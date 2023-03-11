@@ -22,8 +22,7 @@ import type { ComponentTypes } from "oceanic.js";
 import type * as discord from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
-import { CommandMessage } from "../Component/CommandMessage";
-import { PageToggle } from "../Component/PageToggle";
+import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 
 export async function handleButtonInteraction(
   this: MusicBot,
@@ -38,36 +37,7 @@ export async function handleButtonInteraction(
     return;
   }
 
-  if(interaction.data.customID === PageToggle.arrowLeft || interaction.data.customID === PageToggle.arrowRight){
-    const l = this._embedPageToggle.filter(t =>
-      t.Message.channelId === interaction.channel.id
-      && t.Message.id === interaction.message.id);
-    if(l.length >= 1){
-      // ページめくり
-      await l[0].flipPage(
-        interaction.data.customID === PageToggle.arrowLeft ? l[0].Current >= 1 ? l[0].Current - 1 : 0
-          : interaction.data.customID === PageToggle.arrowRight ? l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current : 0
-        ,
-        interaction
-      );
-    }else{
-      await interaction.editOriginal({
-        content: "失敗しました!",
-      });
-    }
-  }else if(interaction.data.customID.startsWith("cancel-last-")){
-    const item = server.queue.get(server.queue.length - 1);
-    const userId = interaction.data.customID.substring("cancel-last-".length);
-    if(interaction.member.id === userId){
-      server.queue.removeAt(server.queue.length - 1);
-      interaction.createMessage({
-        content: `🚮\`${item.basicInfo.title}\`の追加を取り消しました`,
-      }).catch(this.logger.error);
-      interaction.message.edit({
-        components: [],
-      }).catch(this.logger.error);
-    }
-  }else if(interaction.data.customID.startsWith("control_")){
+  if(interaction.data.customID.startsWith("control_")){
     let command: string = null;
     switch(interaction.data.customID){
       case "control_rewind":

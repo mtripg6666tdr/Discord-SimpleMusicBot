@@ -21,7 +21,7 @@ import type { MusicBot } from "../bot";
 import * as discord from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
-import { CommandMessage } from "../Component/CommandMessage";
+import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 import { discordUtil, normalizeText } from "../Util";
 import { useConfig } from "../config";

@@ -25,11 +25,10 @@ import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 
-import { InteractionCollectorManager } from "./Component/InteractionCollector";
-import { PageToggle } from "./Component/PageToggle";
 import { RateLimitController } from "./Component/RateLimitController";
 import { HttpBackupper } from "./Component/backupper/httpBased";
 import { MongoBackupper } from "./Component/backupper/mongodb";
+import { InteractionCollectorManager } from "./Component/collectors/InteractionCollectorManager";
 import { GuildDataContainer } from "./Structure";
 import { LogEmitter } from "./Structure";
 import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";
@@ -57,18 +56,11 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
   protected readonly abstract _client: discord.Client;
   protected readonly _instantiatedTime: Date = null;
   protected readonly _versionInfo: string = null;
-  protected readonly _embedPageToggle: PageToggle[] = [];
   protected readonly _rateLimitController = new RateLimitController();
   protected readonly guildData: DataType = new Map();
   protected readonly _interactionCollectorManager: InteractionCollectorManager = new InteractionCollectorManager();
   protected _backupper: Backupper = null;
   private maintenanceTickCount = 0;
-  /**
-   * ページトグル
-   */
-  get toggles(){
-    return this._embedPageToggle;
-  }
 
   /**
    * クライアント
@@ -192,8 +184,6 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
     this.maintenanceTickCount++;
     this.logger.debug(`[Tick] #${this.maintenanceTickCount}`);
     this.emit("tick", this.maintenanceTickCount);
-    // ページトグルの整理
-    PageToggle.organize(this._embedPageToggle, 5);
     // 4分ごとに主要情報を出力
     if(this.maintenanceTickCount % 4 === 1) this.logGeneralInfo();
   }

@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CommandMessage } from "../Component/CommandMessage";
+import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { ListCommandInitializeOptions, UnlistCommandInitializeOptions, ListCommandWithArgumentsInitializeOptions, CommandArgs, SlashCommandArgument, CommandPermission } from "../Structure/Command";
 import type { LoggerObject } from "../logger";
 import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions } from "oceanic.js";

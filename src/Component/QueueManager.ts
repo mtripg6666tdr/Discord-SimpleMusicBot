@@ -16,8 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { InteractionCollector } from "./InteractionCollector";
-import type { ResponseMessage } from "./ResponseMessage";
+import type { InteractionCollector } from "./collectors/InteractionCollector";
+import type { ResponseMessage } from "./commandResolver/ResponseMessage";
 import type { TaskCancellationManager } from "./TaskCancellationManager";
 import type { exportableCustom } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
@@ -367,7 +367,11 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
             }).catch(this.logger.error);
           });
 
-          const destroyCollector = () => collector.destroy();
+          const destroyCollector = () => {
+            this.off("change", destroyCollector);
+            this.off("changeWithoutCurrent", destroyCollector);
+            collector.destroy();
+          };
           this.once("change", destroyCollector);
           this.once("changeWithoutCurrent", destroyCollector);
         }

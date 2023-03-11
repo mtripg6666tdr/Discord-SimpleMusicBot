@@ -128,7 +128,6 @@ export class MusicBot extends MusicBotBase {
    */
   createCommandRunnerArgs(guildId: string, options: string[], optiont: string): CommandArgs{
     return {
-      embedPageToggle: this._embedPageToggle,
       args: options,
       bot: this,
       server: this.guildData.get(guildId),

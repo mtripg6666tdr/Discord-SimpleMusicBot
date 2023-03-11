@@ -16,57 +16,14 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { ResponseMessage } from "./ResponseMessage";
+import type { InteractionCollectorManager } from "./InteractionCollectorManager";
+import type { ResponseMessage } from "../commandResolver/ResponseMessage";
 import type { AnyGuildTextChannel, ComponentInteraction, ComponentTypes, Message } from "oceanic.js";
 
-import { LogEmitter } from "../Structure";
-import { generateUUID } from "../Util";
+import { LogEmitter } from "../../Structure";
+import { generateUUID } from "../../Util";
 
-interface InteractionCollectorManagerEvents {
-  createInteraction: [collector: InteractionCollector<any>];
-}
-
-export class InteractionCollectorManager extends LogEmitter<InteractionCollectorManagerEvents> {
-  protected collectors = new Map<string, InteractionCollector<any>>();
-
-  constructor(){
-    super("InteractionCollectorManager");
-  }
-
-  create(){
-    const collector = new InteractionCollector(this);
-    this.logger.debug(`(${collector.collectorId}) collector created`);
-    collector
-      .on("customIdsCreate", customIds => {
-        this.logger.debug(`(${collector.collectorId}) customIds registered`);
-        customIds.forEach(customId => {
-          this.collectors.set(customId, collector);
-        });
-      })
-      .once("destroy", () => {
-        const customIds = collector.getCustomIds();
-        this.logger.debug(`(${collector.collectorId}) customIds unregistered`);
-        customIds.forEach(customId => {
-          this.collectors.delete(customId);
-        });
-        this.logger.debug(`CustomIds count: ${this.collectors.size}`);
-      });
-    return collector;
-  }
-
-  interactionCreate(interaction: ComponentInteraction<any, AnyGuildTextChannel>){
-    const collector = this.collectors.get(interaction.data.customID);
-    if(!collector){
-      return false;
-    }else{
-      this.logger.debug(`passed an interaction successfully: ${interaction.data.customID} => ${collector.collectorId}`);
-      collector.handleInteraction(interaction);
-      return true;
-    }
-  }
-}
-
-interface InteractionCollectorEvents {
+export interface InteractionCollectorEvents {
   customIdsCreate: [customIds: string[]];
   destroy: [];
   timeout: [];
@@ -83,7 +40,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
   protected destroyed = false;
   protected _collectorId: string = null;
   protected resetTimeoutOnInteraction = false;
-  protected message: Message | ResponseMessage = null;
+  protected message: Message<AnyGuildTextChannel> | ResponseMessage = null;
 
   getCustomIds(){
     return [...this.customIdMap.keys()];
@@ -178,7 +135,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
     }
   }
 
-  setMessage(message: Message | ResponseMessage){
+  setMessage(message: Message<AnyGuildTextChannel> | ResponseMessage){
     this.message = message;
     return message;
   }

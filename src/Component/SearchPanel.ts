@@ -16,8 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CommandMessage } from "./CommandMessage";
-import type { ResponseMessage } from "./ResponseMessage";
+import type { CommandMessage } from "./commandResolver/CommandMessage";
+import type { ResponseMessage } from "./commandResolver/ResponseMessage";
 import type { SelectOption } from "oceanic.js";
 
 import { MessageActionRowBuilder, MessageEmbedBuilder, MessageStringSelectMenuBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
