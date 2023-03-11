@@ -22,8 +22,8 @@ declare namespace NodeJS {
     readonly CSE_KEY?: string;
     readonly CLIENT_ID?: string;
     readonly GUILD_ID?: string;
-    readonly GAS_URL?: string;
-    readonly GAS_TOKEN?: string;
+    readonly DB_URL?: string;
+    readonly DB_TOKEN?: string;
     readonly DSL_ENABLE?: string;
     readonly BD_ENABLE?: string;
     readonly HIBIKI_ENABLE?: string;

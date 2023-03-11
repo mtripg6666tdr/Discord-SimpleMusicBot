@@ -32,5 +32,8 @@
   "twentyFourSeven": [],
 
   // 参加しているユーザーがボイスチャンネルから退出しても、再生を一時停止しない場合にはtrueに設定します。
-  "alwaysTwentyFourSeven": false
+  "alwaysTwentyFourSeven": false,
+
+  // キャッシュレベルの設定。"memory"か"persistent"を設定します。詳細はドキュメントをご覧ください。
+  "cacheLevel": ""
 }

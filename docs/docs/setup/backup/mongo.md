@@ -10,5 +10,5 @@ MongoDBは、各自で準備・起動してください。ここでは詳細な�
 
 ## ボットに構成する
 ボットの`.env`に必要な事項を設定します。  
-- `GAS_URL`には、MongoDBのサーバーのURLを設定します。これは`mongodb://`または`mongodb+srv://`から始まっている必要があります。
-- `GAS_TOKEN`は任意指定です。こちらには、データベース名を指定することができます。指定しないと、デフォルトで`discord_music_bot_backup`となります。
+- `DB_URL`には、MongoDBのサーバーのURLを設定します。これは`mongodb://`または`mongodb+srv://`から始まっている必要があります。
+- `DB_TOKEN`は任意指定です。こちらには、データベース名を指定することができます。指定しないと、デフォルトで`discord_music_bot_backup`となります。

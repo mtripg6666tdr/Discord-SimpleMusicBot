@@ -21,6 +21,7 @@ import type { ListCommandInitializeOptions, UnlistCommandInitializeOptions, List
 import type { LoggerObject } from "../logger";
 import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions } from "oceanic.js";
 
+import { TypedEmitter } from "oceanic.js";
 import { ApplicationCommandTypes } from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
@@ -30,12 +31,16 @@ import { getLogger } from "../logger";
 
 export { CommandArgs } from "../Structure/Command";
 
+interface CommandEvents {
+  run: [Readonly<CommandArgs>];
+}
+
 /**
  * すべてのコマンドハンドラーの基底クラスです
  */
-export abstract class BaseCommand {
+export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   protected abstract run(message: CommandMessage, options: Readonly<CommandArgs>): Promise<void>;
-  
+
   protected readonly _name: string;
   public get name(){
     return this._name;
@@ -102,6 +107,7 @@ export abstract class BaseCommand {
   protected readonly logger: LoggerObject;
 
   constructor(opts: ListCommandInitializeOptions|UnlistCommandInitializeOptions){
+    super();
     this._name = opts.name;
     this._alias = opts.alias;
     this._unlist = opts.unlist;
@@ -147,6 +153,7 @@ export abstract class BaseCommand {
       });
       return;
     }
+    this.emit("run", options);
     await this.run(message, options);
   }
 
