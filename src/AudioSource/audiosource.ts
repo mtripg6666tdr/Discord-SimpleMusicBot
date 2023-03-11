@@ -88,6 +88,11 @@ export abstract class AudioSource<T extends ThumbnailType> {
     this._description = value;
   }
 
+  protected _unableToCache: boolean = false;
+  get unableToCache(){
+    return this._unableToCache;
+  }
+
   // サムネイル
   private _thumbnail: T;
   get thumbnail(){
@@ -119,6 +124,9 @@ export abstract class AudioSource<T extends ThumbnailType> {
   abstract npAdditional(): string;
   // データをエクスポート
   abstract exportData(): exportableCustom;
+
+  destroy(){
+  }
 
   isYouTube(): this is Sources.YouTube{
     return this.serviceIdentifer === "youtube";

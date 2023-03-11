@@ -12,4 +12,5 @@
   "twentyFourSeven": [],
   "alwaysTwentyFourSeven": false,
   "disabledSources": [],
+  "cacheLevel": "memory"
 }

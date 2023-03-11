@@ -17,6 +17,7 @@
  */
 
 import type { KnownAudioSourceIdentifer } from "../Component/QueueManager";
+import type { SourceCache } from "../Component/SourceCache";
 
 import * as ytdl from "ytdl-core";
 
@@ -33,9 +34,24 @@ type AudioSourceBasicInfo = {
 
 const { isDisabledSource } = useConfig();
 
-export async function resolve(info: AudioSourceBasicInfo){
+export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCache){
   let basicInfo = null as AudioSource.AudioSource<any>;
-  const { type, url, knownData: gotData, forceCache: cache } = info;
+
+  const type = info.type;
+  const url = info.url;
+  const cache = info.forceCache;
+  let gotData = info.knownData;
+  let fromPersistentCache = false;
+
+  if(cacheManager.hasSource(url)){
+    return cacheManager.getSource(url);
+  }else if(!gotData && cacheManager.hasExportable(url)){
+    gotData = await cacheManager.getExportable(url);
+    if(gotData){
+      fromPersistentCache = true;
+    }
+  }
+
   if(!isDisabledSource("youtube") && (type === "youtube" || type === "unknown" && ytdl.validateURL(url))){
     // youtube
     basicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.exportableYouTube, cache);
@@ -68,6 +84,10 @@ export async function resolve(info: AudioSourceBasicInfo){
       // Twitter
       basicInfo = await new AudioSource.Twitter().init(url, gotData as AudioSource.exportableTwitter);
     }
+  }
+
+  if(!isNaN(basicInfo.lengthSeconds) && !basicInfo.unableToCache && !fromPersistentCache){
+    cacheManager.addSource(basicInfo);
   }
 
   return basicInfo;
