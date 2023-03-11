@@ -104,7 +104,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   get isPlaying(): boolean{
     return this.isConnecting
       && this._player
-      && (this._player.state.status === AudioPlayerStatus.Playing || !!this._waitForLiveAbortController);
+      && (this._player.state.status === AudioPlayerStatus.Playing || this._player.state.status === AudioPlayerStatus.Paused || !!this._waitForLiveAbortController);
   }
 
   /**
@@ -287,18 +287,11 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
 
         mes.edit(messageContent).catch(this.logger.error);
 
-        const removeControls = () => {
-          this.off("playCompleted", removeControls);
-          this.off("handledError", removeControls);
-          this.off("stop", removeControls);
+        this.eitherOnce(["playCompleted", "handledError", "stop"], () => {
           mes.edit({
             components: [],
           }).catch(this.logger.error);
-        };
-
-        this.once("playCompleted", removeControls);
-        this.once("handledError", removeControls);
-        this.once("stop", removeControls);
+        });
       }
     }
     catch(e){
@@ -425,10 +418,11 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
    * 停止します。切断するにはDisconnectを使用してください。
    * @returns this
   */
-  stop(): PlayManager{
+  stop(force: boolean = false): PlayManager{
     this.logger.info("Stop called");
     if(this.server.connection){
-      this._player?.stop();
+      this._player?.unpause();
+      this._player?.stop(force);
       this.emit("stop");
     }
     return this;
@@ -476,7 +470,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           }
         }
       });
-      this._dsLogger.destroy();
+      this._dsLogger?.destroy();
     }
   }
 
@@ -509,7 +503,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   rewind(): PlayManager{
     this.logger.info("Rewind called");
     this.emit("rewind");
-    this.stop().play();
+    this.stop(true).play();
     return this;
   }
 

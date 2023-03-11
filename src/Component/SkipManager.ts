@@ -23,6 +23,7 @@ import type { GuildDataContainer } from "../Structure";
 import type { QueueContent } from "../Structure/QueueContent";
 import type { Member } from "oceanic.js";
 
+import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { ServerManagerBase } from "../Structure";
@@ -100,33 +101,39 @@ export class SkipManager extends ServerManagerBase<{}> {
     }
   }
 
+  readonly checkThresholdLocker = new LockObj();
   async checkThreshold(){
-    if(!this.inited || this.destroyed){
-      return;
-    }
-    const members = this.getVoiceMembers();
-    this.organize();
-    if(this.agreeUsers.size * 2 >= members.size - members.filter(member => member.bot).length){
-      try{
-        const response = this.reply = await this.reply.edit(":ok: スキップしています");
-        const title = this.server.queue.get(0).basicInfo.title;
-        this.server.player.stop();
-        await this.server.queue.next();
-        await this.server.player.play();
-        response.edit(`:track_next: \`${title}\`をスキップしました:white_check_mark:`)
-          .catch(this.logger.error);
+    return lock(this.checkThresholdLocker, async () => {
+      if(!this.inited || this.destroyed){
+        return;
       }
-      catch(e){
-        this.logger.error(e);
-        this.reply.edit(":astonished:スキップに失敗しました")
-          .catch(this.logger.error);
+      const members = this.getVoiceMembers();
+      this.organize();
+      if(this.agreeUsers.size * 2 >= members.size - members.filter(member => member.bot).length){
+        try{
+          const response = this.reply = await this.reply.edit({
+            content: ":ok: スキップしています",
+            embeds: [],
+          });
+          const title = this.server.queue.get(0).basicInfo.title;
+          this.server.player.stop();
+          await this.server.queue.next();
+          await this.server.player.play();
+          response.edit(`:track_next: \`${title}\`をスキップしました:white_check_mark:`)
+            .catch(this.logger.error);
+        }
+        catch(e){
+          this.logger.error(e);
+          this.reply.edit(":astonished:スキップに失敗しました")
+            .catch(this.logger.error);
+        }
+      }else{
+        const content = this.createMessageContent();
+        if(content.embeds[0].description !== this.reply.embeds[0].description){
+          this.reply = await this.reply.edit(content);
+        }
       }
-    }else{
-      const content = this.createMessageContent();
-      if(content.embeds[0].description !== this.reply.embeds[0].description){
-        this.reply.edit(content);
-      }
-    }
+    });
   }
 
   private getVoiceMembers(){
