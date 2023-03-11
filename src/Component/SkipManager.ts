@@ -48,13 +48,10 @@ export class SkipManager extends ServerManagerBase {
 
   private organize(){
     if(!this.inited || this.destroyed) return;
-    [...this.agreeUsers].forEach(userId => {
-      if(!this.server.connection){
-        return false;
-      }else if(!this.getVoiceMembers().has(userId)){
-        return false;
+    this.agreeUsers.forEach(userId => {
+      if(!this.server.connection || !this.getVoiceMembers().has(userId)){
+        this.agreeUsers.delete(userId);
       }
-      return true;
     });
   }
 
@@ -77,9 +74,13 @@ export class SkipManager extends ServerManagerBase {
 
   async checkThreshold(){
     if(!this.inited || this.destroyed) return;
-    if(this.agreeUsers.size * 2 >= this.getVoiceMembers().size - 1){
+    const membes = this.getVoiceMembers();
+    if(this.agreeUsers.size * 2 >= membes.size - membes.filter(member => member.bot).length){
       try{
-        const response = this.reply = await this.reply.edit(":ok: スキップしています");
+        const response = this.reply = await this.reply.edit({
+          content: ":ok: スキップしています",
+          embeds: [],
+        });
         const title = this.server.queue.get(0).basicInfo.Title;
         this.server.player.stop();
         await this.server.queue.next();
@@ -93,7 +94,7 @@ export class SkipManager extends ServerManagerBase {
     }else{
       const content = this.createMessageContent();
       if(content.embeds[0].description !== this.reply.embeds[0].description){
-        this.reply.edit(content);
+        this.reply = await this.reply.edit(content);
       }
     }
   }
@@ -110,7 +111,7 @@ export class SkipManager extends ServerManagerBase {
           .setTitle(":person_raising_hand: スキップの投票")
           .setDescription(`\`${this.currentSong.basicInfo.Title}\`のスキップに賛成する場合は以下のボタンを押してください。賛成がボイスチャンネルに参加している人数の過半数を超えると、スキップされます。\r\n\r\n現在の状況: ${this.agreeUsers.size}/${voiceSize}\r\nあと${Math.ceil(voiceSize / 2) - this.agreeUsers.size}人の賛成が必要です。`)
           .setFooter({
-            text: `${this.issuer}が、楽曲のスキップを提案しました。`
+            text: `${this.issuer}が楽曲のスキップを提案しました。`
           })
           .toEris()
       ],
