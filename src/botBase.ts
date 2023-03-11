@@ -175,7 +175,7 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
     this.logger.info(`Version: ${this._versionInfo}`);
     this.initializeBackupper();
     const config = useConfig();
-    this._cacheManger = new SourceCache(this, config.cacheLevel === "full" || config.cacheLevel === "persistent");
+    this._cacheManger = new SourceCache(this, config.cacheLevel === "persistent");
   }
 
   /**
