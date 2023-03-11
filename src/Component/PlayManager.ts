@@ -392,7 +392,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       debug: config.debug,
     });
     if(config.debug){
-      this._player.on("debug", message => this.logger.debug(`[InternalAudioPlayer] ${message}`));
+      this._player.on("debug", message => this.logger.trace(`[InternalAudioPlayer] ${message}`));
     }
     this._player.on("error", this.handleError.bind(this));
     this.server.connection.subscribe(this._player);

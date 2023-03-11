@@ -316,7 +316,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     ;
     this.connection = connection;
     if(config.debug){
-      connection.on("debug", connectionLogger.debug);
+      connection.on("debug", connectionLogger.trace);
     }
 
     this.logger.info(`Connected to ${channelId}`);
