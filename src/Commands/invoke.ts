@@ -20,7 +20,7 @@ import type { CommandArgs } from ".";
 
 import { BaseCommand } from ".";
 import { CommandManager } from "../Component/CommandManager";
-import { CommandMessage } from "../Component/CommandMessage";
+import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import { useConfig } from "../config";
 import { getLogs } from "../logger";
 

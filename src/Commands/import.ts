@@ -17,8 +17,8 @@
  */
 
 import type { CommandArgs } from ".";
-import type { CommandMessage } from "../Component/CommandMessage";
-import type { ResponseMessage } from "../Component/ResponseMessage";
+import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { ResponseMessage } from "../Component/commandResolver/ResponseMessage";
 import type { YmxFormat } from "../Structure";
 import type { AnyGuildTextChannel } from "oceanic.js";
 

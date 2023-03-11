@@ -17,7 +17,7 @@
  */
 
 import type { CommandArgs } from ".";
-import type { CommandMessage } from "../Component/CommandMessage";
+import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { EmbedField } from "oceanic.js";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";

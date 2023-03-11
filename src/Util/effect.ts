@@ -18,10 +18,6 @@
 
 import type { GuildDataContainer } from "../Structure";
 
-import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
-
-import { getColor } from "./color";
-
 export const EffectsCustomIds = {
   Reload: "reload",
   BassBoost: "bass_boost",
@@ -46,43 +42,4 @@ export function getFFmpegEffectArgs(data: GuildDataContainer){
   }else{
     return [];
   }
-}
-
-export function getCurrentEffectPanel(avatarUrl: string, data: GuildDataContainer){
-  const embed = new MessageEmbedBuilder()
-    .setTitle(":cd:エフェクトコントロールパネル:microphone:")
-    .setDescription("オーディオエフェクトの設定/解除することができます。\r\n・表示は古い情報であることがありますが、エフェクトを操作したとき、更新ボタンを押したときに更新されます。\r\n・エフェクトは次の曲から適用されます\r\n現在の曲に適用したい場合は、`頭出し`コマンドを使用してください\r\n")
-    .addField("Bass Boost", data.effectPrefs.BassBoost ? "⭕" : "❌", true)
-    .addField("Reverb", data.effectPrefs.Reverb ? "⭕" : "❌", true)
-    .addField("Loudness Eq", data.effectPrefs.LoudnessEqualization ? "⭕" : "❌", true)
-    .setColor(getColor("EFFECT"))
-    .setFooter({
-      iconURL: avatarUrl,
-      text: "エフェクトを選択してボタンを押してください",
-    })
-  ;
-  const messageActions = new MessageActionRowBuilder()
-    .addComponents(
-      new MessageButtonBuilder()
-        .setCustomId("reload")
-        .setStyle("PRIMARY")
-        .setEmoji("🔁")
-        .setLabel("更新"),
-      new MessageButtonBuilder()
-        .setCustomId("bass_boost")
-        .setStyle(data.effectPrefs.BassBoost ? "SUCCESS" : "SECONDARY")
-        .setLabel("Bass Boost"),
-      new MessageButtonBuilder()
-        .setCustomId("reverb")
-        .setStyle(data.effectPrefs.Reverb ? "SUCCESS" : "SECONDARY")
-        .setLabel("Reverb"),
-      new MessageButtonBuilder()
-        .setCustomId("loudness_eq")
-        .setStyle(data.effectPrefs.LoudnessEqualization ? "SUCCESS" : "SECONDARY")
-        .setLabel("Loudness Eq")
-    )
-    .toOceanic()
-  ;
-  
-  return { embed, messageActions };
 }

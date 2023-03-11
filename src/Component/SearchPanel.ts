@@ -16,8 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CommandMessage } from "./CommandMessage";
-import type { ResponseMessage } from "./ResponseMessage";
+import type { CommandMessage } from "./commandResolver/CommandMessage";
+import type { ResponseMessage } from "./commandResolver/ResponseMessage";
 import type { SelectOption } from "oceanic.js";
 
 import { MessageActionRowBuilder, MessageEmbedBuilder, MessageStringSelectMenuBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
@@ -157,7 +157,8 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     };
   }
 
-  async destroy(quiet: boolean = false){
+  async destroy(option?: { quiet: boolean }){
+    const quiet = option.quiet || false;
     if(this.status !== "consumed") return;
     if(!quiet){
       await this._responseMessage.channel.createMessage({

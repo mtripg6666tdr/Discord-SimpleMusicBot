@@ -31,7 +31,7 @@ const { debug } = useConfig();
 const tokens = {
   category: function(logEvent: LoggingEvent){
     if(logEvent.context?.guildId){
-      return `${logEvent.categoryName}/${logEvent.context?.guildId}`;
+      return `${logEvent.categoryName}/${logEvent.context?.id}`;
     }else{
       return logEvent.categoryName;
     }

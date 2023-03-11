@@ -17,7 +17,7 @@
  */
 
 import type { CommandArgs } from ".";
-import type { CommandMessage } from "../Component/CommandMessage";
+import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { EmbedOptions } from "oceanic.js";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
@@ -59,22 +59,23 @@ export default class SystemInfo extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
     // Run default logger
-    options.bot.logGeneralInfo();
+    context.bot.logGeneralInfo();
     await message.reply("実行します");
 
     const embeds = [] as EmbedOptions[];
 
-    if(options.args.includes("basic") || options.args.length === 0){
+    if(context.args.includes("basic") || context.args.length === 0){
       embeds.push(
         new MessageEmbedBuilder()
           .setTitle("Discord-SimpleMusicBot")
           .setDescription("Basic info")
-          .addField("Version", `\`${options.bot.version}\``, true)
-          .addField("Managed embed toggles", `\`${options.embedPageToggle.length}\``, true)
-          .addField("Current total transforming costs", `\`${options.bot.totalTransformingCost}\``)
+          .addField("Version", `\`${context.bot.version}\``, true)
+          .addField("Managed collector customIds", `\`${context.bot.collectors.customIdLength}\``, true)
+          .addField("Managed collectors", `\`${context.bot.collectors.collectorLength}\``, true)
+          .addField("Current total transforming costs", `\`${context.bot.totalTransformingCost}\``)
           .addField("Modules", [
             "oceanic.js",
             "@mtripg6666tdr/oceanic-command-resolver",
@@ -100,7 +101,7 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(config.isBotAdmin(message.member.id) && (options.args.includes("log") || options.args.length === 0)){
+    if(config.isBotAdmin(message.member.id) && (context.args.includes("log") || context.args.length === 0)){
       let logs: string[] = [...getLogs()];
       logs.reverse();
       for(let i = 0; i < logs.length; i++){
@@ -118,27 +119,27 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(config.isBotAdmin(message.member.id) && (options.args.includes("servers") || options.args.length === 0)){
+    if(config.isBotAdmin(message.member.id) && (context.args.includes("servers") || context.args.length === 0)){
       embeds.push(
         new MessageEmbedBuilder()
           .setColor(getColor("UPTIME"))
           .setTitle("Server Info")
           .setDescription(
             "サーバー名(NSFW LEVEL,ID)\r\n"
-            + options.client.guilds.map(guild => `${guild.name.length > 17 ? guild.name.substring(0, 17) + "…" : guild.name} (${guild.nsfwLevel},${guild.id})`).join("\r\n")
+            + context.client.guilds.map(guild => `${guild.name.length > 17 ? guild.name.substring(0, 17) + "…" : guild.name} (${guild.nsfwLevel},${guild.id})`).join("\r\n")
           )
-          .addField("参加サーバー数", options.bot.client.guilds.size.toString(), true)
-          .addField("データが保持されているサーバー数", options.bot.databaseCount.toString(), true)
-          .addField("接続中サーバー数", options.bot.connectingGuildCount.toString(), true)
-          .addField("再生中サーバー数(一時停止含む)", options.bot.playingGuildCount.toString(), true)
-          .addField("一時停止サーバー数", options.bot.pausedGuildCount.toString(), true)
+          .addField("参加サーバー数", context.bot.client.guilds.size.toString(), true)
+          .addField("データが保持されているサーバー数", context.bot.databaseCount.toString(), true)
+          .addField("接続中サーバー数", context.bot.connectingGuildCount.toString(), true)
+          .addField("再生中サーバー数(一時停止含む)", context.bot.playingGuildCount.toString(), true)
+          .addField("一時停止サーバー数", context.bot.pausedGuildCount.toString(), true)
           .toOceanic()
       );
     }
 
-    if(config.isBotAdmin(message.member.id) && (options.args[0] === "server" && options.args[1] && options.client.guilds.has(options.args[1]))){
-      const target = options.client.guilds.get(options.args[1]);
-      const data = options.bot.getData(options.args[1]);
+    if(config.isBotAdmin(message.member.id) && (context.args[0] === "server" && context.args[1] && context.client.guilds.has(context.args[1]))){
+      const target = context.client.guilds.get(context.args[1]);
+      const data = context.bot.getData(context.args[1]);
       embeds.push(
         new MessageEmbedBuilder()
           .setColor(getColor("HELP"))
@@ -162,7 +163,7 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(options.args.includes("cpu") || options.args.length === 0){
+    if(context.args.includes("cpu") || context.args.length === 0){
       // Process CPU Info
       const cpuInfoEmbed = new MessageEmbedBuilder();
       cpuInfoEmbed.setColor(getColor("UPTIME")).setTitle("CPU Info");
@@ -182,7 +183,7 @@ export default class SystemInfo extends BaseCommand {
       embeds.push(cpuInfoEmbed.toOceanic());
     }
 
-    if(options.args.includes("mem") || options.args.length === 0){
+    if(context.args.includes("mem") || context.args.length === 0){
       // Process Mem Info
       const memory = Util.system.getMemoryInfo();
       const nMem = process.memoryUsage();

@@ -16,12 +16,13 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { ResponseMessage } from "./ResponseMessage";
 import type { TaskCancellationManager } from "./TaskCancellationManager";
+import type { InteractionCollector } from "./collectors/InteractionCollector";
+import type { ResponseMessage } from "./commandResolver/ResponseMessage";
 import type { exportableCustom } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { AddedBy, QueueContent } from "../Structure/QueueContent";
-import type { AnyGuildTextChannel, Message } from "oceanic.js";
+import type { AnyGuildTextChannel, EditMessageOptions, Message, MessageActionRow } from "oceanic.js";
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
@@ -256,14 +257,15 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     })
   ): Promise<boolean>{
     this.logger.info("AutoAddQueue Called");
-    let msg: Message<AnyGuildTextChannel>|ResponseMessage = null;
+    let uiMessage: Message<AnyGuildTextChannel>|ResponseMessage = null;
 
     try{
+      // UI表示するためのメッセージを特定する
       if(options.fromSearch){
         // 検索パネルから
         this.logger.info("AutoAddQueue from search panel");
-        msg = options.fromSearch;
-        await msg.edit({
+        uiMessage = options.fromSearch;
+        await uiMessage.edit({
           content: "",
           embeds: [
             new MessageEmbedBuilder()
@@ -279,15 +281,16 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       }else if(options.message){
         // すでに処理中メッセージがある
         this.logger.info("AutoAddQueue will report statuses to the specified message");
-        msg = options.message;
+        uiMessage = options.message;
       }else if(options.channel){
         // まだないので生成
         this.logger.info("AutoAddQueue will make a message that will be used to report statuses");
-        msg = await options.channel.createMessage({
+        uiMessage = await options.channel.createMessage({
           content: "情報を取得しています。お待ちください...",
         });
       }
 
+      // キューの長さ確認
       if(this.server.queue.length > 999){
         // キュー上限
         this.logger.warn("AutoAddQueue failed due to too long queue");
@@ -295,6 +298,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         throw "キューの上限を超えています";
       }
 
+      // キューへの追加を実行
       const info = await this.server.queue.addQueueOnly({
         url: options.url,
         addedBy: options.addedBy,
@@ -304,7 +308,8 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       });
       this.logger.info("AutoAddQueue worked successfully");
 
-      if(msg){
+      // UIを表示する
+      if(uiMessage){
         // 曲の時間取得＆計算
         const _t = Number(info.basicInfo.lengthSeconds);
         const [min, sec] = Util.time.calcMinSec(_t);
@@ -314,6 +319,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         const timeFragments = Util.time.calcHourMinSec(
           this.getLengthSecondsTo(info.index) - _t - Math.floor(this.server.player.currentTime / 1000)
         );
+        // 埋め込みの作成
         const embed = new MessageEmbedBuilder()
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
@@ -328,27 +334,59 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         }else if(info.basicInfo.isSpotify()){
           embed.addField(":warning:注意", "Spotifyのタイトルは正しく再生されない場合があります");
         }
-        let lastReply: Message<AnyGuildTextChannel>|ResponseMessage = null;
-        const components = !options.first && options.cancellable ? [
-          new MessageActionRowBuilder()
-            .addComponents(
-              new MessageButtonBuilder()
-                .setCustomId(`cancel-last-${this.getUserIdFromMember(options.addedBy)}`)
-                .setLabel("キャンセル")
-                .setStyle("DANGER")
-            )
-            .toOceanic(),
-        ] : [];
+
+        const components: MessageActionRow[] = [];
+        const cancellable = !options.first && options.cancellable && !!options.addedBy;
+        let collector: InteractionCollector = null;
+        if(cancellable){
+          const collectorCreateResult = this.server.bot.collectors
+            .create()
+            .setAuthorIdFilter(this.getUserIdFromMember(options.addedBy))
+            .setTimeout(5 * 60 * 1000)
+            .createCustomIds({
+              cancelLast: "button",
+            });
+          collector = collectorCreateResult.collector;
+
+          components.push(
+            new MessageActionRowBuilder()
+              .addComponents(
+                new MessageButtonBuilder()
+                  .setCustomId(collectorCreateResult.customIdMap.cancelLast)
+                  .setLabel("キャンセル")
+                  .setStyle("DANGER")
+              )
+              .toOceanic()
+          );
+
+          collectorCreateResult.collector.once("cancelLast", interaction => {
+            const item = this.get(this.length - 1);
+            this.removeAt(this.length - 1);
+            interaction.createFollowup({
+              content: `🚮\`${item.basicInfo.title}\`の追加を取り消しました`,
+            }).catch(this.logger.error);
+          });
+
+          const destroyCollector = () => {
+            this.off("change", destroyCollector);
+            this.off("changeWithoutCurrent", destroyCollector);
+            collector.destroy();
+          };
+          this.once("change", destroyCollector);
+          this.once("changeWithoutCurrent", destroyCollector);
+        }
+
+        let messageContent: EditMessageOptions = null;
         if(typeof info.basicInfo.thumbnail === "string"){
           embed.setThumbnail(info.basicInfo.thumbnail);
-          lastReply = await msg.edit({
+          messageContent = {
             content: "",
             embeds: [embed.toOceanic()],
             components,
-          });
+          };
         }else{
           embed.setThumbnail("attachment://thumbnail." + info.basicInfo.thumbnail.ext);
-          lastReply = await msg.edit({
+          messageContent = {
             content: "",
             embeds: [embed.toOceanic()],
             components,
@@ -358,28 +396,17 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
                 contents: info.basicInfo.thumbnail.data,
               },
             ],
-          });
+          };
         }
 
-        if(!options.first && options.cancellable){
-          let componentDeleted = false;
-          (["change", "changeWithoutCurrent"] as const).forEach(event => this.once(event, () => {
-            if(!componentDeleted){
-              componentDeleted = true;
-              lastReply.edit({
-                content: "",
-                embeds: lastReply.embeds,
-                components: [],
-              });
-            }
-          }));
-        }
+        const lastReply = await uiMessage.edit(messageContent);
+        collector?.setMessage(lastReply);
       }
     }
     catch(e){
       this.logger.error("AutoAddQueue failed", e);
-      if(msg){
-        msg.edit({
+      if(uiMessage){
+        uiMessage.edit({
           content: `:weary: キューの追加に失敗しました。追加できませんでした。${typeof e === "object" && "message" in e ? `(${e.message})` : ""}`,
           embeds: null,
         })

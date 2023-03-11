@@ -19,13 +19,10 @@
 import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
 import type { ComponentTypes } from "oceanic.js";
-
-import * as discord from "oceanic.js";
+import type * as discord from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
-import { CommandMessage } from "../Component/CommandMessage";
-import { PageToggle } from "../Component/PageToggle";
-import { effectUtil } from "../Util";
+import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 
 export async function handleButtonInteraction(
   this: MusicBot,
@@ -34,63 +31,13 @@ export async function handleButtonInteraction(
 ){
   this.logger.info("received button interaction");
   await interaction.deferUpdate();
-  if(interaction.data.customID === PageToggle.arrowLeft || interaction.data.customID === PageToggle.arrowRight){
-    const l = this._embedPageToggle.filter(t =>
-      t.Message.channelId === interaction.channel.id
-      && t.Message.id === interaction.message.id);
-    if(l.length >= 1){
-      // ページめくり
-      await l[0].flipPage(
-        interaction.data.customID === PageToggle.arrowLeft ? l[0].Current >= 1 ? l[0].Current - 1 : 0
-          : interaction.data.customID === PageToggle.arrowRight ? l[0].Current < l[0].Length - 1 ? l[0].Current + 1 : l[0].Current : 0
-        ,
-        interaction
-      );
-    }else{
-      await interaction.editOriginal({
-        content: "失敗しました!",
-      });
-    }
-  }else if(interaction.data.customID.startsWith("skip_vote")){
-    const result = server.skipSession?.vote(interaction.member);
-    if(result === "voted"){
-      interaction.createMessage({
-        content: "投票しました",
-        flags: discord.MessageFlags.EPHEMERAL,
-      });
-    }else if(result === "cancelled"){
-      interaction.createMessage({
-        content: "投票を取り消しました",
-        flags: discord.MessageFlags.EPHEMERAL,
-      });
-    }
-  }else if(interaction.data.customID.startsWith("cancel-last-")){
-    const item = server.queue.get(server.queue.length - 1);
-    const userId = interaction.data.customID.substring("cancel-last-".length);
-    if(interaction.member.id === userId){
-      server.queue.removeAt(server.queue.length - 1);
-      interaction.createMessage({
-        content: `🚮\`${item.basicInfo.title}\`の追加を取り消しました`,
-      }).catch(this.logger.error);
-      interaction.message.edit({
-        components: [],
-      }).catch(this.logger.error);
-    }
-  }else if(interaction.data.customID.startsWith("cancel-search-")){
-    const userId = interaction.data.customID.substring("cancel-search-".length);
-    if(interaction.member.id === userId && this.guildData.get(interaction.guildID)?.searchPanel.has(userId)){
-      this.guildData.get(interaction.guildID).searchPanel
-        .get(userId)
-        .destroy(/* quiet */ true)
-      ;
-      interaction.createMessage({
-        content: "🚮検索パネルを破棄しました:white_check_mark:",
-      }).catch(this.logger.error);
-      interaction.message.edit({
-        components: [],
-      }).catch(this.logger.error);
-    }
-  }else if(interaction.data.customID.startsWith("control_")){
+
+  // コレクターで処理できるか？
+  if(this.collectors.interactionCreate(interaction)){
+    return;
+  }
+
+  if(interaction.data.customID.startsWith("control_")){
     let command: string = null;
     switch(interaction.data.customID){
       case "control_rewind":
@@ -112,35 +59,5 @@ export async function handleButtonInteraction(
     const args = this["createCommandRunnerArgs"](commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions);
     args.includeMention = true;
     CommandManager.instance.resolve(command)?.checkAndRun(commandMessage, args);
-  }else{
-    const updateEffectPanel = () => {
-      const mes = interaction.message;
-      const { embed, messageActions } = effectUtil.getCurrentEffectPanel(
-        interaction.member.avatarURL(),
-        this.guildData.get(interaction.channel.guild.id)
-      );
-      mes.edit({
-        content: "",
-        embeds: [embed.toOceanic()],
-        components: [messageActions],
-      }).catch(this.logger.error);
-    };
-    switch(interaction.data.customID){
-      case effectUtil.EffectsCustomIds.Reload:
-        updateEffectPanel();
-        break;
-      case effectUtil.EffectsCustomIds.BassBoost:
-        this.guildData.get(interaction.channel.guild.id).effectPrefs.BassBoost = !server.effectPrefs.BassBoost;
-        updateEffectPanel();
-        break;
-      case effectUtil.EffectsCustomIds.Reverb:
-        this.guildData.get(interaction.channel.guild.id).effectPrefs.Reverb = !server.effectPrefs.Reverb;
-        updateEffectPanel();
-        break;
-      case effectUtil.EffectsCustomIds.LoudnessEqualization:
-        this.guildData.get(interaction.channel.guild.id).effectPrefs.LoudnessEqualization = !server.effectPrefs.LoudnessEqualization;
-        updateEffectPanel();
-        break;
-    }
   }
 }

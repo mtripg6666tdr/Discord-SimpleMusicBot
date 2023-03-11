@@ -17,7 +17,7 @@
  */
 
 import type { CommandArgs } from ".";
-import type { CommandMessage } from "../Component/CommandMessage";
+import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 
 import { BaseCommand } from ".";
 import { discordUtil } from "../Util";
