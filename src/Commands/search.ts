@@ -17,8 +17,8 @@
  */
 
 import type { CommandArgs } from ".";
-import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { SongInfo } from "../Component/SearchPanel";
+import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type * as ytsr from "ytsr";
 
 import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";

@@ -16,9 +16,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { TaskCancellationManager } from "./TaskCancellationManager";
 import type { InteractionCollector } from "./collectors/InteractionCollector";
 import type { ResponseMessage } from "./commandResolver/ResponseMessage";
-import type { TaskCancellationManager } from "./TaskCancellationManager";
 import type { exportableCustom } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { AddedBy, QueueContent } from "../Structure/QueueContent";
