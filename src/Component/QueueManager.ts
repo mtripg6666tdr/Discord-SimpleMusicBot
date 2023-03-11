@@ -209,7 +209,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           type: sourceType,
           knownData: gotData,
           forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000),
-        }),
+        }, this.server.bot.cache),
         additionalInfo: {
           addedBy: {
             userId: addedBy && this.getUserIdFromMember(addedBy) || "0",

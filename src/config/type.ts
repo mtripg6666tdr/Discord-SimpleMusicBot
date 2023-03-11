@@ -56,6 +56,11 @@ export const ConfigSchema = Type.Object({
   twentyFourSeven: Type.Array(Type.RegEx(/^\d+$/), { default: [] }),
   alwaysTwentyFourSeven: Type.Boolean({ default: false }),
   disabledSources: Type.Optional(Type.Array(Type.String(), { default: [] })),
+  cacheLevel: Type.Union([
+    Type.Literal("memory"),
+    Type.Literal("persistent"),
+    Type.Literal("full"),
+  ]),
 });
 
 export type GuildBGMContainerType = Static<typeof GuildBGMContainer>;

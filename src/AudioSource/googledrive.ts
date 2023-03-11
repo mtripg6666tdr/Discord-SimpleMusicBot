@@ -26,6 +26,7 @@ import { retriveHttpStatusCode, retriveLengthSeconds } from "../Util";
 export class GoogleDrive extends AudioSource<string> {
   constructor(){
     super("googledrive");
+    this._unableToCache = true;
   }
 
   async init(url: string, prefetched: exportableCustom){

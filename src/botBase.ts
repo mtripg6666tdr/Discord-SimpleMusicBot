@@ -26,6 +26,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { RateLimitController } from "./Component/RateLimitController";
+import { SourceCache } from "./Component/SourceCache";
 import { HttpBackupper } from "./Component/backupper/httpBased";
 import { MongoBackupper } from "./Component/backupper/mongodb";
 import { InteractionCollectorManager } from "./Component/collectors/InteractionCollectorManager";
@@ -33,6 +34,7 @@ import { GuildDataContainer } from "./Structure";
 import { LogEmitter } from "./Structure";
 import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";
 import * as Util from "./Util";
+import { useConfig } from "./config";
 
 export type DataType = Map<string, GuildDataContainer>;
 
@@ -59,6 +61,7 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
   protected readonly _rateLimitController = new RateLimitController();
   protected readonly guildData: DataType = new Map();
   protected readonly _interactionCollectorManager: InteractionCollectorManager = new InteractionCollectorManager();
+  protected readonly _cacheManger: SourceCache = null;
   protected _backupper: Backupper = null;
   private maintenanceTickCount = 0;
 
@@ -74,6 +77,13 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
    */
   get collectors(){
     return this._interactionCollectorManager;
+  }
+
+  /**
+   * キャッシュマネージャー
+   */
+  get cache(){
+    return this._cacheManger;
   }
 
   /**
@@ -164,6 +174,8 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
     }
     this.logger.info(`Version: ${this._versionInfo}`);
     this.initializeBackupper();
+    const config = useConfig();
+    this._cacheManger = new SourceCache(this, config.cacheLevel === "full" || config.cacheLevel === "persistent");
   }
 
   /**

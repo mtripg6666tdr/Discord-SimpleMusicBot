@@ -33,6 +33,7 @@ export class Hibiki extends AudioSource<DynamicThumbnail> {
 
   constructor(){
     super("hibiki");
+    this._unableToCache = true;
   }
   
   async init(url: string){

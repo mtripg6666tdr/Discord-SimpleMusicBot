@@ -27,6 +27,9 @@ import candyget from "candyget";
 import { BaseCommand } from ".";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
 import { YmxVersion } from "../Structure";
+import { useConfig } from "../config";
+
+const config = useConfig();
 
 export default class Import extends BaseCommand {
   constructor(){
@@ -57,7 +60,7 @@ export default class Import extends BaseCommand {
     }
     let force = false;
     let url = options.rawArgs;
-    if(options.args.length >= 2 && options.args[0] === "force" && message.member.id === "593758391395155978"){
+    if(options.args.length >= 2 && options.args[0] === "force" && config.isBotAdmin(message.member.id)){
       force = true;
       url = options.args[1];
     }

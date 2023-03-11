@@ -19,3 +19,4 @@ addon
 config.json
 logs/*
 !**/.gitkeep
+cache

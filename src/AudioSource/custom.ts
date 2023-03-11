@@ -25,6 +25,7 @@ import { isAvailableRawAudioURL, retriveLengthSeconds } from "../Util";
 export class CustomStream extends AudioSource<string> {
   constructor(){
     super("custom");
+    this._unableToCache = true;
   }
 
   async init(url: string, prefetched: exportableCustom){
