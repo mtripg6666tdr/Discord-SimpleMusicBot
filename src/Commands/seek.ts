@@ -72,7 +72,7 @@ export default class Seek extends BaseCommand {
 
     try{
       const response = await message.reply(":rocket:シークしています...");
-      server.player.stop();
+      server.player.stop(true);
       await server.player.play(time);
       await response.edit(":white_check_mark:シークしました").catch(this.logger.error);
     }

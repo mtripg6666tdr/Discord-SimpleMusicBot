@@ -116,7 +116,7 @@ export class SkipManager extends ServerManagerBase<{}> {
             embeds: [],
           });
           const title = this.server.queue.get(0).basicInfo.title;
-          this.server.player.stop();
+          this.server.player.stop(true);
           await this.server.queue.next();
           await this.server.player.play();
           response.edit(`:track_next: \`${title}\`をスキップしました:white_check_mark:`)

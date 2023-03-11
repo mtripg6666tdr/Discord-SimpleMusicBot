@@ -66,7 +66,7 @@ export default class Skip extends BaseCommand {
       }
 
       const title = item.basicInfo.title;
-      server.player.stop();
+      server.player.stop(true);
       await server.queue.next();
       await server.player.play();
       await message.reply({

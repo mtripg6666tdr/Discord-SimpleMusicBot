@@ -539,7 +539,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       await entersState(this._player, AudioPlayerStatus.Idle, 20e3)
         .catch(() => {
           this.logger.warn("Stream has not ended in time and will force stream into destroying");
-          this.stop();
+          this.stop(true);
         })
       ;
     }
