@@ -32,9 +32,15 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
   this.logger.info("reveived command interaction");
   if(!interaction.inCachedGuildChannel()) return;
 
-  if(!(interaction.channel instanceof discord.TextChannel)){
+  if(
+    interaction.channel.type !== discord.ChannelTypes.GUILD_TEXT
+    && interaction.channel.type !== discord.ChannelTypes.PRIVATE_THREAD
+    && interaction.channel.type !== discord.ChannelTypes.PUBLIC_THREAD
+    && interaction.channel.type !== discord.ChannelTypes.GUILD_STAGE_VOICE
+    && interaction.channel.type !== discord.ChannelTypes.GUILD_VOICE
+  ){
     await interaction.createMessage({
-      content: "テキストチャンネルで実行してください",
+      content: "テキストチャンネルまたはスレッドで実行してください",
     });
     return;
   }
