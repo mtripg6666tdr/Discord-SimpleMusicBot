@@ -105,7 +105,7 @@ if(isMainThread){
         },
       },
       categories: {
-        default: { appenders: ["out", "file", "memory"], level: "debug" },
+        default: { appenders: ["out", "file", "memory"], level: "trace" },
       },
     });
   }else{
@@ -137,12 +137,13 @@ if(isMainThread){
       },
     },
     categories: {
-      default: { appenders: ["network"], level: "debug" },
+      default: { appenders: ["network"], level: "trace" },
     },
   });
 }
 
 export type LoggerObject = {
+  trace: log4js.Logger["trace"],
   debug: log4js.Logger["debug"],
   info: log4js.Logger["info"],
   warn: log4js.Logger["warn"],
@@ -159,6 +160,7 @@ export function getLogger(tag: string){
   }else{
     const log4jsLogger = log4js.getLogger(tag);
     const logger: LoggerObject = {
+      trace: log4jsLogger.trace.bind(log4jsLogger),
       debug: log4jsLogger.debug.bind(log4jsLogger),
       info: log4jsLogger.info.bind(log4jsLogger),
       warn: log4jsLogger.warn.bind(log4jsLogger),

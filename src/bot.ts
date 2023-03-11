@@ -95,7 +95,7 @@ export class MusicBot extends MusicBotBase {
   }
 
   private onDebug(message: string, id?: number){
-    this.logger.debug(`${message} (ID: ${id || "NaN"})`);
+    this.logger.trace(`${message} (ID: ${id || "NaN"})`);
   }
 
   private onWarn(message: string, id?: number){
