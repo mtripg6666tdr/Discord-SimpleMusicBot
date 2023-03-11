@@ -80,35 +80,45 @@ export default class BulkDelete extends BaseCommand {
       const { collector, customIdMap } = context.bot.collectors
         .create()
         .setAuthorIdFilter(message.member.id)
-        .setTimeout(5 * 60 * 1000)
+        .setTimeout(2 * 60 * 1000)
         .createCustomIds({
           ok: "button",
         });
       await reply.edit({
-        content: messages.length + "件見つかりました。削除を実行します。",
+        content: [
+          `${messages.length}件見つかりました。`,
+          "一括削除を確定するにはボタンを押してください。",
+          "押されないと一定時間後にキャンセルされます。",
+        ].join("\r\n"),
         components: [
           new MessageActionRowBuilder()
             .addComponents(
               new MessageButtonBuilder()
                 .setCustomId(customIdMap.ok)
                 .setLabel("OK")
-                .setStyle("PRIMARY")
+                .setStyle("DANGER")
             )
             .toOceanic(),
         ],
       });
 
-      collector.on("ok", async () => {
+      collector.once("ok", async () => {
         // bulk delete
         await message.channel.deleteMessages(
           messages.map(msg => msg.id),
           `${message.member.username}#${message.member.discriminator}により${count}件のメッセージの削除が要求されたため。`
         );
-        await reply.edit(":sparkles:完了!(このメッセージは自動的に消去されます)");
+        await reply.edit({
+          content: ":sparkles:完了!(このメッセージは自動的に消去されます)",
+          components: [],
+        });
         setTimeout(() => reply.delete().catch(() => {}), 10 * 1000).unref();
       });
       collector.on("timeout", () => {
-        reply.edit("削除をキャンセルしました");
+        reply.edit({
+          content: "削除をキャンセルしました",
+          components: [],
+        });
       });
     }
     catch(er){

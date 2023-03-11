@@ -66,15 +66,17 @@ export class MusicBot extends MusicBotBase {
       },
     });
 
-    this.client
-      .on("ready", eventHandlers.onReady.bind(this))
-      .on("messageCreate", eventHandlers.onMessageCreate.bind(this))
-      .on("interactionCreate", eventHandlers.onInteractionCreate.bind(this))
-      .on("voiceChannelJoin", eventHandlers.onVoiceChannelJoin.bind(this))
-      .on("voiceChannelLeave", eventHandlers.onVoiceChannelLeave.bind(this))
-      .on("voiceChannelSwitch", eventHandlers.onVoiceChannelSwitch.bind(this))
-      .on("error", this.onError.bind(this))
-    ;
+    this.client.once("ready", eventHandlers.onReady.bind(this));
+    this.once("ready", () => {
+      this.client
+        .on("messageCreate", eventHandlers.onMessageCreate.bind(this))
+        .on("interactionCreate", eventHandlers.onInteractionCreate.bind(this))
+        .on("voiceChannelJoin", eventHandlers.onVoiceChannelJoin.bind(this))
+        .on("voiceChannelLeave", eventHandlers.onVoiceChannelLeave.bind(this))
+        .on("voiceChannelSwitch", eventHandlers.onVoiceChannelSwitch.bind(this))
+        .on("error", this.onError.bind(this))
+      ;
+    });
     if(config.debug){
       this.client
         .on("debug", this.onDebug.bind(this))

@@ -334,7 +334,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    */
   async joinVoiceChannel(message: CommandMessage, reply: boolean = false, replyOnFail: boolean = false): Promise<boolean>{
     return lock(this.joinVoiceChannelLocker, async () => {
-      if(message.member.voiceState.channelID){
+      if(message.member.voiceState?.channelID){
         const targetVC = this.bot.client.getChannel<VoiceChannel | StageChannel>(message.member.voiceState.channelID);
 
         if(targetVC.voiceMembers.has(this.bot.client.user.id)){

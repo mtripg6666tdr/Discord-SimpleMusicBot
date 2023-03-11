@@ -85,13 +85,10 @@ export class SourceCache extends LogEmitter<CacheEvents> {
   }
 
   hasSource(url: string){
-    if(this.enablePersistent){
-      const result = this._sourceCache.has(url);
-      this.logger.info(`Requested memory cache ${result ? "" : "not "}found`);
-      return result;
-    }else{
-      return false;
-    }
+    if(url.includes("?si=")) url = url.split("?")[0];
+    const result = this._sourceCache.has(url);
+    this.logger.info(`Requested memory cache ${result ? "" : "not "}found`);
+    return result;
   }
 
   getSource(url: string){
@@ -109,6 +106,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
   }
 
   private createCacheId(url: string, type: "exportable"){
+    if(url.includes("?si=")) url = url.split("?")[0];
     return this.generateHash(`${type}+${url}`);
   }
 
