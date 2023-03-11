@@ -18,7 +18,6 @@
 
 import type { UrlStreamInfo } from ".";
 import type { exportableCustom } from "./custom";
-import type { EmbedField } from "oceanic.js";
 
 import { AudioSource } from "./audiosource";
 import { retriveHttpStatusCode, retriveLengthSeconds } from "../Util";
@@ -58,10 +57,12 @@ export class GoogleDrive extends AudioSource<string> {
   }
 
   toField(){
-    return [{
-      name: ":asterisk:詳細",
-      value: "Googleドライブにて共有されたファイル",
-    }] as EmbedField[];
+    return [
+      {
+        name: ":asterisk:詳細",
+        value: "Googleドライブにて共有されたファイル",
+      },
+    ];
   }
 
   npAdditional(){return "";}

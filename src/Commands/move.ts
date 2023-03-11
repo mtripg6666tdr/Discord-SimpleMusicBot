@@ -47,18 +47,21 @@ export default class Mv extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    if(options.args.length !== 2){
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+
+    if(context.args.length !== 2){
       message.reply("✘引数は`移動したい曲の元のオフセット(番号) 移動先のオフセット(番号)`のように指定します。").catch(this.logger.error);
       return;
-    }else if(options.args.includes("0") && options.server.player.isPlaying){
+    }else if(context.args.includes("0") && context.server.player.isPlaying){
       message.reply("✘音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。").catch(this.logger.error);
       return;
     }
-    const from = Number(options.args[0]);
-    const to = Number(options.args[1]);
-    const q = options.server.queue;
+
+    const from = Number(context.args[0]);
+    const to = Number(context.args[1]);
+    const q = context.server.queue;
+
     if(
       from >= 0 && from <= q.length
       && to >= 0 && to <= q.length
@@ -66,12 +69,15 @@ export default class Mv extends BaseCommand {
       const title = q.get(from).basicInfo.title;
       if(from !== to){
         q.move(from, to);
-        message.reply("✅ `" + title + "`を`" + from + "`番目から`" + to + "`番目に移動しました").catch(this.logger.error);
+        message.reply(`✅ \`${title}\`を\`${from}\`番目から\`${to}\`番目に移動しました`)
+          .catch(this.logger.error);
       }else{
-        message.reply("✘移動元と移動先の要素が同じでした。").catch(this.logger.error);
+        message.reply("✘移動元と移動先の要素が同じでした。")
+          .catch(this.logger.error);
       }
     }else{
-      message.reply("✘失敗しました。引数がキューの範囲外です").catch(this.logger.error);
+      message.reply("✘失敗しました。引数がキューの範囲外です")
+        .catch(this.logger.error);
     }
   }
 }

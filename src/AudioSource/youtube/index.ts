@@ -52,7 +52,7 @@ export class YouTube extends AudioSource<string> {
   protected set isLiveStream(value: boolean){
     this._isLiveStream = value;
   }
-  
+
   _relatedVideos: readonly exportableYouTube[] = [];
   get relatedVideos(): readonly exportableYouTube[] {
     return this._relatedVideos;
@@ -178,7 +178,7 @@ export class YouTube extends AudioSource<string> {
     this.isLiveStream = exportable.isLive;
   }
 
-  disableCache(){
+  override disableCache(){
     this.cache = null;
   }
 
@@ -197,11 +197,17 @@ export class YouTube extends AudioSource<string> {
       }, { once: true });
       const checkForLive = () => {
         if(signal.aborted) return;
+
         tick();
+
         const startTime = this.availableAfter;
-        if(!startTime) resolve();
+        if(!startTime){
+          resolve();
+        }
+
         const waitTime = Math.max(new Date(startTime).getTime() - Date.now(), 20 * 1000);
         this.logger.info(`Retrying after ${waitTime}ms`);
+
         timeout = setTimeout(async () => {
           if(signal.aborted) return;
           tick();

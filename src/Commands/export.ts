@@ -35,13 +35,13 @@ export default class Export extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    if(options.server.queue.length === 0){
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    if(context.server.queue.length === 0){
       message.reply("キューが空です。").catch(this.logger.error);
       return;
     }
-    const ymxFile = options.server.exportQueue();
+    const ymxFile = context.server.exportQueue();
     message.reply({
       content: "✅エクスポートしました",
       files: [{

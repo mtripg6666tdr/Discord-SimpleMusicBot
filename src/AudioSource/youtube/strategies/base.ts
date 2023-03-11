@@ -22,12 +22,21 @@ import type { StreamInfo } from "../../audiosource";
 
 import { getLogger } from "../../../logger";
 
-
+/**
+ * 戦略ごとに保持されるキャッシュを示します。
+ * @template T キャッシュが生成された戦略の識別子
+ * @template U 各戦略に固有のキャッシュの構造
+ */
 export type Cache<T extends string, U> = {
   type: T,
   data: U,
 };
 
+/**
+ * 戦略を示します
+ * @template T キャッシュの種類を指定します
+ * @template U 各戦略に固有のキャッシュの構造
+ */
 export abstract class Strategy<T extends Cache<any, U>, U> {
   abstract get cacheType(): string;
   protected logger: LoggerObject;
@@ -47,6 +56,7 @@ export abstract class Strategy<T extends Cache<any, U>, U> {
     relatedVideos: exportableYouTube[],
   }>;
 
+  /** 戦略が使用されたことを示すログを出力します */
   protected logStrategyUsed(){
     this.logger.info("using strategy #" + this.priority);
   }

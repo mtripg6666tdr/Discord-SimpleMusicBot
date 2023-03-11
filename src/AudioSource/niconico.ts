@@ -17,7 +17,6 @@
  */
 
 import type { exportableCustom, ReadableStreamInfo } from ".";
-import type { EmbedField } from "oceanic.js";
 import type { Readable } from "stream";
 
 import { convert as htmlToText } from "html-to-text";
@@ -74,21 +73,25 @@ export class NicoNicoS extends AudioSource<string> {
   }
 
   toField(verbose: boolean = false){
-    const fields = [] as EmbedField[];
-    fields.push({
-      name: ":cinema:投稿者",
-      value: this.author,
-      inline: false,
-    }, {
-      name: ":eyes:視聴回数",
-      value: this.views + "回",
-      inline: false,
-    }, {
-      name: ":asterisk:概要",
-      value: this.description.length > (verbose ? 1000 : 350) ? this.description.substring(0, verbose ? 1000 : 300) + "..." : this.description,
-      inline: false,
-    });
-    return fields;
+    return [
+      {
+        name: ":cinema:投稿者",
+        value: this.author,
+        inline: false,
+      },
+      {
+        name: ":eyes:視聴回数",
+        value: this.views + "回",
+        inline: false,
+      },
+      {
+        name: ":asterisk:概要",
+        value: this.description.length > (verbose ? 1000 : 350)
+          ? this.description.substring(0, verbose ? 1000 : 300) + "..."
+          : this.description,
+        inline: false,
+      },
+    ];
   }
 
   npAdditional(){

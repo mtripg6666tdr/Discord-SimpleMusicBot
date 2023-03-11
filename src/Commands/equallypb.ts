@@ -37,11 +37,11 @@ export default class EquallyPlayback extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
+  async run(context: CommandMessage, options: CommandArgs){
+    options.server.updateBoundChannel(context);
     if(options.server.equallyPlayback){
       options.server.equallyPlayback = false;
-      message.reply("❌均等再生をオフにしました").catch(this.logger.error);
+      context.reply("❌均等再生をオフにしました").catch(this.logger.error);
     }else{
       options.server.equallyPlayback = true;
       const embed = new MessageEmbedBuilder()
@@ -50,7 +50,7 @@ export default class EquallyPlayback extends BaseCommand {
         .setColor(getColor("EQUALLY"))
         .toOceanic()
       ;
-      message.reply({ embeds: [embed] }).catch(this.logger.error);
+      context.reply({ embeds: [embed] }).catch(this.logger.error);
     }
   }
 }

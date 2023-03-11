@@ -34,13 +34,13 @@ export default class QueueLoop extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    if(options.server.queue.queueLoopEnabled){
-      options.server.queue.queueLoopEnabled = false;
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    if(context.server.queue.queueLoopEnabled){
+      context.server.queue.queueLoopEnabled = false;
       message.reply(":repeat:キューリピートを無効にしました:x:").catch(this.logger.error);
     }else{
-      options.server.queue.queueLoopEnabled = true;
+      context.server.queue.queueLoopEnabled = true;
       message.reply(":repeat:キューリピートを有効にしました:o:").catch(this.logger.error);
     }
   }

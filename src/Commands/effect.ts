@@ -84,6 +84,7 @@ export default class Effect extends BaseCommand {
             .setLabel("Loudness Eq")
         )
         .toOceanic();
+      
       const reply = await message.reply({
         embeds: [createEffectEmbed()],
         components: [createActionRow()],

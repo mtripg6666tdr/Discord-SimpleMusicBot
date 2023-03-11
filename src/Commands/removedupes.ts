@@ -34,9 +34,11 @@ export default class RmDuplicated extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    const q = options.server.queue;
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+
+    // 削除するアイテムのリストを作成
+    const q = context.server.queue;
     const indexes: number[] = [];
     const itemUrl: string[] = [];
     q.forEach((item, i) => {
@@ -53,6 +55,8 @@ export default class RmDuplicated extends BaseCommand {
           .sort((a, b) => b - a)
       )
     );
+
+    // 削除を実行する
     const actualDeleted = [] as number[];
     const failed = [] as number[];
     let firstItemTitle = null;
@@ -64,11 +68,22 @@ export default class RmDuplicated extends BaseCommand {
         firstItemTitle = item.basicInfo.title;
       }
     }
+
     if(actualDeleted.length > 0){
       const title = actualDeleted.length === 1 ? firstItemTitle : null;
       const resultStr = actualDeleted.sort((a, b) => a - b).join(",");
       const failedStr = failed.sort((a, b) => a - b).join(",");
-      message.reply(`🚮${resultStr.length > 100 ? "重複していた" : `${resultStr}番目の`}曲${title ? "(`" + title + "`)" : ""}を削除しました${failed.length > 0 ? `\r\n:warning:${failed.length > 100 ? "一部" : `${failedStr}番目`}の曲は権限がないため削除できませんでした。` : ""}`).catch(this.logger.error);
+      message.reply(
+        `🚮${
+          resultStr.length > 100
+            ? "重複していた"
+            : `${resultStr}番目の`
+        }曲${title ? `(\`${title}\`)` : ""}を削除しました${
+          failed.length > 0
+            ? `\r\n:warning:${failed.length > 100 ? "一部" : `${failedStr}番目`}の曲は権限がないため削除できませんでした。`
+            : ""
+        }`
+      ).catch(this.logger.error);
     }else{
       message.reply("削除できる楽曲がありませんでした。").catch(this.logger.error);
     }

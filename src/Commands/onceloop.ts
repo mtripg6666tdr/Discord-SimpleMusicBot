@@ -34,20 +34,20 @@ export default class OnceLoop extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    if(options.server.queue.onceLoopEnabled){
-      options.server.queue.onceLoopEnabled = false;
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    if(context.server.queue.onceLoopEnabled){
+      context.server.queue.onceLoopEnabled = false;
       message.reply({
-        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:ワンスループを無効にしました:x:`,
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:ワンスループを無効にしました:x:`,
         allowedMentions: {
           users: false,
         },
       }).catch(this.logger.error);
     }else{
-      options.server.queue.onceLoopEnabled = true;
+      context.server.queue.onceLoopEnabled = true;
       message.reply({
-        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:ワンスループを有効にしました:o:`,
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:ワンスループを有効にしました:o:`,
         allowedMentions: {
           users: false,
         },

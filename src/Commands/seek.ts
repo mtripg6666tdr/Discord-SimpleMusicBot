@@ -42,10 +42,11 @@ export default class Seek extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    const server = options.server;
-    // そもそも再生状態じゃないよ...
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    const server = context.server;
+
+    // そもそも再生状態ではない場合
     if(!server.player.isPlaying || server.player.preparing){
       await message.reply("再生中ではありません").catch(this.logger.error);
       return;
@@ -53,6 +54,8 @@ export default class Seek extends BaseCommand {
       await message.reply(":warning:シーク先に対応していない楽曲です").catch(this.logger.error);
       return;
     }
+
+    // 引数から時間を算出
     const time = (function(rawTime){
       if(rawTime.match(/^(\d+:)*\d+$/)){
         return rawTime.split(":").map(d => Number(d))
@@ -60,14 +63,16 @@ export default class Seek extends BaseCommand {
       }else{
         return NaN;
       }
-    }(options.rawArgs));
+    }(context.rawArgs));
+
     if(time > server.player.currentAudioInfo.lengthSeconds || isNaN(time)){
       await message.reply(":warning:シーク先の時間が正しくありません").catch(this.logger.error);
       return;
     }
+
     try{
       const response = await message.reply(":rocket:シークしています...");
-      server.player.stop();
+      server.player.stop(true);
       await server.player.play(time);
       await response.edit(":white_check_mark:シークしました").catch(this.logger.error);
     }

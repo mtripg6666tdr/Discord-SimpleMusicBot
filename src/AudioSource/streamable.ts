@@ -17,7 +17,6 @@
  */
 
 import type { exportableCustom, UrlStreamInfo } from ".";
-import type { EmbedField } from "oceanic.js";
 
 import candyget from "candyget";
 
@@ -58,16 +57,20 @@ export class Streamable extends AudioSource<string> {
   }
 
   toField(){
-    return [{
-      name: ":link:URL",
-      value: this.url,
-    }, {
-      name: ":asterisk:詳細",
-      value: "Streamableにて共有されたファイル",
-    }] as EmbedField[];
+    return [
+      {
+        name: ":link:URL",
+        value: this.url,
+      }, {
+        name: ":asterisk:詳細",
+        value: "Streamableにて共有されたファイル",
+      },
+    ];
   }
 
-  npAdditional(){return "";}
+  npAdditional(){
+    return "";
+  }
 
   exportData(): exportableStreamable{
     return {

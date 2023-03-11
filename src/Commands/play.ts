@@ -43,50 +43,61 @@ export default class Play extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    const server = options.server;
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    const server = context.server;
     const firstAttachment = Array.isArray(message.attachments) ? message.attachments[0] : message.attachments.first();
+
+
     // キューが空だし引数もないし添付ファイルもない
     if(
       server.queue.length === 0
-      && options.rawArgs === ""
+      && context.rawArgs === ""
       && !firstAttachment
       && !(message["_message"] && message["_message"].referencedMessage)
     ){
       await message.reply("再生するコンテンツがありません").catch(this.logger.error);
       return;
     }
+
     const wasConnected = server.player.isConnecting;
     // VCに入れない
-    if(!await options.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true)) return;
+    if(!await context.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true)){
+      return;
+    }
+
     // 一時停止されてるね
-    if(options.rawArgs === "" && server.player.isPaused){
+    if(context.rawArgs === "" && server.player.isPaused){
       server.player.resume();
       await message.reply({
-        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:arrow_forward: 再生を再開します。`,
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:arrow_forward: 再生を再開します。`,
         allowedMentions: {
           users: false,
         },
       }).catch(this.logger.error);
       return;
     }
-    // 引数ついてたらそれ優先
-    if(options.rawArgs !== ""){
-      if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){
-        await options.server.playFromURL(message, options.args as string[], !wasConnected);
+
+
+    if(context.rawArgs !== ""){
+      // 引数ついてたらそれ優先して再生する
+      if(context.rawArgs.startsWith("http://") || context.rawArgs.startsWith("https://")){
+        // ついていた引数がURLなら
+        await context.server.playFromURL(message, context.args as string[], !wasConnected);
       }else{
+        // URLでないならキーワードとして検索
         const msg = await message.channel.createMessage({
           content: "🔍検索中...",
         });
+
         try{
-          const result = (await searchYouTube(options.rawArgs)).items.filter(it => it.type === "video") as ytsr.Video[];
+          const result = (await searchYouTube(context.rawArgs)).items.filter(it => it.type === "video") as ytsr.Video[];
           if(result.length === 0){
             await message.reply(":face_with_monocle:該当する動画が見つかりませんでした");
             await msg.delete();
             return;
           }
-          await options.server.playFromURL(message, result[0].url, !wasConnected, options.server.queue.length >= 1);
+          await context.server.playFromURL(message, result[0].url, !wasConnected, context.server.queue.length >= 1);
           await msg.delete();
         }
         catch(e){
@@ -95,40 +106,42 @@ export default class Play extends BaseCommand {
           msg.delete().catch(this.logger.error);
         }
       }
-    // 添付ファイルを確認
     }else if(firstAttachment){
-      await options.server.playFromURL(
+      // 添付ファイルを確認
+      await context.server.playFromURL(
         message,
         firstAttachment.url,
         !wasConnected
       );
-    // 返信先のメッセージを確認
     }else if(message["_message"]?.referencedMessage){
+      // 返信先のメッセージを確認
       const messageReference = message["_message"].referencedMessage;
       const prefixLength = server.prefix.length;
-      // URLのみのメッセージか？
       if(messageReference.content.startsWith("http://") || messageReference.content.startsWith("https://")){
-        await options.server.playFromURL(message, messageReference.content, !wasConnected);
-      // プレフィックス+URLのメッセージか？
+        // URLのみのメッセージか？
+        await context.server.playFromURL(message, messageReference.content, !wasConnected);
       }else if(
         messageReference.content.substring(prefixLength).startsWith("http://")
         || messageReference.content.substring(prefixLength).startsWith("https://")
       ){
-        await options.server.playFromURL(message, messageReference.content.substring(prefixLength), !wasConnected);
-      // 添付ファイル付きか？
+        // プレフィックス+URLのメッセージか？
+        await context.server.playFromURL(message, messageReference.content.substring(prefixLength), !wasConnected);
       }else if(messageReference.attachments.size > 0){
-        await options.server.playFromURL(message, messageReference.attachments.first().url, !wasConnected);
-      // ボットのメッセージなら
-      }else if(messageReference.author.id === options.client.user.id){
+        // 添付ファイル付きか？
+        await context.server.playFromURL(message, messageReference.attachments.first().url, !wasConnected);
+      }else if(messageReference.author.id === context.client.user.id){
+        // ボットのメッセージなら
+        // 埋め込みを取得
         const embed = messageReference.embeds[0];
-        // 曲関連のメッセージならそれをキューに追加
+
         if(
           embed.color === color.getColor("SONG_ADDED")
           || embed.color === color.getColor("AUTO_NP")
           || embed.color === color.getColor("NP")
         ){
+          // 曲関連のメッセージならそれをキューに追加
           const url = embed.description.match(/^\[.+\]\((?<url>https?.+)\)/)?.groups.url;
-          await options.server.playFromURL(message, url, !wasConnected);
+          await context.server.playFromURL(message, url, !wasConnected);
         }else{
           await message.reply(":face_with_raised_eyebrow:返信先のメッセージに再生できるコンテンツが見つかりません")
             .catch(this.logger.error);
@@ -137,8 +150,8 @@ export default class Play extends BaseCommand {
         await message.reply(":face_with_raised_eyebrow:返信先のメッセージに再生できるコンテンツが見つかりません")
           .catch(this.logger.error);
       }
-    // なにもないからキューから再生
     }else if(server.queue.length >= 1){
+      // なにもないからキューから再生
       if(!server.player.isPlaying && !server.player.preparing){
         await message.reply("再生します").catch(this.logger.error);
         await server.player.play();

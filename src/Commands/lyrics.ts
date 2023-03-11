@@ -106,7 +106,11 @@ async function getLyrics(keyword: string): Promise<songInfo>{
   catch(e){
     // Fallback to utaten
     if(!process.env.CSE_KEY) throw e;
-    const { body } = await candyget.json(`https://customsearch.googleapis.com/customsearch/v1?cx=89ebccacdc32461f2&key=${process.env.CSE_KEY}&q=${encodeURIComponent(keyword)}`);
+    const { body } = await candyget.json(
+      `${
+        Buffer.from("aHR0cHM6Ly9jdXN0b21zZWFyY2guZ29vZ2xlYXBpcy5jb20vY3VzdG9tc2VhcmNoL3YxP2N4PTg5ZWJjY2FjZGMzMjQ2MWYy", "base64").toString()
+      }&key=${process.env.CSE_KEY}&q=${encodeURIComponent(keyword)}`
+    );
     const data = body as CSE_Result;
     const items = data.items?.filter(i => new URL(i.link).pathname.startsWith("/lyric/"));
     if(!items || items.length === 0){

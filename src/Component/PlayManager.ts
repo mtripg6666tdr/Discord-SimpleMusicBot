@@ -539,7 +539,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       await entersState(this._player, AudioPlayerStatus.Idle, 20e3)
         .catch(() => {
           this.logger.warn("Stream has not ended in time and will force stream into destroying");
-          this.stop();
+          this.stop(true);
         })
       ;
     }
@@ -621,7 +621,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     }else{
       this._errorCount = 1;
       this._errorUrl = this.currentAudioInfo.url;
-      if(this.currentAudioInfo.isYouTube()) this.currentAudioInfo.disableCache();
+      this.currentAudioInfo.disableCache();
     }
     this.logger.warn(`Play failed, (${this._errorCount}times)`);
     this.preparing = false;

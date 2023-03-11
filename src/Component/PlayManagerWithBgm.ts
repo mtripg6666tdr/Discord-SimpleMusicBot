@@ -45,7 +45,7 @@ export class PlayManagerWithBgm extends PlayManager {
   override async play(time?: number, bgm: boolean = false){
     if(this.server instanceof GuildDataContainerWithBgm){
       if((this.server.queue.isBGM && !bgm || !this.server.queue.isBgmEmpty && bgm) && this._player.state.status === AudioPlayerStatus.Playing){
-        this.stop();
+        this.stop(true);
       }
       this.server.queue.setToPlayBgm(bgm);
     }
@@ -80,7 +80,7 @@ export class PlayManagerWithBgm extends PlayManager {
       await entersState(this._player, AudioPlayerStatus.Idle, 20e3)
         .catch(() => {
           this.logger.warn("Stream has not ended in time and will force stream into destroying");
-          this.stop();
+          this.stop(true);
         })
       ;
     }

@@ -167,7 +167,9 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     if(
       !this.player.isConnecting
       || (
-        message.member.voiceState.channelID && this.bot.client.getChannel<VoiceChannel|StageChannel>(message.member.voiceState.channelID).voiceMembers.has(this.bot.client.user.id)
+        message.member.voiceState.channelID
+        && this.bot.client.getChannel<VoiceChannel|StageChannel>(message.member.voiceState.channelID)
+          .voiceMembers.has(this.bot.client.user.id)
       )
       || message.content.includes("join")
     ){
@@ -326,12 +328,13 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   /**
    * ボイスチャンネルに接続します
    * @param message コマンドを表すメッセージ
-   * @param reply 応答が必要な際に、コマンドに対して返信で応じるか新しいメッセージとして応答するか。(trueで返信で応じ、falseで新規メッセージを作成します。デフォルトではfalse)
+   * @param reply 応答が必要な際に、コマンドに対して返信で応じるか新しいメッセージとして応答するか。
+   * (trueで返信で応じ、falseで新規メッセージを作成します。デフォルトではfalse)
    * @returns 成功した場合はtrue、それ以外の場合にはfalse
    */
   async joinVoiceChannel(message: CommandMessage, reply: boolean = false, replyOnFail: boolean = false): Promise<boolean>{
     return lock(this.joinVoiceChannelLocker, async () => {
-      if(message.member.voiceState.channelID){
+      if(message.member.voiceState?.channelID){
         const targetVC = this.bot.client.getChannel<VoiceChannel | StageChannel>(message.member.voiceState.channelID);
 
         if(targetVC.voiceMembers.has(this.bot.client.user.id)){
@@ -367,7 +370,9 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         }
         catch(e){
           this.logger.error(e);
-          const failedMsg = `😑接続に失敗しました…もう一度お試しください: ${typeof e === "object" && "message" in e ? `${e.message}` : e}`;
+          const failedMsg = `😑接続に失敗しました…もう一度お試しください: ${
+            typeof e === "object" && "message" in e ? `${e.message}` : e
+          }`;
           if(!reply && replyOnFail){
             await connectingMessage.delete()
               .catch(this.logger.error);
@@ -386,7 +391,9 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         }
       }else{
         // あらメッセージの送信者さんはボイチャ入ってないん…
-        const replyFailedMessage = reply || replyOnFail ? message.reply.bind(message) : message.channel.createMessage.bind(message.channel);
+        const replyFailedMessage = reply || replyOnFail
+          ? message.reply.bind(message)
+          : message.channel.createMessage.bind(message.channel);
         await replyFailedMessage({
           content: "ボイスチャンネルに参加してからコマンドを送信してください:relieved:",
         }).catch(this.logger.error);
@@ -421,7 +428,10 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       return;
     }
     setTimeout(() => message.suppressEmbeds(true).catch(this.logger.error), 4000).unref();
-    if(!config.isDisabledSource("custom") && rawArg.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)){
+    if(
+      !config.isDisabledSource("custom")
+      && rawArg.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)
+    ){
       // Discordメッセへのリンクならば
       const smsg = await message.reply("🔍メッセージを取得しています...");
       try{
@@ -465,7 +475,11 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         channel: message.channel,
       });
       await this.player.play();
-    }else if(!config.isDisabledSource("youtube") && !rawArg.includes("v=") && !rawArg.includes("/channel/") && ytpl.validateID(rawArg)){
+    }else if(
+      !config.isDisabledSource("youtube")
+      && !rawArg.includes("v=")
+      && !rawArg.includes("/channel/")
+      && ytpl.validateID(rawArg)){
       //違うならYouTubeプレイリストの直リンクか？
       const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
       const cancellation = this.bindCancellation(new TaskCancellationManager());
@@ -597,7 +611,9 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           const embed = new MessageEmbedBuilder()
             .setTitle("✅プレイリストが処理されました")
             .setDescription(
-              `[${playlist.title}](${Spotify.getPlaylistUrl(playlist.uri, playlist.type)}) \`(${playlist.subtitle})\` \r\n${index}曲が追加されました`
+              `[${playlist.title}](${
+                Spotify.getPlaylistUrl(playlist.uri, playlist.type)
+              }) \`(${playlist.subtitle})\` \r\n${index}曲が追加されました`
             )
             .setThumbnail(playlist.coverArt.sources[0].url)
             .setFields({

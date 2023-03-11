@@ -70,6 +70,7 @@ export default class Commands extends BaseCommand {
       };
       const rawcommands = CommandManager.instance.commands.filter(ci => !ci.unlist);
       const commands = {} as { [category: string]: BaseCommand[] };
+
       // Generate command list
       for(let i = 0; i < rawcommands.length; i++){
         if(commands[rawcommands[i].category]){
@@ -78,6 +79,7 @@ export default class Commands extends BaseCommand {
           commands[rawcommands[i].category] = [rawcommands[i]];
         }
       }
+
       // Generate embed
       for(let i = 0; i < categoriesList.length; i++){
         embed.push(
@@ -107,6 +109,7 @@ export default class Commands extends BaseCommand {
           )
           .setColor(getColor("COMMAND"));
       }
+      
       await context.bot.collectors
         .createPagenation()
         .setPages(embed, embed.length)
