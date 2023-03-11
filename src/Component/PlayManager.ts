@@ -287,6 +287,7 @@ export class PlayManager extends ServerManagerBase {
       const u = Util.time.timer.start("PlayManager#Play->EnterPlayingState");
       const normalizer = new Normalizer(stream, this.volume !== 100);
       try{
+        if(connection.paused) connection.resume();
         connection.play(normalizer, {
           format: streamType,
           inlineVolume: this.volume !== 100,

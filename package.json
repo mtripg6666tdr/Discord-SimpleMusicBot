@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@mtripg6666tdr/async-lock": "^1.1.0",
-    "@mtripg6666tdr/eris-command-resolver": "^2.0.0",
+    "@mtripg6666tdr/eris-command-resolver": "^2.0.1",
     "@sinclair/typebox": "^0.25.24",
     "candyget": "^0.5.3",
     "comment-json": "^4.2.3",
@@ -70,7 +70,7 @@
     "onlystart": "node util/exec dist",
     "build": "rimraf dist/ typings/ && tsc",
     "lint": "eslint .",
-    "cleanup": "rimraf dist/ typings/ logs/",
+    "cleanup": "rimraf dist/ typings/",
     "generatecommandlist": "node util/generateCommandList"
   },
   "keywords": [],
