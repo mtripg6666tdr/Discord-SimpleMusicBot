@@ -43,6 +43,8 @@ interface PlayManagerEvents {
   playStarted: [];
   playStartUIPrepared: [message:MessageEmbedBuilder];
   playCompleted: [];
+  playFailed: [];
+  reportPlaybackDuration: [duration: number, errorCount: number];
   stop: [];
   disconnect: [];
   disconnectAttempt: [];
@@ -148,7 +150,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
 
   setVolume(val: number){
     this._volume = val;
-    if(this._resource.volume){
+    if(this._resource?.volume){
       this._resource.volume.setVolume(val / 100);
       return true;
     }
@@ -395,6 +397,15 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       this._player.on("debug", message => this.logger.trace(`[InternalAudioPlayer] ${message}`));
     }
     this._player.on("error", this.handleError.bind(this));
+    this._player.on(AudioPlayerStatus.Idle, (oldState) => {
+      if(oldState.status === AudioPlayerStatus.Playing){
+        this.emit(
+          "reportPlaybackDuration",
+          oldState.playbackDuration,
+          this._errorUrl === this.currentAudioUrl ? this._errorCount : 0
+        );
+      }
+    });
     this.server.connection.subscribe(this._player);
   }
 
@@ -613,6 +624,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
 
   async onStreamFailed(quiet: boolean = false){
     this.logger.info("onStreamFailed called");
+    this.emit("playFailed");
     this._cost = 0;
     this.destroyStream();
 

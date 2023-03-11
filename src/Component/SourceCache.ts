@@ -30,8 +30,10 @@ import zlib from "zlib";
 import { LogEmitter } from "../Structure";
 
 interface CacheEvents {
-  cacheAdd: [];
-  cacheDelete: [];
+  memoryCacheHit: [];
+  memoryCacheNotFound: [];
+  persistentCacheHit: [];
+  persistentCacheNotFound: [];
 }
 
 export class SourceCache extends LogEmitter<CacheEvents> {
@@ -85,13 +87,10 @@ export class SourceCache extends LogEmitter<CacheEvents> {
   }
 
   hasSource(url: string){
-    if(this.enablePersistent){
-      const result = this._sourceCache.has(url);
-      this.logger.info(`Requested memory cache ${result ? "" : "not "}found`);
-      return result;
-    }else{
-      return false;
-    }
+    const result = this._sourceCache.has(url);
+    this.logger.debug(`Requested memory cache ${result ? "" : "not "}found`);
+    this.emit(result ? "memoryCacheHit" : "memoryCacheNotFound");
+    return result;
   }
 
   getSource(url: string){
@@ -100,12 +99,20 @@ export class SourceCache extends LogEmitter<CacheEvents> {
 
   hasExportable(url: string){
     const result = this.existPersistentCache(this.createCacheId(url, "exportable"));
-    this.logger.info(`Requested persistent cache ${result ? "" : "not "}found`);
+    this.logger.debug(`Requested persistent cache ${result ? "" : "not "}found`);
+    if(!result){
+      this.emit("persistentCacheNotFound");
+    }
     return result;
   }
 
   getExportable<T extends exportableCustom>(url: string){
-    return this.getPersistentCache(this.createCacheId(url, "exportable")) as Promise<T>;
+    return this.getPersistentCache(this.createCacheId(url, "exportable"))
+      .then(data => {
+        this.emit(data ? "persistentCacheHit" : "persistentCacheNotFound");
+        return data;
+      })
+      .catch(() => null) as Promise<T>;
   }
 
   private createCacheId(url: string, type: "exportable"){

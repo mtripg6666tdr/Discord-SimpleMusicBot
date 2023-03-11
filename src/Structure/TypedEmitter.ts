@@ -44,6 +44,14 @@ class TypedEventEmitter<T extends EventDictionary> extends EventEmitter {
     };
     events.forEach(event => this.once(event, handler));
   }
+
+  eitherOn(events: (keyof T)[], listener: () => void){
+    events.forEach(event => this.on(event, listener));
+  }
+
+  eitherOff(events: (keyof T)[], listener: () => void){
+    events.forEach(event => this.off(event, listener));
+  }
 }
 
 export default TypedEventEmitter;

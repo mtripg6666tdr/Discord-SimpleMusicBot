@@ -28,6 +28,10 @@ import { Backupper } from ".";
 import { waitForEnteringState } from "../../Util";
 
 type Collectionate<T> = T & { guildId: string };
+type Analytics = Collectionate<{
+  totalDuration: number,
+  errorCount: number,
+}>;
 
 export class MongoBackupper extends Backupper {
   private readonly client: mongo.MongoClient = null;
@@ -36,6 +40,7 @@ export class MongoBackupper extends Backupper {
   collections: {
     status: mongo.Collection<Collectionate<exportableStatuses>>,
     queue: mongo.Collection<Collectionate<YmxFormat>>,
+    analytics: mongo.Collection<Analytics>,
   } = null;
 
   static get backuppable(){
@@ -55,6 +60,7 @@ export class MongoBackupper extends Backupper {
         this.collections = {
           status: db.collection<Collectionate<exportableStatuses>>("Status"),
           queue: db.collection<Collectionate<YmxFormat>>("Queue"),
+          analytics: db.collection<Analytics>("Analytics"),
         };
         this.dbConnectionReady = true;
       })
@@ -82,11 +88,10 @@ export class MongoBackupper extends Backupper {
         }
       };
       const setContainerEvent = (container: GuildDataContainer) => {
-        (["change", "changeWithoutCurrent"] as const).forEach(
-          eventName => container.queue.on(eventName, backupQueueFuncFactory(container.getGuildId()))
-        );
+        container.queue.eitherOn(["change", "changeWithoutCurrent"], backupQueueFuncFactory(container.getGuildId()));
         container.queue.on("settingsChanged", backupStatusFuncFactory(container.getGuildId()));
         container.player.on("all", backupStatusFuncFactory(container.getGuildId()));
+        container.player.on("reportPlaybackDuration", this.addPlayerAnalyticsEvent.bind(this, container.getGuildId()));
       };
       this.data.forEach(setContainerEvent);
       this.bot.on("guildDataAdded", setContainerEvent);
@@ -132,6 +137,16 @@ export class MongoBackupper extends Backupper {
     catch(er){
       this.logger.error(er);
       this.logger.warn("Something went wrong while backing up queue");
+    }
+  }
+
+  async addPlayerAnalyticsEvent(guildId: string, totalDuration: number, errorCount: number){
+    if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
+    try{
+      await this.collections.analytics.insertOne({ guildId, totalDuration, errorCount });
+    }
+    catch(er){
+      this.logger.error(er);
     }
   }
 
@@ -188,5 +203,6 @@ export class MongoBackupper extends Backupper {
   async destroy(){
     await this.client.close();
     this.collections = null;
+    this.dbConnectionReady = false;
   }
 }
