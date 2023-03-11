@@ -36,15 +36,18 @@ export default class News extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    options.server.joinVoiceChannel(message);
-    const url = "https://www.youtube.com/playlist?list=PL3ZQ5CpNulQk8-p0CWo9ufI81IdrGoyNZ";
-    if(options.server.searchPanel.has(message.member.id)){
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    context.server.joinVoiceChannel(message);
+    const url = Buffer.from(
+      "aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTDNaUTVDcE51bFFrOC1wMENXbzl1Zkk4MUlkckdveU5a",
+      "base64"
+    ).toString();
+    if(context.server.searchPanel.has(message.member.id)){
       message.reply("✘既に開かれている検索窓があります").catch(this.logger.error);
       return;
     }
-    const searchPanel = options.server.searchPanel.create(message, "ニューストピックス", true);
+    const searchPanel = context.server.searchPanel.create(message, "ニューストピックス", true);
     if(!searchPanel) return;
     await searchPanel.consumeSearchResult(ytpl.default(url, {
       gl: "JP", hl: "ja", limit: 20,

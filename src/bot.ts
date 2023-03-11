@@ -86,7 +86,9 @@ export class MusicBot extends MusicBotBase {
   private async onError(er: Error){
     this.logger.error(er);
     if(er.message?.startsWith("Invalid token")){
-      this.logger.fatal("Invalid token detected. Please ensure that you set the correct token. You can also re-generate new token for your bot.");
+      this.logger.fatal(
+        "Invalid token detected. Please ensure that you set the correct token. You can also re-generate new token for your bot."
+      );
       process.exit(1);
     }else{
       this.logger.info("Attempt reconnecting after waiting for a while...");

@@ -36,16 +36,25 @@ export default class Bgm extends BaseCommand {
     });
   }
   
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    if(!await options.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true)) return;
+  async run(message: CommandMessage, context: CommandArgs){
+    // update bound channel
+    context.server.updateBoundChannel(message);
+
+    // attempt to join
+    if(!await context.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true)) return;
+
     const url = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
-    if(options.server.searchPanel.has(message.member.id)){
+
+    // check existing search panel
+    if(context.server.searchPanel.has(message.member.id)){
       message.reply("✘既に開かれている検索窓があります").catch(this.logger.error);
       return;
     }
-    const searchPanel = options.server.searchPanel.create(message, "プリセットBGM一覧", true);
-    if(!searchPanel) return;
+
+    const searchPanel = context.server.searchPanel.create(message, "プリセットBGM一覧", true);
+    if(!searchPanel){
+      return;
+    }
     await searchPanel.consumeSearchResult(ytpl.default(url, {
       gl: "JP", hl: "ja",
     }), ({ items }) => items.map(item => ({

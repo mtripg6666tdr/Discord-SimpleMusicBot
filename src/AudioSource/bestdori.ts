@@ -17,7 +17,6 @@
  */
 
 import type { exportableCustom, UrlStreamInfo } from ".";
-import type { EmbedField } from "oceanic.js";
 
 import candyget from "candyget";
 
@@ -91,7 +90,7 @@ export class BestdoriS extends AudioSource<string> {
           + "` \r\n編曲: `" + (this.arranger ?? "情報なし") + "`",
         inline: false,
       },
-    ] as EmbedField[];
+    ];
   }
 
   npAdditional(){return "\r\nアーティスト:`" + this.artist + "`";}

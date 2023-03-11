@@ -43,19 +43,24 @@ export default class Rm extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    if(options.args.length === 0){
+  async run(message: CommandMessage, context: CommandArgs){
+    if(context.args.length === 0){
       message.reply("引数に消去する曲のオフセット(番号)を入力してください。").catch(this.logger.error);
       return;
     }
-    if(options.args.includes("0") && options.server.player.isPlaying){
+    if(context.args.includes("0") && context.server.player.isPlaying){
       message.reply("現在再生中の楽曲を削除することはできません。");
       return;
     }
-    options.server.updateBoundChannel(message);
-    const q = options.server.queue;
+
+    context.server.updateBoundChannel(message);
+
+    const q = context.server.queue;
     const addition = [] as number[];
-    options.args.forEach(o => {
+    
+    // 引数についてるハイフン付きのオプションを展開する。
+    // 5-、-12、3-6など。
+    context.args.forEach(o => {
       let match = o.match(/^(?<from>[0-9]+)-(?<to>[0-9]+)$/);
       if(match){
         const from = Number(match.groups.from);
@@ -79,7 +84,7 @@ export default class Rm extends BaseCommand {
           if(match){
             const to = Number(match.groups.to);
             if(!isNaN(to)){
-              for(let i = options.server.player.isPlaying ? 1 : 0; i <= to; i++){
+              for(let i = context.server.player.isPlaying ? 1 : 0; i <= to; i++){
                 addition.push(i);
               }
             }
@@ -87,7 +92,11 @@ export default class Rm extends BaseCommand {
         }
       }
     });
-    const indexes = options.args.concat(addition.map(n => n.toString()));
+
+    // 引数を通常の数字としても処理する
+    const indexes = context.args.concat(addition.map(n => n.toString()));
+
+    // 数字に変換した上で重複を削除して、削除するアイテムのインデックスを作成
     const dels = Array.from(
       new Set(
         indexes
@@ -96,32 +105,45 @@ export default class Rm extends BaseCommand {
           .sort((a, b) => b - a)
       )
     );
+
+    // 実際に削除を実行
     const actualDeleted = [] as number[];
     const failed = [] as number[];
     let firstItemTitle = null;
     for(let i = 0; i < dels.length; i++){
       const item = q.get(dels[i]);
       if(
-        discordUtil.users.isDJ(message.member, options)
+        discordUtil.users.isDJ(message.member, context)
         || item.additionalInfo.addedBy.userId === message.member.id
-        || !discordUtil.channels.getVoiceMember(options).has(item.additionalInfo.addedBy.userId)
-        || discordUtil.channels.isOnlyListener(message.member, options)
+        || !discordUtil.channels.getVoiceMember(context).has(item.additionalInfo.addedBy.userId)
+        || discordUtil.channels.isOnlyListener(message.member, context)
         || discordUtil.users.isPrivileged(message.member)
       ){
+        // 権限等を確認して削除できるものなら削除
         q.removeAt(dels[i]);
         actualDeleted.push(dels[i]);
         if(actualDeleted.length === 1){
           firstItemTitle = item.basicInfo.title;
         }
       }else{
+        // 削除失敗したインデックスを保存
         failed.push(dels[i]);
       }
     }
+
     if(actualDeleted.length > 0){
+      // 実際削除できたものがあったのなら
       const title = actualDeleted.length === 1 ? firstItemTitle : null;
       const resultStr = actualDeleted.sort((a, b) => a - b).join(",");
       const failedStr = failed.sort((a, b) => a - b).join(",");
-      message.reply(`🚮${resultStr.length > 100 ? "指定された" : `${resultStr}番目の`}曲${title ? "(`" + title + "`)" : ""}を削除しました${failed.length > 0 ? `\r\n:warning:${failed.length > 100 ? "一部" : `${failedStr}番目`}の曲は権限がないため削除できませんでした。` : ""}`).catch(this.logger.error);
+      message.reply(
+        `🚮${resultStr.length > 100 ? "指定された" : `${resultStr}番目の`}曲${title ? "(`" + title + "`)" : ""}を削除しました`
+        + `${
+          failed.length > 0
+            ? `\r\n:warning:${failed.length > 100 ? "一部" : `${failedStr}番目`}の曲は権限がないため削除できませんでした。`
+            : ""
+        }`
+      ).catch(this.logger.error);
     }else{
       message.reply("削除できませんでした。権限が不足している可能性があります。").catch(this.logger.error);
     }

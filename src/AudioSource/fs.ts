@@ -18,7 +18,6 @@
 
 import type { exportableCustom } from ".";
 import type { ReadableStreamInfo } from "./audiosource";
-import type { EmbedField } from "oceanic.js";
 
 import * as fs from "fs";
 import * as path from "path";
@@ -50,10 +49,12 @@ export class FsStream extends AudioSource<string> {
   }
 
   toField(){
-    return [{
-      name: ":asterisk:詳細",
-      value: "カスタムストリーム",
-    }] as EmbedField[];
+    return [
+      {
+        name: ":asterisk:詳細",
+        value: "カスタムストリーム",
+      },
+    ];
   }
 
   npAdditional(){

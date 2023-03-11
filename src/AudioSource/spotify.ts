@@ -43,7 +43,8 @@ const client = spotifyUrlInfo?.((url, opts) => candyget(url, "string", opts).the
 
 export class Spotify extends AudioSource<string> {
   protected artist = "";
-  
+  protected referenceUrl: string = null;
+
   constructor(){
     super("spotify");
   }
@@ -55,6 +56,7 @@ export class Spotify extends AudioSource<string> {
       this.lengthSeconds = prefetched.length;
       this.title = prefetched.title;
       this.artist = prefetched.artist;
+      this.referenceUrl = prefetched.referenceUrl;
     }else{
       this.url = url;
       const track = await client.getData(url) as Track;
@@ -67,23 +69,28 @@ export class Spotify extends AudioSource<string> {
   }
 
   override async fetch(forceUrl?: boolean): Promise<StreamInfo>{
-    // construct search keyword
-    // eslint-disable-next-line newline-per-chained-call
-    const keyword = `${this.title} ${this.artist.split(",").map(artist => artist.trim()).join(" ")}`;
+    if(!this.referenceUrl){
+      // construct search keyword
+      // eslint-disable-next-line newline-per-chained-call
+      const keyword = `${this.title} ${this.artist.split(",").map(artist => artist.trim()).join(" ")}`;
 
-    // search youtube
-    this.logger.debug(`Searching the keyword: ${`${this.title} ${this.artist.split(",").map(artist => artist.trim())}`}`);
-    const searchResult = await searchYouTube(keyword);
+      // search youtube
+      this.logger.debug(`Searching the keyword: ${`${this.title} ${this.artist.split(",").map(artist => artist.trim())}`}`);
+      const searchResult = await searchYouTube(keyword);
 
-    // extract videos that seem to be ok
-    this.logger.debug("Extracting the valid item...");
-    const items = searchResult.items.filter(({ type }) => type === "video") as ytsr.Video[];
-    const target = this.extractBestItem(items);
+      // extract videos that seem to be ok
+      this.logger.debug("Extracting the valid item...");
+      const items = searchResult.items.filter(({ type }) => type === "video") as ytsr.Video[];
+      const target = this.extractBestItem(items);
 
-    if(!target) throw new Error("Not Found");
+      if(!target) throw new Error("Not Found");
+
+      // store the result
+      this.referenceUrl = target.url;
+    }
 
     // fetch the video
-    const { result } = await attemptFetchForStrategies(target.url, forceUrl);
+    const { result } = await attemptFetchForStrategies(this.referenceUrl, forceUrl);
 
     this.title = result.info.title;
     this.lengthSeconds = result.info.length;
@@ -155,6 +162,7 @@ export class Spotify extends AudioSource<string> {
       title: this.title,
       length: this.lengthSeconds,
       artist: this.artist,
+      referenceUrl: this.referenceUrl,
     };
   }
 
@@ -164,6 +172,10 @@ export class Spotify extends AudioSource<string> {
 
   override toField(): EmbedField[]{
     return [];
+  }
+
+  override disableCache() {
+    this.referenceUrl = null;
   }
 
   static validateTrackUrl(url: string){
@@ -193,4 +205,5 @@ export class Spotify extends AudioSource<string> {
 
 export type exportableSpotify = exportableCustom & {
   artist: string,
+  referenceUrl: string,
 };

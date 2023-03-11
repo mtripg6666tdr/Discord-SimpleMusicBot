@@ -21,6 +21,8 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import type { ResponseMessage } from "../Component/commandResolver/ResponseMessage";
 import type { AnyGuildTextChannel, Message } from "oceanic.js";
 
+import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
+
 import { BaseCommand } from ".";
 
 export default class BulkDelete extends BaseCommand {
@@ -46,14 +48,15 @@ export default class BulkDelete extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    const count = Number(options.args[0]);
+  async run(message: CommandMessage, context: CommandArgs){
+    const count = Number(context.args[0]);
     if(isNaN(count)){
       message.reply(":warning:指定されたメッセージ数が無効です。");
       return;
     }
     const reply = await message.reply(":mag:取得中...").catch(this.logger.error) as ResponseMessage;
     try{
+      // collect messages
       let before = "";
       const messages = [] as Message[];
       let i = 0;
@@ -65,7 +68,7 @@ export default class BulkDelete extends BaseCommand {
           limit: 100,
         });
         if(allMsgs.length === 0) break;
-        const msgs = allMsgs.filter(_msg => _msg.author.id === options.client.user.id && _msg.id !== reply.id);
+        const msgs = allMsgs.filter(_msg => _msg.author.id === context.client.user.id && _msg.id !== reply.id);
         msgs.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
         messages.push(...msgs);
         before = allMsgs.at(-1).id;
@@ -73,13 +76,40 @@ export default class BulkDelete extends BaseCommand {
         await reply.edit(`:mag:取得中(${messages.length}件ヒット/取得した${i * 100}件中)...`);
       } while(messages.length < count && i <= 10);
       if(messages.length > count) messages.splice(count);
-      await reply.edit(messages.length + "件見つかりました。削除を実行します。");
-      await message.channel.deleteMessages(
-        messages.map(msg => msg.id),
-        `${message.member.username}#${message.member.discriminator}により${count}件のメッセージの削除が要求されたため。`
-      );
-      await reply.edit(":sparkles:完了!(このメッセージは自動的に消去されます)");
-      setTimeout(() => reply.delete().catch(() => {}), 10 * 1000).unref();
+
+      const { collector, customIdMap } = context.bot.collectors
+        .create()
+        .setAuthorIdFilter(message.member.id)
+        .setTimeout(5 * 60 * 1000)
+        .createCustomIds({
+          ok: "button",
+        });
+      await reply.edit({
+        content: messages.length + "件見つかりました。削除を実行します。",
+        components: [
+          new MessageActionRowBuilder()
+            .addComponents(
+              new MessageButtonBuilder()
+                .setCustomId(customIdMap.ok)
+                .setLabel("OK")
+                .setStyle("PRIMARY")
+            )
+            .toOceanic(),
+        ],
+      });
+
+      collector.on("ok", async () => {
+        // bulk delete
+        await message.channel.deleteMessages(
+          messages.map(msg => msg.id),
+          `${message.member.username}#${message.member.discriminator}により${count}件のメッセージの削除が要求されたため。`
+        );
+        await reply.edit(":sparkles:完了!(このメッセージは自動的に消去されます)");
+        setTimeout(() => reply.delete().catch(() => {}), 10 * 1000).unref();
+      });
+      collector.on("timeout", () => {
+        reply.edit("削除をキャンセルしました");
+      });
     }
     catch(er){
       this.logger.error(er);

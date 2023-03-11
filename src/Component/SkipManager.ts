@@ -147,7 +147,10 @@ export class SkipManager extends ServerManagerBase<{}> {
         new MessageEmbedBuilder()
           .setTitle(":person_raising_hand: スキップの投票")
           .setDescription(
-            `\`${this.currentSong.basicInfo.title}\`のスキップに賛成する場合は以下のボタンを押してください。賛成がボイスチャンネルに参加している人数の過半数を超えると、スキップされます。\r\n\r\n現在の状況: ${this.agreeUsers.size}/${voiceSize}\r\nあと${Math.ceil(voiceSize / 2) - this.agreeUsers.size}人の賛成が必要です。`
+            `\`${this.currentSong.basicInfo.title}\`のスキップに賛成する場合は以下のボタンを押してください。`
+            + "賛成がボイスチャンネルに参加している人数の過半数を超えると、スキップされます。\r\n\r\n"
+            + `現在の状況: ${this.agreeUsers.size}/${voiceSize}\r\n`
+            + `あと${Math.ceil(voiceSize / 2) - this.agreeUsers.size}人の賛成が必要です。`
           )
           .setFooter({
             text: `${this.issuer}が、楽曲のスキップを提案しました。`,

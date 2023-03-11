@@ -34,10 +34,10 @@ export default class Rmall extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    options.server.player.disconnect();
-    options.server.queue.removeAll();
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    context.server.player.disconnect();
+    context.server.queue.removeAll();
     await message.reply("✅すべて削除しました").catch(this.logger.error);
   }
 }

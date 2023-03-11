@@ -621,7 +621,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     }else{
       this._errorCount = 1;
       this._errorUrl = this.currentAudioInfo.url;
-      if(this.currentAudioInfo.isYouTube()) this.currentAudioInfo.disableCache();
+      this.currentAudioInfo.disableCache();
     }
     this.logger.warn(`Play failed, (${this._errorCount}times)`);
     this.preparing = false;

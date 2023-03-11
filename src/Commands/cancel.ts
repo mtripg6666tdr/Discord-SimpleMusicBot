@@ -34,9 +34,9 @@ export default class Cancel extends BaseCommand {
     });
   }
   
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    const result = options.server.cancelAll();
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    const result = context.server.cancelAll();
     if(result){
       message.reply("処理中の処理をすべてキャンセルしています....").catch(this.logger.error);
     }else{

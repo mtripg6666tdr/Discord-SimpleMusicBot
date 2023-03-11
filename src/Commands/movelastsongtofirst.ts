@@ -34,14 +34,14 @@ export default class Mltf extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    if(options.server.queue.length <= 2){
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    if(context.server.queue.length <= 2){
       message.reply("キューに3曲以上追加されているときに使用できます。").catch(this.logger.error);
       return;
     }
-    const q = options.server.queue;
-    const to = options.server.player.isPlaying ? 1 : 0;
+    const q = context.server.queue;
+    const to = context.server.player.isPlaying ? 1 : 0;
     q.move(q.length - 1, to);
     const info = q.get(to);
     message.reply("✅`" + info.basicInfo.title + "`を一番最後からキューの先頭に移動しました").catch(this.logger.error);

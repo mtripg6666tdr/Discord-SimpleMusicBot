@@ -17,7 +17,6 @@
  */
 
 import type { exportableCustom, UrlStreamInfo } from ".";
-import type { EmbedField } from "oceanic.js";
 
 import twitterDl from "twitter-url-direct";
 
@@ -39,7 +38,10 @@ export class Twitter extends AudioSource<string> {
       this.streamUrl = prefetched.streamUrl;
     }else{
       const streamInfo = await twitterDl(url.split("?")[0]);
-      if(!streamInfo.found) throw new Error("error" in streamInfo && streamInfo.error);
+      if(!streamInfo.found){
+        throw new Error("error" in streamInfo && streamInfo.error);
+      }
+
       this.lengthSeconds = Math.floor(streamInfo.duration);
       this.title = `${streamInfo.tweet_user.name}(@${streamInfo.tweet_user.username})のツイート`;
       if(!streamInfo.download){
@@ -50,6 +52,7 @@ export class Twitter extends AudioSource<string> {
         return getDimensionFactor(b.dimension) - getDimensionFactor(a.dimension);
       })[0]?.url;
       this.description = streamInfo.tweet_user.text;
+
       if(!this.streamUrl){
         throw new Error("No format found");
       }
@@ -66,19 +69,23 @@ export class Twitter extends AudioSource<string> {
   }
 
   toField(){
-    return [{
-      name: ":link:URL",
-      value: this.url,
-    }, {
-      name: "ツイートの内容",
-      value: this.description.substring(0, 1950),
-    }, {
-      name: ":asterisk:詳細",
-      value: "Twitterにて共有されたファイル",
-    }] as EmbedField[];
+    return [
+      {
+        name: ":link:URL",
+        value: this.url,
+      }, {
+        name: "ツイートの内容",
+        value: this.description.substring(0, 1950),
+      }, {
+        name: ":asterisk:詳細",
+        value: "Twitterにて共有されたファイル",
+      },
+    ];
   }
 
-  npAdditional(){return "";}
+  npAdditional(){
+    return "";
+  }
 
   exportData(): exportableTwitter{
     return {

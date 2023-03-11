@@ -45,25 +45,29 @@ export default class Thumbnail extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+
     const embed = new MessageEmbedBuilder();
     embed.setColor(getColor("THUMB"));
-    const userSearchPanel = options.server.searchPanel.get(message.member.id);
-    const rawArgNumber = Number(options.rawArgs);
-    if(options.rawArgs && userSearchPanel && 0 < rawArgNumber && rawArgNumber <= userSearchPanel.options.length){
+    const userSearchPanel = context.server.searchPanel.get(message.member.id);
+    const rawArgNumber = Number(context.rawArgs);
+    if(context.rawArgs && userSearchPanel && 0 < rawArgNumber && rawArgNumber <= userSearchPanel.options.length){
+      // 検索パネルからのサムネイル
       const opt = userSearchPanel.options[rawArgNumber - 1];
       embed
         .setImage(opt.thumbnail)
         .setTitle(opt.title)
         .setDescription("URL: " + opt.url)
       ;
-    }else if(!options.rawArgs && options.server.player.isPlaying && options.server.queue.length >= 1){
-      const info = options.server.queue.get(0).basicInfo;
+    }else if(!context.rawArgs && context.server.player.isPlaying && context.server.queue.length >= 1){
+      // 現在再生中楽曲のサムネイル
+      const info = context.server.queue.get(0).basicInfo;
       embed
         .setTitle(info.title)
         .setDescription("URL: " + info.url)
       ;
+
       if(typeof info.thumbnail === "string"){
         embed.setImage(info.thumbnail);
         await message.reply({
@@ -85,7 +89,7 @@ export default class Thumbnail extends BaseCommand {
       message.reply("✘検索結果が見つかりません").catch(this.logger.error);
       return;
     }
-    
+
     await message.reply({
       embeds: [embed.toOceanic()],
     }).catch(this.logger.error);

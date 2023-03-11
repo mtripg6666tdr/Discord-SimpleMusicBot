@@ -34,12 +34,12 @@ export default class Join extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    if(message.member.voiceState.channel?.voiceMembers.has(options.client.user.id) && options.server.connection){
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    if(message.member.voiceState.channel?.voiceMembers.has(context.client.user.id) && context.server.connection){
       message.reply("✘すでにボイスチャンネルに接続中です。").catch(this.logger.error);
     }else{
-      await options.server.joinVoiceChannel(message, /* reply result to user inside this method  */ true);
+      await context.server.joinVoiceChannel(message, /* reply result to user inside this method  */ true);
     }
   }
 }

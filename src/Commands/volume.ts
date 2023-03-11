@@ -42,22 +42,23 @@ export default class Volume extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    if(options.rawArgs === ""){
-      await message.reply(`:loud_sound:現在の音量は**${options.server.player.volume}**です(デフォルト:100)`)
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    if(context.rawArgs === ""){
+      await message.reply(`:loud_sound:現在の音量は**${context.server.player.volume}**です(デフォルト:100)`)
         .catch(this.logger.error)
       ;
       return;
     }
-    const newval = Number(options.rawArgs);
+    const newval = Number(context.rawArgs);
     if(isNaN(newval) || newval < 1 || newval > 200){
       message.reply(":bangbang:音量を変更する際は1から200の数字で指定してください。")
         .catch(this.logger.error);
       return;
     }
-    const result = options.server.player.setVolume(newval);
-    await message.reply(`:loud_sound:音量を**${newval}**に変更しました。\r\n${options.server.player.isPlaying && !result ? "次の曲から適用されます。現在再生中の曲に設定を適用するには、`頭出し`コマンドなどを使用してください。" : ""}`)
+    // 音量変更が即反映されたか？
+    const result = context.server.player.setVolume(newval);
+    await message.reply(`:loud_sound:音量を**${newval}**に変更しました。\r\n${context.server.player.isPlaying && !result ? "次の曲から適用されます。現在再生中の曲に設定を適用するには、`頭出し`コマンドなどを使用してください。" : ""}`)
       .catch(this.logger.error);
   }
 }

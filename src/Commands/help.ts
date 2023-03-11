@@ -41,23 +41,23 @@ export default class Help extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs){
     const developerId = "593758391395155978";
-    const cachedUser = options.client.users.get(developerId);
+    const cachedUser = context.client.users.get(developerId);
     const developer = cachedUser
       ? cachedUser.username
-      : await options.client.rest.users.get(developerId)
+      : await context.client.rest.users.get(developerId)
         .then(user => user.username)
         .catch(() => null as string)
       ;
     const { isDisabledSource } = config;
     const embed = new MessageEmbedBuilder()
-      .setTitle(options.client.user.username + ":notes:")
+      .setTitle(context.client.user.username + ":notes:")
       .setDescription(
         "高音質な音楽で、Discordで最高のエクスペリエンスを得るために作られました:robot:\r\n"
-      + `利用可能なコマンドを確認するには、\`${config.noMessageContent ? "/" : options.server.prefix}command\`を使用してください。`)
+      + `利用可能なコマンドを確認するには、\`${config.noMessageContent ? "/" : context.server.prefix}command\`を使用してください。`)
       .addField("開発者", `[${developer || "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`)
-      .addField("バージョン", "`" + options.bot.version + "`")
+      .addField("バージョン", "`" + context.bot.version + "`")
       .addField("レポジトリ/ソースコード", "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot")
       .addField("サポートサーバー", "https://discord.gg/7DrAEXBMHe")
       .addField("現在対応している再生ソース", [

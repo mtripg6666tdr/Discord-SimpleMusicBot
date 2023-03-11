@@ -125,7 +125,7 @@ export abstract class AudioSource<T extends ThumbnailType> {
   // データをエクスポート
   abstract exportData(): exportableCustom;
 
-  destroy(){
+  disableCache(){
   }
 
   isYouTube(): this is Sources.YouTube{

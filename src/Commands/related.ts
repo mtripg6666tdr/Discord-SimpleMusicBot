@@ -37,13 +37,13 @@ export default class Related extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    if(options.server.addRelated){
-      options.server.addRelated = false;
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    if(context.server.addRelated){
+      context.server.addRelated = false;
       message.reply("❌関連曲自動再生をオフにしました").catch(this.logger.error);
     }else{
-      options.server.addRelated = true;
+      context.server.addRelated = true;
       const embed = new MessageEmbedBuilder()
         .setTitle("⭕関連曲自動再生をオンにしました")
         .setDescription("YouTubeからの楽曲再生終了時に、関連曲をキューの末尾に自動追加する機能です。\r\n※YouTube以外のソースからの再生時、ループ有効時には追加されません")
