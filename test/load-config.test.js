@@ -39,6 +39,8 @@ const sampleJson = `
   "twentyFourSeven": [],
 
   "alwaysTwentyFourSeven": false,
+
+  "cacheLevel": "memory",
 }`;
 fs.writeFileSync(configPath, sampleJson, {encoding: "utf-8"});
 console.log("Successfully wrote the config for test");
@@ -66,6 +68,7 @@ describe("Config", function() {
       ["noMessageContent", false],
       ["twentyFourSeven", []],
       ["alwaysTwentyFourSeven", false],
+      ["cacheLevel", "memory"],
     ];
 
     tests.forEach(([prop, expected]) => {
