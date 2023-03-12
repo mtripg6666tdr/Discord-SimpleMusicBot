@@ -24,9 +24,7 @@ import { BaseCommand } from ".";
 export default class Mltf extends BaseCommand {
   constructor(){
     super({
-      name: "最後の曲を先頭へ",
       alias: ["movelastsongtofirst", "mlstf", "ml", "mltf", "mlf", "m1", "pt"],
-      description: "キューの最後の曲をキューの先頭に移動します。",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "onlyListener", "dj"],

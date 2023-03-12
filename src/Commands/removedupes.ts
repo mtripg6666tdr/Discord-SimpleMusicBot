@@ -24,9 +24,7 @@ import { BaseCommand } from ".";
 export default class RmDuplicated extends BaseCommand {
   constructor(){
     super({
-      name: "重複削除",
       alias: ["removedupes", "rmdupes", "rmduplicated", "removeduplicates", "drm"],
-      description: "キュー内の重複（ちょうふく）している曲を削除します。",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "onlyListener", "dj"],

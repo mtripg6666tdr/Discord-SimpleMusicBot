@@ -24,17 +24,12 @@ import { BaseCommand } from ".";
 export default class Seek extends BaseCommand {
   constructor(){
     super({
-      name: "シーク",
       alias: ["seek"],
-      description: "楽曲をシークします。",
       unlist: false,
       category: "player",
-      examples: "シーク 0:30",
-      usage: "検索 <時間(秒数または時間:分:秒の形式で)>",
       argument: [{
         type: "string",
         name: "keyword",
-        description: "シーク先の時間",
         required: true,
       }],
       requiredPermissionsOr: ["admin", "dj"],

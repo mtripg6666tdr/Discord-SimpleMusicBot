@@ -29,17 +29,12 @@ import { getColor } from "../Util/color";
 export default class Searchq extends BaseCommand {
   constructor(){
     super({
-      name: "キュー内を検索",
       alias: ["searchqueue", "searchq", "seq", "sq"],
-      description: "キュー内を検索します。引数にキーワードを指定します。",
       unlist: false,
       category: "playlist",
-      examples: "seq pretender",
-      usage: "seq <キーワード>",
       argument: [{
         type: "string",
         name: "keyword",
-        description: "検索したい楽曲のキーワード",
         required: true,
       }],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],

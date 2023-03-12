@@ -27,19 +27,14 @@ import { getLogs } from "../logger";
 export default class Invoke extends BaseCommand {
   constructor(){
     super({
-      name: "インボーク",
       alias: ["invoke"],
-      description: "指定されたコマンドを実行します。基本的に使用しないでください",
       unlist: false,
       category: "utility",
       argument: [{
         name: "command",
-        description: "実行するコマンド",
         type: "string",
         required: true,
       }],
-      usage: "invoke <コマンド>",
-      examples: "invoke play 夜に駆ける",
       requiredPermissionsOr: [],
       shouldDefer: true,
     });

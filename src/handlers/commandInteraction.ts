@@ -77,7 +77,15 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
   // プレフィックス更新
   server.updatePrefix(commandMessage);
   // コマンドを実行
-  await command.checkAndRun(commandMessage, this["createCommandRunnerArgs"](commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
+  await command.checkAndRun(
+    commandMessage,
+    this["createCommandRunnerArgs"](
+      commandMessage.guild.id,
+      commandMessage.options,
+      commandMessage.rawOptions,
+      interaction.locale
+    )
+  );
 }
 
 function shouldIgnoreInteractionByBgmConfig(server: GuildDataContainer, command: BaseCommand){

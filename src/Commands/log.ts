@@ -35,24 +35,19 @@ const config = useConfig();
 export default class SystemInfo extends BaseCommand {
   constructor(){
     super({
-      name: "システム情報",
       alias: ["ログ", "log", "systeminfo", "sysinfo"],
-      description: "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`、`cpu`、`basic`のうちいずれか)を指定して特定の内容のみ取得することもできます。",
       unlist: false,
       category: "utility",
-      examples: "sysinfo mem",
-      usage: "sysinfo [mem|cpu]",
       argument: [{
         type: "string",
         name: "content",
-        description: "basic,mem,cpuのどれかを指定できます",
         required: false,
-        choices: {
-          "基本情報": "basic",
-          "メモリ": "mem",
-          "CPU": "cpu",
-          "ログ(管理者のみ)": "log",
-        },
+        choices: [
+          "basic",
+          "mem",
+          "cpu",
+          "log",
+        ],
       }],
       requiredPermissionsOr: [],
       shouldDefer: false,

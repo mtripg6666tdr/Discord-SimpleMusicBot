@@ -25,9 +25,7 @@ export default class Dc extends BaseCommand {
   constructor(){
     super({
       unlist: false,
-      name: "切断",
       alias: ["終了", "disconnect", "dc", "leave", "quit"] as const,
-      description: "ボイスチャンネルから切断します。",
       category: "voice",
       requiredPermissionsOr: ["admin", "sameVc"],
       shouldDefer: false,

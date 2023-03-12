@@ -24,9 +24,7 @@ import { BaseCommand } from ".";
 export default class QueueLoop extends BaseCommand {
   constructor(){
     super({
-      name: "キューループ",
       alias: ["queueloop", "loopqueue"],
-      description: "キュー内のループを設定します。",
       unlist: false,
       category: "player",
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],

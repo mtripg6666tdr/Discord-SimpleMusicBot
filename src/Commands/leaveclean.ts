@@ -24,9 +24,7 @@ import { BaseCommand } from ".";
 export default class LeaveClean extends BaseCommand {
   constructor(){
     super({
-      name: "キューを整理",
       alias: ["leaveclean", "lc", "leavecleanup"],
-      description: "ボイスチャンネルから離脱した人がリクエストした曲をキューから削除して整理します",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "onlyListener", "dj"],

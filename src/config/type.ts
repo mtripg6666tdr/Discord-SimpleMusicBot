@@ -60,7 +60,8 @@ export const ConfigSchema = Type.Object({
     Type.Literal("memory"),
     Type.Literal("persistent"),
     //Type.Literal("full"),
-  ]),
+  ], { default: "memory" }),
+  defaultLanguage: Type.String({ default: "ja" }),
 });
 
 export type GuildBGMContainerType = Static<typeof GuildBGMContainer>;

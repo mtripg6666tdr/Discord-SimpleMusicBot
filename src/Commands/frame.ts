@@ -30,17 +30,12 @@ import { getLogger } from "../logger";
 export default class Frame extends BaseCommand {
   constructor(){
     super({
-      name: "フレーム",
       alias: ["frame", "キャプチャ", "capture"],
-      description: "現在の再生位置の動画のフレーム画像を可能な場合取得します。引数が指定された場合その時点でのフレームを取得します",
       unlist: false,
       category: "player",
-      examples: "フレーム 1:20",
-      usage: "フレーム [時間]",
       argument: [{
         type: "string",
         name: "time",
-        description: "指定された場合その時点でのフレームを取得します",
         required: false,
       }],
       requiredPermissionsOr: ["admin", "sameVc"],

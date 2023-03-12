@@ -130,7 +130,7 @@ export class MusicBot extends MusicBotBase {
    * @param optiont コマンドの生の引数
    * @returns コマンドを実行する際にランナーに渡す引数
    */
-  createCommandRunnerArgs(guildId: string, options: string[], optiont: string): CommandArgs{
+  createCommandRunnerArgs(guildId: string, options: string[], optiont: string, locale: string): CommandArgs{
     return {
       args: options,
       bot: this,
@@ -139,6 +139,7 @@ export class MusicBot extends MusicBotBase {
       client: this._client,
       initData: this.initData.bind(this),
       includeMention: false,
+      locale,
     };
   }
 }

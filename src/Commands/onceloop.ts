@@ -24,9 +24,7 @@ import { BaseCommand } from ".";
 export default class OnceLoop extends BaseCommand {
   constructor(){
     super({
-      name: "ワンスループ",
       alias: ["onceloop", "looponce"],
-      description: "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
       unlist: false,
       category: "player",
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],

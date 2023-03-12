@@ -24,9 +24,7 @@ import { BaseCommand } from ".";
 export default class Loop extends BaseCommand {
   constructor(){
     super({
-      name: "ループ",
       alias: ["トラックループ", "loop", "repeat", "lp", "trackloop", "trackrepeat"],
-      description: "トラックごとのループを設定します。",
       unlist: false,
       category: "player",
       requiredPermissionsOr: ["admin", "noConnection", "onlyListener", "dj"],

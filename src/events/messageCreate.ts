@@ -92,7 +92,15 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
       return;
     }
     // コマンドの処理
-    await command.checkAndRun(commandMessage, this["createCommandRunnerArgs"](commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
+    await command.checkAndRun(
+      commandMessage,
+      this["createCommandRunnerArgs"](
+        commandMessage.guild.id,
+        commandMessage.options,
+        commandMessage.rawOptions,
+        config.defaultLanguage
+      )
+    );
   }else if(server.searchPanel.has(message.member.id)){
     // searchコマンドのキャンセルを捕捉
     const panel = server.searchPanel.get(message.member.id);

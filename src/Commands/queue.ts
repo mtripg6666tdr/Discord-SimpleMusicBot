@@ -28,15 +28,12 @@ import { getColor } from "../Util/color";
 export default class Queue extends BaseCommand {
   constructor(){
     super({
-      name: "キュー",
       alias: ["キューを表示", "再生待ち", "queue", "q"],
-      description: "キューを表示します。",
       unlist: false,
       category: "playlist",
       argument: [{
         type: "integer",
         name: "page",
-        description: "表示するキューのページを指定することができます",
         required: false,
       }],
       requiredPermissionsOr: [],

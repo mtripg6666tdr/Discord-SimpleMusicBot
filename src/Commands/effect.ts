@@ -27,9 +27,7 @@ import { getColor } from "../Util/color";
 export default class Effect extends BaseCommand {
   constructor(){
     super({
-      name: "エフェクト",
       alias: ["effect", "音声エフェクト", "音声効果", "効果"],
-      description: "エフェクトコントロールパネルを表示します",
       unlist: false,
       category: "player",
       requiredPermissionsOr: [],

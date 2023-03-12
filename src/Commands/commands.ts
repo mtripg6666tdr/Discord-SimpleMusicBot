@@ -43,15 +43,10 @@ export default class Commands extends BaseCommand {
   constructor(){
     super({
       unlist: false,
-      name: "コマンド",
       alias: ["command", "commands", "cmd"],
-      description: "コマンド一覧を表示します。コマンド名を渡すとそのコマンドの詳細を表示します。",
       category: "bot",
-      usage: "command [コマンド名]",
-      examples: "command search",
       argument: [{
         type: "string",
-        description: "詳細表示するするコマンド名",
         name: "command",
         required: false,
       }],

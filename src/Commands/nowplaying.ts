@@ -28,15 +28,12 @@ import { getColor } from "../Util/color";
 export default class NowPlaying extends BaseCommand {
   constructor(){
     super({
-      name: "現在再生中",
       alias: ["今の曲", "nowplaying", "np"],
-      description: "現在再生中の曲の情報を表示します。 `l`(スラッシュコマンドの場合はTrue)を引数にするとより長く概要を表示します(可能な場合)",
       unlist: false,
       category: "player",
       argument: [{
         type: "bool",
         name: "detailed",
-        description: "Trueが指定された場合、可能な場合より長く詳細を表示します",
         required: false,
       }],
       requiredPermissionsOr: [],

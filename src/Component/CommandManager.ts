@@ -151,7 +151,7 @@ export class CommandManager extends LogEmitter<{}> {
     // });
 
     // Get registered commands
-    const registeredAppCommands = await client.application.getGlobalCommands();
+    const registeredAppCommands = await client.application.getGlobalCommands({ withLocalizations: true });
 
     // no registered commands, bulk-registering them
     if(registeredAppCommands.length === 0){
@@ -248,10 +248,12 @@ export class CommandManager extends LogEmitter<{}> {
               type: option.type,
               name: option.name,
               description: option.description,
+              descriptionLocalizations: option.descriptionLocalizations,
               required: !!option.required,
               choices: option.choices.map(choice => ({
                 name: choice.name,
                 value: choice.value,
+                nameLocalizations: choice.nameLocalizations,
               })),
             };
           }else{
@@ -259,6 +261,7 @@ export class CommandManager extends LogEmitter<{}> {
               type: option.type,
               name: option.name,
               description: option.description,
+              descriptionLocalizations: option.descriptionLocalizations,
               required: !!option.required,
             };
           }
@@ -269,6 +272,7 @@ export class CommandManager extends LogEmitter<{}> {
         type: apiCommand.type,
         name: apiCommand.name,
         description: apiCommand.description,
+        descriptionLocalizations: apiCommand.descriptionLocalizations,
       };
     }
   }

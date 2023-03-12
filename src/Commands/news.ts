@@ -26,9 +26,7 @@ import { BaseCommand } from ".";
 export default class News extends BaseCommand {
   constructor(){
     super({
-      name: "ニュース",
       alias: ["news"],
-      description: "現在配信されているニューストピックスを閲覧・視聴できます。",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],

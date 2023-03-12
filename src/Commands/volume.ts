@@ -24,17 +24,12 @@ import { BaseCommand } from ".";
 export default class Volume extends BaseCommand {
   constructor(){
     super({
-      name: "ボリューム",
       alias: ["volume", "vol"],
-      description: "音量を調節します。1から200の間で指定します(デフォルト100)。何も引数を付けないと現在の音量を表示します。不安定になった場合には100に戻してください。",
       unlist: false,
       category: "voice",
-      examples: "volume [音量]",
-      usage: "volume 120",
       argument: [{
         type: "integer",
         name: "volume",
-        description: "変更先の音量。1~200までが指定できます。",
         required: false,
       }],
       requiredPermissionsOr: ["admin", "sameVc"],

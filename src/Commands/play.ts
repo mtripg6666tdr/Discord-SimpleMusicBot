@@ -27,15 +27,12 @@ import { color } from "../Util";
 export default class Play extends BaseCommand {
   constructor(){
     super({
-      name: "再生",
       alias: ["play", "p", "resume", "re"],
-      description: "キュー内の楽曲を再生します。引数として対応しているサイトの楽曲のURLを指定することもできます。",
       unlist: false,
       category: "player",
       argument: [{
         type: "string",
         name: "keyword",
-        description: "再生する動画のキーワードまたはURL。VCに未接続の場合接続してその曲を優先して再生します。接続中の場合はキューの末尾に追加します。一時停止中の場合はオプションは無視され、再生が再開されます。",
         required: false,
       }],
       requiredPermissionsOr: [],

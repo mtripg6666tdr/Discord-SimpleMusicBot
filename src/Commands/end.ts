@@ -24,9 +24,7 @@ import { BaseCommand } from ".";
 export default class End extends BaseCommand {
   constructor(){
     super({
-      name: "この曲で終了",
       alias: ["end"],
-      description: "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "dj", "onlyListener"],

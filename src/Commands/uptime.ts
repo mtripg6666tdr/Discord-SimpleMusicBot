@@ -28,9 +28,7 @@ import { getColor } from "../Util/color";
 export default class Uptime extends BaseCommand {
   constructor(){
     super({
-      name: "アップタイム",
       alias: ["uptime"],
-      description: "ボットのアップタイムを表示します。",
       unlist: false,
       category: "utility",
       requiredPermissionsOr: [],

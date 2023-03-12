@@ -24,9 +24,7 @@ import { BaseCommand } from ".";
 export default class Pause extends BaseCommand {
   constructor(){
     super({
-      name: "一時停止",
       alias: ["一旦停止", "停止", "pause", "stop"],
-      description: "再生を一時停止します。",
       unlist: false,
       category: "player",
       requiredPermissionsOr: ["admin", "sameVc"],

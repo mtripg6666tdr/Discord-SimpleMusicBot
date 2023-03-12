@@ -33,19 +33,16 @@ import { DefaultAudioThumbnailURL } from "../definition";
 export default class Lyrics extends BaseCommand {
   constructor(){
     super({
-      name: "歌詞",
       alias: ["lyrics", "l", "lyric"],
-      description: "指定された曲の歌詞を検索します。",
       unlist: false,
       category: "utility",
-      examples: "l 夜に駆ける",
-      usage: "l <タイトル、アーティスト等>",
-      argument: [{
-        type: "string",
-        name: "keyword",
-        description: "楽曲を検索するキーワード",
-        required: true,
-      }],
+      argument: [
+        {
+          type: "string",
+          name: "keyword",
+          required: true,
+        },
+      ],
       requiredPermissionsOr: [],
       shouldDefer: false,
     });

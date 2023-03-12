@@ -103,17 +103,12 @@ export abstract class SearchBase<T> extends BaseCommand {
 export default class Search extends SearchBase<ytsr.Video[]> {
   constructor(){
     super({
-      name: "検索",
       alias: ["search", "se"],
-      description: "曲をYouTubeで検索します。直接URLを直接指定することもできます。",
       unlist: false,
       category: "playlist",
-      examples: "検索 夜に駆ける",
-      usage: "検索 <キーワード>",
       argument: [{
         type: "string",
         name: "keyword",
-        description: "検索したい動画のキーワードまたはURL。",
         required: true,
       }],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],

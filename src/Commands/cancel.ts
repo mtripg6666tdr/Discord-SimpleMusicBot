@@ -24,9 +24,7 @@ import { BaseCommand } from ".";
 export default class Cancel extends BaseCommand {
   constructor(){
     super({
-      name: "キャンセル",
       alias: ["cancel", "中止", "abort"],
-      description: "実行中のキャンセル可能な処理がある場合それをすべて中止します。",
       unlist: false,
       category: "utility",
       requiredPermissionsOr: ["admin", "sameVc"],

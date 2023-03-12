@@ -24,9 +24,7 @@ import { BaseCommand } from ".";
 export default class Rewind extends BaseCommand {
   constructor(){
     super({
-      name: "頭出し",
       alias: ["rewind", "gotop", "replay"],
-      description: "再生中の曲の頭出しを行い、初めから再生します。",
       unlist: false,
       category: "player",
       requiredPermissionsOr: ["admin", "sameVc"],

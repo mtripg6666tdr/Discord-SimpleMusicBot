@@ -25,9 +25,7 @@ import { YmxVersion } from "../Structure";
 export default class Export extends BaseCommand {
   constructor(){
     super({
-      name: "エクスポート",
       alias: ["export"],
-      description: "キューの内容をインポートできるようエクスポートします。",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: [],

@@ -33,17 +33,12 @@ const config = useConfig();
 export default class Import extends BaseCommand {
   constructor(){
     super({
-      name: "インポート",
       alias: ["import"],
-      description: "指定されたメッセージからキューをインポートします。exportコマンドで出力されたファイルが添付されたURL、もしくはキューの埋め込みのあるメッセージのURLを引数として指定してください。",
       unlist: false,
       category: "playlist",
-      examples: "import https://discord.com/channels/...",
-      usage: "インポート <インポート元のURL>",
       argument: [{
         type: "string",
         name: "url",
-        description: "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURL、もしくはキューの埋め込みが添付されたURLを指定できます。",
         required: true,
       }],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],

@@ -17,10 +17,11 @@
  */
 
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { ListCommandInitializeOptions, UnlistCommandInitializeOptions, ListCommandWithArgumentsInitializeOptions, CommandArgs, SlashCommandArgument, CommandPermission } from "../Structure/Command";
+import type { ListCommandInitializeOptions, UnlistCommandOptions, ListCommandWithArgsOptions, CommandArgs, CommandPermission, LocalizedSlashCommandArgument } from "../Structure/Command";
 import type { LoggerObject } from "../logger";
-import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions } from "oceanic.js";
+import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap } from "oceanic.js";
 
+import i18next from "i18next";
 import { TypedEmitter } from "oceanic.js";
 import { ApplicationCommandTypes } from "oceanic.js";
 
@@ -61,12 +62,12 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     return this._unlist;
   }
 
-  protected readonly _examples: string = null;
+  protected readonly _examples: LocaleMap = null;
   public get examples(){
     return this._examples;
   }
 
-  protected readonly _usage: string = null;
+  protected readonly _usage: LocaleMap = null;
   public get usage(){
     return this._usage;
   }
@@ -81,7 +82,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     return this._shouldDefer;
   }
 
-  protected readonly _argument: Readonly<SlashCommandArgument[]> = null;
+  protected readonly _argument: Readonly<LocalizedSlashCommandArgument[]> = null;
   public get argument(){
     return this._argument;
   }
@@ -104,22 +105,89 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     }
   }
 
+  protected readonly _descriptionLocalization: LocaleMap = null;
+
+  get descriptionLocalization(){
+    return this._descriptionLocalization;
+  }
+
   protected readonly logger: LoggerObject;
 
-  constructor(opts: ListCommandInitializeOptions|UnlistCommandInitializeOptions){
+  constructor(opts: ListCommandInitializeOptions|UnlistCommandOptions){
     super();
-    this._name = opts.name;
     this._alias = opts.alias;
+    this._name = "name" in opts ? opts.name : i18next.t(`commands:${this.asciiName}.name`);
     this._unlist = opts.unlist;
     this._shouldDefer = opts.shouldDefer;
     if(!this._unlist){
       if(!this.asciiName) throw new Error("Command has not ascii name");
-      const { description, examples, usage, category, argument, requiredPermissionsOr } = opts as ListCommandWithArgumentsInitializeOptions;
-      this._description = description;
-      this._examples = examples || null;
-      this._usage = usage || null;
+      const {
+        examples,
+        usage,
+        category,
+        argument,
+        requiredPermissionsOr,
+      } = opts as ListCommandWithArgsOptions;
+
+      this._description = i18next.t(`commands:${this.asciiName}.description`);
+      this._descriptionLocalization = Object.create({});
+      i18next.languages.forEach(language => {
+        if(i18next.language === language) return;
+        this._descriptionLocalization[language as keyof typeof this._descriptionLocalization]
+          = i18next.t(`commands:${this.asciiName}.description`, { lng: language });
+      });
+
+      this._examples = examples ? Object.create(null) : null;
+      if(this._examples){
+        i18next.languages.forEach(language => {
+          this._examples[language as keyof typeof this._examples]
+            = i18next.t(`commands:${this.asciiName}.examples`, { lng: language });
+        });
+      }
+
+      this._usage = usage ? Object.create(null) : null;
+      if(this._usage){
+        i18next.languages.forEach(language => {
+          this._usage[language as keyof typeof this._usage]
+            = i18next.t(`commands:${this.asciiName}.usage`, { lng: language });
+        });
+      }
+
       this._category = category;
-      this._argument = argument || null;
+
+      this._argument = argument ? argument.map(arg => {
+        const result = {
+          type: arg.type,
+          name: arg.name,
+          required: arg.required || false,
+          description: i18next.t(`commands:${this.asciiName}.args.${arg.name}.description`),
+          descriptionLocalization: Object.create(null),
+          choices: [] as LocalizedSlashCommandArgument["choices"],
+        };
+        i18next.languages.forEach(language => {
+          result.descriptionLocalization[language as keyof typeof result.descriptionLocalization]
+            = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description`, { lng: language });
+        });
+
+        arg.choices.forEach(choiceValue => {
+          const resultChoice = {
+            name: i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}`),
+            value: choiceValue,
+            nameLocalizations: Object.create(null),
+          };
+          i18next.languages.forEach(language => {
+            resultChoice.nameLocalizations[language as keyof LocaleMap]
+              = i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}`, { lng: language });
+          });
+        });
+
+        if(arg.choices.length === 0){
+          delete arg.choices;
+        }
+
+        return result;
+      }) : null;
+
       this._requiredPermissionsOr = requiredPermissionsOr || [];
     }
     this.logger = getLogger(`Command(${this.asciiName})`);
@@ -164,11 +232,13 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         type: CommandManager.mapCommandOptionTypeToInteger(arg.type),
         name: arg.name,
         description: arg.description.replace(/\r/g, "").replace(/\n/g, ""),
+        description_localizations: arg.descriptionLocalization,
         required: arg.required,
-        choices: !arg.choices ? undefined : Object.keys(arg.choices).map(name => ({
-          name,
-          value: arg.choices[name],
-        })),
+        choices: arg.choices.map(choice => ({
+          name: choice.name,
+          value: choice.value,
+          nameLocalizations: choice.nameLocalizations,
+        })) as ApplicationCommandOptionsChoice[],
       };
       if(!discordCommandStruct.choices) delete discordCommandStruct.choices;
       return discordCommandStruct as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean;
@@ -178,6 +248,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         type: ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
         description: this.description.replace(/\r/g, "").replace(/\n/g, ""),
+        descriptionLocalizations: this.descriptionLocalization,
         options,
       };
     }else{
@@ -185,6 +256,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         type: ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
         description: this.description.replace(/\r/g, "").replace(/\n/g, ""),
+        descriptionLocalizations: this.descriptionLocalization,
       };
     }
   }

@@ -24,9 +24,7 @@ import { BaseCommand } from ".";
 export default class Shuffle extends BaseCommand {
   constructor(){
     super({
-      name: "シャッフル",
       alias: ["shuffle"],
-      description: "キューの内容をシャッフルします。",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "onlyListener", "dj"],

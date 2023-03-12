@@ -21,13 +21,20 @@ import path from "path";
 import i18next from "i18next";
 import Backend from "i18next-fs-backend";
 
-export function initLocalization(debug: boolean){
+export function initLocalization(debug: boolean, lang: string){
   return i18next
     .use(Backend)
     .init({
       debug,
-      lowerCaseLng: true,
       cleanCode: true,
+      fallbackLng: "ja",
+      lng: lang,
+      ns: [
+        "default",
+        "commands",
+        "components",
+      ],
+      defaultNS: "default",
       backend: {
         loadPath: path.join(__dirname, "../locales/{{lng}}/{{ns}}.json"),
       },

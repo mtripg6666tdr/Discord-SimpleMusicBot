@@ -21,6 +21,8 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
+import i18next from "i18next";
+
 import { BaseCommand } from ".";
 import { Spotify } from "../AudioSource";
 import { getColor } from "../Util/color";
@@ -31,9 +33,7 @@ const config = useConfig();
 export default class Help extends BaseCommand {
   constructor(){
     super({
-      name: "ヘルプ",
       alias: ["help", "support"],
-      description: "ヘルプを表示します",
       unlist: false,
       category: "bot",
       requiredPermissionsOr: [],
@@ -54,8 +54,9 @@ export default class Help extends BaseCommand {
     const embed = new MessageEmbedBuilder()
       .setTitle(context.client.user.username + ":notes:")
       .setDescription(
-        "高音質な音楽で、Discordで最高のエクスペリエンスを得るために作られました:robot:\r\n"
-      + `利用可能なコマンドを確認するには、\`${config.noMessageContent ? "/" : context.server.prefix}command\`を使用してください。`)
+        i18next.t("commands:help.embedDescription")
+        + "\r\n"
+        + i18next.t("commands:help.toLearnMore", { command: `\`${config.noMessageContent ? "/" : context.server.prefix}command\`` }))
       .addField("開発者", `[${developer || "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`)
       .addField("バージョン", "`" + context.bot.version + "`")
       .addField("レポジトリ/ソースコード", "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot")

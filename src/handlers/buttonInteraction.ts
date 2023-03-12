@@ -56,7 +56,12 @@ export async function handleButtonInteraction(
         return;
     }
     const commandMessage = CommandMessage.createFromInteraction(interaction, command, [], "");
-    const args = this["createCommandRunnerArgs"](commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions);
+    const args = this["createCommandRunnerArgs"](
+      commandMessage.guild.id,
+      commandMessage.options,
+      commandMessage.rawOptions,
+      interaction.locale,
+    );
     args.includeMention = true;
     CommandManager.instance.resolve(command)?.checkAndRun(commandMessage, args);
   }

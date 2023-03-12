@@ -19,13 +19,7 @@
 import type { categories } from "../Commands/commands";
 import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
-import type { Client } from "oceanic.js";
-
-export type BaseCommandInitializeOptions = {
-  name: string,
-  alias: Readonly<string[]>,
-  shouldDefer: boolean,
-};
+import type { Client, LocaleMap } from "oceanic.js";
 
 export type CommandPermission =
   | "admin"
@@ -47,30 +41,40 @@ export const permissionDescriptionParts: Readonly<{ [key in CommandPermission]: 
   noConnection: "ボットがどこのボイスチャンネルにも接続していないこと",
 };
 
-export type ListCommandWithArgumentsInitializeOptions = BaseCommandInitializeOptions & {
-  description: string,
-  unlist: boolean,
-  examples: string,
-  usage: string,
+export type BaseCommandInitializeOptions = {
+  alias: Readonly<string[]>,
+  shouldDefer: boolean,
+};
+
+export type ListCommandWithArgsOptions = BaseCommandInitializeOptions & {
+  unlist: false,
+  examples: boolean,
+  usage: boolean,
   category: keyof typeof categories,
-  argument: SlashCommandArgument[],
+  argument: [firstArgument: SlashCommandArgument, ...restArguments: SlashCommandArgument[]],
   requiredPermissionsOr: CommandPermission[],
 };
 
-export type ListCommandWithoutArgumentsInitializeOptions = BaseCommandInitializeOptions & {
-  description: string,
+export type ListCommandWithoutArgsOptions = BaseCommandInitializeOptions & {
   unlist: false,
   category: keyof typeof categories,
   requiredPermissionsOr: CommandPermission[],
 };
 
 export type ListCommandInitializeOptions =
-  | ListCommandWithArgumentsInitializeOptions
-  | ListCommandWithoutArgumentsInitializeOptions
+  | ListCommandWithArgsOptions
+  | ListCommandWithoutArgsOptions
 ;
 
-export type UnlistCommandInitializeOptions = BaseCommandInitializeOptions & {
+export type UnlistCommandOptions = BaseCommandInitializeOptions & {
   unlist: true,
+  name: string,
+  description?: string,
+  usage?: string,
+  examples?: string,
+  category?: keyof typeof categories,
+  argument?: { type: CommandOptionsTypes, name: string, description: string, required: boolean }[],
+  requiredPermissionsOr?: CommandPermission[],
 };
 
 export type CommandOptionsTypes = "bool"|"integer"|"string";
@@ -78,13 +82,22 @@ export type CommandOptionsTypes = "bool"|"integer"|"string";
 /**
  * スラッシュコマンドの引数として取れるものを定義するインターフェースです
  */
-export interface SlashCommandArgument {
-  type: CommandOptionsTypes;
-  name: string;
-  description: string;
-  required: boolean;
-  choices?: { [key: string]: string|number };
-}
+export type SlashCommandArgument = {
+  type: CommandOptionsTypes,
+  name: string,
+  required: boolean,
+  choices?: [firstChoice: string, ...restChoices: string[]],
+};
+
+export type LocalizedSlashCommandArgument = Omit<SlashCommandArgument, "choices"> & {
+  description: string,
+  descriptionLocalization: LocaleMap,
+  choices: {
+    name: string,
+    value: string,
+    nameLocalizations: LocaleMap,
+  }[],
+};
 
 /**
  * コマンドのランナに渡される引数
@@ -120,4 +133,8 @@ export interface CommandArgs {
    * メンションをメッセージに含めるか
    */
   includeMention: boolean;
+  /**
+   * ユーザーのロケール
+   */
+  locale: string;
 }

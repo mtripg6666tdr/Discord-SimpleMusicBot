@@ -25,6 +25,7 @@ import log4js from "log4js";
 import { stringifyObject } from "./Util";
 import { MusicBot } from "./bot";
 import { useConfig } from "./config";
+import { initLocalization } from "./i18n";
 import { createServer } from "./server";
 
 const logger = log4js.getLogger("Entry");
@@ -96,6 +97,9 @@ const onTerminated = async function(code: string){
 ["SIGINT", "SIGTERM", "SIGUSR2"].forEach(signal => {
   process.on(signal, onTerminated.bind(undefined, signal));
 });
+
+logger.info("Loading locales...");
+initLocalization(config.debug, config.defaultLanguage);
 
 // ボット開始
 bot.run();

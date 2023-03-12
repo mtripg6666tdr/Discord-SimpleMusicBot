@@ -27,9 +27,7 @@ import { getColor } from "../Util/color";
 export default class Related extends BaseCommand {
   constructor(){
     super({
-      name: "関連動画",
       alias: ["関連曲", "おすすめ", "オススメ", "related", "relatedsong", "r", "recommend"],
-      description: "YouTubeから楽曲を再生終了時に、関連曲をキューに自動で追加する機能の有効/無効を設定します",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],

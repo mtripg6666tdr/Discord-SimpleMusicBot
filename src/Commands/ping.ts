@@ -27,9 +27,7 @@ import { getColor } from "../Util/color";
 export default class Uptime extends BaseCommand {
   constructor(){
     super({
-      name: "ピング",
       alias: ["ping", "latency"],
-      description: "ボットのping時間(レイテンシ)を表示します。",
       unlist: false,
       category: "utility",
       requiredPermissionsOr: [],

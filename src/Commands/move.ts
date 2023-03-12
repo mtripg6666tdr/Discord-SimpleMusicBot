@@ -24,24 +24,21 @@ import { BaseCommand } from ".";
 export default class Mv extends BaseCommand {
   constructor(){
     super({
-      name: "移動",
       alias: ["move", "mv"],
-      description: "曲を指定された位置から指定された位置までキュー内で移動します。2番目の曲を5番目に移動したい場合は`mv 2 5`のようにします。",
       unlist: false,
       category: "playlist",
-      examples: "移動 2 5",
-      usage: "移動 <from> <to>",
-      argument: [{
-        type: "integer",
-        name: "from",
-        description: "移動元のインデックス。キューに併記されているものです",
-        required: true,
-      }, {
-        type: "integer",
-        name: "to",
-        description: "移動先のインデックス。キューに併記されているものです",
-        required: true,
-      }],
+      argument: [
+        {
+          type: "integer",
+          name: "from",
+          required: true,
+        },
+        {
+          type: "integer",
+          name: "to",
+          required: true,
+        },
+      ],
       requiredPermissionsOr: ["admin", "onlyListener", "dj"],
       shouldDefer: false,
     });

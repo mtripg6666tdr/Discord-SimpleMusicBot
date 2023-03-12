@@ -31,17 +31,12 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
 
   constructor(){
     super({
-      name: "サウンドクラウドを検索",
       alias: ["soundcloudを検索", "searchsoundcloud", "searchs", "ses", "ss", "sc", "soundcloud"],
-      description: "曲をSoundCloudで検索します",
       unlist: false,
       category: "playlist",
-      examples: "ses sakura trip",
-      usage: "ses <キーワード>",
       argument: [{
         type: "string",
         name: "keyword",
-        description: "検索したい楽曲のキーワードまたはURL。",
         required: true,
       }],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
