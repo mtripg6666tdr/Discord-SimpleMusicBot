@@ -18,6 +18,7 @@
 
 import type { AudioSource, exportableCustom } from "../AudioSource";
 import type { MusicBotBase } from "../botBase";
+import type ytsr from "ytsr";
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 
@@ -78,10 +79,10 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     }
   }
 
-  addSource(content: AudioSource<any>){
+  addSource(content: AudioSource<any>, fromPersistentCache: boolean){
     this._sourceCache.set(content.url, content);
     this.logger.info(`New memory cache added (total: ${this._sourceCache.size})`);
-    if(this.enablePersistent){
+    if(this.enablePersistent && !fromPersistentCache){
       this.addPersistentCache(this.createCacheId(content.url, "exportable"), content.exportData());
     }
   }
@@ -99,8 +100,9 @@ export class SourceCache extends LogEmitter<CacheEvents> {
   }
 
   hasExportable(url: string){
-    const result = this.existPersistentCache(this.createCacheId(url, "exportable"));
-    this.logger.debug(`Requested persistent cache ${result ? "" : "not "}found`);
+    const id = this.createCacheId(url, "exportable");
+    const result = this.existPersistentCache(id);
+    this.logger.info(`Requested persistent cache ${result ? "" : "not "}found (id: ${id})`);
     if(!result){
       this.emit("persistentCacheNotFound");
     }
@@ -116,9 +118,28 @@ export class SourceCache extends LogEmitter<CacheEvents> {
       .catch(() => null) as Promise<T>;
   }
 
-  private createCacheId(url: string, type: "exportable"){
-    if(url.includes("?si=")) url = url.split("?")[0];
-    return this.generateHash(`${type}+${url}`);
+  addSearch(keyword: string, result: ytsr.Video[]){
+    if(this.enablePersistent){
+      this.addPersistentCache(this.createCacheId(keyword.toLowerCase(), "search"), result);
+    }
+  }
+
+  hasSearch(keyword: string){
+    const id = this.createCacheId(keyword, "search");
+    const result = this.existPersistentCache(id);
+    this.logger.info(`Requested persistent cache ${result ? "" : "not "}found (id: ${id})`);
+    return result;
+  }
+
+  getSearch(keyword: string){
+    return this.getPersistentCache(this.createCacheId(keyword, "search")) as Promise<ytsr.Video[]>;
+  }
+
+  private createCacheId(key: string, type: "exportable" | "search"){
+    if(key.includes("?si=")) key = key.split("?")[0];
+    const id = this.generateHash(`${type}+${key}`);
+    this.logger.debug(`type: ${type}, id: ${id}`);
+    return id;
   }
 
   private readonly persistentCacheLocker = new LockObj();
@@ -127,7 +148,11 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     return lock(this.persistentCacheLocker, () => new Promise<void>((resolve, reject) => {
       pipeline(
         Readable.from(Buffer.from(JSON.stringify(data))),
-        zlib.createGzip(),
+        zlib.createBrotliCompress({
+          params: {
+            [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+          },
+        }),
         fs.createWriteStream(this.getCachePath(cacheId)),
         er => {
           if(er){
@@ -162,7 +187,11 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     return lock(this.persistentCacheLocker, () => new Promise<any>((resolve, reject) => {
       const bufs: Buffer[] = [];
       fs.createReadStream(this.getCachePath(cacheId))
-        .pipe(zlib.createGunzip())
+        .pipe(zlib.createBrotliDecompress({
+          params: {
+            [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+          },
+        }))
         .on("data", chunk => bufs.push(chunk))
         .on("end", () => {
           resolve(JSON.parse(Buffer.concat(bufs).toString()));
@@ -174,7 +203,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
   }
 
   private getCachePath(cacheId: string){
-    return `${this.cacheDirPath}${cacheId}.bin`;
+    return `${this.cacheDirPath}${cacheId}.bin2`;
   }
 
   private generateHash(content: string){

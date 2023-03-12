@@ -81,14 +81,14 @@ export abstract class SearchBase<T> extends BaseCommand {
       if(!searchPanel){
         return;
       }
-      await searchPanel.consumeSearchResult(this.searchContent(context.rawArgs), this.consumer);
+      await searchPanel.consumeSearchResult(this.searchContent(context.rawArgs, context), this.consumer);
     }else{
       await message.reply("引数を指定してください").catch(this.logger.error);
     }
   }
 
   /** 検索を実行する関数 */
-  protected abstract searchContent(query: string): Promise<T|{ result: T, transformedQuery: string }>;
+  protected abstract searchContent(query: string, context: CommandArgs): Promise<T|{ result: T, transformedQuery: string }>;
 
   /** 検索結果を検索パネルで使用できるデータに変換する関数 */
   protected abstract consumer(result: T): SongInfo[];
@@ -100,7 +100,7 @@ export abstract class SearchBase<T> extends BaseCommand {
   }
 }
 
-export default class Search extends SearchBase<ytsr.Result> {
+export default class Search extends SearchBase<ytsr.Video[]> {
   constructor(){
     super({
       name: "検索",
@@ -121,19 +121,24 @@ export default class Search extends SearchBase<ytsr.Result> {
     });
   }
 
-  protected override searchContent(query: string){
-    return searchYouTube(query);
+  protected override async searchContent(query: string, context: CommandArgs){
+    return searchYouTube(query)
+      .then(result => {
+        const videos = result.items.filter(item => item.type === "video") as ytsr.Video[];
+        context.bot.cache.addSearch(query, videos);
+        return videos;
+      });
   }
 
-  protected override consumer({ items }: ytsr.Result){
-    return items.map(item => item.type !== "video" ? null : {
+  protected override consumer(items: ytsr.Video[]){
+    return items.map(item => ({
       url: item.url,
       title: item.title,
       duration: item.duration,
       thumbnail: item.bestThumbnail.url,
       author: item.author.name,
       description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`,
-    }).filter(n => n);
+    })).filter(n => n);
   }
 
   protected override urlCheck(query: string){

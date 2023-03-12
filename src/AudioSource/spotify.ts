@@ -100,7 +100,7 @@ export class Spotify extends AudioSource<string> {
   }
 
   protected extractBestItem(items: ytsr.Video[]){
-    console.log("result", items);
+    this.logger.debug("result", items);
     const normalize = (text: string) => {
       return text.toLowerCase()
         .replace(/’/g, "'")
