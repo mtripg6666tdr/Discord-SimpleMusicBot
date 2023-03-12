@@ -66,7 +66,9 @@ const memoryAppender = {
   configure: function(){
     return function(logEvent: LoggingEvent){
       const level = logEvent.level.levelStr[0];
-      const logContent = `${level}:[${tokens.category(logEvent)}] ${logEvent.data.map(data => typeof data === "string" ? data : stringifyObject(data))}`;
+      const logContent = `${level}:[${
+        tokens.category(logEvent)
+      }] ${logEvent.data.map(data => typeof data === "string" ? data : stringifyObject(data))}`;
       memoryStore.push(logContent);
       if(memoryStore.length > MEMORYSTORE_MAXSIZE){
         memoryStore.shift();

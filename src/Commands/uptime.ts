@@ -38,20 +38,20 @@ export default class Uptime extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs){
     const now = Date.now();
-    const insta = Util.time.calcTime(now - options.bot.instantiatedTime.getTime());
-    const ready = Util.time.calcTime(options.client.uptime);
+    const insta = Util.time.calcTime(now - context.bot.instantiatedTime.getTime());
+    const ready = Util.time.calcTime(context.client.uptime);
     const embed = new MessageEmbedBuilder()
       .setColor(getColor("UPTIME"))
-      .setTitle(options.client.user.username + "のアップタイム")
+      .setTitle(context.client.user.username + "のアップタイム")
       .addField("インスタンス作成からの経過時間", `${insta[0]}時間${insta[1]}分${insta[2]}秒`)
       .addField("Discordに接続してからの経過時間", `${ready[0]}時間${ready[1]}分${ready[2]}秒`)
-      .addField("データが保持されているサーバー数", `${options.bot.databaseCount}サーバー`)
+      .addField("データが保持されているサーバー数", `${context.bot.databaseCount}サーバー`)
       .setTimestamp(Date.now())
       .setAuthor({
-        iconURL: options.client.user.avatarURL(),
-        name: options.client.user.username,
+        iconURL: context.client.user.avatarURL(),
+        name: context.client.user.username,
       })
       .toOceanic()
     ;

@@ -34,13 +34,13 @@ export default class Reset extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
     // VC接続中なら切断
-    options.server.player.disconnect();
-    options.server.bot.resetData(message.guild.id);
+    context.server.player.disconnect();
+    context.server.bot.resetData(message.guild.id);
     // データ初期化
-    options.initData(message.guild.id, message.channel.id);
+    context.initData(message.guild.id, message.channel.id);
     message.reply("✅サーバーの設定を初期化しました").catch(this.logger.error);
   }
 }

@@ -34,15 +34,15 @@ export default class Dc extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
-    if(!options.server.player.isConnecting){
+    if(!context.server.player.isConnecting){
       message.reply("再生中ではありません").catch(this.logger.error);
       return;
     }
     // 停止しま～す
-    options.server.player.disconnect();
+    context.server.player.disconnect();
     message.reply(":postbox: 正常に切断しました").catch(this.logger.error);
   }
 }

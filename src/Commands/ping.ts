@@ -37,7 +37,7 @@ export default class Uptime extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs){
     const now = Date.now();
     const embed = new MessageEmbedBuilder()
       .setColor(getColor("UPTIME"))
@@ -52,12 +52,12 @@ export default class Uptime extends BaseCommand {
       )
       .addField(
         "ボイスチャンネルUDP接続実測値",
-        `${options.server.player.isConnecting && options.server.vcPing || "-"}ms`
+        `${context.server.player.isConnecting && context.server.vcPing || "-"}ms`
       )
       .setTimestamp(Date.now())
       .setAuthor({
-        iconURL: options.client.user.avatarURL(),
-        name: options.client.user.username,
+        iconURL: context.client.user.avatarURL(),
+        name: context.client.user.username,
       })
       .toOceanic()
     ;

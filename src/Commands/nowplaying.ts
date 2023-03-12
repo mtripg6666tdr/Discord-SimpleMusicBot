@@ -44,29 +44,29 @@ export default class NowPlaying extends BaseCommand {
     });
   }
   
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
-    if(!options.server.player.isPlaying){
+    if(!context.server.player.isPlaying){
       message.reply("再生中ではありません").catch(this.logger.error);
       return;
     }
-    const _s = Math.floor(options.server.player.currentTime / 1000);
-    const _t = Number(options.server.player.currentAudioInfo.lengthSeconds);
+
+    // create progress bar
+    const _s = Math.floor(context.server.player.currentTime / 1000);
+    const _t = Number(context.server.player.currentAudioInfo.lengthSeconds);
     const [min, sec] = Util.time.calcMinSec(_s);
     const [tmin, tsec] = Util.time.calcMinSec(_t);
-    const info = options.server.player.currentAudioInfo;
+    const info = context.server.player.currentAudioInfo;
     let progressBar = "";
     if(_t > 0){
       const progress = Math.floor(_s / _t * 20);
-      for(let i = 1; i < progress; i++){
-        progressBar += "=";
-      }
+      progressBar += "=".repeat(progress - 1);
       progressBar += "●";
-      for(let i = progress + 1; i <= 20; i++){
-        progressBar += "=";
-      }
+      progressBar += "=".repeat(20 - progress);
     }
+
+    // create embed
     const embed = new MessageEmbedBuilder()
       .setColor(getColor("NP"))
       .setTitle("現在再生中の曲:musical_note:")
@@ -77,11 +77,11 @@ export default class NowPlaying extends BaseCommand {
       )
       .setFields(
         ...info.toField(
-          ["long", "l", "verbose", "l", "true"].some(arg => options.args[0] === arg)
+          ["long", "l", "verbose", "l", "true"].some(arg => context.args[0] === arg)
         )
       )
-      .addField(":link:URL", info.url)
-    ;
+      .addField(":link:URL", info.url);
+
     if(typeof info.thumbnail === "string"){
       embed.setThumbnail(info.thumbnail);
       await message.reply({ embeds: [embed.toOceanic()] }).catch(this.logger.error);

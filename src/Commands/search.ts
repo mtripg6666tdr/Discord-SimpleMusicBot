@@ -29,11 +29,17 @@ import { searchYouTube } from "../AudioSource";
 export abstract class SearchBase<T> extends BaseCommand {
   async run(message: CommandMessage, context: CommandArgs){
     context.server.updateBoundChannel(message);
+
+    // ボイスチャンネルへの参加の試みをしておく
     context.server.joinVoiceChannel(message);
+
+    // URLが渡されたら、そのままキューに追加を試みる
     if(this.urlCheck(context.rawArgs)){
       await context.server.playFromURL(message, context.args as string[], !context.server.player.isConnecting);
       return;
     }
+
+    // 検索パネルがすでにあるなら
     if(context.server.searchPanel.has(message.member.id)){
       const { collector, customIdMap } = context.bot.collectors
         .create()
@@ -68,6 +74,8 @@ export abstract class SearchBase<T> extends BaseCommand {
       }
       return;
     }
+
+    // 検索を実行する
     if(context.rawArgs !== ""){
       const searchPanel = context.server.searchPanel.create(message, context.rawArgs);
       if(!searchPanel){
@@ -79,10 +87,13 @@ export abstract class SearchBase<T> extends BaseCommand {
     }
   }
 
+  /** 検索を実行する関数 */
   protected abstract searchContent(query: string): Promise<T|{ result: T, transformedQuery: string }>;
 
+  /** 検索結果を検索パネルで使用できるデータに変換する関数 */
   protected abstract consumer(result: T): SongInfo[];
 
+  /** この検索が対象とするURLかを判断する関数 */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected urlCheck(query: string){
     return false;

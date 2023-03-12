@@ -17,7 +17,6 @@
  */
 
 import type { exportableCustom, ReadableStreamInfo } from ".";
-import type { EmbedField } from "oceanic.js";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 import type { Readable } from "stream";
 
@@ -25,6 +24,8 @@ import SoundCloud from "soundcloud.ts";
 
 import { AudioSource } from "./audiosource";
 import { createPassThrough } from "../Util";
+
+let soundCloudClient = new SoundCloud();
 
 export class SoundCloudS extends AudioSource<string> {
   protected author: string;
@@ -42,8 +43,7 @@ export class SoundCloudS extends AudioSource<string> {
       this.author = prefetched.author;
       this.thumbnail = prefetched.thumbnail;
     }else{
-      const sc = new SoundCloud();
-      const info = await sc.tracks.getV2(url);
+      const info = await soundCloudClient.tracks.getV2(url);
       this.title = info.title;
       this.description = info.description;
       this.lengthSeconds = Math.floor(info.duration / 1000);
@@ -54,14 +54,14 @@ export class SoundCloudS extends AudioSource<string> {
   }
 
   async fetch(): Promise<ReadableStreamInfo>{
-    const sc = new SoundCloud();
-    const source = await sc.util.streamTrack(this.url) as Readable;
+    const source = await soundCloudClient.util.streamTrack(this.url) as Readable;
     const stream = createPassThrough();
     source
       .on("error", e => !stream.destroyed ? stream.destroy(e) : stream.emit("error", e))
       .pipe(stream)
       .on("close", () => !source.destroyed && source.destroy?.())
     ;
+
     return {
       type: "readable",
       stream,
@@ -70,17 +70,18 @@ export class SoundCloudS extends AudioSource<string> {
   }
 
   toField(verbose: boolean = false){
-    const fields = [] as EmbedField[];
-    fields.push({
-      name: ":musical_note:ユーザー",
-      value: this.author,
-      inline: false,
-    }, {
-      name: ":asterisk:概要",
-      value: this.description.length > (verbose ? 1000 : 350) ? this.description.substring(0, verbose ? 1000 : 300) + "..." : this.description,
-      inline: false,
-    });
-    return fields;
+    return [
+      {
+        name: ":musical_note:ユーザー",
+        value: this.author,
+        inline: false,
+      },
+      {
+        name: ":asterisk:概要",
+        value: this.description.length > (verbose ? 1000 : 350) ? this.description.substring(0, verbose ? 1000 : 300) + "..." : this.description,
+        inline: false,
+      },
+    ];
   }
 
   npAdditional(){
@@ -96,6 +97,10 @@ export class SoundCloudS extends AudioSource<string> {
       author: this.author,
       thumbnail: this.thumbnail,
     };
+  }
+
+  override disableCache(){
+    soundCloudClient = new SoundCloud();
   }
 
   static validateUrl(url: string){

@@ -34,18 +34,21 @@ export default class LeaveClean extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    if(!options.server.player.isConnecting){
-      options.server.queue.removeAll();
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+
+    if(!context.server.player.isConnecting){
+      context.server.queue.removeAll();
       message.reply("✅すべて削除しました").catch(this.logger.error);
       return;
-    }else if(options.server.queue.length === 0){
+    }else if(context.server.queue.length === 0){
       message.reply("キューが空です").catch(this.logger.error);
       return;
     }
-    const members = options.server.connectingVoiceChannel.voiceMembers.map(member => member.id);
-    const number = options.server.queue.removeIf(q => !members.includes(q.additionalInfo.addedBy.userId)).length;
-    await message.reply(number >= 1 ? "✅" + number + "曲削除しました。" : "削除するものはありませんでした。").catch(this.logger.error);
+    const memberIds = context.server.connectingVoiceChannel.voiceMembers.map(member => member.id);
+    const removed = context.server.queue.removeIf(q => !memberIds.includes(q.additionalInfo.addedBy.userId)).length;
+    await message.reply(
+      removed >= 1 ? `✅${removed}曲削除しました。` : "削除するものはありませんでした。"
+    ).catch(this.logger.error);
   }
 }

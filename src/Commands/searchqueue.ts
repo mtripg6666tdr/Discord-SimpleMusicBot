@@ -47,26 +47,36 @@ export default class Searchq extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    if(options.server.queue.length === 0){
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+
+    if(context.server.queue.length === 0){
       message.reply("✘キューが空です").catch(this.logger.error);
       return;
     }
-    const qsresult = options.server.queue
+
+    // 検索を実行
+    const qsresult = context.server.queue
       .filter(c =>
-        c.basicInfo.title.toLowerCase().includes(options.rawArgs.toLowerCase())
-        || c.basicInfo.url.toLowerCase().includes(options.rawArgs.toLowerCase())
-        || c.basicInfo.description.toLowerCase().includes(options.rawArgs.toLowerCase())
+        c.basicInfo.title.toLowerCase().includes(context.rawArgs.toLowerCase())
+        || c.basicInfo.url.toLowerCase().includes(context.rawArgs.toLowerCase())
+        || c.basicInfo.description.toLowerCase().includes(context.rawArgs.toLowerCase())
       )
     ;
+
     if(qsresult.length === 0){
       message.reply(":confused:見つかりませんでした").catch(this.logger.error);
       return;
     }
-    if(qsresult.length > 20) qsresult.splice(20);
+
+    // 20件以上の検索結果をドロップ
+    if(qsresult.length > 20){
+      qsresult.splice(20);
+    }
+
+    // 埋め込みを作成
     const fields = qsresult.map(c => {
-      const index = options.server.queue.findIndex(d => d.basicInfo.title === c.basicInfo.title).toString();
+      const index = context.server.queue.findIndex(d => d.basicInfo.title === c.basicInfo.title).toString();
       const _t = c.basicInfo.lengthSeconds;
       const [min, sec] = Util.time.calcMinSec(_t);
       return {
@@ -78,7 +88,7 @@ export default class Searchq extends BaseCommand {
       } as EmbedField;
     });
     const embed = new MessageEmbedBuilder()
-      .setTitle(`"${options.rawArgs}"の検索結果✨`)
+      .setTitle(`"${context.rawArgs}"の検索結果✨`)
       .setDescription("キュー内での検索結果です。最大20件表示されます。")
       .setFields(...fields)
       .setColor(getColor("SEARCH"))

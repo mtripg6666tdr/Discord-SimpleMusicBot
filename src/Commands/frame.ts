@@ -48,9 +48,9 @@ export default class Frame extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    const server = options.server;
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    const server = context.server;
 
     // そもそも再生状態ではない場合
     if(!server.player.isConnecting || !server.player.isPlaying){
@@ -72,9 +72,9 @@ export default class Frame extends BaseCommand {
       else if(rawTime.match(/^(\d+:)*\d+(\.\d+)?$/)) return rawTime.split(":").map(n => Number(n))
         .reduce((prev, current) => prev * 60 + current);
       else return NaN;
-    }(options.rawArgs));
+    }(context.rawArgs));
 
-    if(options.rawArgs !== "" && vinfo.isLiveStream){
+    if(context.rawArgs !== "" && vinfo.isLiveStream){
       await message.channel.createMessage({
         content: "ライブストリームでは時間指定できません",
       });

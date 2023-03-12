@@ -17,7 +17,6 @@
  */
 
 import type { UrlStreamInfo } from ".";
-import type { EmbedField } from "oceanic.js";
 
 import { AudioSource } from "./audiosource";
 import { isAvailableRawAudioURL, retriveLengthSeconds } from "../Util";
@@ -56,13 +55,16 @@ export class CustomStream extends AudioSource<string> {
   }
 
   toField(){
-    return [{
-      name: ":link:URL",
-      value: this.url,
-    }, {
-      name: ":asterisk:詳細",
-      value: "カスタムストリーム",
-    }] as EmbedField[];
+    return [
+      {
+        name: ":link:URL",
+        value: this.url,
+      },
+      {
+        name: ":asterisk:詳細",
+        value: "カスタムストリーム",
+      },
+    ];
   }
 
   npAdditional(){

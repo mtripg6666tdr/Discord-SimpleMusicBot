@@ -34,13 +34,13 @@ export default class Loop extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    if(options.server.queue.loopEnabled){
-      options.server.queue.loopEnabled = false;
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    if(context.server.queue.loopEnabled){
+      context.server.queue.loopEnabled = false;
       message.reply(":repeat_one:トラックリピートを無効にしました:x:").catch(this.logger.error);
     }else{
-      options.server.queue.loopEnabled = true;
+      context.server.queue.loopEnabled = true;
       message.reply(":repeat_one:トラックリピートを有効にしました:o:").catch(this.logger.error);
     }
   }

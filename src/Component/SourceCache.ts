@@ -87,6 +87,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
   }
 
   hasSource(url: string){
+    if(url.includes("?si=")) url = url.split("?")[0];
     const result = this._sourceCache.has(url);
     this.logger.debug(`Requested memory cache ${result ? "" : "not "}found`);
     this.emit(result ? "memoryCacheHit" : "memoryCacheNotFound");
@@ -116,6 +117,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
   }
 
   private createCacheId(url: string, type: "exportable"){
+    if(url.includes("?si=")) url = url.split("?")[0];
     return this.generateHash(`${type}+${url}`);
   }
 

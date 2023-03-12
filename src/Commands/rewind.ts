@@ -34,14 +34,14 @@ export default class Rewind extends BaseCommand {
     });
   }
   
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    if(!options.server.player.isPlaying){
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    if(!context.server.player.isPlaying){
       message.reply("再生中ではありません").catch(this.logger.error);
     }else{
-      options.server.player.rewind();
+      context.server.player.rewind();
       message.reply({
-        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:rewind:再生中の楽曲を頭出ししました:+1:`,
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:rewind:再生中の楽曲を頭出ししました:+1:`,
         allowedMentions: {
           users: false,
         },

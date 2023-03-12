@@ -35,8 +35,8 @@ export default class Skip extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    const server = options.server;
+  async run(message: CommandMessage, context: CommandArgs){
+    const server = context.server;
     // そもそも再生状態じゃないよ...
     if(server.player.preparing){
       message.reply("再生準備中です").catch(this.logger.error);
@@ -45,14 +45,18 @@ export default class Skip extends BaseCommand {
       message.reply("再生中ではありません").catch(this.logger.error);
       return;
     }
+
     try{
       const item = server.queue.get(0);
-      const members = discordUtil.channels.getVoiceMember(options);
-      options.server.updateBoundChannel(message);
+      const members = discordUtil.channels.getVoiceMember(context);
+      context.server.updateBoundChannel(message);
+
       if(
         item.additionalInfo.addedBy.userId !== message.member.id
-        && !discordUtil.users.isDJ(message.member, options)
-        && !discordUtil.users.isPrivileged(message.member) && members.size > 3){
+        && !discordUtil.users.isDJ(message.member, context)
+        && !discordUtil.users.isPrivileged(message.member) && members.size > 3
+      ){
+        // 投票パネルを作成する
         if(!server.skipSession){
           await server.createSkipSession(message);
         }else{
@@ -60,12 +64,13 @@ export default class Skip extends BaseCommand {
         }
         return;
       }
+
       const title = item.basicInfo.title;
       server.player.stop(true);
       await server.queue.next();
       await server.player.play();
       await message.reply({
-        content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:track_next: \`${title}\`をスキップしました:white_check_mark:`,
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:track_next: \`${title}\`をスキップしました:white_check_mark:`,
         allowedMentions: {
           users: false,
         },

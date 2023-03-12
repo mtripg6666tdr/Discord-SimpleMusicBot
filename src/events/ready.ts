@@ -113,6 +113,6 @@ export async function onReady(this: MusicBot){
 
   // Finish initializing
   this["_isReadyFinished"] = true;
-  this.logger.info("Bot is ready now");
   this.emit("ready");
+  this.logger.info("Bot is ready now");
 }

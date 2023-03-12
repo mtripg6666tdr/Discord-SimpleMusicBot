@@ -61,6 +61,7 @@ export default class Queue extends BaseCommand {
     }
     // 合計ページ数割り出し
     const totalpage = Math.ceil(queue.length / 10);
+    
     // ページのキューを割り出す
     const getQueueEmbed = (page: number) => {
       const fields: { name: string, value: string }[] = [];

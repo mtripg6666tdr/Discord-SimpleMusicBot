@@ -34,21 +34,22 @@ export default class Pause extends BaseCommand {
     });
   }
   
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
-    if(!options.server.player.isPlaying){
+    if(!context.server.player.isPlaying){
       await message.reply("再生中ではありません").catch(this.logger.error);
       return;
     }
-    if(options.server.player.isPaused){
+    if(context.server.player.isPaused){
       await message.reply(":pause_button: すでに一時停止されています\r\n再生を再開するには`再生`コマンドを使用してください").catch(this.logger.error);
       return;
     }
-    // 停止しま～す
-    options.server.player.pause();
+    
+    // 停止
+    context.server.player.pause();
     message.reply({
-      content: `${options.includeMention ? `<@${message.member.id}> ` : ""}:pause_button: 一時停止しました`,
+      content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:pause_button: 一時停止しました`,
       allowedMentions: {
         users: false,
       },

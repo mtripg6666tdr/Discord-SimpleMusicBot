@@ -34,18 +34,18 @@ export default class End extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
-    options.server.updateBoundChannel(message);
-    if(!options.server.player.isPlaying){
+  async run(message: CommandMessage, context: CommandArgs){
+    context.server.updateBoundChannel(message);
+    if(!context.server.player.isPlaying){
       message.reply("再生中ではありません").catch(this.logger.error);
       return;
     }
-    if(options.server.queue.length <= 1){
+    if(context.server.queue.length <= 1){
       message.reply("キューが空、もしくは一曲しかないため削除されませんでした。").catch(this.logger.error);
       return;
     }
-    options.server.queue.removeFrom2nd();
-    options.server.queue.queueLoopEnabled = options.server.queue.onceLoopEnabled = options.server.queue.loopEnabled = false;
+    context.server.queue.removeFrom2nd();
+    context.server.queue.queueLoopEnabled = context.server.queue.onceLoopEnabled = context.server.queue.loopEnabled = false;
     message.reply("✅キューに残された曲を削除しました").catch(this.logger.error);
   }
 }
