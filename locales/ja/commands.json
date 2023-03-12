@@ -289,7 +289,7 @@
   },
   "uptime": {
     "name": "アップタイム",
-    "description": "ボットのアップタイムを表示します"
+    "description": "ボットのアップタイムを表示します。"
   },
   "volume": {
     "name": "ボリューム",
@@ -297,7 +297,9 @@
     "examples": "volume [音量]",
     "usage": "volume 120",
     "args": {
-      "volume": "変更先の音量。1~200までが指定できます。"
+      "volume": {
+        "description": "変更先の音量。1~200までが指定できます。"
+      }
     }
   }
 }

@@ -242,6 +242,7 @@ export class CommandManager extends LogEmitter<{}> {
         type: apiCommand.type,
         name: apiCommand.name,
         description: apiCommand.description,
+        descriptionLocalizations: apiCommand.descriptionLocalizations,
         options: apiCommand.options.map(option => {
           if("choices" in option && option.choices){
             return {
@@ -253,7 +254,8 @@ export class CommandManager extends LogEmitter<{}> {
               choices: option.choices.map(choice => ({
                 name: choice.name,
                 value: choice.value,
-                nameLocalizations: choice.nameLocalizations,
+                // @ts-expect-error
+                nameLocalizations: choice.nameLocalizations || choice.name_localizations,
               })),
             };
           }else{

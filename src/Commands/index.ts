@@ -140,6 +140,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       this._examples = examples ? Object.create(null) : null;
       if(this._examples){
         i18next.languages.forEach(language => {
+          if(i18next.language === language) return;
           this._examples[language as keyof typeof this._examples]
             = i18next.t(`commands:${this.asciiName}.examples`, { lng: language });
         });
@@ -148,6 +149,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       this._usage = usage ? Object.create(null) : null;
       if(this._usage){
         i18next.languages.forEach(language => {
+          if(i18next.language === language) return;
           this._usage[language as keyof typeof this._usage]
             = i18next.t(`commands:${this.asciiName}.usage`, { lng: language });
         });
@@ -165,6 +167,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           choices: [] as LocalizedSlashCommandArgument["choices"],
         };
         i18next.languages.forEach(language => {
+          if(i18next.language === language) return;
           result.descriptionLocalization[language as keyof typeof result.descriptionLocalization]
             = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description`, { lng: language });
         });
@@ -176,6 +179,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
             nameLocalizations: Object.create(null),
           };
           i18next.languages.forEach(language => {
+            if(i18next.language === language) return;
             resultChoice.nameLocalizations[language as keyof LocaleMap]
               = i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}`, { lng: language });
           });
@@ -183,7 +187,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         });
 
         if(result.choices.length === 0){
-          delete arg.choices;
+          delete result.choices;
         }
 
         return result;
@@ -233,12 +237,12 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         type: CommandManager.mapCommandOptionTypeToInteger(arg.type),
         name: arg.name,
         description: arg.description.replace(/\r/g, "").replace(/\n/g, ""),
-        description_localizations: arg.descriptionLocalization,
+        descriptionLocalizations: Object.entries(arg.descriptionLocalization).length > 0 ? arg.descriptionLocalization : null,
         required: arg.required,
-        choices: arg.choices.map(choice => ({
+        choices: arg.choices?.map(choice => ({
           name: choice.name,
           value: choice.value,
-          nameLocalizations: choice.nameLocalizations,
+          nameLocalizations: Object.entries(choice.nameLocalizations).length > 0 ? choice.nameLocalizations : null,
         })) as ApplicationCommandOptionsChoice[],
       };
       if(!discordCommandStruct.choices) delete discordCommandStruct.choices;
@@ -249,7 +253,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         type: ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
         description: this.description.replace(/\r/g, "").replace(/\n/g, ""),
-        descriptionLocalizations: this.descriptionLocalization,
+        descriptionLocalizations: Object.entries(this.descriptionLocalization).length > 0 ? this.descriptionLocalization : null,
         options,
       };
     }else{
@@ -257,7 +261,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         type: ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
         description: this.description.replace(/\r/g, "").replace(/\n/g, ""),
-        descriptionLocalizations: this.descriptionLocalization,
+        descriptionLocalizations: Object.entries(this.descriptionLocalization).length > 0 ? this.descriptionLocalization : null,
       };
     }
   }
