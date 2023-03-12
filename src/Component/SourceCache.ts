@@ -31,8 +31,10 @@ import zlib from "zlib";
 import { LogEmitter } from "../Structure";
 
 interface CacheEvents {
-  cacheAdd: [];
-  cacheDelete: [];
+  memoryCacheHit: [];
+  memoryCacheNotFound: [];
+  persistentCacheHit: [];
+  persistentCacheNotFound: [];
 }
 
 export class SourceCache extends LogEmitter<CacheEvents> {
@@ -88,7 +90,8 @@ export class SourceCache extends LogEmitter<CacheEvents> {
   hasSource(url: string){
     if(url.includes("?si=")) url = url.split("?")[0];
     const result = this._sourceCache.has(url);
-    this.logger.info(`Requested memory cache ${result ? "" : "not "}found`);
+    this.logger.debug(`Requested memory cache ${result ? "" : "not "}found`);
+    this.emit(result ? "memoryCacheHit" : "memoryCacheNotFound");
     return result;
   }
 
@@ -100,11 +103,19 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     const id = this.createCacheId(url, "exportable");
     const result = this.existPersistentCache(id);
     this.logger.info(`Requested persistent cache ${result ? "" : "not "}found (id: ${id})`);
+    if(!result){
+      this.emit("persistentCacheNotFound");
+    }
     return result;
   }
 
   getExportable<T extends exportableCustom>(url: string){
-    return this.getPersistentCache(this.createCacheId(url, "exportable")) as Promise<T>;
+    return this.getPersistentCache(this.createCacheId(url, "exportable"))
+      .then(data => {
+        this.emit(data ? "persistentCacheHit" : "persistentCacheNotFound");
+        return data;
+      })
+      .catch(() => null) as Promise<T>;
   }
 
   addSearch(keyword: string, result: ytsr.Video[]){

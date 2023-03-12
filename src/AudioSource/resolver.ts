@@ -24,6 +24,7 @@ import * as ytdl from "ytdl-core";
 import * as AudioSource from ".";
 import { isAvailableRawAudioURL } from "../Util";
 import { useConfig } from "../config";
+import { getLogger } from "../logger";
 
 type AudioSourceBasicInfo = {
   type: KnownAudioSourceIdentifer,
@@ -33,6 +34,7 @@ type AudioSourceBasicInfo = {
 };
 
 const { isDisabledSource } = useConfig();
+const logger = getLogger("Resolver");
 
 export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCache){
   let basicInfo = null as AudioSource.AudioSource<any>;
@@ -44,12 +46,20 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
   let fromPersistentCache = false;
 
   if(cacheManager.hasSource(url)){
+    logger.debug("cache found");
     return cacheManager.getSource(url);
   }else if(!gotData && cacheManager.hasExportable(url)){
     gotData = await cacheManager.getExportable(url);
     if(gotData){
+      logger.debug("exportable cache found");
       fromPersistentCache = true;
     }
+  }
+
+  if(gotData){
+    logger.debug("initializing source with cache");
+  }else{
+    logger.debug("initializing source from scratch");
   }
 
   if(!isDisabledSource("youtube") && (type === "youtube" || type === "unknown" && ytdl.validateURL(url))){

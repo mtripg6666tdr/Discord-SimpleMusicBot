@@ -49,6 +49,9 @@ export async function onReady(this: MusicBot){
     ]);
   }
 
+  // Command instance preparing
+  await CommandManager.instance.sync(this.client);
+
   // add bgm tracks
   if(config.bgm){
     const guildIds = Object.keys(config.bgm);
@@ -90,6 +93,20 @@ export async function onReady(this: MusicBot){
     );
   }
 
+  // Set main tick
+  setTimeout(() => {
+    this.maintenanceTick();
+    setInterval(this.maintenanceTick.bind(this), 1 * 60 * 1000).unref();
+  }, 10 * 1000).unref();
+  this.logger.info("Interval jobs set up successfully");
+
+  this.emit("beforeReady");
+
+  // Finish initializing
+  this["_isReadyFinished"] = true;
+  this.emit("ready");
+  this.logger.info("Bot is ready now");
+
   // Set activity
   if(!this.maintenance){
     client.editStatus("online", [
@@ -99,20 +116,4 @@ export async function onReady(this: MusicBot){
       },
     ]);
   }
-  // Set main tick
-  setTimeout(() => {
-    this.maintenanceTick();
-    setInterval(this.maintenanceTick.bind(this), 1 * 60 * 1000).unref();
-  }, 10 * 1000).unref();
-  this.logger.info("Interval jobs set up successfully");
-
-  // Command instance preparing
-  await CommandManager.instance.sync(this.client);
-
-  this.emit("beforeReady");
-
-  // Finish initializing
-  this["_isReadyFinished"] = true;
-  this.emit("ready");
-  this.logger.info("Bot is ready now");
 }

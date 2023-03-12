@@ -17,6 +17,7 @@
  */
 
 import type { exportableStatuses } from ".";
+import type { BaseCommand, CommandArgs } from "../../Commands";
 import type { GuildDataContainer, YmxFormat } from "../../Structure";
 import type { DataType, MusicBotBase } from "../../botBase";
 import type * as mongo from "mongodb";
@@ -26,8 +27,19 @@ import { debounce } from "throttle-debounce";
 
 import { Backupper } from ".";
 import { waitForEnteringState } from "../../Util";
+import { CommandManager } from "../CommandManager";
 
 type Collectionate<T> = T & { guildId: string };
+type Analytics = Collectionate<{
+  totalDuration: number,
+  errorCount: number,
+  timestamp: number,
+  type: "playlog",
+}|{
+  command: string,
+  count: number,
+  type: "command",
+}>;
 
 export class MongoBackupper extends Backupper {
   private readonly client: mongo.MongoClient = null;
@@ -36,25 +48,27 @@ export class MongoBackupper extends Backupper {
   collections: {
     status: mongo.Collection<Collectionate<exportableStatuses>>,
     queue: mongo.Collection<Collectionate<YmxFormat>>,
+    analytics: mongo.Collection<Analytics>,
   } = null;
 
   static get backuppable(){
-    return process.env.GAS_URL && (process.env.GAS_URL.startsWith("mongodb://") || process.env.GAS_URL.startsWith("mongodb+srv://"));
+    return process.env.DB_URL && (process.env.DB_URL.startsWith("mongodb://") || process.env.DB_URL.startsWith("mongodb+srv://"));
   }
 
   constructor(bot: MusicBotBase, getData: () => DataType){
     super(bot, getData);
     this.logger.info("Initializing Mongo DB backup server adapter...");
-    this.client = new MongoClient(process.env.GAS_URL, {
+    this.client = new MongoClient(process.env.DB_URL, {
       appName: `mtripg6666tdr/Discord-SimpleMusicBot#${this.bot.version || "unknown"} MondoDB backup server adapter`,
     });
     this.client.connect()
       .then(() => {
         this.logger.info("Database connection ready");
-        const db = this.client.db(process.env.GAS_TOKEN || "discord_music_bot_backup");
+        const db = this.client.db(process.env.DB_TOKEN || "discord_music_bot_backup");
         this.collections = {
           status: db.collection<Collectionate<exportableStatuses>>("Status"),
           queue: db.collection<Collectionate<YmxFormat>>("Queue"),
+          analytics: db.collection<Analytics>("Analytics"),
         };
         this.dbConnectionReady = true;
       })
@@ -82,15 +96,15 @@ export class MongoBackupper extends Backupper {
         }
       };
       const setContainerEvent = (container: GuildDataContainer) => {
-        (["change", "changeWithoutCurrent"] as const).forEach(
-          eventName => container.queue.on(eventName, backupQueueFuncFactory(container.getGuildId()))
-        );
+        container.queue.eitherOn(["change", "changeWithoutCurrent"], backupQueueFuncFactory(container.getGuildId()));
         container.queue.on("settingsChanged", backupStatusFuncFactory(container.getGuildId()));
         container.player.on("all", backupStatusFuncFactory(container.getGuildId()));
+        container.player.on("reportPlaybackDuration", this.addPlayerAnalyticsEvent.bind(this, container.getGuildId()));
       };
       this.data.forEach(setContainerEvent);
       this.bot.on("guildDataAdded", setContainerEvent);
       this.bot.on("onBotVoiceChannelJoin", (channel) => backupStatusFuncFactory(channel.guild.id)());
+      CommandManager.instance.commands.forEach(command => command.on("run", args => this.addCommandAnalyticsEvent(command, args)));
       this.logger.info("Hook was set up successfully");
     });
   }
@@ -132,6 +146,42 @@ export class MongoBackupper extends Backupper {
     catch(er){
       this.logger.error(er);
       this.logger.warn("Something went wrong while backing up queue");
+    }
+  }
+
+  async addPlayerAnalyticsEvent(guildId: string, totalDuration: number, errorCount: number){
+    if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
+    try{
+      await this.collections.analytics.insertOne({
+        type: "playlog",
+        guildId,
+        totalDuration,
+        errorCount,
+        timestamp: Date.now(),
+      });
+    }
+    catch(er){
+      this.logger.error(er);
+    }
+  }
+
+  async addCommandAnalyticsEvent(command: BaseCommand, context: CommandArgs){
+    if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
+    try{
+      await this.collections.analytics.updateOne({
+        type: "command",
+        commandName: command.name,
+        guildId: context.server.getGuildId(),
+      }, {
+        $inc: {
+          count: 1,
+        },
+      }, {
+        upsert: true,
+      });
+    }
+    catch(er){
+      this.logger.error(er);
     }
   }
 
@@ -188,5 +238,6 @@ export class MongoBackupper extends Backupper {
   async destroy(){
     await this.client.close();
     this.collections = null;
+    this.dbConnectionReady = false;
   }
 }

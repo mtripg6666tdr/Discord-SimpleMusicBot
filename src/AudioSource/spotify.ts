@@ -57,6 +57,7 @@ export class Spotify extends AudioSource<string> {
       this.title = prefetched.title;
       this.artist = prefetched.artist;
       this.referenceUrl = prefetched.referenceUrl;
+      this.thumbnail = prefetched.thumbnail || this.thumbnail;
     }else{
       this.url = url;
       const track = await client.getData(url) as Track;
@@ -162,6 +163,7 @@ export class Spotify extends AudioSource<string> {
       title: this.title,
       length: this.lengthSeconds,
       artist: this.artist,
+      thumbnail: this.thumbnail,
       referenceUrl: this.referenceUrl,
     };
   }
@@ -206,4 +208,5 @@ export class Spotify extends AudioSource<string> {
 export type exportableSpotify = exportableCustom & {
   artist: string,
   referenceUrl: string,
+  thumbnail: string,
 };
