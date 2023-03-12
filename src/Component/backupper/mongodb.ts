@@ -33,6 +33,7 @@ type Collectionate<T> = T & { guildId: string };
 type Analytics = Collectionate<{
   totalDuration: number,
   errorCount: number,
+  timestamp: number,
   type: "playlog",
 }|{
   command: string,
@@ -151,7 +152,13 @@ export class MongoBackupper extends Backupper {
   async addPlayerAnalyticsEvent(guildId: string, totalDuration: number, errorCount: number){
     if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
     try{
-      await this.collections.analytics.insertOne({ type: "playlog", guildId, totalDuration, errorCount });
+      await this.collections.analytics.insertOne({
+        type: "playlog",
+        guildId,
+        totalDuration,
+        errorCount,
+        timestamp: Date.now(),
+      });
     }
     catch(er){
       this.logger.error(er);
