@@ -163,6 +163,8 @@ export class Spotify extends AudioSource<string> {
       title: this.title,
       length: this.lengthSeconds,
       artist: this.artist,
+      thumbnail: this.thumbnail,
+      referenceUrl: this.referenceUrl,
     };
   }
 
@@ -205,4 +207,6 @@ export class Spotify extends AudioSource<string> {
 
 export type exportableSpotify = exportableCustom & {
   artist: string,
+  referenceUrl: string,
+  thumbnail: string,
 };
