@@ -137,7 +137,11 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     return lock(this.persistentCacheLocker, () => new Promise<void>((resolve, reject) => {
       pipeline(
         Readable.from(Buffer.from(JSON.stringify(data))),
-        zlib.createGzip(),
+        zlib.createBrotliCompress({
+          params: {
+            [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+          },
+        }),
         fs.createWriteStream(this.getCachePath(cacheId)),
         er => {
           if(er){
@@ -172,7 +176,11 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     return lock(this.persistentCacheLocker, () => new Promise<any>((resolve, reject) => {
       const bufs: Buffer[] = [];
       fs.createReadStream(this.getCachePath(cacheId))
-        .pipe(zlib.createGunzip())
+        .pipe(zlib.createBrotliDecompress({
+          params: {
+            [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+          },
+        }))
         .on("data", chunk => bufs.push(chunk))
         .on("end", () => {
           resolve(JSON.parse(Buffer.concat(bufs).toString()));
@@ -184,7 +192,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
   }
 
   private getCachePath(cacheId: string){
-    return `${this.cacheDirPath}${cacheId}.bin`;
+    return `${this.cacheDirPath}${cacheId}.bin2`;
   }
 
   private generateHash(content: string){
