@@ -28,6 +28,7 @@
     "html-to-text": "^8.2.1",
     "https-proxy-agent": "^5.0.1",
     "i18next": "^22.4.11",
+    "i18next-fs-backend": "^2.1.1",
     "log4js": "^6.9.1",
     "miniget": "^4.2.2",
     "niconico-dl.js": "^1.1.3",
