@@ -93,15 +93,6 @@ export async function onReady(this: MusicBot){
     );
   }
 
-  // Set activity
-  if(!this.maintenance){
-    client.editStatus("online", [
-      {
-        type: discord.ActivityTypes.LISTENING,
-        name: "音楽",
-      },
-    ]);
-  }
   // Set main tick
   setTimeout(() => {
     this.maintenanceTick();
@@ -115,4 +106,14 @@ export async function onReady(this: MusicBot){
   this["_isReadyFinished"] = true;
   this.emit("ready");
   this.logger.info("Bot is ready now");
+
+  // Set activity
+  if(!this.maintenance){
+    client.editStatus("online", [
+      {
+        type: discord.ActivityTypes.LISTENING,
+        name: "音楽",
+      },
+    ]);
+  }
 }

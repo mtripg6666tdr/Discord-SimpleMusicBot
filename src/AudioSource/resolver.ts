@@ -56,7 +56,11 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
     }
   }
 
-  logger.debug("initializing source with cache...");
+  if(gotData){
+    logger.debug("initializing source with cache");
+  }else{
+    logger.debug("initializing source from scratch");
+  }
 
   if(!isDisabledSource("youtube") && (type === "youtube" || type === "unknown" && ytdl.validateURL(url))){
     // youtube
