@@ -169,7 +169,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
             = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description`, { lng: language });
         });
 
-        arg.choices.forEach(choiceValue => {
+        arg.choices?.forEach(choiceValue => {
           const resultChoice = {
             name: i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}`),
             value: choiceValue,
@@ -179,9 +179,10 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
             resultChoice.nameLocalizations[language as keyof LocaleMap]
               = i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}`, { lng: language });
           });
+          result.choices.push(resultChoice);
         });
 
-        if(arg.choices.length === 0){
+        if(result.choices.length === 0){
           delete arg.choices;
         }
 
