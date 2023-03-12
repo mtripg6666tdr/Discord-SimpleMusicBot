@@ -18,6 +18,7 @@
 
 import type { AudioSource, exportableCustom } from "../AudioSource";
 import type { MusicBotBase } from "../botBase";
+import type ytsr from "ytsr";
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 
@@ -76,10 +77,10 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     }
   }
 
-  addSource(content: AudioSource<any>){
+  addSource(content: AudioSource<any>, fromPersistentCache: boolean){
     this._sourceCache.set(content.url, content);
     this.logger.info(`New memory cache added (total: ${this._sourceCache.size})`);
-    if(this.enablePersistent){
+    if(this.enablePersistent && !fromPersistentCache){
       this.addPersistentCache(this.createCacheId(content.url, "exportable"), content.exportData());
     }
   }
@@ -96,8 +97,9 @@ export class SourceCache extends LogEmitter<CacheEvents> {
   }
 
   hasExportable(url: string){
-    const result = this.existPersistentCache(this.createCacheId(url, "exportable"));
-    this.logger.info(`Requested persistent cache ${result ? "" : "not "}found`);
+    const id = this.createCacheId(url, "exportable");
+    const result = this.existPersistentCache(id);
+    this.logger.info(`Requested persistent cache ${result ? "" : "not "}found (id: ${id})`);
     return result;
   }
 
@@ -105,9 +107,28 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     return this.getPersistentCache(this.createCacheId(url, "exportable")) as Promise<T>;
   }
 
-  private createCacheId(url: string, type: "exportable"){
-    if(url.includes("?si=")) url = url.split("?")[0];
-    return this.generateHash(`${type}+${url}`);
+  addSearch(keyword: string, result: ytsr.Video[]){
+    if(this.enablePersistent){
+      this.addPersistentCache(this.createCacheId(keyword.toLowerCase(), "search"), result);
+    }
+  }
+
+  hasSearch(keyword: string){
+    const id = this.createCacheId(keyword, "search");
+    const result = this.existPersistentCache(id);
+    this.logger.info(`Requested persistent cache ${result ? "" : "not "}found (id: ${id})`);
+    return result;
+  }
+
+  getSearch(keyword: string){
+    return this.getPersistentCache(this.createCacheId(keyword, "search")) as Promise<ytsr.Video[]>;
+  }
+
+  private createCacheId(key: string, type: "exportable" | "search"){
+    if(key.includes("?si=")) key = key.split("?")[0];
+    const id = this.generateHash(`${type}+${key}`);
+    this.logger.debug(`type: ${type}, id: ${id}`);
+    return id;
   }
 
   private readonly persistentCacheLocker = new LockObj();
