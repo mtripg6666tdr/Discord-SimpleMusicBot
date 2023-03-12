@@ -91,13 +91,20 @@ export default class Play extends BaseCommand {
         });
 
         try{
-          const result = (await searchYouTube(context.rawArgs)).items.filter(it => it.type === "video") as ytsr.Video[];
-          if(result.length === 0){
+          let videos: ytsr.Video[] = null;
+          if(context.bot.cache.hasSearch(context.rawArgs)){
+            videos = await context.bot.cache.getSearch(context.rawArgs);
+          }else{
+            const result = await searchYouTube(context.rawArgs);
+            videos = result.items.filter(it => it.type === "video") as ytsr.Video[];
+            context.bot.cache.addSearch(context.rawArgs, videos);
+          }
+          if(videos.length === 0){
             await message.reply(":face_with_monocle:該当する動画が見つかりませんでした");
             await msg.delete();
             return;
           }
-          await context.server.playFromURL(message, result[0].url, !wasConnected, context.server.queue.length >= 1);
+          await context.server.playFromURL(message, videos[0].url, !wasConnected, context.server.queue.length >= 1);
           await msg.delete();
         }
         catch(e){
