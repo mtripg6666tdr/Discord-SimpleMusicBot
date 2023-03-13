@@ -113,7 +113,7 @@ export default class Import extends BaseCommand {
             })
           }`);
         }else{
-          await smsg.edit(`✅${t("cancelled")}`);
+          await smsg.edit(`✅${t("canceled")}`);
         }
       }else if(attac && attac.filename.endsWith(".ymx")){
         // if an attachment is ymx
@@ -148,7 +148,7 @@ export default class Import extends BaseCommand {
         if(!cancellation.Cancelled){
           await smsg.edit(`✅${t("songProcessingCompleted", { count: qs.length })}`);
         }else{
-          await smsg.edit(`✅${t("cancelled")}`);
+          await smsg.edit(`✅${t("canceled")}`);
         }
       }else{
         await smsg.edit(`❌${t("commands:import.contentNotIncludedInMessage")}`);

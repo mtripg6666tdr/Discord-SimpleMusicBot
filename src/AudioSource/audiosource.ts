@@ -19,8 +19,10 @@
 import type * as Sources from ".";
 import type { exportableCustom } from "./custom";
 import type { LoggerObject } from "../logger";
+import type { i18n } from "i18next";
 import type { EmbedField } from "oceanic.js";
 import type { Readable } from "stream";
+
 
 import { DefaultAudioThumbnailURL } from "../definition";
 import { getLogger } from "../logger";
@@ -115,13 +117,13 @@ export abstract class AudioSource<T extends ThumbnailType> {
   }
 
   // 現在再生中の曲を示すEmbedField
-  abstract toField(verbose: boolean): EmbedField[];
+  abstract toField(verbose: boolean, t: i18n["t"]): EmbedField[];
   // 再生するためのストリームをフェッチ
   abstract fetch(url?: boolean): Promise<StreamInfo>;
   // クラスを初期化する非同期メソッド
   abstract init(url: string, prefetched: exportableCustom): Promise<AudioSource<T>>;
   // 現在再生中の曲に関する追加データ
-  abstract npAdditional(): string;
+  abstract npAdditional(t: i18n["t"]): string;
   // データをエクスポート
   abstract exportData(): exportableCustom;
 

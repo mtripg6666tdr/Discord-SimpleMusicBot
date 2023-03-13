@@ -27,13 +27,13 @@ import type { AnyGuildTextChannel, EditMessageOptions, Message, MessageActionRow
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
+import i18next from "i18next";
 import { Member } from "oceanic.js";
 
 import * as AudioSource from "../AudioSource";
 import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
-import { FallBackNotice } from "../definition";
 
 export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"spotify"|"unknown";
 
@@ -213,7 +213,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         additionalInfo: {
           addedBy: {
             userId: addedBy && this.getUserIdFromMember(addedBy) || "0",
-            displayName: addedBy && this.getDisplayNameFromMember(addedBy) || "不明",
+            displayName: addedBy && this.getDisplayNameFromMember(addedBy) || i18next.t("unknown"),
           },
         },
       } as QueueContent;
@@ -269,8 +269,8 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           content: "",
           embeds: [
             new MessageEmbedBuilder()
-              .setTitle("お待ちください")
-              .setDescription("情報を取得しています...")
+              .setTitle(i18next.t("pleaseWait"))
+              .setDescription(`${i18next.t("loadingInfo")}...`)
               .toOceanic(),
           ],
           allowedMentions: {
@@ -286,7 +286,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         // まだないので生成
         this.logger.info("AutoAddQueue will make a message that will be used to report statuses");
         uiMessage = await options.channel.createMessage({
-          content: "情報を取得しています。お待ちください...",
+          content: i18next.t("loadingInfoPleaseWait"),
         });
       }
 
@@ -295,7 +295,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         // キュー上限
         this.logger.warn("AutoAddQueue failed due to too long queue");
         // eslint-disable-next-line @typescript-eslint/no-throw-literal
-        throw "キューの上限を超えています";
+        throw i18next.t("components:queue.tooManyQueueItems");
       }
 
       // キューへの追加を実行
@@ -322,17 +322,41 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         // 埋め込みの作成
         const embed = new MessageEmbedBuilder()
           .setColor(getColor("SONG_ADDED"))
-          .setTitle("✅曲が追加されました")
+          .setTitle(`✅${i18next.t("components:queue.songAdded")}`)
           .setDescription(`[${info.basicInfo.title}](${info.basicInfo.url})`)
-          .addField("長さ", info.basicInfo.isYouTube() && info.basicInfo.isLiveStream ? "ライブストリーム" : _t !== 0 ? min + ":" + sec : "不明", true)
-          .addField("リクエスト", this.getDisplayNameFromMember(options.addedBy) ?? "不明", true)
-          .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
-          .addField("再生されるまでの予想時間", index === "0" ? "-" : Util.time.HourMinSecToString(timeFragments), true)
+          .addField(
+            i18next.t("length"),
+            info.basicInfo.isYouTube() && info.basicInfo.isLiveStream
+              ? i18next.t("liveStream")
+              : _t !== 0
+                ? min + ":" + sec
+                : i18next.t("unknown"),
+            true
+          )
+          .addField(
+            i18next.t("components:nowplaying.requestedBy"),
+            this.getDisplayNameFromMember(options.addedBy) || i18next.t("unknown"),
+            true
+          )
+          .addField(
+            i18next.t("components:queue.positionInQueue"),
+            index === "0"
+              ? `${i18next.t("components:nowplaying.nowplaying")}/${i18next.t("components:nowplaying.waitForPlaying")}`
+              : index,
+            true
+          )
+          .addField(
+            i18next.t("components:queue.etaToPlay"),
+            index === "0"
+              ? "-"
+              : Util.time.HourMinSecToString(timeFragments),
+            true
+          )
         ;
         if(info.basicInfo.isYouTube() && info.basicInfo.IsFallbacked){
-          embed.addField(":warning:注意", FallBackNotice);
+          embed.addField(`:warning:${i18next.t("attention")}`, i18next.t("components:queue.fallbackNotice"));
         }else if(info.basicInfo.isSpotify()){
-          embed.addField(":warning:注意", "Spotifyのタイトルは正しく再生されない場合があります");
+          embed.addField(`:warning:${i18next.t("attention")}`, i18next.t("components:queue.spotifyNotice"));
         }
 
         const components: MessageActionRow[] = [];
@@ -353,7 +377,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
               .addComponents(
                 new MessageButtonBuilder()
                   .setCustomId(collectorCreateResult.customIdMap.cancelLast)
-                  .setLabel("キャンセル")
+                  .setLabel(i18next.t("cancel"))
                   .setStyle("DANGER")
               )
               .toOceanic()
@@ -363,7 +387,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
             const item = this.get(this.length - 1);
             this.removeAt(this.length - 1);
             interaction.createFollowup({
-              content: `🚮\`${item.basicInfo.title}\`の追加を取り消しました`,
+              content: `🚮${i18next.t("components:queue.cancelAdded", { title: item.basicInfo.title })}`,
             }).catch(this.logger.error);
           });
 
@@ -407,7 +431,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       this.logger.error("AutoAddQueue failed", e);
       if(uiMessage){
         uiMessage.edit({
-          content: `:weary: キューの追加に失敗しました。追加できませんでした。${typeof e === "object" && "message" in e ? `(${e.message})` : ""}`,
+          content: `:weary:${i18next.t("components:queue.failedToAdd")}${typeof e === "object" && "message" in e ? `(${e.message})` : ""}`,
           embeds: null,
         })
           .catch(this.logger.error)
@@ -460,7 +484,15 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         || totalCount <= 50 && index % 10 === 0
         || totalCount <= 10 && index % 4 === 0
       ){
-        await msg.edit(`:hourglass_flowing_sand:プレイリスト\`${title}\`を処理しています。お待ちください。${totalCount}曲中${index}曲処理済み。`);
+        await msg.edit(
+          `:hourglass_flowing_sand:${
+            i18next.t("components:queue.processingPlaylist", { title })
+          }${i18next.t("pleaseWait")}${
+            i18next.t("default:songProcessingInProgress", {
+              totalSongCount: i18next.t("totalSongCount", { count: totalCount }),
+              currentSongCount: i18next.t("currentSongCount", { count: index }),
+            })
+          }`);
       }
       if(cancellation.Cancelled){
         break;

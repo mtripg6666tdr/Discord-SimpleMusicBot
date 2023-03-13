@@ -78,10 +78,10 @@ export default class Searchq extends BaseCommand {
       const [min, sec] = Util.time.calcMinSec(_t);
       return {
         name: index === "0"
-          ? `${t("components:queue.nowplaying")}/${t("components:queue.waitForPlaying")}`
+          ? `${t("components:nowplaying.nowplaying")}/${t("components:nowplaying.waitForPlaying")}`
           : index,
         value: `[${c.basicInfo.title}](${c.basicInfo.url})\r\n`
-          + `${t("components:queue.requestedBy")}: \`${c.additionalInfo.addedBy.displayName}\` \r\n`
+          + `${t("components:nowplaying.requestedBy")}: \`${c.additionalInfo.addedBy.displayName}\` \r\n`
           + `${t("length")}: ${
             c.basicInfo.isYouTube() && c.basicInfo.isLiveStream
               ? `(${t("liveStream")})`

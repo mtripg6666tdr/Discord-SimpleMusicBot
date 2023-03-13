@@ -18,6 +18,7 @@
 
 import type { MusicBot } from "../bot";
 
+import i18next from "i18next";
 import * as discord from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
@@ -43,7 +44,12 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
   if(message.content === `<@${this._client.user.id}>`){
     // メンションならば
     await message.channel.createMessage({
-      content: `コマンドの一覧は、\`/command\`で確認できます。\r\nメッセージでコマンドを送信する場合のプレフィックスは\`${server.prefix}\`です。`,
+      content: `${i18next.t("mentionHelp")}\r\n`
+      + (
+        config.noMessageContent
+          ? ""
+          : i18next.t("mentionHelpPrefix", { prefix: server.prefix })
+      ),
     })
       .catch(this.logger.error);
     return;
@@ -105,7 +111,7 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
     // searchコマンドのキャンセルを捕捉
     const panel = server.searchPanel.get(message.member.id);
     const content = normalizeText(message.content);
-    if(message.content === "キャンセル" || message.content === "cancel"){
+    if(message.content === "キャンセル" || message.content === "cancel" || message.content === i18next.t("cancel")){
       panel.destroy();
     }
     // searchコマンドの選択を捕捉
@@ -114,7 +120,7 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
       const nums = content.split(" ");
       await server.playFromSearchPanelOptions(nums, panel);
     }
-  }else if(message.content === "キャンセル" || message.content === "cancel"){
+  }else if(message.content === "キャンセル" || message.content === "cancel" || message.content === i18next.t("cancel")){
     const result = server.cancelAll();
     if(!result) return;
     await message.channel.createMessage({

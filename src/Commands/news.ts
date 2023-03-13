@@ -49,17 +49,23 @@ export default class News extends BaseCommand {
       message.reply(t("search.alreadyOpen")).catch(this.logger.error);
       return;
     }
-    const searchPanel = context.server.searchPanel.create(message, t("commands:news.newsTopics"), true);
+    const searchPanel = context.server.searchPanel.create(message, t("commands:news.newsTopics"), t, true);
     if(!searchPanel) return;
-    await searchPanel.consumeSearchResult(ytpl.default(url, {
-      gl: config.country, hl: context.locale, limit: 20,
-    }), ({ items }) => items.map(item => ({
-      title: item.title,
-      author: item.author.name,
-      description: `${t("length")}: ${item.duration}, ${t("channelName")}: ${item.author.name}`,
-      duration: item.duration,
-      thumbnail: item.thumbnails[0].url,
-      url: item.url,
-    })));
+    await searchPanel.consumeSearchResult(
+      ytpl.default(url, {
+        gl: config.country,
+        hl: context.locale,
+        limit: 20,
+      }),
+      ({ items }) => items.map(item => ({
+        title: item.title,
+        author: item.author.name,
+        description: `${t("length")}: ${item.duration}, ${t("channelName")}: ${item.author.name}`,
+        duration: item.duration,
+        thumbnail: item.thumbnails[0].url,
+        url: item.url,
+      })),
+      t
+    );
   }
 }

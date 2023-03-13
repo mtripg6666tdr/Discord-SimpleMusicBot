@@ -18,6 +18,8 @@
 
 import type { UrlStreamInfo } from ".";
 
+import i18next from "i18next";
+
 import { AudioSource } from "./audiosource";
 import { isAvailableRawAudioURL, retriveLengthSeconds } from "../Util";
 
@@ -29,15 +31,15 @@ export class CustomStream extends AudioSource<string> {
 
   async init(url: string, prefetched: exportableCustom){
     if(prefetched){
-      this.title = prefetched.title || "カスタムストリーム";
+      this.title = prefetched.title || i18next.t("audioSources.customStream");
       this.url = url;
       this.lengthSeconds = prefetched.length;
     }else{
       if(!isAvailableRawAudioURL(url)){
-        throw new Error("正しいストリームではありません");
+        throw new Error(i18next.t("audioSources.invalidStream"));
       }
       this.url = url;
-      this.title = this.extractFilename() || "カスタムストリーム";
+      this.title = this.extractFilename() || i18next.t("audioSources.customStream");
       try{
         this.lengthSeconds = await retriveLengthSeconds(url);
       }
@@ -62,7 +64,7 @@ export class CustomStream extends AudioSource<string> {
       },
       {
         name: ":asterisk:詳細",
-        value: "カスタムストリーム",
+        value: i18next.t("audioSources.customStream"),
       },
     ];
   }

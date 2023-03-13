@@ -19,6 +19,7 @@
 import type { Cache } from "./strategies/base";
 import type { ytdlCoreStrategy } from "./strategies/ytdl-core";
 import type { StreamInfo } from "..";
+import type { i18n } from "i18next";
 import type { EmbedField } from "oceanic.js";
 
 import * as ytdl from "ytdl-core";
@@ -137,22 +138,24 @@ export class YouTube extends AudioSource<string> {
     };
   }
 
-  toField(verbose: boolean = false){
+  toField(verbose: boolean, t: i18n["t"]){
     const fields = [] as EmbedField[];
     fields.push({
-      name: ":cinema:チャンネル名",
+      name: `:cinema:${t("channelName")}`,
       value: this.channelUrl ? `[${this.channelName}](${this.channelUrl})` : this.channelName,
       inline: false,
     }, {
-      name: ":asterisk:概要",
-      value: this.description.length > (verbose ? 1000 : 350) ? this.description.substring(0, verbose ? 1000 : 300) + "..." : this.description || "*概要欄なし*",
+      name: `:asterisk:${t("summary")}`,
+      value: this.description.length > (verbose ? 1000 : 350)
+        ? this.description.substring(0, verbose ? 1000 : 300) + "..."
+        : this.description || `*${t("noSummary")}*`,
       inline: false,
     });
     return fields;
   }
 
-  npAdditional(){
-    return "\r\nチャンネル名:`" + this.channelName + "`";
+  npAdditional(t: i18n["t"]){
+    return `\r\n${t("channelName")}:\`" + this.channelName + "\``;
   }
 
   exportData(): exportableYouTube{

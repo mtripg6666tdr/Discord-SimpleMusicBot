@@ -74,8 +74,8 @@ export default class Queue extends BaseCommand {
           name: i !== 0
             ? i.toString()
             : context.server.player.isPlaying
-              ? t("components:queue.nowplaying")
-              : t("components:queue.waitForPlaying"),
+              ? t("components:nowplaying.nowplaying")
+              : t("components:nowplaying.waitForPlaying"),
           value: [
             `[${q.basicInfo.title}](${q.basicInfo.url})`,
             `${t("length")}: \`${
@@ -83,8 +83,8 @@ export default class Queue extends BaseCommand {
                 ? t("commands:log.liveStream")
                 : `${min}:${sec}`
             } \``,
-            `${t("components:queue.requestedBy")}: \`${q.additionalInfo.addedBy.displayName}\` `,
-            q.basicInfo.npAdditional(),
+            `${t("components:nowplaying.requestedBy")}: \`${q.additionalInfo.addedBy.displayName}\` `,
+            q.basicInfo.npAdditional(t),
           ].join("\r\n"),
         });
       }

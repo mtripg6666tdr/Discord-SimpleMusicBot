@@ -79,7 +79,7 @@ export abstract class SearchBase<T> extends BaseCommand {
 
     // 検索を実行する
     if(context.rawArgs !== ""){
-      const searchPanel = context.server.searchPanel.create(message, context.rawArgs);
+      const searchPanel = context.server.searchPanel.create(message, context.rawArgs, t);
       if(!searchPanel){
         return;
       }

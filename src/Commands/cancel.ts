@@ -37,9 +37,9 @@ export default class Cancel extends BaseCommand {
     context.server.updateBoundChannel(message);
     const result = context.server.cancelAll();
     if(result){
-      message.reply(t("commands:cancel.cancelling")).catch(this.logger.error);
+      message.reply(t("commands:cancel.canceling")).catch(this.logger.error);
     }else{
-      message.reply(t("commands:cancel.noCancellable")).catch(this.logger.error);
+      message.reply(t("commands:cancel.noCancelable")).catch(this.logger.error);
     }
   }
 }

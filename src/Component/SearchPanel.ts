@@ -176,7 +176,7 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     if(this.status !== "consumed") return;
     if(!quiet){
       await this._responseMessage.channel.createMessage({
-        content: `✅${this.t("cancelling")}`,
+        content: `✅${this.t("canceling")}`,
       }).catch(this.logger.error);
     }
     await this._responseMessage.delete().catch(this.logger.error);

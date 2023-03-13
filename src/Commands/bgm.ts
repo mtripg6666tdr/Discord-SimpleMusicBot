@@ -56,6 +56,7 @@ export default class Bgm extends BaseCommand {
     const searchPanel = context.server.searchPanel.create(
       message,
       t("commands:bgm.listOfPresetBGM"),
+      t,
       true
     );
     if(!searchPanel){

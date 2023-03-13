@@ -77,7 +77,8 @@ export default class NowPlaying extends BaseCommand {
       )
       .setFields(
         ...info.toField(
-          ["long", "l", "verbose", "l", "true"].some(arg => context.args[0] === arg)
+          ["long", "l", "verbose", "l", "true"].some(arg => context.args[0] === arg),
+          t
         )
       )
       .addField(":link:URL", info.url);

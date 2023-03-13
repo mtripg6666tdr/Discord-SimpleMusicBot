@@ -25,6 +25,7 @@ import type { Readable } from "stream";
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { AudioPlayerStatus, createAudioResource, createAudioPlayer, entersState, StreamType, VoiceConnectionStatus } from "@discordjs/voice";
+import i18next from "i18next";
 
 import { resolveStreamToPlayable } from "./streams";
 import { DSL } from "./streams/dsl";
@@ -34,7 +35,6 @@ import * as Util from "../Util";
 import { getColor } from "../Util/color";
 import { getFFmpegEffectArgs } from "../Util/effect";
 import { useConfig } from "../config";
-import { FallBackNotice } from "../definition";
 
 interface PlayManagerEvents {
   volumeChanged: [volume:string];
@@ -184,7 +184,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         mes = await this.server.bot.client.rest.channels.createMessage(
           this.server.boundTextChannel,
           {
-            content: `:stopwatch: \`${this.currentAudioInfo.title}\` \`(ライブストリーム)\`の開始を待機中...`,
+            content: `:stopwatch:${i18next.t("components:play.waitingForLiveStream")}`,
           }
         );
         this.preparing = false;
@@ -201,7 +201,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         if(abortController.signal.aborted){
           this._waitForLiveAbortController = null;
           await mes.edit({
-            content: ":white_check_mark: 待機をキャンセルしました",
+            content: `:white_check_mark:${i18next.t("components:play.waitingForLiveCanceled")}`,
           });
           return this;
         }
@@ -211,7 +211,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         mes = await this.server.bot.client.rest.channels.createMessage(
           this.server.boundTextChannel,
           {
-            content: `:hourglass_flowing_sand: \`${this.currentAudioInfo.title}\` \`(${isLive ? "ライブストリーム" : `${min}:${sec}`})\`の再生準備中...`,
+            content: `:hourglass_flowing_sand:${
+              i18next.t("components:play.preparing", { title: `\`${this.currentAudioInfo.title}\` \`(${isLive ? i18next.t("liveStream") : `${min}:${sec}`})\`` })
+            }...`,
           }
         );
       }
@@ -308,15 +310,16 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     const timeFragments = Util.time.calcHourMinSec(this.server.queue.lengthSecondsActual - (this.currentAudioInfo.lengthSeconds || 0));
     /* eslint-disable @typescript-eslint/indent */
     const embed = new MessageEmbedBuilder()
-      .setTitle(":cd:現在再生中:musical_note:")
+      .setTitle(`:cd:${i18next.t("components:nowplaying.nowplaying")}:musical_note:`)
       .setDescription(
           `[${this.currentAudioInfo.title}](${this.currentAudioUrl}) \``
-        + (this.currentAudioInfo.isYouTube() && this.currentAudioInfo.isLiveStream ? "(ライブストリーム)" : _t === 0 ? "(不明)" : min + ":" + sec)
+        + (this.currentAudioInfo.isYouTube() && this.currentAudioInfo.isLiveStream ? `(${i18next.t("liveStream")})` : _t === 0 ? `(${i18next.t("unknown")})` : min + ":" + sec)
         + "`"
       )
       .setColor(getColor("AUTO_NP"))
-      .addField("リクエスト", this.server.queue.get(0).additionalInfo.addedBy.displayName, true)
-      .addField("次の曲",
+      .addField(i18next.t("components:nowplaying.requestedBy"), this.server.queue.get(0).additionalInfo.addedBy.displayName, true)
+      .addField(
+        i18next.t("components:nowplaying.nextSong"),
         // トラックループオンなら現在の曲
         this.server.queue.loopEnabled ? this.server.queue.get(0).basicInfo.title
         // (トラックループはオフ)長さが2以上ならオフセット1の曲
@@ -324,9 +327,15 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         // (トラックループオフ,長さ1)キューループがオンなら現在の曲
         : this.server.queue.queueLoopEnabled ? this.server.queue.get(0).basicInfo.title
         // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
-        : "次の曲がまだ登録されていません", true
+        : i18next.t("components:nowplaying.nextSong"), true
       )
-      .addField("再生待ちの曲", this.server.queue.loopEnabled ? "ループします" : this.server.queue.length - 1 + "曲(" + Util.time.HourMinSecToString(timeFragments) + ")", true)
+      .addField(
+        "再生待ちの曲",
+        this.server.queue.loopEnabled
+          ? "ループします"
+          : `${i18next.t("currentSongCount", { count: this.server.queue.length - 1 })}(${Util.time.HourMinSecToString(timeFragments)})`,
+        true
+      )
     ;
     if(typeof this.currentAudioInfo.thumbnail === "string"){
       embed.setThumbnail(this.currentAudioInfo.thumbnail);
@@ -335,7 +344,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     }
     /* eslint-enable @typescript-eslint/indent */
     if(this.currentAudioInfo.isYouTube() && this.currentAudioInfo.IsFallbacked){
-      embed.addField(":warning:注意", FallBackNotice);
+      embed.addField(`:warning:${i18next.t("attention")}`, i18next.t("components:queue.fallbackNotice"));
     }
 
     this.emit("playStartUIPrepared", embed);
@@ -346,22 +355,22 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           new MessageButtonBuilder()
             .setCustomId("control_rewind")
             .setEmoji("⏮️")
-            .setLabel("頭出し")
+            .setLabel(i18next.t("commands:rewind.name"))
             .setStyle("SECONDARY"),
           new MessageButtonBuilder()
             .setCustomId("control_playpause")
             .setEmoji("⏯️")
-            .setLabel("再生/一時停止")
+            .setLabel(`${i18next.t("commands:play.name")}/${i18next.t("commands:pause.name")}`)
             .setStyle("PRIMARY"),
           new MessageButtonBuilder()
             .setCustomId("control_skip")
             .setEmoji("⏭️")
-            .setLabel("スキップ")
+            .setLabel(i18next.t("commands:skip.name"))
             .setStyle("SECONDARY"),
           new MessageButtonBuilder()
             .setCustomId("control_onceloop")
             .setEmoji("🔂")
-            .setLabel("ワンスループ")
+            .setLabel(i18next.t("commands:onceloop.name"))
             .setStyle("SECONDARY"),
         )
         .toOceanic(),
@@ -529,8 +538,12 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       }
     }
     this._errorReportChannel?.createMessage({
-      content: ":tired_face:曲の再生に失敗しました...。"
-        + (this._errorCount + 1 >= this.retryLimit ? "スキップします。" : "再試行します。"),
+      content: `:tired_face:${i18next.t("components:play.failedToPlay")}`
+        + (
+          this._errorCount + 1 >= this.retryLimit
+            ? i18next.t("components:play.failedAndSkipping")
+            : i18next.t("components:play.failedAndRetrying")
+        ),
     });
     this.onStreamFailed();
   }
@@ -593,7 +606,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     if(this.server.boundTextChannel){
       await this.server.bot.client.rest.channels
         .createMessage(this.server.boundTextChannel, {
-          content: ":upside_down: キューが空になりました",
+          content: `:upside_down:${i18next.t("components:play.queueEmpty")}`,
         })
         .catch(this.logger.error)
       ;
@@ -606,7 +619,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       if(!this.isPlaying && this.server.boundTextChannel){
         this.server.bot.client.rest.channels
           .createMessage(this.server.boundTextChannel, {
-            content: ":wave:キューが空になったため終了します",
+            content: `:wave:${i18next.t("components:play.queueEmptyAndExiting")}`,
           })
           .catch(this.logger.error)
         ;
@@ -635,7 +648,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       this._errorUrl = this.currentAudioInfo.url;
       this.currentAudioInfo.disableCache();
     }
-    this.logger.warn(`Play failed, (${this._errorCount}times)`);
+    this.logger.warn(`Play failed (${this._errorCount}times)`);
     this.preparing = false;
     this.stop(true);
     if(this._errorCount >= this.retryLimit){
