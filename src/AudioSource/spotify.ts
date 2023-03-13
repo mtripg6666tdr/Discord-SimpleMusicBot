@@ -176,7 +176,7 @@ export class Spotify extends AudioSource<string> {
     return [];
   }
 
-  override disableCache() {
+  override purgeCache() {
     this.referenceUrl = null;
   }
 

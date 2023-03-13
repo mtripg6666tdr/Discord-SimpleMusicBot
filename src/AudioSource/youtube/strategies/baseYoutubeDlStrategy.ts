@@ -67,6 +67,10 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
           url: format[0].url,
           userAgent: format[0].http_headers["User-Agent"],
         } as UrlStreamInfo,
+        cache: {
+          type: this.id,
+          data: info,
+        },
       };
     }else{
       const formats = info.formats.filter(f => f.format_note === "tiny" || f.video_ext === "none" && f.abr);
@@ -91,6 +95,10 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
                   : "unknown",
             userAgent: format.http_headers["User-Agent"],
           } as UrlStreamInfo,
+          cache: {
+            type: this.id,
+            data: info,
+          },
         };
       }
       return {
@@ -105,6 +113,10 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
                 ? "ogg/opus"
                 : "unknown",
         } as ReadableStreamInfo,
+        cache: {
+          type: this.id,
+          data: info,
+        },
       };
     }
   }

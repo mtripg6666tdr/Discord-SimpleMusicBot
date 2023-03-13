@@ -119,12 +119,15 @@ export class YouTube extends AudioSource<string> {
     if(forceUrl){
       this.logger.info("Returning a url instead of stream");
     }
+    if(result.cache) this.cache = result.cache;
     return result.stream;
   }
 
   async fetchVideo(){
     let info = this.cache?.type === ytdlCore && this.cache.data as ytdl.videoInfo || null;
-    if(!info) info = await (strategies[0] as ytdlCoreStrategy).getInfo(this.url).then(result => (this.cache = result.cache).data);
+    if(!info){
+      info = await (strategies[0] as ytdlCoreStrategy).getInfo(this.url).then(result => (this.cache = result.cache).data);
+    }
     const isLive = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
     const format = ytdl.chooseFormat(info.formats, {
       quality: isLive ? null : "highestvideo",
@@ -178,7 +181,7 @@ export class YouTube extends AudioSource<string> {
     this.isLiveStream = exportable.isLive;
   }
 
-  override disableCache(){
+  override purgeCache(){
     this.cache = null;
   }
 
@@ -211,7 +214,7 @@ export class YouTube extends AudioSource<string> {
         timeout = setTimeout(async () => {
           if(signal.aborted) return;
           tick();
-          this.disableCache();
+          this.purgeCache();
           await this.init(this.url, null);
           checkForLive();
         }, waitTime).unref();

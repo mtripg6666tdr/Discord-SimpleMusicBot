@@ -64,6 +64,10 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
           type: "url",
           url: info.LiveStreamData.hlsManifestUrl,
         } as UrlStreamInfo,
+        cache: {
+          type: playDl,
+          data: info,
+        },
       };
     }else{
       const format = info.format.filter(f => f.mimeType.startsWith("audio"));
@@ -76,6 +80,10 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
           url: format[0].url,
           streamType: (format[0] as any)["container"] === "webm" && (format[0] as any)["codec"] === "opus" ? "webm/opus" : undefined,
         } as UrlStreamInfo,
+        cache: {
+          type: playDl,
+          data: info,
+        },
       };
     }
   }

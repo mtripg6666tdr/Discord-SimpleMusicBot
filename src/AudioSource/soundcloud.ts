@@ -99,7 +99,7 @@ export class SoundCloudS extends AudioSource<string> {
     };
   }
 
-  override disableCache(){
+  override purgeCache(){
     soundCloudClient = new SoundCloud();
   }
 
