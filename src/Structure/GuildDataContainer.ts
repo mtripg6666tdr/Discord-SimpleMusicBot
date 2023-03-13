@@ -319,19 +319,23 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       connection.on("debug", connectionLogger.trace);
     }
     // ニックネームの変更
-    const botSelf = this.bot.client.guilds.get(this.getGuildId()).clientMember;
+    const guild = this.bot.client.guilds.get(this.getGuildId());
+    const botSelf = guild.clientMember;
     let nickname = botSelf.nick;
-    if(nickname && (nickname.includes("🈳") || nickname.includes("⏹️") || nickname.includes("🈵") || nickname.includes("▶"))){
+    // "⏹" これ
+    const stopButton = String.fromCharCode(9209);
+    // eslint-disable-next-line @typescript-eslint/prefer-includes
+    if(nickname && (nickname.indexOf("🈳") >= 0 || nickname.indexOf(stopButton) >= 0 || nickname.indexOf("🈵") >= 0 || nickname.indexOf("▶") >= 0)){
       nickname = nickname.replace("🈳", "🈵");
       nickname = nickname.replace("⏹", "▶");
-      await botSelf.edit({
+      await guild.editCurrentMember({
         nick: nickname,
       }).catch(this.logger.error);
       // ニックネームを元に戻すやつ
       connection.on(VoiceConnectionStatus.Destroyed, () => {
         nickname = nickname.replace("🈵", "🈳");
-        nickname = nickname.replace("▶", "⏹");
-        botSelf.edit({
+        nickname = nickname.replace("▶", stopButton);
+        guild.editCurrentMember({
           nick: nickname,
         }).catch(this.logger.error);
       });
