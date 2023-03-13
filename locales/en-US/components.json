@@ -20,6 +20,7 @@
     "spotifyNotice": "Spotifyのタイトルは正しく再生されない場合があります",
     "cancelAdded": "`{{title}}`の追加を取り消しました",
     "failedToAdd": "キューの追加に失敗しました。追加できませんでした。",
+    "processingPlaylistBefore": "プレイリストを処理しています。",
     "processingPlaylist": "プレイリスト`{{title}}`を処理しています。",
     "noDescriptionInPlaylist": "プレイリストから指定のため詳細は表示されません",
     "processingPlaylistCompleted": "プレイリストが処理されました",
