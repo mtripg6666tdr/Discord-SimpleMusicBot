@@ -46,20 +46,16 @@ YouTubeなどからの再生に対応。
 Issueのほか、下記のサポートサーバーでも各種お問い合わせを受け付けています。  
 いづれかの手段でお気軽にどうぞ！  
 
+## ローカライズについて
+プロジェクトでは、Crowdinで多言語化をしています。ボットの翻訳に協力してくれる方々を随時募集しています。  
+現在、英語のみ対応予定がありますが、需要によってはほかの言語への翻訳も可能です。  
+[Crowdinのプロジェクトページ](https://crowdin.com/project/discord-simplemusicbot)
+
 ## サポート
 Discordにて、インストール等のサポート、およびアップデートのお知らせ等を行っています。  
 ボットを試すこともできますので、興味を持たれた方はぜひご参加ください。  
 [サポートサーバーへの参加はこちら](https://discord.gg/7DrAEXBMHe)  
-
-### サポートされているバージョン
-|バージョン|Node.js|サポート状況|サポート範囲|サポート終了[予定]日|
-|:---------|------|:----------|:----------:|------------------:|
-|[v1](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v1)|>=12.0.0 |:x:サポート終了|-|2021/08|
-|[v2](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v2)|>=16.6.0 |:x:サポート終了|-|2022/12|
-|[v3](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v3)|>=12     |:white_check_mark:サポート中|バグ修正と依存関係の更新|未定|
-|[master🚧](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/master)|>=16.16.0|未定|🚧未サポート|-|-|
-
-masterブランチは、現在メジャーアップデートの開発用ブランチです。
+[サポートされているバージョン](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
 
 ## ライセンス
 GPLv3  
