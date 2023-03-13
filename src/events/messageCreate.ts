@@ -26,7 +26,6 @@ import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 import { discordUtil, normalizeText } from "../Util";
 import { useConfig } from "../config";
-import { NotSendableMessage } from "../definition";
 
 const config = useConfig();
 
@@ -88,7 +87,7 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
           messageReference: {
             messageID: message.id,
           },
-          content: NotSendableMessage,
+          content: i18next.t("lackPermissions"),
           allowedMentions: {
             repliedUser: false,
           },
@@ -118,7 +117,7 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
     else if(content.match(/^([0-9]\s?)+$/)){
       // メッセージ送信者が検索者と一致するかを確認
       const nums = content.split(" ");
-      await server.playFromSearchPanelOptions(nums, panel);
+      await server.playFromSearchPanelOptions(nums, panel, i18next.t);
     }
   }else if(message.content === "キャンセル" || message.content === "cancel" || message.content === i18next.t("cancel")){
     const result = server.cancelAll();

@@ -24,14 +24,15 @@ import type { exportableStatuses } from "../Component/backupper";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { MusicBotBase } from "../botBase";
 import type { VoiceConnection } from "@discordjs/voice";
+import type { i18n } from "i18next";
 import type { AnyGuildTextChannel, Message, StageChannel, VoiceChannel } from "oceanic.js";
+import type { TextChannel } from "oceanic.js";
 import type { Playlist } from "spotify-url-info";
 
 import { LockObj, lock } from "@mtripg6666tdr/async-lock";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
-import { TextChannel } from "oceanic.js";
 import Soundcloud from "soundcloud.ts";
 import * as ytpl from "ytpl";
 
@@ -332,7 +333,11 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    * (trueで返信で応じ、falseで新規メッセージを作成します。デフォルトではfalse)
    * @returns 成功した場合はtrue、それ以外の場合にはfalse
    */
-  async joinVoiceChannel(message: CommandMessage, reply: boolean = false, replyOnFail: boolean = false): Promise<boolean>{
+  async joinVoiceChannel(
+    message: CommandMessage,
+    { reply = false, replyOnFail = false }: { reply?: boolean, replyOnFail?: boolean },
+    t: i18n["t"]
+  ): Promise<boolean>{
     return lock(this.joinVoiceChannelLocker, async () => {
       if(message.member.voiceState?.channelID){
         const targetVC = this.bot.client.getChannel<VoiceChannel | StageChannel>(message.member.voiceState.channelID);
@@ -348,7 +353,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
             ? message.reply.bind(message)
             : message.channel.createMessage.bind(message.channel);
           await replyFailMessage({
-            content: ":warning:既にほかのボイスチャンネルに接続中です。この操作を実行する権限がありません。",
+            content: `:warning:${t("guildDataContainer.alreadyJoined")}`,
           }).catch(this.logger.error);
           return false;
         }
@@ -356,21 +361,21 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         // 入ってないね～参加しよう
         const replyMessage = reply ? message.reply.bind(message) : message.channel.createMessage.bind(message.channel);
         const connectingMessage = await replyMessage({
-          content: ":electric_plug:接続中...",
+          content: `:electric_plug:${t("guildDataContainer.connecting")}...`,
         });
         try{
           if(!targetVC.permissionsOf(this.bot.client.user.id).has("CONNECT")){
-            throw new Error("ボイスチャンネルに参加できません。権限を確認してください。");
+            throw new Error(t("guildDataContainer.unableToJoinPermission"));
           }
           await this.joinVoiceChannelOnly(targetVC.id);
           await connectingMessage.edit({
-            content: `:+1:ボイスチャンネル:speaker:\`${targetVC.name}\`に接続しました!`,
+            content: `:+1:${t("guildDataContainer.connected", { channel: `speaker:\`${targetVC.name}\`` })}`,
           });
           return true;
         }
         catch(e){
           this.logger.error(e);
-          const failedMsg = `😑接続に失敗しました…もう一度お試しください: ${
+          const failedMsg = `😑${t("guildDataContainer.failedToConnect")}: ${
             typeof e === "object" && "message" in e ? `${e.message}` : e
           }`;
           if(!reply && replyOnFail){
@@ -395,7 +400,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           ? message.reply.bind(message)
           : message.channel.createMessage.bind(message.channel);
         await replyFailedMessage({
-          content: "ボイスチャンネルに参加してからコマンドを送信してください:relieved:",
+          content: `${t("guildDataContainer.issuerNoVoiceChannel")}:relieved:`,
         }).catch(this.logger.error);
         return false;
       }
@@ -406,14 +411,19 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    * メッセージからストリームを判定してキューに追加し、状況に応じて再生を開始します
    * @param first キューの先頭に追加するかどうか
    */
-  async playFromURL(message: CommandMessage, rawArg: string|string[], first: boolean = true, cancellable: boolean = false){
+  async playFromURL(
+    message: CommandMessage,
+    rawArg: string|string[],
+    { first = true, cancellable = false }: { first?: boolean, cancellable?: boolean },
+    t: i18n["t"]
+  ){
     if(Array.isArray(rawArg)){
       const [firstUrl, ...restUrls] = rawArg
         .flatMap(fragment => Util.normalizeText(fragment).split(" "))
         .filter(url => url.startsWith("http"));
 
       if(firstUrl){
-        await this.playFromURL(message, firstUrl, first, false);
+        await this.playFromURL(message, firstUrl, { first, cancellable: false }, t);
 
         if(restUrls){
           for(let i = 0; i < restUrls.length; i++){
@@ -433,22 +443,22 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       && rawArg.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)
     ){
       // Discordメッセへのリンクならば
-      const smsg = await message.reply("🔍メッセージを取得しています...");
+      const smsg = await message.reply(`🔍${t("guildDataContainer.loadingMessage")}...`);
       try{
         // URLを分析してチャンネルIDとメッセージIDを抽出
         const ids = rawArg.split("/");
-        const ch = this.bot.client.getChannel(ids[ids.length - 2]);
+        const ch = this.bot.client.getChannel<TextChannel>(ids[ids.length - 2]);
 
-        if(!(ch instanceof TextChannel)){
-          throw new Error("サーバーのテキストチャンネルではありません");
+        if(!("getMessage" in ch) || typeof ch.getMessage !== "function"){
+          throw new Error(t("guildDataContainer.notTextChannel"));
         }
 
         const msg = await ch.getMessage(ids[ids.length - 1]);
 
         if(ch.guild.id !== msg.channel.guild.id){
-          throw new Error("異なるサーバーのコンテンツは再生できません");
+          throw new Error(t("guildDataContainer.unableToPlayOtherServer"));
         }else if(msg.attachments.size <= 0 || !Util.isAvailableRawAudioURL(msg.attachments.first()?.url)){
-          throw new Error("添付ファイルが見つかりません");
+          throw new Error(t("guildDataContainer.attachmentNotFound"));
         }
 
         await this.queue.addQueue({
@@ -462,7 +472,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       }
       catch(e){
         this.logger.error(e);
-        await smsg.edit("✘追加できませんでした")
+        await smsg.edit(`✘${t("components:queue.failedToAdd")}`)
           .catch(this.logger.error);
       }
     }else if(!config.isDisabledSource("custom") && Util.isAvailableRawAudioURL(rawArg)){
@@ -481,7 +491,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       && !rawArg.includes("/channel/")
       && ytpl.validateID(rawArg)){
       //違うならYouTubeプレイリストの直リンクか？
-      const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
+      const msg = await message.reply(`:hourglass_flowing_sand:${t("components:queue.processingPlaylist")}`);
       const cancellation = this.bindCancellation(new TaskCancellationManager());
       try{
         const id = await ytpl.getPlaylistID(rawArg);
@@ -501,7 +511,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           /* consumer */ (c) => ({
             url: c.url,
             channel: c.author.name,
-            description: "プレイリストから指定のため詳細は表示されません",
+            description: t("components:queue.noDescriptionInPlaylist"),
             isLive: c.isLive,
             length: c.durationSec,
             thumbnail: c.thumbnails[0].url,
@@ -509,12 +519,12 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           } as exportableCustom)
         );
         if(cancellation.Cancelled){
-          await msg.edit("✅キャンセルされました。");
+          await msg.edit(`✅${t("canceled")}`);
         }else{
           const embed = new MessageEmbedBuilder()
-            .setTitle("✅プレイリストが処理されました")
+            .setTitle(`✅${t("components:queue.processingPlaylistCompleted")}`)
             // \`(${result.author.name})\` author has been null lately
-            .setDescription(`[${result.title}](${result.url}) \r\n${index}曲が追加されました`)
+            .setDescription(`[${result.title}](${result.url}) \r\n${t("components:queue.songsAdded", { count: index })}`)
             .setThumbnail(result.bestThumbnail.url)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({
@@ -526,7 +536,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       catch(e){
         this.logger.error(e);
         await msg.edit(
-          "✘追加できませんでした"
+          `✘${t("components:queue.failedToAdd")}`
         ).catch(this.logger.error);
       }
       finally{
@@ -534,7 +544,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       }
       await this.player.play();
     }else if(!config.isDisabledSource("soundcloud") && SoundCloudS.validatePlaylistUrl(rawArg)){
-      const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
+      const msg = await message.reply(`:hourglass_flowing_sand:${t("components:queue.processingPlaylist")}`);
       const sc = new Soundcloud();
       const playlist = await sc.playlists.getV2(rawArg);
       const cancellation = this.bindCancellation(new TaskCancellationManager());
@@ -560,12 +570,13 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           }
         );
         if(cancellation.Cancelled){
-          await msg.edit("✅キャンセルされました。");
+          await msg.edit(`✅${t("canceled")}`);
         }else{
           const embed = new MessageEmbedBuilder()
-            .setTitle("✅プレイリストが処理されました")
+            .setTitle(`✅${t("components:queue.processingPlaylistCompleted")}`)
             .setDescription(
-              `[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n${index}曲が追加されました`
+              `[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n`
+              + `${t("components:queue.songsAdded", { count: index })}`
             )
             .setThumbnail(playlist.artwork_url)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
@@ -575,7 +586,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       catch(e){
         this.logger.error(e);
         await msg.edit(
-          "✘追加できませんでした"
+          `✘${t("components:queue.failedToAdd")}`
         ).catch(this.logger.error);
       }
       finally{
@@ -583,7 +594,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       }
       await this.player.play();
     }else if(!config.isDisabledSource("spotify") && Spotify.validatePlaylistUrl(rawArg) && Spotify.available){
-      const msg = await message.reply(":hourglass_flowing_sand:プレイリストを処理しています。お待ちください。");
+      const msg = await message.reply(`:hourglass_flowing_sand:${t("components:queue.processingPlaylist")}`);
       const cancellation = this.bindCancellation(new TaskCancellationManager());
       try{
         const playlist = await Spotify.client.getData(rawArg) as Playlist;
@@ -606,19 +617,19 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           }
         );
         if(cancellation.Cancelled){
-          await msg.edit("✅キャンセルされました。");
+          await msg.edit(`✅${t("canceled")}`);
         }else{
           const embed = new MessageEmbedBuilder()
-            .setTitle("✅プレイリストが処理されました")
+            .setTitle(`✅${t("components:queue.processingPlaylistCompleted")}`)
             .setDescription(
               `[${playlist.title}](${
                 Spotify.getPlaylistUrl(playlist.uri, playlist.type)
-              }) \`(${playlist.subtitle})\` \r\n${index}曲が追加されました`
+              }) \`(${playlist.subtitle})\` \r\n${t("components:queue.songsAdded", { count: index })}`
             )
             .setThumbnail(playlist.coverArt.sources[0].url)
             .setFields({
-              name: ":warning:注意",
-              value: "Spotifyのタイトルは、正しく再生されない場合があります",
+              name: `:warning:${t("attention")}`,
+              value: t("components:queue.spotifyNotice"),
             })
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({ content: "", embeds: [embed.toOceanic()] });
@@ -626,7 +637,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       }
       catch(e){
         this.logger.error(e);
-        await msg.edit("✘追加できませんでした")
+        await msg.edit(`✘${t("components:queue.failedToAdd")}`)
           .catch(this.logger.error);
       }
       finally{
@@ -639,7 +650,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           url: rawArg,
           addedBy: message.member,
           first,
-          message: await message.reply("お待ちください..."),
+          message: await message.reply(`${t("pleaseWait")}...`),
           cancellable,
         });
         if(success) this.player.play();
@@ -648,7 +659,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       catch(er){
         this.logger.error(er);
         // なに指定したし…
-        await message.reply("🔭有効なURLを指定してください。キーワードで再生する場合はsearchコマンドを使用してください。")
+        await message.reply(`🔭${t("guildDataContainer.invalidUrl")}`)
           .catch(this.logger.error);
       }
     }
@@ -679,7 +690,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    * @param nums インデックス番号の配列
    * @param message 
    */
-  async playFromSearchPanelOptions(nums: string[], panel: SearchPanel){
+  async playFromSearchPanelOptions(nums: string[], panel: SearchPanel, t: i18n["t"]){
     const includingNums = panel.filterOnlyIncludes(nums.map(n => Number(n)).filter(n => !isNaN(n)));
     const {
       urls: items,
@@ -695,7 +706,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     });
     // 現在の状態を確認してVCに接続中なら接続試行
     if(panel.commandMessage.member.voiceState.channelID){
-      await this.joinVoiceChannel(panel.commandMessage, false, false);
+      await this.joinVoiceChannel(panel.commandMessage, {}, t);
     }
     // 接続中なら再生を開始
     if(this.player.isConnecting && !this.player.isPlaying){

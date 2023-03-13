@@ -349,7 +349,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
             i18next.t("components:queue.etaToPlay"),
             index === "0"
               ? "-"
-              : Util.time.HourMinSecToString(timeFragments),
+              : Util.time.HourMinSecToString(timeFragments, i18next.t),
             true
           )
         ;

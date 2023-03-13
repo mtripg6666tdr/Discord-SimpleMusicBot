@@ -60,7 +60,7 @@ export default class Play extends BaseCommand {
 
     const wasConnected = server.player.isConnecting;
     // VCに入れない
-    if(!await context.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true)){
+    if(!await context.server.joinVoiceChannel(message, { replyOnFail: true }, t)){
       return;
     }
 
@@ -81,7 +81,7 @@ export default class Play extends BaseCommand {
       // 引数ついてたらそれ優先して再生する
       if(context.rawArgs.startsWith("http://") || context.rawArgs.startsWith("https://")){
         // ついていた引数がURLなら
-        await context.server.playFromURL(message, context.args as string[], !wasConnected);
+        await context.server.playFromURL(message, context.args as string[], { first: !wasConnected }, t);
       }else{
         // URLでないならキーワードとして検索
         const msg = await message.channel.createMessage({
@@ -102,7 +102,7 @@ export default class Play extends BaseCommand {
             await msg.delete();
             return;
           }
-          await context.server.playFromURL(message, videos[0].url, !wasConnected, context.server.queue.length >= 1);
+          await context.server.playFromURL(message, videos[0].url, { first: !wasConnected, cancellable: context.server.queue.length >= 1 }, t);
           await msg.delete();
         }
         catch(e){
@@ -116,7 +116,8 @@ export default class Play extends BaseCommand {
       await context.server.playFromURL(
         message,
         firstAttachment.url,
-        !wasConnected
+        { first: !wasConnected },
+        t
       );
     }else if(message["_message"]?.referencedMessage){
       // 返信先のメッセージを確認
@@ -124,16 +125,16 @@ export default class Play extends BaseCommand {
       const prefixLength = server.prefix.length;
       if(messageReference.content.startsWith("http://") || messageReference.content.startsWith("https://")){
         // URLのみのメッセージか？
-        await context.server.playFromURL(message, messageReference.content, !wasConnected);
+        await context.server.playFromURL(message, messageReference.content, { first: !wasConnected }, t);
       }else if(
         messageReference.content.substring(prefixLength).startsWith("http://")
         || messageReference.content.substring(prefixLength).startsWith("https://")
       ){
         // プレフィックス+URLのメッセージか？
-        await context.server.playFromURL(message, messageReference.content.substring(prefixLength), !wasConnected);
+        await context.server.playFromURL(message, messageReference.content.substring(prefixLength), { first: !wasConnected }, t);
       }else if(messageReference.attachments.size > 0){
         // 添付ファイル付きか？
-        await context.server.playFromURL(message, messageReference.attachments.first().url, !wasConnected);
+        await context.server.playFromURL(message, messageReference.attachments.first().url, { first: !wasConnected }, t);
       }else if(messageReference.author.id === context.client.user.id){
         // ボットのメッセージなら
         // 埋め込みを取得
@@ -146,7 +147,7 @@ export default class Play extends BaseCommand {
         ){
           // 曲関連のメッセージならそれをキューに追加
           const url = embed.description.match(/^\[.+\]\((?<url>https?.+)\)/)?.groups.url;
-          await context.server.playFromURL(message, url, !wasConnected);
+          await context.server.playFromURL(message, url, { first: !wasConnected }, t);
         }else{
           await message.reply(`:face_with_raised_eyebrow:${t("commands:play.noContentWhereReplyingTo")}`)
             .catch(this.logger.error);

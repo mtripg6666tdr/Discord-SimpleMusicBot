@@ -17,13 +17,5 @@
  */
 
 export const DefaultAudioThumbnailURL = "https://cdn.discordapp.com/attachments/757824315294220329/846737267951271946/Audio_icon-icons.com_71845.png";
-export const NotSendableMessage = ":warning: コマンドが実行されたチャンネルでのボットの権限が不足しています。[メッセージを読む][メッセージ履歴を読む][メッセージの送信][埋め込みリンク][メッセージの管理][ファイルの添付]の権限があるかどうかご確認のうえ、もう一度お試しください。";
-export const FFmpegDefaultNetworkArgs = [
-  "-reconnect", "1",
-  "-reconnect_streamed", "1",
-  "-reconnect_on_network_error", "1",
-  "-reconnect_on_http_error", "4xx,5xx",
-  "-reconnect_delay_max", "30",
-] as const;
 export const DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36";
 export const SecondaryUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36";

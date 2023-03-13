@@ -26,7 +26,6 @@
   "alias": "エイリアス",
   "permissionsToRun": "実行に必要な権限",
   "notPlaying": "再生中ではありません",
-  "disconnectedSuccessfully": ":postbox: 正常に切断しました",
   "errorOccurred": "エラーが発生しました",
   "internalErrorOccurred": "内部エラーが発生しました",
   "totalSongCount": "{{count}}曲中",
@@ -68,5 +67,22 @@
   "suppressed": "発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。",
   "disconnected": "正常に切断しました",
   "autoPaused": "ボイスチャンネルから誰もいなくなったため一時停止しました。`再生`コマンドで再開できます。",
-  "autoDisconnect": "長時間使用しなかったため、終了します"
+  "autoDisconnect": "長時間使用しなかったため、終了します",
+  "invalidChannel": "テキストチャンネルまたはスレッドで実行してください",
+  "lackPermissions": "コマンドが実行されたチャンネルでのボットの権限が不足しています。[メッセージを読む][メッセージ履歴を読む][メッセージの送信][埋め込みリンク][メッセージの管理][ファイルの添付]の権限があるかどうかご確認のうえ、もう一度お試しください。",
+  "commandNotFound": "おっと！なにかが間違ってしまったようです。コマンドが見つかりませんでした。 ",
+  "guildDataContainer": {
+    "alreadyJoined": "既にほかのボイスチャンネルに接続中です。この操作を実行する権限がありません。",
+    "connecting": "接続中",
+    "unableToJoinPermission": "ボイスチャンネルに参加できません。権限を確認してください。",
+    "connected": "ボイスチャンネル{{channel}}に接続しました!",
+    "failedToConnect": "接続に失敗しました…もう一度お試しください",
+    "issuerNoVoiceChannel": "ボイスチャンネルに参加してからコマンドを送信してください",
+    "loadingMessage": "メッセージを取得しています",
+    "notTextChannel": "サーバーのテキストチャンネルではありません",
+    "unableToPlayOtherServer": "異なるサーバーのコンテンツは再生できません",
+    "attachmentNotFound": "添付ファイルが見つかりません",
+    "invalidUrl": "有効なURLを指定してください。キーワードで再生する場合は`検索`コマンドを使用してください。"
+  },
+  "system": "システム"
 }

@@ -33,11 +33,11 @@ export abstract class SearchBase<T> extends BaseCommand {
     context.server.updateBoundChannel(message);
 
     // ボイスチャンネルへの参加の試みをしておく
-    context.server.joinVoiceChannel(message);
+    context.server.joinVoiceChannel(message, {}, t);
 
     // URLが渡されたら、そのままキューに追加を試みる
     if(this.urlCheck(context.rawArgs)){
-      await context.server.playFromURL(message, context.args as string[], !context.server.player.isConnecting);
+      await context.server.playFromURL(message, context.args as string[], { first: !context.server.player.isConnecting }, t);
       return;
     }
 

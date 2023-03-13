@@ -333,7 +333,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         "再生待ちの曲",
         this.server.queue.loopEnabled
           ? "ループします"
-          : `${i18next.t("currentSongCount", { count: this.server.queue.length - 1 })}(${Util.time.HourMinSecToString(timeFragments)})`,
+          : `${i18next.t("currentSongCount", { count: this.server.queue.length - 1 })}(${Util.time.HourMinSecToString(timeFragments, i18next.t)})`,
         true
       )
     ;

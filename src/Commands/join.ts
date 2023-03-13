@@ -38,7 +38,7 @@ export default class Join extends BaseCommand {
     if(message.member.voiceState.channel?.voiceMembers.has(context.client.user.id) && context.server.connection){
       message.reply(`✘${t("commands:join.alreadyConnected")}`).catch(this.logger.error);
     }else{
-      await context.server.joinVoiceChannel(message, /* reply result to user inside this method  */ true);
+      await context.server.joinVoiceChannel(message, { reply: true }, t);
     }
   }
 }

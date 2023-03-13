@@ -43,7 +43,7 @@ export default class Bgm extends BaseCommand {
     context.server.updateBoundChannel(message);
 
     // attempt to join
-    if(!await context.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true)) return;
+    if(!await context.server.joinVoiceChannel(message, { replyOnFail: true }, t)) return;
 
     const url = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
 
