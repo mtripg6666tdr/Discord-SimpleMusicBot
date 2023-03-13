@@ -10,8 +10,8 @@
     "test": "mocha",
     "start": "npm run build && npm run onlystart",
     "onlystart": "node util/exec dist",
-    "build": "rimraf dist/ typings/ && tsc",
-    "lint": "eslint .",
+    "build": "rimraf dist/ typings/ && tsc -p tsconfig.build.json",
+    "lint": "tsc && eslint .",
     "cleanup": "rimraf dist/ typings/",
     "generatecommandlist": "node util/generateCommandList"
   },

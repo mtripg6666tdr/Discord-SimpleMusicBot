@@ -26,7 +26,6 @@ import { TypedEmitter } from "oceanic.js";
 import { ApplicationCommandTypes } from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
-import { permissionDescriptionParts } from "../Structure/Command";
 import { discordUtil } from "../Util";
 import { getLogger } from "../logger";
 
@@ -40,7 +39,7 @@ interface CommandEvents {
  * すべてのコマンドハンドラーの基底クラスです
  */
 export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
-  protected abstract run(message: CommandMessage, options: Readonly<CommandArgs>): Promise<void>;
+  protected abstract run(message: CommandMessage, options: Readonly<CommandArgs>, t: (typeof i18next)["t"]): Promise<void>;
 
   protected readonly _name: string;
   public get name(){
@@ -96,13 +95,17 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     return this._requiredPermissionsOr || [];
   }
 
-  get permissionDescription(){
+  getPermissionDescription(locale: string){
     const perms = this.requiredPermissionsOr.filter(perm => perm !== "admin");
     if(perms.length === 0){
       return "なし";
     }else{
-      return `${perms.map(permission => permissionDescriptionParts[permission]).join("、")}${perms.length > 1 ? "のいずれか" : ""}`;
+      return `${perms.map(permission => i18next.t(`permissions.${permission}`, { lng: locale })).join("、")}${perms.length > 1 ? "のいずれか" : ""}`;
     }
+  }
+
+  getLocalizedDescription(locale: string){
+    return this.descriptionLocalization[locale as keyof LocaleMap] || this.description;
   }
 
   protected readonly _descriptionLocalization: LocaleMap = null;
@@ -116,7 +119,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   constructor(opts: ListCommandInitializeOptions|UnlistCommandOptions){
     super();
     this._alias = opts.alias;
-    this._name = "name" in opts ? opts.name : i18next.t(`commands:${this.asciiName}.name`);
+    this._name = "name" in opts ? opts.name : i18next.t(`commands:${this.asciiName}.name` as any);
     this._unlist = opts.unlist;
     this._shouldDefer = opts.shouldDefer;
     if(!this._unlist){
@@ -129,29 +132,27 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         requiredPermissionsOr,
       } = opts as ListCommandWithArgsOptions;
 
-      this._description = i18next.t(`commands:${this.asciiName}.description`);
+      this._description = i18next.t(`commands:${this.asciiName}.description` as any);
       this._descriptionLocalization = Object.create({});
       i18next.languages.forEach(language => {
         if(i18next.language === language) return;
         this._descriptionLocalization[language as keyof typeof this._descriptionLocalization]
-          = i18next.t(`commands:${this.asciiName}.description`, { lng: language });
+          = i18next.t(`commands:${this.asciiName}.description` as any, { lng: language });
       });
 
       this._examples = examples ? Object.create(null) : null;
       if(this._examples){
         i18next.languages.forEach(language => {
-          if(i18next.language === language) return;
           this._examples[language as keyof typeof this._examples]
-            = i18next.t(`commands:${this.asciiName}.examples`, { lng: language });
+            = i18next.t(`commands:${this.asciiName}.examples` as any, { lng: language });
         });
       }
 
       this._usage = usage ? Object.create(null) : null;
       if(this._usage){
         i18next.languages.forEach(language => {
-          if(i18next.language === language) return;
           this._usage[language as keyof typeof this._usage]
-            = i18next.t(`commands:${this.asciiName}.usage`, { lng: language });
+            = i18next.t(`commands:${this.asciiName}.usage` as any, { lng: language });
         });
       }
 
@@ -162,26 +163,26 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           type: arg.type,
           name: arg.name,
           required: arg.required || false,
-          description: i18next.t(`commands:${this.asciiName}.args.${arg.name}.description`),
+          description: i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any),
           descriptionLocalization: Object.create(null),
           choices: [] as LocalizedSlashCommandArgument["choices"],
         };
         i18next.languages.forEach(language => {
           if(i18next.language === language) return;
           result.descriptionLocalization[language as keyof typeof result.descriptionLocalization]
-            = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description`, { lng: language });
+            = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any, { lng: language });
         });
 
         arg.choices?.forEach(choiceValue => {
           const resultChoice = {
-            name: i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}`),
+            name: i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}` as any),
             value: choiceValue,
             nameLocalizations: Object.create(null),
           };
           i18next.languages.forEach(language => {
             if(i18next.language === language) return;
             resultChoice.nameLocalizations[language as keyof LocaleMap]
-              = i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}`, { lng: language });
+              = i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}` as any, { lng: language });
           });
           result.choices.push(resultChoice);
         });
@@ -199,35 +200,35 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     this.logger.debug(`${this.name} loaded`);
   }
 
-  async checkAndRun(message: CommandMessage, options: Readonly<CommandArgs>){
+  async checkAndRun(message: CommandMessage, context: Readonly<CommandArgs>){
     const judgeIfPermissionMeeted = (perm: CommandPermission) => {
       if(perm === "admin"){
         return discordUtil.users.isPrivileged(message.member);
       }else if(perm === "dj"){
-        return discordUtil.users.isDJ(message.member, options);
+        return discordUtil.users.isDJ(message.member, context);
       }else if(perm === "manageGuild"){
         return message.member.permissions.has("MANAGE_GUILD");
       }else if(perm === "manageMessages"){
         return message.channel.permissionsOf(message.member).has("MANAGE_MESSAGES");
       }else if(perm === "noConnection"){
-        return !options.server.player.isConnecting;
+        return !context.server.player.isConnecting;
       }else if(perm === "onlyListener"){
-        return discordUtil.channels.isOnlyListener(message.member, options);
+        return discordUtil.channels.isOnlyListener(message.member, context);
       }else if(perm === "sameVc"){
-        return discordUtil.channels.sameVC(message.member, options);
+        return discordUtil.channels.sameVC(message.member, context);
       }else{
         return false;
       }
     };
     if(this.requiredPermissionsOr.length !== 0 && !this.requiredPermissionsOr.some(judgeIfPermissionMeeted)){
       await message.reply({
-        content: `この操作を実行するには、${this.permissionDescription}が必要です。`,
+        content: `この操作を実行するには、${this.getLocalizedDescription(context.locale)}が必要です。`,
         ephemeral: true,
       });
       return;
     }
-    this.emit("run", options);
-    await this.run(message, options);
+    this.emit("run", context);
+    await this.run(message, context, i18next.getFixedT(context.locale));
   }
 
   toApplicationCommandStructure(): CreateApplicationCommandOptions {

@@ -18,8 +18,10 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
+
 
 import { BaseCommand } from ".";
 import * as Util from "../Util";
@@ -36,16 +38,25 @@ export default class Uptime extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     const now = Date.now();
     const insta = Util.time.calcTime(now - context.bot.instantiatedTime.getTime());
     const ready = Util.time.calcTime(context.client.uptime);
     const embed = new MessageEmbedBuilder()
       .setColor(getColor("UPTIME"))
-      .setTitle(context.client.user.username + "のアップタイム")
-      .addField("インスタンス作成からの経過時間", `${insta[0]}時間${insta[1]}分${insta[2]}秒`)
-      .addField("Discordに接続してからの経過時間", `${ready[0]}時間${ready[1]}分${ready[2]}秒`)
-      .addField("データが保持されているサーバー数", `${context.bot.databaseCount}サーバー`)
+      .setTitle(t("commands:uptime.embedTitle", { name: context.client.user.username }))
+      .addField(
+        t("commands:uptime.elapsedAfterInstantiated"),
+        t("commands:uptime.datetimeLabel", { hour: insta[0], min: insta[1], sec: insta[2] })
+      )
+      .addField(
+        t("commands:uptime.elapsedAfterConnected"),
+        t("commands:uptime.datetimeLabel", { hour: ready[0], min: ready[1], sec: ready[2] })
+      )
+      .addField(
+        t("commands:uptime.registeredServerCount"),
+        t("commands:uptime.serverCount", { count: context.bot.databaseCount })
+      )
       .setTimestamp(Date.now())
       .setAuthor({
         iconURL: context.client.user.avatarURL(),

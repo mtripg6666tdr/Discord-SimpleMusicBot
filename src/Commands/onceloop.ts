@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
@@ -32,12 +33,12 @@ export default class OnceLoop extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(context.server.queue.onceLoopEnabled){
       context.server.queue.onceLoopEnabled = false;
       message.reply({
-        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:ワンスループを無効にしました:x:`,
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:${t("commands:onceloop.disabled")}:x:`,
         allowedMentions: {
           users: false,
         },
@@ -45,7 +46,7 @@ export default class OnceLoop extends BaseCommand {
     }else{
       context.server.queue.onceLoopEnabled = true;
       message.reply({
-        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:ワンスループを有効にしました:o:`,
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:${t("commands:onceloop.enabled")}:o:`,
         allowedMentions: {
           users: false,
         },

@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
@@ -32,21 +33,23 @@ export default class LeaveClean extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
 
     if(!context.server.player.isConnecting){
       context.server.queue.removeAll();
-      message.reply("✅すべて削除しました").catch(this.logger.error);
+      message.reply(`✅${t("commands:leaveclean.allRemoved")}`).catch(this.logger.error);
       return;
     }else if(context.server.queue.length === 0){
-      message.reply("キューが空です").catch(this.logger.error);
+      message.reply(t("commands:leaveclean.queueEmpty")).catch(this.logger.error);
       return;
     }
     const memberIds = context.server.connectingVoiceChannel.voiceMembers.map(member => member.id);
     const removed = context.server.queue.removeIf(q => !memberIds.includes(q.additionalInfo.addedBy.userId)).length;
     await message.reply(
-      removed >= 1 ? `✅${removed}曲削除しました。` : "削除するものはありませんでした。"
+      removed >= 1
+        ? `✅${t("commands:leaveclean.removed", { count: removed })}`
+        : t("commands:leaveclean.removedNothing")
     ).catch(this.logger.error);
   }
 }

@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 import { discordUtil } from "../Util";
@@ -33,14 +34,14 @@ export default class Skip extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     const server = context.server;
     // そもそも再生状態じゃないよ...
     if(server.player.preparing){
-      message.reply("再生準備中です").catch(this.logger.error);
+      message.reply(t("commands:skip.preparing")).catch(this.logger.error);
       return;
     }else if(!server.player.isPlaying){
-      message.reply("再生中ではありません").catch(this.logger.error);
+      message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }
 
@@ -58,7 +59,7 @@ export default class Skip extends BaseCommand {
         if(!server.skipSession){
           await server.createSkipSession(message);
         }else{
-          message.reply(":red_circle: すでに開かれている投票パネルがあります");
+          message.reply(`:red_circle:${t("commands:skip.votePanelAlreadyOpen")}`);
         }
         return;
       }
@@ -68,7 +69,11 @@ export default class Skip extends BaseCommand {
       await server.queue.next();
       await server.player.play();
       await message.reply({
-        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:track_next: \`${title}\`をスキップしました:white_check_mark:`,
+        content: `${
+          context.includeMention
+            ? `<@${message.member.id}> `
+            : ""
+        }:track_next: ${t("commands:skip.success", { title })}:white_check_mark:`,
         allowedMentions: {
           users: false,
         },
@@ -80,10 +85,10 @@ export default class Skip extends BaseCommand {
     catch(e){
       this.logger.error(e);
       if(message.response){
-        message.response.edit(":astonished:スキップに失敗しました").catch(this.logger.error);
+        message.response.edit(`:astonished:${t("commands:skip.failed")}`).catch(this.logger.error);
       }else{
         message.channel.createMessage({
-          content: ":astonished:スキップに失敗しました",
+          content: `:astonished:${t("commands:skip.failed")}`,
         }).catch(this.logger.error);
       }
     }

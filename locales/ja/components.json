@@ -1,3 +1,19 @@
 {
-  "default": "default"
+  "queue": {
+    "nowplaying": "現在再生中",
+    "waitForPlaying": "再生待ち",
+    "requestedBy": "リクエスト",
+    "queueTitle": "{{server}}のキュー",
+    "trackloop": "トラックループ",
+    "queueloop": "キューループ",
+    "autoplayRelated": "関連曲自動再生",
+    "equallyplayback": "均等再生"
+  },
+  "search": {
+    "resultTitle": "\"{{query}}\"の検索結果",
+    "resultFooterInteraction": "再生したい項目を、下から選択してください。キャンセルするには、下から\"キャンセル\"を選択してください。また、サムネイルコマンドを使用してサムネイルを確認することもできます。",
+    "resultFooterMessage": "再生したい項目を選択して数字を送信するか、下から選択してください。キャンセルするには「キャンセル」または「cancel」と選択/入力します。また、サムネイルコマンドを使用してサムネイルを確認できます。",
+    "select": "ここから選択...",
+    "typeOrSelect": "数字を直接送信するか、ここから選択..."
+  }
 }

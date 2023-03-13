@@ -18,10 +18,14 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import * as ytpl from "ytpl";
 
 import { BaseCommand } from ".";
+import { useConfig } from "../config";
+
+const config = useConfig();
 
 export default class News extends BaseCommand {
   constructor(){
@@ -34,7 +38,7 @@ export default class News extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     context.server.joinVoiceChannel(message);
     const url = Buffer.from(
@@ -42,17 +46,17 @@ export default class News extends BaseCommand {
       "base64"
     ).toString();
     if(context.server.searchPanel.has(message.member.id)){
-      message.reply("✘既に開かれている検索窓があります").catch(this.logger.error);
+      message.reply(t("search.alreadyOpen")).catch(this.logger.error);
       return;
     }
-    const searchPanel = context.server.searchPanel.create(message, "ニューストピックス", true);
+    const searchPanel = context.server.searchPanel.create(message, t("commands:news.newsTopics"), true);
     if(!searchPanel) return;
     await searchPanel.consumeSearchResult(ytpl.default(url, {
-      gl: "JP", hl: "ja", limit: 20,
+      gl: config.country, hl: context.locale, limit: 20,
     }), ({ items }) => items.map(item => ({
       title: item.title,
       author: item.author.name,
-      description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`,
+      description: `${t("length")}: ${item.duration}, ${t("channelName")}: ${item.author.name}`,
       duration: item.duration,
       thumbnail: item.thumbnails[0].url,
       url: item.url,

@@ -1,3 +1,42 @@
 {
-  "default": "default"
+  "search": {
+    "alreadyOpen": "✘すでに開かれている検索窓があります",
+    "removePreviousPanel": "以前の検索結果を破棄",
+    "previousPanelRemoved": "検索パネルを破棄しました",
+    "searching": "検索中",
+    "notFound": "見つかりませんでした"
+  },
+  "length": "長さ",
+  "channelName": "チャンネル名",
+  "user": "ユーザー",
+  "currentPage": "{{count}}ページ目",
+  "allPages": "{{count}}ページ中",
+  "prefixIs": "プレフィックスは`{{prefix}}`です。",
+  "permissions": {
+    "admin": "サーバー/チャンネルの管理権限を持っていること",
+    "dj": "同じボイスチャンネルに接続していてかつDJロールを保持していること",
+    "sameVc": "同じボイスチャンネルに接続していること",
+    "manageMessages": "メッセージの管理権限を持っていること",
+    "manageGuild": "サーバーの管理権限を持っていること",
+    "onlyListener": "ボイスチャンネルの唯一のユーザーであること",
+    "noConnection": "ボットがどこのボイスチャンネルにも接続していないこと"
+  },
+  "alias": "エイリアス",
+  "permissionsToRun": "実行に必要な権限",
+  "notPlaying": "再生中ではありません",
+  "disconnectedSuccessfully": ":postbox: 正常に切断しました",
+  "errorOccurred": "エラーが発生しました",
+  "internalErrorOccurred": "内部エラーが発生しました",
+  "totalSongCount": "{{count}}曲中",
+  "currentSongCount": "{{count}}曲",
+  "songProcessingInProgress": "{{totalSongCount}}{{currentSongCount}}処理しました",
+  "songProcessingCompleted": "{{count}}曲を処理しました",
+  "failed": "失敗しました",
+  "yes": "はい",
+  "no": "いいえ",
+  "liveStream": "ライブストリーム",
+  "unknown": "不明",
+  "cancel": "キャンセル",
+  "cancelling": "キャンセルしました",
+  "cancelled": "キャンセルされました"
 }

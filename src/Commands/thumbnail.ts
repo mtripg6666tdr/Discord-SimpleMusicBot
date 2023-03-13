@@ -18,8 +18,10 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
+
 
 import { BaseCommand } from ".";
 import { getColor } from "../Util/color";
@@ -40,7 +42,7 @@ export default class Thumbnail extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
 
     const embed = new MessageEmbedBuilder();
@@ -81,7 +83,7 @@ export default class Thumbnail extends BaseCommand {
         }).catch(this.logger.error);
       }
     }else{
-      message.reply("✘検索結果が見つかりません").catch(this.logger.error);
+      message.reply(`✘${t("commands:thumbnail.noSearchPanelFound")}`).catch(this.logger.error);
       return;
     }
 

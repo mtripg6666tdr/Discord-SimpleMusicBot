@@ -5,7 +5,7 @@
       "type": "shell",
       "group": "build",
       "command": [
-        "npx tsc --incremental"
+        "npx tsc --incremental -p tsconfig.build.json"
       ],
       "label": "Transpile TypeScript"
     },

@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
@@ -32,7 +33,7 @@ export default class RmDuplicated extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
 
     // 削除するアイテムのリストを作成
@@ -82,8 +83,21 @@ export default class RmDuplicated extends BaseCommand {
             : ""
         }`
       ).catch(this.logger.error);
+      message.reply(
+        `🚮${
+          resultStr.length > 100
+            ? t("commands:removedupes.removedMany")
+            : t("commands:removedupes.removedAt", { indexes: resultStr, title: title ? `(\`${title}\`)` : "" })
+        }${
+          failed.length > 100
+            ? `\r\n${t("commands:remove.unableToRemoveMany")}`
+            : failed.length > 0
+              ? `\r\n${t("commands:remove.unableToRemoveAt", { indexes: failedStr })}`
+              : ""
+        }`
+      ).catch(this.logger.error);
     }else{
-      message.reply("削除できる楽曲がありませんでした。").catch(this.logger.error);
+      message.reply(t("commands:removedupes.noSongRemoved")).catch(this.logger.error);
     }
   }
 }

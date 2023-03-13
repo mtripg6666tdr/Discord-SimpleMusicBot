@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
@@ -31,14 +32,14 @@ export default class Cancel extends BaseCommand {
       shouldDefer: false,
     });
   }
-  
-  async run(message: CommandMessage, context: CommandArgs){
+
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     const result = context.server.cancelAll();
     if(result){
-      message.reply("処理中の処理をすべてキャンセルしています....").catch(this.logger.error);
+      message.reply(t("commands:cancel.cancelling")).catch(this.logger.error);
     }else{
-      message.reply("キャンセルできる処理がありませんでした").catch(this.logger.error);
+      message.reply(t("commands:cancel.noCancellable")).catch(this.logger.error);
     }
   }
 }

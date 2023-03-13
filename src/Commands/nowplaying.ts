@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -41,11 +42,11 @@ export default class NowPlaying extends BaseCommand {
     });
   }
   
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!context.server.player.isPlaying){
-      message.reply("再生中ではありません").catch(this.logger.error);
+      message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }
 
@@ -66,10 +67,12 @@ export default class NowPlaying extends BaseCommand {
     // create embed
     const embed = new MessageEmbedBuilder()
       .setColor(getColor("NP"))
-      .setTitle("現在再生中の曲:musical_note:")
+      .setTitle(`${t("commands:nowplaying.nowPlayingSong")}:musical_note:`)
       .setDescription(
         `[${info.title}](${info.url})\r\n${progressBar}${
-          info.isYouTube() && info.isLiveStream ? "(ライブストリーム)" : ` \`${min}:${sec}/${_t === 0 ? "(不明)" : `${tmin}:${tsec}\``}`
+          info.isYouTube() && info.isLiveStream
+            ? `(${t("liveStream")})`
+            : ` \`${min}:${sec}/${_t === 0 ? `(${t("unknown")})` : `${tmin}:${tsec}\``}`
         }`
       )
       .setFields(

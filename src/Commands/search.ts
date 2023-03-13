@@ -19,6 +19,7 @@
 import type { CommandArgs } from ".";
 import type { SongInfo } from "../Component/SearchPanel";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 import type * as ytsr from "ytsr";
 
 import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
@@ -27,7 +28,7 @@ import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
 
 export abstract class SearchBase<T> extends BaseCommand {
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
 
     // ボイスチャンネルへの参加の試みをしておく
@@ -49,13 +50,13 @@ export abstract class SearchBase<T> extends BaseCommand {
           cancelSearch: "button",
         });
       const responseMessage = await message.reply({
-        content: "✘既に開かれている検索窓があります",
+        content: `✘${t("search.alreadyOpen")}`,
         components: [
           new MessageActionRowBuilder()
             .addComponents(
               new MessageButtonBuilder()
                 .setCustomId(customIdMap.cancelSearch)
-                .setLabel("以前の検索結果を破棄")
+                .setLabel(t("search.searching"))
                 .setStyle("DANGER")
             )
             .toOceanic(),
@@ -66,7 +67,7 @@ export abstract class SearchBase<T> extends BaseCommand {
         collector.on("cancelSearch", interaction => {
           panel.destroy({ quiet: true });
           interaction.createFollowup({
-            content: "🚮検索パネルを破棄しました:white_check_mark:",
+            content: `🚮${t("search.previousPanelRemoved")}:white_check_mark:`,
           }).catch(this.logger.error);
         });
         collector.setMessage(responseMessage);
@@ -81,9 +82,9 @@ export abstract class SearchBase<T> extends BaseCommand {
       if(!searchPanel){
         return;
       }
-      await searchPanel.consumeSearchResult(this.searchContent(context.rawArgs, context), this.consumer);
+      await searchPanel.consumeSearchResult(this.searchContent(context.rawArgs, context), this.consumer, t);
     }else{
-      await message.reply("引数を指定してください").catch(this.logger.error);
+      await message.reply(t("commands:search.noArgument")).catch(this.logger.error);
     }
   }
 
@@ -91,7 +92,7 @@ export abstract class SearchBase<T> extends BaseCommand {
   protected abstract searchContent(query: string, context: CommandArgs): Promise<T|{ result: T, transformedQuery: string }>;
 
   /** 検索結果を検索パネルで使用できるデータに変換する関数 */
-  protected abstract consumer(result: T): SongInfo[];
+  protected abstract consumer(result: T, t: i18n["t"]): SongInfo[];
 
   /** この検索が対象とするURLかを判断する関数 */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -125,14 +126,14 @@ export default class Search extends SearchBase<ytsr.Video[]> {
       });
   }
 
-  protected override consumer(items: ytsr.Video[]){
+  protected override consumer(items: ytsr.Video[], t: i18n["t"]){
     return items.map(item => ({
       url: item.url,
       title: item.title,
       duration: item.duration,
       thumbnail: item.bestThumbnail.url,
       author: item.author.name,
-      description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`,
+      description: `${t("length")}: ${item.duration}, ${t("channelName")}: ${item.author.name}`,
     })).filter(n => n);
   }
 

@@ -38,5 +38,8 @@
   "cacheLevel": "",
 
   // デフォルトの言語。日本語の場合は"ja"
-  "defaultLanguage": "ja"
+  "defaultLanguage": "ja",
+
+  // 地域の設定
+  "country": "JP"
 }

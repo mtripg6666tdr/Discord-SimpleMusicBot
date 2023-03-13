@@ -17,6 +17,7 @@
  */
 
 import type { SoundCloudTrackCollection } from "../AudioSource";
+import type { i18n } from "i18next";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 
 import candyget from "candyget";
@@ -75,7 +76,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
     };
   }
 
-  protected override consumer(result: SoundcloudTrackV2[]){
+  protected override consumer(result: SoundcloudTrackV2[], t: i18n["t"]){
     return result.map(item => {
       const [min, sec] = Util.time.calcMinSec(Math.floor(item.duration / 1000));
       return {
@@ -84,7 +85,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
         duration: item.full_duration.toString(),
         thumbnail: item.artwork_url,
         author: item.user.username,
-        description: `長さ: ${min}:${sec}, ユーザー: ${item.user.username}`,
+        description: `${t("length")}: ${min}:${sec}, ${t("user")}: ${item.user.username}`,
       };
     });
   }

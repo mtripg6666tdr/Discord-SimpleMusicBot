@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { categories } from "../Commands/commands";
+import type { categoriesList } from "../Commands/commands";
 import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
 import type { Client, LocaleMap } from "oceanic.js";
@@ -31,16 +31,6 @@ export type CommandPermission =
   | "noConnection"
 ;
 
-export const permissionDescriptionParts: Readonly<{ [key in CommandPermission]: string }> = {
-  admin: "サーバー/チャンネルの管理権限を持っていること",
-  dj: "同じボイスチャンネルに接続していてかつDJロールを保持していること",
-  sameVc: "同じボイスチャンネルに接続していること",
-  manageMessages: "メッセージの管理権限を持っていること",
-  manageGuild: "サーバーの管理権限を持っていること",
-  onlyListener: "ボイスチャンネルの唯一のユーザーであること",
-  noConnection: "ボットがどこのボイスチャンネルにも接続していないこと",
-};
-
 export type BaseCommandInitializeOptions = {
   alias: Readonly<string[]>,
   shouldDefer: boolean,
@@ -50,14 +40,14 @@ export type ListCommandWithArgsOptions = BaseCommandInitializeOptions & {
   unlist: false,
   examples: boolean,
   usage: boolean,
-  category: keyof typeof categories,
+  category: typeof categoriesList[number],
   argument: [firstArgument: SlashCommandArgument, ...restArguments: SlashCommandArgument[]],
   requiredPermissionsOr: CommandPermission[],
 };
 
 export type ListCommandWithoutArgsOptions = BaseCommandInitializeOptions & {
   unlist: false,
-  category: keyof typeof categories,
+  category: typeof categoriesList[number],
   requiredPermissionsOr: CommandPermission[],
 };
 
@@ -72,7 +62,7 @@ export type UnlistCommandOptions = BaseCommandInitializeOptions & {
   description?: string,
   usage?: string,
   examples?: string,
-  category?: keyof typeof categories,
+  category?: typeof categoriesList[number],
   argument?: { type: CommandOptionsTypes, name: string, description: string, required: boolean }[],
   requiredPermissionsOr?: CommandPermission[],
 };

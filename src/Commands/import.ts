@@ -19,6 +19,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { YmxFormat } from "../Structure";
+import type { i18n } from "i18next";
 import type { AnyGuildTextChannel } from "oceanic.js";
 
 import candyget from "candyget";
@@ -46,10 +47,10 @@ export default class Import extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(context.rawArgs === ""){
-      message.reply("❓インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。").catch(this.logger.error);
+      message.reply(`❓${t("commands:import.invalidArgumentMessage")}`).catch(this.logger.error);
       return;
     }
     let force = false;
@@ -59,17 +60,17 @@ export default class Import extends BaseCommand {
       url = context.args[1];
     }
     if(!url.startsWith("http://discord.com/channels/") && !url.startsWith("https://discord.com/channels/")){
-      await message.reply("❌Discordのメッセージへのリンクを指定してください").catch(this.logger.error);
+      await message.reply(`❌${t("commands:import.noDiscordLink")}`).catch(this.logger.error);
       return;
     }
 
     const ids = url.split("/");
     if(ids.length < 2){
-      await message.reply("🔗指定されたURLは無効です");
+      await message.reply(`🔗${t("commands:import.invalidLink")}`);
       return;
     }
 
-    const smsg = await message.reply("🔍メッセージを取得しています...");
+    const smsg = await message.reply(`🔍${t("commands:import.loadingMessage")}...`);
     const cancellation = context.server.bindCancellation(new TaskCancellationManager());
     try{
       // get the message
@@ -78,7 +79,7 @@ export default class Import extends BaseCommand {
       const channel = await context.client.rest.channels.get<AnyGuildTextChannel>(targetChannelId);
       const msg = channel.guild && await channel.getMessage(targetMessageId);
       if(msg.author.id !== context.client.user.id && !force){
-        await smsg.edit("❌ボットのメッセージではありません");
+        await smsg.edit(`❌${t("commands:import.notBotMessage")}`);
         return;
       }
 
@@ -97,20 +98,32 @@ export default class Import extends BaseCommand {
             url: tMatch.groups.url,
             addedBy: message.member,
           });
-          await smsg.edit(`${fields.length}曲中${i + 1}曲処理しました。`);
+          await smsg.edit(
+            t("songProcessingInProgress", {
+              totalSongCount: t("totalSongCount", { count: fields.length }),
+              currentSongCount: t("currentSongCount", { count: i + 1 }),
+            })
+          );
           if(cancellation.Cancelled) break;
         }
         if(!cancellation.Cancelled){
-          await smsg.edit(`✅${fields.length}曲を処理しました`);
+          await smsg.edit(`✅${
+            t("songProcessingCompleted", {
+              count: fields.length,
+            })
+          }`);
         }else{
-          await smsg.edit("✅キャンセルされました");
+          await smsg.edit(`✅${t("cancelled")}`);
         }
       }else if(attac && attac.filename.endsWith(".ymx")){
         // if an attachment is ymx
         const raw = await candyget.json(attac.url).then(({ body }) => body) as YmxFormat;
 
         if(raw.version !== YmxVersion){
-          await smsg.edit("✘指定されたファイルはバージョンに互換性がないためインポートできません(現行:v" + YmxVersion + "; ファイル:v" + raw.version + ")");
+          await smsg.edit(
+            `✘${
+              t("commands:import.versionIncompatible")
+            }(${t("commands:import.current")}:v${YmxVersion}; ${t("commands:import.file")}:v${raw.version})`);
           return;
         }
 
@@ -122,24 +135,29 @@ export default class Import extends BaseCommand {
             gotData: qs[i],
           });
           if(qs.length <= 10 || i % 10 === 9){
-            await smsg.edit(qs.length + "曲中" + (i + 1) + "曲処理しました。");
+            await smsg.edit(
+              t("songProcessingInProgress", {
+                totalSongCount: t("totalSongCount", { count: qs.length }),
+                currentSongCount: t("currentSongCount", { count: i + 1 }),
+              })
+            );
           }
           if(cancellation.Cancelled) break;
         }
 
         if(!cancellation.Cancelled){
-          await smsg.edit(`✅${qs.length}曲を処理しました`);
+          await smsg.edit(`✅${t("songProcessingCompleted", { count: qs.length })}`);
         }else{
-          await smsg.edit("✅キャンセルされました");
+          await smsg.edit(`✅${t("cancelled")}`);
         }
       }else{
-        await smsg.edit("❌キューの埋め込みもしくは添付ファイルが見つかりませんでした");
+        await smsg.edit(`❌${t("commands:import.contentNotIncludedInMessage")}`);
         return;
       }
     }
     catch(e){
       this.logger.error(e);
-      smsg?.edit(":sob:失敗しました...");
+      smsg?.edit(`:sob:${t("failed")}...`);
     }
     finally{
       context.server.unbindCancellation(cancellation);

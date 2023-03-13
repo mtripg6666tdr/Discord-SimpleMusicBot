@@ -18,7 +18,8 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { EmbedField } from "oceanic.js";
+import type { i18n } from "i18next";
+import type { EmbedField, LocaleMap } from "oceanic.js";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -29,15 +30,7 @@ import { useConfig } from "../config";
 
 const config = useConfig();
 
-export const categories = {
-  "voice": "ボイスチャンネル操作系",
-  "player": "音楽プレイヤー制御系",
-  "playlist": "プレイリスト操作系",
-  "utility": "ユーティリティ系",
-  "bot": "ボット操作全般",
-};
-
-export const categoriesList = ["voice", "player", "playlist", "utility", "bot"];
+export const categoriesList = ["voice", "player", "playlist", "utility", "bot"] as const;
 
 export default class Commands extends BaseCommand {
   constructor(){
@@ -55,13 +48,12 @@ export default class Commands extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     if(context.rawArgs === ""){
       // 引数がない場合は全コマンドの一覧を表示
       const embed = [] as MessageEmbedBuilder[];
-      const getCategoryText = (label: string)=>{
-        // @ts-expect-error
-        return categories[label as any] as string;
+      const getCategoryText = (label: typeof categoriesList[number])=>{
+        return t(`commands:command.categories.${label}`);
       };
       const rawcommands = CommandManager.instance.commands.filter(ci => !ci.unlist);
       const commands = {} as { [category: string]: BaseCommand[] };
@@ -82,8 +74,8 @@ export default class Commands extends BaseCommand {
             .setTitle(getCategoryText(categoriesList[i]))
             .addFields(
               ...commands[categoriesList[i]].map(ci => ({
-                name: ci.name + ", " + ci.alias.join(", "),
-                value: ci.description,
+                name: `${ci.name}, ${ci.alias.join(", ")}`,
+                value: ci.getLocalizedDescription(context.locale),
                 inline: true,
               } as EmbedField))
             )
@@ -91,20 +83,22 @@ export default class Commands extends BaseCommand {
       }
       for(let i = 0; i < embed.length; i++){
         embed[i]
-          .setTitle("コマンド一覧(" + embed[i].title + ")")
+          .setTitle(`${t("commands:command.commandList")}(${embed[i].title})`)
           .setDescription(
-            "コマンドの一覧です。\r\n"
-            + `\`${i + 1}ページ目(${embed.length}ページ中)\`\r\n`
+            `\`${
+              t("currentPage", { count: i + 1 })
+            }(${
+              t("allPages", { count: embed.length })
+            })\`\r\n`
             + (
               config.noMessageContent
-                ? "`/コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。"
-                : `コマンドプレフィックスは、\`${context.server.prefix}\`です。\r\n\``
-                  + `\`${context.server.prefix}コマンド 再生\`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。`
+                ? t("commands:command.toLearnMoreInteraction")
+                : `${t("prefixIs", { prefix: context.server.prefix })}\r\n${t("commands:command.toLearnMoreMessage", { prefix: context.server.prefix })}`
             )
           )
           .setColor(getColor("COMMAND"));
       }
-      
+
       await context.bot.collectors
         .createPagenation()
         .setPages(embed, embed.length)
@@ -114,21 +108,25 @@ export default class Commands extends BaseCommand {
       if(ci && !ci.unlist){
         const prefix = context.server ? context.server.prefix : ">";
         const embed = new MessageEmbedBuilder()
-          .setTitle(`コマンド \`${ci.name}\` の詳細`)
-          .setDescription(ci.description)
+          .setTitle(t("commands:command.commandExplanation", { command: ci.name }))
+          .setDescription(ci.getLocalizedDescription(context.locale))
           .setColor(getColor("COMMAND"))
-          .addField("エイリアス", `\`${ci.alias.join("`, `")}\``)
-          .addField("実行に必要な権限", ci.permissionDescription)
+          .addField(t("alias"), `\`${ci.alias.join("`, `")}\``)
+          .addField(t("permissionsToRun"), ci.getPermissionDescription(context.locale))
         ;
         if(ci.usage){
-          embed.addField("使い方", `\`${prefix}${ci.usage}\` \r\n\`<>\` 内の引数は必須の引数、\`[]\`内の引数は任意の引数です。`);
+          embed.addField(
+            t("commands:command.usageLabel"),
+            `\`${prefix}${ci.usage[context.locale as keyof LocaleMap] || ci.usage["ja"]}\` \r\n`
+            + t("commands:command.argumentDescription")
+          );
         }
         if(ci.examples){
-          embed.addField("使用例", `\`${prefix + ci.examples}\``);
+          embed.addField(t("commands:command.exampleLabel"), `\`${prefix + ci.examples}\``);
         }
         await message.reply({ embeds: [embed.toOceanic()] });
       }else{
-        await message.reply(":face_with_raised_eyebrow: コマンドが見つかりませんでした");
+        await message.reply(`:face_with_raised_eyebrow:${t("commands:command.commandNotFound")}`);
       }
     }
   }

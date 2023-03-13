@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -35,21 +36,21 @@ export default class Uptime extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     const now = Date.now();
     const embed = new MessageEmbedBuilder()
       .setColor(getColor("UPTIME"))
-      .setTitle("ping情報")
+      .setTitle(t("commands:ping.pingInfo"))
       .addField(
-        "ボット接続実測値",
+        t("commands:ping.botMessageReceive"),
         `${now - message.createdTimestamp.getTime()}ms`
       )
       .addField(
-        "ボットWebSocket接続実測値",
+        t("commands:ping.botWebSocketConnection"),
         `${message.guild.shard.latency === Infinity ? "-" : message.guild.shard.latency}ms`
       )
       .addField(
-        "ボイスチャンネルUDP接続実測値",
+        t("commands:ping.voiceUdpConnection"),
         `${context.server.player.isConnecting && context.server.vcPing || "-"}ms`
       )
       .setTimestamp(Date.now())

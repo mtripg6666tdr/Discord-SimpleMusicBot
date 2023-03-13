@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
@@ -32,14 +33,14 @@ export default class QueueLoop extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(context.server.queue.queueLoopEnabled){
       context.server.queue.queueLoopEnabled = false;
-      message.reply(":repeat:キューリピートを無効にしました:x:").catch(this.logger.error);
+      message.reply(`:repeat:${t("commands:queueloop.disabled")}:x:`).catch(this.logger.error);
     }else{
       context.server.queue.queueLoopEnabled = true;
-      message.reply(":repeat:キューリピートを有効にしました:o:").catch(this.logger.error);
+      message.reply(`:repeat:${t("commands:queueloop.enabled")}:o:`).catch(this.logger.error);
     }
   }
 }

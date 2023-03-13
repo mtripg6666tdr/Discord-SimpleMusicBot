@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
@@ -32,15 +33,15 @@ export default class Dc extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!context.server.player.isConnecting){
-      message.reply("再生中ではありません").catch(this.logger.error);
+      message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }
     // 停止しま～す
     context.server.player.disconnect();
-    message.reply(":postbox: 正常に切断しました").catch(this.logger.error);
+    message.reply(t("disconnectedSuccessfully")).catch(this.logger.error);
   }
 }

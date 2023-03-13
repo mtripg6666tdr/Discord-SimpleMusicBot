@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -48,7 +49,7 @@ export default class Lyrics extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs){
+  async run(message: CommandMessage, options: CommandArgs, t: i18n["t"]){
     options.server.updateBoundChannel(message);
     const msg = await message.reply("🔍検索中...");
     try{
@@ -65,7 +66,7 @@ export default class Lyrics extends BaseCommand {
         );
       }
       embeds[0]
-        .setTitle("\"" + songInfo.title + "\"(" + songInfo.artist + ")の歌詞")
+        .setTitle(t("commands:lyrics.embedTitle", { title: songInfo.title, artist: songInfo.artist }))
         .setURL(songInfo.url)
         .setThumbnail(songInfo.artwork)
       ;
@@ -82,7 +83,7 @@ export default class Lyrics extends BaseCommand {
     }
     catch(e){
       this.logger.error(e);
-      await msg.edit(":confounded:失敗しました。曲名を確認してもう一度試してみてください。")
+      await msg.edit(`:confounded:${t("commands:lyrics.failed")}`)
         .catch(this.logger.error);
     }
   }

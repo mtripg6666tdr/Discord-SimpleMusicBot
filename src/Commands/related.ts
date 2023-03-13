@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -35,16 +36,16 @@ export default class Related extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(context.server.addRelated){
       context.server.addRelated = false;
-      message.reply("❌関連曲自動再生をオフにしました").catch(this.logger.error);
+      message.reply(`❌${t("commands:related.disabled")}`).catch(this.logger.error);
     }else{
       context.server.addRelated = true;
       const embed = new MessageEmbedBuilder()
-        .setTitle("⭕関連曲自動再生をオンにしました")
-        .setDescription("YouTubeからの楽曲再生終了時に、関連曲をキューの末尾に自動追加する機能です。\r\n※YouTube以外のソースからの再生時、ループ有効時には追加されません")
+        .setTitle(`⭕${t("commands:related.enabled")}`)
+        .setDescription(`${t("commands:related.featureDescription")}\r\n${t("commands:related.featureNote")}`)
         .setColor(getColor("RELATIVE_SETUP"))
         .toOceanic()
       ;

@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
@@ -32,16 +33,16 @@ export default class Mltf extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(context.server.queue.length <= 2){
-      message.reply("キューに3曲以上追加されているときに使用できます。").catch(this.logger.error);
+      message.reply(t("commands:movelastsongtofirst.usableWhen3orMoreQueue")).catch(this.logger.error);
       return;
     }
     const q = context.server.queue;
     const to = context.server.player.isPlaying ? 1 : 0;
     q.move(q.length - 1, to);
     const info = q.get(to);
-    message.reply("✅`" + info.basicInfo.title + "`を一番最後からキューの先頭に移動しました").catch(this.logger.error);
+    message.reply(`✅${t("commands:movelastsongtofirst.success", info.basicInfo.title)}`).catch(this.logger.error);
   }
 }

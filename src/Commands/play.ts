@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 import type * as ytsr from "ytsr";
 
 import { BaseCommand } from ".";
@@ -40,7 +41,7 @@ export default class Play extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     const server = context.server;
     const firstAttachment = Array.isArray(message.attachments) ? message.attachments[0] : message.attachments.first();
@@ -53,7 +54,7 @@ export default class Play extends BaseCommand {
       && !firstAttachment
       && !(message["_message"] && message["_message"].referencedMessage)
     ){
-      await message.reply("再生するコンテンツがありません").catch(this.logger.error);
+      await message.reply(t("commands:play.noContent")).catch(this.logger.error);
       return;
     }
 
@@ -67,7 +68,7 @@ export default class Play extends BaseCommand {
     if(context.rawArgs === "" && server.player.isPaused){
       server.player.resume();
       await message.reply({
-        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:arrow_forward: 再生を再開します。`,
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:arrow_forward:${t("commands:play.resuming")}`,
         allowedMentions: {
           users: false,
         },
@@ -84,7 +85,7 @@ export default class Play extends BaseCommand {
       }else{
         // URLでないならキーワードとして検索
         const msg = await message.channel.createMessage({
-          content: "🔍検索中...",
+          content: `🔍${t("search.searching")}...`,
         });
 
         try{
@@ -97,7 +98,7 @@ export default class Play extends BaseCommand {
             context.bot.cache.addSearch(context.rawArgs, videos);
           }
           if(videos.length === 0){
-            await message.reply(":face_with_monocle:該当する動画が見つかりませんでした");
+            await message.reply(`:face_with_monocle:${t("commands:play.noMusicFound")}`);
             await msg.delete();
             return;
           }
@@ -106,7 +107,7 @@ export default class Play extends BaseCommand {
         }
         catch(e){
           this.logger.error(e);
-          message.reply("✗内部エラーが発生しました").catch(this.logger.error);
+          message.reply(`✗${t("internalErrorOccurred")}`).catch(this.logger.error);
           msg.delete().catch(this.logger.error);
         }
       }
@@ -147,23 +148,23 @@ export default class Play extends BaseCommand {
           const url = embed.description.match(/^\[.+\]\((?<url>https?.+)\)/)?.groups.url;
           await context.server.playFromURL(message, url, !wasConnected);
         }else{
-          await message.reply(":face_with_raised_eyebrow:返信先のメッセージに再生できるコンテンツが見つかりません")
+          await message.reply(`:face_with_raised_eyebrow:${t("commands:play.noContentWhereReplyingTo")}`)
             .catch(this.logger.error);
         }
       }else{
-        await message.reply(":face_with_raised_eyebrow:返信先のメッセージに再生できるコンテンツが見つかりません")
+        await message.reply(`:face_with_raised_eyebrow:${t("commands:play.noContentWhereReplyingTo")}`)
           .catch(this.logger.error);
       }
     }else if(server.queue.length >= 1){
       // なにもないからキューから再生
       if(!server.player.isPlaying && !server.player.preparing){
-        await message.reply("再生します").catch(this.logger.error);
+        await message.reply(t("commands:play.playing")).catch(this.logger.error);
         await server.player.play();
       }else{
-        await message.reply("すでに再生中です").catch(this.logger.error);
+        await message.reply(t("commands:play.alreadyPlaying")).catch(this.logger.error);
       }
     }else{
-      await message.reply("✘キューが空です").catch(this.logger.error);
+      await message.reply(`✘${t("commands:play.queueEmpty")}`).catch(this.logger.error);
     }
   }
 }

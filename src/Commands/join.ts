@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
@@ -32,10 +33,10 @@ export default class Join extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(message.member.voiceState.channel?.voiceMembers.has(context.client.user.id) && context.server.connection){
-      message.reply("✘すでにボイスチャンネルに接続中です。").catch(this.logger.error);
+      message.reply(`✘${t("commands:join.alreadyConnected")}`).catch(this.logger.error);
     }else{
       await context.server.joinVoiceChannel(message, /* reply result to user inside this method  */ true);
     }

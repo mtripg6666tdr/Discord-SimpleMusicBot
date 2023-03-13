@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
@@ -32,18 +33,18 @@ export default class End extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(!context.server.player.isPlaying){
-      message.reply("再生中ではありません").catch(this.logger.error);
+      message.reply(t("errorOccurred")).catch(this.logger.error);
       return;
     }
     if(context.server.queue.length <= 1){
-      message.reply("キューが空、もしくは一曲しかないため削除されませんでした。").catch(this.logger.error);
+      message.reply(t("commands:end.queueWasEmpty")).catch(this.logger.error);
       return;
     }
     context.server.queue.removeFrom2nd();
     context.server.queue.queueLoopEnabled = context.server.queue.onceLoopEnabled = context.server.queue.loopEnabled = false;
-    message.reply("✅キューに残された曲を削除しました").catch(this.logger.error);
+    message.reply(`✅${t("commands:end.success")}`).catch(this.logger.error);
   }
 }
