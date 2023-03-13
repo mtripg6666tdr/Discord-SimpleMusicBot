@@ -3,7 +3,7 @@
     "nowplaying": "Now playing",
     "waitForPlaying": "Waiting to be played",
     "requestedBy": "Request",
-    "nextSong": "Next music",
+    "nextSong": "Next song",
     "noNextSong": "次の曲がまだ登録されていません"
   },
   "queue": {
@@ -13,7 +13,7 @@
     "autoplayRelated": "関連曲自動再生",
     "equallyplayback": "均等再生",
     "tooManyQueueItems": "キューの上限を超えています",
-    "songAdded": "Music added",
+    "songAdded": "Song added",
     "positionInQueue": "キュー内の位置",
     "etaToPlay": "再生されるまでの予想時間",
     "fallbackNotice": "現在、通常の方法で情報を取得できなかったため、代替ライブラリにフォールバックして取得しました。これが異常だと思われる場合はサポートまでお問い合わせください。\r\n処理に時間がかかる、突然終了するなど、正常なオペレーションができない場合があります。なお、フォールバックしたあとの動作はサポート対象外です。問題が発生した場合、`リセット`コマンドを使用すると、サーバーのデータをすべて初期化することができます。",
@@ -23,7 +23,8 @@
     "processingPlaylist": "プレイリスト`{{title}}`を処理しています。",
     "noDescriptionInPlaylist": "プレイリストから指定のため詳細は表示されません",
     "processingPlaylistCompleted": "プレイリストが処理されました",
-    "songsAdded": "{{count}}曲が追加されました"
+    "songsAdded_one": "{{count}}曲が追加されました",
+    "songsAdded_other": "{{count}}曲が追加されました"
   },
   "search": {
     "resultTitle": "Search results for \"{{query}}\"",
@@ -51,7 +52,8 @@
     "howToUseSkipVote": "`{{title}}`のスキップに賛成する場合は以下のボタンを押してください。",
     "skipVoteDescription": "賛成がボイスチャンネルに参加している人数の過半数を超えると、スキップされます。",
     "currentStatus": "現在の状況",
-    "skipRequirement": "あと{{count}}人の賛成が必要です。",
+    "skipRequirement_one": "あと{{count}}人の賛成が必要です。",
+    "skipRequirement_other": "あと{{count}}人の賛成が必要です。",
     "skipIssuer": "{{issuer}}が、楽曲のスキップを提案しました",
     "agree": "賛成"
   }
