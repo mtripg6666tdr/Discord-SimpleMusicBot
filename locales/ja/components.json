@@ -23,7 +23,8 @@
     "processingPlaylist": "プレイリスト`{{title}}`を処理しています。",
     "noDescriptionInPlaylist": "プレイリストから指定のため詳細は表示されません",
     "processingPlaylistCompleted": "プレイリストが処理されました",
-    "songsAdded": "{{count}}曲が追加されました"
+    "songsAdded_one": "{{count}}曲が追加されました",
+    "songsAdded_other": "{{count}}曲が追加されました"
   },
   "search": {
     "resultTitle": "\"{{query}}\"の検索結果",
@@ -51,7 +52,8 @@
     "howToUseSkipVote": "`{{title}}`のスキップに賛成する場合は以下のボタンを押してください。",
     "skipVoteDescription": "賛成がボイスチャンネルに参加している人数の過半数を超えると、スキップされます。",
     "currentStatus": "現在の状況",
-    "skipRequirement": "あと{{count}}人の賛成が必要です。",
+    "skipRequirement_one": "あと{{count}}人の賛成が必要です。",
+    "skipRequirement_other": "あと{{count}}人の賛成が必要です。",
     "skipIssuer": "{{issuer}}が、楽曲のスキップを提案しました",
     "agree": "賛成"
   }
