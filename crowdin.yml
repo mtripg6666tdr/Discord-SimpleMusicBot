@@ -1,6 +1,6 @@
-commit_message: "Change: update translations in %language% [ci skip]"
+commit_message: "Change: update translations in %language%"
 append_commit_message: false
-pull_request_title: "Change: update translations in %language% [ci skip]"
+pull_request_title: "Change: update translations in %language%"
 pull_request_labels:
   - language
 files:
