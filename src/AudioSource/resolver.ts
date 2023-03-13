@@ -96,7 +96,7 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
     }
   }
 
-  if(!isNaN(basicInfo.lengthSeconds) && !basicInfo.unableToCache){
+  if(basicInfo && !isNaN(basicInfo.lengthSeconds) && !basicInfo.unableToCache){
     cacheManager.addSource(basicInfo, fromPersistentCache);
   }
 

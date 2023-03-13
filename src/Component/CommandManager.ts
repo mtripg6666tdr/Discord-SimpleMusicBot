@@ -277,6 +277,8 @@ export class CommandManager extends LogEmitter<{}> {
         return ApplicationCommandOptionTypes.INTEGER;
       case "string":
         return ApplicationCommandOptionTypes.STRING;
+      case "file":
+        return ApplicationCommandOptionTypes.ATTACHMENT;
     }
   }
 }

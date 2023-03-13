@@ -70,7 +70,7 @@ export type UnlistCommandOptions = BaseCommandInitializeOptions & {
   requiredPermissionsOr?: CommandPermission[],
 };
 
-export type CommandOptionsTypes = "bool"|"integer"|"string";
+export type CommandOptionsTypes = "bool"|"integer"|"string"|"file";
 
 /**
  * スラッシュコマンドの引数として取れるものを定義するインターフェースです
