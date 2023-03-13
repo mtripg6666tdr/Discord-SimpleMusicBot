@@ -388,7 +388,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           }
           await this.joinVoiceChannelOnly(targetVC.id);
           await connectingMessage.edit({
-            content: `:+1:${t("guildDataContainer.connected", { channel: `speaker:\`${targetVC.name}\`` })}`,
+            content: `:+1:${t("guildDataContainer.connected", { channel: `:speaker:\`${targetVC.name}\`` })}`,
           });
           return true;
         }
