@@ -12,5 +12,6 @@
   "twentyFourSeven": [],
   "alwaysTwentyFourSeven": false,
   "disabledSources": [],
-  "cacheLevel": "memory"
+  "cacheLevel": "memory",
+  "country": "JP"
 }

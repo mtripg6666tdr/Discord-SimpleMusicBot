@@ -24,8 +24,8 @@ import { FFmpeg } from "prism-media";
 import * as ytdl from "ytdl-core";
 
 import { BaseCommand } from ".";
+import { FFmpegDefaultNetworkArgs } from "../Component/streams/ffmpeg";
 import * as Util from "../Util";
-import { FFmpegDefaultNetworkArgs } from "../definition";
 import { getLogger } from "../logger";
 
 export default class Frame extends BaseCommand {

@@ -24,7 +24,7 @@ import { destroyStream } from ".";
 import { DefaultUserAgent } from "../../definition";
 import { getLogger } from "../../logger";
 
-const FFmpegDefaultNetworkArgs = [
+export const FFmpegDefaultNetworkArgs = [
   "-reconnect", "1",
   "-reconnect_streamed", "1",
   "-reconnect_on_network_error", "1",
