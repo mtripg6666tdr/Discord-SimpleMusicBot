@@ -42,6 +42,8 @@ const sampleJson = `
 
   "cacheLevel": "memory",
 
+  "defaultLanguage": "ja",
+
   "country": "JP"
 }`;
 fs.writeFileSync(configPath, sampleJson, {encoding: "utf-8"});
