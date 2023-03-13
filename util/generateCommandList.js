@@ -19,6 +19,8 @@
 // @ts-check
 const fs = require("fs");
 const path = require("path");
+const config = require("../dist/config").useConfig();
+require("../dist/i18n").initLocalization(false, config.defaultLanguage)
 const { CommandManager } = require("../dist/Component/CommandManager");
 // const { categories, categoriesList } = require("../dist/Commands/commands");
 
@@ -62,7 +64,7 @@ ${cmd.usage ? `## 使い方\r\n\`\`\`\r\n${cmd.usage}\r\n\`\`\`\r\n` : ""}
 ${cmd.examples ? `## 使用例\r\n\`\`\`\r\n${cmd.examples}\r\n\`\`\`\r\n` : ""}
 
 ## 実行に必要な権限
-${cmd.permissionDescription}
+${cmd.getPermissionDescription(config.defaultLanguage)}
 
 ※管理者権限や、サーバーの管理権限、チャンネルの管理権限、および管理者権限を持つユーザーはこの権限を満たしていなくてもいつでもこのコマンドを実行できます。
   \r\n`, {encoding: "utf-8"});

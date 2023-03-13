@@ -29,6 +29,7 @@ import { pipeline, Readable } from "stream";
 import zlib from "zlib";
 
 import { LogEmitter } from "../Structure";
+import { useConfig } from "../config";
 
 interface CacheEvents {
   memoryCacheHit: [];
@@ -36,6 +37,8 @@ interface CacheEvents {
   persistentCacheHit: [];
   persistentCacheNotFound: [];
 }
+
+const config = useConfig();
 
 export class SourceCache extends LogEmitter<CacheEvents> {
   private readonly _sourceCache: Map<string, AudioSource<any>> = null;
@@ -54,7 +57,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
   }
 
   private onTick(count: number){
-    if(count % 5 === 0){
+    if(count % 5 === 0 || config.debug){
       const now = Date.now();
       let purgeCount = 0;
       this._expireMap.forEach((expiresAt, url) => {
