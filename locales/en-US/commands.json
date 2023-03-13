@@ -46,17 +46,17 @@
     "toLearnMoreMessage": "`{{prefix}}コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
     "toLearnMoreInteraction": "`/command 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
     "commandExplanation": "コマンド`{{command}}`の詳細",
-    "usageLabel": "Instructions",
+    "usageLabel": "Usage",
     "exampleLabel": "Example",
     "argumentDescription": "`<>` 内の引数は必須の引数、`[]`内の引数は任意の引数です。",
     "commandNotFound": "Command not found"
   },
   "disconnect": {
-    "name": "Disconnect",
+    "name": "disconnect",
     "description": "Disconnect from voice channel"
   },
   "effect": {
-    "name": "Effect",
+    "name": "effect",
     "description": "エフェクトコントロールパネルを表示します",
     "effectControllPanel": {
       "title": "エフェクトコントロールパネル",
@@ -79,7 +79,7 @@
     "featureDescription": "楽曲追加時に、楽曲を追加したユーザーごとにできるだけ均等になるようにする機能です。"
   },
   "export": {
-    "name": "Export",
+    "name": "export",
     "description": "キューの内容をインポートできるようエクスポートします。",
     "queueEmpty": "キューが空なのでエクスポートできません",
     "exported": "Exported",
@@ -87,9 +87,9 @@
     "importInstruction": "インポート時は、「<{{url}}>」をインポートコマンドの引数に指定してください"
   },
   "frame": {
-    "name": "Frame",
-    "examples": "Frame 1:20",
-    "usage": "Frame [time]",
+    "name": "frame",
+    "examples": "frame 1:20",
+    "usage": "frame [time]",
     "description": "現在の再生位置の動画のフレーム画像を可能な場合取得します。引数が指定された場合その時点でのフレームを取得します",
     "args": {
       "time": {
@@ -127,7 +127,7 @@
     "custom": "オーディオファイルへの直URL"
   },
   "import": {
-    "name": "Import",
+    "name": "import",
     "description": "指定されたメッセージからキューをインポートします。exportコマンドで出力されたファイルが添付されたURL、もしくはキューの埋め込みのあるメッセージのURLを引数として指定してください。",
     "examples": "import https://discord.com/channels/...",
     "usage": "import <URL>",
@@ -140,14 +140,14 @@
     "noDiscordLink": "Discordのメッセージへのリンクを指定してください",
     "invalidLink": "指定されたURLは無効です",
     "loadingMessage": "Fetching message",
-    "notBotMessage": "Not a message send by bot",
+    "notBotMessage": "Not a message sent by bot",
     "versionIncompatible": "指定されたファイルはバージョンに互換性がないためインポートできません",
     "current": "現行",
     "file": "File",
     "contentNotIncludedInMessage": "対象の内容が見つかりませんでした"
   },
   "invoke": {
-    "name": "Invoke",
+    "name": "invoke",
     "description": "指定されたコマンドを実行します。基本的に使用しないでください",
     "usage": "invoke <command>",
     "examples": "invoke play 夜に駆ける",
@@ -162,14 +162,14 @@
     "specialCommandNotFound": "特別コマンドが見つかりません"
   },
   "join": {
-    "name": "Connect",
+    "name": "connect",
     "description": "ボイスチャンネルに参加します",
     "alreadyConnected": "すでにボイスチャンネルに接続中です。"
   },
   "leaveclean": {
     "name": "キューを整理",
     "description": "ボイスチャンネルから離脱した人がリクエストした曲をキューから削除して整理します",
-    "allRemoved": "Removed",
+    "allRemoved": "Removed all items",
     "queueEmpty": "Queue empty",
     "removed_one": "{{count}}曲削除しました",
     "removed_other": "{{count}}曲削除しました",
@@ -432,7 +432,7 @@
     "success": "Shuffled"
   },
   "skip": {
-    "name": "Skip",
+    "name": "skip",
     "description": "現在再生中の曲をスキップします。",
     "preparing": "現在再生準備中です",
     "votePanelAlreadyOpen": "すでに開かれている投票パネルがあります",
@@ -440,9 +440,9 @@
     "failed": "Skip failed"
   },
   "thumbnail": {
-    "name": "Thumbnail",
+    "name": "thumbnail",
     "description": "現在再生中のサムネイルを表示します。検索パネルが開いていて検索パネル中の番号が指定された場合にはその曲のサムネイルを表示します。",
-    "examples": "Thumbnail 5",
+    "examples": "thumbnail 5",
     "usage": "サムネイル [検索パネル中のインデックス]",
     "args": {
       "index": {
@@ -452,7 +452,7 @@
     "noSearchPanelFound": "検索結果が見つかりません"
   },
   "uptime": {
-    "name": "Uptime",
+    "name": "uptime",
     "description": "ボットのアップタイムを表示します。",
     "embedTitle": "{{name}} uptime",
     "elapsedAfterInstantiated": "インスタンス作成からの経過時間",
@@ -463,7 +463,7 @@
     "serverCount_other": "{{count}}サーバー"
   },
   "volume": {
-    "name": "Volume",
+    "name": "volume",
     "description": "音量を調節します。1から200の間で指定します(デフォルト100)。何も引数を付けないと現在の音量を表示します。不安定になった場合には100に戻してください。",
     "examples": "volume [number]",
     "usage": "volume 120",
