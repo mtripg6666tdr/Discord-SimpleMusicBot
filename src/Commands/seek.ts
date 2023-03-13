@@ -35,6 +35,8 @@ export default class Seek extends BaseCommand {
       }],
       requiredPermissionsOr: ["admin", "dj"],
       shouldDefer: false,
+      examples: true,
+      usage: true,
     });
   }
 

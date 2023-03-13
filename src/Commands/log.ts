@@ -52,6 +52,8 @@ export default class SystemInfo extends BaseCommand {
       }],
       requiredPermissionsOr: [],
       shouldDefer: false,
+      examples: true,
+      usage: true,
     });
   }
 

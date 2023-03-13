@@ -38,6 +38,8 @@ export default class Invoke extends BaseCommand {
       }],
       requiredPermissionsOr: [],
       shouldDefer: true,
+      usage: true,
+      examples: true,
     });
   }
 

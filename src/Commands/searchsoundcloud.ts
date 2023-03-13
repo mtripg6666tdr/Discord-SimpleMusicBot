@@ -46,6 +46,8 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
       disabled: config.isDisabledSource("soundcloud"),
+      usage: true,
+      examples: true,
     });
   }
 

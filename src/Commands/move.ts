@@ -42,6 +42,8 @@ export default class Mv extends BaseCommand {
       ],
       requiredPermissionsOr: ["admin", "onlyListener", "dj"],
       shouldDefer: false,
+      examples: true,
+      usage: true,
     });
   }
 

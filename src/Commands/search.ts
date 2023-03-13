@@ -118,6 +118,8 @@ export default class Search extends SearchBase<ytsr.Video[]> {
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
       disabled: config.isDisabledSource("youtube"),
+      usage: true,
+      examples: true,
     });
   }
 

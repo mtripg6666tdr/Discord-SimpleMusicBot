@@ -39,6 +39,8 @@ export default class Thumbnail extends BaseCommand {
       }],
       requiredPermissionsOr: [],
       shouldDefer: false,
+      usage: true,
+      examples: true,
     });
   }
 

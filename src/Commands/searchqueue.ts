@@ -41,6 +41,8 @@ export default class Searchq extends BaseCommand {
       }],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
+      examples: true,
+      usage: true,
     });
   }
 

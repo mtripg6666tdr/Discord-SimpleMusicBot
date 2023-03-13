@@ -50,6 +50,8 @@ export type ListCommandWithoutArgsOptions = BaseCommandInitializeOptions & {
   unlist: false,
   category: typeof categoriesList[number],
   requiredPermissionsOr: CommandPermission[],
+  usage?: never,
+  examples?: never,
 };
 
 export type ListCommandInitializeOptions =

@@ -35,6 +35,8 @@ export default class Volume extends BaseCommand {
       }],
       requiredPermissionsOr: ["admin", "sameVc"],
       shouldDefer: false,
+      examples: true,
+      usage: true,
     });
   }
 

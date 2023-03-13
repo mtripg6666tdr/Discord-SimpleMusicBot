@@ -45,6 +45,8 @@ export default class Commands extends BaseCommand {
       }],
       requiredPermissionsOr: [],
       shouldDefer: false,
+      usage: true,
+      examples: true,
     });
   }
 

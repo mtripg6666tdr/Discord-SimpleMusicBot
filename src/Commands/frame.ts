@@ -41,6 +41,8 @@ export default class Frame extends BaseCommand {
       }],
       requiredPermissionsOr: ["admin", "sameVc"],
       shouldDefer: false,
+      usage: true,
+      examples: true,
     });
   }
 

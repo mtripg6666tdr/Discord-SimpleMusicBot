@@ -44,6 +44,8 @@ export default class Import extends BaseCommand {
       }],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: false,
+      usage: true,
+      examples: true,
     });
   }
 

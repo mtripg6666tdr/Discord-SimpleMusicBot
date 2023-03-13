@@ -20,34 +20,34 @@
 const fs = require("fs");
 const path = require("path");
 const config = require("../dist/config").useConfig();
-require("../dist/i18n").initLocalization(false, config.defaultLanguage)
-const { CommandManager } = require("../dist/Component/CommandManager");
-// const { categories, categoriesList } = require("../dist/Commands/commands");
+require("../dist/i18n").initLocalization(false, config.defaultLanguage).then(() => {
+  const { CommandManager } = require("../dist/Component/CommandManager");
+  // const { categories, categoriesList } = require("../dist/Commands/commands");
 
-const commandDocPath = path.join(__dirname, "../docs/docs/guide/commands/");
+  const commandDocPath = path.join(__dirname, "../docs/docs/guide/commands/");
 
-const existingFiles = new Set(fs.readdirSync(commandDocPath));
-existingFiles.delete("_category_.json");
-existingFiles.delete("overview.md");
+  const existingFiles = new Set(fs.readdirSync(commandDocPath));
+  existingFiles.delete("_category_.json");
+  existingFiles.delete("overview.md");
 
-/**
- * @type { import("../src/Commands").BaseCommand[] }
- */
-const commands = new CommandManager().commands.filter(
   /**
-   * @param { import("../src/Commands").BaseCommand } c 
-   * @returns { boolean }
+   * @type { import("../src/Commands").BaseCommand[] }
    */
-  c => !c.unlist
-);
+  const commands = new CommandManager().commands.filter(
+    /**
+     * @param { import("../src/Commands").BaseCommand } c 
+     * @returns { boolean }
+     */
+    c => !c.unlist
+  );
 
-for(let i = 0; i < commands.length; i++){
-  const cmd = commands[i];
-  const filename = `${cmd.asciiName}.md`;
-  if(existingFiles.has(filename)){
-    existingFiles.delete(filename);
-  }
-  fs.writeFileSync(path.join(commandDocPath, filename), `---
+  for(let i = 0; i < commands.length; i++){
+    const cmd = commands[i];
+    const filename = `${cmd.asciiName}.md`;
+    if(existingFiles.has(filename)){
+      existingFiles.delete(filename);
+    }
+    fs.writeFileSync(path.join(commandDocPath, filename), `---
 sidebar_label: ${cmd.name}
 ---
 # \`${cmd.name}\`コマンド
@@ -60,16 +60,17 @@ ${cmd.description}
 
 ${cmd.alias.map(alias => `- ${alias}`).join("\r\n")}
 
-${cmd.usage ? `## 使い方\r\n\`\`\`\r\n${cmd.usage}\r\n\`\`\`\r\n` : ""}
-${cmd.examples ? `## 使用例\r\n\`\`\`\r\n${cmd.examples}\r\n\`\`\`\r\n` : ""}
+${cmd.usage ? `## 使い方\r\n\`\`\`\r\n${cmd.usage[config.defaultLanguage]}\r\n\`\`\`\r\n` : ""}
+${cmd.examples ? `## 使用例\r\n\`\`\`\r\n${cmd.examples[config.defaultLanguage]}\r\n\`\`\`\r\n` : ""}
 
 ## 実行に必要な権限
 ${cmd.getPermissionDescription(config.defaultLanguage)}
 
 ※管理者権限や、サーバーの管理権限、チャンネルの管理権限、および管理者権限を持つユーザーはこの権限を満たしていなくてもいつでもこのコマンドを実行できます。
   \r\n`, {encoding: "utf-8"});
-}
+  }
 
-existingFiles.forEach(file => fs.unlinkSync(path.join(commandDocPath, file)));
+  existingFiles.forEach(file => fs.unlinkSync(path.join(commandDocPath, file)));
 
-process.exit(0);
+  process.exit(0);
+});

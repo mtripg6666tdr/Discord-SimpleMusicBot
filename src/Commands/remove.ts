@@ -36,6 +36,8 @@ export default class Rm extends BaseCommand {
       }],
       requiredPermissionsOr: [],
       shouldDefer: false,
+      examples: true,
+      usage: true,
     });
   }
 
