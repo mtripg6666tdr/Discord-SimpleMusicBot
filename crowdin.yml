@@ -1,5 +1,8 @@
 commit_message: "Change: update translations in %language% [ci skip]"
 append_commit_message: false
+pull_request_title: "Change: update translations in %language% [ci skip]"
+pull_request_labels:
+  - language
 files:
   - source: /locales/ja/*.json
     translation: /locales/%locale%/%original_file_name%
