@@ -311,16 +311,31 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     const connectionLogger = getLogger("Connection");
     connectionLogger.addContext("id", this.getGuildId());
 
-    connection
-      .on("error", err => {
-        connectionLogger.error(err);
-      })
-    ;
+    connection.on("error", err => {
+      connectionLogger.error(err);
+    });
     this.connection = connection;
     if(config.debug){
       connection.on("debug", connectionLogger.trace);
     }
-
+    // ニックネームの変更
+    const botSelf = this.bot.client.guilds.get(this.getGuildId()).clientMember;
+    let nickname = botSelf.nick;
+    if(nickname && (nickname.includes("🈳") || nickname.includes("⏹️") || nickname.includes("🈵") || nickname.includes("▶"))){
+      nickname = nickname.replace("🈳", "🈵");
+      nickname = nickname.replace("⏹", "▶");
+      await botSelf.edit({
+        nick: nickname,
+      }).catch(this.logger.error);
+      // ニックネームを元に戻すやつ
+      connection.on(VoiceConnectionStatus.Destroyed, () => {
+        nickname = nickname.replace("🈵", "🈳");
+        nickname = nickname.replace("▶", "⏹");
+        botSelf.edit({
+          nick: nickname,
+        }).catch(this.logger.error);
+      });
+    }
     this.logger.info(`Connected to ${channelId}`);
   }
 
