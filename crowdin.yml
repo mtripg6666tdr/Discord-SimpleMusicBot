@@ -1,4 +1,4 @@
-commit_message: "Change: update translations in %language%"
+commit_message: "Change: update translations in %language% [ci skip]"
 append_commit_message: false
 files:
   - source: /locales/ja/*.json
