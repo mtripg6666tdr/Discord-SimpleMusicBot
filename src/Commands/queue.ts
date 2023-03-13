@@ -117,7 +117,7 @@ export default class Queue extends BaseCommand {
     if(totalpage > 1){
       const pagenation = await context.bot.collectors
         .createPagenation()
-        .setPages(getQueueEmbed, totalLength)
+        .setPages(getQueueEmbed, totalpage)
         .send(message);
       context.server.queue.eitherOnce(["change", "changeWithoutCurrent"], pagenation.destroy.bind(pagenation));
     }else{
