@@ -339,7 +339,6 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     this.logger.info(`Connected to ${channelId}`);
   }
 
-
   private readonly joinVoiceChannelLocker: LockObj = new LockObj();
   /**
    * ボイスチャンネルに接続します
