@@ -13,7 +13,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci
 COPY . .
-RUN npx tsc
+RUN npx tsc -p tsconfig.build.json
 
 
 FROM base AS runner
