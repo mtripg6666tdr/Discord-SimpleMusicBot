@@ -16,6 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { i18n } from "i18next";
+
 import { padZero } from ".";
 
 /**
@@ -46,8 +48,8 @@ export function calcHourMinSec(seconds: number){
  * @param param0 
  * @returns 
  */
-export function HourMinSecToString([hour, min, sec]: string[]){
-  return hour === "NaN" ? "不明" : `${hour === "0" ? "" : `${hour}:`}${min}:${sec}`;
+export function HourMinSecToString([hour, min, sec]: string[], t: i18n["t"]){
+  return hour === "NaN" ? t("unknown") : `${hour === "0" ? "" : `${hour}:`}${min}:${sec}`;
 }
 
 // Returns hour, min, sec and millisec from total millisec

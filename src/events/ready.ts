@@ -18,6 +18,7 @@
 
 import type { MusicBot } from "../bot";
 
+import i18next from "i18next";
 import * as discord from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
@@ -37,14 +38,14 @@ export async function onReady(this: MusicBot){
     client.editStatus("dnd", [
       {
         type: discord.ActivityTypes.GAME,
-        name: "起動中...",
+        name: i18next.t("startingUp"),
       },
     ]);
   }else{
     client.editStatus("dnd", [
       {
         type: discord.ActivityTypes.GAME,
-        name: "メンテナンス中...",
+        name: i18next.t("maintenance"),
       },
     ]);
   }
@@ -112,7 +113,7 @@ export async function onReady(this: MusicBot){
     client.editStatus("online", [
       {
         type: discord.ActivityTypes.LISTENING,
-        name: "音楽",
+        name: i18next.t("music"),
       },
     ]);
   }

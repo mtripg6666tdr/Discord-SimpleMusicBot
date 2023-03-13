@@ -41,6 +41,10 @@ const sampleJson = `
   "alwaysTwentyFourSeven": false,
 
   "cacheLevel": "memory",
+
+  "defaultLanguage": "ja",
+
+  "country": "JP"
 }`;
 fs.writeFileSync(configPath, sampleJson, {encoding: "utf-8"});
 console.log("Successfully wrote the config for test");

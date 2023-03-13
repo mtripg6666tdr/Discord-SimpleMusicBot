@@ -17,6 +17,7 @@
  */
 
 import type { SoundCloudTrackCollection } from "../AudioSource";
+import type { i18n } from "i18next";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 
 import candyget from "candyget";
@@ -24,28 +25,29 @@ import Soundcloud from "soundcloud.ts";
 
 import { SearchBase } from "./search";
 import * as Util from "../Util";
+import { useConfig } from "../config";
 import { DefaultUserAgent } from "../definition";
+
+const config = useConfig();
 
 export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
   private readonly soundcloud = new Soundcloud();
 
   constructor(){
     super({
-      name: "サウンドクラウドを検索",
       alias: ["soundcloudを検索", "searchsoundcloud", "searchs", "ses", "ss", "sc", "soundcloud"],
-      description: "曲をSoundCloudで検索します",
       unlist: false,
       category: "playlist",
-      examples: "ses sakura trip",
-      usage: "ses <キーワード>",
       argument: [{
         type: "string",
         name: "keyword",
-        description: "検索したい楽曲のキーワードまたはURL。",
         required: true,
       }],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
+      disabled: config.isDisabledSource("soundcloud"),
+      usage: true,
+      examples: true,
     });
   }
 
@@ -80,7 +82,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
     };
   }
 
-  protected override consumer(result: SoundcloudTrackV2[]){
+  protected override consumer(result: SoundcloudTrackV2[], t: i18n["t"]){
     return result.map(item => {
       const [min, sec] = Util.time.calcMinSec(Math.floor(item.duration / 1000));
       return {
@@ -89,7 +91,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
         duration: item.full_duration.toString(),
         thumbnail: item.artwork_url,
         author: item.user.username,
-        description: `長さ: ${min}:${sec}, ユーザー: ${item.user.username}`,
+        description: `${t("length")}: ${min}:${sec}, ${t("user")}: ${item.user.username}`,
       };
     });
   }

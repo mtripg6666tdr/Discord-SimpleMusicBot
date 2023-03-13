@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -31,9 +32,7 @@ const config = useConfig();
 export default class Help extends BaseCommand {
   constructor(){
     super({
-      name: "ヘルプ",
       alias: ["help", "support"],
-      description: "ヘルプを表示します",
       unlist: false,
       category: "bot",
       requiredPermissionsOr: [],
@@ -41,7 +40,7 @@ export default class Help extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     const developerId = "593758391395155978";
     const cachedUser = context.client.users.get(developerId);
     const developer = cachedUser
@@ -54,25 +53,29 @@ export default class Help extends BaseCommand {
     const embed = new MessageEmbedBuilder()
       .setTitle(context.client.user.username + ":notes:")
       .setDescription(
-        "高音質な音楽で、Discordで最高のエクスペリエンスを得るために作られました:robot:\r\n"
-      + `利用可能なコマンドを確認するには、\`${config.noMessageContent ? "/" : context.server.prefix}command\`を使用してください。`)
-      .addField("開発者", `[${developer || "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`)
-      .addField("バージョン", "`" + context.bot.version + "`")
-      .addField("レポジトリ/ソースコード", "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot")
-      .addField("サポートサーバー", "https://discord.gg/7DrAEXBMHe")
-      .addField("現在対応している再生ソース", [
-        !isDisabledSource("youtube") && "・YouTube(キーワード検索)",
-        !isDisabledSource("youtube") && "・YouTube(動画URL指定)",
-        !isDisabledSource("youtube") && "・YouTube(プレイリストURL指定)",
-        !isDisabledSource("soundcloud") && "・SoundCloud(キーワード検索)",
-        !isDisabledSource("soundcloud") && "・SoundCloud(楽曲ページURL指定)",
-        !isDisabledSource("streamable") && "・Streamable(動画ページURL指定)",
-        !isDisabledSource("custom") && "・Discord(音声ファイルの添付付きメッセージのURL指定)",
-        !isDisabledSource("googledrive") && "・Googleドライブ(音声ファイルの限定公開リンクのURL指定)",
-        !isDisabledSource("niconico") && "・ニコニコ動画(動画ページURL指定)",
-        !isDisabledSource("twitter") && "・Twitter(ツイートURL指定)",
-        !isDisabledSource("spotify") && Spotify.available && "・Spotify(曲のURL、およびプレイリストのURL。曲を推測してYouTubeから再生します。)",
-        !isDisabledSource("custom") && "・オーディオファイルへの直URL",
+        t("commands:help.embedDescription")
+        + "\r\n"
+        + t("commands:help.toLearnMore", { command: `\`${config.noMessageContent ? "/" : context.server.prefix}command\`` }))
+      .addField(t("commands:help.developer"), `[${developer || "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`)
+      .addField(t("commands:help.version"), `\`${context.bot.version}\``)
+      .addField(
+        `${t("commands:help.repository")}/${t("commands:help.sourceCode")}`,
+        "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot"
+      )
+      .addField(t("commands:help.supportServer"), "https://discord.gg/7DrAEXBMHe")
+      .addField(t("commands:help.availableSources"), [
+        !isDisabledSource("youtube") && `・YouTube(${t("commands:help.keywordSearch")})`,
+        !isDisabledSource("youtube") && `・YouTube(${t("commands:help.videoUrl")})`,
+        !isDisabledSource("youtube") && `・YouTube(${t("commands:help.playlistUrl")})`,
+        !isDisabledSource("soundcloud") && `・SoundCloud(${t("commands:help.keywordSearch")})`,
+        !isDisabledSource("soundcloud") && `・SoundCloud(${t("commands:help.musicPageUrl")})`,
+        !isDisabledSource("streamable") && `・Streamable(${t("commands:help.videoUrl")})`,
+        !isDisabledSource("custom") && `・Discord(${t("commands:help.discordAttachmentUrl")})`,
+        !isDisabledSource("googledrive") && `・Googleドライブ(${t("commands:help.driveShareUrl")})`,
+        !isDisabledSource("niconico") && `・ニコニコ動画(${t("commands:help.videoUrl")})`,
+        !isDisabledSource("twitter") && `・Twitter(${t("commands:help.tweetUrl")})`,
+        !isDisabledSource("spotify") && Spotify.available && `・Spotify(${t("commands:help.spotify")})`,
+        !isDisabledSource("custom") && t("commands:help.custom"),
       ].filter(d => d).join("\r\n"))
       .setColor(getColor("HELP"))
       .toOceanic()

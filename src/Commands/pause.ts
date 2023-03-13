@@ -18,15 +18,14 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
 export default class Pause extends BaseCommand {
   constructor(){
     super({
-      name: "一時停止",
       alias: ["一旦停止", "停止", "pause", "stop"],
-      description: "再生を一時停止します。",
       unlist: false,
       category: "player",
       requiredPermissionsOr: ["admin", "sameVc"],
@@ -34,22 +33,24 @@ export default class Pause extends BaseCommand {
     });
   }
   
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!context.server.player.isPlaying){
-      await message.reply("再生中ではありません").catch(this.logger.error);
+      await message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }
     if(context.server.player.isPaused){
-      await message.reply(":pause_button: すでに一時停止されています\r\n再生を再開するには`再生`コマンドを使用してください").catch(this.logger.error);
+      await message.reply(
+        `:pause_button: ${t("commands:pause.alreadyPaused")}\r\n`
+        + t("commands:pause.usePlayToResume")).catch(this.logger.error);
       return;
     }
-    
+
     // 停止
     context.server.player.pause();
     message.reply({
-      content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:pause_button: 一時停止しました`,
+      content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:pause_button:${t("commands:pause.paused")}`,
       allowedMentions: {
         users: false,
       },

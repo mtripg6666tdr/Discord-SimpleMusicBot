@@ -18,52 +18,50 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { FFmpeg } from "prism-media";
 import * as ytdl from "ytdl-core";
 
 import { BaseCommand } from ".";
+import { FFmpegDefaultNetworkArgs } from "../Component/streams/ffmpeg";
 import * as Util from "../Util";
-import { FFmpegDefaultNetworkArgs } from "../definition";
 import { getLogger } from "../logger";
 
 export default class Frame extends BaseCommand {
   constructor(){
     super({
-      name: "フレーム",
       alias: ["frame", "キャプチャ", "capture"],
-      description: "現在の再生位置の動画のフレーム画像を可能な場合取得します。引数が指定された場合その時点でのフレームを取得します",
       unlist: false,
       category: "player",
-      examples: "フレーム 1:20",
-      usage: "フレーム [時間]",
       argument: [{
         type: "string",
         name: "time",
-        description: "指定された場合その時点でのフレームを取得します",
         required: false,
       }],
       requiredPermissionsOr: ["admin", "sameVc"],
       shouldDefer: false,
+      usage: true,
+      examples: true,
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     const server = context.server;
 
     // そもそも再生状態ではない場合
     if(!server.player.isConnecting || !server.player.isPlaying){
-      await message.reply("再生中ではありません").catch(this.logger.error);
+      await message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }
 
     const vinfo = server.player.currentAudioInfo;
     if(!vinfo.isYouTube()){
-      await message.reply(":warning:フレームのキャプチャ機能に非対応のソースです。").catch(this.logger.error);
+      await message.reply(`:warning:${t("commands:frame.unsupported")}`).catch(this.logger.error);
       return;
     }else if(vinfo.fallback){
-      await message.reply(":warning:フォールバックしているため、現在この機能を使用できません。").catch(this.logger.error);
+      await message.reply(`:warning:${t("commands:frame.fallbacking")}`).catch(this.logger.error);
       return;
     }
 
@@ -76,19 +74,19 @@ export default class Frame extends BaseCommand {
 
     if(context.rawArgs !== "" && vinfo.isLiveStream){
       await message.channel.createMessage({
-        content: "ライブストリームでは時間指定できません",
+        content: t("commands:frame.liveStreamWithTime"),
       });
       return;
     }
 
     if(!vinfo.isLiveStream && (isNaN(time) || time > vinfo.lengthSeconds)){
-      await message.reply(":warning:時間の指定が正しくありません。").catch(this.logger.error);
+      await message.reply(`:warning:${t("commands:frame.invalidTime")}`).catch(this.logger.error);
       return;
     }
 
     try{
       const [hour, min, sec] = Util.time.calcHourMinSec(Math.floor(time * 100) / 100);
-      const response = await message.reply(":camera_with_flash:取得中...");
+      const response = await message.reply(`:camera_with_flash:${t("commands:frame.capturing")}...`);
       const { url, ua } = await vinfo.fetchVideo();
       const frame = await getFrame(url, time, ua);
       await response.channel.createMessage({
@@ -101,13 +99,18 @@ export default class Frame extends BaseCommand {
         ],
       });
       await response.edit({
-        content: ":white_check_mark:完了!" + (vinfo.isLiveStream ? "" : `(${hour}:${min}:${sec}時点)`),
+        content: `:white_check_mark:${
+          t("commands:frame.finish")
+        }${vinfo.isLiveStream
+          ? ""
+          : `(${t("commands:frame.timeAt", { hour, min, sec })})`
+        }`,
       });
     }
     catch(e){
       this.logger.error(e);
       await message.channel.createMessage({
-        content: ":sob:失敗しました...",
+        content: `:sob:${t("commands:frame.failed")}`,
       }).catch(this.logger.error);
     }
   }

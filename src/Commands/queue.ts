@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -28,15 +29,12 @@ import { getColor } from "../Util/color";
 export default class Queue extends BaseCommand {
   constructor(){
     super({
-      name: "キュー",
       alias: ["キューを表示", "再生待ち", "queue", "q"],
-      description: "キューを表示します。",
       unlist: false,
       category: "playlist",
       argument: [{
         type: "integer",
         name: "page",
-        description: "表示するキューのページを指定することができます",
         required: false,
       }],
       requiredPermissionsOr: [],
@@ -44,11 +42,11 @@ export default class Queue extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     const queue = context.server.queue;
     if(queue.length === 0){
-      await message.reply(":face_with_raised_eyebrow:キューは空です。").catch(this.logger.error);
+      await message.reply(`:face_with_raised_eyebrow:${t("commands:queue.queueEmpty")}`).catch(this.logger.error);
       return;
     }
     // 合計所要時間の計算
@@ -56,12 +54,12 @@ export default class Queue extends BaseCommand {
     let _page = context.rawArgs === "" ? 1 : Number(context.rawArgs);
     if(isNaN(_page)) _page = 1;
     if(queue.length > 0 && _page > Math.ceil(queue.length / 10)){
-      await message.reply(":warning:指定されたページは範囲外です").catch(this.logger.error);
+      await message.reply(`:warning:${t("commands:queue.pageOutOfRange")}`).catch(this.logger.error);
       return;
     }
     // 合計ページ数割り出し
     const totalpage = Math.ceil(queue.length / 10);
-    
+
     // ページのキューを割り出す
     const getQueueEmbed = (page: number) => {
       const fields: { name: string, value: string }[] = [];
@@ -73,26 +71,41 @@ export default class Queue extends BaseCommand {
         const _t = Number(q.basicInfo.lengthSeconds);
         const [min, sec] = Util.time.calcMinSec(_t);
         fields.push({
-          name: i !== 0 ? i.toString() : context.server.player.isPlaying ? "現在再生中" : "再生待ち",
+          name: i !== 0
+            ? i.toString()
+            : context.server.player.isPlaying
+              ? t("components:nowplaying.nowplaying")
+              : t("components:nowplaying.waitForPlaying"),
           value: [
             `[${q.basicInfo.title}](${q.basicInfo.url})`,
-            `長さ: \`${q.basicInfo.isYouTube() && q.basicInfo.isLiveStream ? "ライブストリーム" : `${min}:${sec}`} \``,
-            `リクエスト: \`${q.additionalInfo.addedBy.displayName}\` `,
-            q.basicInfo.npAdditional(),
+            `${t("length")}: \`${
+              q.basicInfo.isYouTube() && q.basicInfo.isLiveStream
+                ? t("commands:log.liveStream")
+                : `${min}:${sec}`
+            } \``,
+            `${t("components:nowplaying.requestedBy")}: \`${q.additionalInfo.addedBy.displayName}\` `,
+            q.basicInfo.npAdditional(t),
           ].join("\r\n"),
         });
       }
       const [thour, tmin, tsec] = Util.time.calcHourMinSec(totalLength);
       return new MessageEmbedBuilder()
-        .setTitle(`${message.guild.name}のキュー`)
-        .setDescription(`\`${page + 1}ページ目(${totalpage}ページ中)\``)
+        .setTitle(t("components:queue.queueTitle", { server: message.guild.name }))
+        .setDescription(`\`${t("currentPage", { count: page + 1 })}(${t("allPages", { count: totalpage })})\``)
         .addFields(...fields)
         .setAuthor({
           name: context.client.user.username,
           iconURL: context.client.user.avatarURL(),
         })
         .setFooter({
-          text: `${queue.length}曲 | 合計:${thour}:${tmin}:${tsec} | トラックループ:${queue.loopEnabled ? "⭕" : "❌"} | キューループ:${queue.queueLoopEnabled ? "⭕" : "❌"} | 関連曲自動再生:${context.server.addRelated ? "⭕" : "❌"} | 均等再生:${context.server.equallyPlayback ? "⭕" : "❌"}`,
+          text: [
+            `${t("commands:queue.songCount", { count: queue.length })}`,
+            `${t("commands:queue.total")}: ${thour}:${tmin}:${tsec}`,
+            `${t("components:queue.trackloop")}:${queue.loopEnabled ? "⭕" : "❌"}`,
+            `${t("components:queue.queueloop")}:${queue.queueLoopEnabled ? "⭕" : "❌"}`,
+            `${t("components:queue.autoplayRelated")}:${context.server.addRelated ? "⭕" : "❌"}`,
+            `${t("components:queue.equallyplayback")}:${context.server.equallyPlayback ? "⭕" : "❌"}`,
+          ].join(" | "),
         })
         .setThumbnail(message.guild.iconURL())
         .setColor(getColor("QUEUE"))

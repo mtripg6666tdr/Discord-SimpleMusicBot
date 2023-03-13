@@ -18,15 +18,14 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
 export default class Loop extends BaseCommand {
   constructor(){
     super({
-      name: "ループ",
       alias: ["トラックループ", "loop", "repeat", "lp", "trackloop", "trackrepeat"],
-      description: "トラックごとのループを設定します。",
       unlist: false,
       category: "player",
       requiredPermissionsOr: ["admin", "noConnection", "onlyListener", "dj"],
@@ -34,14 +33,14 @@ export default class Loop extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(context.server.queue.loopEnabled){
       context.server.queue.loopEnabled = false;
-      message.reply(":repeat_one:トラックリピートを無効にしました:x:").catch(this.logger.error);
+      message.reply(`:repeat_one:${t("commands:loop.disabled")}:x:`).catch(this.logger.error);
     }else{
       context.server.queue.loopEnabled = true;
-      message.reply(":repeat_one:トラックリピートを有効にしました:o:").catch(this.logger.error);
+      message.reply(`:repeat_one:${t("commands:loop.enabled")}:o:`).catch(this.logger.error);
     }
   }
 }

@@ -18,9 +18,11 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 import type { EmbedField } from "oceanic.js";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
+
 
 import { BaseCommand } from ".";
 import * as Util from "../Util";
@@ -29,29 +31,26 @@ import { getColor } from "../Util/color";
 export default class Searchq extends BaseCommand {
   constructor(){
     super({
-      name: "キュー内を検索",
       alias: ["searchqueue", "searchq", "seq", "sq"],
-      description: "キュー内を検索します。引数にキーワードを指定します。",
       unlist: false,
       category: "playlist",
-      examples: "seq pretender",
-      usage: "seq <キーワード>",
       argument: [{
         type: "string",
         name: "keyword",
-        description: "検索したい楽曲のキーワード",
         required: true,
       }],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
+      examples: true,
+      usage: true,
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
 
     if(context.server.queue.length === 0){
-      message.reply("✘キューが空です").catch(this.logger.error);
+      message.reply(t("commands:searchqueue.queueEmpty")).catch(this.logger.error);
       return;
     }
 
@@ -65,7 +64,7 @@ export default class Searchq extends BaseCommand {
     ;
 
     if(qsresult.length === 0){
-      message.reply(":confused:見つかりませんでした").catch(this.logger.error);
+      message.reply(`:confused:${t("search.notFound")}`).catch(this.logger.error);
       return;
     }
 
@@ -80,16 +79,22 @@ export default class Searchq extends BaseCommand {
       const _t = c.basicInfo.lengthSeconds;
       const [min, sec] = Util.time.calcMinSec(_t);
       return {
-        name: index === "0" ? "現在再生中/再生待ち" : index,
-        value: `[${c.basicInfo.title}](${c.basicInfo.url})\r\nリクエスト: \`${c.additionalInfo.addedBy.displayName}\` \r\n長さ: ${
-          c.basicInfo.isYouTube() && c.basicInfo.isLiveStream ? "(ライブストリーム)" : ` \`${_t === 0 ? "(不明)" : `${min}:${sec}`}\`)`
-        }`,
+        name: index === "0"
+          ? `${t("components:nowplaying.nowplaying")}/${t("components:nowplaying.waitForPlaying")}`
+          : index,
+        value: `[${c.basicInfo.title}](${c.basicInfo.url})\r\n`
+          + `${t("components:nowplaying.requestedBy")}: \`${c.additionalInfo.addedBy.displayName}\` \r\n`
+          + `${t("length")}: ${
+            c.basicInfo.isYouTube() && c.basicInfo.isLiveStream
+              ? `(${t("liveStream")})`
+              : ` \`${_t === 0 ? `(${t("unknown")})` : `${min}:${sec}`}\`)`
+          }`,
         inline: false,
       } as EmbedField;
     });
     const embed = new MessageEmbedBuilder()
-      .setTitle(`"${context.rawArgs}"の検索結果✨`)
-      .setDescription("キュー内での検索結果です。最大20件表示されます。")
+      .setTitle(`${t("components:search.resultTitle", { query: context.rawArgs })}✨`)
+      .setDescription(t("commands:searchqueue.embedDescription"))
       .setFields(...fields)
       .setColor(getColor("SEARCH"))
       .toOceanic()

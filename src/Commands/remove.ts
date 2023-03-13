@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 import { discordUtil } from "../Util";
@@ -25,31 +26,28 @@ import { discordUtil } from "../Util";
 export default class Rm extends BaseCommand {
   constructor(){
     super({
-      name: "削除",
       alias: ["消去", "remove", "rm", "del", "delete"],
-      description: "キュー内の指定された位置の曲を削除します。",
       unlist: false,
       category: "playlist",
-      examples: "rm 5",
-      usage: "削除 <削除する位置>",
       argument: [{
         type: "string",
         name: "index",
-        description: "削除するインデックスはキューに併記されているものです。ハイフンを使って2-5のように範囲指定したり、スペースを使って1 4 8のように複数指定することも可能です。",
         required: true,
       }],
       requiredPermissionsOr: [],
       shouldDefer: false,
+      examples: true,
+      usage: true,
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     if(context.args.length === 0){
-      message.reply("引数に消去する曲のオフセット(番号)を入力してください。").catch(this.logger.error);
+      message.reply(t("commands:remove.noArgument")).catch(this.logger.error);
       return;
     }
     if(context.args.includes("0") && context.server.player.isPlaying){
-      message.reply("現在再生中の楽曲を削除することはできません。");
+      message.reply(t("commands:remove.invalidArgument"));
       return;
     }
 
@@ -57,7 +55,7 @@ export default class Rm extends BaseCommand {
 
     const q = context.server.queue;
     const addition = [] as number[];
-    
+
     // 引数についてるハイフン付きのオプションを展開する。
     // 5-、-12、3-6など。
     context.args.forEach(o => {
@@ -137,15 +135,20 @@ export default class Rm extends BaseCommand {
       const resultStr = actualDeleted.sort((a, b) => a - b).join(",");
       const failedStr = failed.sort((a, b) => a - b).join(",");
       message.reply(
-        `🚮${resultStr.length > 100 ? "指定された" : `${resultStr}番目の`}曲${title ? "(`" + title + "`)" : ""}を削除しました`
+        `🚮${resultStr.length > 100
+          ? t("commands:remove.removedMany")
+          : t("commands:remove.removedAt", { indexes: resultStr, title: title ? `(\`${title}\`)` : "" })
+        }`
         + `${
-          failed.length > 0
-            ? `\r\n:warning:${failed.length > 100 ? "一部" : `${failedStr}番目`}の曲は権限がないため削除できませんでした。`
-            : ""
+          failed.length > 100
+            ? `\r\n${t("commands:remove.unableToRemoveMany")}`
+            : failed.length > 0
+              ? `\r\n${t("commands:remove.unableToRemoveAt", { indexes: failedStr })}`
+              : ""
         }`
       ).catch(this.logger.error);
     }else{
-      message.reply("削除できませんでした。権限が不足している可能性があります。").catch(this.logger.error);
+      message.reply(t("commands:remove.unableToRemoveAll")).catch(this.logger.error);
     }
   }
 }

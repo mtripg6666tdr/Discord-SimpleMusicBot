@@ -18,15 +18,14 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
 export default class Rewind extends BaseCommand {
   constructor(){
     super({
-      name: "頭出し",
       alias: ["rewind", "gotop", "replay"],
-      description: "再生中の曲の頭出しを行い、初めから再生します。",
       unlist: false,
       category: "player",
       requiredPermissionsOr: ["admin", "sameVc"],
@@ -34,14 +33,14 @@ export default class Rewind extends BaseCommand {
     });
   }
   
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(!context.server.player.isPlaying){
-      message.reply("再生中ではありません").catch(this.logger.error);
+      message.reply(t("notPlaying")).catch(this.logger.error);
     }else{
       context.server.player.rewind();
       message.reply({
-        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:rewind:再生中の楽曲を頭出ししました:+1:`,
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:rewind:${t("commands:rewind.success")}:+1:`,
         allowedMentions: {
           users: false,
         },

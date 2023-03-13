@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 import type { EmbedOptions } from "oceanic.js";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
@@ -35,35 +36,32 @@ const config = useConfig();
 export default class SystemInfo extends BaseCommand {
   constructor(){
     super({
-      name: "システム情報",
       alias: ["ログ", "log", "systeminfo", "sysinfo"],
-      description: "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`、`cpu`、`basic`のうちいずれか)を指定して特定の内容のみ取得することもできます。",
       unlist: false,
       category: "utility",
-      examples: "sysinfo mem",
-      usage: "sysinfo [mem|cpu]",
       argument: [{
         type: "string",
         name: "content",
-        description: "basic,mem,cpuのどれかを指定できます",
         required: false,
-        choices: {
-          "基本情報": "basic",
-          "メモリ": "mem",
-          "CPU": "cpu",
-          "ログ(管理者のみ)": "log",
-        },
+        choices: [
+          "basic",
+          "mem",
+          "cpu",
+          "log",
+        ],
       }],
       requiredPermissionsOr: [],
       shouldDefer: false,
+      examples: true,
+      usage: true,
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     // Run default logger
     context.bot.logGeneralInfo();
-    await message.reply("実行します");
+    await message.reply(t("commands:log.executing"));
 
     const embeds = [] as EmbedOptions[];
 
@@ -125,14 +123,14 @@ export default class SystemInfo extends BaseCommand {
           .setColor(getColor("UPTIME"))
           .setTitle("Server Info")
           .setDescription(
-            "サーバー名(NSFW LEVEL,ID)\r\n"
+            `${t("commands:log.guildName")}(NSFW LEVEL,ID)\r\n`
             + context.client.guilds.map(guild => `${guild.name.length > 17 ? guild.name.substring(0, 17) + "…" : guild.name} (${guild.nsfwLevel},${guild.id})`).join("\r\n")
           )
-          .addField("参加サーバー数", context.bot.client.guilds.size.toString(), true)
-          .addField("データが保持されているサーバー数", context.bot.databaseCount.toString(), true)
-          .addField("接続中サーバー数", context.bot.connectingGuildCount.toString(), true)
-          .addField("再生中サーバー数(一時停止含む)", context.bot.playingGuildCount.toString(), true)
-          .addField("一時停止サーバー数", context.bot.pausedGuildCount.toString(), true)
+          .addField(t("commands:log.participatingGuildCount"), context.bot.client.guilds.size.toString(), true)
+          .addField(t("commands:log.registeredGuildCount"), context.bot.databaseCount.toString(), true)
+          .addField(t("commands:log.connectingGuildCount"), context.bot.connectingGuildCount.toString(), true)
+          .addField(t("commands:log.playingGuildCount"), context.bot.playingGuildCount.toString(), true)
+          .addField(t("commands:log.pausedGuildCount"), context.bot.pausedGuildCount.toString(), true)
           .toOceanic()
       );
     }
@@ -143,20 +141,19 @@ export default class SystemInfo extends BaseCommand {
       embeds.push(
         new MessageEmbedBuilder()
           .setColor(getColor("HELP"))
-          .setTitle("(秘)サーバー照会結果")
-          .addField("サーバー名", target.name, true)
-          .addField("サーバーID", target.id)
-          .addField("サーバーアイコン", target.icon || "なし")
-          .addField("チャンネル数(キャッシュによる)", target.channels.size.toString(), true)
-          .addField("メンバー数(概算)", target.approximateMemberCount?.toString() || "不明", true)
-          .addField("接続中", data?.player.isConnecting ? "はい" : "いいえ", true)
-          .addField("再生/一時停止中", data?.player.isPaused ? "はい" : "いいえ", true)
-          .addField("一時停止中", data?.player.isPaused ? "はい" : "いいえ", true)
-          .addField("キュー内のアイテム数", data?.queue.length.toString() || "0", true)
-          .addField("現在の変換コスト", data?.player.cost.toString() || "0", true)
+          .setTitle(t("commands:log.guildSearchResult"))
+          .addField(t("commands:log.guildName"), target.name, true)
+          .addField(t("commands:log.guildId"), target.id)
+          .addField(t("commands:log.guildIcon"), "なし")
+          .addField(t("commands:log.guildChannelCountFromCache"), target.channels.size.toString(), true)
+          .addField(t("commands:log.guildConnecting"), data?.player.isConnecting ? t("yes") : t("no"), true)
+          .addField(t("commands:log.guildPlaying"), data?.player.isPaused ? t("yes") : t("no"), true)
+          .addField(t("commands:log.guildPaused"), data?.player.isPaused ? t("yes") : t("no"), true)
+          .addField(t("commands:log.itemsInQueue"), data?.queue.length.toString() || "0", true)
+          .addField(t("commands:log.currentTransformingCost"), data?.player.cost.toString() || "0", true)
           .addField(
-            "ライブストリーム",
-            data?.player.currentAudioInfo?.isYouTube() && data?.player.currentAudioInfo.isLiveStream ? "はい" : "いいえ",
+            t("commands:log.liveStream"),
+            data?.player.currentAudioInfo?.isYouTube() && data?.player.currentAudioInfo.isLiveStream ? t("yes") : t("no"),
             true
           )
           .toOceanic()

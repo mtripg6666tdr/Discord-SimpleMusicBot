@@ -18,6 +18,7 @@
 
 import type { CommandMessage } from "./commandResolver/CommandMessage";
 import type { GuildDataContainer } from "../Structure";
+import type { i18n } from "i18next";
 
 import { SearchPanel } from "./SearchPanel";
 import { ServerManagerBase } from "../Structure";
@@ -32,16 +33,16 @@ export class SearchPanelManager extends ServerManagerBase<SearchPanelManagerEven
   constructor(parent: GuildDataContainer){
     super("SearchPanelManager", parent);
   }
-  
+
   protected _searchPanels = new Map<string, SearchPanel>();
 
   get size(){
     return this._searchPanels.size;
   }
 
-  create(_commandMessage: CommandMessage, query: string, isRawTitle: boolean = false){
+  create(_commandMessage: CommandMessage, query: string, t: i18n["t"], isRawTitle: boolean = false){
     if(this._searchPanels.size >= 3){
-      _commandMessage.reply(":cry:すでに開いている検索パネルが上限を超えています")
+      _commandMessage.reply(`:cry:${t("components:search.maximumSearch")}`)
         .catch(this.logger.error);
       return null;
     }

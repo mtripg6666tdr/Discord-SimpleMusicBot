@@ -22,6 +22,8 @@ import type { ReadableStreamInfo } from "./audiosource";
 import * as fs from "fs";
 import * as path from "path";
 
+import i18next from "i18next";
+
 import { AudioSource } from "./audiosource";
 import { retriveLengthSeconds } from "../Util";
 
@@ -32,7 +34,7 @@ export class FsStream extends AudioSource<string> {
 
   async init(url: string){
     this.url = url;
-    this.title = "カスタムストリーム";
+    this.title = i18next.t("audioSources.customStream");
     try{
       this.lengthSeconds = await retriveLengthSeconds(url);
     }
@@ -51,8 +53,8 @@ export class FsStream extends AudioSource<string> {
   toField(){
     return [
       {
-        name: ":asterisk:詳細",
-        value: "カスタムストリーム",
+        name: `:asterisk:${i18next.t("moreInfo")}`,
+        value: i18next.t("audioSources.customStream"),
       },
     ];
   }

@@ -19,6 +19,8 @@
 import type { MusicBot } from "../bot";
 import type * as discord from "oceanic.js";
 
+import i18next from "i18next";
+
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 
 export async function onVoiceChannelJoin(
@@ -49,7 +51,7 @@ export async function onVoiceChannelJoin(
             this._client.rest.channels.createMessage(
               this.guildData.get((newChannel as discord.VoiceChannel).guild.id).boundTextChannel,
               {
-                content: ":sob:発言が抑制されています。音楽を聞くにはサーバー側ミュートを解除するか、[メンバーをミュート]権限を渡してください。",
+                content: `:sob:${i18next.t("suppressed")}`,
               }
             )
               .catch(this.logger.error);

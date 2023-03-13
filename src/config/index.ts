@@ -16,6 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { AudioSourceTypeIdentifer } from "../AudioSource";
 import type { Static } from "@sinclair/typebox";
 
 import * as fs from "fs";
@@ -31,7 +32,7 @@ const DEVELOPMENT_PHASE = true;
 
 type ConfigObject = Static<typeof ConfigSchema> & {
   isBotAdmin: (userId: string) => boolean,
-  isDisabledSource: (sourceIdentifer: string) => boolean,
+  isDisabledSource: (sourceIdentifer: AudioSourceTypeIdentifer) => boolean,
 };
 
 class ConfigLoader {
@@ -97,7 +98,7 @@ class ConfigLoader {
       }
       return typeof this._config.adminId === "string" ? this._config.adminId === userId : this._config.adminId.includes(userId);
     };
-    this._config.isDisabledSource = (sourceIdentifer: string) => {
+    this._config.isDisabledSource = (sourceIdentifer: AudioSourceTypeIdentifer) => {
       return this._config.disabledSources.includes(sourceIdentifer);
     };
     Object.freeze(this._config);

@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -27,9 +28,7 @@ import { getColor } from "../Util/color";
 export default class Effect extends BaseCommand {
   constructor(){
     super({
-      name: "エフェクト",
       alias: ["effect", "音声エフェクト", "音声効果", "効果"],
-      description: "エフェクトコントロールパネルを表示します",
       unlist: false,
       category: "player",
       requiredPermissionsOr: [],
@@ -37,7 +36,7 @@ export default class Effect extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     try{
       const { collector, customIdMap } = context.server.bot.collectors.create()
@@ -51,15 +50,15 @@ export default class Effect extends BaseCommand {
           loudnessEq: "button",
         });
       const createEffectEmbed = () => new MessageEmbedBuilder()
-        .setTitle(":cd:エフェクトコントロールパネル:microphone:")
-        .setDescription("オーディオエフェクトの設定/解除することができます。\r\n・表示は古い情報であることがありますが、エフェクトを操作したとき、更新ボタンを押したときに更新されます。\r\n・エフェクトは次の曲から適用されます\r\n現在の曲に適用したい場合は、`頭出し`コマンドを使用してください\r\n")
+        .setTitle(`:cd:${t("commands:effect.effectControllPanel.title")}:microphone:`)
+        .setDescription(t("commands:effect.effectControllPanel.description"))
         .addField("Bass Boost", context.server.effectPrefs.BassBoost ? "⭕" : "❌", true)
         .addField("Reverb", context.server.effectPrefs.Reverb ? "⭕" : "❌", true)
         .addField("Loudness Eq", context.server.effectPrefs.LoudnessEqualization ? "⭕" : "❌", true)
         .setColor(getColor("EFFECT"))
         .setFooter({
           iconURL: message.member.avatarURL(),
-          text: "エフェクトを選択してボタンを押してください",
+          text: t("commands:effect.effectControllPanel.footer"),
         })
         .toOceanic()
       ;
@@ -69,7 +68,7 @@ export default class Effect extends BaseCommand {
             .setCustomId(customIdMap.reload)
             .setStyle("PRIMARY")
             .setEmoji("🔁")
-            .setLabel("更新"),
+            .setLabel(t("commands:effect.effectControllPanel.reload")),
           new MessageButtonBuilder()
             .setCustomId(customIdMap.bassBoost)
             .setStyle(context.server.effectPrefs.BassBoost ? "SUCCESS" : "SECONDARY")
@@ -84,7 +83,7 @@ export default class Effect extends BaseCommand {
             .setLabel("Loudness Eq")
         )
         .toOceanic();
-      
+
       const reply = await message.reply({
         embeds: [createEffectEmbed()],
         components: [createActionRow()],
@@ -112,7 +111,7 @@ export default class Effect extends BaseCommand {
     }
     catch(e){
       this.logger.error(e);
-      message.reply(":cry:エラーが発生しました").catch(this.logger.error);
+      message.reply(`:cry:${t("errorOccurred")}`).catch(this.logger.error);
     }
   }
 }

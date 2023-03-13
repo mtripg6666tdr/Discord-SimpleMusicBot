@@ -19,6 +19,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { ResponseMessage } from "../Component/commandResolver/ResponseMessage";
+import type { i18n } from "i18next";
 import type { AnyGuildTextChannel, Message } from "oceanic.js";
 
 import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
@@ -48,13 +49,15 @@ export default class BulkDelete extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     const count = Number(context.args[0]);
     if(isNaN(count)){
-      message.reply(":warning:指定されたメッセージ数が無効です。");
+      message.reply(`:warning:${t("commands:bulk-delete.invalidMessageCount")}`);
       return;
     }
-    const reply = await message.reply(":mag:取得中...").catch(this.logger.error) as ResponseMessage;
+    const reply = await message.reply(
+      t("commands:bulk-delete.loading") + "..."
+    ).catch(this.logger.error) as ResponseMessage;
     try{
       // collect messages
       let before = "";
@@ -73,7 +76,12 @@ export default class BulkDelete extends BaseCommand {
         messages.push(...msgs);
         before = allMsgs.at(-1).id;
         i++;
-        await reply.edit(`:mag:取得中(${messages.length}件ヒット/取得した${i * 100}件中)...`);
+        await reply.edit(
+          `:mag:${t("commands:bulk-delete.loading")}(${
+            t("commands:bulk-delete.hitCount", { count: messages.length })
+          }/${
+            t("commands:bulk-delete.inCount", { count: i * 100 })
+          })...`);
       } while(messages.length < count && i <= 10);
       if(messages.length > count) messages.splice(count);
 
@@ -86,9 +94,8 @@ export default class BulkDelete extends BaseCommand {
         });
       await reply.edit({
         content: [
-          `${messages.length}件見つかりました。`,
-          "一括削除を確定するにはボタンを押してください。",
-          "押されないと一定時間後にキャンセルされます。",
+          t("commands:bulk-delete.found", { count: messages.length }),
+          t("commands:bulk-delete.confirm"),
         ].join("\r\n"),
         components: [
           new MessageActionRowBuilder()
@@ -106,17 +113,17 @@ export default class BulkDelete extends BaseCommand {
         // bulk delete
         await message.channel.deleteMessages(
           messages.map(msg => msg.id),
-          `${message.member.username}#${message.member.discriminator}により${count}件のメッセージの削除が要求されたため。`
+          t("commands:bulk-delete.auditLog", { issuer: message.member.username, count })
         );
         await reply.edit({
-          content: ":sparkles:完了!(このメッセージは自動的に消去されます)",
+          content: `:sparkles:${t("commands:bulk-delete.finish")}`,
           components: [],
         });
         setTimeout(() => reply.delete().catch(() => {}), 10 * 1000).unref();
       });
       collector.on("timeout", () => {
         reply.edit({
-          content: "削除をキャンセルしました",
+          content: t("commands:bulk-delete.cancel"),
           components: [],
         });
       });
@@ -124,7 +131,7 @@ export default class BulkDelete extends BaseCommand {
     catch(er){
       this.logger.error(er);
       if(reply){
-        await reply.edit("失敗しました...").catch(this.logger.error);
+        await reply.edit(t("failed")).catch(this.logger.error);
       }
     }
   }

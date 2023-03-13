@@ -18,15 +18,14 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
 export default class Reset extends BaseCommand {
   constructor(){
     super({
-      name: "リセット",
       alias: ["reset"],
-      description: "サーバーのキュー、設定やデータを削除して初期化します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
       unlist: false,
       category: "utility",
       requiredPermissionsOr: ["manageGuild"],
@@ -34,13 +33,13 @@ export default class Reset extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     // VC接続中なら切断
     context.server.player.disconnect();
     context.server.bot.resetData(message.guild.id);
     // データ初期化
     context.initData(message.guild.id, message.channel.id);
-    message.reply("✅サーバーの設定を初期化しました").catch(this.logger.error);
+    message.reply(`✅${t("commands:reset.success")}`).catch(this.logger.error);
   }
 }

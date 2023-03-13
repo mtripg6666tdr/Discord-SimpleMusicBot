@@ -18,43 +18,43 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
 export default class Mv extends BaseCommand {
   constructor(){
     super({
-      name: "移動",
       alias: ["move", "mv"],
-      description: "曲を指定された位置から指定された位置までキュー内で移動します。2番目の曲を5番目に移動したい場合は`mv 2 5`のようにします。",
       unlist: false,
       category: "playlist",
-      examples: "移動 2 5",
-      usage: "移動 <from> <to>",
-      argument: [{
-        type: "integer",
-        name: "from",
-        description: "移動元のインデックス。キューに併記されているものです",
-        required: true,
-      }, {
-        type: "integer",
-        name: "to",
-        description: "移動先のインデックス。キューに併記されているものです",
-        required: true,
-      }],
+      argument: [
+        {
+          type: "integer",
+          name: "from",
+          required: true,
+        },
+        {
+          type: "integer",
+          name: "to",
+          required: true,
+        },
+      ],
       requiredPermissionsOr: ["admin", "onlyListener", "dj"],
       shouldDefer: false,
+      examples: true,
+      usage: true,
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
 
     if(context.args.length !== 2){
-      message.reply("✘引数は`移動したい曲の元のオフセット(番号) 移動先のオフセット(番号)`のように指定します。").catch(this.logger.error);
+      message.reply(`✘${t("commands:move.invalidArgumentCount")}`).catch(this.logger.error);
       return;
     }else if(context.args.includes("0") && context.server.player.isPlaying){
-      message.reply("✘音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。").catch(this.logger.error);
+      message.reply(`✘${t("commands:move.invalidIndex")}`).catch(this.logger.error);
       return;
     }
 
@@ -69,14 +69,14 @@ export default class Mv extends BaseCommand {
       const title = q.get(from).basicInfo.title;
       if(from !== to){
         q.move(from, to);
-        message.reply(`✅ \`${title}\`を\`${from}\`番目から\`${to}\`番目に移動しました`)
+        message.reply(`✅${t("commands:move.moved", { title, from, to })}`)
           .catch(this.logger.error);
       }else{
-        message.reply("✘移動元と移動先の要素が同じでした。")
+        message.reply(`✘${t("commands:move.originEqualsDestination")}`)
           .catch(this.logger.error);
       }
     }else{
-      message.reply("✘失敗しました。引数がキューの範囲外です")
+      message.reply(`✘${t("commands:move.indexOutOfRange")}`)
         .catch(this.logger.error);
     }
   }

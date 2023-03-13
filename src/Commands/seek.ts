@@ -18,40 +18,38 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
 export default class Seek extends BaseCommand {
   constructor(){
     super({
-      name: "シーク",
       alias: ["seek"],
-      description: "楽曲をシークします。",
       unlist: false,
       category: "player",
-      examples: "シーク 0:30",
-      usage: "検索 <時間(秒数または時間:分:秒の形式で)>",
       argument: [{
         type: "string",
         name: "keyword",
-        description: "シーク先の時間",
         required: true,
       }],
       requiredPermissionsOr: ["admin", "dj"],
       shouldDefer: false,
+      examples: true,
+      usage: true,
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     const server = context.server;
 
     // そもそも再生状態ではない場合
     if(!server.player.isPlaying || server.player.preparing){
-      await message.reply("再生中ではありません").catch(this.logger.error);
+      await message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }else if(server.player.currentAudioInfo.lengthSeconds === 0 || server.player.currentAudioInfo.isUnseekable()){
-      await message.reply(":warning:シーク先に対応していない楽曲です").catch(this.logger.error);
+      await message.reply(`:warning:${t("commands:seek.unseekable")}`).catch(this.logger.error);
       return;
     }
 
@@ -66,20 +64,20 @@ export default class Seek extends BaseCommand {
     }(context.rawArgs));
 
     if(time > server.player.currentAudioInfo.lengthSeconds || isNaN(time)){
-      await message.reply(":warning:シーク先の時間が正しくありません").catch(this.logger.error);
+      await message.reply(`:warning:${t("commands:seek.invalidTime")}`).catch(this.logger.error);
       return;
     }
 
     try{
-      const response = await message.reply(":rocket:シークしています...");
+      const response = await message.reply(`:rocket:${t("commands:seek.seeking")}...`);
       server.player.stop(true);
       await server.player.play(time);
-      await response.edit(":white_check_mark:シークしました").catch(this.logger.error);
+      await response.edit(`:white_check_mark:${t("commands:seek.success")}`).catch(this.logger.error);
     }
     catch(e){
       this.logger.error(e);
       await message.channel.createMessage({
-        content: ":astonished:シークに失敗しました",
+        content: `:astonished:${t("commands:seek.failed")}`,
       }).catch(this.logger.error);
     }
   }

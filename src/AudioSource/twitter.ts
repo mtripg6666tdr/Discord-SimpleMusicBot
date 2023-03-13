@@ -18,6 +18,7 @@
 
 import type { exportableCustom, UrlStreamInfo } from ".";
 
+import i18next from "i18next";
 import twitterDl from "twitter-url-direct";
 
 import { AudioSource } from "./audiosource";
@@ -43,7 +44,7 @@ export class Twitter extends AudioSource<string> {
       }
 
       this.lengthSeconds = Math.floor(streamInfo.duration);
-      this.title = `${streamInfo.tweet_user.name}(@${streamInfo.tweet_user.username})のツイート`;
+      this.title = i18next.t("audioSources.tweet", { name: streamInfo.tweet_user.name, id: streamInfo.tweet_user.username });
       if(!streamInfo.download){
         throw new Error("No media found");
       }

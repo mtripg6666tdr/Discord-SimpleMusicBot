@@ -18,15 +18,14 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
 export default class Shuffle extends BaseCommand {
   constructor(){
     super({
-      name: "シャッフル",
       alias: ["shuffle"],
-      description: "キューの内容をシャッフルします。",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "onlyListener", "dj"],
@@ -34,13 +33,13 @@ export default class Shuffle extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(context.server.queue.length === 0){
-      message.reply("キューが空です。").catch(this.logger.error);
+      message.reply(t("commands:shuffle.queueEmpty")).catch(this.logger.error);
       return;
     }
     context.server.queue.shuffle();
-    message.reply(":twisted_rightwards_arrows:シャッフルしました✅").catch(this.logger.error);
+    message.reply(`:twisted_rightwards_arrows:${t("commands:shuffle.success")}✅`).catch(this.logger.error);
   }
 }

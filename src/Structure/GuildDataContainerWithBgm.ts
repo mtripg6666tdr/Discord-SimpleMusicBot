@@ -19,6 +19,8 @@
 import type { MusicBotBase } from "../botBase";
 import type { GuildBGMContainerType } from "../config";
 
+import i18next from "i18next";
+
 import { GuildDataContainer } from "./GuildDataContainer";
 import { PlayManagerWithBgm } from "../Component/PlayManagerWithBgm";
 import { QueueManagerWithBgm } from "../Component/QueueManagerWithBGM";
@@ -62,7 +64,7 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
         await this.queue.addQueueOnly({
           url: items[i],
           addedBy: {
-            displayName: "システム",
+            displayName: i18next.t("system"),
             userId: "0",
           },
           gotData: {

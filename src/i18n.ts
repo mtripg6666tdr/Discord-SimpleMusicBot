@@ -16,31 +16,27 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CommandArgs } from ".";
-import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
+import path from "path";
 
-import { BaseCommand } from ".";
+import i18next from "i18next";
+import Backend from "i18next-fs-backend";
 
-export default class QueueLoop extends BaseCommand {
-  constructor(){
-    super({
-      alias: ["queueloop", "loopqueue"],
-      unlist: false,
-      category: "player",
-      requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
-      shouldDefer: false,
+export function initLocalization(debug: boolean, lang: string){
+  return i18next
+    .use(Backend)
+    .init({
+      debug,
+      cleanCode: true,
+      fallbackLng: "ja",
+      lng: lang,
+      ns: [
+        "default",
+        "commands",
+        "components",
+      ],
+      defaultNS: "default",
+      backend: {
+        loadPath: path.join(__dirname, "../locales/{{lng}}/{{ns}}.json"),
+      },
     });
-  }
-
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
-    context.server.updateBoundChannel(message);
-    if(context.server.queue.queueLoopEnabled){
-      context.server.queue.queueLoopEnabled = false;
-      message.reply(`:repeat:${t("commands:queueloop.disabled")}:x:`).catch(this.logger.error);
-    }else{
-      context.server.queue.queueLoopEnabled = true;
-      message.reply(`:repeat:${t("commands:queueloop.enabled")}:o:`).catch(this.logger.error);
-    }
-  }
 }

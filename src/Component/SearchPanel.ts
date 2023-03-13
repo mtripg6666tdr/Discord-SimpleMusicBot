@@ -18,6 +18,7 @@
 
 import type { CommandMessage } from "./commandResolver/CommandMessage";
 import type { ResponseMessage } from "./commandResolver/ResponseMessage";
+import type { i18n } from "i18next";
 import type { SelectOption } from "oceanic.js";
 
 import { MessageActionRowBuilder, MessageEmbedBuilder, MessageStringSelectMenuBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
@@ -60,6 +61,8 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     return this._responseMessage;
   }
 
+  protected t: i18n["t"];
+
   constructor(protected readonly _commandMessage: CommandMessage, protected query: string, protected readonly isRawTitle: boolean = false){
     super("SearchPanel");
     if(!_commandMessage){
@@ -67,17 +70,28 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     }
   }
 
-  async consumeSearchResult<T>(searchPromise: Promise<T|{ result: T, transformedQuery: string }>, consumer: (result: T) => SongInfo[]){
-    if(this.status !== "init") return false;
+  async consumeSearchResult<T>(searchPromise: Promise<T|{ result: T, transformedQuery: string }>, consumer: (result: T, t: i18n["t"]) => SongInfo[], t: i18n["t"]){
+    if(this.status !== "init"){
+      return false;
+    }
     this.status = "consumed";
+    this.t = t;
+
     let reply: ResponseMessage = null;
     try{
-      reply = await this._commandMessage.reply("🔍検索中...");
+      reply = await this._commandMessage.reply(`🔍${t("search.searching")}...`);
       const waitedPromiseResult = await searchPromise;
-      if("transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string })) this.query = (waitedPromiseResult as { result: T, transformedQuery: string }).transformedQuery;
-      const songResult = this._options = consumer("transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string }) ? (waitedPromiseResult as { result: T, transformedQuery: string }).result : waitedPromiseResult as T).slice(0, 20);
+      if("transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string })){
+        this.query = (waitedPromiseResult as { result: T, transformedQuery: string }).transformedQuery;
+      }
+      const songResult = this._options = consumer(
+        "transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string })
+          ? (waitedPromiseResult as { result: T, transformedQuery: string }).result
+          : waitedPromiseResult as T,
+        t
+      ).slice(0, 20);
       if(songResult.length <= 0){
-        await reply.edit(":pensive:見つかりませんでした。");
+        await reply.edit(`:pensive:${t("search.notFound")}`);
         return false;
       }
       let searchPanelDescription = "";
@@ -93,15 +107,15 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
         content: "",
         embeds: [
           new MessageEmbedBuilder()
-            .setTitle(this.isRawTitle ? this.query : `"${this.query}"の検索結果✨`)
+            .setTitle(this.isRawTitle ? this.query : `${t("components:search.resultTitle", { query: this.query })}✨`)
             .setColor(getColor("SEARCH"))
             .setDescription(searchPanelDescription)
             .setFooter({
               iconURL: this._commandMessage.member.avatarURL(),
               text:
                 config.noMessageContent
-                  ? "再生したい項目を選択して数字を送信するか、下から選択してください。キャンセルするには「キャンセル」または「cancel」と選択/入力します。また、サムネイルコマンドを使用してサムネイルを確認できます。"
-                  : "再生したい項目を、下から選択してください。キャンセルするには、下から\"キャンセル\"を選択してください。また、サムネイルコマンドを使用してサムネイルを確認することもできます。"
+                  ? t("components:search.resultFooterInteraction")
+                  : t("components:search.resultFooterMessage")
               ,
             })
             .toOceanic(),
@@ -113,15 +127,15 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
                 .setCustomId("search")
                 .setPlaceholder(
                   config.noMessageContent
-                    ? "ここから選択..."
-                    : "数字を直接送信するか、ここから選択..."
+                    ? t("components:search.select")
+                    : t("components:search.typeOrSelect")
                 )
                 .setMinValues(1)
                 .setMaxValues(songResult.length - 1)
                 .addOptions(
                   ...selectOpts,
                   {
-                    label: "キャンセル",
+                    label: t("cancel"),
                     value: "cancel",
                   }
                 )
@@ -135,10 +149,10 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     catch(e){
       this.logger.error(e);
       if(reply){
-        reply.edit("✘内部エラーが発生しました")
+        reply.edit(`✘${t("internalErrorOccurred")}`)
           .catch(this.logger.error);
       }else{
-        this._commandMessage.reply("✘内部エラーが発生しました")
+        this._commandMessage.reply(`✘${t("internalErrorOccurred")}`)
           .catch(this.logger.error);
       }
       return false;
@@ -162,7 +176,7 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     if(this.status !== "consumed") return;
     if(!quiet){
       await this._responseMessage.channel.createMessage({
-        content: "✅キャンセルしました",
+        content: `✅${this.t("canceling")}`,
       }).catch(this.logger.error);
     }
     await this._responseMessage.delete().catch(this.logger.error);

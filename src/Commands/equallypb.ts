@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -27,9 +28,7 @@ import { getColor } from "../Util/color";
 export default class EquallyPlayback extends BaseCommand {
   constructor(){
     super({
-      name: "均等再生",
       alias: ["equallyplayback", "eqpb", "equally"],
-      description: "追加ユーザーごとにキュー内の楽曲を均等に再生します",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "noConnection", "onlyListener", "dj"],
@@ -37,16 +36,16 @@ export default class EquallyPlayback extends BaseCommand {
     });
   }
 
-  async run(context: CommandMessage, options: CommandArgs){
+  async run(context: CommandMessage, options: CommandArgs, t: i18n["t"]){
     options.server.updateBoundChannel(context);
     if(options.server.equallyPlayback){
       options.server.equallyPlayback = false;
-      context.reply("❌均等再生をオフにしました").catch(this.logger.error);
+      context.reply(`❌${t("commands:equallyplayback.disabled")}`).catch(this.logger.error);
     }else{
       options.server.equallyPlayback = true;
       const embed = new MessageEmbedBuilder()
-        .setTitle("⭕均等再生をオンにしました")
-        .setDescription("楽曲追加時に、楽曲を追加したユーザーごとにできるだけ均等になるようにする機能です。")
+        .setTitle(`⭕${t("commands:equallyplayback.enabled")}`)
+        .setDescription(t("commands:equallyplayback.featureDescription"))
         .setColor(getColor("EQUALLY"))
         .toOceanic()
       ;

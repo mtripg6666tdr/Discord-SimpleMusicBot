@@ -19,6 +19,8 @@
 import type { UrlStreamInfo } from ".";
 import type { exportableCustom } from "./custom";
 
+import i18next from "i18next";
+
 import { AudioSource } from "./audiosource";
 import { retriveHttpStatusCode, retriveLengthSeconds } from "../Util";
 
@@ -30,14 +32,14 @@ export class GoogleDrive extends AudioSource<string> {
 
   async init(url: string, prefetched: exportableCustom){
     if(prefetched){
-      this.title = prefetched.title || "Googleドライブストリーム";
+      this.title = prefetched.title || i18next.t("audioSources.driveStream");
       this.url = url;
       this.lengthSeconds = prefetched.length;
     }else{
-      this.title = "Googleドライブストリーム";
+      this.title = i18next.t("audioSources.driveStream");
       this.url = url;
       if(await retriveHttpStatusCode(this.url) !== 200){
-        throw new Error("URLがみつかりません");
+        throw new Error(i18next.t("urlNotFound"));
       }
       try{
         this.lengthSeconds = await retriveLengthSeconds((await this.fetch()).url);
@@ -60,7 +62,7 @@ export class GoogleDrive extends AudioSource<string> {
     return [
       {
         name: ":asterisk:詳細",
-        value: "Googleドライブにて共有されたファイル",
+        value: i18next.t("audioSources.fileInDrive"),
       },
     ];
   }

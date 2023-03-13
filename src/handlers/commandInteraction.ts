@@ -20,13 +20,13 @@ import type { BaseCommand } from "../Commands";
 import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
 
+import i18next from "i18next";
 import * as discord from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
 import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 import { discordUtil } from "../Util";
-import { NotSendableMessage } from "../definition";
 
 export async function handleCommandInteraction(this: MusicBot, server: GuildDataContainer, interaction: discord.CommandInteraction){
   this.logger.info("reveived command interaction");
@@ -40,7 +40,7 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
     && interaction.channel.type !== discord.ChannelTypes.GUILD_VOICE
   ){
     await interaction.createMessage({
-      content: "テキストチャンネルまたはスレッドで実行してください",
+      content: i18next.t("invalidChannel", { lng: interaction.locale }),
     });
     return;
   }
@@ -48,7 +48,7 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
   // 送信可能か確認
   if(!discordUtil.channels.checkSendable(interaction.channel, this._client.user.id)){
     await interaction.createMessage({
-      content: NotSendableMessage,
+      content: `:warning:${i18next.t("lackPermissions", { lng: interaction.locale })}`,
     });
     return;
   }
@@ -57,7 +57,7 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
   const command = CommandManager.instance.resolve(interaction.data.name);
   if(!command){
     await interaction.createMessage({
-      content: "おっと！なにかが間違ってしまったようです。\r\nコマンドが見つかりませんでした。 :sob:",
+      content: `${i18next.t("commandNotFound", { lng: interaction.locale })}:sob:`,
     });
     return;
   }
@@ -77,7 +77,15 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
   // プレフィックス更新
   server.updatePrefix(commandMessage);
   // コマンドを実行
-  await command.checkAndRun(commandMessage, this["createCommandRunnerArgs"](commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
+  await command.checkAndRun(
+    commandMessage,
+    this["createCommandRunnerArgs"](
+      commandMessage.guild.id,
+      commandMessage.options,
+      commandMessage.rawOptions,
+      interaction.locale
+    )
+  );
 }
 
 function shouldIgnoreInteractionByBgmConfig(server: GuildDataContainer, command: BaseCommand){

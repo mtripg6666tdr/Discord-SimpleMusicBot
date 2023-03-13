@@ -18,17 +18,19 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import * as ytpl from "ytpl";
 
 import { BaseCommand } from ".";
+import { useConfig } from "../config";
+
+const config = useConfig();
 
 export default class News extends BaseCommand {
   constructor(){
     super({
-      name: "ニュース",
       alias: ["news"],
-      description: "現在配信されているニューストピックスを閲覧・視聴できます。",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
@@ -36,28 +38,34 @@ export default class News extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
-    context.server.joinVoiceChannel(message);
+    context.server.joinVoiceChannel(message, {}, t);
     const url = Buffer.from(
       "aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTDNaUTVDcE51bFFrOC1wMENXbzl1Zkk4MUlkckdveU5a",
       "base64"
     ).toString();
     if(context.server.searchPanel.has(message.member.id)){
-      message.reply("✘既に開かれている検索窓があります").catch(this.logger.error);
+      message.reply(t("search.alreadyOpen")).catch(this.logger.error);
       return;
     }
-    const searchPanel = context.server.searchPanel.create(message, "ニューストピックス", true);
+    const searchPanel = context.server.searchPanel.create(message, t("commands:news.newsTopics"), t, true);
     if(!searchPanel) return;
-    await searchPanel.consumeSearchResult(ytpl.default(url, {
-      gl: "JP", hl: "ja", limit: 20,
-    }), ({ items }) => items.map(item => ({
-      title: item.title,
-      author: item.author.name,
-      description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`,
-      duration: item.duration,
-      thumbnail: item.thumbnails[0].url,
-      url: item.url,
-    })));
+    await searchPanel.consumeSearchResult(
+      ytpl.default(url, {
+        gl: config.country,
+        hl: context.locale,
+        limit: 20,
+      }),
+      ({ items }) => items.map(item => ({
+        title: item.title,
+        author: item.author.name,
+        description: `${t("length")}: ${item.duration}, ${t("channelName")}: ${item.author.name}`,
+        duration: item.duration,
+        thumbnail: item.thumbnails[0].url,
+        url: item.url,
+      })),
+      t
+    );
   }
 }

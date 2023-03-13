@@ -12,5 +12,7 @@
   "twentyFourSeven": [],
   "alwaysTwentyFourSeven": false,
   "disabledSources": [],
-  "cacheLevel": "memory"
+  "cacheLevel": "memory",
+  "defaultLanguage": "ja",
+  "country": "JP"
 }

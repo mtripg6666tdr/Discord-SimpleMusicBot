@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 import { YmxVersion } from "../Structure";
@@ -25,9 +26,7 @@ import { YmxVersion } from "../Structure";
 export default class Export extends BaseCommand {
   constructor(){
     super({
-      name: "エクスポート",
       alias: ["export"],
-      description: "キューの内容をインポートできるようエクスポートします。",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: [],
@@ -35,21 +34,26 @@ export default class Export extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(context.server.queue.length === 0){
-      message.reply("キューが空です。").catch(this.logger.error);
+      message.reply(t("commands:export.queueEmpty")).catch(this.logger.error);
       return;
     }
     const ymxFile = context.server.exportQueue();
-    message.reply({
-      content: "✅エクスポートしました",
+    const msg = await message.reply({
+      content: `✅${t("commands:export.exported")}`,
       files: [{
         contents: Buffer.from(JSON.stringify(ymxFile)),
         name: "exported_queue.ymx",
       }],
-    })
-      .then(msg => msg.edit(`✅エクスポートしました (バージョン: v${YmxVersion}互換)\r\nインポート時は、「<${msg.url}>」をimportコマンドの引数に指定してください`))
+    });
+    await msg
+      .edit(`✅${
+        t("commands:export.exported")
+      } (${
+        t("commands:export.compatiblity", { version: YmxVersion })
+      })\r\n${t("commands:export.importInstruction", { url: msg.url })}`)
       .catch(this.logger.error)
     ;
   }

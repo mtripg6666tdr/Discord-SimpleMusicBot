@@ -19,6 +19,7 @@
 import type { exportableCustom, UrlStreamInfo } from ".";
 
 import candyget from "candyget";
+import i18next from "i18next";
 
 import { AudioSource } from "./audiosource";
 
@@ -62,8 +63,8 @@ export class Streamable extends AudioSource<string> {
         name: ":link:URL",
         value: this.url,
       }, {
-        name: ":asterisk:詳細",
-        value: "Streamableにて共有されたファイル",
+        name: `:asterisk:${i18next.t("moreInfo")}`,
+        value: i18next.t("audioSources.fileInStramable"),
       },
     ];
   }

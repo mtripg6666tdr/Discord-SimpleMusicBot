@@ -17,6 +17,7 @@
  */
 
 import type { CommandArgs } from ".";
+import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 import { CommandManager } from "../Component/CommandManager";
@@ -27,28 +28,25 @@ import { getLogs } from "../logger";
 export default class Invoke extends BaseCommand {
   constructor(){
     super({
-      name: "インボーク",
       alias: ["invoke"],
-      description: "指定されたコマンドを実行します。基本的に使用しないでください",
       unlist: false,
       category: "utility",
       argument: [{
         name: "command",
-        description: "実行するコマンド",
         type: "string",
         required: true,
       }],
-      usage: "invoke <コマンド>",
-      examples: "invoke play 夜に駆ける",
       requiredPermissionsOr: [],
       shouldDefer: true,
+      usage: true,
+      examples: true,
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     // handle special commands
     if(context.rawArgs.startsWith("sp;") && useConfig().isBotAdmin(message.member.id)){
-      this.evaluateSpecialCommands(context.rawArgs.substring(3), message, context)
+      this.evaluateSpecialCommands(context.rawArgs.substring(3), message, context, t)
         .then(result => message.reply(result))
         .catch(this.logger.error)
       ;
@@ -58,7 +56,7 @@ export default class Invoke extends BaseCommand {
     // extract a requested normal command
     const commandInfo = CommandMessage.resolveCommandMessage(context.rawArgs, 0);
     if(commandInfo.command === "invoke"){
-      await message.reply("invokeコマンドをinvokeコマンドで実行することはできません").catch(this.logger.error);
+      await message.reply(t("commands:invoke.recursiveInvoke")).catch(this.logger.error);
       return;
     }
 
@@ -69,14 +67,14 @@ export default class Invoke extends BaseCommand {
       context.rawArgs = commandInfo.rawOptions;
       await ci.checkAndRun(message, context).catch(this.logger.error);
       if(!message["isMessage"] && !message["_interactionReplied"]){
-        await message.reply("実行しました").catch(this.logger.error);
+        await message.reply(t("commands:invoke.executed")).catch(this.logger.error);
       }
     }else{
-      await message.reply("コマンドが見つかりませんでした").catch(this.logger.error);
+      await message.reply(t("commands:invoke.commandNotFound")).catch(this.logger.error);
     }
   }
 
-  private async evaluateSpecialCommands(specialCommand: string, message: CommandMessage, options: CommandArgs){
+  private async evaluateSpecialCommands(specialCommand: string, message: CommandMessage, options: CommandArgs, t: i18n["t"]){
     switch(specialCommand){
       case "cleanupsc":
         await CommandManager.instance.sync(options.client, true);
@@ -98,8 +96,8 @@ export default class Invoke extends BaseCommand {
         }).catch(this.logger.error);
         break;
       default:
-        return "特別コマンドが見つかりません。";
+        return t("commands:invoke.specialCommandNotFound");
     }
-    return "完了しました";
+    return t("commands:invoke.executed");
   }
 }

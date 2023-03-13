@@ -29,7 +29,6 @@ import { ApplicationCommandOptionTypes, ApplicationCommandTypes } from "oceanic.
 import { LogEmitter } from "../Structure";
 import { useConfig } from "../config";
 
-const config = useConfig();
 // const commandSeparator = "_";
 
 /**
@@ -68,16 +67,7 @@ export class CommandManager extends LogEmitter<{}> {
         // eslint-disable-next-line new-cap
         return new (require(path.join(__dirname, "../Commands/", n)).default)() as BaseCommand;
       })
-      .filter(n => {
-        if(n.name === "検索" && config.isDisabledSource("youtube")){
-          return false;
-        }else if(n.name === "searchb" && !process.env.BD_ENABLE){
-          return false;
-        }else if(n.name === "サウンドクラウドを検索" && config.isDisabledSource("soundcloud")){
-          return false;
-        }
-        return true;
-      });
+      .filter(n => !n.disabled);
 
     if(useConfig().debug){
       this.checkDuplicate();
@@ -151,7 +141,7 @@ export class CommandManager extends LogEmitter<{}> {
     // });
 
     // Get registered commands
-    const registeredAppCommands = await client.application.getGlobalCommands();
+    const registeredAppCommands = await client.application.getGlobalCommands({ withLocalizations: true });
 
     // no registered commands, bulk-registering them
     if(registeredAppCommands.length === 0){
@@ -242,16 +232,20 @@ export class CommandManager extends LogEmitter<{}> {
         type: apiCommand.type,
         name: apiCommand.name,
         description: apiCommand.description,
+        descriptionLocalizations: apiCommand.descriptionLocalizations,
         options: apiCommand.options.map(option => {
           if("choices" in option && option.choices){
             return {
               type: option.type,
               name: option.name,
               description: option.description,
+              descriptionLocalizations: option.descriptionLocalizations,
               required: !!option.required,
               choices: option.choices.map(choice => ({
                 name: choice.name,
                 value: choice.value,
+                // @ts-expect-error
+                nameLocalizations: choice.nameLocalizations || choice.name_localizations,
               })),
             };
           }else{
@@ -259,6 +253,7 @@ export class CommandManager extends LogEmitter<{}> {
               type: option.type,
               name: option.name,
               description: option.description,
+              descriptionLocalizations: option.descriptionLocalizations,
               required: !!option.required,
             };
           }
@@ -269,6 +264,7 @@ export class CommandManager extends LogEmitter<{}> {
         type: apiCommand.type,
         name: apiCommand.name,
         description: apiCommand.description,
+        descriptionLocalizations: apiCommand.descriptionLocalizations,
       };
     }
   }

@@ -18,8 +18,10 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
+
 
 import { BaseCommand } from ".";
 import { getColor } from "../Util/color";
@@ -27,25 +29,22 @@ import { getColor } from "../Util/color";
 export default class Thumbnail extends BaseCommand {
   constructor(){
     super({
-      name: "サムネイル",
       alias: ["サムネ", "thumbnail", "thumb", "t"],
-      description: "現在再生中のサムネイルを表示します。検索パネルが開いていて検索パネル中の番号が指定された場合にはその曲のサムネイルを表示します。",
       unlist: false,
       category: "player",
-      examples: "サムネイル 5",
-      usage: "サムネイル [検索パネル中のインデックス]",
       argument: [{
         type: "integer",
         name: "index",
-        description: "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します",
         required: false,
       }],
       requiredPermissionsOr: [],
       shouldDefer: false,
+      usage: true,
+      examples: true,
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
 
     const embed = new MessageEmbedBuilder();
@@ -86,7 +85,7 @@ export default class Thumbnail extends BaseCommand {
         }).catch(this.logger.error);
       }
     }else{
-      message.reply("✘検索結果が見つかりません").catch(this.logger.error);
+      message.reply(`✘${t("commands:thumbnail.noSearchPanelFound")}`).catch(this.logger.error);
       return;
     }
 

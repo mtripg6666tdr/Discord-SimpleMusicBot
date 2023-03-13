@@ -21,17 +21,15 @@
       "ES2020.String",
     ],
     "moduleResolution": "node",
-    "strictBindCallApply": true,
-    "resolveJsonModule": true,
-    "noEmit": true
+    "strictBindCallApply": true
   },
   "include": [
-    "src/**/*.ts",
-    "util/lint-i18n.d.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
     "**/node_modules",
     "test",
+    "./util",
     "./docs",
     "./dist",
     "**/.*/"

@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 import type * as ytsr from "ytsr";
 
 import { BaseCommand } from ".";
@@ -27,15 +28,12 @@ import { color } from "../Util";
 export default class Play extends BaseCommand {
   constructor(){
     super({
-      name: "再生",
       alias: ["play", "p", "resume", "re"],
-      description: "キュー内の楽曲を再生します。引数として対応しているサイトの楽曲のURLを指定することもできます。",
       unlist: false,
       category: "player",
       argument: [{
         type: "string",
         name: "keyword",
-        description: "再生する動画のキーワードまたはURL。VCに未接続の場合接続してその曲を優先して再生します。接続中の場合はキューの末尾に追加します。一時停止中の場合はオプションは無視され、再生が再開されます。",
         required: false,
       }],
       requiredPermissionsOr: [],
@@ -43,7 +41,7 @@ export default class Play extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     const server = context.server;
     const firstAttachment = Array.isArray(message.attachments) ? message.attachments[0] : message.attachments.first();
@@ -56,13 +54,13 @@ export default class Play extends BaseCommand {
       && !firstAttachment
       && !(message["_message"] && message["_message"].referencedMessage)
     ){
-      await message.reply("再生するコンテンツがありません").catch(this.logger.error);
+      await message.reply(t("commands:play.noContent")).catch(this.logger.error);
       return;
     }
 
     const wasConnected = server.player.isConnecting;
     // VCに入れない
-    if(!await context.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true)){
+    if(!await context.server.joinVoiceChannel(message, { replyOnFail: true }, t)){
       return;
     }
 
@@ -70,7 +68,7 @@ export default class Play extends BaseCommand {
     if(context.rawArgs === "" && server.player.isPaused){
       server.player.resume();
       await message.reply({
-        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:arrow_forward: 再生を再開します。`,
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:arrow_forward:${t("commands:play.resuming")}`,
         allowedMentions: {
           users: false,
         },
@@ -83,11 +81,11 @@ export default class Play extends BaseCommand {
       // 引数ついてたらそれ優先して再生する
       if(context.rawArgs.startsWith("http://") || context.rawArgs.startsWith("https://")){
         // ついていた引数がURLなら
-        await context.server.playFromURL(message, context.args as string[], !wasConnected);
+        await context.server.playFromURL(message, context.args as string[], { first: !wasConnected }, t);
       }else{
         // URLでないならキーワードとして検索
         const msg = await message.channel.createMessage({
-          content: "🔍検索中...",
+          content: `🔍${t("search.searching")}...`,
         });
 
         try{
@@ -100,16 +98,16 @@ export default class Play extends BaseCommand {
             context.bot.cache.addSearch(context.rawArgs, videos);
           }
           if(videos.length === 0){
-            await message.reply(":face_with_monocle:該当する動画が見つかりませんでした");
+            await message.reply(`:face_with_monocle:${t("commands:play.noMusicFound")}`);
             await msg.delete();
             return;
           }
-          await context.server.playFromURL(message, videos[0].url, !wasConnected, context.server.queue.length >= 1);
+          await context.server.playFromURL(message, videos[0].url, { first: !wasConnected, cancellable: context.server.queue.length >= 1 }, t);
           await msg.delete();
         }
         catch(e){
           this.logger.error(e);
-          message.reply("✗内部エラーが発生しました").catch(this.logger.error);
+          message.reply(`✗${t("internalErrorOccurred")}`).catch(this.logger.error);
           msg.delete().catch(this.logger.error);
         }
       }
@@ -118,7 +116,8 @@ export default class Play extends BaseCommand {
       await context.server.playFromURL(
         message,
         firstAttachment.url,
-        !wasConnected
+        { first: !wasConnected },
+        t
       );
     }else if(message["_message"]?.referencedMessage){
       // 返信先のメッセージを確認
@@ -126,16 +125,16 @@ export default class Play extends BaseCommand {
       const prefixLength = server.prefix.length;
       if(messageReference.content.startsWith("http://") || messageReference.content.startsWith("https://")){
         // URLのみのメッセージか？
-        await context.server.playFromURL(message, messageReference.content, !wasConnected);
+        await context.server.playFromURL(message, messageReference.content, { first: !wasConnected }, t);
       }else if(
         messageReference.content.substring(prefixLength).startsWith("http://")
         || messageReference.content.substring(prefixLength).startsWith("https://")
       ){
         // プレフィックス+URLのメッセージか？
-        await context.server.playFromURL(message, messageReference.content.substring(prefixLength), !wasConnected);
+        await context.server.playFromURL(message, messageReference.content.substring(prefixLength), { first: !wasConnected }, t);
       }else if(messageReference.attachments.size > 0){
         // 添付ファイル付きか？
-        await context.server.playFromURL(message, messageReference.attachments.first().url, !wasConnected);
+        await context.server.playFromURL(message, messageReference.attachments.first().url, { first: !wasConnected }, t);
       }else if(messageReference.author.id === context.client.user.id){
         // ボットのメッセージなら
         // 埋め込みを取得
@@ -148,25 +147,25 @@ export default class Play extends BaseCommand {
         ){
           // 曲関連のメッセージならそれをキューに追加
           const url = embed.description.match(/^\[.+\]\((?<url>https?.+)\)/)?.groups.url;
-          await context.server.playFromURL(message, url, !wasConnected);
+          await context.server.playFromURL(message, url, { first: !wasConnected }, t);
         }else{
-          await message.reply(":face_with_raised_eyebrow:返信先のメッセージに再生できるコンテンツが見つかりません")
+          await message.reply(`:face_with_raised_eyebrow:${t("commands:play.noContentWhereReplyingTo")}`)
             .catch(this.logger.error);
         }
       }else{
-        await message.reply(":face_with_raised_eyebrow:返信先のメッセージに再生できるコンテンツが見つかりません")
+        await message.reply(`:face_with_raised_eyebrow:${t("commands:play.noContentWhereReplyingTo")}`)
           .catch(this.logger.error);
       }
     }else if(server.queue.length >= 1){
       // なにもないからキューから再生
       if(!server.player.isPlaying && !server.player.preparing){
-        await message.reply("再生します").catch(this.logger.error);
+        await message.reply(t("commands:play.playing")).catch(this.logger.error);
         await server.player.play();
       }else{
-        await message.reply("すでに再生中です").catch(this.logger.error);
+        await message.reply(t("commands:play.alreadyPlaying")).catch(this.logger.error);
       }
     }else{
-      await message.reply("✘キューが空です").catch(this.logger.error);
+      await message.reply(`✘${t("commands:play.queueEmpty")}`).catch(this.logger.error);
     }
   }
 }

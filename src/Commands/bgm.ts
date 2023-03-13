@@ -18,17 +18,19 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { i18n } from "i18next";
 
 import * as ytpl from "ytpl";
 
 import { BaseCommand } from ".";
+import { useConfig } from "../config";
+
+const config = useConfig();
 
 export default class Bgm extends BaseCommand {
   constructor(){
     super({
-      name: "BGM",
       alias: ["bgm", "study"],
-      description: "開発者が勝手に作った勉強用・作業用BGMのプリセットプレイリストを表示し、聞きたいものを選択して再生することができます。",
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: [],
@@ -36,34 +38,48 @@ export default class Bgm extends BaseCommand {
     });
   }
   
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     // update bound channel
     context.server.updateBoundChannel(message);
 
     // attempt to join
-    if(!await context.server.joinVoiceChannel(message, /* reply */ false, /* reply when failed */ true)) return;
+    if(!await context.server.joinVoiceChannel(message, { replyOnFail: true }, t)) return;
 
     const url = "https://www.youtube.com/playlist?list=PLLffhcApso9xIBMYq55izkFpxS3qi9hQK";
 
     // check existing search panel
     if(context.server.searchPanel.has(message.member.id)){
-      message.reply("✘既に開かれている検索窓があります").catch(this.logger.error);
+      message.reply(t("search.alreadyOpen")).catch(this.logger.error);
       return;
     }
 
-    const searchPanel = context.server.searchPanel.create(message, "プリセットBGM一覧", true);
+    const searchPanel = context.server.searchPanel.create(
+      message,
+      t("commands:bgm.listOfPresetBGM"),
+      t,
+      true
+    );
     if(!searchPanel){
       return;
     }
-    await searchPanel.consumeSearchResult(ytpl.default(url, {
-      gl: "JP", hl: "ja",
-    }), ({ items }) => items.map(item => ({
-      title: item.title,
-      author: item.author.name,
-      description: `長さ: ${item.duration}, チャンネル名: ${item.author.name}`,
-      duration: item.duration,
-      thumbnail: item.thumbnails[0].url,
-      url: item.url,
-    })));
+    await searchPanel.consumeSearchResult(
+      ytpl.default(url, {
+        gl: config.country,
+        hl: context.locale,
+      }),
+      ({ items }) => items.map(item => ({
+        title: item.title,
+        author: item.author.name,
+        description: `${
+          t("length")
+        }: ${item.duration}, ${
+          t("channelName")
+        }: ${item.author.name}`,
+        duration: item.duration,
+        thumbnail: item.thumbnails[0].url,
+        url: item.url,
+      })),
+      t
+    );
   }
 }

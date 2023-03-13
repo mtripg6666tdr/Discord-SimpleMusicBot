@@ -18,6 +18,7 @@
 
 import type { MusicBot } from "../bot";
 
+import i18next from "i18next";
 import * as discord from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
@@ -25,7 +26,6 @@ import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 import { discordUtil, normalizeText } from "../Util";
 import { useConfig } from "../config";
-import { NotSendableMessage } from "../definition";
 
 const config = useConfig();
 
@@ -43,7 +43,12 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
   if(message.content === `<@${this._client.user.id}>`){
     // メンションならば
     await message.channel.createMessage({
-      content: `コマンドの一覧は、\`/command\`で確認できます。\r\nメッセージでコマンドを送信する場合のプレフィックスは\`${server.prefix}\`です。`,
+      content: `${i18next.t("mentionHelp")}\r\n`
+      + (
+        config.noMessageContent
+          ? ""
+          : i18next.t("mentionHelpPrefix", { prefix: server.prefix })
+      ),
     })
       .catch(this.logger.error);
     return;
@@ -82,7 +87,7 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
           messageReference: {
             messageID: message.id,
           },
-          content: NotSendableMessage,
+          content: i18next.t("lackPermissions"),
           allowedMentions: {
             repliedUser: false,
           },
@@ -92,21 +97,29 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
       return;
     }
     // コマンドの処理
-    await command.checkAndRun(commandMessage, this["createCommandRunnerArgs"](commandMessage.guild.id, commandMessage.options, commandMessage.rawOptions));
+    await command.checkAndRun(
+      commandMessage,
+      this["createCommandRunnerArgs"](
+        commandMessage.guild.id,
+        commandMessage.options,
+        commandMessage.rawOptions,
+        config.defaultLanguage
+      )
+    );
   }else if(server.searchPanel.has(message.member.id)){
     // searchコマンドのキャンセルを捕捉
     const panel = server.searchPanel.get(message.member.id);
     const content = normalizeText(message.content);
-    if(message.content === "キャンセル" || message.content === "cancel"){
+    if(message.content === "キャンセル" || message.content === "cancel" || message.content === i18next.t("cancel")){
       panel.destroy();
     }
     // searchコマンドの選択を捕捉
     else if(content.match(/^([0-9]\s?)+$/)){
       // メッセージ送信者が検索者と一致するかを確認
       const nums = content.split(" ");
-      await server.playFromSearchPanelOptions(nums, panel);
+      await server.playFromSearchPanelOptions(nums, panel, i18next.t);
     }
-  }else if(message.content === "キャンセル" || message.content === "cancel"){
+  }else if(message.content === "キャンセル" || message.content === "cancel" || message.content === i18next.t("cancel")){
     const result = server.cancelAll();
     if(!result) return;
     await message.channel.createMessage({

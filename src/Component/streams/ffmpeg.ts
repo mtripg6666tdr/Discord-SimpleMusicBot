@@ -21,8 +21,16 @@ import type { StreamInfo } from "../../AudioSource";
 import { FFmpeg } from "prism-media";
 
 import { destroyStream } from ".";
-import { DefaultUserAgent, FFmpegDefaultNetworkArgs } from "../../definition";
+import { DefaultUserAgent } from "../../definition";
 import { getLogger } from "../../logger";
+
+export const FFmpegDefaultNetworkArgs = [
+  "-reconnect", "1",
+  "-reconnect_streamed", "1",
+  "-reconnect_on_network_error", "1",
+  "-reconnect_on_http_error", "4xx,5xx",
+  "-reconnect_delay_max", "30",
+] as const;
 
 const logger = getLogger("FFmpeg");
 

@@ -35,5 +35,11 @@
   "alwaysTwentyFourSeven": false,
 
   // キャッシュレベルの設定。"memory"か"persistent"を設定します。詳細はドキュメントをご覧ください。
-  "cacheLevel": ""
+  "cacheLevel": "",
+
+  // デフォルトの言語。日本語の場合は"ja"
+  "defaultLanguage": "ja",
+
+  // 地域の設定。日本の場合は"JP"
+  "country": "JP"
 }

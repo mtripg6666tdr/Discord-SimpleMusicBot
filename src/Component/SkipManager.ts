@@ -26,6 +26,8 @@ import type { Member } from "oceanic.js";
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
+import i18next from "i18next";
+
 import { ServerManagerBase } from "../Structure";
 
 type voteResult = "voted"|"cancelled"|"ignored";
@@ -112,19 +114,19 @@ export class SkipManager extends ServerManagerBase<{}> {
       if(this.agreeUsers.size * 2 >= members.size - members.filter(member => member.bot).length){
         try{
           const response = this.reply = await this.reply.edit({
-            content: ":ok: スキップしています",
+            content: `:ok: ${i18next.t("components:skip.skipping")}`,
             embeds: [],
           });
           const title = this.server.queue.get(0).basicInfo.title;
           this.server.player.stop(true);
           await this.server.queue.next();
           await this.server.player.play();
-          response.edit(`:track_next: \`${title}\`をスキップしました:white_check_mark:`)
+          response.edit(`:track_next:${i18next.t("components:skip.skipped", { title })}:white_check_mark:`)
             .catch(this.logger.error);
         }
         catch(e){
           this.logger.error(e);
-          this.reply.edit(":astonished:スキップに失敗しました")
+          this.reply.edit(`:astonished:${i18next.t("components:skip.failed")}`)
             .catch(this.logger.error);
         }
       }else{
@@ -145,15 +147,15 @@ export class SkipManager extends ServerManagerBase<{}> {
     return {
       embeds: [
         new MessageEmbedBuilder()
-          .setTitle(":person_raising_hand: スキップの投票")
+          .setTitle(`:person_raising_hand: ${i18next.t("components:skip.embedTitle")}`)
           .setDescription(
-            `\`${this.currentSong.basicInfo.title}\`のスキップに賛成する場合は以下のボタンを押してください。`
-            + "賛成がボイスチャンネルに参加している人数の過半数を超えると、スキップされます。\r\n\r\n"
-            + `現在の状況: ${this.agreeUsers.size}/${voiceSize}\r\n`
-            + `あと${Math.ceil(voiceSize / 2) - this.agreeUsers.size}人の賛成が必要です。`
+            i18next.t("components:skip.howToUseSkipVote", { title: this.currentSong.basicInfo.title })
+            + `${i18next.t("components:skip.skipVoteDescription")}\r\n\r\n`
+            + `${i18next.t("components:skip.currentStatus")}: ${this.agreeUsers.size}/${voiceSize}\r\n`
+            + i18next.t("components:skip.skipRequirement", { count: Math.ceil(voiceSize / 2) - this.agreeUsers.size })
           )
           .setFooter({
-            text: `${this.issuer}が、楽曲のスキップを提案しました。`,
+            text: i18next.t("components:skip.skipIssuer", { issuer: this.issuer }),
           })
           .toOceanic(),
       ],
@@ -163,7 +165,7 @@ export class SkipManager extends ServerManagerBase<{}> {
             new MessageButtonBuilder()
               .setCustomId(this.skipVoteCustomId)
               .setEmoji("⏩")
-              .setLabel("賛成")
+              .setLabel(i18next.t("components:skip.agree"))
               .setStyle("PRIMARY")
           )
           .toOceanic(),
@@ -172,7 +174,9 @@ export class SkipManager extends ServerManagerBase<{}> {
   }
 
   destroy(){
-    this.destroyed = true;
-    this.collector.destroy();
+    if(!this.destroyed){
+      this.destroyed = true;
+      this.collector.destroy();
+    }
   }
 }

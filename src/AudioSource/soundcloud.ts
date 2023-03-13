@@ -17,6 +17,7 @@
  */
 
 import type { exportableCustom, ReadableStreamInfo } from ".";
+import type { i18n } from "i18next";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 import type { Readable } from "stream";
 
@@ -69,23 +70,23 @@ export class SoundCloudS extends AudioSource<string> {
     };
   }
 
-  toField(verbose: boolean = false){
+  toField(verbose: boolean, t: i18n["t"]){
     return [
       {
-        name: ":musical_note:ユーザー",
+        name: `:musical_note:${t("user")}`,
         value: this.author,
         inline: false,
       },
       {
-        name: ":asterisk:概要",
+        name: `:asterisk:${t("summary")}`,
         value: this.description.length > (verbose ? 1000 : 350) ? this.description.substring(0, verbose ? 1000 : 300) + "..." : this.description,
         inline: false,
       },
     ];
   }
 
-  npAdditional(){
-    return "\r\nアーティスト:`" + this.author + "`";
+  npAdditional(t: i18n["t"]){
+    return `\r\n${t("audioSources.artist")}: \`${this.author}\``;
   }
 
   exportData(): exportableSoundCloud{
