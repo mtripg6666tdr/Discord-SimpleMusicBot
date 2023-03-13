@@ -327,7 +327,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     const stopButton = String.fromCharCode(9209);
     if(nickname && (nickname.includes("🈳") || nickname.includes(stopButton) || nickname.includes("🈵") || nickname.includes("▶"))){
       nickname = nickname.replace("🈳", "🈵");
-      nickname = nickname.replace("⏹", "▶");
+      nickname = nickname.replace(stopButton, "▶");
       await guild.editCurrentMember({
         nick: nickname,
       }).catch(this.logger.error);
