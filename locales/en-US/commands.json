@@ -7,11 +7,15 @@
   "bulk-delete": {
     "invalidMessageCount": "指定されたメッセージ数が無効です。",
     "loading": "Fetching",
-    "hitCount": "{{count}} hit",
-    "inCount": "取得した{{count}}件中",
-    "found": "{{count}} matched.",
+    "hitCount_one": "{{count}}件ヒット",
+    "hitCount_other": "{{count}}件ヒット",
+    "inCount_one": "取得した{{count}}件中",
+    "inCount_other": "取得した{{count}}件中",
+    "found_one": "{{count}}件見つかりました。",
+    "found_other": "{{count}}件見つかりました。",
     "confirm": "一括削除を確定するにはボタンを押してください。\r\n押されないと一定時間後にキャンセルされます。",
-    "auditLog": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため",
+    "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため",
+    "auditLog_other": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため",
     "finish": "Done! (This message will be deleted automatically)",
     "cancel": "Canceled the deletions."
   },
@@ -167,7 +171,8 @@
     "description": "ボイスチャンネルから離脱した人がリクエストした曲をキューから削除して整理します",
     "allRemoved": "Removed",
     "queueEmpty": "Queue empty",
-    "removed": "Removed {{count}} music",
+    "removed_one": "{{count}}曲削除しました",
+    "removed_other": "{{count}}曲削除しました",
     "removedNothing": "削除するものはありませんでした。"
   },
   "log": {
@@ -310,7 +315,8 @@
     },
     "queueEmpty": "Queue empty",
     "pageOutOfRange": "指定されたページは範囲外です",
-    "songCount": "{{count}} music",
+    "songCount_one": "{{count}}曲",
+    "songCount_other": "{{count}}曲",
     "total": "Total"
   },
   "queueloop": {
@@ -453,7 +459,8 @@
     "elapsedAfterConnected": "Discordに接続してからの経過時間",
     "registeredServerCount": "データが保持されているサーバー数",
     "datetimeLabel": "{{hour}} hour {{min}} minute {{sec}} second",
-    "serverCount": "{{count}} server(s)"
+    "serverCount_one": "{{count}}サーバー",
+    "serverCount_other": "{{count}}サーバー"
   },
   "volume": {
     "name": "Volume",
