@@ -26,6 +26,7 @@ export default class Searchb extends SearchBase<string[]> {
       alias: ["seb", "sb"],
       unlist: true,
       shouldDefer: true,
+      disabled: !process.env.BD_ENABLE,
     });
   }
 

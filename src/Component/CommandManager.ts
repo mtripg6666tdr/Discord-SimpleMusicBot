@@ -29,7 +29,6 @@ import { ApplicationCommandOptionTypes, ApplicationCommandTypes } from "oceanic.
 import { LogEmitter } from "../Structure";
 import { useConfig } from "../config";
 
-const config = useConfig();
 // const commandSeparator = "_";
 
 /**
@@ -68,16 +67,7 @@ export class CommandManager extends LogEmitter<{}> {
         // eslint-disable-next-line new-cap
         return new (require(path.join(__dirname, "../Commands/", n)).default)() as BaseCommand;
       })
-      .filter(n => {
-        if(n.name === "検索" && config.isDisabledSource("youtube")){
-          return false;
-        }else if(n.name === "searchb" && !process.env.BD_ENABLE){
-          return false;
-        }else if(n.name === "サウンドクラウドを検索" && config.isDisabledSource("soundcloud")){
-          return false;
-        }
-        return true;
-      });
+      .filter(n => !n.disabled);
 
     if(useConfig().debug){
       this.checkDuplicate();

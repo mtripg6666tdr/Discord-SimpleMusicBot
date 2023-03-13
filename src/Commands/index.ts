@@ -86,32 +86,23 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     return this._argument;
   }
 
-  get asciiName(){
-    return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
-  }
-
   protected readonly _requiredPermissionsOr: CommandPermission[] = null;
   public get requiredPermissionsOr(){
     return this._requiredPermissionsOr || [];
   }
 
-  getPermissionDescription(locale: string){
-    const perms = this.requiredPermissionsOr.filter(perm => perm !== "admin");
-    if(perms.length === 0){
-      return "なし";
-    }else{
-      return `${perms.map(permission => i18next.t(`permissions.${permission}`, { lng: locale })).join("、")}${perms.length > 1 ? "のいずれか" : ""}`;
-    }
-  }
-
-  getLocalizedDescription(locale: string){
-    return this.descriptionLocalization[locale as keyof LocaleMap] || this.description;
-  }
-
   protected readonly _descriptionLocalization: LocaleMap = null;
-
   get descriptionLocalization(){
     return this._descriptionLocalization;
+  }
+
+  protected readonly _disabled: boolean = false;
+  get disabled(){
+    return this._disabled;
+  }
+
+  get asciiName(){
+    return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
   }
 
   protected readonly logger: LoggerObject;
@@ -122,6 +113,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     this._name = "name" in opts ? opts.name : i18next.t(`commands:${this.asciiName}.name` as any);
     this._unlist = opts.unlist;
     this._shouldDefer = opts.shouldDefer;
+    this._disabled = opts.disabled || false;
     if(!this._unlist){
       if(!this.asciiName) throw new Error("Command has not ascii name");
       const {
@@ -198,6 +190,19 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     }
     this.logger = getLogger(`Command(${this.asciiName})`);
     this.logger.debug(`${this.name} loaded`);
+  }
+
+  getPermissionDescription(locale: string){
+    const perms = this.requiredPermissionsOr.filter(perm => perm !== "admin");
+    if(perms.length === 0){
+      return "なし";
+    }else{
+      return `${perms.map(permission => i18next.t(`permissions.${permission}`, { lng: locale })).join("、")}${perms.length > 1 ? "のいずれか" : ""}`;
+    }
+  }
+
+  getLocalizedDescription(locale: string){
+    return this.descriptionLocalization[locale as keyof LocaleMap] || this.description;
   }
 
   async checkAndRun(message: CommandMessage, context: Readonly<CommandArgs>){

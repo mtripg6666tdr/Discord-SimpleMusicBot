@@ -25,7 +25,10 @@ import Soundcloud from "soundcloud.ts";
 
 import { SearchBase } from "./search";
 import * as Util from "../Util";
+import { useConfig } from "../config";
 import { DefaultUserAgent } from "../definition";
+
+const config = useConfig();
 
 export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
   private readonly soundcloud = new Soundcloud();
@@ -42,6 +45,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
       }],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
+      disabled: config.isDisabledSource("soundcloud"),
     });
   }
 

@@ -26,6 +26,7 @@ import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oc
 
 import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
+import { useConfig } from "../config";
 
 export abstract class SearchBase<T> extends BaseCommand {
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
@@ -101,6 +102,8 @@ export abstract class SearchBase<T> extends BaseCommand {
   }
 }
 
+const config = useConfig();
+
 export default class Search extends SearchBase<ytsr.Video[]> {
   constructor(){
     super({
@@ -114,6 +117,7 @@ export default class Search extends SearchBase<ytsr.Video[]> {
       }],
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
       shouldDefer: true,
+      disabled: config.isDisabledSource("youtube"),
     });
   }
 

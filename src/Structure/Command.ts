@@ -34,6 +34,7 @@ export type CommandPermission =
 export type BaseCommandInitializeOptions = {
   alias: Readonly<string[]>,
   shouldDefer: boolean,
+  disabled?: boolean,
 };
 
 export type ListCommandWithArgsOptions = BaseCommandInitializeOptions & {
@@ -63,7 +64,7 @@ export type UnlistCommandOptions = BaseCommandInitializeOptions & {
   usage?: string,
   examples?: string,
   category?: typeof categoriesList[number],
-  argument?: { type: CommandOptionsTypes, name: string, description: string, required: boolean }[],
+  argument?: { type: CommandOptionsTypes, name: string, description?: string, required: boolean }[],
   requiredPermissionsOr?: CommandPermission[],
 };
 
