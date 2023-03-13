@@ -19,6 +19,8 @@
 import type { MusicBot } from "../bot";
 import type * as discord from "oceanic.js";
 
+import i18next from "i18next";
+
 import { QueueManagerWithBgm } from "../Component/QueueManagerWithBGM";
 import { useConfig } from "../config";
 
@@ -40,7 +42,7 @@ export async function onVoiceChannelLeave(
     await this._client.rest.channels.createMessage(
       server.boundTextChannel,
       {
-        content: ":postbox: 正常に切断しました",
+        content: `:postbox: ${i18next.t("disconnected")}`,
       }
     ).catch(this.logger.error);
   }else if(oldChannel.voiceMembers.has(this._client.user.id) && oldChannel.voiceMembers.size === 1){
@@ -61,7 +63,7 @@ export async function onVoiceChannelLeave(
         await this._client.rest.channels.createMessage(
           server.boundTextChannel,
           {
-            content: ":postbox: 正常に切断しました",
+            content: `:postbox: ${i18next.t("disconnected")}`,
           }
         ).catch(this.logger.error);
       }else if(!server.player.isPaused){
@@ -70,7 +72,7 @@ export async function onVoiceChannelLeave(
         await this._client.rest.channels.createMessage(
           server.boundTextChannel,
           {
-            content: ":pause_button:ボイスチャンネルから誰もいなくなったため一時停止しました。`再生`コマンドで再開できます。",
+            content: `:pause_button:${i18next.t("autoPaused")}`,
           }
         ).catch(this.logger.error);
         const timer = setTimeout(() => {
@@ -80,7 +82,7 @@ export async function onVoiceChannelLeave(
             this._client.rest.channels.createMessage(
               server.boundTextChannel,
               {
-                content: ":postbox: 長時間使用しなかったため、終了します",
+                content: `:postbox: ${i18next.t("autoDisconnect")}`,
               }
             ).catch(this.logger.error);
             server.player.disconnect();
@@ -95,7 +97,7 @@ export async function onVoiceChannelLeave(
       await this._client.rest.channels.createMessage(
         server.boundTextChannel,
         {
-          content: ":postbox: 正常に切断しました",
+          content: `:postbox: ${i18next.t("disconnected")}`,
         }
       ).catch(this.logger.error);
     }
