@@ -325,8 +325,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     let nickname = botSelf.nick;
     // "⏹" これ
     const stopButton = String.fromCharCode(9209);
-    // eslint-disable-next-line @typescript-eslint/prefer-includes
-    if(nickname && (nickname.indexOf("🈳") >= 0 || nickname.indexOf(stopButton) >= 0 || nickname.indexOf("🈵") >= 0 || nickname.indexOf("▶") >= 0)){
+    if(nickname && (nickname.includes("🈳") || nickname.includes(stopButton) || nickname.includes("🈵") || nickname.includes("▶"))){
       nickname = nickname.replace("🈳", "🈵");
       nickname = nickname.replace("⏹", "▶");
       await guild.editCurrentMember({

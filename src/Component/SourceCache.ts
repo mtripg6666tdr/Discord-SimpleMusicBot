@@ -138,6 +138,38 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     return this.getPersistentCache(this.createCacheId(keyword, "search")) as Promise<ytsr.Video[]>;
   }
 
+  getMemoryCacheState(){
+    return {
+      totalCount: this._sourceCache.size,
+      purgeScheduled: this._expireMap.size,
+    };
+  }
+
+  purgeMemoryCache(){
+    this._sourceCache.clear();
+    this._expireMap.clear();
+  }
+
+  getPersistentCacheSize(){
+    return fs.promises.readdir(this.cacheDirPath, { withFileTypes: true })
+      .then(
+        files => Promise.all(
+          files
+            .filter(file => file.isFile())
+            .map(file => fs.promises.stat(path.join(this.cacheDirPath, file.name)))
+        ).then(sizes => sizes.reduce((prev, current) => prev + current.size, 0))
+      );
+  }
+
+  purgePersistentCache(){
+    return fs.promises.readdir(this.cacheDirPath, { withFileTypes: true })
+      .then(files => Promise.all(
+        files
+          .filter(file => file.isFile())
+          .map(file => fs.promises.unlink(path.join(this.cacheDirPath, file.name)))
+      ));
+  }
+
   private createCacheId(key: string, type: "exportable" | "search"){
     if(key.includes("?si=")) key = key.split("?")[0];
     const id = this.generateHash(`${type}+${key}`);

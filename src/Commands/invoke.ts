@@ -74,16 +74,22 @@ export default class Invoke extends BaseCommand {
     }
   }
 
-  private async evaluateSpecialCommands(specialCommand: string, message: CommandMessage, options: CommandArgs, t: i18n["t"]){
+  private async evaluateSpecialCommands(specialCommand: string, message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     switch(specialCommand){
       case "cleanupsc":
-        await CommandManager.instance.sync(options.client, true);
+        await CommandManager.instance.sync(context.client, true);
         break;
       case "removesca":
-        CommandManager.instance.removeAllApplicationCommand(options.client);
+        CommandManager.instance.removeAllApplicationCommand(context.client);
         break;
       case "removescg":
-        CommandManager.instance.removeAllGuildCommand(options.client, message.guild.id);
+        CommandManager.instance.removeAllGuildCommand(context.client, message.guild.id);
+        break;
+      case "purgememcache":
+        context.bot.cache.purgeMemoryCache();
+        break;
+      case "purgediskcache":
+        await context.bot.cache.purgePersistentCache();
         break;
       case "obtainsyslog":
         message.reply({
