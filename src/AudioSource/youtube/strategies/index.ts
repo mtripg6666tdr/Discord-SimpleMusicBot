@@ -67,6 +67,7 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(.
         return {
           result,
           resolved: checkedStrategy,
+          cache: result.cache,
         };
       }
       catch(e){
@@ -81,6 +82,7 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(.
         return {
           result,
           resolved: i,
+          cache: result.cache,
         };
       }
       catch(e){

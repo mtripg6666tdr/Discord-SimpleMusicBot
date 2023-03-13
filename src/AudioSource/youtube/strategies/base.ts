@@ -54,6 +54,7 @@ export abstract class Strategy<T extends Cache<any, U>, U> {
     stream: StreamInfo,
     info: exportableYouTube,
     relatedVideos: exportableYouTube[],
+    cache: T,
   }>;
 
   /** 戦略が使用されたことを示すログを出力します */
