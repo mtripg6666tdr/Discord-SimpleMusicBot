@@ -99,10 +99,10 @@ const onTerminated = async function(code: string){
 });
 
 logger.info("Loading locales...");
-initLocalization(config.debug, config.defaultLanguage);
-
-// ボット開始
-bot.run();
+initLocalization(config.debug, config.defaultLanguage).then(() => {
+  // ボット開始
+  bot.run();
+});
 
 async function reportError(err: any){
   try{
