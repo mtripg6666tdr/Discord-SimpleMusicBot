@@ -28,6 +28,7 @@ import * as os from "os";
 import { BaseCommand } from ".";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
+import { getMBytes } from "../Util/system";
 import { useConfig } from "../config";
 import { getLogs } from "../logger";
 
@@ -66,6 +67,7 @@ export default class SystemInfo extends BaseCommand {
     const embeds = [] as EmbedOptions[];
 
     if(context.args.includes("basic") || context.args.length === 0){
+      const cacheState = context.bot.cache.getMemoryCacheState();
       embeds.push(
         new MessageEmbedBuilder()
           .setTitle("Discord-SimpleMusicBot")
@@ -73,7 +75,18 @@ export default class SystemInfo extends BaseCommand {
           .addField("Version", `\`${context.bot.version}\``, true)
           .addField("Managed collector customIds", `\`${context.bot.collectors.customIdLength}\``, true)
           .addField("Managed collectors", `\`${context.bot.collectors.collectorLength}\``, true)
-          .addField("Current total transforming costs", `\`${context.bot.totalTransformingCost}\``)
+          .addField("Current total transforming costs", `\`${context.bot.totalTransformingCost}\``, true)
+          .addField("Memory cache total count", `\`${cacheState.totalCount}\``, true)
+          .addField("Memory cache garbase count", `\`${cacheState.purgeScheduled}\``, true)
+          .addField(
+            "Persistent cache size",
+            `\`${
+              await context.bot.cache.getPersistentCacheSize()
+                .then(size => getMBytes(size))
+                .catch(() => "unknown")
+            }MB\``,
+            true
+          )
           .addField("Modules", [
             "oceanic.js",
             "@mtripg6666tdr/oceanic-command-resolver",
