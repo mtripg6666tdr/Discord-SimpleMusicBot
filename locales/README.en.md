@@ -8,7 +8,8 @@
 <img alt="bot usage example" src="https://user-images.githubusercontent.com/56076195/218059644-2ebdf405-b9f8-4561-a3cc-2bcecf09f145.png" width="550" />
 
 A music bot for Discord, made in Japan.  
-Support playing musics from YouTube. You don't have to copy & paste Urls because you can play them from keywords.  
+Support playing musics from YouTube.You don't have to copy & paste Urls because you can play them from keywords.  
+Let's enjoy musics by using this OSS bot.  
 Let's enjoy musics by using this OSS bot.
 
 ## Features
@@ -24,7 +25,7 @@ Let's enjoy musics by using this OSS bot.
 - 🔁 トラックごと及びキュー全体でループ
 - ❕ プレフィックス変更
   - デフォルトのプレフィックスは`>`です。
-  - ボットを自分でホストする場合、後述の`config.json`でボットレベルでデフォルトのプレフィックスを変更することができます。(複数文字に対応)
+  - ボットを自分でホストする場合、後述の`config.json`でボットレベルでデフォルトのプレフィックスを変更することができます。(複数文字に対応)(複数文字に対応)
 - ▶️事前設定による音楽の自動再生
 - 👍 Botに関するサポート(下記)
 
@@ -34,18 +35,23 @@ Let's enjoy musics by using this OSS bot.
 
 ## 貢献について
 開発中のためバグが多々あります。  
+本リポジトリへの貢献は大歓迎です！開発中のためバグが多々あります。  
 本リポジトリへの貢献は大歓迎です！  
 バグを発見した場合等も重複したIssueがないことを確認し、Issueをまず開いてください。可能な場合、Pull Requestをそのうえで開いてください。  
+Issueのほか、下記のサポートサーバーでも各種お問い合わせを受け付けています。  
+いづれかの手段でお気軽にどうぞ！可能な場合、Pull Requestをそのうえで開いてください。  
 Issueのほか、下記のサポートサーバーでも各種お問い合わせを受け付けています。  
 いづれかの手段でお気軽にどうぞ！
 
 ## ローカライズについて
 プロジェクトでは、Crowdinで多言語化をしています。ボットの翻訳に協力してくれる方々を随時募集しています。  
+現在、英語のみ対応予定がありますが、需要によってはほかの言語への翻訳も可能です。プロジェクトでは、Crowdinで多言語化をしています。ボットの翻訳に協力してくれる方々を随時募集しています。  
 現在、英語のみ対応予定がありますが、需要によってはほかの言語への翻訳も可能です。  
 [Crowdinのプロジェクトページ](https://crowdin.com/project/discord-simplemusicbot)
 
 ## サポート
 Discordにて、インストール等のサポート、およびアップデートのお知らせ等を行っています。  
+ボットを試すこともできますので、興味を持たれた方はぜひご参加ください。Discordにて、インストール等のサポート、およびアップデートのお知らせ等を行っています。  
 ボットを試すこともできますので、興味を持たれた方はぜひご参加ください。  
 [サポートサーバーへの参加はこちら](https://discord.gg/7DrAEXBMHe)  
 [サポートされているバージョン](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
