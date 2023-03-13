@@ -509,7 +509,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       && !rawArg.includes("/channel/")
       && ytpl.validateID(rawArg)){
       //違うならYouTubeプレイリストの直リンクか？
-      const msg = await message.reply(`:hourglass_flowing_sand:${t("components:queue.processingPlaylist")}`);
+      const msg = await message.reply(`:hourglass_flowing_sand:${t("components:queue.processingPlaylistBefore")}`);
       const cancellation = this.bindCancellation(new TaskCancellationManager());
       try{
         const id = await ytpl.getPlaylistID(rawArg);
@@ -521,7 +521,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         const index = await this.queue.processPlaylist(
           msg,
           cancellation,
-          first,
+          false,
           /* known source */ "youtube",
           /* result */ result.items,
           /* playlist name */ result.title,
@@ -570,7 +570,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         const index = await this.queue.processPlaylist(
           msg,
           cancellation,
-          first,
+          false,
           "soundcloud",
           playlist.tracks,
           playlist.title,
@@ -620,7 +620,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         const index = await this.queue.processPlaylist(
           msg,
           cancellation,
-          first,
+          false,
           "spotify",
           tracks,
           playlist.name,

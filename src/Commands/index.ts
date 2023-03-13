@@ -39,7 +39,7 @@ interface CommandEvents {
  * すべてのコマンドハンドラーの基底クラスです
  */
 export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
-  protected abstract run(message: CommandMessage, options: Readonly<CommandArgs>, t: (typeof i18next)["t"]): Promise<void>;
+  protected abstract run(message: CommandMessage, context: Readonly<CommandArgs>, t: (typeof i18next)["t"]): Promise<void>;
 
   protected readonly _name: string;
   public get name(){

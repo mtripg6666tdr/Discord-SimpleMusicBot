@@ -158,7 +158,7 @@ export class YouTube extends AudioSource<string> {
   }
 
   npAdditional(t: i18n["t"]){
-    return `\r\n${t("channelName")}:\`" + this.channelName + "\``;
+    return `\r\n${t("channelName")}:\`${this.channelName}\``;
   }
 
   exportData(): exportableYouTube{

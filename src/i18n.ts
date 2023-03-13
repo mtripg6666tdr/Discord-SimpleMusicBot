@@ -34,6 +34,9 @@ export function initLocalization(debug: boolean, lang: string){
         "commands",
         "components",
       ],
+      interpolation: {
+        escapeValue: false,
+      },
       defaultNS: "default",
       backend: {
         loadPath: path.join(__dirname, "../locales/{{lng}}/{{ns}}.json"),
