@@ -327,7 +327,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         // (トラックループオフ,長さ1)キューループがオンなら現在の曲
         : this.server.queue.queueLoopEnabled ? this.server.queue.get(0).basicInfo.title
         // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
-        : i18next.t("components:nowplaying.nextSong"), true
+        : i18next.t("components:nowplaying.noNextSong"), true
       )
       .addField(
         "再生待ちの曲",
