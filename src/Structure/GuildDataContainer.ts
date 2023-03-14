@@ -495,7 +495,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         addedBy: message.member,
         sourceType: "custom",
         first,
-        channel: message.channel,
+        message: await message.reply(t("pleaseWait")),
       });
       await this.player.play();
     }else if(
@@ -712,11 +712,11 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         const url = embed.description.match(/^\[.+\]\((?<url>https?.+)\)/)?.groups.url;
         await context.server.playFromURL(commandMessage, url, morePrefs, t);
       }else{
-        await commandMessage.reply(`:face_with_raised_eyebrow:${t("commands:play.noContentWhereReplyingTo")}`)
+        await commandMessage.reply(`:face_with_raised_eyebrow:${t("commands:play.noContent")}`)
           .catch(this.logger.error);
       }
     }else{
-      await commandMessage.reply(`:face_with_raised_eyebrow:${t("commands:play.noContentWhereReplyingTo")}`)
+      await commandMessage.reply(`:face_with_raised_eyebrow:${t("commands:play.noContent")}`)
         .catch(this.logger.error);
     }
   }

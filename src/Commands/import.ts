@@ -20,9 +20,10 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { YmxFormat } from "../Structure";
 import type { i18n } from "i18next";
-import type { AnyGuildTextChannel } from "oceanic.js";
+import type { AnyGuildTextChannel, Message } from "oceanic.js";
 
 import candyget from "candyget";
+import { ApplicationCommandTypes } from "oceanic.js";
 
 import { BaseCommand } from ".";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
@@ -46,83 +47,71 @@ export default class Import extends BaseCommand {
       shouldDefer: false,
       usage: true,
       examples: true,
+      messageCommand: true,
     });
   }
 
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
-    if(context.rawArgs === ""){
-      message.reply(`❓${t("commands:import.invalidArgumentMessage")}`).catch(this.logger.error);
-      return;
-    }
-    let force = false;
-    let url = context.rawArgs;
-    if(context.args.length >= 2 && context.args[0] === "force" && config.isBotAdmin(message.member.id)){
-      force = true;
-      url = context.args[1];
-    }
-    if(!url.startsWith("http://discord.com/channels/") && !url.startsWith("https://discord.com/channels/")){
-      await message.reply(`❌${t("commands:import.noDiscordLink")}`).catch(this.logger.error);
-      return;
-    }
 
-    const ids = url.split("/");
-    if(ids.length < 2){
-      await message.reply(`🔗${t("commands:import.invalidLink")}`);
-      return;
-    }
-
-    const smsg = await message.reply(`🔍${t("commands:import.loadingMessage")}...`);
-    const cancellation = context.server.bindCancellation(new TaskCancellationManager());
-    try{
-      // get the message
-      const targetChannelId = ids[ids.length - 2];
-      const targetMessageId = ids[ids.length - 1];
-      const channel = await context.client.rest.channels.get<AnyGuildTextChannel>(targetChannelId);
-      const msg = channel.guild && await channel.getMessage(targetMessageId);
-      if(msg.author.id !== context.client.user.id && !force){
-        await smsg.edit(`❌${t("commands:import.notBotMessage")}`);
+    const statusMessage = await message.reply(`🔍${t("commands:import.loadingMessage")}...`);
+    let targetMessage: Message<AnyGuildTextChannel> = null;
+    if(message["_interaction"] && "type" in message["_interaction"].data && message["_interaction"].data.type === ApplicationCommandTypes.MESSAGE){
+      targetMessage = message["_interaction"].data.resolved.messages.first() as Message<AnyGuildTextChannel>;
+      if(targetMessage.author?.id !== context.client.user.id){
+        await statusMessage.edit(`❌${t("commands:import.notBotMessage")}`);
+        return;
+      }
+    }else{
+      if(context.rawArgs === ""){
+        message.reply(`❓${t("commands:import.invalidArgumentMessage")}`).catch(this.logger.error);
+        return;
+      }
+      let force = false;
+      let url = context.rawArgs;
+      if(context.args.length >= 2 && context.args[0] === "force" && config.isBotAdmin(message.member.id)){
+        force = true;
+        url = context.args[1];
+      }
+      if(!url.startsWith("http://discord.com/channels/") && !url.startsWith("https://discord.com/channels/")){
+        await message.reply(`❌${t("commands:import.noDiscordLink")}`).catch(this.logger.error);
         return;
       }
 
+      const ids = url.split("/");
+      if(ids.length < 2){
+        await message.reply(`🔗${t("commands:import.invalidLink")}`);
+        return;
+      }
+
+      try{
+        // get the message
+        const targetChannelId = ids[ids.length - 2];
+        const targetMessageId = ids[ids.length - 1];
+        const channel = await context.client.rest.channels.get<AnyGuildTextChannel>(targetChannelId);
+        targetMessage = channel.guild && await channel.getMessage(targetMessageId);
+        if(targetMessage.author?.id !== context.client.user.id && !force){
+          await statusMessage.edit(`❌${t("commands:import.notBotMessage")}`);
+          return;
+        }
+      }
+      catch(e){
+        this.logger.error(e);
+        statusMessage?.edit(`:sob:${t("failed")}...`);
+      }
+    }
+
+    const cancellation = context.server.bindCancellation(new TaskCancellationManager());
+    try{
       // extract an embed and an attachment
-      const embed = msg.embeds.length > 0 ? msg.embeds[0] : null;
-      const attac = msg.attachments.size > 0 ? msg.attachments.first() : null;
+      const attac = targetMessage.attachments.size > 0 ? targetMessage.attachments.first() : null;
 
-
-      if(embed && embed.title.endsWith("のキュー")){
-        // if embed detected
-        const fields = embed.fields;
-        for(let i = 0; i < fields.length; i++){
-          const lines = fields[i].value.split("\r\n");
-          const tMatch = lines[0].match(/\[(?<title>.+)\]\((?<url>.+)\)/);
-          await context.server.queue.addQueueOnly({
-            url: tMatch.groups.url,
-            addedBy: message.member,
-          });
-          await smsg.edit(
-            t("songProcessingInProgress", {
-              totalSongCount: t("totalSongCount", { count: fields.length }),
-              currentSongCount: t("currentSongCount", { count: i + 1 }),
-            })
-          );
-          if(cancellation.Cancelled) break;
-        }
-        if(!cancellation.Cancelled){
-          await smsg.edit(`✅${
-            t("songProcessingCompleted", {
-              count: fields.length,
-            })
-          }`);
-        }else{
-          await smsg.edit(`✅${t("canceled")}`);
-        }
-      }else if(attac && attac.filename.endsWith(".ymx")){
+      if(attac && attac.filename.endsWith(".ymx")){
         // if an attachment is ymx
         const raw = await candyget.json(attac.url).then(({ body }) => body) as YmxFormat;
 
         if(raw.version !== YmxVersion){
-          await smsg.edit(
+          await statusMessage.edit(
             `✘${
               t("commands:import.versionIncompatible")
             }(${t("commands:import.current")}:v${YmxVersion}; ${t("commands:import.file")}:v${raw.version})`);
@@ -137,7 +126,7 @@ export default class Import extends BaseCommand {
             gotData: qs[i],
           });
           if(qs.length <= 10 || i % 10 === 9){
-            await smsg.edit(
+            await statusMessage.edit(
               t("songProcessingInProgress", {
                 totalSongCount: t("totalSongCount", { count: qs.length }),
                 currentSongCount: t("currentSongCount", { count: i + 1 }),
@@ -148,18 +137,18 @@ export default class Import extends BaseCommand {
         }
 
         if(!cancellation.Cancelled){
-          await smsg.edit(`✅${t("songProcessingCompleted", { count: qs.length })}`);
+          await statusMessage.edit(`✅${t("songProcessingCompleted", { count: qs.length })}`);
         }else{
-          await smsg.edit(`✅${t("canceled")}`);
+          await statusMessage.edit(`✅${t("canceled")}`);
         }
       }else{
-        await smsg.edit(`❌${t("commands:import.contentNotIncludedInMessage")}`);
+        await statusMessage.edit(`❌${t("commands:import.contentNotIncludedInMessage")}`);
         return;
       }
     }
     catch(e){
       this.logger.error(e);
-      smsg?.edit(`:sob:${t("failed")}...`);
+      statusMessage?.edit(`:sob:${t("failed")}...`);
     }
     finally{
       context.server.unbindCancellation(cancellation);

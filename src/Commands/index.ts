@@ -101,6 +101,11 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     return this._disabled;
   }
 
+  protected readonly _messageCommand: boolean = false;
+  get messageCommand(){
+    return this._messageCommand;
+  }
+
   get asciiName(){
     return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
   }
@@ -114,6 +119,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     this._unlist = opts.unlist;
     this._shouldDefer = opts.shouldDefer;
     this._disabled = opts.disabled || false;
+    this._messageCommand = "messageCommand" in opts && opts.messageCommand;
     if(!this._unlist){
       if(!this.asciiName) throw new Error("Command has not ascii name");
       const {
@@ -125,14 +131,14 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       } = opts as ListCommandWithArgsOptions;
 
       this._description = i18next.t(`commands:${this.asciiName}.description` as any);
-      this._descriptionLocalization = Object.create({});
+      this._descriptionLocalization = {};
       i18next.languages.forEach(language => {
         if(i18next.language === language) return;
         this._descriptionLocalization[language as keyof typeof this._descriptionLocalization]
           = i18next.t(`commands:${this.asciiName}.description` as any, { lng: language });
       });
 
-      this._examples = examples ? Object.create(null) : null;
+      this._examples = examples ? {} : null;
       if(this._examples){
         i18next.languages.forEach(language => {
           this._examples[language as keyof typeof this._examples]
@@ -140,7 +146,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         });
       }
 
-      this._usage = usage ? Object.create(null) : null;
+      this._usage = usage ? {} : null;
       if(this._usage){
         i18next.languages.forEach(language => {
           this._usage[language as keyof typeof this._usage]
@@ -156,7 +162,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           name: arg.name,
           required: arg.required || false,
           description: i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any),
-          descriptionLocalization: Object.create(null),
+          descriptionLocalization: {} as LocaleMap,
           choices: [] as LocalizedSlashCommandArgument["choices"],
         };
         i18next.languages.forEach(language => {
@@ -169,7 +175,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           const resultChoice = {
             name: i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}` as any),
             value: choiceValue,
-            nameLocalizations: Object.create(null),
+            nameLocalizations: {} as LocaleMap,
           };
           i18next.languages.forEach(language => {
             if(i18next.language === language) return;
@@ -192,7 +198,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     this.logger.debug(`${this.name} loaded`);
   }
 
-  getPermissionDescription(locale: string){
+  getLocalizedPermissionDescription(locale: string){
     const perms = this.requiredPermissionsOr.filter(perm => perm !== "admin");
     if(perms.length === 0){
       return "なし";
@@ -227,7 +233,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     };
     if(this.requiredPermissionsOr.length !== 0 && !this.requiredPermissionsOr.some(judgeIfPermissionMeeted)){
       await message.reply({
-        content: `この操作を実行するには、${this.getLocalizedDescription(context.locale)}が必要です。`,
+        content: `この操作を実行するには、${this.getLocalizedPermissionDescription(context.locale)}が必要です。`,
         ephemeral: true,
       });
       return;
@@ -236,8 +242,9 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     await this.run(message, context, i18next.getFixedT(context.locale));
   }
 
-  toApplicationCommandStructure(): CreateApplicationCommandOptions {
+  toApplicationCommandStructure(): CreateApplicationCommandOptions[] {
     if(this.unlist) throw new Error("This command cannot be listed due to private command!");
+    const result: CreateApplicationCommandOptions[] = [];
     const options = this.argument?.map(arg => {
       const discordCommandStruct = {
         type: CommandManager.mapCommandOptionTypeToInteger(arg.type),
@@ -255,20 +262,34 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       return discordCommandStruct as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean;
     });
     if(options && options.length > 0){
-      return {
+      result.push({
         type: ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
         description: this.description.replace(/\r/g, "").replace(/\n/g, ""),
         descriptionLocalizations: Object.entries(this.descriptionLocalization).length > 0 ? this.descriptionLocalization : null,
         options,
-      };
+      });
     }else{
-      return {
+      result.push({
         type: ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
         description: this.description.replace(/\r/g, "").replace(/\n/g, ""),
         descriptionLocalizations: Object.entries(this.descriptionLocalization).length > 0 ? this.descriptionLocalization : null,
-      };
+      });
     }
+
+    if(this.messageCommand){
+      const messageCommand = {
+        type: ApplicationCommandTypes.MESSAGE as const,
+        name: this.asciiName,
+        nameLocalizations: {} as LocaleMap,
+      };
+      i18next.languages.forEach(language => {
+        messageCommand.nameLocalizations[language as keyof LocaleMap] = i18next.t(`commands:${this.asciiName}.name` as any, { lng: language });
+      });
+      result.push(messageCommand);
+    }
+
+    return result;
   }
 }

@@ -54,10 +54,6 @@ export async function onInteractionCreate(this: MusicBot, interaction: discord.A
   if(interaction instanceof discord.CommandInteraction){
     handlers.handleCommandInteraction.call(this, server, interaction);
   }else if(interaction instanceof discord.ComponentInteraction){
-    if(!(interaction.channel instanceof discord.TextChannel)){
-      return;
-    }
-
     if(interaction.data.componentType === discord.ComponentTypes.BUTTON){
       // ボタンインタラクション
       handlers.handleButtonInteraction.call(this, server, interaction);

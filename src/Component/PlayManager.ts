@@ -267,12 +267,6 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       });
       this._dsLogger?.appendReadable(normalizer);
 
-      // 昔はこれないとダメだったので
-      // 様子を見ながら考える
-      // ノーマライザーがあるから大丈夫かもしれない
-      // const fixedResource = FixedAudioResource.fromAudioResource(resource, this.currentAudioInfo.LengthSeconds - time);
-      // this._player.play(fixedResource);
-
       this._player.play(resource);
 
       // setup volume

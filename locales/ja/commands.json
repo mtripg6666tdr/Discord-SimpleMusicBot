@@ -124,7 +124,9 @@
     "driveShareUrl": "音声ファイルの限定公開リンクのURL指定",
     "tweetUrl": "ツイートURL指定",
     "spotify": "曲のURL、およびプレイリストのURL。曲を推測してYouTubeから再生します。",
-    "custom": "オーディオファイルへの直URL"
+    "custom": "オーディオファイルへの直URL",
+    "googleDrive": "Google ドライブ",
+    "niconico": "ニコニコ動画"
   },
   "import": {
     "name": "インポート",
@@ -300,7 +302,6 @@
     "noContent": "再生するコンテンツがありません",
     "resuming": "再生を再開します。",
     "noMusicFound": "該当する楽曲が見つかりませんでした",
-    "noContentWhereReplyingTo": "返信先のメッセージに再生できるコンテンツが見つかりません",
     "playing": "再生します",
     "alreadyPlaying": "すでに再生中です",
     "queueEmpty": "キューが空です。再生するコンテンツがありません。"

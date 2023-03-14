@@ -21,6 +21,8 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import type { i18n } from "i18next";
 import type * as ytsr from "ytsr";
 
+import { ApplicationCommandTypes } from "oceanic.js";
+
 import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
 
@@ -44,6 +46,7 @@ export default class Play extends BaseCommand {
       ],
       requiredPermissionsOr: [],
       shouldDefer: true,
+      messageCommand: true,
     });
   }
 
@@ -59,13 +62,14 @@ export default class Play extends BaseCommand {
       && context.rawArgs === ""
       && !firstAttachment
       && !(message["_message"] && message["_message"].referencedMessage)
+      && !(message["_interaction"] && "type" in message["_interaction"].data && message["_interaction"].data.type === ApplicationCommandTypes.MESSAGE)
     ){
       await message.reply(t("commands:play.noContent")).catch(this.logger.error);
       return;
     }
 
     const wasConnected = server.player.isConnecting;
-    // VCに入れない
+    //VCに入れない
     if(!await context.server.joinVoiceChannel(message, { replyOnFail: true }, t)){
       return;
     }
@@ -128,6 +132,11 @@ export default class Play extends BaseCommand {
     }else if(message["_message"]?.referencedMessage){
       // 返信先のメッセージを確認
       const messageReference = message["_message"].referencedMessage;
+      if(messageReference.inCachedGuildChannel()){
+        context.server.playFromMessage(message, messageReference, context, { first: !wasConnected }, t);
+      }
+    }else if(message["_interaction"] && "type" in message["_interaction"].data && message["_interaction"].data.type === ApplicationCommandTypes.MESSAGE){
+      const messageReference = message["_interaction"].data.resolved.messages.first();
       if(messageReference.inCachedGuildChannel()){
         context.server.playFromMessage(message, messageReference, context, { first: !wasConnected }, t);
       }

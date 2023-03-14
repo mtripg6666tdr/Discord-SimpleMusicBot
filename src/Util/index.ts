@@ -190,9 +190,15 @@ export function downloadAsReadable(url: string, options: miniget.Options = {}): 
  * @returns 取得された秒数
  */
 export function retriveLengthSeconds(url: string){
+  return retrieveLengthSecondsInternal(url, () => require("ffmpeg-static")).catch(() => {
+    return retrieveLengthSecondsInternal(url, () => "ffmpeg");
+  });
+}
+
+function retrieveLengthSecondsInternal(url: string, ffmpeg: () => string){
   return new Promise<number>((resolve, reject) => {
     let data = "";
-    const proc = spawn(require("ffmpeg-static"), [
+    const proc = spawn(ffmpeg(), [
       "-i", url,
       "-user_agent", DefaultUserAgent,
     ], {

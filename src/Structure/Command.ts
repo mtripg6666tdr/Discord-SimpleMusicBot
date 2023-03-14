@@ -44,14 +44,16 @@ export type ListCommandWithArgsOptions = BaseCommandInitializeOptions & {
   category: typeof categoriesList[number],
   argument: [firstArgument: SlashCommandArgument, ...restArguments: SlashCommandArgument[]],
   requiredPermissionsOr: CommandPermission[],
+  messageCommand?: boolean,
 };
 
 export type ListCommandWithoutArgsOptions = BaseCommandInitializeOptions & {
   unlist: false,
-  category: typeof categoriesList[number],
-  requiredPermissionsOr: CommandPermission[],
   usage?: never,
   examples?: never,
+  category: typeof categoriesList[number],
+  requiredPermissionsOr: CommandPermission[],
+  messageCommand?: boolean,
 };
 
 export type ListCommandInitializeOptions =
