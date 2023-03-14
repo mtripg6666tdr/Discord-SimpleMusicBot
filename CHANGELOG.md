@@ -48,3 +48,14 @@
 - erisのアップデートが公開され、v3.11.2以前のv3.x系のすべてのバージョンで、今後数週間以内に音声接続が機能しなくなる可能性があります。そのため、v3.11.2へのアップデートを強く推奨します。
 
 ---
+
+# v3.11.3
+## バグ修正
+* スキップ投票の画面が動作しない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1162)
+* 頭出しコマンドと再生コマンドに関するバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1162)
+* 検索コマンドのフッターが間違っていた問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1176)
+
+### その他の特記事項
+- Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
