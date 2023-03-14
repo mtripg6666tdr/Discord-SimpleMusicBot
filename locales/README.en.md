@@ -1,4 +1,4 @@
-> # :warning: This branch is for development of v4
+> # :warning: This is a branch developing v4
 > 
 > The branch is currently used for development, and you shouldn't host a bot from the branch.
 
@@ -13,29 +13,28 @@ Let's enjoy musics by using this OSS bot.
 Let's enjoy musics by using this OSS bot.
 
 ## Features
-- 🎵Play musics in however high quality the bot can
+- 🎵Play songs in however high quality the bot can
 - ⌨️Support both slash-commands and conventional message-based-commands
-- 🔗 Play from URLs
+- 🔗 Play songs from URLs
   - YouTube video's url
   - YouTube's playlist url
   - SoundCloud's music page url
   - Niconico video's watch page url
   - [and so on...](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/commands/overview)
-- 🔎 キーワードから検索して再生(YouTubeとSoundCloud)
-- 🔁 トラックごと及びキュー全体でループ
-- ❕ プレフィックス変更
-  - デフォルトのプレフィックスは`>`です。
-  - ボットを自分でホストする場合、後述の`config.json`でボットレベルでデフォルトのプレフィックスを変更することができます。(複数文字に対応)(複数文字に対応)
-- ▶️事前設定による音楽の自動再生
-- 👍 Botに関するサポート(下記)
+- 🔎 Search videos from keyword and play them(YouTubeとSoundCloud)
+- 🔁Track loop and queue loop
+- ❕Changing the prefix
+  - The default prefix is `>`.
+  - If you're running your own instance, you can change the bot's default prefix by editing `config.json`.(prefixes of multiple characters supported)
+- ▶️Autoplay songs, by pre-defined configuration
+- 👍 Support (Japanese only)
 
-## ガイド
-ボットの設定方法、コマンドなどはこちらからご覧になれます。
-- [ドキュメント](https://web.usamyon.moe/Discord-SimpleMusicBot/)
+## Guide
+The documentation of the bot (Japanese).
+- [Documentation](https://web.usamyon.moe/Discord-SimpleMusicBot/)
 
-## 貢献について
+## Contributing
 開発中のためバグが多々あります。  
-本リポジトリへの貢献は大歓迎です！開発中のためバグが多々あります。  
 本リポジトリへの貢献は大歓迎です！  
 バグを発見した場合等も重複したIssueがないことを確認し、Issueをまず開いてください。可能な場合、Pull Requestをそのうえで開いてください。  
 Issueのほか、下記のサポートサーバーでも各種お問い合わせを受け付けています。  
@@ -43,7 +42,7 @@ Issueのほか、下記のサポートサーバーでも各種お問い合わせ
 Issueのほか、下記のサポートサーバーでも各種お問い合わせを受け付けています。  
 いづれかの手段でお気軽にどうぞ！
 
-## ローカライズについて
+## Localization
 プロジェクトでは、Crowdinで多言語化をしています。ボットの翻訳に協力してくださる方々を随時募集しています。  
 現在、英語のみ対応予定がありますが、需要によってはほかの言語への翻訳も可能です。プロジェクトでは、Crowdinで多言語化をしています。ボットの翻訳に協力してくれる方々を随時募集しています。  
 現在、英語のみ対応予定がありますが、需要によってはほかの言語への翻訳も可能です。  
@@ -56,6 +55,6 @@ Discordにて、インストール等のサポート、およびアップデー�
 [サポートサーバーへの参加はこちら](https://discord.gg/7DrAEXBMHe)  
 [サポートされているバージョン](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
 
-## ライセンス
+## License
 GPLv3  
-詳細は[COPYING](COPYING)を参照。
+See [COPYING](COPYING) for more info.
