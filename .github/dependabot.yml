@@ -16,6 +16,30 @@ updates:
     allow:
       - dependency-type: "direct"
     ignore:
+      - dependency-name: "sodium-native"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "p-queue"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "p-event"
+        update-types: ["version-update:semver-major"]
+
+  # v3 branch
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    commit-message:
+      prefix: "Update:"
+    target-branch: "v3"
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "target:v3"
+    allow:
+      - dependency-type: "direct"
+    ignore:
       - dependency-name: "html-to-text"
         update-types: ["version-update:semver-major"]
       - dependency-name: "pako"
@@ -54,8 +78,22 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "react-dom"
         update-types: ["version-update:semver-major"]
-  
-  # actions
+
+  # actions (master)
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    commit-message:
+      prefix: "Update(action):"
+    target-branch: "master"
+    labels:
+      - "dependencies"
+      - "github_actions"
+
+  # actions (v3)
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
