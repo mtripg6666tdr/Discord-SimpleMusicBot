@@ -32,6 +32,7 @@ import type { Playlist } from "spotify-url-info";
 import { LockObj, lock } from "@mtripg6666tdr/async-lock";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
+import { joinVoiceChannel } from "@discordjs/voice";
 import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
 import Soundcloud from "soundcloud.ts";
 import * as ytpl from "ytpl";
@@ -288,30 +289,20 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    */
   async joinVoiceChannelOnly(channelId: string){
     const targetChannel = this.bot.client.getChannel<VoiceChannel | StageChannel>(channelId);
-    const connection = targetChannel.join({
+    const connection = joinVoiceChannel({
+      guildId: targetChannel.guild.id,
+      channelId: targetChannel.id,
+      adapterCreator: targetChannel.guild.voiceAdapterCreator,
       selfDeaf: true,
       debug: config.debug,
     });
     this.connectingVoiceChannel = targetChannel;
     if(this.connection === connection) return;
 
-    // Temporary fix for voice stucking
-    // remove below code after the @discordjs/voice fixed and updated
-    // ref: https://github.com/discordjs/discord.js/issues/9185#issuecomment-1459083216
-    const networkStateChangeHandler = (oldState: any, newState: any) => {
-      const newUdp = Reflect.get(newState, "udp");
-      clearInterval(newUdp?.keepAliveInterval);
-    };
-    connection.on("stateChange", (oldState, newState) => {
-      Reflect.get(oldState, "networking")?.off("stateChange", networkStateChangeHandler);
-      Reflect.get(newState, "networking")?.on("stateChange", networkStateChangeHandler);
-    });
-
     await entersState(connection, VoiceConnectionStatus.Ready, 10e3);
 
     const connectionLogger = getLogger("Connection");
     connectionLogger.addContext("id", this.getGuildId());
-
     connection.on("error", err => {
       connectionLogger.error(err);
     });
@@ -319,6 +310,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     if(config.debug){
       connection.on("debug", connectionLogger.trace);
     }
+
     // ニックネームの変更
     const guild = this.bot.client.guilds.get(this.getGuildId());
     const botSelf = guild.clientMember;
@@ -332,7 +324,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         nick: nickname,
       }).catch(this.logger.error);
       // ニックネームを元に戻すやつ
-      connection.on(VoiceConnectionStatus.Destroyed, () => {
+      connection.once(VoiceConnectionStatus.Destroyed, () => {
         nickname = nickname.replace("🈵", "🈳");
         nickname = nickname.replace("▶", stopButton);
         guild.editCurrentMember({
@@ -340,6 +332,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         }).catch(this.logger.error);
       });
     }
+
     this.logger.info(`Connected to ${channelId}`);
   }
 
