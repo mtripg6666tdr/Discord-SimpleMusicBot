@@ -8,9 +8,8 @@
 <img alt="bot usage example" src="https://user-images.githubusercontent.com/56076195/218059644-2ebdf405-b9f8-4561-a3cc-2bcecf09f145.png" width="550" />
 
 A music bot for Discord, made in Japan.  
-Support playing musics from YouTube.You don't have to copy & paste Urls because you can play them from keywords.  
-Let's enjoy musics by using this OSS bot.  
-Let's enjoy musics by using this OSS bot.
+Support playing musics from YouTube.No need to copy and paste URLs, but you can find music by keywords  
+Let's enjoy music by using this OSS bot.
 
 ## Features
 - 🎵Play songs in however high quality the bot can
@@ -25,7 +24,7 @@ Let's enjoy musics by using this OSS bot.
 - 🔁Track loop and queue loop
 - ❕Changing the prefix
   - The default prefix is `>`.
-  - If you're running your own instance, you can change the bot's default prefix by editing `config.json`.(prefixes of multiple characters supported)
+  - If you're running your own instance, you can change the bot's default prefix by editing `config.json`.(prefixes of multiple letters supported)
 - ▶️Autoplay songs, by pre-defined configuration
 - 👍 Support (Japanese only)
 
@@ -34,26 +33,21 @@ The documentation of the bot (Japanese).
 - [Documentation](https://web.usamyon.moe/Discord-SimpleMusicBot/)
 
 ## Contributing
-開発中のためバグが多々あります。  
-本リポジトリへの貢献は大歓迎です！  
-バグを発見した場合等も重複したIssueがないことを確認し、Issueをまず開いてください。可能な場合、Pull Requestをそのうえで開いてください。  
-Issueのほか、下記のサポートサーバーでも各種お問い合わせを受け付けています。  
-いづれかの手段でお気軽にどうぞ！可能な場合、Pull Requestをそのうえで開いてください。  
+The bot is still in development phase so very buggy.  
+Any contributions are welcome!  
+If you find any bugs, please confirm there's no duplicated issues at first and feel free to open a new issue.可能な場合、Pull Requestをそのうえで開いてください。  
 Issueのほか、下記のサポートサーバーでも各種お問い合わせを受け付けています。  
 いづれかの手段でお気軽にどうぞ！
 
 ## Localization
 プロジェクトでは、Crowdinで多言語化をしています。ボットの翻訳に協力してくださる方々を随時募集しています。  
-現在、英語のみ対応予定がありますが、需要によってはほかの言語への翻訳も可能です。プロジェクトでは、Crowdinで多言語化をしています。ボットの翻訳に協力してくれる方々を随時募集しています。  
 現在、英語のみ対応予定がありますが、需要によってはほかの言語への翻訳も可能です。  
-[Crowdinのプロジェクトページ](https://crowdin.com/project/discord-simplemusicbot)
+[Project page on Crowdin](https://crowdin.com/project/discord-simplemusicbot)
 
-## サポート
-Discordにて、インストール等のサポート、およびアップデートのお知らせ等を行っています。  
-ボットを試すこともできますので、興味を持たれた方はぜひご参加ください。Discordにて、インストール等のサポート、およびアップデートのお知らせ等を行っています。  
-ボットを試すこともできますので、興味を持たれた方はぜひご参加ください。  
-[サポートサーバーへの参加はこちら](https://discord.gg/7DrAEXBMHe)  
-[サポートされているバージョン](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
+## Support
+You can receive notifications on Discord when new versions are available.   
+[Support server](https://discord.gg/7DrAEXBMHe)  
+[Supported versions](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
 
 ## License
 GPLv3  
