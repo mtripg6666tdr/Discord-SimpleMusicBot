@@ -23,7 +23,6 @@ import type * as ytsr from "ytsr";
 
 import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
-import { color } from "../Util";
 
 export default class Play extends BaseCommand {
   constructor(){
@@ -129,39 +128,8 @@ export default class Play extends BaseCommand {
     }else if(message["_message"]?.referencedMessage){
       // 返信先のメッセージを確認
       const messageReference = message["_message"].referencedMessage;
-      const prefixLength = server.prefix.length;
-      if(messageReference.content.startsWith("http://") || messageReference.content.startsWith("https://")){
-        // URLのみのメッセージか？
-        await context.server.playFromURL(message, messageReference.content, { first: !wasConnected }, t);
-      }else if(
-        messageReference.content.substring(prefixLength).startsWith("http://")
-        || messageReference.content.substring(prefixLength).startsWith("https://")
-      ){
-        // プレフィックス+URLのメッセージか？
-        await context.server.playFromURL(message, messageReference.content.substring(prefixLength), { first: !wasConnected }, t);
-      }else if(messageReference.attachments.size > 0){
-        // 添付ファイル付きか？
-        await context.server.playFromURL(message, messageReference.attachments.first().url, { first: !wasConnected }, t);
-      }else if(messageReference.author.id === context.client.user.id){
-        // ボットのメッセージなら
-        // 埋め込みを取得
-        const embed = messageReference.embeds[0];
-
-        if(
-          embed.color === color.getColor("SONG_ADDED")
-          || embed.color === color.getColor("AUTO_NP")
-          || embed.color === color.getColor("NP")
-        ){
-          // 曲関連のメッセージならそれをキューに追加
-          const url = embed.description.match(/^\[.+\]\((?<url>https?.+)\)/)?.groups.url;
-          await context.server.playFromURL(message, url, { first: !wasConnected }, t);
-        }else{
-          await message.reply(`:face_with_raised_eyebrow:${t("commands:play.noContentWhereReplyingTo")}`)
-            .catch(this.logger.error);
-        }
-      }else{
-        await message.reply(`:face_with_raised_eyebrow:${t("commands:play.noContentWhereReplyingTo")}`)
-          .catch(this.logger.error);
+      if(messageReference.inCachedGuildChannel()){
+        context.server.playFromMessage(message, messageReference, context, { first: !wasConnected }, t);
       }
     }else if(server.queue.length >= 1){
       // なにもないからキューから再生

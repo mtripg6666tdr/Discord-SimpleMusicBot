@@ -17,6 +17,7 @@
  */
 
 import type { AudioEffect } from "./AudioEffect";
+import type { CommandArgs } from "./Command";
 import type { YmxFormat } from "./YmxFormat";
 import type { exportableCustom, exportableSpotify } from "../AudioSource";
 import type { SearchPanel } from "../Component/SearchPanel";
@@ -449,6 +450,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       return;
     }
     setTimeout(() => message.suppressEmbeds(true).catch(this.logger.error), 4000).unref();
+
     if(
       !config.isDisabledSource("custom")
       && rawArg.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)
@@ -676,23 +678,46 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     }
   }
 
-  /**
-   * プレフィックス更新します
-   * @param message 更新元となるメッセージ
-   */
-  updatePrefix(message: CommandMessage|Message<AnyGuildTextChannel>){
-    const oldPrefix = this.prefix;
-    const member = message.guild.members.get(this.bot.client.user.id);
-    const pmatch = (member.nick || member.username).match(/^(\[(?<prefix0>[a-zA-Z!?_-]+)\]|【(?<prefix1>[a-zA-Z!?_-]+)】)/);
-    if(pmatch){
-      if(this.prefix !== (pmatch.groups.prefix0 || pmatch.groups.prefix1)){
-        this.prefix = Util.normalizeText(pmatch.groups.prefix0 || pmatch.groups.prefix1);
+  async playFromMessage(
+    commandMessage: CommandMessage,
+    message: Message<AnyGuildTextChannel>,
+    context: CommandArgs,
+    morePrefs: { first?: boolean, cancellable?: boolean },
+    t: i18n["t"],
+  ){
+    const prefixLength = context.server.prefix.length;
+    if(message.content.startsWith("http://") || message.content.startsWith("https://")){
+      // URLのみのメッセージか？
+      await context.server.playFromURL(commandMessage, message.content, morePrefs, t);
+    }else if(
+      message.content.substring(prefixLength).startsWith("http://")
+        || message.content.substring(prefixLength).startsWith("https://")
+    ){
+      // プレフィックス+URLのメッセージか？
+      await context.server.playFromURL(commandMessage, message.content.substring(prefixLength), morePrefs, t);
+    }else if(message.attachments.size > 0){
+      // 添付ファイル付きか？
+      await context.server.playFromURL(commandMessage, message.attachments.first().url, morePrefs, t);
+    }else if(message.author.id === context.client.user.id){
+      // ボットのメッセージなら
+      // 埋め込みを取得
+      const embed = message.embeds[0];
+
+      if(
+        embed.color === Util.color.getColor("SONG_ADDED")
+          || embed.color === Util.color.getColor("AUTO_NP")
+          || embed.color === Util.color.getColor("NP")
+      ){
+        // 曲関連のメッセージならそれをキューに追加
+        const url = embed.description.match(/^\[.+\]\((?<url>https?.+)\)/)?.groups.url;
+        await context.server.playFromURL(commandMessage, url, morePrefs, t);
+      }else{
+        await commandMessage.reply(`:face_with_raised_eyebrow:${t("commands:play.noContentWhereReplyingTo")}`)
+          .catch(this.logger.error);
       }
-    }else if(this.prefix !== config.prefix){
-      this.prefix = config.prefix;
-    }
-    if(this.prefix !== oldPrefix){
-      this.logger.info(`Prefix was set to '${this.prefix}'`);
+    }else{
+      await commandMessage.reply(`:face_with_raised_eyebrow:${t("commands:play.noContentWhereReplyingTo")}`)
+        .catch(this.logger.error);
     }
   }
 
@@ -730,6 +755,26 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         addedBy: panel.commandMessage.member,
         channel: panel.commandMessage.channel,
       });
+    }
+  }
+
+  /**
+   * プレフィックス更新します
+   * @param message 更新元となるメッセージ
+   */
+  updatePrefix(message: CommandMessage|Message<AnyGuildTextChannel>){
+    const oldPrefix = this.prefix;
+    const member = message.guild.members.get(this.bot.client.user.id);
+    const pmatch = (member.nick || member.username).match(/^(\[(?<prefix0>[a-zA-Z!?_-]+)\]|【(?<prefix1>[a-zA-Z!?_-]+)】)/);
+    if(pmatch){
+      if(this.prefix !== (pmatch.groups.prefix0 || pmatch.groups.prefix1)){
+        this.prefix = Util.normalizeText(pmatch.groups.prefix0 || pmatch.groups.prefix1);
+      }
+    }else if(this.prefix !== config.prefix){
+      this.prefix = config.prefix;
+    }
+    if(this.prefix !== oldPrefix){
+      this.logger.info(`Prefix was set to '${this.prefix}'`);
     }
   }
 
