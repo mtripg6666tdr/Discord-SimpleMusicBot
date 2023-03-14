@@ -33,7 +33,7 @@ export default class Seek extends BaseCommand {
         name: "keyword",
         required: true,
       }],
-      requiredPermissionsOr: ["admin", "dj"],
+      requiredPermissionsOr: ["admin", "dj", "onlyListener"],
       shouldDefer: false,
       examples: true,
       usage: true,

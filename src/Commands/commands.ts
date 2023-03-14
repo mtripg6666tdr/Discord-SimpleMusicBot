@@ -114,7 +114,7 @@ export default class Commands extends BaseCommand {
           .setDescription(ci.getLocalizedDescription(context.locale))
           .setColor(getColor("COMMAND"))
           .addField(t("alias"), `\`${ci.alias.join("`, `")}\``)
-          .addField(t("permissionsToRun"), ci.getPermissionDescription(context.locale))
+          .addField(t("permissionsToRun"), ci.getLocalizedPermissionDescription(context.locale))
         ;
         if(ci.usage){
           embed.addField(

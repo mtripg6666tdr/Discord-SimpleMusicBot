@@ -25,6 +25,7 @@ import { getLogger } from "../../logger";
 export class Normalizer extends Readable {
   protected resumeHighWaterMark: number;
   protected logger = getLogger("Normalizer");
+  protected _destroyed = false;
 
   constructor(protected origin: Readable, protected inlineVolume: boolean, options: ReadableOptions = {}){
     super(Object.assign({
@@ -78,6 +79,10 @@ export class Normalizer extends Readable {
   }
 
   protected _onDestroy(){
+    if(this._destroyed){
+      return;
+    }
+    this._destroyed = true;
     this.logger.debug("Destroy hook called");
     this.off("close", this._onDestroy);
     this.off("end", this._onDestroy);

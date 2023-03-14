@@ -18,7 +18,7 @@
 
 import type { BaseCommand } from "../Commands";
 import type { CommandOptionsTypes } from "../Structure";
-import type { AnyApplicationCommand, ChatInputApplicationCommand, Client, CreateApplicationCommandOptions } from "oceanic.js";
+import type { AnyApplicationCommand, ChatInputApplicationCommand, Client, CreateApplicationCommandOptions, MessageApplicationCommand } from "oceanic.js";
 
 import * as fs from "fs";
 import * as path from "path";
@@ -118,27 +118,7 @@ export class CommandManager extends LogEmitter<{}> {
     // format local commands into the api-compatible well-formatted ones
     const apiCompatibleCommands: CreateApplicationCommandOptions[] = this.commands
       .filter(command => !command.unlist)
-      .map(command => command.toApplicationCommandStructure());
-
-    // // create api compatible command structure without commands grouping
-    // const rawApiCompatibleCommands = this.commands
-    //   .filter(command => !command.unlist)
-    //   .map(command => command.toApplicationCommandStructure());
-    // // create root command map
-    // const rootCommandsMap: Map<string, CreateApplicationCommandOptions> = new Map();
-    // rawApiCompatibleCommands.forEach(command => {
-    //   if(!command.name.includes(commandSeparator)){
-    //     rootCommandsMap.set(command.name, command);
-    //     apiCompatibleCommands.push(command);
-    //   }
-    // });
-    // // finalize api-compatible commands
-    // rawApiCompatibleCommands.forEach(command => {
-    //   const commandStructure = command.name.split(commandSeparator);
-    //   const rootCommandName = commandStructure[0];
-    //   const rootCommand = rootCommandsMap.get(rootCommandName);
-    //   // TODO: group commands
-    // });
+      .flatMap(command => command.toApplicationCommandStructure());
 
     // Get registered commands
     const registeredAppCommands = await client.application.getGlobalCommands({ withLocalizations: true });
@@ -151,25 +131,42 @@ export class CommandManager extends LogEmitter<{}> {
       return;
     }
 
-    // filter slash-commands
-    const registeredCommands = registeredAppCommands
-      .filter(command => command.type === ApplicationCommandTypes.CHAT_INPUT) as ChatInputApplicationCommand[];
-
-    this.logger.info(`Successfully get ${registeredCommands.length} commands`);
+    this.logger.info(`Successfully get ${registeredAppCommands.length} commands`);
 
     // search commands that should be updated
     const commandsToEdit = apiCompatibleCommands.filter(expected => {
-      const actual = registeredCommands.find(command => command.name === expected.name);
-      if(!actual){
-        return false;
+      if(expected.type === ApplicationCommandTypes.CHAT_INPUT){
+        const actual = registeredAppCommands.find(
+          command => command.type === ApplicationCommandTypes.CHAT_INPUT && command.name === expected.name
+        ) as ChatInputApplicationCommand;
+        if(!actual){
+          return false;
+        }else{
+          return !this.sameCommand(actual, expected);
+        }
+      }else if(expected.type === ApplicationCommandTypes.MESSAGE){
+        const actual = registeredAppCommands.find(
+          command => command.type === ApplicationCommandTypes.MESSAGE && command.name === expected.name
+        ) as MessageApplicationCommand;
+        if(!actual){
+          return false;
+        }else{
+          return !this.sameCommand(actual, expected);
+        }
       }else{
-        return !this.sameCommand(actual, expected);
+        return false;
       }
     });
 
     // search commands that should be added newly
     const commandsToAdd = apiCompatibleCommands.filter(expected => {
-      return registeredCommands.findIndex(reg => reg.name === expected.name) < 0;
+      if(expected.type === ApplicationCommandTypes.CHAT_INPUT){
+        return registeredAppCommands.findIndex(reg => reg.type === ApplicationCommandTypes.CHAT_INPUT && reg.name === expected.name) < 0;
+      }else if(expected.type === ApplicationCommandTypes.MESSAGE){
+        return registeredAppCommands.findIndex(reg => reg.type === ApplicationCommandTypes.MESSAGE && reg.name === expected.name) < 0;
+      }else{
+        return false;
+      }
     });
 
     // if there are any commands that should be added or updated
@@ -178,7 +175,7 @@ export class CommandManager extends LogEmitter<{}> {
       this.logger.info(`These are ${[...commandsToEdit, ...commandsToAdd].map(command => command.name)}`);
       for(let i = 0; i < commandsToEdit.length; i++){
         const commandToRegister = commandsToEdit[i];
-        const id = registeredCommands.find(cmd => cmd.name === commandToRegister.name).id;
+        const id = registeredAppCommands.find(cmd => cmd.type === commandToRegister.type && cmd.name === commandToRegister.name).id;
         await client.application.editGlobalCommand(id, commandToRegister);
       }
       for(let i = 0; i < commandsToAdd.length; i++){
@@ -192,8 +189,8 @@ export class CommandManager extends LogEmitter<{}> {
 
     // remove outdated commands (that doesn't recognized as the bot's command)
     if(removeOutdated){
-      const commandsToRemove = registeredCommands.filter(registered => {
-        const index = apiCompatibleCommands.findIndex(command => registered.name === command.name);
+      const commandsToRemove = registeredAppCommands.filter(registered => {
+        const index = apiCompatibleCommands.findIndex(command =>registered.type === command.type && registered.name === command.name);
         return index < 0;
       });
       if(commandsToRemove.length > 0){
@@ -219,7 +216,7 @@ export class CommandManager extends LogEmitter<{}> {
     this.logger.info("Successfully removed all guild commands");
   }
 
-  sameCommand(actual: ChatInputApplicationCommand, expected: CreateApplicationCommandOptions): boolean{
+  sameCommand(actual: ChatInputApplicationCommand | MessageApplicationCommand, expected: CreateApplicationCommandOptions): boolean{
     return util.isDeepStrictEqual(
       this.apiToApplicationCommand(actual),
       expected,
@@ -227,7 +224,13 @@ export class CommandManager extends LogEmitter<{}> {
   }
 
   protected apiToApplicationCommand(apiCommand: AnyApplicationCommand) {
-    if(apiCommand.options){
+    if(apiCommand.type === ApplicationCommandTypes.MESSAGE){
+      return {
+        type: apiCommand.type,
+        name: apiCommand.name,
+        nameLocalizations: apiCommand.nameLocalizations,
+      };
+    }else if(apiCommand.options){
       return {
         type: apiCommand.type,
         name: apiCommand.name,

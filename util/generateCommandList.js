@@ -64,7 +64,7 @@ ${cmd.usage ? `## 使い方\r\n\`\`\`\r\n${cmd.usage[config.defaultLanguage]}\r\
 ${cmd.examples ? `## 使用例\r\n\`\`\`\r\n${cmd.examples[config.defaultLanguage]}\r\n\`\`\`\r\n` : ""}
 
 ## 実行に必要な権限
-${cmd.getPermissionDescription(config.defaultLanguage)}
+${cmd.getLocalizedPermissionDescription(config.defaultLanguage)}
 
 ※管理者権限や、サーバーの管理権限、チャンネルの管理権限、および管理者権限を持つユーザーはこの権限を満たしていなくてもいつでもこのコマンドを実行できます。
   \r\n`, {encoding: "utf-8"});

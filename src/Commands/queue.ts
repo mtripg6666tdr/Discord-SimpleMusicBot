@@ -51,7 +51,7 @@ export default class Queue extends BaseCommand {
     }
     // 合計所要時間の計算
     const totalLength = queue.lengthSecondsActual;
-    let _page = context.rawArgs === "" ? 1 : Number(context.rawArgs);
+    let _page = context.rawArgs === "" ? 0 : Number(context.rawArgs);
     if(isNaN(_page)) _page = 1;
     if(queue.length > 0 && _page > Math.ceil(queue.length / 10)){
       await message.reply(`:warning:${t("commands:queue.pageOutOfRange")}`).catch(this.logger.error);

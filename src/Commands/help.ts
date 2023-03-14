@@ -71,11 +71,11 @@ export default class Help extends BaseCommand {
         !isDisabledSource("soundcloud") && `・SoundCloud(${t("commands:help.musicPageUrl")})`,
         !isDisabledSource("streamable") && `・Streamable(${t("commands:help.videoUrl")})`,
         !isDisabledSource("custom") && `・Discord(${t("commands:help.discordAttachmentUrl")})`,
-        !isDisabledSource("googledrive") && `・Googleドライブ(${t("commands:help.driveShareUrl")})`,
-        !isDisabledSource("niconico") && `・ニコニコ動画(${t("commands:help.videoUrl")})`,
+        !isDisabledSource("googledrive") && `・${t("commands:help.googleDrive")}(${t("commands:help.driveShareUrl")})`,
+        !isDisabledSource("niconico") && `・${t("commands:help.niconico")}(${t("commands:help.videoUrl")})`,
         !isDisabledSource("twitter") && `・Twitter(${t("commands:help.tweetUrl")})`,
         !isDisabledSource("spotify") && Spotify.available && `・Spotify(${t("commands:help.spotify")})`,
-        !isDisabledSource("custom") && t("commands:help.custom"),
+        !isDisabledSource("custom") && `・${t("commands:help.custom")}`,
       ].filter(d => d).join("\r\n"))
       .setColor(getColor("HELP"))
       .toOceanic()

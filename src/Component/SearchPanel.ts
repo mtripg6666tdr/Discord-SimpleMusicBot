@@ -172,7 +172,7 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
   }
 
   async destroy(option?: { quiet: boolean }){
-    const quiet = option.quiet || false;
+    const quiet = option?.quiet || false;
     if(this.status !== "consumed") return;
     if(!quiet){
       await this._responseMessage.channel.createMessage({
