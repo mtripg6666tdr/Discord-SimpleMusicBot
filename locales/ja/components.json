@@ -43,7 +43,9 @@
     "failedAndSkipping": "スキップします",
     "failedAndRetrying": "再試行します",
     "queueEmpty": "キューが空になりました",
-    "queueEmptyAndExiting": "キューが空になったため終了します"
+    "queueEmptyAndExiting": "キューが空になったため終了します",
+    "songsInQueue": "再生待ちの曲",
+    "willLoop": "ループします"
   },
   "skip": {
     "skipping": "スキップしています",
