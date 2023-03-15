@@ -65,8 +65,8 @@ export function transformThroughFFmpeg(
   }else{
     if(output === "ogg" || output === "webm"){
       outputArgs.push(
-        "-acodec", "libopus",
         "-f", output === "ogg" ? "opus" : "webm",
+        "-acodec", "libopus",
       );
     }else{
       outputArgs.push(
