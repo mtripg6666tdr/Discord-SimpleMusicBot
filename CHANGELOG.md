@@ -15,7 +15,7 @@
   * `cache`フォルダに保存されるファイルは任意のタイミングで削除することができます。
 * テキストチャンネルおよびボイスチャンネル以外の、スレッドチャンネル、テキストボイスチャンネル、ステージチャンネルで利用可能になりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1168)
 * データベースを使用した際に、再生の分析情報が保存されるようになりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1170)
-  * ビューワーなどの開発予定は未定です
+  * ビューワーなどの開発は未定です
 * ボットのニックネームに:u7a7a:、:stop_button:が含まれていた場合、ボイスチャンネルに参加した際にそれぞれ:u6e80:、:arrow_forward:に自動的に変更することで、ボイスチャンネルに参加しているかがわかりやすくなる機能の追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1177, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1178)
   * 退出すると元の絵文字に戻ります
 * 日本語以外の言語に対応しました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1173)
