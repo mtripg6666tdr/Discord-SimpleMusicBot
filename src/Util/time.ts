@@ -36,7 +36,7 @@ export function calcMinSec(_t: number){
  * @param seconds 合計時間(秒)
  * @returns [時間, ゼロ補完された分, ゼロ補完された秒]
  */
-export function calcHourMinSec(seconds: number){
+export function calcHourMinSec(seconds: number): [string, string, string]{
   const sec = seconds % 60;
   const min = (seconds - sec) / 60 % 60;
   const hor = ((seconds - sec) / 60 - min) / 60;

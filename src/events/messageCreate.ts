@@ -34,7 +34,16 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
     if(!config.isBotAdmin(message.author.id)) return;
   }
   // botのメッセやdm、およびnewsは無視
-  if(!this["_isReadyFinished"] || message.author.bot || !(message.channel instanceof discord.TextChannel)) return;
+  if(!this["_isReadyFinished"] || message.author.bot) return;
+  if(
+    message.channel.type !== discord.ChannelTypes.GUILD_TEXT
+    && message.channel.type !== discord.ChannelTypes.PRIVATE_THREAD
+    && message.channel.type !== discord.ChannelTypes.PUBLIC_THREAD
+    && message.channel.type !== discord.ChannelTypes.GUILD_STAGE_VOICE
+    && message.channel.type !== discord.ChannelTypes.GUILD_VOICE
+  ){
+    return;
+  }
   if(this._rateLimitController.isRateLimited(message.member.id)) return;
   // データ初期化
   const server = this.initData(message.guildID, message.channel.id);

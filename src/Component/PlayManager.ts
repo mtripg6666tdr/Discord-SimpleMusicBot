@@ -79,6 +79,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   protected _resource: AudioResource = null;
   protected _waitForLiveAbortController: AbortController = null;
   protected _dsLogger: DSL = null;
+  protected _playing: boolean = false;
 
   get preparing(){
     return this._preparing;
@@ -280,6 +281,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       // wait for entering playing state
       await entersState(this._player, AudioPlayerStatus.Playing, 10e3);
       this.preparing = false;
+      this._playing = true;
       this.emit("playStarted");
 
       this.logger.info("Play started successfully");
@@ -306,7 +308,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   private createNowPlayingMessage(){
     const _t = Number(this.currentAudioInfo.lengthSeconds);
     const [min, sec] = Util.time.calcMinSec(_t);
-    const timeFragments = Util.time.calcHourMinSec(this.server.queue.lengthSecondsActual - (this.currentAudioInfo.lengthSeconds || 0));
+    const queueTimeFragments = Util.time.calcHourMinSec(
+      this.server.queue.lengthSecondsActual - (this.currentAudioInfo.lengthSeconds >= 0 ? this.currentAudioInfo.lengthSeconds : 0)
+    );
     /* eslint-disable @typescript-eslint/indent */
     const embed = new MessageEmbedBuilder()
       .setTitle(`:cd:${i18next.t("components:nowplaying.nowplaying")}:musical_note:`)
@@ -329,10 +333,10 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         : i18next.t("components:nowplaying.noNextSong"), true
       )
       .addField(
-        "再生待ちの曲",
+        i18next.t("components:play.songsInQueue"),
         this.server.queue.loopEnabled
-          ? "ループします"
-          : `${i18next.t("currentSongCount", { count: this.server.queue.length - 1 })}(${Util.time.HourMinSecToString(timeFragments, i18next.t)})`,
+          ? i18next.t("components:play.willLoop")
+          : `${i18next.t("currentSongCount", { count: this.server.queue.length - 1 })}(${Util.time.HourMinSecToString(queueTimeFragments, i18next.t)})`,
         true
       )
     ;
@@ -412,6 +416,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           oldState.playbackDuration,
           this._errorUrl === this.currentAudioUrl ? this._errorCount : 0
         );
+        if(this._playing){
+          this.onStreamFinished();
+        }
       }
     });
     this.server.connection.subscribe(this._player);
@@ -439,6 +446,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   */
   stop(force: boolean = false): PlayManager{
     this.logger.info("Stop called");
+    this._playing = false;
     if(this.server.connection){
       this._cost = 0;
       this._player?.unpause();
@@ -554,9 +562,10 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   }
 
   async onStreamFinished(){
-    if(!this.currentAudioUrl){
+    if(!this.currentAudioUrl || !this._playing){
       return;
     }
+    this._playing = false;
     this.logger.info("onStreamFinished called");
 
     if(this.server.connection && this._player.state.status === AudioPlayerStatus.Playing){
@@ -636,6 +645,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   }
 
   async onStreamFailed(quiet: boolean = false){
+    this._playing = false;
     this.logger.info("onStreamFailed called");
     this.emit("playFailed");
     this._cost = 0;
