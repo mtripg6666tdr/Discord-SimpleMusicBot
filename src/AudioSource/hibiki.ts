@@ -85,7 +85,7 @@ export class Hibiki extends AudioSource<DynamicThumbnail> {
   }
 
   npAdditional(){
-    return "\r\nキャスト: `" + this.casts + "`";
+    return `キャスト: \`${this.casts}\``;
   }
 
   exportData(): exportableCustom{

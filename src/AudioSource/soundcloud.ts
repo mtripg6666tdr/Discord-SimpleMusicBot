@@ -86,7 +86,7 @@ export class SoundCloudS extends AudioSource<string> {
   }
 
   npAdditional(t: i18n["t"]){
-    return `\r\n${t("audioSources.artist")}: \`${this.author}\``;
+    return `${t("audioSources.artist")}: \`${this.author}\``;
   }
 
   exportData(): exportableSoundCloud{
