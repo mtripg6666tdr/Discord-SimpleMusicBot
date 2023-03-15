@@ -6,7 +6,7 @@
   },
   "bulk-delete": {
     "invalidMessageCount": "指定されたメッセージ数が無効です。",
-    "loading": "Fetching",
+    "loading": "取得中",
     "hitCount_one": "{{count}}件ヒット",
     "hitCount_other": "{{count}}件ヒット",
     "inCount_one": "取得した{{count}}件中",
@@ -16,18 +16,18 @@
     "confirm": "一括削除を確定するにはボタンを押してください。\r\n押されないと一定時間後にキャンセルされます。",
     "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため",
     "auditLog_other": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため",
-    "finish": "Done! (This message will be deleted automatically)",
-    "cancel": "Canceled the deletions."
+    "finish": "完了!(このメッセージは自動的に消去されます)",
+    "cancel": "削除をキャンセルしました"
   },
   "cancel": {
-    "name": "Cancel",
+    "name": "キャンセル",
     "description": "実行中のキャンセル可能な処理がある場合それをすべて中止します。",
     "canceling": "処理中の処理をすべてキャンセルしています....",
     "noCancelable": "キャンセルできる処理がありませんでした"
   },
   "command": {
-    "name": "Command",
-    "usage": "command [name]",
+    "name": "コマンド",
+    "usage": "command [コマンド名]",
     "examples": "command search",
     "description": "コマンド一覧を表示します。コマンド名を渡すとそのコマンドの詳細を表示します。",
     "args": {
@@ -39,30 +39,30 @@
       "voice": "ボイスチャンネル操作系",
       "player": "音楽プレイヤー制御系",
       "playlist": "プレイリスト操作系",
-      "utility": "Utilities",
+      "utility": "ユーティリティ系",
       "bot": "ボット操作全般"
     },
-    "commandList": "Command List",
+    "commandList": "コマンド一覧",
     "toLearnMoreMessage": "`{{prefix}}コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
     "toLearnMoreInteraction": "`/command 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
     "commandExplanation": "コマンド`{{command}}`の詳細",
-    "usageLabel": "Usage",
-    "exampleLabel": "Example",
+    "usageLabel": "使い方",
+    "exampleLabel": "使用例",
     "argumentDescription": "`<>` 内の引数は必須の引数、`[]`内の引数は任意の引数です。",
-    "commandNotFound": "Command not found"
+    "commandNotFound": "コマンドが見つかりませんでした"
   },
   "disconnect": {
-    "name": "disconnect",
-    "description": "Disconnect from voice channel"
+    "name": "切断",
+    "description": "ボイスチャンネルから切断します"
   },
   "effect": {
-    "name": "effect",
+    "name": "エフェクト",
     "description": "エフェクトコントロールパネルを表示します",
     "effectControllPanel": {
       "title": "エフェクトコントロールパネル",
       "description": "オーディオエフェクトの設定/解除することができます。\r\n・表示は古い情報であることがありますが、エフェクトを操作したとき、更新ボタンを押したときに更新されます。\r\n・エフェクトは次の曲から適用されます\r\n現在の曲に適用したい場合は、`頭出し`コマンドを使用してください\r\n",
       "footer": "エフェクトを選択してボタンを押してください",
-      "reload": "Update"
+      "reload": "更新"
     }
   },
   "end": {
@@ -79,17 +79,17 @@
     "featureDescription": "楽曲追加時に、楽曲を追加したユーザーごとにできるだけ均等になるようにする機能です。"
   },
   "export": {
-    "name": "export",
+    "name": "エクスポート",
     "description": "キューの内容をインポートできるようエクスポートします。",
     "queueEmpty": "キューが空なのでエクスポートできません",
-    "exported": "Exported",
+    "exported": "エクスポートしました",
     "compatiblity": "バージョン: v{{version}}互換",
     "importInstruction": "インポート時は、「<{{url}}>」をインポートコマンドの引数に指定してください"
   },
   "frame": {
-    "name": "frame",
-    "examples": "frame 1:20",
-    "usage": "frame [time]",
+    "name": "フレーム",
+    "examples": "フレーム 1:20",
+    "usage": "フレーム [時間]",
     "description": "現在の再生位置の動画のフレーム画像を可能な場合取得します。引数が指定された場合その時点でのフレームを取得します",
     "args": {
       "time": {
@@ -100,23 +100,23 @@
     "fallbacking": "フォールバックしているため、現在この機能を使用できません。",
     "liveStreamWithTime": "ライブストリームでは時間指定できません",
     "invalidTime": "時間の指定が正しくありません",
-    "capturing": "Capturing",
-    "finish": "Done!",
+    "capturing": "取得中",
+    "finish": "完了!",
     "timeAt": "{{hour}}:{{min}}:{{sec}}時点",
-    "failed": "Failed to capture..."
+    "failed": "取得に失敗しました..."
   },
   "help": {
-    "name": "Help",
-    "description": "Show help",
+    "name": "ヘルプ",
+    "description": "ヘルプを表示します",
     "embedDescription": "高音質な音楽で、Discordで最高のエクスペリエンスを得るために作られました:robot:",
     "toLearnMore": "利用可能なコマンドを確認するには{{command}}を使用してください",
-    "developer": "Developer",
-    "version": "Version",
-    "repository": "Repository",
-    "sourceCode": "Source code",
-    "supportServer": "Support server",
+    "developer": "開発者",
+    "version": "バージョン",
+    "repository": "レポジトリ",
+    "sourceCode": "ソースコード",
+    "supportServer": "サポートサーバー",
     "availableSources": "現在対応している音楽ソース",
-    "keywordSearch": "Keyword search",
+    "keywordSearch": "キーワード検索",
     "videoUrl": "動画URL指定",
     "playlistUrl": "プレイリストURL指定",
     "musicPageUrl": "楽曲ページURL指定",
@@ -129,10 +129,10 @@
     "niconico": "ニコニコ動画"
   },
   "import": {
-    "name": "import",
+    "name": "インポート",
     "description": "指定されたメッセージからキューをインポートします。exportコマンドで出力されたファイルが添付されたURL、もしくはキューの埋め込みのあるメッセージのURLを引数として指定してください。",
     "examples": "import https://discord.com/channels/...",
-    "usage": "import <URL>",
+    "usage": "インポート <インポート元のURL>",
     "args": {
       "url": {
         "description": "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURL、もしくはキューの埋め込みが添付されたURLを指定できます。"
@@ -141,17 +141,17 @@
     "invalidArgumentMessage": "インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。",
     "noDiscordLink": "Discordのメッセージへのリンクを指定してください",
     "invalidLink": "指定されたURLは無効です",
-    "loadingMessage": "Fetching message",
-    "notBotMessage": "Not a message sent by bot",
+    "loadingMessage": "メッセージを取得しています",
+    "notBotMessage": "ボットのメッセージではありません",
     "versionIncompatible": "指定されたファイルはバージョンに互換性がないためインポートできません",
     "current": "現行",
-    "file": "File",
+    "file": "ファイル",
     "contentNotIncludedInMessage": "対象の内容が見つかりませんでした"
   },
   "invoke": {
-    "name": "invoke",
+    "name": "インボーク",
     "description": "指定されたコマンドを実行します。基本的に使用しないでください",
-    "usage": "invoke <command>",
+    "usage": "invoke <コマンド>",
     "examples": "invoke play 夜に駆ける",
     "args": {
       "command": {
@@ -159,26 +159,26 @@
       }
     },
     "recursiveInvoke": "インボークコマンドをインボークコマンドで実行することはできません",
-    "executed": "Executed",
-    "commandNotFound": "Command not found",
+    "executed": "実行しました",
+    "commandNotFound": "コマンドが見つかりませんでした",
     "specialCommandNotFound": "特別コマンドが見つかりません"
   },
   "join": {
-    "name": "connect",
+    "name": "接続",
     "description": "ボイスチャンネルに参加します",
     "alreadyConnected": "すでにボイスチャンネルに接続中です。"
   },
   "leaveclean": {
     "name": "キューを整理",
     "description": "ボイスチャンネルから離脱した人がリクエストした曲をキューから削除して整理します",
-    "allRemoved": "Removed all items",
-    "queueEmpty": "Queue empty",
+    "allRemoved": "すべて削除しました",
+    "queueEmpty": "キューが空です",
     "removed_one": "{{count}}曲削除しました",
     "removed_other": "{{count}}曲削除しました",
     "removedNothing": "削除するものはありませんでした。"
   },
   "log": {
-    "name": "System information",
+    "name": "システム情報",
     "description": "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`、`cpu`、`basic`のうちいずれか)を指定して特定の内容のみ取得することもできます。",
     "examples": "sysinfo mem",
     "usage": "sysinfo [mem|cpu]",
@@ -186,39 +186,39 @@
       "content": {
         "description": "basic,mem,cpuのどれかを指定できます",
         "choices": {
-          "basic": "Basic information",
-          "mem": "Memory",
+          "basic": "基本情報",
+          "mem": "メモリ",
           "cpu": "CPU",
-          "log": "Log (administrator only)"
+          "log": "ログ(管理者のみ)"
         }
       }
     },
     "executing": "実行します",
-    "guildName": "Server name",
+    "guildName": "サーバー名",
     "participatingGuildCount": "参加サーバー数",
     "registeredGuildCount": "データが保持されているサーバー数",
     "connectingGuildCount": "接続中サーバー数",
     "playingGuildCount": "再生中サーバー数(一時停止含む)",
     "pausedGuildCount": "一時停止サーバー数",
     "guildSearchResult": "サーバー照会結果",
-    "guildId": "Server ID",
-    "guildIcon": "Server icon",
-    "guildChannelCountFromCache": "Channel count (cached)",
-    "guildConnecting": "Connecting",
-    "guildPlaying": "Playing/Paused",
-    "guildPaused": "Paused",
+    "guildId": "サーバーID",
+    "guildIcon": "サーバーアイコン",
+    "guildChannelCountFromCache": "チャンネル数(キャッシュによる)",
+    "guildConnecting": "接続中",
+    "guildPlaying": "再生中/一時停止中",
+    "guildPaused": "一時停止中",
     "itemsInQueue": "キュー内のアイテム数",
     "currentTransformingCost": "現在の変換コスト",
-    "liveStream": "Livestream"
+    "liveStream": "ライブストリーム"
   },
   "loop": {
-    "name": "Loop",
+    "name": "ループ",
     "description": "トラックごとのループを設定します。",
     "disabled": "トラックリピートを無効にしました",
     "enabled": "トラックリピートを有効にしました"
   },
   "lyrics": {
-    "name": "Lyrics",
+    "name": "歌詞",
     "description": "指定された楽曲の歌詞を検索します",
     "examples": "l 夜に駆ける",
     "usage": "l <タイトル、アーティスト等>",
@@ -231,10 +231,10 @@
     "failed": "失敗しました。曲名を確認してもう一度試してみてください。"
   },
   "move": {
-    "name": "Move",
+    "name": "移動",
     "description": "曲を指定された位置から指定された位置までキュー内で移動します。2番目の曲を5番目に移動したい場合は`mv 2 5`のようにします。",
-    "examples": "Move 2 5",
-    "usage": "Move <from> <to>",
+    "examples": "移動 2 5",
+    "usage": "移動 <from> <to>",
     "args": {
       "from": {
         "description": "移動元のインデックス。キューに併記されているものです"
@@ -256,43 +256,43 @@
     "success": "`{{title}}`を一番最後からキューの先頭に移動しました"
   },
   "news": {
-    "name": "News",
+    "name": "ニュース",
     "description": "現在配信されているニューストピックスを閲覧・視聴できます。",
-    "newsTopics": "News topic"
+    "newsTopics": "ニューストピックス"
   },
   "nowplaying": {
-    "name": "Now playing",
+    "name": "現在再生中",
     "description": "現在再生中の曲の情報を表示します。 `l`(スラッシュコマンドの場合はTrue)を引数にするとより長く概要を表示します(可能な場合)",
     "args": {
       "detailed": {
         "description": "Trueが指定された場合、可能な場合より長く詳細を表示します"
       }
     },
-    "nowPlayingSong": "Now playing"
+    "nowPlayingSong": "現在再生中の曲"
   },
   "onceloop": {
-    "name": "Loop once",
+    "name": "ワンスループ",
     "description": "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
-    "disabled": "Disable loop once",
-    "enabled": "Enable loop once"
+    "disabled": "ワンスループを無効にしました",
+    "enabled": "ワンスループを有効にしました"
   },
   "pause": {
-    "name": "Pause",
-    "description": "Pausing",
-    "alreadyPaused": "Paused",
+    "name": "一時停止",
+    "description": "再生を一時停止します",
+    "alreadyPaused": "すでに一時停止されています",
     "usePlayToResume": "再生を再開するには`再生`コマンドを使用してください",
-    "paused": "Paused"
+    "paused": "一時停止しました"
   },
   "ping": {
-    "name": "Ping",
-    "description": "Show latency",
-    "pingInfo": "Ping info",
+    "name": "ピング",
+    "description": "ボットのping時間(レイテンシ)を表示します。",
+    "pingInfo": "ping情報",
     "botMessageReceive": "ボットメッセージ取得",
     "botWebSocketConnection": "ボットWebSocket接続",
     "voiceUdpConnection": "ボイスチャンネルUDP接続"
   },
   "play": {
-    "name": "Play",
+    "name": "再生",
     "description": "キュー内の楽曲を再生します。引数として対応しているサイトの楽曲のURLを指定することもできます。",
     "args": {
       "keyword": {
@@ -305,23 +305,23 @@
     "noContent": "再生するコンテンツがありません",
     "resuming": "再生を再開します。",
     "noMusicFound": "該当する楽曲が見つかりませんでした",
-    "playing": "Play",
-    "alreadyPlaying": "Playing",
+    "playing": "再生します",
+    "alreadyPlaying": "すでに再生中です",
     "queueEmpty": "キューが空です。再生するコンテンツがありません。"
   },
   "queue": {
-    "name": "Queue",
-    "description": "Show queue",
+    "name": "キュー",
+    "description": "キューを表示します",
     "args": {
       "page": {
         "description": "表示するキューのページを指定することができます"
       }
     },
-    "queueEmpty": "Queue empty",
+    "queueEmpty": "キューは空です",
     "pageOutOfRange": "指定されたページは範囲外です",
     "songCount_one": "{{count}}曲",
     "songCount_other": "{{count}}曲",
-    "total": "Total"
+    "total": "合計"
   },
   "queueloop": {
     "name": "キューループ",
@@ -338,7 +338,7 @@
     "featureNote": "※YouTube以外のソースからの再生時、ループ有効時には追加されません"
   },
   "remove": {
-    "name": "Remove",
+    "name": "削除",
     "description": "キュー内の指定された位置の曲を削除します。",
     "examples": "rm 5",
     "usage": "削除 <削除する位置>",
@@ -356,9 +356,9 @@
     "unableToRemoveAll": "削除できませんでした。リクエスト曲を削除するには権限が不足している可能性があります。"
   },
   "removeall": {
-    "name": "Clear",
+    "name": "すべて削除",
     "description": "キュー内の曲をすべて削除します。(接続中の場合ボイスチャンネルから離脱します。)",
-    "removed": "Cleared"
+    "removed": "すべて削除しました"
   },
   "removedupes": {
     "name": "重複削除",
@@ -368,7 +368,7 @@
     "noSongRemoved": "削除できる楽曲がありませんでした"
   },
   "reset": {
-    "name": "Reset",
+    "name": "リセット",
     "description": "サーバーのキュー、設定やデータを削除して初期化します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
     "success": "サーバーの設定を初期化しました"
   },
@@ -378,10 +378,10 @@
     "success": "再生中の楽曲を頭出ししました"
   },
   "search": {
-    "name": "Search",
+    "name": "検索",
     "description": "曲をYouTubeで検索します。直接URLを直接指定することもできます。",
     "examples": "検索 夜に駆ける",
-    "usage": "Search <term>",
+    "usage": "検索 <キーワード>",
     "args": {
       "keyword": {
         "description": "検索したい動画のキーワードまたはURL。"
@@ -393,20 +393,20 @@
     "name": "キュー内を検索",
     "description": "キュー内を検索します。引数にキーワードを指定します。",
     "examples": "seq pretender",
-    "usage": "seq <term>",
+    "usage": "seq <キーワード>",
     "args": {
       "keyword": {
         "description": "検索したい楽曲のキーワード"
       }
     },
-    "queueEmpty": "Queue is empty",
+    "queueEmpty": "キューが空です",
     "embedDescription": "キュー内での検索結果です。最大20件表示されます。"
   },
   "searchsoundcloud": {
     "name": "サウンドクラウドを検索",
     "description": "曲をSoundCloudで検索します",
     "examples": "ses sakura trip",
-    "usage": "ses <term>",
+    "usage": "ses <キーワード>",
     "args": {
       "keyword": {
         "description": "検索したい楽曲のキーワードまたはURL。"
@@ -414,9 +414,9 @@
     }
   },
   "seek": {
-    "name": "Seek",
+    "name": "シーク",
     "description": "楽曲をシークします。",
-    "examples": "Seek 0:30",
+    "examples": "シーク 0:30",
     "usage": "検索 <時間(秒数または時間:分:秒の形式で)>",
     "args": {
       "keyword": {
@@ -425,28 +425,28 @@
     },
     "unseekable": "シーク先に対応していない楽曲です",
     "invalidTime": "シーク先の時間が正しくありません",
-    "seeking": "Seeking",
-    "success": "Seeked",
-    "failed": "Seek failed"
+    "seeking": "シークしています",
+    "success": "シークしました",
+    "failed": "シークに失敗しました"
   },
   "shuffle": {
-    "name": "Shuffle",
+    "name": "シャッフル",
     "description": "キューの内容をシャッフルします。",
-    "queueEmpty": "Queue empty.",
-    "success": "Shuffled"
+    "queueEmpty": "キューが空です。",
+    "success": "シャッフルしました"
   },
   "skip": {
-    "name": "skip",
+    "name": "スキップ",
     "description": "現在再生中の曲をスキップします。",
     "preparing": "現在再生準備中です",
     "votePanelAlreadyOpen": "すでに開かれている投票パネルがあります",
-    "success": "Skipped `{{title}}`",
-    "failed": "Skip failed"
+    "success": "`{{title}}`をスキップしました",
+    "failed": "スキップに失敗しました"
   },
   "thumbnail": {
-    "name": "thumbnail",
+    "name": "サムネイル",
     "description": "現在再生中のサムネイルを表示します。検索パネルが開いていて検索パネル中の番号が指定された場合にはその曲のサムネイルを表示します。",
-    "examples": "thumbnail 5",
+    "examples": "サムネイル 5",
     "usage": "サムネイル [検索パネル中のインデックス]",
     "args": {
       "index": {
@@ -456,20 +456,20 @@
     "noSearchPanelFound": "検索結果が見つかりません"
   },
   "uptime": {
-    "name": "uptime",
+    "name": "アップタイム",
     "description": "ボットのアップタイムを表示します。",
-    "embedTitle": "{{name}} uptime",
+    "embedTitle": "{{name}}のアップタイム",
     "elapsedAfterInstantiated": "インスタンス作成からの経過時間",
     "elapsedAfterConnected": "Discordに接続してからの経過時間",
     "registeredServerCount": "データが保持されているサーバー数",
-    "datetimeLabel": "{{hour}} hour {{min}} minute {{sec}} second",
+    "datetimeLabel": "{{hour}}時間{{min}}分{{sec}}秒",
     "serverCount_one": "{{count}}サーバー",
     "serverCount_other": "{{count}}サーバー"
   },
   "volume": {
-    "name": "volume",
+    "name": "ボリューム",
     "description": "音量を調節します。1から200の間で指定します(デフォルト100)。何も引数を付けないと現在の音量を表示します。不安定になった場合には100に戻してください。",
-    "examples": "volume [number]",
+    "examples": "volume [音量]",
     "usage": "volume 120",
     "args": {
       "volume": {

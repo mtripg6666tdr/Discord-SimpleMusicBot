@@ -1,9 +1,9 @@
 {
   "nowplaying": {
-    "nowplaying": "Now playing",
-    "waitForPlaying": "Waiting to be played",
-    "requestedBy": "Request",
-    "nextSong": "Next song",
+    "nowplaying": "現在再生中",
+    "waitForPlaying": "再生待ち",
+    "requestedBy": "リクエスト",
+    "nextSong": "次の曲",
     "noNextSong": "次の曲がまだ登録されていません"
   },
   "queue": {
@@ -13,7 +13,7 @@
     "autoplayRelated": "関連曲自動再生",
     "equallyplayback": "均等再生",
     "tooManyQueueItems": "キューの上限を超えています",
-    "songAdded": "Song added",
+    "songAdded": "曲が追加されました",
     "positionInQueue": "キュー内の位置",
     "etaToPlay": "再生されるまでの予想時間",
     "fallbackNotice": "現在、通常の方法で情報を取得できなかったため、代替ライブラリにフォールバックして取得しました。これが異常だと思われる場合はサポートまでお問い合わせください。\r\n処理に時間がかかる、突然終了するなど、正常なオペレーションができない場合があります。なお、フォールバックしたあとの動作はサポート対象外です。問題が発生した場合、`リセット`コマンドを使用すると、サーバーのデータをすべて初期化することができます。",
@@ -28,20 +28,20 @@
     "songsAdded_other": "{{count}}曲が追加されました"
   },
   "search": {
-    "resultTitle": "Search results for \"{{query}}\"",
+    "resultTitle": "\"{{query}}\"の検索結果",
     "resultFooterInteraction": "再生したい項目を、下から選択してください。キャンセルするには、下から\"キャンセル\"を選択してください。また、サムネイルコマンドを使用してサムネイルを確認することもできます。",
     "resultFooterMessage": "再生したい項目を選択して数字を送信するか、下から選択してください。キャンセルするには「キャンセル」または「cancel」と選択/入力します。また、サムネイルコマンドを使用してサムネイルを確認できます。",
-    "select": "Select...",
+    "select": "ここから選択...",
     "typeOrSelect": "数字を直接送信するか、ここから選択...",
     "maximumSearch": "すでに開いている検索パネルが上限を超えています"
   },
   "play": {
     "waitingForLiveStream": "{{title}} `(ライブストリーム)`の開始を待機中...",
     "waitingForLiveCanceled": "待機をキャンセルしました",
-    "preparing": "Preparing to play {{title}}",
+    "preparing": "{{title}}の再生準備中",
     "failedToPlay": "曲の再生に失敗しました...。",
-    "failedAndSkipping": "Skipping",
-    "failedAndRetrying": "Re-trying",
+    "failedAndSkipping": "スキップします",
+    "failedAndRetrying": "再試行します",
     "queueEmpty": "キューが空になりました",
     "queueEmptyAndExiting": "キューが空になったため終了します"
   },
