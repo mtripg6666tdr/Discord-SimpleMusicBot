@@ -172,17 +172,19 @@ export class CommandManager extends LogEmitter<{}> {
     // if there are any commands that should be added or updated
     if(commandsToEdit.length > 0 || commandsToAdd.length > 0){
       this.logger.info(`Detected ${commandsToEdit.length + commandsToAdd.length} commands that should be updated; updating`);
-      this.logger.info(`These are ${[...commandsToEdit, ...commandsToAdd].map(command => command.name)}`);
+      this.logger.info([...commandsToEdit, ...commandsToAdd].map(command => command.name));
       for(let i = 0; i < commandsToEdit.length; i++){
         const commandToRegister = commandsToEdit[i];
         const id = registeredAppCommands.find(cmd => cmd.type === commandToRegister.type && cmd.name === commandToRegister.name).id;
+        this.logger.info(`command editing ${Math.floor((i + 1) / commandsToEdit.length * 1000) / 10}% completed`);
         await client.application.editGlobalCommand(id, commandToRegister);
       }
       for(let i = 0; i < commandsToAdd.length; i++){
         const commandToRegister = commandsToAdd[i];
+        this.logger.info(`command adding ${Math.floor((i + 1) / commandsToEdit.length * 1000) / 10}% completed`);
         await client.application.createGlobalCommand(commandToRegister);
       }
-      this.logger.info("Updating success.");
+      this.logger.info("Updating completed.");
     }else{
       this.logger.info("Detected no command that should be updated");
     }

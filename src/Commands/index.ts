@@ -27,6 +27,7 @@ import { ApplicationCommandTypes } from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
 import { discordUtil } from "../Util";
+import { availableLanguages } from "../i18n";
 import { getLogger } from "../logger";
 
 export { CommandArgs } from "../Structure/Command";
@@ -132,15 +133,16 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
       this._description = i18next.t(`commands:${this.asciiName}.description` as any);
       this._descriptionLocalization = {};
-      i18next.languages.forEach(language => {
+      availableLanguages().forEach(language => {
         if(i18next.language === language) return;
-        this._descriptionLocalization[language as keyof typeof this._descriptionLocalization]
-          = i18next.t(`commands:${this.asciiName}.description` as any, { lng: language });
+        const localized = i18next.t(`commands:${this.asciiName}.description` as any, { lng: language });
+        if(localized === this._description) return;
+        this._descriptionLocalization[language as keyof typeof this._descriptionLocalization] = localized;
       });
 
       this._examples = examples ? {} : null;
       if(this._examples){
-        i18next.languages.forEach(language => {
+        availableLanguages().forEach(language => {
           this._examples[language as keyof typeof this._examples]
             = i18next.t(`commands:${this.asciiName}.examples` as any, { lng: language });
         });
@@ -148,7 +150,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
       this._usage = usage ? {} : null;
       if(this._usage){
-        i18next.languages.forEach(language => {
+        availableLanguages().forEach(language => {
           this._usage[language as keyof typeof this._usage]
             = i18next.t(`commands:${this.asciiName}.usage` as any, { lng: language });
         });
@@ -165,10 +167,11 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           descriptionLocalization: {} as LocaleMap,
           choices: [] as LocalizedSlashCommandArgument["choices"],
         };
-        i18next.languages.forEach(language => {
+        availableLanguages().forEach(language => {
           if(i18next.language === language) return;
-          result.descriptionLocalization[language as keyof typeof result.descriptionLocalization]
-            = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any, { lng: language });
+          const localized = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any, { lng: language });
+          if(localized === result.description) return;
+          result.descriptionLocalization[language as keyof typeof result.descriptionLocalization] = localized;
         });
 
         arg.choices?.forEach(choiceValue => {
@@ -177,10 +180,11 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
             value: choiceValue,
             nameLocalizations: {} as LocaleMap,
           };
-          i18next.languages.forEach(language => {
+          availableLanguages().forEach(language => {
             if(i18next.language === language) return;
-            resultChoice.nameLocalizations[language as keyof LocaleMap]
-              = i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}` as any, { lng: language });
+            const localized = i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}` as any, { lng: language });
+            if(localized === resultChoice.name) return;
+            resultChoice.nameLocalizations[language as keyof LocaleMap] = localized;
           });
           result.choices.push(resultChoice);
         });
@@ -201,7 +205,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   getLocalizedPermissionDescription(locale: string){
     const perms = this.requiredPermissionsOr.filter(perm => perm !== "admin");
     if(perms.length === 0){
-      return "なし";
+      return i18next.t("none", { lng: locale });
     }else{
       return `${perms.map(permission => i18next.t(`permissions.${permission}`, { lng: locale })).join("、")}${perms.length > 1 ? "のいずれか" : ""}`;
     }
@@ -284,7 +288,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         name: this.asciiName,
         nameLocalizations: {} as LocaleMap,
       };
-      i18next.languages.forEach(language => {
+      availableLanguages().forEach(language => {
         messageCommand.nameLocalizations[language as keyof LocaleMap] = i18next.t(`commands:${this.asciiName}.name` as any, { lng: language });
       });
       result.push(messageCommand);
