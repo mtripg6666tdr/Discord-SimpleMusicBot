@@ -1,27 +1,68 @@
-# v3.10.0
+# v4.0.0-beta.0
+**これは、プレリリースバージョンです**
 ## 機能追加
-* 検索結果から再生した場合もキャンセルボタンを表示する(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1102)
-* Spotifyのアルバムを解決できるようになりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1103)
-* 検索パネルのタイムアウトを追加しました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1105)
-* すでに検索パネルが開かれている状態で検索コマンドが使用された際に、すでに開いている検索を破棄するボタンを表示するようになりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1105)
-* 管理者向けに参加サーバーの分析機能を追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1110)
-  * 詳細はお問い合わせください。
-## 機能修正/変更
-* BGM機能で設定した音量が、ノーマルキューでの音量と別に管理されるようになりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1104)
-* HTTPベースのデータベースが機能しないバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1107)
-* ボイスチャンネルへの参加失敗時にスタックトレースを表示しないよう変更(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1111)
+* 新しいキャッシュシステムを追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1166)
+  * 二つのキャッシュレベル`"memory"`と`"persistent"`の二段階が`config.json`で設定できます
+  * `"memory"`を設定した場合、楽曲のデータをメモリにキャッシュし、次に同じ楽曲がリクエストされた際にそれを利用します。
+    * ループ機能を使用した際などにも高速化が期待できます。
+    * 同じ曲を何曲も追加した際にメモリの増加が無くなり、メモリ使用の減少が見込めます。
+    * メモリキャッシュは一定期間で自動的に削除されます。
+  * `"persistent"`に設定した場合、上記のメモリキャッシュに加え、`cache`フォルダに永続的なデータをキャッシュします。
+    * ディスク容量に余裕がある場合、こちらを設定することをおすすめします。
+    * データには実際の音声データは含まれていません。
+  * `システム情報`コマンドにて、メモリキャッシュの数および永続キャッシュの合計容量を確認できます。
+  * `invoke sp;purgememcache`にてメモリキャッシュを、`invoke sp;purgediskcache`で永続キャッシュを削除できます(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1190)
+  * `cache`フォルダに保存されるファイルは任意のタイミングで削除することができます。
+* テキストチャンネルおよびボイスチャンネル以外の、スレッドチャンネル、テキストボイスチャンネル、ステージチャンネルで利用可能になりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1168)
+* データベースを使用した際に、再生の分析情報が保存されるようになりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1170)
+  * ビューワーなどの開発予定は未定です
+* ボットのニックネームに:u7a7a:、:stop_button:が含まれていた場合、ボイスチャンネルに参加した際にそれぞれ:u6e80:、:arrow_forward:に自動的に変更することで、ボイスチャンネルに参加しているかがわかりやすくなる昨日の追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1177, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1178)
+* 日本語以外の言語に対応しました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1173)
+  * 翻訳に協力していただける方々を募集中です
+  * [Crowdinのプロジェクトページ](https://ja.crowdin.com/project/discord-simplemusicbot)でよろしくお願いします。
+* スラッシュコマンドの`再生`コマンドで、添付ファイルからの再生に対応しました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1191)
+* メッセージを右クリック/ホールドして実行できるコマンドが追加されました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1203)
+  * `キューに追加されました`の埋め込みなどのメッセージに対して`再生`コマンドを実行することでキューに追加/再生できます。
+  * `エクスポート`コマンドにより出力されたメッセージの上で右クリックして`インポート`を実行することでインポートできます。
+## 機能変更/修正
+* `debug`が`true`の際にも、`config.json`に`errorChannel`が設定されていれば、チャンネルにログを送信する(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1131)
+* `config.json`で、多くのキーが必須になりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1142)
+  * [ドキュメント](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/installation/configuration)をご覧の上アップデートしてください。
+* `システム情報`コマンドで表示される内容の修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1147)
+* カスタムロガーを廃止し、ライブラリを使用するようになりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1150)
+  * パフォーマンスの向上が期待できます。
+  * 新しいログレベルとして`TRACE`が追加されました。
+* 一部のスラッシュコマンドが変更となりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1155)
+  * `study` => `bgm`
+  * `dc` => `disconnect`
+  * `mv` => `move`
+  * `np` => `nowplaying`
+  * `rmall` => `removeall`
+* 一部のコマンドが変更となりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1155)
+  * `ヘルプ`コマンドのエイリアスに`support`が追加されました。
+  * `アップタイム`コマンドの`ピング`確認機能が、`ピング`コマンドに分割されました。
+* 環境変数`GAS_URL`および`GAS_TOKEN`がそれぞれ`DB_URL`および`DB_TOKEN`に変更されました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1170)
+* HTTPベースのボット独自のデータベースが廃止されました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1170)
 ## バグ修正
-* 検索パネルの削除に関するいくつかのバグの修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1105)
-* 複数のURLを再生コマンドなどに渡した際に正しく追加されないバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1106)
-* 一部の環境でのボットのシャットダウン時のエラーを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1113)
+* スキップの投票が機能しない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1163)
+  * v3で https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1162 で修正された問題のv4側の修正です
+* データベースなどの準備が正しく終了するまでボットがコマンドを受け入れないようになりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1170)
+* コストのデータを正しくリセットする(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1210)
+  * v3で https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1209 で修正された問題のv4側の修正です
 ## ドキュメント
-* ドキュメントの継続的な更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1099, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1100, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1108)
+* ドキュメントの継続的な変更(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1114, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1165, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1169)
 ## 依存関係のアップデート
 ## その他の変更
+* `bot.ts`の分割(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1124)
+* コードの改善(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1132, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1171)
+* コアのライブラリを`eris`から`oceanic.js`に変更(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1126)
+* スラッシュコマンドの同期機能が改善されました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1159, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1160)
+* インタラクションの処理を改善しました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1161)
 
-### その他の特記事項
-- Dockerのイメージは、リリース後30～40分程度で公開されます。
+## その他の特記事項
+* v4.0.0-beta.0はプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
+* v4系では、Node.js v16.16以上が必須となります
 
-[**マイルストーン**](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/milestone/12?closed=1)
+[マイルストーン](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/milestone/2?closed=1)
 
 ---
