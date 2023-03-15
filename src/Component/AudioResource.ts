@@ -28,6 +28,7 @@ import { getLogger } from "log4js";
 class NullMetaAudioResource extends voice.AudioResource<null> {}
 
 const SILENCE_FRAME = Buffer.from([0xf8, 0xff, 0xfe]);
+const TIMEOUT = 20 * 1000;
 
 export class FixedAudioResource extends NullMetaAudioResource {
   public error = false;
@@ -35,6 +36,8 @@ export class FixedAudioResource extends NullMetaAudioResource {
   private readLength = 0;
   private estimatedLengthSeconds = 0;
   private readonly logger = getLogger("FixedAudioResource");
+  private dataUnreadableAt = -1;
+  private timedout = false;
 
   constructor(...args: ConstructorParameters<typeof NullMetaAudioResource>){
     super(...args);
@@ -56,7 +59,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
   }
 
   private get isStreamReadable(){
-    return !(this.playStream.readableEnded || this.playStream.destroyed || this.error);
+    return !(this.playStream.readableEnded || this.playStream.destroyed || this.error || this.timedout);
   }
 
   public override get readable(){
@@ -84,9 +87,28 @@ export class FixedAudioResource extends NullMetaAudioResource {
         return SILENCE_FRAME;
       }
     }
-    if(!this.playStream.readable){
+
+    if(this.playStream.readable){
+      if(this.dataUnreadableAt !== -1){
+        this.logger.trace("Stream is now readable");
+        this.dataUnreadableAt = -1;
+      }
+    }else if(this.dataUnreadableAt === -1){
+      this.logger.trace("Stream becomes unreadable");
+      this.dataUnreadableAt = Date.now();
+      return SILENCE_FRAME;
+    }else if(this.dataUnreadableAt - Date.now() >= TIMEOUT){
+      this.logger.trace("Stream timed out");
+      this.timedout = true;
+    }else{
+      this.logger.trace("Stream is not readable; sending silence frame");
       return SILENCE_FRAME;
     }
+
+    if(this.timedout){
+      return null;
+    }
+
     const packet: Buffer | null = this.playStream.read();
     if(packet){
       this.playbackDuration += 20;
