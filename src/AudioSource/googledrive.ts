@@ -67,7 +67,9 @@ export class GoogleDrive extends AudioSource<string> {
     ];
   }
 
-  npAdditional(){return "";}
+  npAdditional(){
+    return "";
+  }
 
   exportData(): exportableCustom{
     return {

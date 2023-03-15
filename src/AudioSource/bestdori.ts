@@ -93,7 +93,9 @@ export class BestdoriS extends AudioSource<string> {
     ];
   }
 
-  npAdditional(){return "\r\nアーティスト:`" + this.artist + "`";}
+  npAdditional(){
+    return `アーティスト:\`${this.artist}\``;
+  }
 
   exportData(): exportableBestdori{
     return {

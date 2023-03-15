@@ -104,6 +104,9 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
           type: "url",
           url: format.url,
           userAgent: SecondaryUserAgent,
+          streamType: format.container === "webm" && format.audioCodec === "opus"
+            ? "webm/opus"
+            : "unknown",
         } as UrlStreamInfo,
         cache: {
           type: ytdlCore,
@@ -125,7 +128,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
           streamType:
             format.container === "webm" && format.audioCodec === "opus"
               ? "webm/opus"
-              : format.container === "mp4" && format.audioCodec === "",
+              : "unknown",
         } as ReadableStreamInfo,
         cache: {
           type: ytdlCore,

@@ -27,6 +27,7 @@ import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } fr
 import { AudioPlayerStatus, createAudioResource, createAudioPlayer, entersState, StreamType, VoiceConnectionStatus } from "@discordjs/voice";
 import i18next from "i18next";
 
+import { FixedAudioResource } from "./AudioResource";
 import { resolveStreamToPlayable } from "./streams";
 import { DSL } from "./streams/dsl";
 import { Normalizer } from "./streams/normalizer";
@@ -252,19 +253,22 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       this.prepareAudioPlayer();
       const normalizer = new Normalizer(stream, this.volume !== 100);
       normalizer.once("end", this.onStreamFinished.bind(this));
-      const resource = this._resource = createAudioResource(normalizer, {
-        inputType:
-          streamType === "webm/opus"
-            ? StreamType.WebmOpus
-            : streamType === "ogg/opus"
-              ? StreamType.OggOpus
-              : streamType === "raw"
-                ? StreamType.Raw
-                : streamType === "opus"
-                  ? StreamType.Opus
-                  : StreamType.Arbitrary,
-        inlineVolume: this.volume !== 100,
-      });
+      const resource = this._resource = FixedAudioResource.fromAudioResource(
+        createAudioResource(normalizer, {
+          inputType:
+            streamType === "webm/opus"
+              ? StreamType.WebmOpus
+              : streamType === "ogg/opus"
+                ? StreamType.OggOpus
+                : streamType === "raw"
+                  ? StreamType.Raw
+                  : streamType === "opus"
+                    ? StreamType.Opus
+                    : StreamType.Arbitrary,
+          inlineVolume: this.volume !== 100,
+        }),
+        this.currentAudioInfo.lengthSeconds - time
+      );
       this._dsLogger?.appendReadable(normalizer);
 
       this._player.play(resource);
