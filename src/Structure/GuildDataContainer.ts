@@ -170,7 +170,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     if(
       !this.player.isConnecting
       || (
-        message.member.voiceState.channelID
+        message.member.voiceState?.channelID
         && this.bot.client.getChannel<VoiceChannel|StageChannel>(message.member.voiceState.channelID)
           .voiceMembers.has(this.bot.client.user.id)
       )
