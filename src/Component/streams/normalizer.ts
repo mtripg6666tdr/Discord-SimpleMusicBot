@@ -49,11 +49,19 @@ export class Normalizer extends Readable {
       });
     }).unref();
     this.origin.once("end", () => this.push(null));
-    this.origin.on("error", er => this.destroy(er));
+    this.origin.on("error", er => {
+      this.logger.error("origin", er);
+      console.error("origin", er);
+      this.destroy(er);
+    });
 
     this._onDestroy = this._onDestroy.bind(this);
     this.once("close", this._onDestroy);
     this.once("end", this._onDestroy);
+    this.on("error", er => {
+      this.logger.error("this", er);
+      console.error("this", er);
+    });
 
     this.logger.info("initialized");
   }

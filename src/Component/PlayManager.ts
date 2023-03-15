@@ -27,6 +27,7 @@ import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } fr
 import { AudioPlayerStatus, createAudioResource, createAudioPlayer, entersState, StreamType, VoiceConnectionStatus } from "@discordjs/voice";
 import i18next from "i18next";
 
+import { FixedAudioResource } from "./AudioResource";
 import { resolveStreamToPlayable } from "./streams";
 import { DSL } from "./streams/dsl";
 import { Normalizer } from "./streams/normalizer";
@@ -267,7 +268,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       });
       this._dsLogger?.appendReadable(normalizer);
 
-      this._player.play(resource);
+      this._player.play(FixedAudioResource.fromAudioResource(resource, this.currentAudioInfo.lengthSeconds - time));
 
       // setup volume
       this.setVolume(this.volume);
