@@ -53,6 +53,7 @@
 ## ドキュメント
 * ドキュメントの継続的な変更(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1114, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1165, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1169)
 ## 依存関係のアップデート
+* 依存関係の更新は、対応Node.jsのバージョンの変更やメインライブラリの変更などを通して追加/変更/削除が多いため、変更ログをご参照ください。
 ## その他の変更
 * `bot.ts`の分割(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1124)
 * コードの改善(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1132, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1171)
