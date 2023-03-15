@@ -63,6 +63,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
         stream: {
           type: "url",
           url: info.LiveStreamData.hlsManifestUrl,
+          streamType: "m3u8",
         } as UrlStreamInfo,
         cache: {
           type: playDl,

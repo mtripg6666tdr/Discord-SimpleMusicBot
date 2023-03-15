@@ -143,8 +143,9 @@ export async function resolveStreamToPlayable(
     };
   }else{
     // Unknown --(FFmpeg)--> Ogg/Opus
-    logger.info(`stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Webm/Opus`);
-    const ffmpeg = transformThroughFFmpeg(streamInfo, { bitrate, effectArgs, seek, output: "ogg" });
+    logger.info(`stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Webm/Ogg`);
+    const ffmpegOutput = streamInfo.streamType === "webm/opus" ? "webm" : "ogg";
+    const ffmpeg = transformThroughFFmpeg(streamInfo, { bitrate, effectArgs, seek, output: ffmpegOutput });
     const passThrough = createPassThrough();
     ffmpeg
       .on("error", e => destroyStream(passThrough, e))
@@ -154,7 +155,7 @@ export async function resolveStreamToPlayable(
 
     return {
       stream: passThrough,
-      streamType: "ogg/opus",
+      streamType: ffmpegOutput === "webm" ? "webm/opus" : "ogg/opus",
       cost: 2,
       streams: [streamInfo.type === "readable" ? streamInfo.stream : undefined, ffmpeg, passThrough].filter(d => d),
     };

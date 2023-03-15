@@ -45,7 +45,7 @@ export function transformThroughFFmpeg(
     bitrate: number,
     effectArgs: string[],
     seek: number,
-    output: "ogg"|"pcm",
+    output: "webm"|"ogg"|"pcm",
   }
 ){
   const ffmpegNetworkArgs = readable.type === "url" ? [
@@ -55,16 +55,34 @@ export function transformThroughFFmpeg(
   const ffmpegSeekArgs = seek > 0 ? [
     "-ss", seek.toString(),
   ] : [];
-  const outputArgs = output === "ogg" ? [
-    "-acodec", "libopus",
-    "-f", "opus",
-  ] : [
-    "-f", "s16le",
-  ];
-  const bitrateArgs = effectArgs.length === 2 && effectArgs[1].includes("loudnorm") ? [] : [
-    "-vbr", "on",
-    "-b:a", bitrate.toString(),
-  ];
+  const outputArgs: string[] = [];
+  const bitrateArgs: string[] = [];
+  if((output === "webm" && readable.streamType === "webm/opus") || (output === "ogg" && readable.streamType === "ogg/opus")){
+    outputArgs.push(
+      "-f", output === "ogg" ? "opus" : "webm",
+      "-acodec", "copy",
+    );
+  }else{
+    if(output === "ogg" || output === "webm"){
+      outputArgs.push(
+        "-acodec", "libopus",
+        "-f", output === "ogg" ? "opus" : "webm",
+      );
+    }else{
+      outputArgs.push(
+        "-f",
+        "s16le",
+      );
+    }
+    if(effectArgs.length !== 2 || !effectArgs[1].includes("loudnorm")){
+      bitrateArgs.push(
+        "-vbr", "on",
+        "-b:a", bitrate.toString(),
+        "-ar", "48000",
+        "-ac", "2",
+      );
+    }
+  }
   const args = [
     "-analyzeduration", "0",
     ...ffmpegNetworkArgs,
@@ -73,8 +91,6 @@ export function transformThroughFFmpeg(
     ...effectArgs,
     "-vn",
     ...outputArgs,
-    "-ar", "48000",
-    "-ac", "2",
     ...bitrateArgs,
   ];
   logger.debug("Passing arguments: " + args.map(arg => arg.startsWith("http") ? "<URL>" : arg).join(" "));

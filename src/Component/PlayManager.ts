@@ -269,7 +269,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         }),
         this.currentAudioInfo.lengthSeconds - time
       );
-      this._dsLogger?.appendReadable(normalizer, resource.playStream);
+      this._dsLogger?.appendReadable(normalizer);
 
       this._player.play(resource);
 
