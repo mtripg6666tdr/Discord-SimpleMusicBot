@@ -452,6 +452,7 @@ export class PlayManager extends ServerManagerBase {
   */
   stop(): PlayManager{
     this.Log("Stop called");
+    this._cost = 0;
     if(this.server.connection){
       this.server.connection.off("end", this.onStreamFinishedBindThis);
       this.server.connection.stopPlaying();
