@@ -32,7 +32,7 @@ export async function onVoiceChannelJoin(
   if(member.id === this._client.user.id){
     // ボットが参加した際
     // ミュート状態/抑制状態なら自分で解除を試みる
-    if(member.voiceState.suppress || member.voiceState.mute){
+    if(member.voiceState?.suppress || member.voiceState?.mute){
       // VC参加 => 抑制状態ならそれの解除を試みる
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const voiceChannel = this._client.getChannel(newChannel.id) as discord.VoiceChannel | discord.StageChannel;

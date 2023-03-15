@@ -89,7 +89,7 @@ export class SkipManager extends ServerManagerBase<{}> {
   protected vote(user: Member): voteResult{
     if(!this.inited || this.destroyed) return "ignored";
     this.organize();
-    if(!user.voiceState.channelID || !this.getVoiceMembers().has(user.id)){
+    if(!user.voiceState?.channelID || !this.getVoiceMembers().has(user.id)){
       return "ignored";
     }
     if(this.agreeUsers.has(user.id)){

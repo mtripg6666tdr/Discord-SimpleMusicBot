@@ -35,7 +35,7 @@ export default class Join extends BaseCommand {
 
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
-    if(message.member.voiceState.channel?.voiceMembers.has(context.client.user.id) && context.server.connection){
+    if(message.member.voiceState?.channel?.voiceMembers.has(context.client.user.id) && context.server.connection){
       message.reply(`✘${t("commands:join.alreadyConnected")}`).catch(this.logger.error);
     }else{
       await context.server.joinVoiceChannel(message, { reply: true }, t);

@@ -16,10 +16,64 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { Locale } from "oceanic.js";
+
+import fs from "fs";
 import path from "path";
 
 import i18next from "i18next";
 import Backend from "i18next-fs-backend";
+
+// Ref: https://stackoverflow.com/questions/60131681/make-sure-array-has-all-types-from-a-union
+const arrayOfAll = <T>() => <U extends T[]>(
+  array: U & ([T] extends [U[number]] ? unknown : "Invalid") & { 0: T }
+) => array;
+
+const discordLanguages = arrayOfAll<Locale>()([
+  "bg",
+  "cs",
+  "da",
+  "de",
+  "el",
+  "en-GB",
+  "en-US",
+  "es-ES",
+  "fi",
+  "fr",
+  "hi",
+  "hr",
+  "hu",
+  "id",
+  "it",
+  "ja",
+  "ko",
+  "lt",
+  "nl",
+  "no",
+  "pl",
+  "pt-BR",
+  "ro",
+  "ru",
+  "sv-SE",
+  "th",
+  "tr",
+  "uk",
+  "vi",
+  "zh-CN",
+  "zh-TW",
+]);
+
+const localesRoot = path.join(__dirname, "../locales/");
+const lngsInLocalesDirectory = fs.readdirSync(localesRoot, { withFileTypes: true })
+  .filter(d => d.isDirectory())
+  .flatMap(d => d.name);
+const supportedDiscordLocales = discordLanguages.filter(lang => {
+  if(lang.includes("-")){
+    return lngsInLocalesDirectory.includes(lang);
+  }else{
+    return lngsInLocalesDirectory.some(directoryLang => directoryLang.split("-")[0] === lang);
+  }
+});
 
 export function initLocalization(debug: boolean, lang: string){
   return i18next
@@ -27,8 +81,16 @@ export function initLocalization(debug: boolean, lang: string){
     .init({
       debug,
       cleanCode: true,
-      fallbackLng: "ja",
-      lng: lang,
+      load: "all",
+      supportedLngs: lngsInLocalesDirectory.flatMap(dirLang => dirLang.includes("-") ? [dirLang.split("-")[0], dirLang] : [dirLang]),
+      preload: lngsInLocalesDirectory,
+      fallbackLng: originalLanguage => {
+        if(typeof originalLanguage === "string"){
+          return [...lngsInLocalesDirectory.filter(dirLang => dirLang.includes(originalLanguage.split("-")[0])), lang];
+        }else{
+          return [lang];
+        }
+      },
       ns: [
         "default",
         "commands",
@@ -39,7 +101,11 @@ export function initLocalization(debug: boolean, lang: string){
       },
       defaultNS: "default",
       backend: {
-        loadPath: path.join(__dirname, "../locales/{{lng}}/{{ns}}.json"),
+        loadPath: path.join(localesRoot, "{{lng}}/{{ns}}.json"),
       },
     });
+}
+
+export function availableLanguages(){
+  return supportedDiscordLocales;
 }
