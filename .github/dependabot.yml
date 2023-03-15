@@ -9,7 +9,7 @@ updates:
       timezone: "Asia/Tokyo"
     commit-message:
       prefix: "Update:"
-    target-branch: "v3"
+    target-branch: "master"
     labels:
       - "dependencies"
       - "javascript"
