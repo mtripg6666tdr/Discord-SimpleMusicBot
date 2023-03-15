@@ -1,0 +1,12 @@
+FROM quay.io/centos/centos:stream9
+RUN yum -y update && \
+    yum -y upgrade && \
+    yum -y install nscd && \
+    dnf -y module install nodejs:18 && \
+    dnf -y module list nodejs
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci
+COPY . .
+RUN npx tsc -p tsconfig.build.json
+CMD ["/bin/bash", "-c", "systemctl start nscd; exec node --dns-result-order=ipv4first dist/index.js"]

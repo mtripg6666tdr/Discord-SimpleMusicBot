@@ -14,3 +14,5 @@ util
 config.json*
 README.md
 CHANGELOG.md
+cache
+bin
