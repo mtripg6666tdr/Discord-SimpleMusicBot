@@ -439,6 +439,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   stop(force: boolean = false): PlayManager{
     this.logger.info("Stop called");
     if(this.server.connection){
+      this._cost = 0;
       this._player?.unpause();
       this._player?.stop(force);
       this.emit("stop");
