@@ -253,22 +253,25 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       this.prepareAudioPlayer();
       const normalizer = new Normalizer(stream, this.volume !== 100);
       normalizer.once("end", this.onStreamFinished.bind(this));
-      const resource = this._resource = createAudioResource(normalizer, {
-        inputType:
-          streamType === "webm/opus"
-            ? StreamType.WebmOpus
-            : streamType === "ogg/opus"
-              ? StreamType.OggOpus
-              : streamType === "raw"
-                ? StreamType.Raw
-                : streamType === "opus"
-                  ? StreamType.Opus
-                  : StreamType.Arbitrary,
-        inlineVolume: this.volume !== 100,
-      });
-      this._dsLogger?.appendReadable(normalizer);
+      const resource = this._resource = FixedAudioResource.fromAudioResource(
+        createAudioResource(normalizer, {
+          inputType:
+            streamType === "webm/opus"
+              ? StreamType.WebmOpus
+              : streamType === "ogg/opus"
+                ? StreamType.OggOpus
+                : streamType === "raw"
+                  ? StreamType.Raw
+                  : streamType === "opus"
+                    ? StreamType.Opus
+                    : StreamType.Arbitrary,
+          inlineVolume: this.volume !== 100,
+        }),
+        this.currentAudioInfo.lengthSeconds - time
+      );
+      this._dsLogger?.appendReadable(normalizer, resource.playStream);
 
-      this._player.play(FixedAudioResource.fromAudioResource(resource, this.currentAudioInfo.lengthSeconds - time));
+      this._player.play(resource);
 
       // setup volume
       this.setVolume(this.volume);
