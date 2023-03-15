@@ -57,7 +57,10 @@ export function transformThroughFFmpeg(
   ] : [];
   const outputArgs: string[] = [];
   const bitrateArgs: string[] = [];
-  if((output === "webm" && readable.streamType === "webm/opus") || (output === "ogg" && readable.streamType === "ogg/opus")){
+  if(
+    effectArgs.length === 0
+    && ((output === "webm" && readable.streamType === "webm/opus") || (output === "ogg" && readable.streamType === "ogg/opus"))
+  ){
     outputArgs.push(
       "-f", output === "ogg" ? "opus" : "webm",
       "-acodec", "copy",
