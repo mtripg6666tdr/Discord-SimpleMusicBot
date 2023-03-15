@@ -2,7 +2,7 @@ project_id: "569777"
 api_token_env: CROWDIN_API_TOKEN
 commit_message: "Change: update translations in %language%"
 append_commit_message: false
-pull_request_title: "Change: update translations in %language%"
+pull_request_title: "Change: update translations
 pull_request_labels:
   - language
 files:
