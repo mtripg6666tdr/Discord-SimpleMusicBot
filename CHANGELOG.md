@@ -68,3 +68,12 @@
 [マイルストーン](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/milestone/2?closed=1)
 
 ---
+
+# v4.0.0-beta.1
+## その他の変更
+* Dockerのイメージが壊れている問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1220)
+## その他の特記事項
+* これはプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
+* v4系では、Node.js v16.16以上が必須となります
+
+---
