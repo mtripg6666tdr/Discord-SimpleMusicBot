@@ -10,6 +10,7 @@ on:
 jobs:
   notification:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || !github.event.release.prerelease }}
     steps:
       - uses: actions/checkout@v3
       
