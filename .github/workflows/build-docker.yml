@@ -59,7 +59,7 @@ jobs:
             type=sha,enable=${{ github.event_name == 'release' }}
             type=sha,format=long
             type=semver,pattern={{version}},enable=${{ github.event_name == 'release' }}
-            type=raw,value=latest,enable=false #${{ github.event_name == 'release' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'release' && github.event.release.prerelease }}
 
       - name: Build and push
         uses: docker/build-push-action@v4
