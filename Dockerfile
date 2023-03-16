@@ -24,6 +24,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,t
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
+COPY ./locales ./locales
 COPY --from=builder /app/dist /app/dist
 RUN mkdir logs && \
     echo DOCKER_BUILD_IMAGE>DOCKER_BUILD_IMAGE
