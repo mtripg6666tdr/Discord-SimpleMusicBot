@@ -1,6 +1,6 @@
 {
   "name": "discord-music-bot",
-  "version": "4.0.0-beta.0",
+  "version": "4.0.0-beta.1",
   "description": "Simple Music Bot for Discord without any database",
   "private": true,
   "engines": {
