@@ -1,8 +1,8 @@
 {
   "bgm": {
     "name": "BGM",
-    "description": "開発者が勝手に作った勉強用・作業用BGMのプリセットプレイリストを表示し、聞きたいものを選択して再生することができます。",
-    "listOfPresetBGM": "プリセットBGM一覧"
+    "description": "I'll show you a BGM playlist that the developer of the bot shares, and you can choose and play a song in it.",
+    "listOfPresetBGM": "BGM Presets available"
   },
   "bulk-delete": {
     "invalidMessageCount": "指定されたメッセージ数が無効です。",
@@ -102,13 +102,13 @@
     "invalidTime": "時間の指定が正しくありません",
     "capturing": "Capturing",
     "finish": "Done!",
-    "timeAt": "{{hour}}:{{min}}:{{sec}}時点",
+    "timeAt": "at {{hour}}:{{min}}:{{sec}}",
     "failed": "Failed to capture..."
   },
   "help": {
     "name": "Help",
     "description": "Show help",
-    "embedDescription": "高音質な音楽で、Discordで最高のエクスペリエンスを得るために作られました:robot:",
+    "embedDescription": "I was made in order to upgrade experiences in Discord, by high-quality songs.:robot:",
     "toLearnMore": "利用可能なコマンドを確認するには{{command}}を使用してください",
     "developer": "Developer",
     "version": "Version",
@@ -144,7 +144,7 @@
     "loadingMessage": "Fetching message",
     "notBotMessage": "Not a message sent by bot",
     "versionIncompatible": "指定されたファイルはバージョンに互換性がないためインポートできません",
-    "current": "現行",
+    "current": "Current",
     "file": "File",
     "contentNotIncludedInMessage": "対象の内容が見つかりませんでした"
   },
@@ -173,9 +173,9 @@
     "description": "ボイスチャンネルから離脱した人がリクエストした曲をキューから削除して整理します",
     "allRemoved": "Removed all items",
     "queueEmpty": "Queue empty",
-    "removed_one": "{{count}}曲削除しました",
-    "removed_other": "{{count}}曲削除しました",
-    "removedNothing": "削除するものはありませんでした。"
+    "removed_one": "deleted {{count}} item",
+    "removed_other": "deleted {{count}} items",
+    "removedNothing": "No item removed."
   },
   "log": {
     "name": "System information",
@@ -214,8 +214,8 @@
   "loop": {
     "name": "Loop",
     "description": "トラックごとのループを設定します。",
-    "disabled": "トラックリピートを無効にしました",
-    "enabled": "トラックリピートを有効にしました"
+    "disabled": "Track loop disabled.",
+    "enabled": "Track loop enabled."
   },
   "lyrics": {
     "name": "Lyrics",
@@ -227,7 +227,7 @@
         "description": "楽曲を検索するキーワード"
       }
     },
-    "embedTitle": "\"{{title}}\"({{artist}})の歌詞",
+    "embedTitle": "\"{{title}}\"({{artist}}) lyrics",
     "failed": "失敗しました。曲名を確認してもう一度試してみてください。"
   },
   "move": {
@@ -292,7 +292,7 @@
     "voiceUdpConnection": "ボイスチャンネルUDP接続"
   },
   "play": {
-    "name": "Play",
+    "name": "play",
     "description": "キュー内の楽曲を再生します。引数として対応しているサイトの楽曲のURLを指定することもできます。",
     "args": {
       "keyword": {
@@ -306,7 +306,7 @@
     "resuming": "再生を再開します。",
     "noMusicFound": "該当する楽曲が見つかりませんでした",
     "playing": "Play",
-    "alreadyPlaying": "Playing",
+    "alreadyPlaying": "すでに再生中です",
     "queueEmpty": "キューが空です。再生するコンテンツがありません。"
   },
   "queue": {
