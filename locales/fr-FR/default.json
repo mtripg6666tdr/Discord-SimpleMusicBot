@@ -10,6 +10,7 @@
   "channelName": "チャンネル名",
   "summary": "概要",
   "noSummary": "概要なし",
+  "none": "なし",
   "user": "ユーザー",
   "currentPage_one": "{{count}}ページ目",
   "currentPage_other": "{{count}}ページ目",

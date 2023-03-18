@@ -4,28 +4,28 @@
     "waitForPlaying": "Waiting to be played",
     "requestedBy": "Request",
     "nextSong": "Next song",
-    "noNextSong": "次の曲がまだ登録されていません"
+    "noNextSong": "No next song added yet."
   },
   "queue": {
-    "queueTitle": "{{server}}のキュー",
-    "trackloop": "トラックループ",
-    "queueloop": "キューループ",
+    "queueTitle": "Queue for {{server}}",
+    "trackloop": "Track loop",
+    "queueloop": "Queue loop",
     "autoplayRelated": "関連曲自動再生",
     "equallyplayback": "均等再生",
-    "tooManyQueueItems": "キューの上限を超えています",
+    "tooManyQueueItems": "Exceeding the maximum item count of queue.",
     "songAdded": "Song added",
-    "positionInQueue": "キュー内の位置",
-    "etaToPlay": "再生されるまでの予想時間",
+    "positionInQueue": "Position in queue",
+    "etaToPlay": "Estimated time to play",
     "fallbackNotice": "現在、通常の方法で情報を取得できなかったため、代替ライブラリにフォールバックして取得しました。これが異常だと思われる場合はサポートまでお問い合わせください。\r\n処理に時間がかかる、突然終了するなど、正常なオペレーションができない場合があります。なお、フォールバックしたあとの動作はサポート対象外です。問題が発生した場合、`リセット`コマンドを使用すると、サーバーのデータをすべて初期化することができます。",
     "spotifyNotice": "Spotifyのタイトルは正しく再生されない場合があります",
-    "cancelAdded": "`{{title}}`の追加を取り消しました",
+    "cancelAdded": "Cancel adding `{{title}}`",
     "failedToAdd": "キューの追加に失敗しました。追加できませんでした。",
     "processingPlaylistBefore": "プレイリストを処理しています。",
     "processingPlaylist": "プレイリスト`{{title}}`を処理しています。",
     "noDescriptionInPlaylist": "プレイリストから指定のため詳細は表示されません",
     "processingPlaylistCompleted": "プレイリストが処理されました",
-    "songsAdded_one": "{{count}}曲が追加されました",
-    "songsAdded_other": "{{count}}曲が追加されました"
+    "songsAdded_one": "{{count}} item added.",
+    "songsAdded_other": "{{count}} items added."
   },
   "search": {
     "resultTitle": "Search results for \"{{query}}\"",
@@ -36,17 +36,19 @@
     "maximumSearch": "すでに開いている検索パネルが上限を超えています"
   },
   "play": {
-    "waitingForLiveStream": "{{title}} `(ライブストリーム)`の開始を待機中...",
+    "waitingForLiveStream": "Waiting for {{title}} `(livestream)`",
     "waitingForLiveCanceled": "待機をキャンセルしました",
     "preparing": "Preparing to play {{title}}",
-    "failedToPlay": "曲の再生に失敗しました...。",
+    "failedToPlay": "Failed to play a song...",
     "failedAndSkipping": "Skipping",
     "failedAndRetrying": "Re-trying",
-    "queueEmpty": "キューが空になりました",
-    "queueEmptyAndExiting": "キューが空になったため終了します"
+    "queueEmpty": "Queue empty",
+    "queueEmptyAndExiting": "キューが空になったため終了します",
+    "songsInQueue": "再生待ちの曲",
+    "willLoop": "ループします"
   },
   "skip": {
-    "skipping": "スキップしています",
+    "skipping": "Skipping",
     "skipped": "`{{title}}`をスキップしました",
     "failed": "スキップに失敗しました",
     "embedTitle": "スキップの投票",

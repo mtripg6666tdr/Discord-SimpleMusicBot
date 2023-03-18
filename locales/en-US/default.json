@@ -1,21 +1,22 @@
 {
   "search": {
-    "alreadyOpen": "✘すでに開かれている検索窓があります",
-    "removePreviousPanel": "以前の検索結果を破棄",
-    "previousPanelRemoved": "検索パネルを破棄しました",
+    "alreadyOpen": "✘ A search result is already open.",
+    "removePreviousPanel": "Close the previous search result",
+    "previousPanelRemoved": "The previous search result was closed",
     "searching": "Searching",
     "notFound": "Not found"
   },
   "length": "Length",
   "channelName": "Channel name",
-  "summary": "概要",
-  "noSummary": "概要なし",
+  "summary": "Summary",
+  "noSummary": "No summary",
+  "none": "なし",
   "user": "User",
   "currentPage_one": "{{count}}ページ目",
   "currentPage_other": "{{count}}ページ目",
   "allPages_one": "{{count}}ページ中",
   "allPages_other": "{{count}}ページ中",
-  "prefixIs": "プレフィックスは`{{prefix}}`です。",
+  "prefixIs": "My prefix is `{{prefix}}`.",
   "permissions": {
     "admin": "サーバー/チャンネルの管理権限を持っていること",
     "dj": "同じボイスチャンネルに接続していてかつDJロールを保持していること",
