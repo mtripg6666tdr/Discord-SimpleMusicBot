@@ -27,7 +27,7 @@
     "html-entities": "^2.3.3",
     "html-to-text": "^9.0.4",
     "https-proxy-agent": "^5.0.1",
-    "i18next": "^22.4.11",
+    "i18next": "^22.4.12",
     "i18next-fs-backend": "^2.1.1",
     "log4js": "^6.9.1",
     "miniget": "^4.2.2",
@@ -49,7 +49,7 @@
     "@types/follow-redirects": "^1.14.1",
     "@types/html-to-text": "^9.0.0",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^18.15.2",
+    "@types/node": "^18.15.3",
     "@types/throttle-debounce": "^5.0.0",
     "@types/ws": "^8.5.4",
     "@typescript-eslint/eslint-plugin": "^5.55.0",
@@ -62,7 +62,7 @@
     "eslint-plugin-node": "^11.1.0",
     "mocha": "^10.2.0",
     "rimraf": "^4.4.0",
-    "typescript": "^4.9.5"
+    "typescript": "^5.0.2"
   },
   "optionalDependencies": {
     "@discordjs/opus": "^0.9.0",
