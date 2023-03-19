@@ -34,7 +34,8 @@ export default class BgmBd extends BaseCommand {
   }
 
   protected async run(message: CommandMessage, context: Readonly<CommandArgs>, t: i18n["t"]): Promise<void> {
-    context.server.joinVoiceChannel(message, { replyOnFail: true }, t);
+    context.server.updateBoundChannel(message);
+    await context.server.joinVoiceChannel(message, { replyOnFail: true }, t);
     const bgmPlaylistUrl = context.rawArgs.length === 0
       ? "aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTExmZmhjQXBzbzl4UFhLUG5YbEZ3czlxWUNkMDltTFA0"
       : "aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTExmZmhjQXBzbzl4WnpYZ0RFdEdsQk5wNUtYZjNPY1Zx";
