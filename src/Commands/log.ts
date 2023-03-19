@@ -77,7 +77,7 @@ export default class SystemInfo extends BaseCommand {
           .addField("Managed collectors", `\`${context.bot.collectors.collectorLength}\``, true)
           .addField("Current total transforming costs", `\`${context.bot.totalTransformingCost}\``, true)
           .addField("Memory cache total count", `\`${cacheState.totalCount}\``, true)
-          .addField("Memory cache garbase count", `\`${cacheState.purgeScheduled}\``, true)
+          .addField("Memory cache garbage count", `\`${cacheState.purgeScheduled}\``, true)
           .addField(
             "Persistent cache size",
             `\`${

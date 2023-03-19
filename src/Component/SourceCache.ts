@@ -78,7 +78,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
       });
       [...this._expireMap.keys()].forEach(url => cacheToPurge.delete(url));
       cacheToPurge.forEach(url => this._expireMap.set(url, Date.now() + 4 * 60 * 60 * 1000));
-      this.logger.debug(`${this._expireMap.size} cache scheduled to be purge (total: ${this._sourceCache.size} stored)`);
+      this.logger.debug(`${this._expireMap.size} cache scheduled to be purged (total: ${this._sourceCache.size} stored)`);
     }
   }
 
