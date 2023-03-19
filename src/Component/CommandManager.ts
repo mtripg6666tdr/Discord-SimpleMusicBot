@@ -28,6 +28,7 @@ import { ApplicationCommandOptionTypes, ApplicationCommandTypes } from "oceanic.
 
 import { LogEmitter } from "../Structure";
 import { useConfig } from "../config";
+import { timeLoggedMethod } from "../logger";
 
 // const commandSeparator = "_";
 
@@ -112,13 +113,14 @@ export class CommandManager extends LogEmitter<{}> {
     return result;
   }
 
+  @timeLoggedMethod
   async sync(client: Client, removeOutdated: boolean = false){
     this.logger.info("Start syncing application commands");
 
     // format local commands into the api-compatible well-formatted ones
     const apiCompatibleCommands: CreateApplicationCommandOptions[] = this.commands
       .filter(command => !command.unlist)
-      .flatMap(command => command.toApplicationCommandStructure());
+      .flatMap(command => this.apiToApplicationCommand(command.toApplicationCommandStructure() as unknown as AnyApplicationCommand) as CreateApplicationCommandOptions);
 
     // Get registered commands
     const registeredAppCommands = await client.application.getGlobalCommands({ withLocalizations: true });
@@ -221,7 +223,7 @@ export class CommandManager extends LogEmitter<{}> {
   sameCommand(actual: ChatInputApplicationCommand | MessageApplicationCommand, expected: CreateApplicationCommandOptions): boolean{
     return util.isDeepStrictEqual(
       this.apiToApplicationCommand(actual),
-      expected,
+      expected
     );
   }
 
@@ -251,6 +253,8 @@ export class CommandManager extends LogEmitter<{}> {
                 value: choice.value,
                 // @ts-expect-error
                 nameLocalizations: choice.nameLocalizations || choice.name_localizations,
+                // @ts-expect-error
+                name_localizations: choice.nameLocalizations || choice.name_localizations,
               })),
             };
           }else{

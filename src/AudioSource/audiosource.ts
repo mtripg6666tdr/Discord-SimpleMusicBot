@@ -118,10 +118,10 @@ export abstract class AudioSource<T extends ThumbnailType> {
 
   // 現在再生中の曲を示すEmbedField
   abstract toField(verbose: boolean, t: i18n["t"]): EmbedField[];
-  // 再生するためのストリームをフェッチ
-  abstract fetch(url?: boolean): Promise<StreamInfo>;
   // クラスを初期化する非同期メソッド
   abstract init(url: string, prefetched: exportableCustom): Promise<AudioSource<T>>;
+  // 再生するためのストリームをフェッチ
+  abstract fetch(url?: boolean): Promise<StreamInfo>;
   // 現在再生中の曲に関する追加データ
   abstract npAdditional(t: i18n["t"]): string;
   // データをエクスポート

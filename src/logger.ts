@@ -174,3 +174,37 @@ export function getLogger(tag: string){
     return logger;
   }
 }
+
+const timerLogger = getLogger("Timer");
+export function timeLoggedMethod<This, Args extends any[], Return>(
+  originalMethod: (this: This, ...args: Args) => Return,
+  context: ClassMethodDecoratorContext<This, (this: This, ...args: Args) => Return>
+){
+  return function replacementMethod(this: This, ...args: Args): Return {
+    const start = Date.now();
+    let end = false;
+    const endLog = () => {
+      if(end) return;
+      end = true;
+      timerLogger.trace(`${String(context.name)} elapsed ${Date.now() - start}ms`);
+    };
+    let result: any = null;
+    try{
+      result = originalMethod.call(this, ...args);
+      if(result instanceof Promise){
+        result.then(f => {
+          endLog();
+          return f;
+        });
+      }else{
+        endLog();
+      }
+      return result;
+    }
+    finally{
+      if(typeof result !== "object" || !(result instanceof Promise)){
+        endLog();
+      }
+    }
+  };
+}
