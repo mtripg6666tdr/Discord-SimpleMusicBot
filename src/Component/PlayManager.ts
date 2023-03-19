@@ -36,6 +36,7 @@ import * as Util from "../Util";
 import { getColor } from "../Util/color";
 import { getFFmpegEffectArgs } from "../Util/effect";
 import { useConfig } from "../config";
+import { timeLoggedMethod } from "../logger";
 
 interface PlayManagerEvents {
   volumeChanged: [volume:string];
@@ -162,6 +163,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   /**
    *  再生します
    */
+  @timeLoggedMethod
   async play(time: number = 0, quiet: boolean = false): Promise<PlayManager>{
     this.emit("playCalled", time);
 

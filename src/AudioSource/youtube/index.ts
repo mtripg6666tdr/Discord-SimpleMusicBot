@@ -27,6 +27,7 @@ import * as ytdl from "ytdl-core";
 import { attemptGetInfoForStrategies, attemptFetchForStrategies, strategies } from "./strategies";
 import { ytdlCore } from "./strategies/ytdl-core";
 import { SecondaryUserAgent } from "../../definition";
+import { timeLoggedMethod } from "../../logger";
 import { AudioSource } from "../audiosource";
 
 export * from "./spawner";
@@ -78,6 +79,7 @@ export class YouTube extends AudioSource<string> {
     return this.upcomingTimestamp;
   }
 
+  @timeLoggedMethod
   async init(url: string, prefetched: exportableYouTube, forceCache?: boolean){
     this.url = "https://www.youtube.com/watch?v=" + ytdl.getVideoID(url);
     if(prefetched){
@@ -111,6 +113,7 @@ export class YouTube extends AudioSource<string> {
     return this;
   }
 
+  @timeLoggedMethod
   async fetch(forceUrl?: boolean): Promise<StreamInfo>{
     const { result, resolved } = await attemptFetchForStrategies(this.url, forceUrl, this.cache);
     this.fallback = resolved !== 0;

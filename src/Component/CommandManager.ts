@@ -28,6 +28,7 @@ import { ApplicationCommandOptionTypes, ApplicationCommandTypes } from "oceanic.
 
 import { LogEmitter } from "../Structure";
 import { useConfig } from "../config";
+import { timeLoggedMethod } from "../logger";
 
 // const commandSeparator = "_";
 
@@ -112,6 +113,7 @@ export class CommandManager extends LogEmitter<{}> {
     return result;
   }
 
+  @timeLoggedMethod
   async sync(client: Client, removeOutdated: boolean = false){
     this.logger.info("Start syncing application commands");
 

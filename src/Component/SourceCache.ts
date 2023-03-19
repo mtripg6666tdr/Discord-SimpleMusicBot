@@ -30,6 +30,7 @@ import zlib from "zlib";
 
 import { LogEmitter } from "../Structure";
 import { useConfig } from "../config";
+import { timeLoggedMethod } from "../logger";
 
 interface CacheEvents {
   memoryCacheHit: [];
@@ -56,6 +57,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     bot.on("tick", this.onTick.bind(this));
   }
 
+  @timeLoggedMethod
   private onTick(count: number){
     if(count % 5 === 0 || config.debug){
       const now = Date.now();

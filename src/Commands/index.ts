@@ -135,7 +135,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       this._descriptionLocalization = {};
       availableLanguages().forEach(language => {
         if(i18next.language === language) return;
-        const localized = i18next.t(`commands:${this.asciiName}.description` as any, { lng: language });
+        const localized: string = i18next.t(`commands:${this.asciiName}.description` as any, { lng: language }).substring(0, 100);
         if(localized === this._description) return;
         this._descriptionLocalization[language as keyof typeof this._descriptionLocalization] = localized;
       });
@@ -169,7 +169,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         };
         availableLanguages().forEach(language => {
           if(i18next.language === language) return;
-          const localized = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any, { lng: language });
+          const localized: string = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any, { lng: language }).substring(0, 100);
           if(localized === result.description) return;
           result.descriptionLocalization[language as keyof typeof result.descriptionLocalization] = localized;
         });

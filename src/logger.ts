@@ -188,8 +188,9 @@ export function timeLoggedMethod<This, Args extends any[], Return>(
       end = true;
       timerLogger.trace(`${String(context.name)} elapsed ${Date.now() - start}ms`);
     };
+    let result: any = null;
     try{
-      const result = originalMethod.call(this, ...args);
+      result = originalMethod.call(this, ...args);
       if(result instanceof Promise){
         result.then(f => {
           endLog();
@@ -201,7 +202,9 @@ export function timeLoggedMethod<This, Args extends any[], Return>(
       return result;
     }
     finally{
-      endLog();
+      if(typeof result !== "object" || !(result instanceof Promise)){
+        endLog();
+      }
     }
   };
 }
