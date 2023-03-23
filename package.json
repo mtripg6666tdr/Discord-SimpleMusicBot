@@ -11,7 +11,7 @@
   "dependencies": {
     "@mtripg6666tdr/async-lock": "^1.1.0",
     "@mtripg6666tdr/eris-command-resolver": "^2.0.1",
-    "@sinclair/typebox": "^0.26.0",
+    "@sinclair/typebox": "^0.26.1",
     "candyget": "^0.5.3",
     "comment-json": "^4.2.3",
     "dotenv": "^16.0.3",
