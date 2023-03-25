@@ -59,7 +59,7 @@ export default class Searchq extends BaseCommand {
       .filter(c =>
         c.basicInfo.title.toLowerCase().includes(context.rawArgs.toLowerCase())
         || c.basicInfo.url.toLowerCase().includes(context.rawArgs.toLowerCase())
-        || c.basicInfo.description.toLowerCase().includes(context.rawArgs.toLowerCase())
+        || c.basicInfo.description?.toLowerCase().includes(context.rawArgs.toLowerCase())
       )
     ;
 
