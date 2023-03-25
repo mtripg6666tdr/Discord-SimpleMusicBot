@@ -30,6 +30,10 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
 ### `DB_TOKEN`
   「キューやループの有効無効等のデータのバックアップ」に使用するデータベースサーバーのトークンです。(任意指定)  
   サーバーの仕様等については[バックアップ](../backup/overview.md)を参照してください。
+### `LOG_TRANSFER_PORT`
+  内部的に、ロガーで使用されるTCPポートの番号を指定します。(任意指定)  
+  複数のボットを同時稼働する際には、それぞれのボットで違う値を設定する必要があります。  
+  デフォルトでは`5003`が使用されます。
 
 ## `config.json`ファイル
 - [サンプルファイル](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/config.json.sample)
