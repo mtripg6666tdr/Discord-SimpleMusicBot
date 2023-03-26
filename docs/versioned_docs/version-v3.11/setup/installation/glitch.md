@@ -10,6 +10,13 @@ sidebar_position: 5
 
 :::
 
+:::info
+
+ここで紹介する方法は、[「クローンして実行する」](./normal)をベースにしています。
+必ず[「クローンして使用する」](./normal)も併せてご確認ください。
+
+:::
+
 Discord-SimpleMusicBotを [Glitch](https://glitch.com/) で実行する手順を説明します。
 
 ## 前提条件
