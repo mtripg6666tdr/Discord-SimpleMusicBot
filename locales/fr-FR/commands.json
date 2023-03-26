@@ -130,12 +130,12 @@
   },
   "import": {
     "name": "インポート",
-    "description": "指定されたメッセージからキューをインポートします。exportコマンドで出力されたファイルが添付されたURL、もしくはキューの埋め込みのあるメッセージのURLを引数として指定してください。",
+    "description": "指定されたメッセージからキューをインポートします。exportコマンドで出力されたファイルが添付されたURLを引数として指定してください。",
     "examples": "import https://discord.com/channels/...",
     "usage": "インポート <インポート元のURL>",
     "args": {
       "url": {
-        "description": "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURL、もしくはキューの埋め込みが添付されたURLを指定できます。"
+        "description": "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURLを指定できます。"
       }
     },
     "invalidArgumentMessage": "インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。",
