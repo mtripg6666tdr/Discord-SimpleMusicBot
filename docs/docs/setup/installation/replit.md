@@ -10,6 +10,12 @@ sidebar_position: 4
 
 :::
 
+:::warning
+
+Replitのエディター環境は頻繁に変更されるため、プロジェクト作成時点でこの手順が使用できない場合があります。ここに記載されている情報は2023年3月25日時点の情報です。
+
+:::
+
 Discord-SimpleMusicBotを [Replit](https://replit.com/) で実行する手順を説明します。
 
 ## 前提条件
@@ -39,11 +45,32 @@ Discord-SimpleMusicBotを [Replit](https://replit.com/) で実行する手順を
   node -v
   ```
 
-  #### Node.jsのバージョンが14以前の場合
-  Node.jsのバージョンがv12.x.xやv14.x.xのような古いバージョンの場合、新しいバージョンのNode.jsが使えるよう次のコマンドを実行してください。
+  #### Node.jsのバージョンが16.16以前の場合
+  Node.jsのバージョンがv16.16より古いバージョンの場合、新しいバージョンのNode.jsが使えるよう次のコマンドを実行してください。
   ```sh
-  npm i node@v18-lts --no-save
+  npm i node@v16-lts --no-save
   ```
+
+  ### `node: command not found`と表示された場合
+  `node -v`を実行すると、以下の表示がされることがあります。
+  ```
+  node: command not installed. Multiple versions of this command were found in Nix.
+  Select one to run (or press Ctrl-C to cancel):
+  > 
+  ```
+  この場合、何もせずにエンターしてください。  
+  そのあと、画面左の`Files`の一番右のメニューから`Show hidden files`を選択し、`replit.nix`を探し、以下の内容に変更してください。
+  ```nix title=replit.nix
+  { pkgs }: {
+    deps = [
+      pkgs.nodejs-16_x
+      pkgs.nodePackages.typescript-language-server
+      pkgs.yarn
+      pkgs.replitPackages.jest
+    ];
+  }
+  ```
+  そして再度`node -v`を実行するとバージョンが表示されるはずです。万が一上の表示が出た際は、もういちど何もせずにエンターしてください。
 
 ### 4. 依存関係をインストールします
   以下のコマンドで依存関係をインストールします

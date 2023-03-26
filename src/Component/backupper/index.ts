@@ -46,13 +46,13 @@ export abstract class Backupper extends LogEmitter<{}> {
   /**
    * バックアップ済みの接続ステータス等を取得します
    */
-  abstract getStatusFromBackup(guildids: string[]): Promise<Map<string, exportableStatuses>>;
+  abstract getStatusFromBackup(guildIds: string[]): Promise<Map<string, exportableStatuses>>;
   /**
    * バックアップ済みのキューのデータを取得します
    */
-  abstract getQueueDataFromBackup(guildids: string[]): Promise<Map<string, YmxFormat>>;
+  abstract getQueueDataFromBackup(guildIds: string[]): Promise<Map<string, YmxFormat>>;
   /**
    * サーバーとの接続を破棄します
    */
-  abstract destroy(): void|Promise<void>;
+  abstract destroy(): void | Promise<void>;
 }

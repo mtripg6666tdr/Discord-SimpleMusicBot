@@ -28,6 +28,7 @@ import * as path from "path";
 import { RateLimitController } from "./Component/RateLimitController";
 import { SourceCache } from "./Component/SourceCache";
 import { MongoBackupper } from "./Component/backupper/mongodb";
+import { ReplitBackupper } from "./Component/backupper/replit";
 import { InteractionCollectorManager } from "./Component/collectors/InteractionCollectorManager";
 import { GuildDataContainer } from "./Structure";
 import { LogEmitter } from "./Structure";
@@ -183,6 +184,8 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
   private initializeBackupper(){
     if(MongoBackupper.backuppable){
       this._backupper = new MongoBackupper(this, () => this.guildData);
+    }else if(ReplitBackupper.backuppable){
+      this._backupper = new ReplitBackupper(this, () => this.guildData);
     }
   }
 
