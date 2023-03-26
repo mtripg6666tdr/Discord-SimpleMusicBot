@@ -45,12 +45,12 @@
     "queueEmpty": "Queue empty",
     "queueEmptyAndExiting": "キューが空になったため終了します",
     "songsInQueue": "再生待ちの曲",
-    "willLoop": "ループします"
+    "willLoop": "Loop"
   },
   "skip": {
     "skipping": "Skipping",
-    "skipped": "`{{title}}`をスキップしました",
-    "failed": "スキップに失敗しました",
+    "skipped": "Skipped `{{title}}`",
+    "failed": "Failed to skip.",
     "embedTitle": "スキップの投票",
     "howToUseSkipVote": "`{{title}}`のスキップに賛成する場合は以下のボタンを押してください。",
     "skipVoteDescription": "賛成がボイスチャンネルに参加している人数の過半数を超えると、スキップされます。",
@@ -58,6 +58,6 @@
     "skipRequirement_one": "あと{{count}}人の賛成が必要です。",
     "skipRequirement_other": "あと{{count}}人の賛成が必要です。",
     "skipIssuer": "{{issuer}}が、楽曲のスキップを提案しました",
-    "agree": "賛成"
+    "agree": "Upvote"
   }
 }
