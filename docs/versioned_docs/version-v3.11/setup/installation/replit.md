@@ -51,7 +51,7 @@ Discord-SimpleMusicBotを [Replit](https://replit.com/) で実行する手順を
   npm i node@v16-lts --no-save
   ```
 
-  ### `node: command not found`と表示された場合
+  #### `node: command not found`と表示された場合
   `node -v`を実行すると、以下の表示がされることがあります。
   ```
   node: command not installed. Multiple versions of this command were found in Nix.
