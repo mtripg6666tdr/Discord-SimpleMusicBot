@@ -43,7 +43,7 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
   const url = info.url;
   const cache = info.forceCache;
   let gotData = info.knownData;
-  let fromPersistentCache = false;
+  let fromPersistentCache = !!gotData;
 
   if(cacheManager.hasSource(url)){
     logger.debug("cache found");

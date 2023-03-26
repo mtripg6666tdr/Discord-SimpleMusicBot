@@ -27,6 +27,7 @@ import { PassThrough } from "stream";
 
 import candyget from "candyget";
 import miniget from "miniget";
+import { debounce } from "throttle-debounce";
 
 import { DefaultUserAgent } from "../definition";
 import { getLogger } from "../logger";
@@ -320,4 +321,18 @@ export function waitForEnteringState(predicate: () => boolean, timeout: number =
       }
     }, timeStep).unref();
   });
+}
+
+export function createDebounceFunctionsFactroy<Key>(func: (key: Key) => void, debounceDelay: number){
+  // eslint-disable-next-line func-call-spacing
+  const functionsStore = new Map<Key, () => void>();
+  return (key: Key) => {
+    if(functionsStore.has(key)){
+      return functionsStore.get(key);
+    }else{
+      const fn = debounce(debounceDelay, () => func(key));
+      functionsStore.set(key, fn);
+      return fn;
+    }
+  };
 }

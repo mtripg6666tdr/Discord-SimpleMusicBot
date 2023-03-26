@@ -22,12 +22,19 @@ import type { GuildDataContainer, YmxFormat } from "../../Structure";
 import type { DataType, MusicBotBase } from "../../botBase";
 import type * as mongo from "mongodb";
 
-import { MongoClient } from "mongodb";
-import { debounce } from "throttle-debounce";
-
 import { Backupper } from ".";
-import { waitForEnteringState } from "../../Util";
+import { createDebounceFunctionsFactroy, waitForEnteringState } from "../../Util";
 import { CommandManager } from "../CommandManager";
+
+const MongoClient = (() => {
+  try{
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    return require("mongodb") as typeof import("mongodb");
+  }
+  catch{
+    return null;
+  }
+})()?.MongoClient;
 
 type Collectionate<T> = T & { guildId: string };
 type Analytics = Collectionate<{
@@ -57,7 +64,10 @@ export class MongoBackupper extends Backupper {
 
   constructor(bot: MusicBotBase, getData: () => DataType){
     super(bot, getData);
+
     this.logger.info("Initializing Mongo DB backup server adapter...");
+
+    // prepare mongodb client
     this.client = new MongoClient(process.env.DB_URL, {
       appName: `mtripg6666tdr/Discord-SimpleMusicBot#${this.bot.version || "unknown"} MondoDB backup server adapter`,
     });
@@ -78,33 +88,26 @@ export class MongoBackupper extends Backupper {
         this.dbError = e;
       })
     ;
-    this.bot.on("beforeReady", () => {
-      const backupStatusDebounceFunctions = Object.create(null);
-      const backupStatusFuncFactory = (guildId: string) => {
-        if(backupStatusDebounceFunctions[guildId]){
-          return backupStatusDebounceFunctions[guildId];
-        }else{
-          return backupStatusDebounceFunctions[guildId] = debounce(5000, () => this.backupStatus(guildId));
-        }
-      };
-      const backupQueueDebounceFunctions = Object.create(null);
-      const backupQueueFuncFactory = (guildId: string) => {
-        if(backupQueueDebounceFunctions[guildId]){
-          return backupQueueDebounceFunctions[guildId];
-        }else{
-          return backupQueueDebounceFunctions[guildId] = debounce(5000, () => this.backupQueue(guildId));
-        }
-      };
+
+    // set hook
+    this.bot.once("beforeReady", () => {
+      const backupStatusFuncFactory = createDebounceFunctionsFactroy(this.backupStatus.bind(this), 5000);
+      const backupQueueFuncFactory = createDebounceFunctionsFactroy(this.backupQueue.bind(this), 5000);
+
       const setContainerEvent = (container: GuildDataContainer) => {
         container.queue.eitherOn(["change", "changeWithoutCurrent"], backupQueueFuncFactory(container.getGuildId()));
         container.queue.on("settingsChanged", backupStatusFuncFactory(container.getGuildId()));
         container.player.on("all", backupStatusFuncFactory(container.getGuildId()));
         container.player.on("reportPlaybackDuration", this.addPlayerAnalyticsEvent.bind(this, container.getGuildId()));
       };
+
       this.data.forEach(setContainerEvent);
       this.bot.on("guildDataAdded", setContainerEvent);
       this.bot.on("onBotVoiceChannelJoin", (channel) => backupStatusFuncFactory(channel.guild.id)());
+      
+      // analytics
       CommandManager.instance.commands.forEach(command => command.on("run", args => this.addCommandAnalyticsEvent(command, args)));
+
       this.logger.info("Hook was set up successfully");
     });
   }
