@@ -10,6 +10,13 @@ sidebar_position: 4
 
 :::
 
+:::info
+
+ここで紹介する方法は、[「クローンして実行する」](./normal)をベースにしています。
+必ず[「クローンして使用する」](./normal)も併せてご確認ください。
+
+:::
+
 :::warning
 
 Replitのエディター環境は頻繁に変更されるため、プロジェクト作成時点でこの手順が使用できない場合があります。ここに記載されている情報は2023年3月25日時点の情報です。
@@ -51,7 +58,7 @@ Discord-SimpleMusicBotを [Replit](https://replit.com/) で実行する手順を
   npm i node@v16-lts --no-save
   ```
 
-  ### `node: command not found`と表示された場合
+  #### `node: command not found`と表示された場合
   `node -v`を実行すると、以下の表示がされることがあります。
   ```
   node: command not installed. Multiple versions of this command were found in Nix.
