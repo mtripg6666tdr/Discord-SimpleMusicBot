@@ -64,7 +64,18 @@
 ## バグ修正
 * 手動で停止した際に、内部のコスト情報をリセットする(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1209)
 ## 依存関係のアップデート
-* @sinclair/typebox 4.9.5 => 5.0.2
+* @sinclair/typebox 0.25.24 => 0.26.0
+
+### その他の特記事項
+- Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
+
+# v3.11.5
+## バグ修正
+* `キュー内を検索`コマンドが失敗する問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1247)
+## 依存関係のアップデート
+* @sinclair/typebox 0.26.0 => 0.26.2
 
 ### その他の特記事項
 - Dockerのイメージは、リリース後30～40分程度で公開されます。
