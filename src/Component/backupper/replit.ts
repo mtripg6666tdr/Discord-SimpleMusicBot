@@ -164,7 +164,11 @@ class ReplitClient {
   protected queue: PQueue;
 
   constructor(baseUrl?: string){
-    this.baseUrl = baseUrl || process.env.REPLIT_DB_URL;
+    this.baseUrl = baseUrl;
+    if(baseUrl === "local" || !this.baseUrl){
+      this.baseUrl = process.env.REPLIT_DB_URL;
+    }
+
     if(!this.baseUrl){
       throw new Error("No URL found");
     }
