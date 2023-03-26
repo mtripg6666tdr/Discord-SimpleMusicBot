@@ -209,7 +209,8 @@
     "guildPaused": "一時停止中",
     "itemsInQueue": "キュー内のアイテム数",
     "currentTransformingCost": "現在の変換コスト",
-    "liveStream": "ライブストリーム"
+    "liveStream": "ライブストリーム",
+    "memberCount": "メンバー数"
   },
   "loop": {
     "name": "ループ",

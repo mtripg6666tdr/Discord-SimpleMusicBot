@@ -5,14 +5,14 @@
     "listOfPresetBGM": "BGM Presets available"
   },
   "bulk-delete": {
-    "invalidMessageCount": "指定されたメッセージ数が無効です。",
+    "invalidMessageCount": "Provided an invalid message count.",
     "loading": "Fetching",
-    "hitCount_one": "{{count}}件ヒット",
-    "hitCount_other": "{{count}}件ヒット",
-    "inCount_one": "取得した{{count}}件中",
-    "inCount_other": "取得した{{count}}件中",
-    "found_one": "{{count}}件見つかりました。",
-    "found_other": "{{count}}件見つかりました。",
+    "hitCount_one": "{{count}} message found.",
+    "hitCount_other": "{{count}} messages found.",
+    "inCount_one": "in {{count}} message",
+    "inCount_other": "in {{count}} messages",
+    "found_one": "{{count}} message found.",
+    "found_other": "{{count}} messages found.",
     "confirm": "一括削除を確定するにはボタンを押してください。\r\n押されないと一定時間後にキャンセルされます。",
     "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため",
     "auditLog_other": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため",
@@ -126,7 +126,7 @@
     "spotify": "曲のURL、およびプレイリストのURL。曲を推測してYouTubeから再生します。",
     "custom": "オーディオファイルへの直URL",
     "googleDrive": "Google ドライブ",
-    "niconico": "ニコニコ動画"
+    "niconico": "Nico-Nico Douga"
   },
   "import": {
     "name": "import",
@@ -138,7 +138,7 @@
         "description": "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURL、もしくはキューの埋め込みが添付されたURLを指定できます。"
       }
     },
-    "invalidArgumentMessage": "インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。",
+    "invalidArgumentMessage": "Pass the URL of a message as an argument that has an exported queue.",
     "noDiscordLink": "Discordのメッセージへのリンクを指定してください",
     "invalidLink": "指定されたURLは無効です",
     "loadingMessage": "Fetching message",
@@ -209,7 +209,8 @@
     "guildPaused": "Paused",
     "itemsInQueue": "キュー内のアイテム数",
     "currentTransformingCost": "現在の変換コスト",
-    "liveStream": "Livestream"
+    "liveStream": "Livestream",
+    "memberCount": "メンバー数"
   },
   "loop": {
     "name": "Loop",
