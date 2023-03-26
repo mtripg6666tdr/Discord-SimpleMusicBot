@@ -156,9 +156,10 @@ export default class SystemInfo extends BaseCommand {
           .setColor(getColor("HELP"))
           .setTitle(t("commands:log.guildSearchResult"))
           .addField(t("commands:log.guildName"), target.name, true)
-          .addField(t("commands:log.guildId"), target.id)
-          .addField(t("commands:log.guildIcon"), "なし")
+          .addField(t("commands:log.guildId"), target.id, true)
+          .addField(t("commands:log.guildIcon"), target.icon || t("none"), true)
           .addField(t("commands:log.guildChannelCountFromCache"), target.channels.size.toString(), true)
+          .addField(t("commands:log.memberCount"), target.memberCount?.toString() || target.approximateMemberCount?.toString() || "不明", true)
           .addField(t("commands:log.guildConnecting"), data?.player.isConnecting ? t("yes") : t("no"), true)
           .addField(t("commands:log.guildPlaying"), data?.player.isPaused ? t("yes") : t("no"), true)
           .addField(t("commands:log.guildPaused"), data?.player.isPaused ? t("yes") : t("no"), true)
@@ -169,6 +170,7 @@ export default class SystemInfo extends BaseCommand {
             data?.player.currentAudioInfo?.isYouTube() && data?.player.currentAudioInfo.isLiveStream ? t("yes") : t("no"),
             true
           )
+          .setThumbnail(target.iconURL())
           .toOceanic()
       );
     }
