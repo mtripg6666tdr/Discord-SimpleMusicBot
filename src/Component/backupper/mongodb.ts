@@ -24,6 +24,7 @@ import type * as mongo from "mongodb";
 
 import { Backupper } from ".";
 import { createDebounceFunctionsFactroy, waitForEnteringState } from "../../Util";
+import { timeLoggedMethod } from "../../logger";
 import { CommandManager } from "../CommandManager";
 
 const MongoClient = (() => {
@@ -112,6 +113,7 @@ export class MongoBackupper extends Backupper {
     });
   }
 
+  @timeLoggedMethod
   async backupStatus(guildId: string){
     if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
     try{
@@ -132,6 +134,7 @@ export class MongoBackupper extends Backupper {
     }
   }
 
+  @timeLoggedMethod
   backupQueue(guildId: string){
     if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
     try{
@@ -188,6 +191,7 @@ export class MongoBackupper extends Backupper {
     }
   }
 
+  @timeLoggedMethod
   override async getStatusFromBackup(guildIds: string[]): Promise<Map<string, exportableStatuses>>{
     if(!this.dbConnectionReady && !this.dbError) await waitForEnteringState(() => this.dbConnectionReady || !!this.dbError, Infinity);
     if(this.dbError){
@@ -213,6 +217,7 @@ export class MongoBackupper extends Backupper {
     }
   }
 
+  @timeLoggedMethod
   override async getQueueDataFromBackup(guildids: string[]): Promise<Map<string, YmxFormat>>{
     if(!this.dbConnectionReady && !this.dbError) await waitForEnteringState(() => this.dbConnectionReady || !!this.dbError, Infinity);
     if(this.dbError){

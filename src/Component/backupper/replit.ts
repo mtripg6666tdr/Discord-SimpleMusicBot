@@ -17,65 +17,34 @@
  */
 
 import type { exportableStatuses } from ".";
-import type { GuildDataContainer, YmxFormat } from "../../Structure";
+import type { YmxFormat } from "../../Structure";
 import type { DataType, MusicBotBase } from "../../botBase";
 
 import candyget from "candyget";
 import PQueue from "p-queue";
 
-import { Backupper } from ".";
+import { IntervalBackupper } from ".";
+import { timeLoggedMethod } from "../../logger";
 
-export class ReplitBackupper extends Backupper {
-  private readonly db: ReplitClient = null;
-  private readonly queueModifiedGuild = new Set<string>();
-  private readonly previousStatusCache = new Map<string, string>();
+export class ReplitBackupper extends IntervalBackupper {
+  protected readonly db: ReplitClient = null;
 
   static get backuppable(){
-    return process.env.DB_URL.startsWith("replit+http");
+    return process.env.DB_URL?.startsWith("replit+http");
   }
 
   constructor(bot: MusicBotBase, getData: () => DataType){
-    super(bot, getData);
-
-    this.logger.info("Initializing Replit Database backup server adapter...");
+    super(bot, getData, "Replit");
 
     this.db = new ReplitClient(process.env.DB_URL.substring("replit+".length));
-
-    // ボットの準備完了直前に実行する
-    this.bot.once("beforeReady", () => {
-      // コンテナにイベントハンドラを設定する関数
-      const setContainerEvent = (container: GuildDataContainer) => {
-        container.queue.eitherOn(["change", "changeWithoutCurrent"], () => this.queueModifiedGuild.add(container.getGuildId()));
-      };
-      // すでに登録されているコンテナにイベントハンドラを登録する
-      this.data.forEach(setContainerEvent);
-      // これから登録されるコンテナにイベントハンドラを登録する
-      this.bot.on("guildDataAdded", setContainerEvent);
-      // バックアップのタイマーをセット(二分に一回)
-      this.bot.on("tick", (count) => count % 2 === 0 && this.backup());
-
-      this.logger.info("Hook was set up successfully");
-    });
   }
 
-  private async backup(){
-    await this.backupStatus();
-    await this.backupQueue();
-  }
-
-  private async backupStatus(){
+  @timeLoggedMethod
+  protected override async backupStatus(){
     if(!this.db) return;
 
     // determine which data should be backed up
-    const filteredGuildIds = [...this.data.keys()]
-      .filter(id => {
-        if(!this.previousStatusCache.has(id)){
-          return true;
-        }else{
-          const currentStatus = JSON.stringify(this.data.get(id).exportStatus());
-          return currentStatus !== this.previousStatusCache.get(id);
-        }
-      });
+    const filteredGuildIds = this.getStatusModifiedGuildIds();
 
     // execute
     for(let i = 0; i < filteredGuildIds.length; i++){
@@ -84,7 +53,7 @@ export class ReplitBackupper extends Backupper {
         this.logger.info(`Backing up status...(${guildId})`);
         const currentStatus = this.data.get(guildId).exportStatus();
         await this.db.set(this.getDbKey("status", guildId), currentStatus);
-        this.previousStatusCache.set(guildId, JSON.stringify(currentStatus));
+        this.updateStatusCache(guildId, currentStatus);
       }
       catch(er){
         this.logger.error(er);
@@ -93,15 +62,16 @@ export class ReplitBackupper extends Backupper {
     }
   }
 
-  private async backupQueue(){
+  @timeLoggedMethod
+  protected override async backupQueue(){
     if(!this.db) return;
-    const modifiedGuildIds = [...this.queueModifiedGuild];
+    const modifiedGuildIds = this.getQueueModifiedGuildIds();
     for(let i = 0; i < modifiedGuildIds.length; i++){
       const guildId = modifiedGuildIds[i];
       try{
         this.logger.info(`Backing up queue...(${guildId})`);
         await this.db.set(this.getDbKey("queue", guildId), this.data.get(guildId).exportQueue());
-        this.queueModifiedGuild.delete(guildId);
+        this.unmarkQueueModifiedGuild(guildId);
       }
       catch(er){
         this.logger.error(er);
@@ -110,6 +80,7 @@ export class ReplitBackupper extends Backupper {
     }
   }
 
+  @timeLoggedMethod
   override async getQueueDataFromBackup(guildIds: string[]): Promise<Map<string, YmxFormat>> {
     const result = new Map<string, YmxFormat>();
     try{
@@ -130,6 +101,7 @@ export class ReplitBackupper extends Backupper {
     }
   }
 
+  @timeLoggedMethod
   override async getStatusFromBackup(guildIds: string[]): Promise<Map<string, exportableStatuses>> {
     const result = new Map<string, exportableStatuses>();
     try{
@@ -138,7 +110,7 @@ export class ReplitBackupper extends Backupper {
           const status = await this.db.get<exportableStatuses>(this.getDbKey("status", id));
           if(status){
             result.set(id, status);
-            this.previousStatusCache.set(id, JSON.stringify(status));
+            this.updateStatusCache(id, status);
           }
         })
       );

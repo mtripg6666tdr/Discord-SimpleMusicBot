@@ -90,7 +90,7 @@ export async function onReady(this: MusicBot){
     }
   }else{
     this.logger.warn(
-      "Cannot perform recovery of queues and statuses. Check .env file to perform this. See README for more info"
+      "Cannot perform recovery of queues and statuses. Check .env file to perform this."
     );
   }
 

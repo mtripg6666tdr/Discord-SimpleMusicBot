@@ -41,7 +41,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
 
   constructor(...args: ConstructorParameters<typeof NullMetaAudioResource>){
     super(...args);
-    this.logger.log("[AudioResource] instantiated");
+    this.logger.log("instantiated");
     this.events = new AudioResourceEvent({
       captureRejections: false,
     });
@@ -53,7 +53,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
       })
       .on("end", () => {
         this.events.emit("end");
-        this.logger.log(`[AudioResource]Pushed total ${this.readLength} bytes${this.estimatedLengthSeconds !== 0 ? ` (average ${Math.round(this.readLength / this.estimatedLengthSeconds * 8 / 100) / 10} kbps)` : ""}`);
+        this.logger.log(`Pushed total ${this.readLength} bytes${this.estimatedLengthSeconds !== 0 ? ` (average ${Math.round(this.readLength / this.estimatedLengthSeconds * 8 / 100) / 10} kbps)` : ""}`);
       })
     ;
   }
