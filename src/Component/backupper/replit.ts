@@ -30,7 +30,7 @@ export class ReplitBackupper extends IntervalBackupper {
   protected readonly db: ReplitClient = null;
 
   static get backuppable(){
-    return process.env.DB_URL.startsWith("replit+http");
+    return process.env.DB_URL?.startsWith("replit+http");
   }
 
   constructor(bot: MusicBotBase, getData: () => DataType){
