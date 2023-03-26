@@ -225,7 +225,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         this.emit(method === "push" ? "changeWithoutCurrent" : "change");
         this.emit("add", result);
         const index = this._default.findIndex(q => q === result);
-        this.logger.info("queue content added in position " + index);
+        this.logger.info(`queue content added at position ${index}`);
         return { ...result, index };
       }
       throw new Error("Provided URL was not resolved as available service");
