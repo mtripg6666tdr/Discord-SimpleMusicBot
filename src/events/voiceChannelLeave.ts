@@ -42,7 +42,7 @@ export async function onVoiceChannelLeave(
     await this._client.rest.channels.createMessage(
       server.boundTextChannel,
       {
-        content: `:postbox: ${i18next.t("disconnected")}`,
+        content: `:postbox: ${i18next.t("disconnected", { lng: server.locale })}`,
       }
     ).catch(this.logger.error);
   }else if(oldChannel.voiceMembers.has(this._client.user.id) && oldChannel.voiceMembers.size === 1){
@@ -63,7 +63,7 @@ export async function onVoiceChannelLeave(
         await this._client.rest.channels.createMessage(
           server.boundTextChannel,
           {
-            content: `:postbox: ${i18next.t("disconnected")}`,
+            content: `:postbox: ${i18next.t("disconnected", { lng: server.locale })}`,
           }
         ).catch(this.logger.error);
       }else if(!server.player.isPaused){
@@ -72,7 +72,7 @@ export async function onVoiceChannelLeave(
         await this._client.rest.channels.createMessage(
           server.boundTextChannel,
           {
-            content: `:pause_button:${i18next.t("autoPaused")}`,
+            content: `:pause_button:${i18next.t("autoPaused", { lng: server.locale })}`,
           }
         ).catch(this.logger.error);
         const timer = setTimeout(() => {
@@ -82,7 +82,7 @@ export async function onVoiceChannelLeave(
             this._client.rest.channels.createMessage(
               server.boundTextChannel,
               {
-                content: `:postbox: ${i18next.t("autoDisconnect")}`,
+                content: `:postbox: ${i18next.t("autoDisconnect", { lng: server.locale })}`,
               }
             ).catch(this.logger.error);
             server.player.disconnect();
@@ -97,7 +97,7 @@ export async function onVoiceChannelLeave(
       await this._client.rest.channels.createMessage(
         server.boundTextChannel,
         {
-          content: `:postbox: ${i18next.t("disconnected")}`,
+          content: `:postbox: ${i18next.t("disconnected", { lng: server.locale })}`,
         }
       ).catch(this.logger.error);
     }

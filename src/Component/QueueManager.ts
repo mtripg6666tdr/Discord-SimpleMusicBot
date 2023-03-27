@@ -206,16 +206,20 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     return lock(this.addQueueLocker, async () => {
       this.logger.info("AddQueue called");
       const result = {
-        basicInfo: await AudioSource.resolve({
-          url,
-          type: sourceType,
-          knownData: gotData,
-          forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000),
-        }, this.server.bot.cache),
+        basicInfo: await AudioSource.resolve(
+          {
+            url,
+            type: sourceType,
+            knownData: gotData,
+            forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000),
+          },
+          this.server.bot.cache,
+          i18next.getFixedT(this.server.locale)
+        ),
         additionalInfo: {
           addedBy: {
             userId: addedBy && this.getUserIdFromMember(addedBy) || "0",
-            displayName: addedBy && this.getDisplayNameFromMember(addedBy) || i18next.t("unknown"),
+            displayName: addedBy && this.getDisplayNameFromMember(addedBy) || i18next.t("unknown", { lng: this.server.locale }),
           },
         },
       } as QueueContent;
@@ -272,8 +276,8 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           content: "",
           embeds: [
             new MessageEmbedBuilder()
-              .setTitle(i18next.t("pleaseWait"))
-              .setDescription(`${i18next.t("loadingInfo")}...`)
+              .setTitle(i18next.t("pleaseWait", { lng: this.server.locale }))
+              .setDescription(`${i18next.t("loadingInfo", { lng: this.server.locale })}...`)
               .toOceanic(),
           ],
           allowedMentions: {
@@ -289,7 +293,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         // まだないので生成
         this.logger.info("AutoAddQueue will make a message that will be used to report statuses");
         uiMessage = await options.channel.createMessage({
-          content: i18next.t("loadingInfoPleaseWait"),
+          content: i18next.t("loadingInfoPleaseWait", { lng: this.server.locale }),
         });
       }
 
@@ -298,7 +302,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         // キュー上限
         this.logger.warn("AutoAddQueue failed due to too long queue");
         // eslint-disable-next-line @typescript-eslint/no-throw-literal
-        throw i18next.t("components:queue.tooManyQueueItems");
+        throw i18next.t("components:queue.tooManyQueueItems", { lng: this.server.locale });
       }
 
       // キューへの追加を実行
@@ -325,41 +329,53 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         // 埋め込みの作成
         const embed = new MessageEmbedBuilder()
           .setColor(getColor("SONG_ADDED"))
-          .setTitle(`✅${i18next.t("components:queue.songAdded")}`)
+          .setTitle(`✅${i18next.t("components:queue.songAdded", { lng: this.server.locale })}`)
           .setDescription(`[${info.basicInfo.title}](${info.basicInfo.url})`)
           .addField(
-            i18next.t("length"),
+            i18next.t("length", { lng: this.server.locale }),
             info.basicInfo.isYouTube() && info.basicInfo.isLiveStream
-              ? i18next.t("liveStream")
+              ? i18next.t("liveStream", { lng: this.server.locale })
               : _t !== 0
                 ? min + ":" + sec
-                : i18next.t("unknown"),
+                : i18next.t("unknown", { lng: this.server.locale }),
             true
           )
           .addField(
-            i18next.t("components:nowplaying.requestedBy"),
-            this.getDisplayNameFromMember(options.addedBy) || i18next.t("unknown"),
+            i18next.t("components:nowplaying.requestedBy", { lng: this.server.locale }),
+            this.getDisplayNameFromMember(options.addedBy) || i18next.t("unknown", { lng: this.server.locale }),
             true
           )
           .addField(
             i18next.t("components:queue.positionInQueue"),
             index === "0"
-              ? `${i18next.t("components:nowplaying.nowplaying")}/${i18next.t("components:nowplaying.waitForPlaying")}`
+              ? `${
+                i18next.t("components:nowplaying.nowplaying", { lng: this.server.locale })
+              }/${
+                i18next.t("components:nowplaying.waitForPlaying", { lng: this.server.locale })
+              }`
               : index,
             true
           )
           .addField(
-            i18next.t("components:queue.etaToPlay"),
+            i18next.t("components:queue.etaToPlay", { lng: this.server.locale }),
             index === "0"
               ? "-"
-              : timeFragments[2].includes("-") ? i18next.t("unknown") : Util.time.HourMinSecToString(timeFragments, i18next.t),
+              : timeFragments[2].includes("-")
+                ? i18next.t("unknown", { lng: this.server.locale })
+                : Util.time.HourMinSecToString(timeFragments, i18next.getFixedT(this.server.locale)),
             true
           )
         ;
         if(info.basicInfo.isYouTube() && info.basicInfo.IsFallbacked){
-          embed.addField(`:warning:${i18next.t("attention")}`, i18next.t("components:queue.fallbackNotice"));
+          embed.addField(
+            `:warning:${i18next.t("attention", { lng: this.server.locale })}`,
+            i18next.t("components:queue.fallbackNotice", { lng: this.server.locale })
+          );
         }else if(info.basicInfo.isSpotify()){
-          embed.addField(`:warning:${i18next.t("attention")}`, i18next.t("components:queue.spotifyNotice"));
+          embed.addField(
+            `:warning:${i18next.t("attention", { lng: this.server.locale })}`,
+            i18next.t("components:queue.spotifyNotice", { lng: this.server.locale })
+          );
         }
 
         const components: MessageActionRow[] = [];
@@ -380,7 +396,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
               .addComponents(
                 new MessageButtonBuilder()
                   .setCustomId(collectorCreateResult.customIdMap.cancelLast)
-                  .setLabel(i18next.t("cancel"))
+                  .setLabel(i18next.t("cancel", { lng: this.server.locale }))
                   .setStyle("DANGER")
               )
               .toOceanic()
@@ -390,7 +406,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
             const item = this.get(this.length - 1);
             this.removeAt(this.length - 1);
             interaction.createFollowup({
-              content: `🚮${i18next.t("components:queue.cancelAdded", { title: item.basicInfo.title })}`,
+              content: `🚮${i18next.t("components:queue.cancelAdded", { title: item.basicInfo.title, lng: this.server.locale })}`,
             }).catch(this.logger.error);
           });
 
@@ -434,7 +450,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       this.logger.error("AutoAddQueue failed", e);
       if(uiMessage){
         uiMessage.edit({
-          content: `:weary:${i18next.t("components:queue.failedToAdd")}${typeof e === "object" && "message" in e ? `(${e.message})` : ""}`,
+          content: `:weary:${i18next.t("components:queue.failedToAdd", { lng: this.server.locale })}${typeof e === "object" && "message" in e ? `(${e.message})` : ""}`,
           embeds: null,
         })
           .catch(this.logger.error)
@@ -491,11 +507,12 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       ){
         await msg.edit(
           `:hourglass_flowing_sand:${
-            i18next.t("components:queue.processingPlaylist", { title })
-          }${i18next.t("pleaseWait")}${
+            i18next.t("components:queue.processingPlaylist", { title, lng: this.server.locale })
+          }${i18next.t("pleaseWait", { lng: this.server.locale })}${
             i18next.t("default:songProcessingInProgress", {
-              totalSongCount: i18next.t("totalSongCount", { count: totalCount }),
-              currentSongCount: i18next.t("currentSongCount", { count: index }),
+              totalSongCount: i18next.t("totalSongCount", { count: totalCount, lng: this.server.locale }),
+              currentSongCount: i18next.t("currentSongCount", { count: index, lng: this.server.locale }),
+              lng: this.server.locale,
             })
           }`);
       }

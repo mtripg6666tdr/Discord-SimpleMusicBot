@@ -17,8 +17,8 @@
  */
 
 import type { exportableCustom, UrlStreamInfo } from ".";
+import type { i18n } from "i18next";
 
-import i18next from "i18next";
 import twitterDl from "twitter-url-direct";
 
 import { AudioSource } from "./audiosource";
@@ -30,7 +30,7 @@ export class Twitter extends AudioSource<string> {
     super("twitter");
   }
 
-  async init(url: string, prefetched?: exportableTwitter){
+  async init(url: string, prefetched: exportableTwitter, t: i18n["t"]){
     this.url = url;
     if(!Twitter.validateUrl(url)) throw new Error("Invalid streamable url");
     if(prefetched){
@@ -44,7 +44,7 @@ export class Twitter extends AudioSource<string> {
       }
 
       this.lengthSeconds = Math.floor(streamInfo.duration);
-      this.title = i18next.t("audioSources.tweet", { name: streamInfo.tweet_user.name, id: streamInfo.tweet_user.username });
+      this.title = t("audioSources.tweet", { name: streamInfo.tweet_user.name, id: streamInfo.tweet_user.username });
       if(!streamInfo.download){
         throw new Error("No media found");
       }
@@ -69,17 +69,17 @@ export class Twitter extends AudioSource<string> {
     };
   }
 
-  toField(){
+  toField(_: boolean, t: i18n["t"]){
     return [
       {
         name: ":link:URL",
         value: this.url,
       }, {
-        name: "ツイートの内容",
+        name: t("audioSources.tweetContent"),
         value: this.description.substring(0, 1950),
       }, {
-        name: ":asterisk:詳細",
-        value: "Twitterにて共有されたファイル",
+        name: `:asterisk:${t("moreInfo")}`,
+        value: t("audioSources.fileInTwitter"),
       },
     ];
   }

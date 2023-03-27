@@ -18,8 +18,7 @@
 
 import type { UrlStreamInfo } from ".";
 import type { exportableCustom } from "./custom";
-
-import i18next from "i18next";
+import type { i18n } from "i18next";
 
 import { AudioSource } from "./audiosource";
 import { retriveHttpStatusCode, retriveLengthSeconds } from "../Util";
@@ -30,16 +29,16 @@ export class GoogleDrive extends AudioSource<string> {
     this._unableToCache = true;
   }
 
-  async init(url: string, prefetched: exportableCustom){
+  async init(url: string, prefetched: exportableCustom, t: i18n["t"]){
     if(prefetched){
-      this.title = prefetched.title || i18next.t("audioSources.driveStream");
+      this.title = prefetched.title || t("audioSources.driveStream");
       this.url = url;
       this.lengthSeconds = prefetched.length;
     }else{
-      this.title = i18next.t("audioSources.driveStream");
+      this.title = t("audioSources.driveStream");
       this.url = url;
       if(await retriveHttpStatusCode(this.url) !== 200){
-        throw new Error(i18next.t("urlNotFound"));
+        throw new Error(t("urlNotFound"));
       }
       try{
         this.lengthSeconds = await retriveLengthSeconds((await this.fetch()).url);
@@ -58,11 +57,11 @@ export class GoogleDrive extends AudioSource<string> {
     };
   }
 
-  toField(){
+  toField(_: boolean, t: i18n["t"]){
     return [
       {
-        name: ":asterisk:詳細",
-        value: i18next.t("audioSources.fileInDrive"),
+        name: `:asterisk:${t("moreInfo")}`,
+        value: t("audioSources.fileInDrive"),
       },
     ];
   }

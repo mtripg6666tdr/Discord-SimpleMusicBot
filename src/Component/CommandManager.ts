@@ -120,7 +120,8 @@ export class CommandManager extends LogEmitter<{}> {
     // format local commands into the api-compatible well-formatted ones
     const apiCompatibleCommands: CreateApplicationCommandOptions[] = this.commands
       .filter(command => !command.unlist)
-      .flatMap(command => this.apiToApplicationCommand(command.toApplicationCommandStructure() as unknown as AnyApplicationCommand) as CreateApplicationCommandOptions);
+      .flatMap(command => command.toApplicationCommandStructure())
+      .map(command => this.apiToApplicationCommand(command as unknown as AnyApplicationCommand) as CreateApplicationCommandOptions);
 
     // Get registered commands
     const registeredAppCommands = await client.application.getGlobalCommands({ withLocalizations: true });

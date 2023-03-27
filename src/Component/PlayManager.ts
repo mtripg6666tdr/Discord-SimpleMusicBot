@@ -188,7 +188,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         mes = await this.server.bot.client.rest.channels.createMessage(
           this.server.boundTextChannel,
           {
-            content: `:stopwatch:${i18next.t("components:play.waitingForLiveStream")}`,
+            content: `:stopwatch:${i18next.t("components:play.waitingForLiveStream", { lng: this.server.locale })}`,
           }
         );
         this.preparing = false;
@@ -205,7 +205,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         if(abortController.signal.aborted){
           this._waitForLiveAbortController = null;
           await mes.edit({
-            content: `:white_check_mark:${i18next.t("components:play.waitingForLiveCanceled")}`,
+            content: `:white_check_mark:${i18next.t("components:play.waitingForLiveCanceled", { lng: this.server.locale })}`,
           });
           return this;
         }
@@ -216,7 +216,10 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           this.server.boundTextChannel,
           {
             content: `:hourglass_flowing_sand:${
-              i18next.t("components:play.preparing", { title: `\`${this.currentAudioInfo.title}\` \`(${isLive ? i18next.t("liveStream") : `${min}:${sec}`})\`` })
+              i18next.t("components:play.preparing", {
+                title: `\`${this.currentAudioInfo.title}\` \`(${isLive ? i18next.t("liveStream") : `${min}:${sec}`})\``,
+                lng: this.server.locale,
+              })
             }...`,
           }
         );
@@ -315,14 +318,22 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     );
     /* eslint-disable @typescript-eslint/indent */
     const embed = new MessageEmbedBuilder()
-      .setTitle(`:cd:${i18next.t("components:nowplaying.nowplaying")}:musical_note:`)
+      .setTitle(`:cd:${i18next.t("components:nowplaying.nowplaying", { lng: this.server.locale })}:musical_note:`)
       .setDescription(
           `[${this.currentAudioInfo.title}](${this.currentAudioUrl}) \``
-        + (this.currentAudioInfo.isYouTube() && this.currentAudioInfo.isLiveStream ? `(${i18next.t("liveStream")})` : _t === 0 ? `(${i18next.t("unknown")})` : min + ":" + sec)
+        + (
+          this.currentAudioInfo.isYouTube() && this.currentAudioInfo.isLiveStream
+            ? `(${i18next.t("liveStream", { lng: this.server.locale })})`
+            : _t === 0 ? `(${i18next.t("unknown", { lng: this.server.locale })})` : min + ":" + sec
+          )
         + "`"
       )
       .setColor(getColor("AUTO_NP"))
-      .addField(i18next.t("components:nowplaying.requestedBy"), this.server.queue.get(0).additionalInfo.addedBy.displayName, true)
+      .addField(
+        i18next.t("components:nowplaying.requestedBy", { lng: this.server.locale }),
+        this.server.queue.get(0).additionalInfo.addedBy.displayName,
+        true
+      )
       .addField(
         i18next.t("components:nowplaying.nextSong"),
         // トラックループオンなら現在の曲
@@ -335,10 +346,16 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         : i18next.t("components:nowplaying.noNextSong"), true
       )
       .addField(
-        i18next.t("components:play.songsInQueue"),
+        i18next.t("components:play.songsInQueue", { lng: this.server.locale }),
         this.server.queue.loopEnabled
-          ? i18next.t("components:play.willLoop")
-          : `${i18next.t("currentSongCount", { count: this.server.queue.length - 1 })}(${Util.time.HourMinSecToString(queueTimeFragments, i18next.t)})`,
+          ? i18next.t("components:play.willLoop", { lng: this.server.locale })
+          : `${i18next.t(
+            "currentSongCount",
+            {
+              count: this.server.queue.length - 1,
+              lng: this.server.locale,
+            }
+          )}(${Util.time.HourMinSecToString(queueTimeFragments, i18next.getFixedT(this.server.locale))})`,
         true
       )
     ;
@@ -349,7 +366,10 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     }
     /* eslint-enable @typescript-eslint/indent */
     if(this.currentAudioInfo.isYouTube() && this.currentAudioInfo.IsFallbacked){
-      embed.addField(`:warning:${i18next.t("attention")}`, i18next.t("components:queue.fallbackNotice"));
+      embed.addField(
+        `:warning:${i18next.t("attention", { lng: this.server.locale })}`,
+        i18next.t("components:queue.fallbackNotice", { lng: this.server.locale })
+      );
     }
 
     this.emit("playStartUIPrepared", embed);
@@ -360,22 +380,26 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           new MessageButtonBuilder()
             .setCustomId("control_rewind")
             .setEmoji("⏮️")
-            .setLabel(i18next.t("commands:rewind.name"))
+            .setLabel(i18next.t("commands:rewind.name", { lng: this.server.locale }))
             .setStyle("SECONDARY"),
           new MessageButtonBuilder()
             .setCustomId("control_playpause")
             .setEmoji("⏯️")
-            .setLabel(`${i18next.t("commands:play.name")}/${i18next.t("commands:pause.name")}`)
+            .setLabel(`${
+              i18next.t("commands:play.name", { lng: this.server.locale })
+            }/${
+              i18next.t("commands:pause.name", { lng: this.server.locale })
+            }`)
             .setStyle("PRIMARY"),
           new MessageButtonBuilder()
             .setCustomId("control_skip")
             .setEmoji("⏭️")
-            .setLabel(i18next.t("commands:skip.name"))
+            .setLabel(i18next.t("commands:skip.name", { lng: this.server.locale }))
             .setStyle("SECONDARY"),
           new MessageButtonBuilder()
             .setCustomId("control_onceloop")
             .setEmoji("🔂")
-            .setLabel(i18next.t("commands:onceloop.name"))
+            .setLabel(i18next.t("commands:onceloop.name", { lng: this.server.locale }))
             .setStyle("SECONDARY"),
         )
         .toOceanic(),
@@ -548,11 +572,11 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       }
     }
     this._errorReportChannel?.createMessage({
-      content: `:tired_face:${i18next.t("components:play.failedToPlay")}`
+      content: `:tired_face:${i18next.t("components:play.failedToPlay", { lng: this.server.locale })}`
         + (
           this._errorCount + 1 >= this.retryLimit
-            ? i18next.t("components:play.failedAndSkipping")
-            : i18next.t("components:play.failedAndRetrying")
+            ? i18next.t("components:play.failedAndSkipping", { lng: this.server.locale })
+            : i18next.t("components:play.failedAndRetrying", { lng: this.server.locale })
         ),
     });
     this.onStreamFailed();
@@ -617,7 +641,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     if(this.server.boundTextChannel){
       await this.server.bot.client.rest.channels
         .createMessage(this.server.boundTextChannel, {
-          content: `:upside_down:${i18next.t("components:play.queueEmpty")}`,
+          content: `:upside_down:${i18next.t("components:play.queueEmpty", { lng: this.server.locale })}`,
         })
         .catch(this.logger.error)
       ;
@@ -630,7 +654,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       if(!this.isPlaying && this.server.boundTextChannel){
         this.server.bot.client.rest.channels
           .createMessage(this.server.boundTextChannel, {
-            content: `:wave:${i18next.t("components:play.queueEmptyAndExiting")}`,
+            content: `:wave:${i18next.t("components:play.queueEmptyAndExiting", { lng: this.server.locale })}`,
           })
           .catch(this.logger.error)
         ;

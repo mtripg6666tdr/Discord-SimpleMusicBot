@@ -29,7 +29,7 @@ const arrayOfAll = <T>() => <U extends T[]>(
   array: U & ([T] extends [U[number]] ? unknown : "Invalid") & { 0: T }
 ) => array;
 
-const discordLanguages = arrayOfAll<Locale>()([
+export const discordLanguages: readonly string[] = arrayOfAll<Locale>()([
   "bg",
   "cs",
   "da",

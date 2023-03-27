@@ -18,6 +18,7 @@
 
 import type { KnownAudioSourceIdentifer } from "../Component/QueueManager";
 import type { SourceCache } from "../Component/SourceCache";
+import type { i18n } from "i18next";
 
 import * as ytdl from "ytdl-core";
 
@@ -36,7 +37,7 @@ type AudioSourceBasicInfo = {
 const { isDisabledSource } = useConfig();
 const logger = getLogger("Resolver");
 
-export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCache){
+export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCache, t: i18n["t"]){
   let basicInfo = null as AudioSource.AudioSource<any>;
 
   const type = info.type;
@@ -67,7 +68,7 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
     basicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.exportableYouTube, cache);
   }else if(!isDisabledSource("custom") && (type === "custom" || type === "unknown" && isAvailableRawAudioURL(url))){
     // カスタムストリーム
-    basicInfo = await new AudioSource.CustomStream().init(url, info.knownData);
+    basicInfo = await new AudioSource.CustomStream().init(url, info.knownData, t);
   }else if(!isDisabledSource("soundcloud") && (type === "soundcloud" || AudioSource.SoundCloudS.validateUrl(url))){
     // soundcloud
     basicInfo = await new AudioSource.SoundCloudS().init(url, gotData as AudioSource.exportableSoundCloud);
@@ -77,7 +78,7 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
   }else if(type === "unknown"){
     // google drive
     if(!isDisabledSource("googledrive") && AudioSource.GoogleDrive.validateUrl(url)){
-      basicInfo = await new AudioSource.GoogleDrive().init(url, info.knownData);
+      basicInfo = await new AudioSource.GoogleDrive().init(url, info.knownData, t);
     }else if(!isDisabledSource("streamable") && AudioSource.StreamableApi.getVideoId(url)){
       // Streamable
       basicInfo = await new AudioSource.Streamable().init(url, gotData as AudioSource.exportableStreamable);
@@ -89,10 +90,10 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
       basicInfo = await new AudioSource.Hibiki().init(url);
     }else if(!isDisabledSource("niconico") && AudioSource.NicoNicoS.validateUrl(url)){
       // NicoNico
-      basicInfo = await new AudioSource.NicoNicoS().init(url, gotData as AudioSource.exportableNicoNico);
+      basicInfo = await new AudioSource.NicoNicoS().init(url, gotData as AudioSource.exportableNicoNico, t);
     }else if(!isDisabledSource("twitter") && AudioSource.Twitter.validateUrl(url)){
       // Twitter
-      basicInfo = await new AudioSource.Twitter().init(url, gotData as AudioSource.exportableTwitter);
+      basicInfo = await new AudioSource.Twitter().init(url, gotData as AudioSource.exportableTwitter, t);
     }
   }
 

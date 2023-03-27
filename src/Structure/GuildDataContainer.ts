@@ -49,6 +49,7 @@ import { SkipManager } from "../Component/SkipManager";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
 import * as Util from "../Util";
 import { useConfig } from "../config";
+import { discordLanguages } from "../i18n";
 import { getLogger } from "../logger";
 
 interface GuildDataContainerEvents {
@@ -65,7 +66,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   private get cancellations(): Readonly<TaskCancellationManager[]>{
     return this._cancellations;
   }
-  
+
   /** プレフィックス */
   prefix: string;
 
@@ -117,6 +118,24 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   connectingVoiceChannel: VoiceChannel | StageChannel;
   /** VCのping */
   vcPing: number;
+
+  get locale(){
+    const guild = this.bot.client.guilds.get(this.getGuildId());
+
+    // try to get the locale from the roles assigned to the bot, if present.
+    const localeRegex = /\[locale:(?<locale>[a-z]{0,2}(-[A-Z]{0,2})?)\]$/;
+    const localeRole = guild.clientMember.roles.map(roleId => guild.roles.get(roleId).name).find(role => localeRegex.test(role));
+    if(localeRole && discordLanguages.includes(localeRole.match(localeRegex).groups.locale)){
+      return localeRole.match(localeRegex).groups.locale;
+    }
+
+    // try to get the default locale from the guild settings, if its community feature enabled.
+    if(guild.features.includes("COMMUNITY") && guild.preferredLocale && discordLanguages.includes(guild.preferredLocale)){
+      return guild.preferredLocale;
+    }
+
+    return config.defaultLanguage;
+  }
 
   constructor(guildId: string, boundchannelid: string, bot: MusicBotBase){
     super("GuildDataContainer", guildId);

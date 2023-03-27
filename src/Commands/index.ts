@@ -40,6 +40,7 @@ interface CommandEvents {
  * すべてのコマンドハンドラーの基底クラスです
  */
 export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
+  /** ボットを実行します */
   protected abstract run(message: CommandMessage, context: Readonly<CommandArgs>, t: (typeof i18next)["t"]): Promise<void>;
 
   protected readonly _name: string;
@@ -107,6 +108,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     return this._messageCommand;
   }
 
+  /** スラッシュコマンドの名称として登録できる旧基準を満たしたコマンド名を取得します */
   get asciiName(){
     return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
   }
@@ -122,7 +124,10 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     this._disabled = opts.disabled || false;
     this._messageCommand = "messageCommand" in opts && opts.messageCommand;
     if(!this._unlist){
-      if(!this.asciiName) throw new Error("Command has not ascii name");
+      if(!this.asciiName){
+        throw new Error("Command has not ascii name");
+      }
+
       const {
         examples,
         usage,
@@ -202,6 +207,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     this.logger.debug(`${this.name} loaded`);
   }
 
+  /**ローカライズされた権限の説明を取得します */
   getLocalizedPermissionDescription(locale: string){
     const perms = this.requiredPermissionsOr.filter(perm => perm !== "admin");
     if(perms.length === 0){
@@ -211,10 +217,12 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     }
   }
 
+  /** ローカライズされたコマンドの説明を取得します */
   getLocalizedDescription(locale: string){
     return this.descriptionLocalization[locale as keyof LocaleMap] || this.description;
   }
 
+  /** 権限の確認と実行を一括して行います */
   async checkAndRun(message: CommandMessage, context: Readonly<CommandArgs>){
     const judgeIfPermissionMeeted = (perm: CommandPermission) => {
       if(perm === "admin"){
@@ -246,6 +254,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     await this.run(message, context, i18next.getFixedT(context.locale));
   }
 
+  /** アプリケーションコマンドとして登録できるオブジェクトを生成します */
   toApplicationCommandStructure(): CreateApplicationCommandOptions[] {
     if(this.unlist) throw new Error("This command cannot be listed due to private command!");
     const result: CreateApplicationCommandOptions[] = [];

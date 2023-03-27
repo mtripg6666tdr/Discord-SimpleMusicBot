@@ -29,6 +29,11 @@ export async function onVoiceChannelJoin(
   newChannel: discord.VoiceChannel | discord.StageChannel | discord.Uncached
 ){
   if(!("guild" in newChannel)) return;
+  const server = this.guildData.get(member.guild.id);
+  if(!server){
+    return;
+  }
+
   if(member.id === this._client.user.id){
     // ボットが参加した際
     // ミュート状態/抑制状態なら自分で解除を試みる
@@ -51,7 +56,7 @@ export async function onVoiceChannelJoin(
             this._client.rest.channels.createMessage(
               this.guildData.get((newChannel as discord.VoiceChannel).guild.id).boundTextChannel,
               {
-                content: `:sob:${i18next.t("suppressed")}`,
+                content: `:sob:${i18next.t("suppressed", { lng: server.locale })}`,
               }
             )
               .catch(this.logger.error);
@@ -60,7 +65,6 @@ export async function onVoiceChannelJoin(
       this.emit("onBotVoiceChannelJoin", voiceChannel);
     }
   }else if(this.guildData.has(member.guild.id)){
-    const server = this.guildData.get(member.guild.id);
     server.skipSession?.checkThreshold();
     if(
       server instanceof GuildDataContainerWithBgm
