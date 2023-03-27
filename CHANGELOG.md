@@ -44,6 +44,7 @@
   * `アップタイム`コマンドの`ピング`確認機能が、`ピング`コマンドに分割されました。
 * 環境変数`GAS_URL`および`GAS_TOKEN`がそれぞれ`DB_URL`および`DB_TOKEN`に変更されました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1170)
 * HTTPベースのボット独自のデータベースが廃止されました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1170)
+* `インポート`コマンドでキューの埋め込みからインポートすることはできなくなりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1203)
 ## バグ修正
 * スキップの投票が機能しない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1163)
   * v3で https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1162 で修正された問題のv4側の修正です
@@ -75,5 +76,27 @@
 ## その他の特記事項
 * これはプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
 * v4系では、Node.js v16.16以上が必須となります
+
+---
+
+# v4.0.0-beta.2
+**これは、プレリリースバージョンです**
+## 機能追加
+* 関数の実行時間に関するログを、一部の関数で再度追加しました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1227)
+* Replit Databaseがバックアップ用のサーバーとして利用可能になりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1251)
+* HTTPベースのボット独自のデータベースを復活しました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1252)
+## バグ修正
+* `キュー内を検索`コマンドが失敗する場合がある問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1248)
+* `システム情報`コマンドでサーバーアイコンに関するバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1253)
+## ドキュメント
+* ロガーが内部的に使用するポート番号の変更方法を追記(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1249)
+## その他の変更
+* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1207, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1225, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1228, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1254, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1256, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1257)
+* 現状にそぐわない古いメッセージを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1255)
+
+## その他の特記事項
+* これはプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
+* v4系では、Node.js v16.16以上が必須となります。
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
