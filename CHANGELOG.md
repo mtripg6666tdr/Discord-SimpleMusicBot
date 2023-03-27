@@ -117,4 +117,9 @@
 ## その他の変更
 * 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1262, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1264)
 
+## その他の特記事項
+* これはプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
+* v4系では、Node.js v16.16以上が必須となります。
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
+
 ---
