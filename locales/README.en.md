@@ -8,7 +8,7 @@
 <img alt="bot usage example" src="https://user-images.githubusercontent.com/56076195/218059644-2ebdf405-b9f8-4561-a3cc-2bcecf09f145.png" width="550" />
 
 A music bot for Discord, made in Japan.  
-This bot supports playing songs from YouTube. No need to copy and paste URLs, but you can find music by keywords  
+This bot supports playing songs from YouTube. No need to copy and paste URLs, but you can find music by keywords.  
 Enjoy your favorite songs with your friends, by using this OSS bot.
 
 ## Features
@@ -41,7 +41,7 @@ Feel free to contact us in any ways!
 
 ## Localization
 This project has a plan to be multi-lingualized via Crowdin.Translators are always welcomed.  
-現在、英語のみ対応予定がありますが、需要によってはほかの言語への翻訳も可能です。  
+We have a plan to translate in English by ourselves, but we feel happy to translate in another language if it's needed.  
 [Project page on Crowdin](https://crowdin.com/project/discord-simplemusicbot)
 
 ## Support
