@@ -24,7 +24,7 @@ Enjoy your favorite songs with your friends, by using this OSS bot.
 - 🔁Track loop and queue loop
 - ❕Changing the prefix
   - The default prefix is `>`.
-  - If you're running your own instance, you can change the bot's default prefix by editing `config.json`.(prefixes of multiple letters supported)(prefixes of multiple letters supported)(prefixes of multiple letters supported)
+  - If you're running your own instance, you can change the bot's default prefix by editing `config.json`.(prefixes of multiple letters supported)
 - ▶️Autoplay songs, by pre-defined configuration
 - 👍 Support (Japanese only).
 
