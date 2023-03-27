@@ -104,3 +104,17 @@
 * Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
+
+# v4.0.0-beta.3
+**これは、プレリリースバージョンです**
+## 機能追加
+* サーバーのロケールを取得するよう試みる(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1263)
+* サーバーからキックされた/サーバーが削除された際にデータベースのデータを可能な場合削除する(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1266)
+## バグ修正
+* 権限の文言を翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1267)
+## ドキュメント
+* ドキュメントの継続的なアップデート(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1265)
+## その他の変更
+* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1262, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1264)
+
+---
