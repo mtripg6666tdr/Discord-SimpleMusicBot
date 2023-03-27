@@ -26,7 +26,7 @@
     "onlyListener": "ボイスチャンネルの唯一のユーザーであること",
     "noConnection": "ボットがどこのボイスチャンネルにも接続していないこと",
     "eitherOf": "{{things}}のいずれか",
-    "needed": "{{things}}が必要です"
+    "needed": "この操作を実行するには{{permissions}}が必要です"
   },
   "alias": "エイリアス",
   "permissionsToRun": "実行に必要な権限",
