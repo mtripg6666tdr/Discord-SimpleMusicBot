@@ -212,8 +212,19 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     const perms = this.requiredPermissionsOr.filter(perm => perm !== "admin");
     if(perms.length === 0){
       return i18next.t("none", { lng: locale });
+    }else if(perms.length > 1){
+      return i18next.t("permissions.needed", {
+        things: i18next.t("permissions.eitherOf", {
+          lng: locale,
+          things: perms.map(permission => i18next.t(`permissions.${permission}`, { lng: locale })).join(", "),
+        }),
+        lng: locale,
+      });
     }else{
-      return `${perms.map(permission => i18next.t(`permissions.${permission}`, { lng: locale })).join("、")}${perms.length > 1 ? "のいずれか" : ""}`;
+      return i18next.t("permissions.needed", {
+        things: i18next.t(`permissions.${perms[0]}`, { lng: locale }),
+        lng: locale,
+      });
     }
   }
 

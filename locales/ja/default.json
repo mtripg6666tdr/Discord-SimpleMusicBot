@@ -24,7 +24,9 @@
     "manageMessages": "メッセージの管理権限を持っていること",
     "manageGuild": "サーバーの管理権限を持っていること",
     "onlyListener": "ボイスチャンネルの唯一のユーザーであること",
-    "noConnection": "ボットがどこのボイスチャンネルにも接続していないこと"
+    "noConnection": "ボットがどこのボイスチャンネルにも接続していないこと",
+    "eitherOf": "{{things}}のいずれか",
+    "needed": "{{things}}が必要です"
   },
   "alias": "エイリアス",
   "permissionsToRun": "実行に必要な権限",
