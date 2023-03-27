@@ -12,7 +12,7 @@ This bot supports playing songs from YouTube. No need to copy and paste URLs, bu
 Enjoy your favorite songs with your friends, by using this OSS bot.
 
 ## Features
-- 🎵Play songs as the highest quality as the bot can
+- 🎵Plays songs as the highest quality as the bot can
 - ⌨️Supports both slash-commands and conventional message-based-commands
 - 🔗 Plays songs from URLs
   - YouTube video's URL
