@@ -24,7 +24,9 @@
     "manageMessages": "Owning the permission of [Manage Messages].",
     "manageGuild": "Owning the permission of [Manage Server].",
     "onlyListener": "The only user in the voice channel.",
-    "noConnection": "The bot connects to no voice channels."
+    "noConnection": "The bot connects to no voice channels.",
+    "eitherOf": "{{things}}のいずれか",
+    "needed": "この操作を実行するには{{permissions}}が必要です"
   },
   "alias": "Alias",
   "permissionsToRun": "Required permissions",
