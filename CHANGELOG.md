@@ -90,6 +90,10 @@
 * `システム情報`コマンドでサーバーアイコンに関するバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1253)
 ## ドキュメント
 * ロガーが内部的に使用するポート番号の変更方法を追記(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1249)
+## 依存関係のアップデート
+* @sinclair/typebox 0.25.24 => 0.26.4
+* html-to-text 9.0.4 => 9.0.5
+* i18next 22.4.11 => 22.4.13
 ## その他の変更
 * 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1207, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1225, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1228, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1254, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1256, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1257)
 * 現状にそぐわない古いメッセージを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1255)
