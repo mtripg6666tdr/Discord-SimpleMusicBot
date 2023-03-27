@@ -74,6 +74,7 @@ export class MusicBot extends MusicBotBase {
         .on("voiceChannelJoin", eventHandlers.onVoiceChannelJoin.bind(this))
         .on("voiceChannelLeave", eventHandlers.onVoiceChannelLeave.bind(this))
         .on("voiceChannelSwitch", eventHandlers.onVoiceChannelSwitch.bind(this))
+        .on("guildDelete", eventHandlers.onGuildDelete.bind(this))
         .on("error", this.onError.bind(this))
       ;
     });

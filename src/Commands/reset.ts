@@ -34,7 +34,6 @@ export default class Reset extends BaseCommand {
   }
 
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
-    context.server.updateBoundChannel(message);
     // VC接続中なら切断
     context.server.player.disconnect();
     context.server.bot.resetData(message.guild.id);
