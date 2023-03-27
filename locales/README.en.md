@@ -7,7 +7,7 @@
 
 <img alt="bot usage example" src="https://user-images.githubusercontent.com/56076195/218059644-2ebdf405-b9f8-4561-a3cc-2bcecf09f145.png" width="550" />
 
-A music bot for Discord, made in Japan.Support playing songs from YouTube.Support playing songs from YouTube.Support playing songs from YouTube. No need to copy and paste URLs, but you can find music by keywords  
+A music bot for Discord, made in Japan.Support playing songs from YouTube.Support playing songs from YouTube.Support playing songs from YouTube.Support playing songs from YouTube. No need to copy and paste URLs, but you can find music by keywords  
   
 Enjoy your favorite songs with your friends, by using this OSS bot.
 
@@ -24,7 +24,7 @@ Enjoy your favorite songs with your friends, by using this OSS bot.
 - 🔁Track loop and queue loop
 - ❕Changing the prefix
   - The default prefix is `>`.
-  - If you're running your own instance, you can change the bot's default prefix by editing `config.json`.(prefixes of multiple letters supported)
+  - If you're running your own instance, you can change the bot's default prefix by editing `config.json`.(prefixes of multiple letters supported)(prefixes of multiple letters supported)
 - ▶️Autoplay songs, by pre-defined configuration
 - 👍 Support (Japanese only)
 
