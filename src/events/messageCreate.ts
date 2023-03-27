@@ -52,11 +52,11 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
   if(message.content === `<@${this._client.user.id}>`){
     // メンションならば
     await message.channel.createMessage({
-      content: `${i18next.t("mentionHelp")}\r\n`
+      content: `${i18next.t("mentionHelp", { lng: server.locale })}\r\n`
       + (
         config.noMessageContent
           ? ""
-          : i18next.t("mentionHelpPrefix", { prefix: server.prefix })
+          : i18next.t("mentionHelpPrefix", { prefix: server.prefix, lng: server.locale })
       ),
     })
       .catch(this.logger.error);
@@ -96,7 +96,7 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
           messageReference: {
             messageID: message.id,
           },
-          content: i18next.t("lackPermissions"),
+          content: i18next.t("lackPermissions", { lng: server.locale }),
           allowedMentions: {
             repliedUser: false,
           },
@@ -112,23 +112,31 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
         commandMessage.guild.id,
         commandMessage.options,
         commandMessage.rawOptions,
-        config.defaultLanguage
+        server.locale,
       )
     );
   }else if(server.searchPanel.has(message.member.id)){
     // searchコマンドのキャンセルを捕捉
     const panel = server.searchPanel.get(message.member.id);
     const content = normalizeText(message.content);
-    if(message.content === "キャンセル" || message.content === "cancel" || message.content === i18next.t("cancel")){
+    if(
+      message.content === "キャンセル"
+      || message.content === "cancel"
+      || message.content === i18next.t("cancel", { lng: server.locale })
+    ){
       panel.destroy();
     }
     // searchコマンドの選択を捕捉
     else if(content.match(/^([0-9]\s?)+$/)){
       // メッセージ送信者が検索者と一致するかを確認
       const nums = content.split(" ");
-      await server.playFromSearchPanelOptions(nums, panel, i18next.t);
+      await server.playFromSearchPanelOptions(nums, panel, i18next.getFixedT(server.locale));
     }
-  }else if(message.content === "キャンセル" || message.content === "cancel" || message.content === i18next.t("cancel")){
+  }else if(
+    message.content === "キャンセル"
+    || message.content === "cancel"
+    || message.content === i18next.t("cancel", { lng: server.locale })
+  ){
     const result = server.cancelAll();
     if(!result) return;
     await message.channel.createMessage({

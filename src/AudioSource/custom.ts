@@ -17,8 +17,7 @@
  */
 
 import type { UrlStreamInfo } from ".";
-
-import i18next from "i18next";
+import type { i18n } from "i18next";
 
 import { AudioSource } from "./audiosource";
 import { isAvailableRawAudioURL, retriveLengthSeconds } from "../Util";
@@ -29,17 +28,17 @@ export class CustomStream extends AudioSource<string> {
     this._unableToCache = true;
   }
 
-  async init(url: string, prefetched: exportableCustom){
+  async init(url: string, prefetched: exportableCustom, t: i18n["t"]){
     if(prefetched){
-      this.title = prefetched.title || i18next.t("audioSources.customStream");
+      this.title = prefetched.title || t("audioSources.customStream");
       this.url = url;
       this.lengthSeconds = prefetched.length;
     }else{
       if(!isAvailableRawAudioURL(url)){
-        throw new Error(i18next.t("audioSources.invalidStream"));
+        throw new Error(t("audioSources.invalidStream"));
       }
       this.url = url;
-      this.title = this.extractFilename() || i18next.t("audioSources.customStream");
+      this.title = this.extractFilename() || t("audioSources.customStream");
       try{
         this.lengthSeconds = await retriveLengthSeconds(url);
       }
@@ -56,15 +55,15 @@ export class CustomStream extends AudioSource<string> {
     };
   }
 
-  toField(){
+  toField(_: boolean, t: i18n["t"]){
     return [
       {
         name: ":link:URL",
         value: this.url,
       },
       {
-        name: ":asterisk:詳細",
-        value: i18next.t("audioSources.customStream"),
+        name: `:asterisk:${t("moreInfo")}`,
+        value: t("audioSources.customStream"),
       },
     ];
   }

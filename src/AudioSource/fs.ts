@@ -18,11 +18,10 @@
 
 import type { exportableCustom } from ".";
 import type { ReadableStreamInfo } from "./audiosource";
+import type { i18n } from "i18next";
 
 import * as fs from "fs";
 import * as path from "path";
-
-import i18next from "i18next";
 
 import { AudioSource } from "./audiosource";
 import { retriveLengthSeconds } from "../Util";
@@ -32,9 +31,9 @@ export class FsStream extends AudioSource<string> {
     super("fs");
   }
 
-  async init(url: string){
+  async init(url: string, _: exportableCustom, t: i18n["t"]){
     this.url = url;
-    this.title = i18next.t("audioSources.customStream");
+    this.title = t("audioSources.customStream");
     try{
       this.lengthSeconds = await retriveLengthSeconds(url);
     }
@@ -50,11 +49,11 @@ export class FsStream extends AudioSource<string> {
     };
   }
 
-  toField(){
+  toField(_: boolean, t: i18n["t"]){
     return [
       {
-        name: `:asterisk:${i18next.t("moreInfo")}`,
-        value: i18next.t("audioSources.customStream"),
+        name: `:asterisk:${t("moreInfo")}`,
+        value: t("audioSources.customStream"),
       },
     ];
   }

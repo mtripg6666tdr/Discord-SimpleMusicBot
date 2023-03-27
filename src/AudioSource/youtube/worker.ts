@@ -38,7 +38,7 @@ function onMessage(message: WithId<spawnerJobMessage>){
   if(message.type === "init"){
     const { id, url, prefetched, forceCache } = message;
     const youtube = new YouTube();
-    youtube.init(url, prefetched, forceCache)
+    youtube.init(url, prefetched, null, forceCache)
       .then(() => {
         const data = Object.assign({}, youtube);
         delete data["logger"];

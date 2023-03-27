@@ -17,9 +17,9 @@
  */
 
 import type { exportableCustom, UrlStreamInfo } from ".";
+import type { i18n } from "i18next";
 
 import candyget from "candyget";
-import i18next from "i18next";
 
 import { AudioSource } from "./audiosource";
 
@@ -57,14 +57,14 @@ export class Streamable extends AudioSource<string> {
     };
   }
 
-  toField(){
+  toField(_: boolean, t: i18n["t"]){
     return [
       {
         name: ":link:URL",
         value: this.url,
       }, {
-        name: `:asterisk:${i18next.t("moreInfo")}`,
-        value: i18next.t("audioSources.fileInStramable"),
+        name: `:asterisk:${t("moreInfo")}`,
+        value: t("audioSources.fileInStramable"),
       },
     ];
   }

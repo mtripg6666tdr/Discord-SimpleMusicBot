@@ -114,19 +114,19 @@ export class SkipManager extends ServerManagerBase<{}> {
       if(this.agreeUsers.size * 2 >= members.size - members.filter(member => member.bot).length){
         try{
           const response = this.reply = await this.reply.edit({
-            content: `:ok: ${i18next.t("components:skip.skipping")}`,
+            content: `:ok: ${i18next.t("components:skip.skipping", { lng: this.parent.locale })}`,
             embeds: [],
           });
           const title = this.server.queue.get(0).basicInfo.title;
           this.server.player.stop(true);
           await this.server.queue.next();
           await this.server.player.play();
-          response.edit(`:track_next:${i18next.t("components:skip.skipped", { title })}:white_check_mark:`)
+          response.edit(`:track_next:${i18next.t("components:skip.skipped", { title, lng: this.parent.locale })}:white_check_mark:`)
             .catch(this.logger.error);
         }
         catch(e){
           this.logger.error(e);
-          this.reply.edit(`:astonished:${i18next.t("components:skip.failed")}`)
+          this.reply.edit(`:astonished:${i18next.t("components:skip.failed", { lng: this.parent.locale })}`)
             .catch(this.logger.error);
         }
       }else{
@@ -147,12 +147,12 @@ export class SkipManager extends ServerManagerBase<{}> {
     return {
       embeds: [
         new MessageEmbedBuilder()
-          .setTitle(`:person_raising_hand: ${i18next.t("components:skip.embedTitle")}`)
+          .setTitle(`:person_raising_hand: ${i18next.t("components:skip.embedTitle", { lng: this.parent.locale })}`)
           .setDescription(
             i18next.t("components:skip.howToUseSkipVote", { title: this.currentSong.basicInfo.title })
-            + `${i18next.t("components:skip.skipVoteDescription")}\r\n\r\n`
-            + `${i18next.t("components:skip.currentStatus")}: ${this.agreeUsers.size}/${voiceSize}\r\n`
-            + i18next.t("components:skip.skipRequirement", { count: Math.ceil(voiceSize / 2) - this.agreeUsers.size })
+            + `${i18next.t("components:skip.skipVoteDescription", { lng: this.parent.locale })}\r\n\r\n`
+            + `${i18next.t("components:skip.currentStatus", { lng: this.parent.locale })}: ${this.agreeUsers.size}/${voiceSize}\r\n`
+            + i18next.t("components:skip.skipRequirement", { lng: this.parent.locale, count: Math.ceil(voiceSize / 2) - this.agreeUsers.size })
           )
           .setFooter({
             text: i18next.t("components:skip.skipIssuer", { issuer: this.issuer }),
@@ -165,7 +165,7 @@ export class SkipManager extends ServerManagerBase<{}> {
             new MessageButtonBuilder()
               .setCustomId(this.skipVoteCustomId)
               .setEmoji("⏩")
-              .setLabel(i18next.t("components:skip.agree"))
+              .setLabel(i18next.t("components:skip.agree", { lng: this.parent.locale }))
               .setStyle("PRIMARY")
           )
           .toOceanic(),

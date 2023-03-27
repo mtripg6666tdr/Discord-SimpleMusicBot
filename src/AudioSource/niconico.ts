@@ -21,7 +21,6 @@ import type { i18n } from "i18next";
 import type { Readable } from "stream";
 
 import { convert as htmlToText } from "html-to-text";
-import i18next from "i18next";
 import NiconicoDL, { isValidURL } from "niconico-dl.js";
 
 import { AudioSource } from "./audiosource";
@@ -36,7 +35,7 @@ export class NicoNicoS extends AudioSource<string> {
     super("niconico");
   }
 
-  async init(url: string, prefetched: exportableNicoNico){
+  async init(url: string, prefetched: exportableNicoNico, t: i18n["t"]){
     this.url = url;
     this.nico = new NiconicoDL(url, /* quality */ "high");
     if(prefetched){
@@ -48,7 +47,9 @@ export class NicoNicoS extends AudioSource<string> {
       this.views = prefetched.views;
     }else{
       const info = await this.nico.getVideoInfo();
-      if(info.isDeleted || info.isPrivate) throw new Error(i18next.t("audioSources.videoNotPlayable"));
+      if(info.isDeleted || info.isPrivate){
+        throw new Error(t("audioSources.videoNotPlayable"));
+      }
       this.title = info.title;
       this.description = htmlToText(info.description);
       this.lengthSeconds = info.duration;
@@ -74,20 +75,20 @@ export class NicoNicoS extends AudioSource<string> {
     };
   }
 
-  toField(verbose: boolean = false){
+  toField(verbose: boolean, t: i18n["t"]){
     return [
       {
-        name: `:cinema:${i18next.t("audioSources.videoAuthor")}`,
+        name: `:cinema:${t("audioSources.videoAuthor")}`,
         value: this.author,
         inline: false,
       },
       {
-        name: `:eyes:${i18next.t("audioSources.playCountLabel")}`,
-        value: i18next.t("audioSources.playCount", { count: this.views }),
+        name: `:eyes:${t("audioSources.playCountLabel")}`,
+        value: t("audioSources.playCount", { count: this.views }),
         inline: false,
       },
       {
-        name: `:asterisk:${i18next.t("summary")}`,
+        name: `:asterisk:${t("summary")}`,
         value: this.description.length > (verbose ? 1000 : 350)
           ? this.description.substring(0, verbose ? 1000 : 300) + "..."
           : this.description,

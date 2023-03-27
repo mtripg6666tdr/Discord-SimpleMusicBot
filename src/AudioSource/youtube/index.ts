@@ -80,7 +80,7 @@ export class YouTube extends AudioSource<string> {
   }
 
   @timeLoggedMethod
-  async init(url: string, prefetched: exportableYouTube, forceCache?: boolean){
+  async init(url: string, prefetched: exportableYouTube, _: i18n["t"], forceCache?: boolean){
     this.url = "https://www.youtube.com/watch?v=" + ytdl.getVideoID(url);
     if(prefetched){
       this.importData(prefetched);
@@ -221,7 +221,7 @@ export class YouTube extends AudioSource<string> {
           if(signal.aborted) return;
           tick();
           this.purgeCache();
-          await this.init(this.url, null);
+          await this.init(this.url, null, null, false);
           checkForLive();
         }, waitTime).unref();
       };
