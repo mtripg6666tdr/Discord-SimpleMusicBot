@@ -31,7 +31,7 @@
   "notPlaying": "Not playing",
   "errorOccurred": "An error occurred",
   "internalErrorOccurred": "An internal error occurred",
-  "totalSongCount_one": "of {{count}} songs",
+  "totalSongCount_one": "of {{count}} song",
   "totalSongCount_other": "of {{count}} songs",
   "currentSongCount": "{{count}}曲",
   "songProcessingInProgress": "{{totalSongCount}}{{currentSongCount}}Processed",
