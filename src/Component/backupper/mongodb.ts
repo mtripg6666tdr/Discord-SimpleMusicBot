@@ -105,12 +105,18 @@ export class MongoBackupper extends Backupper {
       this.data.forEach(setContainerEvent);
       this.bot.on("guildDataAdded", setContainerEvent);
       this.bot.on("onBotVoiceChannelJoin", (channel) => backupStatusFuncFactory(channel.guild.id)());
-      
+      this.bot.client.on("guildDelete", ({ id }) => this.deleteGuildData(id));
+
       // analytics
       CommandManager.instance.commands.forEach(command => command.on("run", args => this.addCommandAnalyticsEvent(command, args)));
 
       this.logger.info("Hook was set up successfully");
     });
+  }
+
+  protected deleteGuildData(guildId: string){
+    this.collections.queue.deleteOne({ guildId });
+    this.collections.status.deleteOne({ guildId });
   }
 
   @timeLoggedMethod

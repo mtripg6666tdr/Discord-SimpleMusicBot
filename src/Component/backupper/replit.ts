@@ -37,6 +37,11 @@ export class ReplitBackupper extends IntervalBackupper {
     super(bot, getData, "Replit");
 
     this.db = new ReplitClient(process.env.DB_URL.substring("replit+".length));
+
+    this.bot.client.on("guildDelete", ({ id }) => {
+      this.db.delete(this.getDbKey("status", id));
+      this.db.delete(this.getDbKey("queue", id));
+    });
   }
 
   @timeLoggedMethod

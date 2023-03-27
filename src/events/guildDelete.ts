@@ -16,10 +16,12 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from "./guildDelete";
-export * from "./interactionCreate";
-export * from "./messageCreate";
-export * from "./ready";
-export * from "./voiceChannelJoin";
-export * from "./voiceChannelLeave";
-export * from "./voiceChannelSwitch";
+import type { MusicBot } from "../bot";
+import type { Guild, Uncached } from "oceanic.js";
+
+export async function onGuildDelete(this: MusicBot, guild: Uncached | Guild){
+  this.logger.info("Guild deleted: ", guild.id);
+  if(this.guildData.has(guild.id)){
+    this.resetData(guild.id);
+  }
+}
