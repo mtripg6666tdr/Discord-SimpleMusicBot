@@ -62,7 +62,9 @@
     "playCount_other": "{{count}}回",
     "artist": "アーティスト",
     "fileInStramable": "Streamableにて共有されたファイル",
-    "tweet": "{{name}}(@{{id}})のツイート"
+    "tweet": "{{name}}(@{{id}})のツイート",
+    "tweetContent": "ツイートの内容",
+    "fileInTwitter": "Twitterにて共有されたファイル"
   },
   "mentionHelp": "コマンドの一覧は、`/command`で確認できます。",
   "mentionHelpPrefix": "メッセージでコマンドを送信する場合のプレフィックスは`{{prefix}}`です。",
