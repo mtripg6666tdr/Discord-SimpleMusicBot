@@ -1,0 +1,50 @@
+version: '3'
+services:
+  bot:
+    image: ghcr.io/mtripg6666tdr/discord-music-bot:latest
+    container_name: dsmb-instance
+    restart: always
+    env_file:
+      # .envファイルのパスを指定
+      - "path/to/your-environment-file"
+    environment:
+      - DB_URL=mongodb://dsmb:hogehoge@localhost:27017/
+    volumes:
+      - type: bind
+        # config.jsonのパスを指定
+        source: "path/to/your-config.json"
+        target: "/app/config.json"
+      - type: bind
+        # ログの保存先を指定
+        source: "path/to/your-logs-directory"
+        target: "/app/logs"
+      - type: volume
+        source: dsmb-bin
+        target: "/app/bin"
+      - type: volume
+        source: dsmb-cache
+        target: "/app/cache"
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latset
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=dsmb
+      - MONGO_INITDB_ROOT_PASSWORD=hogehoge
+    ports:
+      - 27017:27017
+    volumes:
+      - type: volume
+        source: dsmb-mongo-db
+        target: /data/db
+      - type: volume
+        source: dsmb-mongo-config-db
+        target: /data/configdb
+
+volumes:
+  dsmb-bin:
+  dsmb-cache:
+  dsmb-mongo-db:
+  dsmb-mongo-config-db:
