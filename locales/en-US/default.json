@@ -1,7 +1,7 @@
 {
   "search": {
-    "alreadyOpen": "✘ Another search result is already opened.",
-    "removePreviousPanel": "Closed the previous search result",
+    "alreadyOpen": "✘ Another search result has already been opened.",
+    "removePreviousPanel": "Close the previous search result",
     "previousPanelRemoved": "The previous search result was closed",
     "searching": "Searching",
     "notFound": "Not found"
@@ -25,8 +25,8 @@
     "manageGuild": "Owning the permission of [Manage Server].",
     "onlyListener": "The only user in the voice channel.",
     "noConnection": "The bot connects to no voice channels.",
-    "eitherOf": "{{things}}のいずれか",
-    "needed": "この操作を実行するには{{permissions}}が必要です"
+    "eitherOf": "Any of {{things}}",
+    "needed": "This behavior requires the permission(s) of {{permissions}}"
   },
   "alias": "Alias",
   "permissionsToRun": "Required permissions",
@@ -35,7 +35,7 @@
   "internalErrorOccurred": "An internal error occurred",
   "totalSongCount_one": "of {{count}} song",
   "totalSongCount_other": "of {{count}} songs",
-  "currentSongCount": "{{count}}曲",
+  "currentSongCount": "{{count}} song(s)",
   "songProcessingInProgress": "{{totalSongCount}}{{currentSongCount}}Processed",
   "songProcessingCompleted": "Added {{count}} song(s).",
   "failed": "Failed",
@@ -55,18 +55,18 @@
   "audioSources": {
     "customStream": "Custom stream",
     "invalidStream": "Incorrect stream.",
-    "driveStream": "ドライブのストリーム",
+    "driveStream": "Stream on Drive",
     "fileInDrive": "A file shared on Drive.",
     "videoNotPlayable": "Unable to play the video.",
     "videoAuthor": "Author",
     "playCountLabel": "views",
-    "playCount_one": "{{count}}回",
-    "playCount_other": "{{count}}回",
+    "playCount_one": "{{count}} time",
+    "playCount_other": "{{count}} times",
     "artist": "Artist",
     "fileInStramable": "A file shared on Streamable.",
     "tweet": "Tweet by {{name}}(@{{id}})",
-    "tweetContent": "ツイートの内容",
-    "fileInTwitter": "Twitterにて共有されたファイル"
+    "tweetContent": "Contents of the Tweet",
+    "fileInTwitter": "A file shared on Twitter"
   },
   "mentionHelp": "Use `/command` to see the list of the available commands.",
   "mentionHelpPrefix": "When you send message-based command, the prefix is `{{prefix}}`.",
@@ -88,10 +88,10 @@
     "failedToConnect": "Connection failed... Please try again.",
     "issuerNoVoiceChannel": "Send commands after joining a voice channel.",
     "loadingMessage": "Fetching message",
-    "notTextChannel": "This is not a text channel in a server.",
-    "unableToPlayOtherServer": "Unable to play the content in the other server.",
+    "notTextChannel": "This is not a text channel on a server.",
+    "unableToPlayOtherServer": "Unable to play the content on another server.",
     "attachmentNotFound": "No attachment found",
-    "invalidUrl": "Give a valid URL. If you want to play from keyword, use `search` command instead."
+    "invalidUrl": "Give a valid URL. If you want to play by keyword, use `search` command instead."
   },
   "system": "System"
 }
