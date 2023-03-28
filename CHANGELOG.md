@@ -123,3 +123,25 @@
 * Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
+
+# v4.0.0-beta.4
+**これは、プレリリースバージョンです**
+## バグ修正
+* 一部の音楽の再生が途中で終了する・エラーで止まる問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1280)
+* 状態のバックアップが動作していない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1282)
+* 予期せず必要以上にバイナリの更新確認を行う問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1284)
+* `コマンド`コマンドの間違った表示を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1289)
+## ドキュメント
+* ネイティブライブラリ用のビルドツールの必要性についてドキュメントに明記(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1273)
+* 言語の決定方法や設定方法などについてのドキュメントの追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1283)
+## その他の変更
+* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1269, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1277, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1288, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1290)
+* Docker-Composeで利用できるようサンプルファイルを追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1275)
+* Dockerイメージに一部のオプションの依存関係が欠落していた問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1276)
+
+## その他の特記事項
+* これはプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
+* v4系では、Node.js v16.16以上が必須となります。
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
