@@ -20,3 +20,4 @@ config.json
 logs/*
 !**/.gitkeep
 cache
+docker-compose.yml
