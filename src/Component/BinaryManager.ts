@@ -205,9 +205,6 @@ export class BinaryManager extends LogEmitter {
       const onEnd = () => {
         if(ended) return;
         ended = true;
-        if(!stream.writableEnded){
-          stream.end();
-        }
         if(process.connected){
           process.kill("SIGTERM");
         }
