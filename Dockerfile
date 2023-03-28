@@ -15,8 +15,8 @@ COPY --link package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci
 COPY --link ./src ./src
-COPY --link ./tsconfig.build.json ./
-RUN npx tsc -p tsconfig.build.json
+COPY --link ./tsconfig.json ./
+RUN npx tsc -p tsconfig.json
 
 
 FROM base AS deps
