@@ -207,6 +207,9 @@ export class BinaryManager extends LogEmitter<{}> {
         if(!stream.writableEnded){
           stream.end();
         }
+        if(!stream.destroyed){
+          stream.destroy();
+        }
         if(process.connected){
           process.kill("SIGTERM");
         }
