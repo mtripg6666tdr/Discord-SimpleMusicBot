@@ -81,3 +81,10 @@
 - Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
+
+# v3.11.6
+## バグ修正
+* 一部の音楽の再生が途中で終了する問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1281)
+* バイナリの更新確認のタイミングが間違えっていたのを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1286)
+## その他の変更
+* Dockerのイメージに、オプションの依存関係が欠落していた問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1278, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1279)
