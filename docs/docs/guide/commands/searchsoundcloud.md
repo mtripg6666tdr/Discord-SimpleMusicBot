@@ -2,7 +2,7 @@
 sidebar_label: サウンドクラウドを検索
 ---
 # `サウンドクラウドを検索`コマンド
-曲をSoundCloudで検索します
+曲をSoundCloudで検索します。
 
 スラッシュコマンドでは、`/searchsoundcloud`を使用してください。
 
