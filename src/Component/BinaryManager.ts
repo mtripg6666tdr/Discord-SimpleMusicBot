@@ -28,7 +28,8 @@ import candyget from "candyget";
 import pEvent from "p-event";
 
 import { LogEmitter } from "../Structure";
-import { createPassThrough } from "../Util";
+import Util from "../Util";
+import { createPassThrough } from "../Util/general";
 
 type BinaryManagerOptions = {
   binaryName: string,
@@ -183,7 +184,7 @@ export class BinaryManager extends LogEmitter {
     });
   }
 
-  async execStream(args: readonly string[]): Promise<Readable> {
+  async execStream(args: readonly string[]): Promise<Readable>{
     if(!fs.existsSync(this.binaryPath) || this.isStaleInfo){
       const latest = await this.checkIsLatestVersion();
       if(!latest){
@@ -194,7 +195,7 @@ export class BinaryManager extends LogEmitter {
     const stream = createPassThrough();
 
     setImmediate(() => {
-      this.logger.info(`Passing arguments: ${args.join(" ")}`);
+      this.Log(`Passing arguments: ${args.join(" ")}`);
       const process = spawn(this.binaryPath, args, {
         stdio: ["ignore", "pipe", "pipe"],
         shell: false,
@@ -216,7 +217,9 @@ export class BinaryManager extends LogEmitter {
       process.stdout.on("error", err => {
         stream.destroy(err);
       });
-      process.stderr.on("data", (chunk: Buffer) => this.logger.info(`[Child] ${chunk.toString()}`));
+      if(Util.config.debug){
+        process.stderr.on("data", (chunk: Buffer) => this.Log(`[Child] ${chunk.toString()}`, "debug"));
+      }
     });
 
     return stream;
