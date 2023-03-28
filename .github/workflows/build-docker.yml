@@ -60,6 +60,8 @@ jobs:
             type=sha,format=long
             type=semver,pattern={{version}},enable=${{ github.event_name == 'release' }}
             type=raw,value=latest,enable=${{ github.event_name == 'release' && !github.event.release.prerelease }}
+            type=raw,value=beta,enable=${{ github.event_name == 'release' && github.event.release.prerelease }}
+            type=raw,value=dev,enable=${{ github.event_name == 'workflow_dispatch' }}
 
       - name: Build and push
         uses: docker/build-push-action@v4

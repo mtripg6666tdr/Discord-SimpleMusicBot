@@ -1,6 +1,7 @@
-.env.sample         linguist-language=Shell
-config.json.sample  linguist-language=jsonc
-config*.json        linguist-language=jsonc
-*                   text=auto
-*.yml               text eol=lf
-*.ts                text eol=crlf
+.env.sample                  linguist-language=Shell
+config.json.sample           linguist-language=jsonc
+config*.json                 linguist-language=jsonc
+docker-compose.yml.sample    linguist-language=yml
+*                            text=auto
+*.yml                        text eol=lf
+*.ts                         text eol=crlf

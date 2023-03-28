@@ -35,16 +35,21 @@ GitHub Packagesに公開されているパッケージのうち、`3.4.0`のよ�
 設定ファイルは適当な場所に配置します。その際はファイルのパスを控えておいてください。
 `.env`の内容は`.env`を使用せずとも、コマンドラインで指定することもできます。
 
-### 3. 実行
-以下のコマンドを使用して実行します。
+### 3. 各種フォルダの準備
+- `config.json`で`debug`を`true`にした場合は、ログ用のフォルダを用意して、パスを控えておいてください。
+- `config.json`で`cacheLevel`を`persistent`にした場合は、キャッシュファイルを保存する用のフォルダを用意して、パスを控えておいてください。
+
+### 4. 実行
+基本のコマンドの形式は以下のようになります。
 ```bash
-docker container run --mount type=bind,source="<config.jsonのパス>",target=/app/config.json --env-file "<.envのパス>" --name <インスタンスの名前> --detach ghcr.io/mtripg6666tdr/discord-music-bot
+docker container run --mount type=bind,source="<config.jsonのパス>",target=/app/config.json --mount type=bind,source="<ログ用のフォルダのパス>",target=/app/logs --mount type=bind,source="<キャッシュフォルダのパス>",target=/app/cache --env-file "<.envのパス>" --name <インスタンスの名前> --detach ghcr.io/mtripg6666tdr/discord-music-bot
 ```
-例えば、`config.json`の場所が`C:\data\config.json`、`.env`の場所が`C:\data\.env`、インスタンスの名前を`dsmb-instance-1`とするの場合、以下のように設定します。
-```bash
-docker container run --mount type=bind,source="C:\data\config.json",target=/app/config.json --env-file "C:\data\.env" --name dsmb-instance-1 --detach ghcr.io/mtripg6666tdr/discord-music-bot
-```
-`.env`の内容をコマンドラインで渡す場合は以下のようにします。
+
+  * `<.envのパス>`などは、適宜読みかえてください。
+  * `debug`が`false`の場合は、`--mount type=bind,source="<ログ用のフォルダのパス>",target=/app/logs`は不要です。
+  * `cacheLevel`が`memory`の場合は`--mount type=bind,source="<キャッシュフォルダのパス>",target=/app/cache`は不要です。
+
+- `.env`の内容をコマンドラインで渡す場合
 ```bash
 docker container run --mount type=bind,source="<config.jsonのパス>",target=/app/config.json --env TOKEN=<Discordのトークン> --name <インスタンスの名前> --detach ghcr.io/mtripg6666tdr/discord-music-bot
 ```
