@@ -694,5 +694,10 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     }
     this.play(0, quiet);
   }
+
+  override emit<U extends keyof PlayManagerEvents>(event: U, ...args: PlayManagerEvents[U]): boolean {
+    super.emit("all", ...args);
+    return super.emit(event, ...args);
+  }
 }
 
