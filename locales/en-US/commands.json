@@ -1,6 +1,6 @@
 {
   "bgm": {
-    "name": "BGM",
+    "name": "bgm",
     "description": "I'll show you a BGM playlist that the developer of the bot shares, and you can choose and play a song in it.",
     "listOfPresetBGM": "BGM Presets available"
   },
@@ -20,7 +20,7 @@
     "cancel": "Canceled the deletions."
   },
   "cancel": {
-    "name": "Cancel",
+    "name": "cancel",
     "description": "実行中のキャンセル可能な処理がある場合それをすべて中止します。",
     "canceling": "処理中の処理をすべてキャンセルしています....",
     "noCancelable": "キャンセルできる処理がありませんでした"
@@ -66,7 +66,7 @@
     }
   },
   "end": {
-    "name": "この曲で終了",
+    "name": "end",
     "description": "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します",
     "queueWasEmpty": "キューが空、もしくは一曲しかないため削除されませんでした。",
     "success": "キューに残された曲を削除しました"
@@ -106,7 +106,7 @@
     "failed": "Failed to capture..."
   },
   "help": {
-    "name": "Help",
+    "name": "help",
     "description": "Show help",
     "embedDescription": "I was made in order to upgrade experiences in Discord, by high-quality songs.:robot:",
     "toLearnMore": "利用可能なコマンドを確認するには{{command}}を使用してください",
@@ -169,7 +169,7 @@
     "alreadyConnected": "すでにボイスチャンネルに接続中です。"
   },
   "leaveclean": {
-    "name": "キューを整理",
+    "name": "leaveclean",
     "description": "ボイスチャンネルから離脱した人がリクエストした曲をキューから削除して整理します",
     "allRemoved": "Removed all items",
     "queueEmpty": "Queue empty",
@@ -178,7 +178,7 @@
     "removedNothing": "No item removed."
   },
   "log": {
-    "name": "System information",
+    "name": "systeminformation",
     "description": "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`、`cpu`、`basic`のうちいずれか)を指定して特定の内容のみ取得することもできます。",
     "examples": "sysinfo mem",
     "usage": "sysinfo [mem|cpu]",
@@ -213,13 +213,13 @@
     "memberCount": "メンバー数"
   },
   "loop": {
-    "name": "Loop",
+    "name": "loop",
     "description": "トラックごとのループを設定します。",
     "disabled": "Track loop disabled.",
     "enabled": "Track loop enabled."
   },
   "lyrics": {
-    "name": "Lyrics",
+    "name": "lyrics",
     "description": "指定された楽曲の歌詞を検索します",
     "examples": "l 夜に駆ける",
     "usage": "l <タイトル、アーティスト等>",
@@ -232,7 +232,7 @@
     "failed": "失敗しました。曲名を確認してもう一度試してみてください。"
   },
   "move": {
-    "name": "Move",
+    "name": "move",
     "description": "曲を指定された位置から指定された位置までキュー内で移動します。2番目の曲を5番目に移動したい場合は`mv 2 5`のようにします。",
     "examples": "Move 2 5",
     "usage": "Move <from> <to>",
@@ -257,12 +257,12 @@
     "success": "`{{title}}`を一番最後からキューの先頭に移動しました"
   },
   "news": {
-    "name": "News",
+    "name": "news",
     "description": "現在配信されているニューストピックスを閲覧・視聴できます。",
     "newsTopics": "News topic"
   },
   "nowplaying": {
-    "name": "Now playing",
+    "name": "nowplaying",
     "description": "現在再生中の曲の情報を表示します。 `l`(スラッシュコマンドの場合はTrue)を引数にするとより長く概要を表示します(可能な場合)",
     "args": {
       "detailed": {
@@ -272,25 +272,25 @@
     "nowPlayingSong": "Now playing"
   },
   "onceloop": {
-    "name": "Loop once",
+    "name": "looponce",
     "description": "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
     "disabled": "Disable loop once",
     "enabled": "Enable loop once"
   },
   "pause": {
-    "name": "Pause",
+    "name": "pause",
     "description": "Pausing",
     "alreadyPaused": "Paused",
     "usePlayToResume": "再生を再開するには`再生`コマンドを使用してください",
     "paused": "Paused"
   },
   "ping": {
-    "name": "Ping",
+    "name": "ping",
     "description": "Show latency",
     "pingInfo": "Ping info",
     "botMessageReceive": "ボットメッセージ取得",
     "botWebSocketConnection": "ボットWebSocket接続",
-    "voiceUdpConnection": "ボイスチャンネルUDP接続"
+    "voiceUdpConnection": "UDP connection of the voice channel"
   },
   "play": {
     "name": "play",
@@ -304,14 +304,14 @@
       }
     },
     "noContent": "再生するコンテンツがありません",
-    "resuming": "再生を再開します。",
+    "resuming": "Resuming",
     "noMusicFound": "該当する楽曲が見つかりませんでした",
     "playing": "Play",
     "alreadyPlaying": "すでに再生中です",
     "queueEmpty": "キューが空です。再生するコンテンツがありません。"
   },
   "queue": {
-    "name": "Queue",
+    "name": "queue",
     "description": "Show queue",
     "args": {
       "page": {
@@ -325,13 +325,13 @@
     "total": "Total"
   },
   "queueloop": {
-    "name": "キューループ",
+    "name": "queueloop",
     "description": "キュー内のループを設定します。",
     "enabled": "キューループを有効にしました",
     "disabled": "キューループを無効にしました"
   },
   "related": {
-    "name": "関連動画",
+    "name": "related",
     "description": "YouTubeから楽曲を再生終了時に、関連曲をキューに自動で追加する機能の有効/無効を設定します",
     "disabled": "関連曲自動再生をオフにしました",
     "enabled": "関連曲自動再生をオンにしました",
@@ -339,7 +339,7 @@
     "featureNote": "※YouTube以外のソースからの再生時、ループ有効時には追加されません"
   },
   "remove": {
-    "name": "Remove",
+    "name": "remove",
     "description": "キュー内の指定された位置の曲を削除します。",
     "examples": "rm 5",
     "usage": "削除 <削除する位置>",
@@ -357,29 +357,29 @@
     "unableToRemoveAll": "削除できませんでした。リクエスト曲を削除するには権限が不足している可能性があります。"
   },
   "removeall": {
-    "name": "Clear",
+    "name": "clear",
     "description": "キュー内の曲をすべて削除します。(接続中の場合ボイスチャンネルから離脱します。)",
     "removed": "Cleared"
   },
   "removedupes": {
-    "name": "重複削除",
+    "name": "removedupes",
     "description": "キュー内の重複（ちょうふく）している曲を削除します。",
     "removedMany": "重複していた曲を削除しました",
     "removedAt": "{{indexes}}番目の曲{{title}}を削除しました",
     "noSongRemoved": "削除できる楽曲がありませんでした"
   },
   "reset": {
-    "name": "Reset",
+    "name": "reset",
     "description": "サーバーのキュー、設定やデータを削除して初期化します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
     "success": "サーバーの設定を初期化しました"
   },
   "rewind": {
-    "name": "頭出し",
+    "name": "rewind",
     "description": "再生中の曲の頭出しを行い、初めから再生します。",
     "success": "再生中の楽曲を頭出ししました"
   },
   "search": {
-    "name": "Search",
+    "name": "search",
     "description": "曲をYouTubeで検索します。直接URLを直接指定することもできます。",
     "examples": "検索 夜に駆ける",
     "usage": "Search <term>",
@@ -391,7 +391,7 @@
     "noArgument": "引数を指定してください"
   },
   "searchqueue": {
-    "name": "キュー内を検索",
+    "name": "searchqueue",
     "description": "キュー内を検索します。引数にキーワードを指定します。",
     "examples": "seq pretender",
     "usage": "seq <term>",
@@ -404,7 +404,7 @@
     "embedDescription": "キュー内での検索結果です。最大20件表示されます。"
   },
   "searchsoundcloud": {
-    "name": "サウンドクラウドを検索",
+    "name": "searchsoundcloud",
     "description": "曲をSoundCloudで検索します",
     "examples": "ses sakura trip",
     "usage": "ses <term>",
@@ -415,7 +415,7 @@
     }
   },
   "seek": {
-    "name": "Seek",
+    "name": "seek",
     "description": "楽曲をシークします。",
     "examples": "Seek 0:30",
     "usage": "検索 <時間(秒数または時間:分:秒の形式で)>",
@@ -431,7 +431,7 @@
     "failed": "Seek failed"
   },
   "shuffle": {
-    "name": "Shuffle",
+    "name": "shuffle",
     "description": "キューの内容をシャッフルします。",
     "queueEmpty": "Queue empty.",
     "success": "Shuffled"
