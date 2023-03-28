@@ -61,7 +61,7 @@
     "effectControllPanel": {
       "title": "エフェクトコントロールパネル",
       "description": "オーディオエフェクトの設定/解除することができます。\r\n・表示は古い情報であることがありますが、エフェクトを操作したとき、更新ボタンを押したときに更新されます。\r\n・エフェクトは次の曲から適用されます\r\n現在の曲に適用したい場合は、`頭出し`コマンドを使用してください\r\n",
-      "footer": "エフェクトを選択してボタンを押してください",
+      "footer": "Choose an effect you want to apply and press the button of it.",
       "reload": "Update"
     }
   },
