@@ -88,8 +88,8 @@
     "failedToConnect": "Connection failed... Please try again.",
     "issuerNoVoiceChannel": "Send commands after joining a voice channel.",
     "loadingMessage": "Fetching message",
-    "notTextChannel": "This is not a text channel on a server.",
-    "unableToPlayOtherServer": "Unable to play the content on another server.",
+    "notTextChannel": "This is not a text channel in a server.",
+    "unableToPlayOtherServer": "Unable to play the content in another server.",
     "attachmentNotFound": "No attachment found",
     "invalidUrl": "Give a valid URL. If you want to play by keyword, use `search` command instead."
   },
