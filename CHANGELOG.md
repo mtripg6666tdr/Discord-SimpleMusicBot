@@ -86,5 +86,10 @@
 ## バグ修正
 * 一部の音楽の再生が途中で終了する問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1281)
 * バイナリの更新確認のタイミングが間違えっていたのを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1286)
+## 依存関係のアップデート
+* @sinclair/typebox 0.26.2 => 0.26.5
 ## その他の変更
 * Dockerのイメージに、オプションの依存関係が欠落していた問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1278, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1279)
+
+### その他の特記事項
+- Dockerのイメージは、リリース後30～40分程度で公開されます。
