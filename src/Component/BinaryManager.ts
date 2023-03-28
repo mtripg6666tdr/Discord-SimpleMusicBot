@@ -16,6 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { Readable } from "stream";
+
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 
 import { spawn } from "child_process";
@@ -26,6 +28,7 @@ import candyget from "candyget";
 import pEvent from "p-event";
 
 import { LogEmitter } from "../Structure";
+import { createPassThrough } from "../Util";
 
 type BinaryManagerOptions = {
   binaryName: string,
@@ -178,6 +181,45 @@ export class BinaryManager extends LogEmitter {
         reject(e);
       }
     });
+  }
+
+  async execStream(args: readonly string[]): Promise<Readable> {
+    if(!fs.existsSync(this.binaryPath) || this.isStaleInfo){
+      const latest = await this.checkIsLatestVersion();
+      if(!latest){
+        await this.downloadBinary();
+      }
+    }
+
+    const stream = createPassThrough();
+
+    setImmediate(() => {
+      this.logger.info(`Passing arguments: ${args.join(" ")}`);
+      const process = spawn(this.binaryPath, args, {
+        stdio: ["ignore", "pipe", "pipe"],
+        shell: false,
+        windowsHide: true,
+      });
+      let ended = false;
+      const onEnd = () => {
+        if(ended) return;
+        ended = true;
+        if(!stream.writableEnded){
+          stream.end();
+        }
+        if(process.connected){
+          process.kill("SIGTERM");
+        }
+      };
+      process.stdout.pipe(stream);
+      process.on("exit", onEnd);
+      process.stdout.on("error", err => {
+        stream.destroy(err);
+      });
+      process.stderr.on("data", (chunk: Buffer) => this.logger.info(`[Child] ${chunk.toString()}`));
+    });
+
+    return stream;
   }
 }
 

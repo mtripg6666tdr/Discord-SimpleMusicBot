@@ -21,8 +21,6 @@ import type { exportableYouTube } from "..";
 import type { BinaryManager } from "../../../Component/BinaryManager";
 import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 
-import miniget from "miniget";
-
 import { Strategy } from "./base";
 import { Util } from "../../../Util";
 
@@ -86,11 +84,6 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
       const formats = info.formats.filter(f => (f.format_note === "tiny" || f.video_ext === "none" && f.abr));
       if(formats.length === 0) throw new Error("no format found!");
       const [format] = formats.sort((fa, fb) => fb.abr - fa.abr);
-      const stream = miniget(format.url, {
-        headers: {
-          ...format.http_headers,
-        }
-      });
       if(forceUrl){
         return {
           ...partialResult,
@@ -102,6 +95,9 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
           } as UrlStreamInfo
         };
       }
+
+      const stream = await this.binaryManager.execStream(["-f", format.format_id, "-o", "-", url]);
+
       return {
         ...partialResult,
         stream: {
