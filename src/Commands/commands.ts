@@ -19,7 +19,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { i18n } from "i18next";
-import type { EmbedField, LocaleMap } from "oceanic.js";
+import type { EmbedField } from "oceanic.js";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -119,12 +119,15 @@ export default class Commands extends BaseCommand {
         if(ci.usage){
           embed.addField(
             t("commands:command.usageLabel"),
-            `\`${prefix}${ci.usage[context.locale as keyof LocaleMap] || ci.usage["ja"]}\` \r\n`
+            `\`${prefix}${t(`commands:${ci.asciiName}.usage` as any, { lng: context.locale })}\` \r\n`
             + t("commands:command.argumentDescription")
           );
         }
         if(ci.examples){
-          embed.addField(t("commands:command.exampleLabel"), `\`${prefix + ci.examples}\``);
+          embed.addField(
+            t("commands:command.exampleLabel"),
+            `\`${prefix}${t(`commands:${ci.asciiName}.examples` as any, { lng: context.locale })}\``
+          );
         }
         await message.reply({ embeds: [embed.toOceanic()] });
       }else{
