@@ -137,6 +137,7 @@ export class BinaryManager extends LogEmitter {
           "close",
         )
       ]);
+      this.lastChecked = Date.now();
       this.Log("Finish downloading the binary");
     }
   }
