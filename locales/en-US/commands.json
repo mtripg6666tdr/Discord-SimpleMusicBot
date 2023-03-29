@@ -36,19 +36,19 @@
       }
     },
     "categories": {
-      "voice": "ボイスチャンネル操作系",
-      "player": "音楽プレイヤー制御系",
-      "playlist": "プレイリスト操作系",
+      "voice": "Voice Connection Related",
+      "player": "Music Player Related",
+      "playlist": "Playlist Related",
       "utility": "Utilities",
-      "bot": "ボット操作全般"
+      "bot": "Bot Operation"
     },
     "commandList": "Command List",
     "toLearnMoreMessage": "`{{prefix}}コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
     "toLearnMoreInteraction": "`/command 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
-    "commandExplanation": "コマンド`{{command}}`の詳細",
+    "commandExplanation": "Details of Command `{{command}}`",
     "usageLabel": "Usage",
     "exampleLabel": "Example",
-    "argumentDescription": "`<>` 内の引数は必須の引数、`[]`内の引数は任意の引数です。",
+    "argumentDescription": "The arguments in `<>` are required and them in `[]` are optional.",
     "commandNotFound": "Command not found"
   },
   "disconnect": {
@@ -97,7 +97,7 @@
       }
     },
     "unsupported": "フレームのキャプチャ機能に非対応のソースです。",
-    "fallbacking": "フォールバックしているため、現在この機能を使用できません。",
+    "fallbacking": "通常とは異なる方法を使用しているため、現在この機能を使用できません。",
     "liveStreamWithTime": "ライブストリームでは時間指定できません。",
     "invalidTime": "時間の指定が正しくありません。",
     "capturing": "Capturing",
@@ -125,7 +125,7 @@
     "tweetUrl": "ツイートURL指定",
     "spotify": "曲のURL、およびプレイリストのURL。曲を推測してYouTubeから再生します。",
     "custom": "オーディオファイルへの直URL",
-    "googleDrive": "Google ドライブ",
+    "googleDrive": "Google Drive",
     "niconico": "Nico-Nico Douga"
   },
   "import": {
@@ -193,7 +193,7 @@
         }
       }
     },
-    "executing": "実行します",
+    "executing": "Executing...",
     "guildName": "Server name",
     "participatingGuildCount": "参加サーバー数",
     "registeredGuildCount": "データが保持されているサーバー数",
@@ -210,7 +210,7 @@
     "itemsInQueue": "キュー内のアイテム数",
     "currentTransformingCost": "現在の変換コスト",
     "liveStream": "Livestream",
-    "memberCount": "メンバー数"
+    "memberCount": "Members"
   },
   "loop": {
     "name": "loop",
@@ -280,7 +280,7 @@
   "pause": {
     "name": "pause",
     "description": "Pausing",
-    "alreadyPaused": "Paused",
+    "alreadyPaused": "Already paused",
     "usePlayToResume": "再生を再開するには`再生`コマンドを使用してください。",
     "paused": "Paused"
   },
@@ -307,7 +307,7 @@
     "resuming": "Resuming",
     "noMusicFound": "該当する楽曲が見つかりませんでした。",
     "playing": "Play",
-    "alreadyPlaying": "すでに再生中です。",
+    "alreadyPlaying": "It's playing just now.",
     "queueEmpty": "キューが空です。再生するコンテンツがありません。"
   },
   "queue": {
@@ -320,8 +320,8 @@
     },
     "queueEmpty": "Queue empty",
     "pageOutOfRange": "指定されたページは範囲外です。",
-    "songCount_one": "{{count}}曲",
-    "songCount_other": "{{count}}曲",
+    "songCount_one": "{{count}} song",
+    "songCount_other": "{{count}} songs",
     "total": "Total"
   },
   "queueloop": {
@@ -364,7 +364,7 @@
   "removedupes": {
     "name": "removedupes",
     "description": "キュー内の重複（ちょうふく）している曲を削除します。",
-    "removedMany": "重複していた曲を削除しました。",
+    "removedMany": "Removed duplicated songs.",
     "removedAt": "{{indexes}}番目の曲{{title}}を削除しました。",
     "noSongRemoved": "削除できる楽曲がありませんでした。"
   },
@@ -416,9 +416,9 @@
   },
   "seek": {
     "name": "seek",
-    "description": "楽曲をシークします。",
+    "description": "Seeks to a certain point in the current playing track.",
     "examples": "seek 0:30",
-    "usage": "シーク <時間(秒数または時間:分:秒の形式で)>",
+    "usage": "seek <time(seconds or in the format \"hours:minutes:seconds\")>",
     "args": {
       "keyword": {
         "description": "シーク先の時間"
@@ -432,7 +432,7 @@
   },
   "shuffle": {
     "name": "shuffle",
-    "description": "キューの内容をシャッフルします。",
+    "description": "Shuffles the queue.",
     "queueEmpty": "Queue empty.",
     "success": "Shuffled"
   },
@@ -464,8 +464,8 @@
     "elapsedAfterConnected": "Discordに接続してからの経過時間",
     "registeredServerCount": "データが保持されているサーバー数",
     "datetimeLabel": "{{hour}} hour {{min}} minute {{sec}} second",
-    "serverCount_one": "{{count}}サーバー",
-    "serverCount_other": "{{count}}サーバー"
+    "serverCount_one": "{{count}} server",
+    "serverCount_other": "{{count}} servers"
   },
   "volume": {
     "name": "volume",
