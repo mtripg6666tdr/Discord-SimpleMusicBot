@@ -59,7 +59,7 @@ export default class NowPlaying extends BaseCommand {
     let progressBar = "";
     if(_t > 0){
       const progress = Math.floor(_s / _t * 20);
-      progressBar += "=".repeat(progress - 1);
+      progressBar += "=".repeat(progress > 0 ? progress - 1 : 0);
       progressBar += "●";
       progressBar += "=".repeat(20 - progress);
     }
