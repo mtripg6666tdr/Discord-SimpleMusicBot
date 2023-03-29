@@ -318,7 +318,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     );
     /* eslint-disable @typescript-eslint/indent */
     const embed = new MessageEmbedBuilder()
-      .setTitle(`:cd:${i18next.t("components:nowplaying.nowplaying", { lng: this.server.locale })}:musical_note:`)
+      .setTitle(`:cd:${i18next.t("components:nowplaying.nowplayingTitle", { lng: this.server.locale })}:musical_note:`)
       .setDescription(
           `[${this.currentAudioInfo.title}](${this.currentAudioUrl}) \``
         + (
