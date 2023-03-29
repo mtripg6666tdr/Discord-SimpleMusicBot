@@ -2,8 +2,8 @@
   "search": {
     "alreadyOpen": "Another search result has already been opened.",
     "removePreviousPanel": "Close the previous search result",
-    "previousPanelRemoved": "Discarded the previous search result. ",
-    "searching": "Close",
+    "previousPanelRemoved": "Discarded the previous search result.",
+    "searching": "Searching",
     "notFound": "Not found"
   },
   "length": "Length",
