@@ -14,7 +14,7 @@
     "found_one": "{{count}}件見つかりました。",
     "found_other": "{{count}}件見つかりました。",
     "confirm": "一括削除を確定するにはボタンを押してください。\r\n押されないと一定時間後にキャンセルされます。",
-    "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため",
+    "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
     "auditLog_other": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
     "finish": "完了!(このメッセージは自動的に消去されます)",
     "cancel": "削除をキャンセルしました"
@@ -69,7 +69,7 @@
     "name": "この曲で終了",
     "description": "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します。",
     "queueWasEmpty": "キューが空、もしくは一曲しかないため削除されませんでした。",
-    "success": "キューに残された曲を削除しました"
+    "success": "キューに残された曲を削除しました。"
   },
   "equallyplayback": {
     "name": "均等再生",
@@ -84,7 +84,7 @@
     "queueEmpty": "キューが空なのでエクスポートできません。",
     "exported": "エクスポートしました",
     "compatiblity": "バージョン: v{{version}}互換",
-    "importInstruction": "インポート時は、「<{{url}}>」をインポートコマンドの引数に指定してください。"
+    "importInstruction": "インポート時は、「<{{url}}>」を`インポート`コマンドの引数に指定してください。"
   },
   "frame": {
     "name": "フレーム",
