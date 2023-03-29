@@ -349,9 +349,9 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
             i18next.t("components:queue.positionInQueue"),
             index === "0"
               ? `${
-                i18next.t("components:nowplaying.nowplaying", { lng: this.server.locale })
+                i18next.t("components:nowplaying.nowplayingItemName", { lng: this.server.locale })
               }/${
-                i18next.t("components:nowplaying.waitForPlaying", { lng: this.server.locale })
+                i18next.t("components:nowplaying.waitForPlayingItemName", { lng: this.server.locale })
               }`
               : index,
             true

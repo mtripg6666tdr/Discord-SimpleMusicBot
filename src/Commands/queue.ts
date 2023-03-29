@@ -74,8 +74,8 @@ export default class Queue extends BaseCommand {
           name: i !== 0
             ? i.toString()
             : context.server.player.isPlaying
-              ? t("components:nowplaying.nowplaying")
-              : t("components:nowplaying.waitForPlaying"),
+              ? t("components:nowplaying.nowplayingItemName")
+              : t("components:nowplaying.waitForPlayingItemName"),
           value: [
             `[${q.basicInfo.title}](${q.basicInfo.url})`,
             `${t("length")}: \`${
