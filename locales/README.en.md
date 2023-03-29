@@ -45,7 +45,7 @@ We have a plan to translate in English by ourselves, but we feel happy to transl
 [Project page on Crowdin](https://crowdin.com/project/discord-simplemusicbot)
 
 ## Support
-You can receive notifications on Discord when new versions are available.   
+You can receive notifications on Discord when new versions are available. You can receive notifications on Discord when new versions are available.   
 [Support server](https://discord.gg/7DrAEXBMHe)  
 [Supported versions](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
 
