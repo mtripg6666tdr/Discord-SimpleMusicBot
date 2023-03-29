@@ -57,7 +57,7 @@ export abstract class SearchBase<T> extends BaseCommand {
             .addComponents(
               new MessageButtonBuilder()
                 .setCustomId(customIdMap.cancelSearch)
-                .setLabel(t("search.searching"))
+                .setLabel(t("search.removePreviousPanel"))
                 .setStyle("DANGER")
             )
             .toOceanic(),
