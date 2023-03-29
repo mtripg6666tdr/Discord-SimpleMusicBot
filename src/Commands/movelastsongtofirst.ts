@@ -43,6 +43,6 @@ export default class Mltf extends BaseCommand {
     const to = context.server.player.isPlaying ? 1 : 0;
     q.move(q.length - 1, to);
     const info = q.get(to);
-    message.reply(`✅${t("commands:movelastsongtofirst.success", info.basicInfo.title)}`).catch(this.logger.error);
+    message.reply(`✅${t("commands:movelastsongtofirst.success", { title: info.basicInfo.title })}`).catch(this.logger.error);
   }
 }
