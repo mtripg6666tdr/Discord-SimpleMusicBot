@@ -145,3 +145,24 @@
 * Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
+
+# v4.0.0-beta.5
+**これは、プレリリースバージョンです**
+## バグ修正
+* ボイスチャンネルに参加せずに検索を使用した際にエラーが発生する問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1297)
+* `最後の曲を先頭に`コマンドのメッセージ内容が正しくないのを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1298)
+* `検索`コマンドで送信されるボタンのラベルが間違っている問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1303)
+* `現在再生中`コマンドがエラーで失敗することがある問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1304)
+## 依存関係のアップデート
+* @mtripg6666tdr/oceanic-command-resolver 1.0.0-alpha.8 => 1.0.0-alpha.9
+* @sinclair/typebox 0.26.5 => 0.26.7
+* candyget 0.5.3 => 0.5.4
+## その他の変更
+* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1299, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1300, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1301, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1302, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1306)
+
+## その他の特記事項
+* これはプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
+* v4系では、Node.js v16.16以上が必須となります。
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
