@@ -29,7 +29,7 @@
     "name": "Command",
     "usage": "command [name]",
     "examples": "command search",
-    "description": "コマンド一覧を表示します。コマンド名を渡すとそのコマンドの詳細を表示します。",
+    "description": "コマンド一覧を表示します。コマンド名を指定するとそのコマンドの詳細を表示します。",
     "args": {
       "command": {
         "description": "詳細表示するコマンド"
