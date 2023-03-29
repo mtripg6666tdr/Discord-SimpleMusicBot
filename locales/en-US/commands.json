@@ -61,7 +61,7 @@
     "effectControllPanel": {
       "title": "エフェクトコントロールパネル",
       "description": "オーディオエフェクトの設定/解除することができます。\n・表示は古い情報であることがありますが、エフェクトを操作したとき、更新ボタンを押したときに更新されます。\n・エフェクトは次の曲から適用されます。\n現在の曲に適用したい場合は、`頭出し`コマンドを使用してください。\n",
-      "footer": "Choose an effect you want to apply and press the button of it.",
+      "footer": "Choose an effect you want to apply and press the button.",
       "reload": "Update"
     }
   },
@@ -234,8 +234,8 @@
   "move": {
     "name": "move",
     "description": "曲を指定された位置から指定された位置までキュー内で移動します。2番目の曲を5番目に移動したい場合は`mv 2 5`のようにします。",
-    "examples": "Move 2 5",
-    "usage": "Move <from> <to>",
+    "examples": "move 2 5",
+    "usage": "move <from> <to>",
     "args": {
       "from": {
         "description": "移動元のインデックス。キューに併記されているものです。"
@@ -382,7 +382,7 @@
     "name": "search",
     "description": "曲をYouTubeで検索します。直接URLを直接指定することもできます。",
     "examples": "search Into The Night",
-    "usage": "Search <term>",
+    "usage": "search <keyword>",
     "args": {
       "keyword": {
         "description": "検索したい動画のキーワードまたはURL。"
