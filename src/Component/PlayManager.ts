@@ -217,7 +217,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           {
             content: `:hourglass_flowing_sand:${
               i18next.t("components:play.preparing", {
-                title: `\`${this.currentAudioInfo.title}\` \`(${isLive ? i18next.t("liveStream") : `${min}:${sec}`})\``,
+                title: `\`${this.currentAudioInfo.title}\` \`(${
+                  isLive ? i18next.t("liveStream", { lng: this.server.locale }) : `${min}:${sec}`
+                })\``,
                 lng: this.server.locale,
               })
             }...`,
@@ -335,7 +337,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         true
       )
       .addField(
-        i18next.t("components:nowplaying.nextSong"),
+        i18next.t("components:nowplaying.nextSong", { lng: this.server.locale }),
         // トラックループオンなら現在の曲
         this.server.queue.loopEnabled ? this.server.queue.get(0).basicInfo.title
         // (トラックループはオフ)長さが2以上ならオフセット1の曲
@@ -343,7 +345,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         // (トラックループオフ,長さ1)キューループがオンなら現在の曲
         : this.server.queue.queueLoopEnabled ? this.server.queue.get(0).basicInfo.title
         // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
-        : i18next.t("components:nowplaying.noNextSong"), true
+        : i18next.t("components:nowplaying.noNextSong", { lng: this.server.locale }), true
       )
       .addField(
         i18next.t("components:play.songsInQueue", { lng: this.server.locale }),
