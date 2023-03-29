@@ -29,7 +29,7 @@
     "needed": "This behavior needs to satisfy at least one requirement below; {{permissions}}"
   },
   "alias": "Alias",
-  "permissionsToRun": "Required permissions",
+  "permissionsToRun": "Requirements (at least one needs to be fulfilled)",
   "notPlaying": "Not playing",
   "errorOccurred": "An error occurred",
   "internalErrorOccurred": "An internal error occurred",
