@@ -14,7 +14,7 @@
     "found_one": "{{count}} message found.",
     "found_other": "{{count}} messages found.",
     "confirm": "一括削除を確定するにはボタンを押してください。\r\n押されないと一定時間後にキャンセルされます。",
-    "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため",
+    "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
     "auditLog_other": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
     "finish": "Done! (This message will be deleted automatically)",
     "cancel": "Canceled the deletions."
@@ -69,7 +69,7 @@
     "name": "end",
     "description": "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します。",
     "queueWasEmpty": "キューが空、もしくは一曲しかないため削除されませんでした。",
-    "success": "キューに残された曲を削除しました"
+    "success": "キューに残された曲を削除しました。"
   },
   "equallyplayback": {
     "name": "均等再生",
@@ -83,8 +83,8 @@
     "description": "キューの内容をインポートできるようエクスポートします。",
     "queueEmpty": "キューが空なのでエクスポートできません。",
     "exported": "Exported",
-    "compatiblity": "バージョン: v{{version}}互換",
-    "importInstruction": "インポート時は、「<{{url}}>」をインポートコマンドの引数に指定してください。"
+    "compatiblity": "Version: v{{version}} compatible",
+    "importInstruction": "When you import, set \"<{{url}}>\" for the argument of command `import`."
   },
   "frame": {
     "name": "frame",
@@ -281,7 +281,7 @@
     "name": "pause",
     "description": "Pausing",
     "alreadyPaused": "Already paused",
-    "usePlayToResume": "再生を再開するには`再生`コマンドを使用してください。",
+    "usePlayToResume": "To resume playing, use command `play`.",
     "paused": "Paused"
   },
   "ping": {
@@ -371,7 +371,7 @@
   "reset": {
     "name": "reset",
     "description": "サーバーのキュー、設定やデータを削除して初期化します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
-    "success": "サーバーの設定を初期化しました。"
+    "success": "Successfully reset the server settings."
   },
   "rewind": {
     "name": "rewind",
@@ -394,7 +394,7 @@
     "name": "searchqueue",
     "description": "キュー内を検索します。引数にキーワードを指定します。",
     "examples": "seq pretender",
-    "usage": "seq <term>",
+    "usage": "seq <keyword>",
     "args": {
       "keyword": {
         "description": "検索したい楽曲のキーワード"
@@ -407,7 +407,7 @@
     "name": "searchsoundcloud",
     "description": "曲をSoundCloudで検索します。",
     "examples": "ses sakura trip",
-    "usage": "ses <term>",
+    "usage": "ses <keyword>",
     "args": {
       "keyword": {
         "description": "検索したい楽曲のキーワードまたはURL。"
