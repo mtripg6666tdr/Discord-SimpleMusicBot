@@ -1,9 +1,7 @@
 {
   "nowplaying": {
     "nowplaying": "現在再生中",
-    "nowplayingTitle": "現在再生中",
-    "nowplayingItemName": "現在再生中",
-    "waitForPlayingItemName": "再生待ち",
+    "waitForPlaying": "再生待ち",
     "requestedBy": "リクエスト",
     "nextSong": "次の曲",
     "noNextSong": "次の曲がまだ登録されていません"
