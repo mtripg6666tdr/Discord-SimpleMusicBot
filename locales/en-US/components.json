@@ -1,7 +1,9 @@
 {
   "nowplaying": {
-    "nowplaying": "Now playing",
-    "waitForPlaying": "Waiting to be played",
+    "nowplaying": "now playing",
+    "nowplayingTitle": "Now Playing",
+    "nowplayingItemName": "Now playing",
+    "waitForPlayingItemName": "Wait for playing",
     "requestedBy": "Requested by",
     "nextSong": "Up Next",
     "noNextSong": "Nothing added yet."
@@ -14,14 +16,14 @@
     "equallyplayback": "Evenly playing",
     "tooManyQueueItems": "Exceeding the maximum item count of queue.",
     "songAdded": "Song Added",
-    "positionInQueue": "Position in the Queue",
-    "etaToPlay": "Estimated Time to Play",
-    "fallbackNotice": "現在、通常の方法で情報を取得できなかったため、代わりの方法を使用しました。これが異常だと思われる場合はサポートまでお問い合わせください。\n処理に時間がかかる、突然終了するなど、正常な動作をしない場合があります。この場合の動作はサポート対象外です。問題が発生した場合、`リセット`コマンドを使用すると、サーバーのデータをすべて初期化することができます。",
-    "spotifyNotice": "Spotifyのタイトルは正しく再生されない場合があります。",
+    "positionInQueue": "Position in Queue",
+    "etaToPlay": "Estimated Time until Playing",
+    "fallbackNotice": "This song couldn't be played in the normal method, so used an alternative method. If this behavior is obviously an error, please contact our support.\nIt may be NOT played correctly, like it takes more time than usual or it ends suddenly. We don't support such cases. When you have any troubles, use command `reset` to reset all data in the server.",
+    "spotifyNotice": "Songs on Spotify may NOT be played correctly.",
     "cancelAdded": "Cancel adding `{{title}}`",
-    "failedToAdd": "キューの追加に失敗しました。追加できませんでした。",
+    "failedToAdd": "Failed to add to queue.",
     "processingPlaylistBefore": "Processing the playlist...",
-    "processingPlaylist": "プレイリスト`{{title}}`を処理しています。",
+    "processingPlaylist": "Processing the playlist `{{title}}`.",
     "noDescriptionInPlaylist": "プレイリストから指定のため詳細は表示されません。",
     "processingPlaylistCompleted": "Playlist successfully processed.",
     "songsAdded_one": "{{count}} item added.",
@@ -30,9 +32,9 @@
   "search": {
     "resultTitle": "Search results for \"{{query}}\"",
     "resultFooterInteraction": "再生したい項目を、下から選択してください。キャンセルするには、下から\"キャンセル\"を選択してください。また、サムネイルコマンドを使用してサムネイルを確認することもできます。",
-    "resultFooterMessage": "再生したい項目を選択して数字を送信するか、下から選択してください。キャンセルするには「キャンセル」または「cancel」と選択/入力します。また、サムネイルコマンドを使用してサムネイルを確認できます。",
+    "resultFooterMessage": "Choose item(s) you want to play and send number(s) or select on the pull down. If you cancel, select/send \"キャンセル\" or \"cancel\". You can also check the thumbnail(s) by using command \"thumbnail\".",
     "select": "Select...",
-    "typeOrSelect": "数字を直接送信するか、ここから選択...",
+    "typeOrSelect": "Type and send numbers or select here...",
     "maximumSearch": "すでに開いている検索パネルが上限を超えています。"
   },
   "play": {
@@ -43,21 +45,21 @@
     "failedAndSkipping": "Skipping",
     "failedAndRetrying": "Retrying",
     "queueEmpty": "Queue empty",
-    "queueEmptyAndExiting": "Disconnecting due to queue empty.",
-    "songsInQueue": "Song(s) in the Queue",
+    "queueEmptyAndExiting": "Disconnecting due to idling.",
+    "songsInQueue": "Song(s) in Queue",
     "willLoop": "Loop"
   },
   "skip": {
     "skipping": "Skipping",
     "skipped": "Skipped `{{title}}`",
     "failed": "Failed to skip.",
-    "embedTitle": "スキップの投票",
-    "howToUseSkipVote": "`{{title}}`のスキップに賛成する場合は以下のボタンを押してください。",
-    "skipVoteDescription": "賛成がボイスチャンネルに参加している人数の過半数を超えると、スキップされます。",
-    "currentStatus": "現在の状況",
-    "skipRequirement_one": "あと{{count}}人の賛成が必要です。",
-    "skipRequirement_other": "あと{{count}}人の賛成が必要です。",
-    "skipIssuer": "{{issuer}}が、楽曲のスキップを提案しました。",
+    "embedTitle": "Vote to Skip",
+    "howToUseSkipVote": "If you approve skipping `{{title}}`, press the button below.",
+    "skipVoteDescription": "If most of the members approved, this song would be skipped.",
+    "currentStatus": "Current status",
+    "skipRequirement_one": "{{count}} more approval is needed to skip this song.",
+    "skipRequirement_other": "{{count}} more approvals are needed to skip this song.",
+    "skipIssuer": "{{issuer}} suggests skipping this song.",
     "agree": "Upvote"
   }
 }
