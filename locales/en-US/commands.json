@@ -29,7 +29,7 @@
     "name": "Command",
     "usage": "command [name]",
     "examples": "command search",
-    "description": "コマンド一覧を表示します。コマンド名を渡すとそのコマンドの詳細を表示します。",
+    "description": "コマンド一覧を表示します。コマンド名を指定するとそのコマンドの詳細を表示します。",
     "args": {
       "command": {
         "description": "詳細表示するコマンド"
@@ -200,7 +200,7 @@
     "connectingGuildCount": "接続中サーバー数",
     "playingGuildCount": "再生中サーバー数(一時停止含む)",
     "pausedGuildCount": "一時停止サーバー数",
-    "guildSearchResult": "サーバー照会結果",
+    "guildSearchResult": "サーバー照会結果(秘)",
     "guildId": "Server ID",
     "guildIcon": "Server icon",
     "guildChannelCountFromCache": "Channel count (cached)",
@@ -418,7 +418,7 @@
     "name": "seek",
     "description": "楽曲をシークします。",
     "examples": "seek 0:30",
-    "usage": "検索 <時間(秒数または時間:分:秒の形式で)>",
+    "usage": "シーク <時間(秒数または時間:分:秒の形式で)>",
     "args": {
       "keyword": {
         "description": "シーク先の時間"
