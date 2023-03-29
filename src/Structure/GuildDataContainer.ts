@@ -760,7 +760,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       cancellable: this.queue.length >= 1,
     });
     // 現在の状態を確認してVCに接続中なら接続試行
-    if(panel.commandMessage.member.voiceState.channelID){
+    if(panel.commandMessage.member.voiceState?.channelID){
       await this.joinVoiceChannel(panel.commandMessage, {}, t);
     }
     // 接続中なら再生を開始
