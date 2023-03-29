@@ -48,8 +48,8 @@
   "canceled": "Canceled",
   "attention": "Attention",
   "pleaseWait": "Please wait",
-  "loadingInfo": "Gathering information",
-  "loadingInfoPleaseWait": "Gathering information, please wait...",
+  "loadingInfo": "Fetching data",
+  "loadingInfoPleaseWait": "Fetching data, please wait...",
   "moreInfo": "More info",
   "urlNotFound": "URL not found",
   "audioSources": {
