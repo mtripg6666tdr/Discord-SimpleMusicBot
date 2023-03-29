@@ -152,7 +152,7 @@
     "name": "invoke",
     "description": "指定されたコマンドを実行します。基本的に使用しないでください。",
     "usage": "invoke <command>",
-    "examples": "invoke play 夜に駆ける",
+    "examples": "invoke play Into The Night",
     "args": {
       "command": {
         "description": "実行するコマンド"
@@ -221,8 +221,8 @@
   "lyrics": {
     "name": "lyrics",
     "description": "指定された楽曲の歌詞を検索します。",
-    "examples": "l 夜に駆ける",
-    "usage": "l <タイトル、アーティスト等>",
+    "examples": "l Into The Night",
+    "usage": "l <ex. titles, artists and so on>",
     "args": {
       "keyword": {
         "description": "楽曲を検索するキーワード"
@@ -303,7 +303,7 @@
         "description": "対応している音声ファイルをアップロードすることで、ファイルを再生することができます。"
       }
     },
-    "noContent": "再生するコンテンツがありません。",
+    "noContent": "There's no content to play.",
     "resuming": "Resuming",
     "noMusicFound": "該当する楽曲が見つかりませんでした。",
     "playing": "Play",
@@ -381,7 +381,7 @@
   "search": {
     "name": "search",
     "description": "曲をYouTubeで検索します。直接URLを直接指定することもできます。",
-    "examples": "検索 夜に駆ける",
+    "examples": "search Into The Night",
     "usage": "Search <term>",
     "args": {
       "keyword": {
@@ -417,7 +417,7 @@
   "seek": {
     "name": "seek",
     "description": "楽曲をシークします。",
-    "examples": "Seek 0:30",
+    "examples": "seek 0:30",
     "usage": "検索 <時間(秒数または時間:分:秒の形式で)>",
     "args": {
       "keyword": {
