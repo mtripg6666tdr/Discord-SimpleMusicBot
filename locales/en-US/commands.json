@@ -23,7 +23,7 @@
     "name": "cancel",
     "description": "実行中のキャンセル可能な処理がある場合それをすべて中止します。",
     "canceling": "処理中の処理をすべてキャンセルしています....",
-    "noCancelable": "キャンセルできる処理がありませんでした。"
+    "noCancelable": "No tasks that ca be canceled."
   },
   "command": {
     "name": "Command",
@@ -32,7 +32,7 @@
     "description": "コマンド一覧を表示します。コマンド名を指定するとそのコマンドの詳細を表示します。",
     "args": {
       "command": {
-        "description": "詳細表示するコマンド"
+        "description": "The command you want to know."
       }
     },
     "categories": {
@@ -158,14 +158,14 @@
         "description": "実行するコマンド"
       }
     },
-    "recursiveInvoke": "インボークコマンドをインボークコマンドで実行することはできません。",
+    "recursiveInvoke": "You cannot use the `invoke` command in `invoke` command.",
     "executed": "Executed",
     "commandNotFound": "Command not found",
     "specialCommandNotFound": "特別コマンドが見つかりません。"
   },
   "join": {
     "name": "connect",
-    "description": "ボイスチャンネルに参加します。",
+    "description": "Join a voice channel.",
     "alreadyConnected": "すでにボイスチャンネルに接続中です。"
   },
   "leaveclean": {
@@ -327,8 +327,8 @@
   "queueloop": {
     "name": "queueloop",
     "description": "キュー内のループを設定します。",
-    "enabled": "キューループを有効にしました。",
-    "disabled": "キューループを無効にしました。"
+    "enabled": "Queue loop enabled.",
+    "disabled": "Queue loop disabled."
   },
   "related": {
     "name": "related",
@@ -342,7 +342,7 @@
     "name": "remove",
     "description": "キュー内の指定された位置の曲を削除します。",
     "examples": "rm 5",
-    "usage": "削除 <削除する位置>",
+    "usage": "remove <the position of the song you want to remove>",
     "args": {
       "index": {
         "description": "削除するインデックスはキューに併記されているものです。ハイフンを使って2-5のように範囲指定したり、スペースを使って1 4 8のように複数指定することも可能です。"
@@ -366,7 +366,7 @@
     "description": "キュー内の重複（ちょうふく）している曲を削除します。",
     "removedMany": "Removed duplicated songs.",
     "removedAt": "{{indexes}}番目の曲{{title}}を削除しました。",
-    "noSongRemoved": "削除できる楽曲がありませんでした。"
+    "noSongRemoved": "No duplicated songs that can be deleted."
   },
   "reset": {
     "name": "reset",
@@ -439,7 +439,7 @@
   "skip": {
     "name": "skip",
     "description": "現在再生中の曲をスキップします。",
-    "preparing": "現在再生準備中です。",
+    "preparing": "Unable to skip due to preparing to play a song now.",
     "votePanelAlreadyOpen": "すでに開かれている投票パネルがあります。",
     "success": "Skipped `{{title}}`",
     "failed": "Skip failed"
