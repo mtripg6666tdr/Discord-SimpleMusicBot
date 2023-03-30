@@ -32,7 +32,7 @@
     "twitter-url-direct": "^1.0.9",
     "ytdl-core": "^4.11.2",
     "ytpl": "^2.3.0",
-    "ytsr": "^3.8.0"
+    "ytsr": "^3.8.1"
   },
   "devDependencies": {
     "@types/follow-redirects": "^1.14.1",
