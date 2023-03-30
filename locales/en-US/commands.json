@@ -108,7 +108,7 @@
   "help": {
     "name": "help",
     "description": "Show help",
-    "embedDescription": "I was made in order to upgrade experiences in Discord, by high-quality songs.:robot:",
+    "embedDescription": "I was made in order to upgrade experiences in Discord, by high-quality songs",
     "toLearnMore": "利用可能なコマンドを確認するには{{command}}を使用してください。",
     "developer": "Developer",
     "version": "Version",
@@ -287,7 +287,7 @@
   "ping": {
     "name": "ping",
     "description": "Show latency",
-    "pingInfo": "Ping info",
+    "pingInfo": "Ping Info",
     "botMessageReceive": "ボットメッセージ取得",
     "botWebSocketConnection": "ボットWebSocket接続",
     "voiceUdpConnection": "UDP connection of the voice channel"
