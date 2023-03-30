@@ -19,7 +19,7 @@
     "@discordjs/voice": "^0.15.0",
     "@mtripg6666tdr/async-lock": "^1.1.0",
     "@mtripg6666tdr/oceanic-command-resolver": "^1.0.0-alpha.9",
-    "@sinclair/typebox": "^0.26.7",
+    "@sinclair/typebox": "^0.26.8",
     "candyget": "^0.5.4",
     "comment-json": "^4.2.3",
     "dotenv": "^16.0.3",
@@ -43,7 +43,7 @@
     "twitter-url-direct": "^1.0.9",
     "ytdl-core": "^4.11.2",
     "ytpl": "^2.3.0",
-    "ytsr": "^3.8.0"
+    "ytsr": "^3.8.1"
   },
   "devDependencies": {
     "@types/follow-redirects": "^1.14.1",
