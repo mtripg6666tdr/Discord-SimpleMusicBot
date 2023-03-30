@@ -36,7 +36,7 @@
   "totalSongCount_one": "of {{count}} song",
   "totalSongCount_other": "of {{count}} songs",
   "currentSongCount": "{{count}} song(s)",
-  "songProcessingInProgress": "{{totalSongCount}}{{currentSongCount}}Processed",
+  "songProcessingInProgress": "{{totalSongCount}}{{currentSongCount}} processed",
   "songProcessingCompleted": "Added {{count}} song(s).",
   "failed": "Failed",
   "yes": "Yes",

@@ -158,7 +158,7 @@
         "description": "実行するコマンド"
       }
     },
-    "recursiveInvoke": "インボークコマンドをインボークコマンドで実行することはできません。",
+    "recursiveInvoke": "`インボーク`コマンドを`インボーク`コマンドで実行することはできません。",
     "executed": "実行しました",
     "commandNotFound": "コマンドが見つかりませんでした",
     "specialCommandNotFound": "特別コマンドが見つかりません。"
@@ -439,7 +439,7 @@
   "skip": {
     "name": "スキップ",
     "description": "現在再生中の曲をスキップします。",
-    "preparing": "現在再生準備中です。",
+    "preparing": "現在再生準備中のためスキップできません。",
     "votePanelAlreadyOpen": "すでに開かれている投票パネルがあります。",
     "success": "`{{title}}`をスキップしました",
     "failed": "スキップに失敗しました"
