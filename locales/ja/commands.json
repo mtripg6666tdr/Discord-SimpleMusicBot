@@ -108,7 +108,7 @@
   "help": {
     "name": "ヘルプ",
     "description": "ヘルプを表示します",
-    "embedDescription": "高音質な音楽で、Discordで最高のエクスペリエンスを得るために作られました:robot:",
+    "embedDescription": "高音質な音楽で、Discordで最高のエクスペリエンスを得るために作られました",
     "toLearnMore": "利用可能なコマンドを確認するには{{command}}を使用してください。",
     "developer": "開発者",
     "version": "バージョン",
