@@ -3,7 +3,7 @@
     "nowplaying": "now playing",
     "nowplayingTitle": "Now Playing",
     "nowplayingItemName": "Now playing",
-    "waitForPlayingItemName": "Wait for playing",
+    "waitForPlayingItemName": "Waiting to be played",
     "requestedBy": "Requested by",
     "nextSong": "Up Next",
     "noNextSong": "Nothing added yet."
@@ -20,7 +20,7 @@
     "etaToPlay": "Estimated Time until Playing",
     "fallbackNotice": "This song couldn't be played in the normal method, so used an alternative method. If this behavior is obviously an error, please contact our support.\nIt may NOT be played correctly, like it takes more time than usual or it ends suddenly. We don't support such cases. When you have any troubles, you can use command `reset` to reset all data in the server.",
     "spotifyNotice": "Songs on Spotify may NOT be played correctly.",
-    "cancelAdded": "Cancel adding `{{title}}`",
+    "cancelAdded": "Canceled adding `{{title}}`",
     "failedToAdd": "Failed to add to queue.",
     "processingPlaylistBefore": "Processing the playlist...",
     "processingPlaylist": "Processing the playlist `{{title}}`.",
