@@ -53,7 +53,7 @@ export default class Help extends BaseCommand {
     const embed = new MessageEmbedBuilder()
       .setTitle(context.client.user.username + ":notes:")
       .setDescription(
-        t("commands:help.embedDescription")
+        t("commands:help.embedDescription") + ":robot:"
         + "\r\n"
         + t("commands:help.toLearnMore", { command: `\`${config.noMessageContent ? "/" : context.server.prefix}command\`` }))
       .addField(t("commands:help.developer"), `[${developer || "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`)
