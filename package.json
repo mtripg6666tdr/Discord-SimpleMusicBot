@@ -41,7 +41,7 @@
     "throttle-debounce": "^5.0.0",
     "tslib": "^2.5.0",
     "twitter-url-direct": "^1.0.9",
-    "ytdl-core": "^4.11.2",
+    "ytdl-core": "^4.11.3",
     "ytpl": "^2.3.0",
     "ytsr": "^3.8.1"
   },
@@ -62,7 +62,7 @@
     "eslint-plugin-node": "^11.1.0",
     "mocha": "^10.2.0",
     "rimraf": "^4.4.1",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.3"
   },
   "optionalDependencies": {
     "@discordjs/opus": "^0.9.0",
