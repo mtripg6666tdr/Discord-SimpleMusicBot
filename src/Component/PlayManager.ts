@@ -382,26 +382,26 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           new MessageButtonBuilder()
             .setCustomId("control_rewind")
             .setEmoji("⏮️")
-            .setLabel(i18next.t("commands:rewind.name", { lng: this.server.locale }))
+            .setLabel(i18next.t("components:controlPanel.rewind", { lng: this.server.locale }))
             .setStyle("SECONDARY"),
           new MessageButtonBuilder()
             .setCustomId("control_playpause")
             .setEmoji("⏯️")
             .setLabel(`${
-              i18next.t("commands:play.name", { lng: this.server.locale })
+              i18next.t("components:controlPanel.play", { lng: this.server.locale })
             }/${
-              i18next.t("commands:pause.name", { lng: this.server.locale })
+              i18next.t("components:controlPanel.pause", { lng: this.server.locale })
             }`)
             .setStyle("PRIMARY"),
           new MessageButtonBuilder()
             .setCustomId("control_skip")
             .setEmoji("⏭️")
-            .setLabel(i18next.t("commands:skip.name", { lng: this.server.locale }))
+            .setLabel(i18next.t("components:controlPanel.skip", { lng: this.server.locale }))
             .setStyle("SECONDARY"),
           new MessageButtonBuilder()
             .setCustomId("control_onceloop")
             .setEmoji("🔂")
-            .setLabel(i18next.t("commands:onceloop.name", { lng: this.server.locale }))
+            .setLabel(i18next.t("components:controlPanel.onceloop", { lng: this.server.locale }))
             .setStyle("SECONDARY"),
         )
         .toOceanic(),
