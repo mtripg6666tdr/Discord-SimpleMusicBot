@@ -161,7 +161,7 @@ export default class SystemInfo extends BaseCommand {
           .addField(t("commands:log.guildChannelCountFromCache"), target.channels.size.toString(), true)
           .addField(t("commands:log.memberCount"), target.memberCount?.toString() || target.approximateMemberCount?.toString() || "不明", true)
           .addField(t("commands:log.guildConnecting"), data?.player.isConnecting ? t("yes") : t("no"), true)
-          .addField(t("commands:log.guildPlaying"), data?.player.isPaused ? t("yes") : t("no"), true)
+          .addField(t("commands:log.guildPlaying"), data?.player.isPlaying ? t("yes") : t("no"), true)
           .addField(t("commands:log.guildPaused"), data?.player.isPaused ? t("yes") : t("no"), true)
           .addField(t("commands:log.itemsInQueue"), data?.queue.length.toString() || "0", true)
           .addField(t("commands:log.currentTransformingCost"), data?.player.cost.toString() || "0", true)
