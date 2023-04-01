@@ -61,5 +61,12 @@
     "skipRequirement_other": "{{count}} more approvals are needed to skip this song.",
     "skipIssuer": "{{issuer}} suggests skipping this song.",
     "agree": "Upvote"
+  },
+  "controlPanel": {
+    "rewind": "Rewind",
+    "play": "Play",
+    "pause": "Pause",
+    "skip": "Skip",
+    "onceloop": "Loop Once"
   }
 }

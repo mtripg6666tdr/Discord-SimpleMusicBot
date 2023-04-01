@@ -61,5 +61,12 @@
     "skipRequirement_other": "あと{{count}}人の賛成が必要です。",
     "skipIssuer": "{{issuer}}が、楽曲のスキップを提案しました。",
     "agree": "賛成"
+  },
+  "controlPanel": {
+    "rewind": "頭出し",
+    "play": "再生",
+    "pause": "一時停止",
+    "skip": "スキップ",
+    "onceloop": "ワンスループ"
   }
 }
