@@ -224,7 +224,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
   /** ローカライズされたコマンドの説明を取得します */
   getLocalizedDescription(locale: string){
-    return this.descriptionLocalization[locale as keyof LocaleMap] || this.description;
+    return i18next.t(`commands:${this.asciiName}.description` as any, { lng: locale });
   }
 
   /** 権限の確認と実行を一括して行います */
