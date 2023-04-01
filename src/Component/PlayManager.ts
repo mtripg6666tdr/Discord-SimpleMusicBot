@@ -18,12 +18,13 @@
 
 import type { AudioSource } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
-import type { AudioPlayer, AudioResource } from "@discordjs/voice";
+import type { AudioPlayer } from "@discordjs/voice";
 import type { Message, TextChannel } from "oceanic.js";
 import type { Readable } from "stream";
 
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
+import { NoSubscriberBehavior } from "@discordjs/voice";
 import { AudioPlayerStatus, createAudioResource, createAudioPlayer, entersState, StreamType, VoiceConnectionStatus } from "@discordjs/voice";
 import i18next from "i18next";
 
@@ -77,7 +78,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   protected _cost = 0;
   protected _finishTimeout = false;
   protected _player: AudioPlayer = null;
-  protected _resource: AudioResource = null;
+  protected _resource: FixedAudioResource = null;
   protected _waitForLiveAbortController: AbortController = null;
   protected _dsLogger: DSL = null;
   protected _playing: boolean = false;
@@ -153,8 +154,8 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
 
   setVolume(val: number){
     this._volume = val;
-    if(this._resource?.volume){
-      this._resource.volume.setVolume(val / 100);
+    if(this._resource?.volumeTransformer){
+      this._resource.volumeTransformer.setVolume(val / 100);
       return true;
     }
     return false;
@@ -238,7 +239,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
 
       // 情報からストリームを作成
       const voiceChannel = this.server.connectingVoiceChannel;
-      if(!voiceChannel) return this;
+      if(!voiceChannel){
+        return this;
+      }
       const { stream, streamType, cost, streams } = await resolveStreamToPlayable(rawStream, {
         effectArgs: getFFmpegEffectArgs(this.server),
         seek: this._seek,
@@ -432,6 +435,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     if(this._player || !this.server.connection) return;
     this._player = createAudioPlayer({
       debug: config.debug,
+      behaviors: {
+        noSubscriber: NoSubscriberBehavior.Stop,
+      },
     });
     if(config.debug){
       this._player.on("debug", message => this.logger.trace(`[InternalAudioPlayer] ${message}`));

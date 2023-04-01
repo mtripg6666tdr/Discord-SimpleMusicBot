@@ -19,16 +19,22 @@
 // This was included in v2
 // https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/v2/src/Component/AudioResource.ts
 
+import type { VolumeTransformer } from "prism-media";
+
 import { EventEmitter } from "stream";
 
 import * as voice from "@discordjs/voice";
 import { getLogger } from "log4js";
 
-
 class NullMetaAudioResource extends voice.AudioResource<null> {}
 
 const SILENCE_FRAME = Buffer.from([0xf8, 0xff, 0xfe]);
 const TIMEOUT = 20 * 1000;
+
+// hide 'volume' property trick
+export interface FixedAudioResource extends NullMetaAudioResource {
+  volume: never;
+}
 
 export class FixedAudioResource extends NullMetaAudioResource {
   public error = false;
@@ -38,6 +44,11 @@ export class FixedAudioResource extends NullMetaAudioResource {
   private readonly logger = getLogger("FixedAudioResource");
   private dataUnreadableAt = -1;
   private timedout = false;
+  protected _volume: VolumeTransformer = null;
+
+  get volumeTransformer(){
+    return this._volume;
+  }
 
   constructor(...args: ConstructorParameters<typeof NullMetaAudioResource>){
     super(...args);
@@ -120,6 +131,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
   static fromAudioResource(resource: voice.AudioResource, estimatedLengthSeconds: number){
     const _this = new this(resource.edges, [resource.playStream], null, resource.silencePaddingFrames);
     _this.estimatedLengthSeconds = estimatedLengthSeconds;
+    _this._volume = resource.volume;
     return _this;
   }
 }
