@@ -43,10 +43,11 @@ jobs:
 
       - name: Commit & Push
         run: |
-          git remote set-url origin "https://mtripg6666tdr:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git"
           git fetch
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add .
           git commit -m "Chore: fix lint issues" -m "* Automated changes"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
