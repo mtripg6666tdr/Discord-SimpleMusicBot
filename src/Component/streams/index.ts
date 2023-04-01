@@ -76,7 +76,7 @@ export async function resolveStreamToPlayable(
     return {
       stream: (streamInfo as ReadableStreamInfo).stream,
       streamType: streamInfo.streamType,
-      cost: 0,
+      cost: 1,
       streams: [(streamInfo as ReadableStreamInfo).stream],
     };
   }
@@ -139,7 +139,7 @@ export async function resolveStreamToPlayable(
       stream: pcmStream,
       streamType: "raw",
       streams,
-      cost: pcmCost,
+      cost: pcmCost + 0.5 + 1.5,
     };
   }else{
     // Unknown --(FFmpeg)--> Ogg/Opus
@@ -156,7 +156,7 @@ export async function resolveStreamToPlayable(
     return {
       stream: passThrough,
       streamType: ffmpegOutput === "webm" ? "webm/opus" : "ogg/opus",
-      cost: 2,
+      cost: 2 + 1,
       streams: [streamInfo.type === "readable" ? streamInfo.stream : undefined, ffmpeg, passThrough].filter(d => d),
     };
   }
