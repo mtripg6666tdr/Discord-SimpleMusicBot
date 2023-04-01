@@ -63,10 +63,10 @@
     "agree": "Upvote"
   },
   "controlPanel": {
-    "rewind": "頭出し",
-    "play": "再生",
-    "pause": "一時停止",
-    "skip": "スキップ",
-    "onceloop": "ワンスループ"
+    "rewind": "Rewind",
+    "play": "Play",
+    "pause": "Pause",
+    "skip": "Skip",
+    "onceloop": "Loop once"
   }
 }
