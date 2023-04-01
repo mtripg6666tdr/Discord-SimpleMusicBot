@@ -274,8 +274,8 @@
   "onceloop": {
     "name": "looponce",
     "description": "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
-    "disabled": "Disable loop once",
-    "enabled": "Enable loop once"
+    "disabled": "Disabled loop once",
+    "enabled": "Enabled loop once"
   },
   "pause": {
     "name": "pause",
