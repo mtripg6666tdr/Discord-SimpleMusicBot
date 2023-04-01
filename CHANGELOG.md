@@ -189,6 +189,7 @@
 **これは、プレリリースバージョンです**
 ## バグ修正
 * メッセージが正しい言語で表示されない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1326, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1327, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1328)
+* コストの計算が間違っていたのを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1333)
 ## その他の変更
 * 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1327, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1330)
 
