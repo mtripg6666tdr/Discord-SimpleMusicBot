@@ -73,7 +73,7 @@
   "startingUp": "Starting...",
   "maintenance": "On maintenance...",
   "music": "Music",
-  "suppressed": "My speaking is suppressed. To listen music, unlock server mute or allow me to [Mute Members].",
+  "suppressed": "Speaking is suppressed. To listen music, unlock server mute or allow me to [Mute Members].",
   "disconnected": "Disconnected successfully",
   "autoPaused": "Paused due to no members in the voice channel. Use `play` command to resume.",
   "autoDisconnect": "Disconnecting due to long inactive time.",
