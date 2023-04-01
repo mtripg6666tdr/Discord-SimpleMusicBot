@@ -37,7 +37,9 @@ jobs:
         run: npm run build
 
       - name: Generate documentation of commands
-        run: npm run generatecommandlist
+        run: |
+          cp util/config-for-test.json config.json
+          npm run generatecommandlist
 
       - name: Commit & Push
         run: |
