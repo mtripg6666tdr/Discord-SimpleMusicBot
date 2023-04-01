@@ -55,7 +55,7 @@
     "failed": "Failed to skip.",
     "embedTitle": "Vote to Skip",
     "howToUseSkipVote": "If you approve skipping `{{title}}`, press the button below.",
-    "skipVoteDescription": "If most of the members approved, this song would be skipped.",
+    "skipVoteDescription": "When requests for skipping become the majority, the current playing song will be skipped.",
     "currentStatus": "Current status",
     "skipRequirement_one": "{{count}} more approval is needed to skip this song.",
     "skipRequirement_other": "{{count}} more approvals are needed to skip this song.",

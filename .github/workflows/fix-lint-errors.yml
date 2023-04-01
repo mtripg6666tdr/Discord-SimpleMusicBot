@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_PAT }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -37,7 +39,9 @@ jobs:
         run: npm run build
 
       - name: Generate documentation of commands
-        run: npm run generatecommandlist
+        run: |
+          cp util/config-for-test.json config.json
+          npm run generatecommandlist
 
       - name: Commit & Push
         run: |
@@ -47,3 +51,4 @@ jobs:
           git add .
           git commit -m "Chore: fix lint issues" -m "* Automated changes"
           git push
+
