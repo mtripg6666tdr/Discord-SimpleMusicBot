@@ -166,3 +166,21 @@
 * Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
+
+# v4.0.0-beta.6
+**これは、プレリリースバージョンです**
+## バグ修正
+* メッセージが正しい言語で表示されない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1309, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1310, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1315, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1323)
+## 依存関係のアップデート
+* @sinclair/typebox 0.26.7 => 0.26.8
+* ytdl-core 4.11.2 => 4.11.3
+* ytsr 3.8.0 => 3.8.1
+## その他の変更
+* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1311, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1317, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1318, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1324)
+
+## その他の特記事項
+* これはプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
+* v4系では、Node.js v16.16以上が必須となります。
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
