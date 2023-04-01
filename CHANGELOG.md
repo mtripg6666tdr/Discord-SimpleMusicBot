@@ -199,3 +199,18 @@
 * Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
+
+# v4.0.0-beta.7
+**これは、プレリリースバージョンです**
+## バグ修正
+* 音量調整が機能しないバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1334)
+## その他の変更
+* メッセージコマンドのラベルを通常のコマンドとは別で管理する(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1335, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1336)
+* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1336)
+
+## その他の特記事項
+* これはプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
+* v4系では、Node.js v16.16以上が必須となります。
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
