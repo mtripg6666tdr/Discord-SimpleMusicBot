@@ -155,7 +155,7 @@ export class SkipManager extends ServerManagerBase<{}> {
             + i18next.t("components:skip.skipRequirement", { lng: this.parent.locale, count: Math.ceil(voiceSize / 2) - this.agreeUsers.size })
           )
           .setFooter({
-            text: i18next.t("components:skip.skipIssuer", { issuer: this.issuer }),
+            text: i18next.t("components:skip.skipIssuer", { issuer: this.issuer, lng: this.parent.locale }),
           })
           .toOceanic(),
       ],
