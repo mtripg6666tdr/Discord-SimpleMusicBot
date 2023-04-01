@@ -43,7 +43,7 @@ jobs:
 
       - name: Commit & Push
         run: |
-          git fetch
+          git config --global --add url."https://${{ secrets.GH_PAT }}:x-oauth-basic@github".insteadOf https://github
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add .
