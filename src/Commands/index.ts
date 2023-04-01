@@ -306,7 +306,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         nameLocalizations: {} as LocaleMap,
       };
       availableLanguages().forEach(language => {
-        messageCommand.nameLocalizations[language as keyof LocaleMap] = i18next.t(`commands:${this.asciiName}.name` as any, { lng: language });
+        messageCommand.nameLocalizations[language as keyof LocaleMap] = i18next.t(`commands:${this.asciiName}.messageCommandName` as any, { lng: language });
       });
       result.push(messageCommand);
     }
