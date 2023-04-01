@@ -108,7 +108,7 @@
   "help": {
     "name": "help",
     "description": "Show help",
-    "embedDescription": "I was made in order to upgrade experiences in Discord, by high-quality songs",
+    "embedDescription": "Made for your experiences in Discord with high-quality songs",
     "toLearnMore": "利用可能なコマンドを確認するには{{command}}を使用してください。",
     "developer": "Developer",
     "version": "Version",
@@ -438,7 +438,7 @@
   },
   "skip": {
     "name": "skip",
-    "description": "現在再生中の曲をスキップします。",
+    "description": "状況に応じて現在再生中の曲をスキップするか、スキップ投票を開始します。",
     "preparing": "Unable to skip due to preparing to play a song now.",
     "votePanelAlreadyOpen": "すでに開かれている投票パネルがあります。",
     "success": "Skipped `{{title}}`",
