@@ -149,7 +149,7 @@ export class SkipManager extends ServerManagerBase<{}> {
         new MessageEmbedBuilder()
           .setTitle(`:person_raising_hand: ${i18next.t("components:skip.embedTitle", { lng: this.parent.locale })}`)
           .setDescription(
-            i18next.t("components:skip.howToUseSkipVote", { title: this.currentSong.basicInfo.title })
+            i18next.t("components:skip.howToUseSkipVote", { title: this.currentSong.basicInfo.title, lng: this.parent.locale })
             + `${i18next.t("components:skip.skipVoteDescription", { lng: this.parent.locale })}\r\n\r\n`
             + `${i18next.t("components:skip.currentStatus", { lng: this.parent.locale })}: ${this.agreeUsers.size}/${voiceSize}\r\n`
             + i18next.t("components:skip.skipRequirement", { lng: this.parent.locale, count: Math.ceil(voiceSize / 2) - this.agreeUsers.size })
