@@ -130,7 +130,7 @@
   },
   "import": {
     "name": "import",
-    "messageCommandName": "インポート",
+    "messageCommandName": "Import",
     "description": "指定されたメッセージからキューをインポートします。exportコマンドで出力されたファイルが添付されたURLを引数として指定してください。",
     "examples": "import https://discord.com/channels/...",
     "usage": "import <URL>",
@@ -295,7 +295,7 @@
   },
   "play": {
     "name": "play",
-    "messageCommandName": "再生",
+    "messageCommandName": "Play",
     "description": "キュー内の楽曲を再生します。引数として対応しているサイトの楽曲のURLを指定することもできます。",
     "args": {
       "keyword": {
