@@ -23,7 +23,7 @@
     "name": "cancel",
     "description": "実行中のキャンセル可能な処理がある場合それをすべて中止します。",
     "canceling": "処理中の処理をすべてキャンセルしています....",
-    "noCancelable": "No tasks that ca be canceled."
+    "noCancelable": "No tasks that can be canceled."
   },
   "command": {
     "name": "Command",
