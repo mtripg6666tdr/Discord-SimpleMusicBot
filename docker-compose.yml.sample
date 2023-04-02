@@ -28,7 +28,7 @@ services:
       - mongo
 
   mongo:
-    image: mongo:latset
+    image: mongo:latest
     restart: always
     environment:
       - MONGO_INITDB_ROOT_USERNAME=dsmb
