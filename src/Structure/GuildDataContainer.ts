@@ -630,7 +630,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       const cancellation = this.bindCancellation(new TaskCancellationManager());
       try{
         const playlist = await Spotify.client.getData(rawArg) as Playlist;
-        const tracks = playlist.trackList.reverse();
+        const tracks = playlist.trackList;
         const index = await this.queue.processPlaylist(
           msg,
           cancellation,
