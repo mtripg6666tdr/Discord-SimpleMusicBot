@@ -8,7 +8,7 @@ services:
       # .envファイルのパスを指定
       - "path/to/your-environment-file"
     environment:
-      - DB_URL=mongodb://dsmb:hogehoge@localhost:27017/
+      - DB_URL=mongodb://dsmb:hogehoge@mongo:27017/
     volumes:
       - type: bind
         # config.jsonのパスを指定
