@@ -113,7 +113,7 @@ export default class Commands extends BaseCommand {
           .setTitle(t("commands:command.commandExplanation", { command: ci.name }))
           .setDescription(ci.getLocalizedDescription(context.locale))
           .setColor(getColor("COMMAND"))
-          .addField([...new Set([t("alias"), ...ci.alias])].join(", "))
+          .addField(t("alias"), `\`${ci.alias.filter(a => a !== t("alias")).join("`, `")}\``)
           .addField(t("permissionsToRun"), ci.getLocalizedPermissionDescription(context.locale))
         ;
         if(ci.usage){
