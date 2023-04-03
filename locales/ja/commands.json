@@ -180,9 +180,9 @@
   },
   "log": {
     "name": "システム情報",
-    "description": "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`、`cpu`、`basic`のうちいずれか)を指定して特定の内容のみ取得することもできます。",
-    "examples": "sysinfo mem",
-    "usage": "sysinfo [mem|cpu]",
+    "description": "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`、`cpu`、`basic`、`log`のうちいずれか)を指定して特定の内容のみ取得することもできます。",
+    "examples": "log mem",
+    "usage": "log [mem|cpu|basic|log]",
     "args": {
       "content": {
         "description": "basic,mem,cpuのどれかを指定できます。",
@@ -211,7 +211,16 @@
     "itemsInQueue": "キュー内のアイテム数",
     "currentTransformingCost": "現在の変換コスト",
     "liveStream": "ライブストリーム",
-    "memberCount": "メンバー数"
+    "memberCount": "メンバー数",
+    "version": "バージョン",
+    "managedCollectorsID": "保持されているコレクターのIDの合計",
+    "managedCollectors": "保持されているコレクター数",
+    "totalCost": "総変換コスト",
+    "memCacheTotal": "メモリキャッシュ数",
+    "memCacheGarbage": "廃棄メモリキャッシュ数",
+    "persistentCache": "恒常キャッシュサイズ",
+    "modules": "モジュール",
+    "incorrectArgument": "正しい引数を指定してください。"
   },
   "loop": {
     "name": "ループ",
