@@ -26,16 +26,16 @@ Enjoy your favorite songs with your friends, by using this OSS bot.
   - The default prefix is "`>`".
   - If you're running your own instance, you can change the bot's default prefix by editing `config.json`.(multiple letters' prefix is supported)
 - ▶️Autoplay songs, by pre-defined configuration
-- 👍 Support (Japanese only).
+- 👍 Support (Japanese and English available).
 
 ## Guide
 The documentation of the bot (Japanese).
 - [Documentation](https://web.usamyon.moe/Discord-SimpleMusicBot/)
 
 ## Contribution
-The bot is still in development phase so very buggy.  
+The bot is still in developing phase so very buggy.  
 Any contributions are welcome!  
-If you find any bugs, please confirm there's no duplicated issues at first and feel free to open a new issue.After it, open a pull request if you can.  
+If you find any bugs, please confirm there's no duplicated issues at first and feel free to open a new issue.After that, open a pull request if you can.  
 Not only opening issues, we accept inquiries in the support server below.  
 Feel free to contact us in any ways!
 
@@ -45,7 +45,7 @@ We have a plan to translate in English by ourselves, but we feel happy to transl
 [Project page on Crowdin](https://crowdin.com/project/discord-simplemusicbot)
 
 ## Support
-You can receive notifications on Discord when new versions are available.   
+You can receive notifications on Discord when new version is available.   
 [Support server](https://discord.gg/7DrAEXBMHe)  
 [Supported versions](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
 
