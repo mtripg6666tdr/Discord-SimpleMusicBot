@@ -76,7 +76,7 @@ export default class Commands extends BaseCommand {
             .setTitle(getCategoryText(categoriesList[i]))
             .addFields(
               ...commands[categoriesList[i]].map(ci => ({
-                name: `${ci.name}, ${ci.alias.join(", ")}`,
+                name: [...new Set([ci.name, ...ci.alias])].join(", "),
                 value: ci.getLocalizedDescription(context.locale),
                 inline: true,
               } as EmbedField))
@@ -113,7 +113,7 @@ export default class Commands extends BaseCommand {
           .setTitle(t("commands:command.commandExplanation", { command: ci.name }))
           .setDescription(ci.getLocalizedDescription(context.locale))
           .setColor(getColor("COMMAND"))
-          .addField(t("alias"), `\`${ci.alias.join("`, `")}\``)
+          .addField([...new Set([t("alias"), ...ci.alias])].join(", "))
           .addField(t("permissionsToRun"), ci.getLocalizedPermissionDescription(context.locale))
         ;
         if(ci.usage){
