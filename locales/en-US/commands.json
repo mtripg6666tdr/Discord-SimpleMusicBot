@@ -48,7 +48,7 @@
     "commandExplanation": "Details of Command `{{command}}`",
     "usageLabel": "Usage",
     "exampleLabel": "Example",
-    "argumentDescription": "The arguments in `<>` are required and ones in `[]` are optional.",
+    "argumentDescription": "The arguments in `<>` are required and them in `[]` are optional.",
     "commandNotFound": "Command not found"
   },
   "disconnect": {
