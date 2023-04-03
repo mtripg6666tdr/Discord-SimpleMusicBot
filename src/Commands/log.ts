@@ -229,7 +229,7 @@ export default class SystemInfo extends BaseCommand {
       await message.channel.createMessage({ embeds }).catch(this.logger.error);
     }
     if(embeds.length === 0){
-      await message.channel.createMessage({content:t("commands:log.incorrectArgument")}).catch(this.logger.error);
+      await message.channel.createMessage({ content: t("commands:log.incorrectArgument") }).catch(this.logger.error);
     }
   }
 }
