@@ -71,15 +71,15 @@ export default class SystemInfo extends BaseCommand {
       embeds.push(
         new MessageEmbedBuilder()
           .setTitle("Discord-SimpleMusicBot")
-          .setDescription("Basic info")
-          .addField("Version", `\`${context.bot.version}\``, true)
-          .addField("Managed collector customIds", `\`${context.bot.collectors.customIdLength}\``, true)
-          .addField("Managed collectors", `\`${context.bot.collectors.collectorLength}\``, true)
-          .addField("Current total transforming costs", `\`${context.bot.totalTransformingCost}\``, true)
-          .addField("Memory cache total count", `\`${cacheState.totalCount}\``, true)
-          .addField("Memory cache garbage count", `\`${cacheState.purgeScheduled}\``, true)
+          .setDescription("Basic Info")
+          .addField(t("commands:log.version"), `\`${context.bot.version}\``, true)
+          .addField(t("commands:log.managedCollectorsID"), `\`${context.bot.collectors.customIdLength}\``, true)
+          .addField(t("commands:log.managedCollectors"), `\`${context.bot.collectors.collectorLength}\``, true)
+          .addField(t("commands:log.totalCost"), `\`${context.bot.totalTransformingCost}\``, true)
+          .addField(t("commands:log.memCacheTotal"), `\`${cacheState.totalCount}\``, true)
+          .addField(t("commands:log.memCacheGarbage"), `\`${cacheState.purgeScheduled}\``, true)
           .addField(
-            "Persistent cache size",
+            t("commands:log.persistentCache"),
             `\`${
               await context.bot.cache.getPersistentCacheSize()
                 .then(size => getMBytes(size))
@@ -87,7 +87,7 @@ export default class SystemInfo extends BaseCommand {
             }MB\``,
             true
           )
-          .addField("Modules", [
+          .addField(t("commands:log.modules"), [
             "oceanic.js",
             "@mtripg6666tdr/oceanic-command-resolver",
             "@discordjs/voice",
@@ -227,6 +227,9 @@ export default class SystemInfo extends BaseCommand {
     
     if(embeds.length > 0){
       await message.channel.createMessage({ embeds }).catch(this.logger.error);
+    }
+    if(embeds.length === 0){
+      await message.channel.createMessage(t("commands:log.incorrectArgument")).catch(this.logger.error);
     }
   }
 }
