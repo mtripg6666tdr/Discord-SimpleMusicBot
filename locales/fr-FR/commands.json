@@ -131,7 +131,7 @@
   "import": {
     "name": "インポート",
     "messageCommandName": "インポート",
-    "description": "指定されたメッセージからキューをインポートします。exportコマンドで出力されたファイルが添付されたURLを引数として指定してください。",
+    "description": "指定されたメッセージからキューをインポートします。`export`コマンドで出力されたファイルが添付されたURLを引数として指定してください。",
     "examples": "import https://discord.com/channels/...",
     "usage": "Importer <URL à importer depuis>",
     "args": {
@@ -257,7 +257,7 @@
     "invalidArgumentCount": "引数は`移動したい曲の元の番号 移動先の番号`のように指定します。",
     "invalidIndex": "音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。",
     "moved": "`{{title}}`を`{{from}}`番目から`{{to}}`番目に移動しました。",
-    "originEqualsDestination": "移動元と移動先の要素が同じでした。",
+    "originEqualsDestination": "移動元と移動先の曲が同じでした。",
     "indexOutOfRange": "失敗しました。引数がキューの範囲外です。"
   },
   "movelastsongtofirst": {
@@ -385,7 +385,7 @@
   },
   "search": {
     "name": "検索",
-    "description": "曲をYouTubeで検索します。直接URLを直接指定することもできます。",
+    "description": "曲をYouTubeで検索します。",
     "examples": "検索 夜に駆ける",
     "usage": "検索 <キーワード>",
     "args": {
