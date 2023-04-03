@@ -37,10 +37,10 @@ export default class QueueLoop extends BaseCommand {
     context.server.updateBoundChannel(message);
     if(context.server.queue.queueLoopEnabled){
       context.server.queue.queueLoopEnabled = false;
-      message.reply(`:repeat:${t("commands:queueloop.disabled")}:x:`).catch(this.logger.error);
+      message.reply(`:repeat:${t("commands:loopqueue.disabled")}:x:`).catch(this.logger.error);
     }else{
       context.server.queue.queueLoopEnabled = true;
-      message.reply(`:repeat:${t("commands:queueloop.enabled")}:o:`).catch(this.logger.error);
+      message.reply(`:repeat:${t("commands:loopqueue.enabled")}:o:`).catch(this.logger.error);
     }
   }
 }

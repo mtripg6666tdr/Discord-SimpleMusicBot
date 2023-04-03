@@ -1,75 +1,75 @@
 {
   "bgm": {
     "name": "BGM",
-    "description": "Vous pouvez afficher une liste de lecture prédéfinie de BGM pour l'étude et le travail créé par le développeur, et sélectionner et lire ce que vous voulez entendre.",
-    "listOfPresetBGM": "Liste de musiques prédéfinies"
+    "description": "開発者が勝手に作った勉強用・作業用BGMのプリセットプレイリストを表示し、聞きたいものを選択して再生することができます。",
+    "listOfPresetBGM": "プリセットBGM一覧"
   },
   "bulk-delete": {
-    "invalidMessageCount": "Nombre de messages spécifié non valide.",
-    "loading": "obtenir",
-    "hitCount_one": "{{count}} visites",
-    "hitCount_other": "{{count}} visites",
-    "inCount_one": "sur {{count}} récupérés",
-    "inCount_other": "sur {{count}} récupérés",
-    "found_one": "{{count}} trouvé.",
-    "found_other": "{{count}} trouvé.",
-    "confirm": "Appuyez sur le bouton pour confirmer la suppression en bloc.\nS'il n'est pas enfoncé, il sera annulé après un certain temps.",
-    "auditLog_one": "{{count}} messages dont la suppression a été demandée par {{issuer}}.",
-    "auditLog_other": "{{count}} messages dont la suppression a été demandée par {{issuer}}.",
-    "finish": "Terminé ! (Ce message sera effacé automatiquement)",
-    "cancel": "Suppression annulée"
+    "invalidMessageCount": "指定されたメッセージ数が無効です。",
+    "loading": "取得中",
+    "hitCount_one": "{{count}}件ヒット",
+    "hitCount_other": "{{count}}件ヒット",
+    "inCount_one": "取得した{{count}}件中",
+    "inCount_other": "取得した{{count}}件中",
+    "found_one": "{{count}}件見つかりました。",
+    "found_other": "{{count}}件見つかりました。",
+    "confirm": "一括削除を確定するにはボタンを押してください。\r\n押されないと一定時間後にキャンセルされます。",
+    "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
+    "auditLog_other": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
+    "finish": "完了!(このメッセージは自動的に消去されます)",
+    "cancel": "削除をキャンセルしました"
   },
   "cancel": {
-    "name": "Annuler",
-    "description": "Abandonne toutes les opérations annulables en cours.",
-    "canceling": "Annulation de tous les traitements en cours....",
-    "noCancelable": "Aucun processus ne peut être annulé."
+    "name": "キャンセル",
+    "description": "実行中のキャンセル可能な処理がある場合それをすべて中止します。",
+    "canceling": "処理中の処理をすべてキャンセルしています....",
+    "noCancelable": "キャンセルできる処理がありませんでした。"
   },
   "command": {
-    "name": "commande",
-    "usage": "commande [nom de la commande]",
-    "examples": "commande recherche",
-    "description": "Affichez la liste des commandes. La spécification d'un nom de commande affiche les détails de cette commande.",
+    "name": "コマンド",
+    "usage": "command [コマンド名]",
+    "examples": "command search",
+    "description": "コマンド一覧を表示します。コマンド名を指定するとそのコマンドの詳細を表示します。",
     "args": {
       "command": {
-        "description": "Commande pour afficher les détails"
+        "description": "詳細表示するコマンド"
       }
     },
     "categories": {
-      "voice": "Système d'exploitation du salon vocal",
-      "player": "Système de contrôle du lecteur de musique",
-      "playlist": "Système d'exploitation de la liste de lecture",
-      "utility": "Système utilitaire",
-      "bot": "Fonctionnement général du bot"
+      "voice": "ボイスチャンネル操作系",
+      "player": "音楽プレイヤー制御系",
+      "playlist": "プレイリスト操作系",
+      "utility": "ユーティリティ系",
+      "bot": "ボット操作全般"
     },
-    "commandList": "Liste de commandes",
-    "toLearnMoreMessage": "Comme `{{prefix}} command replay`, vous pouvez ajouter un nom de commande comme argument pour afficher les détails de cette commande.",
-    "toLearnMoreInteraction": "Comme `/command play`, vous pouvez donner le nom de la commande comme argument pour afficher les détails de cette commande.",
-    "commandExplanation": "Détails de la commande `{{command}}`",
-    "usageLabel": "Usage",
-    "exampleLabel": "Cas d'utilisation",
-    "argumentDescription": "Les arguments entre `<>` sont des arguments obligatoires, les arguments entre `[]` sont des arguments facultatifs.",
-    "commandNotFound": "commande non trouvée"
+    "commandList": "コマンド一覧",
+    "toLearnMoreMessage": "`{{prefix}}コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
+    "toLearnMoreInteraction": "`/command 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
+    "commandExplanation": "コマンド`{{command}}`の詳細",
+    "usageLabel": "使い方",
+    "exampleLabel": "使用例",
+    "argumentDescription": "`<>` 内の引数は必須の引数、`[]`内の引数は任意の引数です。",
+    "commandNotFound": "コマンドが見つかりませんでした"
   },
   "disconnect": {
-    "name": "Coupe",
-    "description": "se déconnecter du salon vocal"
+    "name": "切断",
+    "description": "ボイスチャンネルから切断します"
   },
   "effect": {
-    "name": "effet",
-    "description": "Afficher le panneau de contrôle des effets.",
+    "name": "エフェクト",
+    "description": "エフェクトコントロールパネルを表示します。",
     "effectControllPanel": {
-      "title": "panneau de contrôle des effets",
-      "description": "Les effets audio peuvent être réglés/désactivés.\n・L'affichage peut contenir des informations anciennes, mais elles seront mises à jour lorsque vous appuyez sur le bouton de mise à jour lorsque vous utilisez l'effet.\n・Les effets sont appliqués à partir de la chanson suivante.\nSi vous voulez l'appliquer au morceau en cours, utilisez la commande `cue`.",
-      "footer": "Sélectionnez un effet et appuyez sur le bouton",
-      "reload": "renouveler"
+      "title": "エフェクトコントロールパネル",
+      "description": "オーディオエフェクトの設定/解除することができます。\n・表示は古い情報であることがありますが、エフェクトを操作したとき、更新ボタンを押したときに更新されます。\n・エフェクトは次の曲から適用されます。\n現在の曲に適用したい場合は、`頭出し`コマンドを使用してください。\n",
+      "footer": "エフェクトを選択してボタンを押してください",
+      "reload": "更新"
     }
   },
   "end": {
-    "name": "finir avec cette chanson",
-    "description": "Supprime toutes les chansons sauf la chanson en cours de lecture (en attente de lecture).",
-    "queueWasEmpty": "Il n'a pas été supprimé car la file d'attente est vide ou il n'y a qu'une seule chanson.",
-    "success": "Chansons supprimées laissées dans la file d'attente."
+    "name": "この曲で終了",
+    "description": "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します。",
+    "queueWasEmpty": "キューが空、もしくは一曲しかないため削除されませんでした。",
+    "success": "キューに残された曲を削除しました。"
   },
   "equallyplayback": {
     "name": "均等再生",
@@ -133,19 +133,19 @@
     "messageCommandName": "インポート",
     "description": "指定されたメッセージからキューをインポートします。exportコマンドで出力されたファイルが添付されたURLを引数として指定してください。",
     "examples": "import https://discord.com/channels/...",
-    "usage": "Importer <URL à importer depuis>",
+    "usage": "インポート <インポート元のURL>",
     "args": {
       "url": {
-        "description": "URL du message à importer depuis. Vous pouvez spécifier l'URL du message avec la sortie du fichier ymx par la commande d'exportation jointe."
+        "description": "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURLを指定できます。"
       }
     },
-    "invalidArgumentMessage": "Transmettez l'URL du message avec la file d'attente intégrée à partir de laquelle importer en tant qu'argument.",
-    "noDiscordLink": "Fournissez un lien vers votre message Discord.",
-    "invalidLink": "L'URL spécifiée n'est pas valide.",
-    "loadingMessage": "recevoir un message",
-    "notBotMessage": "Pas un message de robot",
-    "versionIncompatible": "Le fichier spécifié ne peut pas être importé car les versions sont incompatibles.",
-    "current": "en vigueur",
+    "invalidArgumentMessage": "インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。",
+    "noDiscordLink": "Discordのメッセージへのリンクを指定してください。",
+    "invalidLink": "指定されたURLは無効です。",
+    "loadingMessage": "メッセージを取得しています",
+    "notBotMessage": "ボットのメッセージではありません",
+    "versionIncompatible": "指定されたファイルはバージョンに互換性がないためインポートできません。",
+    "current": "現行",
     "file": "ファイル",
     "contentNotIncludedInMessage": "対象の内容が見つかりませんでした。"
   },

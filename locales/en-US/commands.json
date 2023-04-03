@@ -29,7 +29,7 @@
     "name": "Command",
     "usage": "command [name]",
     "examples": "command search",
-    "description": "コマンド一覧を表示します。コマンド名を指定するとそのコマンドの詳細を表示します。",
+    "description": "Shows the list of commands. If you specify a command, shows details of the command.",
     "args": {
       "command": {
         "description": "The command to show the details."
@@ -48,12 +48,12 @@
     "commandExplanation": "Details of Command `{{command}}`",
     "usageLabel": "Usage",
     "exampleLabel": "Example",
-    "argumentDescription": "The arguments in `<>` are required and them in `[]` are optional.",
+    "argumentDescription": "The arguments in `<>` are required and ones in `[]` are optional.",
     "commandNotFound": "Command not found"
   },
   "disconnect": {
     "name": "disconnect",
-    "description": "Disconnect from voice channel"
+    "description": "Disconnects from the voice channel."
   },
   "effect": {
     "name": "effect",
@@ -81,7 +81,7 @@
   "export": {
     "name": "export",
     "description": "キューの内容をインポートできるようエクスポートします。",
-    "queueEmpty": "キューが空なのでエクスポートできません。",
+    "queueEmpty": "Unable to export queue due to no items in queue.",
     "exported": "Exported",
     "compatiblity": "Version: v{{version}} compatible",
     "importInstruction": "When you import, set \"<{{url}}>\" for the argument of command `import`."
@@ -166,7 +166,7 @@
   },
   "join": {
     "name": "connect",
-    "description": "Join a voice channel.",
+    "description": "Joins the voice channel.",
     "alreadyConnected": "Already connected to the voice channel."
   },
   "leaveclean": {
@@ -176,13 +176,13 @@
     "queueEmpty": "Queue empty",
     "removed_one": "deleted {{count}} item",
     "removed_other": "deleted {{count}} items",
-    "removedNothing": "No item removed."
+    "removedNothing": "No item to remove."
   },
   "log": {
     "name": "systeminformation",
-    "description": "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`、`cpu`、`basic`のうちいずれか)を指定して特定の内容のみ取得することもできます。",
-    "examples": "sysinfo mem",
-    "usage": "sysinfo [mem|cpu]",
+    "description": "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`、`cpu`、`basic`、`log`のうちいずれか)を指定して特定の内容のみ取得することもできます。",
+    "examples": "log mem",
+    "usage": "log [mem|cpu|basic|log]",
     "args": {
       "content": {
         "description": "basic,mem,cpuのどれかを指定できます。",
@@ -196,28 +196,37 @@
     },
     "executing": "Executing...",
     "guildName": "Server name",
-    "participatingGuildCount": "参加サーバー数",
+    "participatingGuildCount": "Server(s) Participating",
     "registeredGuildCount": "データが保持されているサーバー数",
     "connectingGuildCount": "接続中サーバー数",
     "playingGuildCount": "再生中サーバー数(一時停止含む)",
     "pausedGuildCount": "一時停止サーバー数",
     "guildSearchResult": "サーバー照会結果(秘)",
     "guildId": "Server ID",
-    "guildIcon": "Server icon",
-    "guildChannelCountFromCache": "Channel count (cached)",
+    "guildIcon": "Server Icon",
+    "guildChannelCountFromCache": "Channel Count (cached)",
     "guildConnecting": "Connecting",
     "guildPlaying": "Playing/Paused",
     "guildPaused": "Paused",
     "itemsInQueue": "Item(s) in Queue",
     "currentTransformingCost": "Current Transforming Cost",
     "liveStream": "Livestream",
-    "memberCount": "Members"
+    "memberCount": "Members",
+    "version": "Version",
+    "managedCollectorsID": "Managed Collector Custom IDs",
+    "managedCollectors": "Managed Collectors",
+    "totalCost": "Current Total Transforming Costs",
+    "memCacheTotal": "Memory Cache Total Count",
+    "memCacheGarbage": "Memory Cache Garbage Count",
+    "persistentCache": "Persistent Cache Size",
+    "modules": "Modules",
+    "incorrectArgument": "Set the correct argument."
   },
   "loop": {
     "name": "loop",
     "description": "トラックごとのループを設定します。",
-    "disabled": "Track loop disabled.",
-    "enabled": "Track loop enabled."
+    "disabled": "Disabled track loop.",
+    "enabled": "Enabled track loop."
   },
   "lyrics": {
     "name": "lyrics",
@@ -308,7 +317,7 @@
     "noContent": "There's no content to play.",
     "resuming": "Resuming",
     "noMusicFound": "該当する楽曲が見つかりませんでした。",
-    "playing": "Play",
+    "playing": "Starting to play",
     "alreadyPlaying": "It's playing just now.",
     "queueEmpty": "キューが空です。再生するコンテンツがありません。"
   },
@@ -321,16 +330,10 @@
       }
     },
     "queueEmpty": "Queue empty",
-    "pageOutOfRange": "指定されたページは範囲外です。",
+    "pageOutOfRange": "The page you provided is out of the range.",
     "songCount_one": "{{count}} song",
     "songCount_other": "{{count}} songs",
     "total": "Total"
-  },
-  "queueloop": {
-    "name": "queueloop",
-    "description": "キュー内のループを設定します。",
-    "enabled": "Enabled queue loop.",
-    "disabled": "Disabled queue loop."
   },
   "related": {
     "name": "related",
@@ -365,7 +368,7 @@
   },
   "removedupes": {
     "name": "removedupes",
-    "description": "キュー内の重複（ちょうふく）している曲を削除します。",
+    "description": "Removes duplicated songs in queue.",
     "removedMany": "Removed duplicated songs.",
     "removedAt": "Removed the song(s) {{title}} at position {{indexes}}.",
     "noSongRemoved": "No duplicated songs that can be deleted."
@@ -377,8 +380,8 @@
   },
   "rewind": {
     "name": "rewind",
-    "description": "再生中の曲の頭出しを行い、初めから再生します。",
-    "success": "再生中の楽曲を頭出ししました。"
+    "description": "Rewinds the current playing song.",
+    "success": "Successfully rewound."
   },
   "search": {
     "name": "search",
@@ -390,7 +393,7 @@
         "description": "検索したい動画のキーワードまたはURL。"
       }
     },
-    "noArgument": "引数を指定してください。"
+    "noArgument": "Set the argument."
   },
   "searchqueue": {
     "name": "searchqueue",
@@ -407,7 +410,7 @@
   },
   "searchsoundcloud": {
     "name": "searchsoundcloud",
-    "description": "曲をSoundCloudで検索します。",
+    "description": "Searches a song on SoundCloud.",
     "examples": "ses sakura trip",
     "usage": "ses <keyword>",
     "args": {
@@ -471,7 +474,7 @@
   },
   "volume": {
     "name": "volume",
-    "description": "音量を調節します。1から200の間で指定します(デフォルト100)。何も引数を付けないと現在の音量を表示します。不安定になった場合には100に戻してください。",
+    "description": "Changes the volume. Set between 1 and 200. (The default value is 100.) When you provide no argument, shows the current volume. If it becomes unstable, set the volume to 100.",
     "examples": "volume [number]",
     "usage": "volume 120",
     "args": {
@@ -480,8 +483,14 @@
       }
     },
     "currentVolume": "現在の音量は**{{volume}}**です。(デフォルトは100)",
-    "outOfRange": "音量を変更する際は1から200の数字で指定してください。",
-    "changed": "音量を**{{volume}}**に変更しました。",
+    "outOfRange": "Please provide the value between 1 and 200.",
+    "changed": "Changed the volume to **{{volume}}**.",
     "appliedFromNext": "次の曲から適用されます。現在再生中の曲に設定を適用するには、`頭出し`コマンドなどを使用してください。"
+  },
+  "loopqueue": {
+    "disabled": "Disabled queue loop.",
+    "enabled": "Enabled queue loop.",
+    "name": "loopqueue",
+    "description": "キュー内のループを設定します。"
   }
 }
