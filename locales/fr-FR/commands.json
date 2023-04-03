@@ -28,7 +28,7 @@
   "command": {
     "name": "commande",
     "usage": "commande [nom de la commande]",
-    "examples": "recherche de commande",
+    "examples": "commande recherche",
     "description": "Affichez la liste des commandes. La spécification d'un nom de commande affiche les détails de cette commande.",
     "args": {
       "command": {
