@@ -48,12 +48,12 @@
     "commandExplanation": "Details of Command `{{command}}`",
     "usageLabel": "Usage",
     "exampleLabel": "Example",
-    "argumentDescription": "The arguments in `<>` are required and them in `[]` are optional.",
+    "argumentDescription": "The arguments in `<>` are required and ones in `[]` are optional.",
     "commandNotFound": "Command not found"
   },
   "disconnect": {
     "name": "disconnect",
-    "description": "Disconnect from voice channel"
+    "description": "Disconnects from the voice channel."
   },
   "effect": {
     "name": "effect",
@@ -81,7 +81,7 @@
   "export": {
     "name": "export",
     "description": "キューの内容をインポートできるようエクスポートします。",
-    "queueEmpty": "キューが空なのでエクスポートできません。",
+    "queueEmpty": "Unable to export queue due to no items in queue.",
     "exported": "Exported",
     "compatiblity": "Version: v{{version}} compatible",
     "importInstruction": "When you import, set \"<{{url}}>\" for the argument of command `import`."
@@ -317,7 +317,7 @@
     "noContent": "There's no content to play.",
     "resuming": "Resuming",
     "noMusicFound": "該当する楽曲が見つかりませんでした。",
-    "playing": "Play",
+    "playing": "Starting to play",
     "alreadyPlaying": "It's playing just now.",
     "queueEmpty": "キューが空です。再生するコンテンツがありません。"
   },
@@ -336,10 +336,7 @@
     "total": "Total"
   },
   "queueloop": {
-    "name": "queueloop",
-    "description": "キュー内のループを設定します。",
-    "enabled": "Enabled queue loop.",
-    "disabled": "Disabled queue loop."
+    "description": "キュー内のループを設定します。"
   },
   "related": {
     "name": "related",
@@ -416,7 +413,7 @@
   },
   "searchsoundcloud": {
     "name": "searchsoundcloud",
-    "description": "Finds a song on SoundCloud.",
+    "description": "Searches a song on SoundCloud.",
     "examples": "ses sakura trip",
     "usage": "ses <keyword>",
     "args": {
@@ -492,5 +489,10 @@
     "outOfRange": "Please provide the value between 1 and 200.",
     "changed": "Changed the volume to **{{volume}}**.",
     "appliedFromNext": "次の曲から適用されます。現在再生中の曲に設定を適用するには、`頭出し`コマンドなどを使用してください。"
+  },
+  "loopqueue": {
+    "disabled": "Disabled queue loop.",
+    "enabled": "Enabled queue loop.",
+    "name": "loopqueue"
   }
 }
