@@ -196,7 +196,7 @@
     },
     "executing": "Executing...",
     "guildName": "Server name",
-    "participatingGuildCount": "参加サーバー数",
+    "participatingGuildCount": "Server(s) Participating",
     "registeredGuildCount": "データが保持されているサーバー数",
     "connectingGuildCount": "接続中サーバー数",
     "playingGuildCount": "再生中サーバー数(一時停止含む)",
