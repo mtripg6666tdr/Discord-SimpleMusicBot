@@ -13,16 +13,16 @@
     "inCount_other": "in {{count}} messages",
     "found_one": "{{count}} message found.",
     "found_other": "{{count}} messages found.",
-    "confirm": "一括削除を確定するにはボタンを押してください。\r\n押されないと一定時間後にキャンセルされます。",
-    "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
-    "auditLog_other": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
+    "confirm": "Press the button below to confirm bulk-deletion.\nIf not, the operation will be automatically cancelled after a while.",
+    "auditLog_one": "Because {{issuer}} requested to delete {{count}} message.",
+    "auditLog_other": "Because {{issuer}} requested to delete {{count}} messages.",
     "finish": "Done! (This message will be deleted automatically)",
     "cancel": "Canceled the deletions."
   },
   "cancel": {
     "name": "cancel",
-    "description": "実行中のキャンセル可能な処理がある場合それをすべて中止します。",
-    "canceling": "処理中の処理をすべてキャンセルしています....",
+    "description": "Abort the all operations that can be canceled, if any.",
+    "canceling": "Canceling the all operations that can be canceled....",
     "noCancelable": "There's no task to be canceled."
   },
   "command": {
@@ -68,8 +68,8 @@
   "end": {
     "name": "end",
     "description": "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します。",
-    "queueWasEmpty": "キューが空、もしくは一曲しかないため削除されませんでした。",
-    "success": "キューに残された曲を削除しました。"
+    "queueWasEmpty": "None was removed because of no items or just one item in queue.",
+    "success": "Deleted all items left in queue."
   },
   "equallyplayback": {
     "name": "均等再生",
@@ -99,7 +99,7 @@
     "unsupported": "フレームのキャプチャ機能に非対応のソースです。",
     "fallbacking": "通常とは異なる方法を使用しているため、現在この機能を使用できません。",
     "liveStreamWithTime": "ライブストリームでは時間指定できません。",
-    "invalidTime": "時間の指定が正しくありません。",
+    "invalidTime": "Invalid time specification.",
     "capturing": "Capturing",
     "finish": "Done!",
     "timeAt": "at {{hour}}:{{min}}:{{sec}}",
@@ -107,9 +107,9 @@
   },
   "help": {
     "name": "help",
-    "description": "Show help",
+    "description": "Shows help.",
     "embedDescription": "Made for your experiences in Discord with high-quality songs",
-    "toLearnMore": "利用可能なコマンドを確認するには{{command}}を使用してください。",
+    "toLearnMore": "Use {{command}} to see the all available commands.",
     "developer": "Developer",
     "version": "Version",
     "repository": "Repository",
@@ -131,7 +131,7 @@
   "import": {
     "name": "import",
     "messageCommandName": "Import",
-    "description": "指定されたメッセージからキューをインポートします。exportコマンドで出力されたファイルが添付されたURLを引数として指定してください。",
+    "description": "Import queue from the specified message. Specify the URL of the message that has a file exported by `export` command.",
     "examples": "import https://discord.com/channels/...",
     "usage": "import <URL>",
     "args": {
@@ -179,7 +179,7 @@
     "removedNothing": "No item to remove."
   },
   "log": {
-    "name": "systeminformation",
+    "name": "systeminfo",
     "description": "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`、`cpu`、`basic`、`log`のうちいずれか)を指定して特定の内容のみ取得することもできます。",
     "examples": "log mem",
     "usage": "log [mem|cpu|basic|log]",
@@ -257,7 +257,7 @@
     "invalidArgumentCount": "引数は`移動したい曲の元の番号 移動先の番号`のように指定します。",
     "invalidIndex": "音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。",
     "moved": "`{{title}}`を`{{from}}`番目から`{{to}}`番目に移動しました。",
-    "originEqualsDestination": "移動元と移動先の要素が同じでした。",
+    "originEqualsDestination": "移動元と移動先の曲が同じでした。",
     "indexOutOfRange": "失敗しました。引数がキューの範囲外です。"
   },
   "movelastsongtofirst": {
@@ -289,14 +289,14 @@
   },
   "pause": {
     "name": "pause",
-    "description": "Pausing",
+    "description": "Pauses the current playing song.",
     "alreadyPaused": "Already paused",
     "usePlayToResume": "To resume playing, use command `play`.",
     "paused": "Paused"
   },
   "ping": {
     "name": "ping",
-    "description": "Show latency",
+    "description": "Shows latency.",
     "pingInfo": "Ping Info",
     "botMessageReceive": "ボットメッセージ取得",
     "botWebSocketConnection": "ボットWebSocket接続",
@@ -385,7 +385,7 @@
   },
   "search": {
     "name": "search",
-    "description": "曲をYouTubeで検索します。直接URLを直接指定することもできます。",
+    "description": "Shows a list of songs that match the search query on YouTube.",
     "examples": "search Into The Night",
     "usage": "search <keyword>",
     "args": {
@@ -410,7 +410,7 @@
   },
   "searchsoundcloud": {
     "name": "searchsoundcloud",
-    "description": "Searches a song on SoundCloud.",
+    "description": "Shows a list of songs that match the search query on SoundCloud.",
     "examples": "ses sakura trip",
     "usage": "ses <keyword>",
     "args": {
