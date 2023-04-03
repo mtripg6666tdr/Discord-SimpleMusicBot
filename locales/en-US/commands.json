@@ -459,7 +459,7 @@
         "description": "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します。"
       }
     },
-    "noSearchPanelFound": "検索結果が見つかりません。"
+    "noSearchPanelFound": "表示できるサムネイルがありません。"
   },
   "uptime": {
     "name": "uptime",
