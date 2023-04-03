@@ -1,13 +1,13 @@
 ---
-sidebar_label: loopqueue.name
+sidebar_label: キューループ
 ---
-# `loopqueue.name`コマンド
-loopqueue.description
+# `キューループ`コマンド
+キュー内のループを設定します。
 
 スラッシュコマンドでは、`/loopqueue`を使用してください。
 
 ## 別名
-`loopqueue.name`以外にも以下の別名を使用できます。
+`キューループ`以外にも以下の別名を使用できます。
 
 - loopqueue
 - queueloop
