@@ -25,7 +25,7 @@ import { BaseCommand } from ".";
 export default class QueueLoop extends BaseCommand {
   constructor(){
     super({
-      alias: ["queueloop", "loopqueue"],
+      alias: ["loopqueue", "queueloop"],
       unlist: false,
       category: "player",
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],

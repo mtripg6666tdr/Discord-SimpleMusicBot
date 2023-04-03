@@ -576,7 +576,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       }
       await this.player.play();
     }else if(!config.isDisabledSource("soundcloud") && SoundCloudS.validatePlaylistUrl(rawArg)){
-      const msg = await message.reply(`:hourglass_flowing_sand:${t("components:queue.processingPlaylist")}`);
+      const msg = await message.reply(`:hourglass_flowing_sand:${t("components:queue.processingPlaylistBefore")}`);
       const sc = new Soundcloud();
       const playlist = await sc.playlists.getV2(rawArg);
       const cancellation = this.bindCancellation(new TaskCancellationManager());
@@ -626,11 +626,11 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       }
       await this.player.play();
     }else if(!config.isDisabledSource("spotify") && Spotify.validatePlaylistUrl(rawArg) && Spotify.available){
-      const msg = await message.reply(`:hourglass_flowing_sand:${t("components:queue.processingPlaylist")}`);
+      const msg = await message.reply(`:hourglass_flowing_sand:${t("components:queue.processingPlaylistBefore")}`);
       const cancellation = this.bindCancellation(new TaskCancellationManager());
       try{
         const playlist = await Spotify.client.getData(rawArg) as Playlist;
-        const tracks = playlist.trackList.reverse();
+        const tracks = playlist.trackList;
         const index = await this.queue.processPlaylist(
           msg,
           cancellation,
