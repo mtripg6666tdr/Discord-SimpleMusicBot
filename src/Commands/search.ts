@@ -32,14 +32,19 @@ export abstract class SearchBase<T> extends BaseCommand {
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
 
-    // ボイスチャンネルへの参加の試みをしておく
-    context.server.joinVoiceChannel(message, {}, t);
-
     // URLが渡されたら、そのままキューに追加を試みる
     if(this.urlCheck(context.rawArgs)){
+      const joinResult = await context.server.joinVoiceChannel(message, { replyOnFail: true }, t);
+      if(!joinResult){
+        return;
+      }
+
       await context.server.playFromURL(message, context.args as string[], { first: !context.server.player.isConnecting }, t);
       return;
     }
+
+    // ボイスチャンネルへの参加の試みをしておく
+    context.server.joinVoiceChannel(message, {}, t);
 
     // 検索パネルがすでにあるなら
     if(context.server.searchPanel.has(message.member.id)){

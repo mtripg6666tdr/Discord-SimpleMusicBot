@@ -123,7 +123,7 @@ export interface CommandArgs {
    * @param guildid サーバーID
    * @param channelid チャンネルID
    */
-  initData: (guildid: string, channelid: string) => void;
+  initData: (guildid: string, channelid: string) => GuildDataContainer;
   /**
    * メンションをメッセージに含めるか
    */
