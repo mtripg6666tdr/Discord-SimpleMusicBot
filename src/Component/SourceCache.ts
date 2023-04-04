@@ -29,6 +29,7 @@ import { pipeline, Readable } from "stream";
 import zlib from "zlib";
 
 import { LogEmitter } from "../Structure";
+import { getMBytes } from "../Util/system";
 import { useConfig } from "../config";
 import { timeLoggedMethod } from "../logger";
 
@@ -45,6 +46,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
   private readonly _sourceCache: Map<string, AudioSource<any>> = null;
   private readonly _expireMap: Map<string, number> = null;
   private readonly cacheDirPath: string;
+  private lastCleanup: number = 0;
 
   constructor(protected bot: MusicBotBase, protected enablePersistent: boolean){
     super("Cache");
@@ -250,7 +252,13 @@ export class SourceCache extends LogEmitter<CacheEvents> {
 
   private async cleanupCache(){
     if(config.cacheLimit > 0){
+      if(Date.now() - this.lastCleanup < 3 * 60 * 60 * 1000) return;
+      this.logger.info("Start cleaning up cache files");
+      this.lastCleanup = Date.now();
+
       const maxSize = config.cacheLimit * 1024 * 1024;
+      this.logger.info(`Configured cache limit is ${config.cacheLimit}MB`);
+
       const items = await fs.promises.readdir(this.cacheDirPath, { withFileTypes: true });
       const files = await Promise.all(
         items.filter(d => d.isFile()).map(async d => {
@@ -264,8 +272,12 @@ export class SourceCache extends LogEmitter<CacheEvents> {
         })
       );
       files.sort((a, b) => a.lastAccess - b.lastAccess);
+
       const currentTotalSize = files.reduce((prev, current) => prev + current.size, 0);
+      this.logger.info(`Current total cache size: ${getMBytes(currentTotalSize)}MB`);
+
       if(currentTotalSize > maxSize){
+        this.logger.info("Searching stale caches...");
         const reduceSize = currentTotalSize - maxSize;
         const removePaths: string[] = [];
         let current = 0;
@@ -277,7 +289,12 @@ export class SourceCache extends LogEmitter<CacheEvents> {
           }
         }
 
+        this.logger.info(`${removePaths.length} caches will be purged and ${getMBytes(current)}MB disk space will be freed.`);
+
         await Promise.all(removePaths.map(logPath => fs.promises.unlink(logPath)));
+        this.logger.info("Cleaning up completed.");
+      }else{
+        this.logger.info("Skip deleting");
       }
     }
   }
