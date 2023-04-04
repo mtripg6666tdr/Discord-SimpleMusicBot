@@ -2,10 +2,10 @@
   "bgm": {
     "name": "bgm",
     "description": "Shows BGM playlists that the developer of this bot shares, and you can choose and play them.",
-    "listOfPresetBGM": "BGM Presets available"
+    "listOfPresetBGM": "Available BGM Presets"
   },
   "bulk-delete": {
-    "invalidMessageCount": "Provided an invalid message count.",
+    "invalidMessageCount": "Provided message count is invalid.",
     "loading": "Fetching",
     "hitCount_one": "{{count}} message found.",
     "hitCount_other": "{{count}} messages found.",
@@ -13,7 +13,7 @@
     "inCount_other": "in {{count}} messages",
     "found_one": "{{count}} message found.",
     "found_other": "{{count}} messages found.",
-    "confirm": "Press the button below to confirm bulk-deletion.\nIf not, the operation will be automatically cancelled after a while.",
+    "confirm": "Press the button below to confirm bulk-deletion of messages.\nIf not, the operation will be automatically cancelled after a while.",
     "auditLog_one": "Because {{issuer}} requested to delete {{count}} message.",
     "auditLog_other": "Because {{issuer}} requested to delete {{count}} messages.",
     "finish": "Done! (This message will be deleted automatically)",
@@ -21,8 +21,8 @@
   },
   "cancel": {
     "name": "cancel",
-    "description": "Abort the all operations that can be canceled, if any.",
-    "canceling": "Canceling the all operations that can be canceled....",
+    "description": "Aborts all operations that can be canceled, if any.",
+    "canceling": "Canceling all operations that can be canceled....",
     "noCancelable": "There's no task to be canceled."
   },
   "command": {
@@ -43,12 +43,12 @@
       "bot": "Bot Operation"
     },
     "commandList": "Command List",
-    "toLearnMoreMessage": "`{{prefix}}コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
-    "toLearnMoreInteraction": "`/command 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
+    "toLearnMoreMessage": "Like `{{prefix}} command play`, you can add a command name as an argument to display the details of that command.",
+    "toLearnMoreInteraction": "Like `/command play`, you can add a command name as an argument to display the details of that command.",
     "commandExplanation": "Details of Command `{{command}}`",
     "usageLabel": "Usage",
     "exampleLabel": "Example",
-    "argumentDescription": "The arguments in `<>` are required and them in `[]` are optional.",
+    "argumentDescription": "The arguments in `<>` are required and the arguments in `[]` are optional.",
     "commandNotFound": "Command not found"
   },
   "disconnect": {
@@ -68,7 +68,7 @@
   "end": {
     "name": "end",
     "description": "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します。",
-    "queueWasEmpty": "None was removed because of no items or just one item in queue.",
+    "queueWasEmpty": "Nothing was removed because of no items or just one item in queue.",
     "success": "Deleted all items left in queue."
   },
   "equallyplayback": {
@@ -98,8 +98,8 @@
     },
     "unsupported": "フレームのキャプチャ機能に非対応のソースです。",
     "fallbacking": "通常とは異なる方法を使用しているため、現在この機能を使用できません。",
-    "liveStreamWithTime": "ライブストリームでは時間指定できません。",
-    "invalidTime": "Invalid time specification.",
+    "liveStreamWithTime": "Unable to specify the time on livestream.",
+    "invalidTime": "Incorrect time specification.",
     "capturing": "Capturing",
     "finish": "Done!",
     "timeAt": "at {{hour}}:{{min}}:{{sec}}",
@@ -109,13 +109,13 @@
     "name": "help",
     "description": "Shows help.",
     "embedDescription": "Made for your experiences in Discord with high-quality songs",
-    "toLearnMore": "Use {{command}} to see the all available commands.",
+    "toLearnMore": "Use {{command}} to show all available commands.",
     "developer": "Developer",
     "version": "Version",
     "repository": "Repository",
     "sourceCode": "Source code",
     "supportServer": "Support server",
-    "availableSources": "現在対応している音楽ソース",
+    "availableSources": "Available Audio Sources",
     "keywordSearch": "keyword search",
     "videoUrl": "動画URL指定",
     "playlistUrl": "プレイリストURL指定",
@@ -139,7 +139,7 @@
         "description": "インポート元のメッセージのURL。exportコマンドで出力されたymxファイルが添付されたメッセージのURLを指定できます。"
       }
     },
-    "invalidArgumentMessage": "Pass the URL of a message as an argument that has an exported queue.",
+    "invalidArgumentMessage": "Send the URL of a message as an argument that has an exported queue.",
     "noDiscordLink": "Discordのメッセージへのリンクを指定してください。",
     "invalidLink": "The provided URL is invalid.",
     "loadingMessage": "Fetching message",
@@ -156,10 +156,10 @@
     "examples": "invoke play Into The Night",
     "args": {
       "command": {
-        "description": "実行するコマンド"
+        "description": "Command to execute"
       }
     },
-    "recursiveInvoke": "You cannot use the `invoke` command in `invoke` command.",
+    "recursiveInvoke": "You cannot use the `invoke` command with `invoke` command.",
     "executed": "Executed",
     "commandNotFound": "Command not found",
     "specialCommandNotFound": "特別コマンドが見つかりません。"
@@ -185,7 +185,7 @@
     "usage": "log [mem|cpu|basic|log]",
     "args": {
       "content": {
-        "description": "basic,mem,cpuのどれかを指定できます。",
+        "description": "You can choose from basic, mem and cpu.",
         "choices": {
           "basic": "Basic information",
           "mem": "Memory",
@@ -198,10 +198,10 @@
     "guildName": "Server name",
     "participatingGuildCount": "Server(s) Participating",
     "registeredGuildCount": "データが保持されているサーバー数",
-    "connectingGuildCount": "接続中サーバー数",
-    "playingGuildCount": "再生中サーバー数(一時停止含む)",
-    "pausedGuildCount": "一時停止サーバー数",
-    "guildSearchResult": "サーバー照会結果(秘)",
+    "connectingGuildCount": "Server(s) Connecting",
+    "playingGuildCount": "Server(s) Playing (include paused)",
+    "pausedGuildCount": "Server(s) Paused",
+    "guildSearchResult": "The Result of Inquiring the Server (SECRET)",
     "guildId": "Server ID",
     "guildIcon": "Server Icon",
     "guildChannelCountFromCache": "Channel Count (cached)",
@@ -224,7 +224,7 @@
   },
   "loop": {
     "name": "loop",
-    "description": "トラックごとのループを設定します。",
+    "description": "Toggles looping the current playing song.",
     "disabled": "Disabled track loop.",
     "enabled": "Enabled track loop."
   },
@@ -298,9 +298,9 @@
     "name": "ping",
     "description": "Shows latency.",
     "pingInfo": "Ping Info",
-    "botMessageReceive": "ボットメッセージ取得",
-    "botWebSocketConnection": "ボットWebSocket接続",
-    "voiceUdpConnection": "UDP connection of the voice channel"
+    "botMessageReceive": "Fetching Messages",
+    "botWebSocketConnection": "Connection to Web Socket",
+    "voiceUdpConnection": "UDP Connection of the Voice Channel"
   },
   "play": {
     "name": "play",
@@ -443,32 +443,32 @@
   },
   "skip": {
     "name": "skip",
-    "description": "状況に応じて現在再生中の曲をスキップするか、スキップ投票を開始します。",
+    "description": "Skips the current playing song or shows skip vote according to the situation.",
     "preparing": "Unable to skip due to preparing to play a song now.",
-    "votePanelAlreadyOpen": "すでに開かれている投票パネルがあります。",
+    "votePanelAlreadyOpen": "There's already another skip vote opened.",
     "success": "Skipped `{{title}}`",
     "failed": "Skip failed"
   },
   "thumbnail": {
     "name": "thumbnail",
-    "description": "現在再生中のサムネイルを表示します。検索パネルが開いていて検索パネル中の番号が指定された場合にはその曲のサムネイルを表示します。",
+    "description": "Shows the thumbnail of the current playing song. When a search result is opened and provided a number in the result, shows the thumbnail of the specified song.",
     "examples": "thumbnail 5",
-    "usage": "サムネイル [検索パネル中のインデックス]",
+    "usage": "thumbnail [a number in a search result]",
     "args": {
       "index": {
         "description": "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します。"
       }
     },
-    "noSearchPanelFound": "表示できるサムネイルがありません。"
+    "noSearchPanelFound": "There's no thumbnails to show."
   },
   "uptime": {
     "name": "uptime",
-    "description": "ボットのアップタイムを表示します。",
+    "description": "Shows bot's uptime.",
     "embedTitle": "{{name}} uptime",
-    "elapsedAfterInstantiated": "インスタンス作成からの経過時間",
-    "elapsedAfterConnected": "Discordに接続してからの経過時間",
+    "elapsedAfterInstantiated": "Elapsed Time from Bot Starts",
+    "elapsedAfterConnected": "Elapsed Time from Connecting Discord",
     "registeredServerCount": "データが保持されているサーバー数",
-    "datetimeLabel": "{{hour}} hour {{min}} minute {{sec}} second",
+    "datetimeLabel": "{{hour}} hours {{min}} minutes {{sec}} seconds",
     "serverCount_one": "{{count}} server",
     "serverCount_other": "{{count}} servers"
   },
@@ -479,18 +479,18 @@
     "usage": "volume 120",
     "args": {
       "volume": {
-        "description": "変更先の音量。1~200までが指定できます。"
+        "description": "The volume you change to. Set between 1 and 200."
       }
     },
-    "currentVolume": "現在の音量は**{{volume}}**です。(デフォルトは100)",
+    "currentVolume": "Current volume is **{{volume}}**. (The default is 100.)",
     "outOfRange": "Please provide the value between 1 and 200.",
     "changed": "Changed the volume to **{{volume}}**.",
-    "appliedFromNext": "次の曲から適用されます。現在再生中の曲に設定を適用するには、`頭出し`コマンドなどを使用してください。"
+    "appliedFromNext": "It will be applied from the next song. If you'd like to apply to the current playing song, use command `rewind`."
   },
   "loopqueue": {
     "disabled": "Disabled queue loop.",
     "enabled": "Enabled queue loop.",
     "name": "loopqueue",
-    "description": "キュー内のループを設定します。"
+    "description": "Toggles looping the entire queue."
   }
 }
