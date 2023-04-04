@@ -68,7 +68,7 @@ export async function onVoiceChannelLeave(
         ).catch(this.logger.error);
       }else if(!server.player.isPaused){
         // すでに一時停止されていないならば、一時停止する
-        server.player.pause();
+        server.player.pause(member);
         await this._client.rest.channels.createMessage(
           server.boundTextChannel,
           {

@@ -19,7 +19,7 @@
 import type { AudioSource } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { AudioPlayer } from "@discordjs/voice";
-import type { Message, TextChannel } from "oceanic.js";
+import type { Member, Message, TextChannel } from "oceanic.js";
 import type { Readable } from "stream";
 
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
@@ -82,6 +82,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   protected _waitForLiveAbortController: AbortController = null;
   protected _dsLogger: DSL = null;
   protected _playing: boolean = false;
+  protected _lastMember: string = null;
 
   get preparing(){
     return this._preparing;
@@ -259,6 +260,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       // 各種準備
       this._errorReportChannel = mes?.channel as TextChannel;
       this._cost = cost;
+      this._lastMember = null;
 
       // 再生
       this.prepareAudioPlayer();
@@ -540,10 +542,11 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
    * 一時停止します。
    * @returns this
    */
-  pause(): PlayManager{
+  pause(lastMember?: Member): PlayManager{
     this.logger.info("Pause called");
     this.emit("pause");
     this._player.pause();
+    this._lastMember = lastMember.id || null;
     return this;
   }
 
@@ -551,10 +554,13 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
    * 一時停止再生します。
    * @returns this
    */
-  resume(): PlayManager{
+  resume(member?: Member): PlayManager{
     this.logger.info("Resume called");
     this.emit("resume");
-    this._player.unpause();
+    if(!member || member.id === this._lastMember){
+      this._player.unpause();
+      this._lastMember = null;
+    }
     return this;
   }
 
