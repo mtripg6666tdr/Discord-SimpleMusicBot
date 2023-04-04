@@ -185,7 +185,7 @@
     "usage": "log [mem|cpu|basic|log]",
     "args": {
       "content": {
-        "description": "basic,mem,cpuのどれかを指定できます。",
+        "description": "basic,mem,cpu,logのどれかを指定できます。",
         "choices": {
           "basic": "基本情報",
           "mem": "メモリ",
@@ -359,7 +359,7 @@
     "removedMany": "指定された曲を削除しました。",
     "unableToRemoveAt": "{{indexes}}番目の曲は権限がないため削除できませんでした。",
     "unableToRemoveMany": "一部の曲は権限がないため削除できませんでした。",
-    "unableToRemoveAll": "削除できませんでした。リクエスト曲を削除するには権限が不足している可能性があります。"
+    "unableToRemoveAll": "削除できませんでした。リクエストされた曲を削除するには権限が不足している可能性があります。"
   },
   "removeall": {
     "name": "すべて削除",

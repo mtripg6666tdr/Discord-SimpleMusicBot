@@ -43,7 +43,7 @@
       "bot": "Bot Operation"
     },
     "commandList": "Command List",
-    "toLearnMoreMessage": "Like `{{prefix}} command play`, you can add a command name as an argument to display the details of that command.",
+    "toLearnMoreMessage": "Like `{{prefix}}command play`, you can add a command name as an argument to display the details of that command.",
     "toLearnMoreInteraction": "Like `/command play`, you can add a command name as an argument to display the details of that command.",
     "commandExplanation": "Details of Command `{{command}}`",
     "usageLabel": "Usage",
@@ -60,14 +60,14 @@
     "description": "Shows an effect control panel.",
     "effectControllPanel": {
       "title": "Effect Control Panel",
-      "description": "オーディオエフェクトの設定/解除することができます。\n・表示は古い情報であることがありますが、エフェクトを操作したとき、更新ボタンを押したときに更新されます。\n・エフェクトは次の曲から適用されます。\n現在の曲に適用したい場合は、`頭出し`コマンドを使用してください。\n",
+      "description": "You can configure audio effects.\n`-` The button styles may not show the actual current states. They will be updated when toggling the effect, or pressing the reload button.\n`-` All changes will be effected to the next songs.\nIf you'd like to apply to the current playing song, use the command `rewind`.\n",
       "footer": "Choose an effect you want to apply and press the button.",
       "reload": "Update"
     }
   },
   "end": {
     "name": "end",
-    "description": "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します。",
+    "description": "Removes all songs from queue except for the current song (or the song waiting to be played).",
     "queueWasEmpty": "Nothing was removed because of no items or just one item in queue.",
     "success": "Deleted all items left in queue."
   },
@@ -185,7 +185,7 @@
     "usage": "log [mem|cpu|basic|log]",
     "args": {
       "content": {
-        "description": "You can choose from basic, mem and cpu.",
+        "description": "You can choose from basic, mem, cpu and log.",
         "choices": {
           "basic": "Basic information",
           "mem": "Memory",
@@ -256,14 +256,14 @@
     },
     "invalidArgumentCount": "引数は`移動したい曲の元の番号 移動先の番号`のように指定します。",
     "invalidIndex": "音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。",
-    "moved": "`{{title}}`を`{{from}}`番目から`{{to}}`番目に移動しました。",
+    "moved": "Moved `{{title}}` from position `{{from}}` to `{{to}}`.",
     "originEqualsDestination": "移動元と移動先の曲が同じでした。",
     "indexOutOfRange": "失敗しました。引数がキューの範囲外です。"
   },
   "movelastsongtofirst": {
     "name": "最後の曲を先頭へ",
     "description": "キューの最後の曲をキューの先頭に移動します。",
-    "usableWhen3orMoreQueue": "キューに3曲以上追加されているときに使用できます。",
+    "usableWhen3orMoreQueue": "You can use this command when 3 or more items are present in queue.",
     "success": "`{{title}}`を一番最後からキューの先頭に移動しました。"
   },
   "news": {
@@ -299,7 +299,7 @@
     "description": "Shows latency.",
     "pingInfo": "Ping Info",
     "botMessageReceive": "Fetching Messages",
-    "botWebSocketConnection": "Connection to Web Socket",
+    "botWebSocketConnection": "Web Socket Connection",
     "voiceUdpConnection": "UDP Connection of the Voice Channel"
   },
   "play": {
@@ -311,12 +311,12 @@
         "description": "再生する動画のキーワードまたはURL。VCに未接続の場合接続してその曲を優先して再生します。接続中の場合はキューの末尾に追加します。一時停止中の場合はオプションは無視され、再生が再開されます。"
       },
       "audiofile": {
-        "description": "対応している音声ファイルをアップロードすることで、ファイルを再生することができます。"
+        "description": "You can upload and listen to supported audio files."
       }
     },
     "noContent": "There's no content to play.",
     "resuming": "Resuming",
-    "noMusicFound": "該当する楽曲が見つかりませんでした。",
+    "noMusicFound": "No results found.",
     "playing": "Starting to play",
     "alreadyPlaying": "It's playing just now.",
     "queueEmpty": "キューが空です。再生するコンテンツがありません。"
@@ -341,11 +341,11 @@
     "disabled": "Disabled autoplaying related songs.",
     "enabled": "Enabled autoplaying related songs.",
     "featureDescription": "YouTubeからの楽曲再生終了時に、関連曲をキューの末尾に自動追加する機能です。",
-    "featureNote": "※YouTube以外のソースからの再生時、ループ有効時には追加されません。"
+    "featureNote": "\\* Nothing will be added when playing songs not from YouTube, or loop enabled."
   },
   "remove": {
     "name": "remove",
-    "description": "キュー内の指定された位置の曲を削除します。",
+    "description": "Removes the specified songs in queue.",
     "examples": "rm 5",
     "usage": "remove <the position of the song you want to remove>",
     "args": {
@@ -354,16 +354,16 @@
       }
     },
     "noArgument": "引数に消去する曲のオフセット(番号)を入力してください。",
-    "invalidArgument": "現在再生中の楽曲を削除することはできません。",
+    "invalidArgument": "Unable to remove the current playing song.",
     "removedAt": "Removed the song(s) {{title}} at position {{indexes}}.",
-    "removedMany": "指定された曲を削除しました。",
-    "unableToRemoveAt": "{{indexes}}番目の曲は権限がないため削除できませんでした。",
-    "unableToRemoveMany": "一部の曲は権限がないため削除できませんでした。",
-    "unableToRemoveAll": "削除できませんでした。リクエスト曲を削除するには権限が不足している可能性があります。"
+    "removedMany": "Removed the specified songs.",
+    "unableToRemoveAt": "Unable to remove the songs at position {{indexes}}.",
+    "unableToRemoveMany": "Unable to remove some specified songs.",
+    "unableToRemoveAll": "No items could be removed. You may not meet the required permission to remove the requested songs."
   },
   "removeall": {
     "name": "clear",
-    "description": "キュー内の曲をすべて削除します。(接続中の場合ボイスチャンネルから離脱します。)",
+    "description": "Removes all items from queue. (will disconnect from the voice channel if connected to.)",
     "removed": "Cleared"
   },
   "removedupes": {
@@ -375,7 +375,7 @@
   },
   "reset": {
     "name": "reset",
-    "description": "サーバーのキュー、設定やデータを削除して初期化します。\r\n※接続中の場合ボイスチャンネルから離脱します。",
+    "description": "Reset all the data such as queue, settings and any other data.\n\\* The bot will disconnect from the voice channel if connected to.",
     "success": "Successfully reset the server settings."
   },
   "rewind": {
@@ -459,14 +459,14 @@
         "description": "検索パネル中のインデックスを指定するとその項目のサムネイルを表示します。"
       }
     },
-    "noSearchPanelFound": "There's no thumbnails to show."
+    "noSearchPanelFound": "There are no thumbnails to show."
   },
   "uptime": {
     "name": "uptime",
     "description": "Shows bot's uptime.",
     "embedTitle": "{{name}} uptime",
     "elapsedAfterInstantiated": "Elapsed Time from Bot Starts",
-    "elapsedAfterConnected": "Elapsed Time from Connecting Discord",
+    "elapsedAfterConnected": "Elapsed Time from Connecting to Discord",
     "registeredServerCount": "データが保持されているサーバー数",
     "datetimeLabel": "{{hour}} hours {{min}} minutes {{sec}} seconds",
     "serverCount_one": "{{count}} server",
