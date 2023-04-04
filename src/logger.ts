@@ -18,11 +18,11 @@
 
 import type { LoggingEvent } from "log4js";
 
+import fs from "fs";
 import path from "path";
 import { isMainThread } from "worker_threads";
 
 import log4js from "log4js";
-import fs from "fs";
 
 import { stringifyObject } from "./Util";
 import { useConfig } from "./config";
