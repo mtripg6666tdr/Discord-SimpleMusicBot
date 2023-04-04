@@ -64,25 +64,28 @@ export async function onVoiceChannelJoin(
       });
       this.emit("onBotVoiceChannelJoin", voiceChannel);
     }
-  }else if(this.guildData.has(member.guild.id)){
-    server.skipSession?.checkThreshold();
-    if(
-      server instanceof GuildDataContainerWithBgm
+  }
+
+  server.skipSession?.checkThreshold();
+  if(
+    server instanceof GuildDataContainerWithBgm
+      && (
+        newChannel.id === server.bgmConfig.voiceChannelId
         && (
-          newChannel.id === server.bgmConfig.voiceChannelId
-          && (
+          (
             (
-              (
-                !server.connection
-                || (server.bgmConfig.mode === "prior" && server.connectingVoiceChannel.id !== server.bgmConfig.voiceChannelId))
-              && !server.queue.isBGM
-            )
-            || server.player.finishTimeout
+              !server.connection
+              || (server.bgmConfig.mode === "prior" && server.connectingVoiceChannel.id !== server.bgmConfig.voiceChannelId))
+            && !server.queue.isBGM
           )
+          || server.player.finishTimeout
         )
-    ){
-      // BGMを再生する条件が整っている
-      server.playBgmTracks();
-    }
+      )
+  ){
+    // BGMを再生する条件が整っている
+    server.playBgmTracks();
+  }else if(server.player.isPaused){
+    // 自動で一時停止している場合には再開
+    server.player.resume(member);
   }
 }
