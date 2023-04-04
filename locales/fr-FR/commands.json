@@ -72,15 +72,15 @@
     "success": "Chansons supprimées laissées dans la file d'attente."
   },
   "equallyplayback": {
-    "name": "均等再生",
-    "description": "追加ユーザーごとにキュー内の楽曲を均等に再生します。",
-    "enabled": "均等再生をオンにしました",
-    "disabled": "均等再生をオフにしました",
-    "featureDescription": "楽曲追加時に、楽曲を追加したユーザーごとにできるだけ均等になるようにする機能です。"
+    "name": "Jeu égal",
+    "description": "Jouez uniformément des chansons dans la file d'attente pour chaque utilisateur supplémentaire.",
+    "enabled": "Jeu égal activé",
+    "disabled": "J'ai désactivé la lecture égale",
+    "featureDescription": "Il s'agit d'une fonction qui le rend aussi uniforme que possible pour chaque utilisateur qui a ajouté des chansons lors de l'ajout de chansons."
   },
   "export": {
-    "name": "エクスポート",
-    "description": "キューの内容をインポートできるようエクスポートします。",
+    "name": "exporter",
+    "description": "Exportez le contenu de la file d'attente afin qu'il puisse être importé.",
     "queueEmpty": "キューが空なのでエクスポートできません。",
     "exported": "エクスポートしました",
     "compatiblity": "バージョン: v{{version}}互換",
@@ -390,74 +390,74 @@
     "success": "再生中の楽曲を頭出ししました。"
   },
   "search": {
-    "name": "検索",
-    "description": "曲をYouTubeで検索します。",
-    "examples": "検索 夜に駆ける",
-    "usage": "検索 <キーワード>",
+    "name": "recherche",
+    "description": "Recherchez des chansons sur YouTube.",
+    "examples": "Courir dans la nuit",
+    "usage": "rechercher <mot-clé>",
     "args": {
       "keyword": {
-        "description": "検索したい動画のキーワードまたはURL。"
+        "description": "Mot-clé ou URL de la vidéo que vous souhaitez rechercher."
       }
     },
-    "noArgument": "引数を指定してください。"
+    "noArgument": "Mot-clé ou URL de la vidéo que vous souhaitez rechercher."
   },
   "searchqueue": {
-    "name": "キュー内を検索",
-    "description": "キュー内を検索します。引数にキーワードを指定します。",
-    "examples": "seq pretender",
-    "usage": "seq <キーワード>",
+    "name": "Rechercher dans la file d'attente",
+    "description": "Recherche dans la file d'attente. Spécifiez un mot-clé pour l'argument.",
+    "examples": "faire semblant de suite",
+    "usage": "suite <mot-clé>",
     "args": {
       "keyword": {
-        "description": "検索したい楽曲のキーワード"
+        "description": "Mot-clé de la chanson que vous souhaitez rechercher"
       }
     },
-    "queueEmpty": "キューが空です",
-    "embedDescription": "キュー内での検索結果です。最大20件表示されます。"
+    "queueEmpty": "la file d'attente est vide",
+    "embedDescription": "Résultats de la recherche dans la file d'attente. Jusqu'à 20 éléments sont affichés."
   },
   "searchsoundcloud": {
-    "name": "サウンドクラウドを検索",
-    "description": "曲をSoundCloudで検索します。",
+    "name": "Rechercher",
+    "description": "Recherchez des chansons sur SoundCloud.",
     "examples": "ses sakura trip",
-    "usage": "ses <キーワード>",
+    "usage": "ses <mot-clé>",
     "args": {
       "keyword": {
-        "description": "検索したい楽曲のキーワードまたはURL。"
+        "description": "Mot-clé ou URL de la chanson que vous souhaitez rechercher."
       }
     }
   },
   "seek": {
-    "name": "シーク",
-    "description": "楽曲をシークします。",
-    "examples": "シーク 0:30",
-    "usage": "シーク <時間(秒数または時間:分:秒の形式で)>",
+    "name": "chercher",
+    "description": "Cherchez la musique.",
+    "examples": "chercher 0:30",
+    "usage": "chercher <heure (en secondes ou au format heures:minutes:secondes)>",
     "args": {
       "keyword": {
-        "description": "シーク先の時間"
+        "description": "Chercher à temps"
       }
     },
-    "unseekable": "シーク先に対応していない楽曲です。",
-    "invalidTime": "シーク先の時間が正しくありません。",
-    "seeking": "シークしています",
-    "success": "シークしました",
-    "failed": "シークに失敗しました"
+    "unseekable": "Cette chanson ne correspond pas à la destination de recherche.",
+    "invalidTime": "Cherchez à l'heure incorrecte.",
+    "seeking": "En cherchant",
+    "success": "recherché",
+    "failed": "la recherche a échoué"
   },
   "shuffle": {
-    "name": "シャッフル",
-    "description": "キューの内容をシャッフルします。",
-    "queueEmpty": "キューが空です。",
-    "success": "シャッフルしました"
+    "name": "mélanger",
+    "description": "Mélangez le contenu de la file d'attente.",
+    "queueEmpty": "La file d'attente est vide.",
+    "success": "mélangé"
   },
   "skip": {
-    "name": "スキップ",
-    "description": "状況に応じて現在再生中の曲をスキップするか、スキップ投票を開始します。",
-    "preparing": "現在再生準備中のためスキップできません。",
-    "votePanelAlreadyOpen": "すでに開かれている投票パネルがあります。",
-    "success": "`{{title}}`をスキップしました",
-    "failed": "スキップに失敗しました"
+    "name": "sauter",
+    "description": "Éventuellement, sautez la chanson en cours de lecture ou lancez un vote de saut.",
+    "preparing": "Impossible de sauter car il se prépare actuellement à jouer.",
+    "votePanelAlreadyOpen": "Il y a un panneau de vote déjà ouvert.",
+    "success": "ignoré `{{title}}`",
+    "failed": "n'a pas réussi à sauter"
   },
   "thumbnail": {
-    "name": "サムネイル",
-    "description": "現在再生中のサムネイルを表示します。検索パネルが開いていて検索パネル中の番号が指定された場合にはその曲のサムネイルを表示します。",
+    "name": "vignette",
+    "description": "Affiche la vignette en cours de lecture. Si le panneau de recherche est ouvert et qu'un numéro dans le panneau de recherche est spécifié, la vignette de cette chanson s'affichera.",
     "examples": "サムネイル 5",
     "usage": "サムネイル [検索パネル中のインデックス]",
     "args": {
