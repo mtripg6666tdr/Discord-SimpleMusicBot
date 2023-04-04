@@ -220,7 +220,7 @@ const deleteFiles = fs.readdirSync(path.join(__dirname, "../logs/"), { withFileT
   .sort()
   .slice(0, -maxLogFiles);
 
-if (deleteFiles.length > 0){
+if(deleteFiles.length > 0){
   logger.debug("Deleted " + deleteFiles.length + " log files.");
 
   deleteFiles.forEach(name => fs.unlinkSync(path.join(__dirname, "../logs", name)));
