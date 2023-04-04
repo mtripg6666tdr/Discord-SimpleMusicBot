@@ -21,6 +21,8 @@ import type { exportableYouTube } from "..";
 import type { UrlStreamInfo } from "../../audiosource";
 import type { InfoData } from "play-dl";
 
+import { StreamType } from "@discordjs/voice";
+import { stream_from_info } from "play-dl";
 import { video_info } from "play-dl";
 
 import { Strategy } from "./base";
@@ -46,7 +48,6 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
     this.logStrategyUsed();
     let info = null as InfoData;
@@ -70,17 +71,31 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
           data: info,
         },
       };
-    }else{
+    }else if(forceUrl){
       const format = info.format.filter(f => f.mimeType.startsWith("audio"));
       if(format.length === 0) throw new Error("no format found!");
       format.sort((fa, fb) => fb.bitrate - fa.bitrate);
       return {
         ...partialResult,
         stream: {
-          type: "url",
+          type: "url" as const,
           url: format[0].url,
-          streamType: (format[0] as any)["container"] === "webm" && (format[0] as any)["codec"] === "opus" ? "webm/opus" : undefined,
-        } as UrlStreamInfo,
+          streamType: (format[0] as any)["container"] === "webm" && (format[0] as any)["codec"] === "opus" ? "webm/opus" as const : undefined,
+        },
+        cache: {
+          type: playDl,
+          data: info,
+        },
+      };
+    }else{
+      const stream = await stream_from_info(info, { quality: 2, discordPlayerCompatibility: true });
+      return {
+        ...partialResult,
+        stream: {
+          type: "readable" as const,
+          stream: stream.stream,
+          streamType: stream.type === StreamType.WebmOpus ? "webm/opus" as const : undefined,
+        },
         cache: {
           type: playDl,
           data: info,
