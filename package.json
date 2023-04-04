@@ -16,7 +16,7 @@
     "generatecommandlist": "node util/generateCommandList"
   },
   "dependencies": {
-    "@discordjs/voice": "^0.15.0",
+    "@discordjs/voice": "^0.16.0",
     "@mtripg6666tdr/async-lock": "^1.1.0",
     "@mtripg6666tdr/oceanic-command-resolver": "^1.0.0-alpha.9",
     "@sinclair/typebox": "^0.26.8",
@@ -27,7 +27,7 @@
     "html-entities": "^2.3.3",
     "html-to-text": "^9.0.5",
     "https-proxy-agent": "^5.0.1",
-    "i18next": "^22.4.13",
+    "i18next": "^22.4.14",
     "i18next-fs-backend": "^2.1.1",
     "log4js": "^6.9.1",
     "miniget": "^4.2.2",
@@ -52,8 +52,8 @@
     "@types/node": "^18.15.11",
     "@types/throttle-debounce": "^5.0.0",
     "@types/ws": "^8.5.4",
-    "@typescript-eslint/eslint-plugin": "^5.57.0",
-    "@typescript-eslint/parser": "^5.57.0",
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/parser": "^5.57.1",
     "eslint": "^8.37.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.27.5",
