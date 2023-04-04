@@ -63,6 +63,7 @@ export const ConfigSchema = Type.Object({
   ], { default: "memory" }),
   defaultLanguage: Type.String({ default: "ja" }),
   country: Type.String({ default: "JP" }),
+  maxLogFiles: Type.Optional(Type.Number({ default: 100 })),
 });
 
 export type GuildBGMContainerType = Static<typeof GuildBGMContainer>;
