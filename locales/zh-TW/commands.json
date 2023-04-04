@@ -36,28 +36,28 @@
       }
     },
     "categories": {
-      "voice": "ボイスチャンネル操作系",
-      "player": "音楽プレイヤー制御系",
-      "playlist": "プレイリスト操作系",
-      "utility": "ユーティリティ系",
-      "bot": "ボット操作全般"
+      "voice": "語音通道操作系統",
+      "player": "音樂播放器控制系統",
+      "playlist": "播放列表操作系統",
+      "utility": "實用系統",
+      "bot": "一般機器人操作"
     },
-    "commandList": "コマンド一覧",
-    "toLearnMoreMessage": "`{{prefix}}コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
-    "toLearnMoreInteraction": "`/command 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
-    "commandExplanation": "コマンド`{{command}}`の詳細",
-    "usageLabel": "使い方",
-    "exampleLabel": "使用例",
-    "argumentDescription": "`<>` 内の引数は必須の引数、`[]`内の引数は任意の引数です。",
-    "commandNotFound": "コマンドが見つかりませんでした"
+    "commandList": "命令列表",
+    "toLearnMoreMessage": "與 `{{prefix}} command replay` 一樣，您可以添加命令名稱作為參數以顯示該命令的詳細信息。",
+    "toLearnMoreInteraction": "與 `/command play` 一樣，您可以將命令名稱作為參數提供，以顯示該命令的詳細信息。",
+    "commandExplanation": "命令 `{{command}}` 的詳細信息",
+    "usageLabel": "教學",
+    "exampleLabel": "使用範例",
+    "argumentDescription": "`<>` 中的參數是必需參數，`[]` 中的參數是可選參數。",
+    "commandNotFound": "找不到命令"
   },
   "disconnect": {
-    "name": "切断",
-    "description": "ボイスチャンネルから切断します"
+    "name": "切割",
+    "description": "斷開語音通道"
   },
   "effect": {
-    "name": "エフェクト",
-    "description": "エフェクトコントロールパネルを表示します。",
+    "name": "影響",
+    "description": "顯示效果控制面板。",
     "effectControllPanel": {
       "title": "エフェクトコントロールパネル",
       "description": "オーディオエフェクトの設定/解除することができます。\n・表示は古い情報であることがありますが、エフェクトを操作したとき、更新ボタンを押したときに更新されます。\n・エフェクトは次の曲から適用されます。\n現在の曲に適用したい場合は、`頭出し`コマンドを使用してください。\n",
