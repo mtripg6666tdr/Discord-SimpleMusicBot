@@ -505,10 +505,12 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       this.server.connection.disconnect();
       this.server.connection.destroy();
       this.emit("disconnect");
-      this.destroyStream();
     }else{
       this.logger.warn("Disconnect called but no connection");
     }
+
+    // attempt to destroy current stream
+    this.destroyStream();
 
     this.server.connection = null;
     this.server.connectingVoiceChannel = null;
@@ -546,7 +548,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.logger.info("Pause called");
     this.emit("pause");
     this._player.pause();
-    this._lastMember = lastMember.id || null;
+    this._lastMember = lastMember?.id || null;
     return this;
   }
 

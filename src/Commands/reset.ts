@@ -20,6 +20,8 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { i18n } from "i18next";
 
+import { Routes } from "oceanic.js";
+
 import { BaseCommand } from ".";
 
 export default class Reset extends BaseCommand {
@@ -30,15 +32,48 @@ export default class Reset extends BaseCommand {
       category: "utility",
       requiredPermissionsOr: ["manageGuild"],
       shouldDefer: false,
+      argument: [
+        {
+          type: "bool",
+          name: "preservequeue",
+          required: false,
+        },
+      ],
     });
   }
 
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     // VC接続中なら切断
     context.server.player.disconnect();
+
+    const queueItems = context.args[0]?.toLowerCase() === "true" ? context.server.queue.getRawQueueItems() : null;
+
+    // データホルダーからデータを削除
     context.server.bot.resetData(message.guild.id);
-    // データ初期化
-    context.initData(message.guild.id, message.channel.id);
+
+    // レートリミットの制限をすべて解除
+    const bucket = context.client.rest.handler.ratelimits[Routes.CHANNEL_MESSAGES(context.server.boundTextChannel)];
+    if(bucket){
+      // キューをすべて消すためのトリック
+      let allPurged = false;
+      bucket.queue(cb => {
+        allPurged = true;
+        cb();
+      });
+      do{
+        bucket["check"](/* force */ true);
+      // eslint-disable-next-line no-unmodified-loop-condition
+      } while(!allPurged);
+    }
+
+    // データあたらしく初期化
+    const newServer = context.initData(message.guild.id, message.channel.id);
+
+    // キューの復元を試みる
+    if(queueItems){
+      newServer.queue.addRawQueueItems(queueItems);
+    }
+
     message.reply(`✅${t("commands:reset.success")}`).catch(this.logger.error);
   }
 }
