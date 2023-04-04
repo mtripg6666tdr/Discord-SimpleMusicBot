@@ -216,7 +216,7 @@ export function timeLoggedMethod<This, Args extends any[], Return>(
 const logger = getLogger("Logger");
 const deleteFiles = fs.readdirSync(path.join(__dirname, "../logs/"), { withFileTypes: true }).filter(d => d.isFile() && d.name.endsWith(".log")).map(d => d.name).sort().slice(0, -maxLogFiles);
 
-logger.info("Deleted " + deleteFiles.length + " log files.");
+logger.debug("Deleted " + deleteFiles.length + " log files.");
 
 deleteFiles.forEach(name => fs.unlinkSync(path.join(__dirname, "../logs", name)));
 
