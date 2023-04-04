@@ -22,11 +22,13 @@ import path from "path";
 import { isMainThread } from "worker_threads";
 
 import log4js from "log4js";
+import fs from "fs";
 
 import { stringifyObject } from "./Util";
 import { useConfig } from "./config";
 
-const { debug } = useConfig();
+const { debug, maxLogFiles } = useConfig();
+
 
 const tokens = {
   category: function(logEvent: LoggingEvent){
@@ -208,3 +210,13 @@ export function timeLoggedMethod<This, Args extends any[], Return>(
     }
   };
 }
+
+//古いログファイルの削除
+
+const logger = getLogger("Logger");
+const deleteFiles = fs.readdirSync(path.join(__dirname, "../logs/"), { withFileTypes: true }).filter(d => d.isFile() && d.name.endsWith(".log")).map(d => d.name).sort().slice(0, -maxLogFiles);
+
+logger.info("Deleted " + deleteFiles.length + " log files.");
+
+deleteFiles.forEach(name => fs.unlinkSync(path.join(__dirname, "../logs", name)));
+

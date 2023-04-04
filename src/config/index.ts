@@ -88,6 +88,7 @@ class ConfigLoader {
       // optional options default value
       {
         disabledSources: [],
+        maxLogFiles: 100,
       },
       // loaded config
       config,
