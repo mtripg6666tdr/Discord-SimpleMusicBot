@@ -89,6 +89,7 @@ class ConfigLoader {
       {
         disabledSources: [],
         maxLogFiles: 100,
+        cacheLimit: 500,
       },
       // loaded config
       config,

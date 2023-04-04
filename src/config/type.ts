@@ -61,6 +61,7 @@ export const ConfigSchema = Type.Object({
     Type.Literal("persistent"),
     //Type.Literal("full"),
   ], { default: "memory" }),
+  cacheLimit: Type.Optional(Type.Number({ default: 500 })),
   defaultLanguage: Type.String({ default: "ja" }),
   country: Type.String({ default: "JP" }),
   maxLogFiles: Type.Optional(Type.Number({ default: 100 })),

@@ -211,8 +211,8 @@ export function timeLoggedMethod<This, Args extends any[], Return>(
   };
 }
 
-//古いログファイルの削除
 
+//古いログファイルの削除
 const logger = getLogger("Logger");
 const deleteFiles = fs.readdirSync(path.join(__dirname, "../logs/"), { withFileTypes: true })
   .filter(d => d.isFile() && d.name.endsWith(".log"))
@@ -221,7 +221,7 @@ const deleteFiles = fs.readdirSync(path.join(__dirname, "../logs/"), { withFileT
   .slice(0, -maxLogFiles);
 
 if(deleteFiles.length > 0){
-  logger.debug("Deleted " + deleteFiles.length + " log files.");
+  logger.debug("Deleting " + deleteFiles.length + " log files.");
 
   deleteFiles.forEach(name => fs.unlinkSync(path.join(__dirname, "../logs", name)));
 }
