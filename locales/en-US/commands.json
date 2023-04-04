@@ -376,7 +376,13 @@
   "reset": {
     "name": "reset",
     "description": "Reset all the data such as queue, settings and any other data.\n\\* The bot will disconnect from the voice channel if connected to.",
-    "success": "Successfully reset the server settings."
+    "success": "Successfully reset the server settings.",
+    "usage": "リセット true",
+    "args": {
+      "preservequeue": {
+        "description": "キューを保持するにはTrueを指定します。それでも解決しない場合はFalseを指定して再実行してください。"
+      }
+    }
   },
   "rewind": {
     "name": "rewind",
