@@ -37,6 +37,9 @@
   // キャッシュレベルの設定。"memory"か"persistent"を設定します。詳細はドキュメントをご覧ください。
   "cacheLevel": "",
 
+  // キャッシュの最大容量(MB単位)
+  "cacheLimit": 500,
+
   // デフォルトの言語。日本語の場合は"ja"
   "defaultLanguage": "ja",
 

@@ -53,7 +53,7 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
 
 `config.json.sample`がサンプルファイルとなっていますので、コピー＆リネームしてお使いください。  
 (カッコ内は設定値の、TypeScript表記の"型"です。)
-### `adminId` (string|string[]|null)  
+### `adminId` (string | string[] | null)  
   管理人のユーザーのIDを指定します。複数の管理人がいる場合は、配列で指定してください。設定しない場合は`null`
 ### `debug` (boolean)  
   デバッグ用の構成で起動するかを指定します。通常であれば`false`に設定してください。  
@@ -66,35 +66,66 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
 このオプションは、`Node.js`の`--inspect`オプションとはまったく別であるため、このオプションを使用しても、デバッガーを接続することはできません。
 :::
 
+### `maxLogFiles` (number | undefined)
+  上の`debug`が`true`に設定されている際に出力されるログファイルの最大数を指定できます。
+  設定しないとデフォルトで`100`となります。  
+  このプロパティは、省略されても動作するようになっています。
+
+:::note
+
+`debug`プロパティが`false`の場合にはこのオプションに効果はありません。
+
+:::
+
 ### `maintenance` (boolean)  
   メンテナンス用の構成で起動するか。メンテナンス用構成では、`adminId`で指定した管理者以外からのコマンドをすべて無視するようになります。
+
 ### `errorChannel` (string|null)  
   エラーレポートを送信するテキストチャンネルのID。設定しない場合は`null`
+
 ### `proxy` (string|null)  
   プロキシを使用する場合はそのURL。設定しない場合は`null`
-### `prefix` (string|null|undefined)  
+
+### `prefix` (string|null)  
   指定する場合は一文字でデフォルトプレフィックスを指定してください。  
-### `webserver` (boolean|undefined)  
+
+### `webserver` (boolean)  
   ウェブサーバーを起動するか  
-### `bgm` (object|undefined)  
+
+### `bgm` (object)  
   このプロパティを設定することで、自動的にBGMを再生するように構成できます。  
   詳細は、[BGM機能](../feature/bgm)を参照してください。
-### `noMessageContent` (boolean|undefined)
+
+### `noMessageContent` (boolean)
   Message Content IntentがDiscord Developers Portalで無効になっている場合は、`true`に設定してください。  
   デフォルトは`false`です。  
-### `twentyFourSeven` (string[]|undefined)
+
+### `twentyFourSeven` (string[])
   参加しているユーザーがボイスチャンネルから退出しても、再生を一時停止しないボイスチャンネルのIDを配列で指定します。  
   詳細は、[24/7再生機能](../feature/247)を参照してください。  
-### `alwaysTwentyFourSeven` (boolean|undefined)
+
+### `alwaysTwentyFourSeven` (boolean)
   参加しているユーザーがボイスチャンネルから退出しても、再生を一時停止しない場合には`true`に設定します。  
   このオプションが`true`の場合、上の`twentyFourSeven`は常に無視されます。  
   詳細は、[24/7再生機能](../feature/247)を参照してください。  
-### `cacheLevel` ("memory"|"persistent")
+
+### `cacheLevel` ("memory" | "persistent")
   ボットによるキャッシュレベルを設定します。`"memory"`を設定すると、メモリ内にキャッシュを保存します。
   ディスクに余裕がある場合は、`"persistent"`を指定することで、キャッシュを永続化できます。  
   `"persistent"`を指定した場合、キャッシュは`./cache`に保存されますが、任意のタイミングで削除することができます。
+
+### `cacheLimit` (number)
+  `cacheLevel`が`persistent`の場合に、`./cache`に保存されるキャッシュの最大容量をMB(メガバイト)単位で指定します。
+
+:::note
+
+`cacheLevel`プロパティが`"memory"`の場合にはこのオプションに効果はありません。
+
+:::
+
 ### `defaultLanguage` (string)
   ボットのデフォルトの言語を設定します。使用可能な言語はリポジトリの`locales`フォルダをご確認ください。日本語であれば`"ja"`です。
+
 ### `country` (string)
   ボットがメインとする国コードを設定します。日本であれば`"JP"`です。
 
