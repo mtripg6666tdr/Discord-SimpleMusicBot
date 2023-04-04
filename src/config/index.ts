@@ -88,6 +88,7 @@ class ConfigLoader {
       // optional options default value
       {
         disabledSources: [],
+        cacheLimit: 500,
       },
       // loaded config
       config,

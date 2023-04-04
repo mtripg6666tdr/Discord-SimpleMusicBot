@@ -154,13 +154,12 @@ export class SourceCache extends LogEmitter<CacheEvents> {
 
   getPersistentCacheSize(){
     return fs.promises.readdir(this.cacheDirPath, { withFileTypes: true })
-      .then(
-        files => Promise.all(
-          files
-            .filter(file => file.isFile())
-            .map(file => fs.promises.stat(path.join(this.cacheDirPath, file.name)))
-        ).then(sizes => sizes.reduce((prev, current) => prev + current.size, 0))
-      );
+      .then(files => Promise.all(
+        files
+          .filter(file => file.isFile())
+          .map(file => fs.promises.stat(path.join(this.cacheDirPath, file.name)))
+      ))
+      .then(sizes => sizes.reduce((prev, current) => prev + current.size, 0));
   }
 
   purgePersistentCache(){
@@ -196,7 +195,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
             reject(er);
           }else{
             this.logger.info(`persistent cache (id: ${cacheId}) stored`);
-            resolve();
+            resolve(this.cleanupCache());
           }
         }
       );
@@ -247,5 +246,39 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     return crypto.createHash("md5")
       .update(Buffer.from(content))
       .digest("hex");
+  }
+
+  private async cleanupCache(){
+    if(config.cacheLimit > 0){
+      const maxSize = config.cacheLimit * 1024 * 1024;
+      const items = await fs.promises.readdir(this.cacheDirPath, { withFileTypes: true });
+      const files = await Promise.all(
+        items.filter(d => d.isFile()).map(async d => {
+          const filePath = path.join(this.cacheDirPath, d.name);
+          const stats = await fs.promises.stat(filePath);
+          return {
+            path: filePath,
+            lastAccess: stats.atimeMs,
+            size: stats.size,
+          };
+        })
+      );
+      files.sort((a, b) => a.lastAccess - b.lastAccess);
+      const currentTotalSize = files.reduce((prev, current) => prev + current.size, 0);
+      if(currentTotalSize > maxSize){
+        const reduceSize = currentTotalSize - maxSize;
+        const removePaths: string[] = [];
+        let current = 0;
+        for(let i = 0; i < files.length; i++){
+          current += files[i].size;
+          removePaths.push(files[i].path);
+          if(current >= reduceSize){
+            break;
+          }
+        }
+
+        await Promise.all(removePaths.map(logPath => fs.promises.unlink(logPath)));
+      }
+    }
   }
 }
