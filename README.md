@@ -1,5 +1,5 @@
 # Discord-SimpleMusicBot 
-[![GitHub package.json dynamic](https://img.shields.io/github/package-json/version/mtripg6666tdr/Discord-SimpleMusicBot)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/package.json)
+[![GitHub package.json dynamic](https://img.shields.io/github/package-json/version/mtripg6666tdr/Discord-SimpleMusicBot/v3)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/package.json)
 [![GitHub package.json dependency version (prod)](https://img.shields.io/badge/dynamic/json?color=blue&label=eris&query=%24.dependencies.eris&url=https%3A%2F%2Fraw.githubusercontent.com%2Fmtripg6666tdr%2FDiscord-SimpleMusicBot%2Fv3%2Fpackage.json)](https://github.com/abalabahaha/eris)
 [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml)
 [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml)
