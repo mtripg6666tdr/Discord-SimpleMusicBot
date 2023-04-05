@@ -114,8 +114,9 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
   ディスクに余裕がある場合は、`"persistent"`を指定することで、キャッシュを永続化できます。  
   `"persistent"`を指定した場合、キャッシュは`./cache`に保存されますが、任意のタイミングで削除することができます。
 
-### `cacheLimit` (number)
-  `cacheLevel`が`persistent`の場合に、`./cache`に保存されるキャッシュの最大容量をMB(メガバイト)単位で指定します。
+### `cacheLimit` (number | undefined)
+  `cacheLevel`が`persistent`の場合に、`./cache`に保存されるキャッシュの最大容量をMB(メガバイト)単位で指定します。  
+  プロパティを省略すると、`500`MBとなります。
 
 :::note
 
