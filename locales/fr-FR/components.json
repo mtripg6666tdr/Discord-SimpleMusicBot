@@ -52,21 +52,21 @@
   "skip": {
     "skipping": "スキップしています",
     "skipped": "`{{title}}`をスキップしました",
-    "failed": "スキップに失敗しました",
-    "embedTitle": "スキップの投票",
-    "howToUseSkipVote": "`{{title}}`のスキップに賛成する場合は以下のボタンを押してください。",
-    "skipVoteDescription": "賛成がボイスチャンネルに参加している人数の過半数を超えると、スキップされます。",
-    "currentStatus": "現在の状況",
-    "skipRequirement_one": "あと{{count}}人の賛成が必要です。",
-    "skipRequirement_other": "あと{{count}}人の賛成が必要です。",
-    "skipIssuer": "{{issuer}}が、楽曲のスキップを提案しました。",
-    "agree": "賛成"
+    "failed": "n'a pas réussi à sauter",
+    "embedTitle": "sauter le vote",
+    "howToUseSkipVote": "Si vous acceptez de sauter `{{title}}`, veuillez appuyer sur le bouton ci-dessous.",
+    "skipVoteDescription": "Si le vote positif dépasse la majorité des personnes sur le canal vocal, il sera ignoré.",
+    "currentStatus": "situation actuelle",
+    "skipRequirement_one": "Nous avons besoin de {{count}} votes supplémentaires.",
+    "skipRequirement_other": "Nous avons besoin de {{count}} votes supplémentaires.",
+    "skipIssuer": "{{issuer}} a suggéré de sauter une chanson.",
+    "agree": "accord"
   },
   "controlPanel": {
-    "rewind": "頭出し",
-    "play": "再生",
-    "pause": "一時停止",
-    "skip": "スキップ",
-    "onceloop": "ワンスループ"
+    "rewind": "signal",
+    "play": "la reproduction",
+    "pause": "arrêter un moment",
+    "skip": "sauter",
+    "onceloop": "Un sloop"
   }
 }
