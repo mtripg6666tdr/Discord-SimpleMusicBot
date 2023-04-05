@@ -200,13 +200,52 @@
 
 ---
 
-# v4.0.0-beta.7
+# v4.0.0-beta.8
 **これは、プレリリースバージョンです**
 ## バグ修正
 * 音量調整が機能しないバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1334)
 ## その他の変更
 * メッセージコマンドのラベルを通常のコマンドとは別で管理する(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1335, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1336)
 * 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1336)
+
+## その他の特記事項
+* これはプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
+* v4系では、Node.js v16.16以上が必須となります。
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
+
+# v4.0.0-beta.9
+**これは、プレリリースバージョンです**
+## 機能追加
+* 古いログファイルを削除(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1357)
+  * ログを保持する個数を`config.json`にて設定することができます。詳細はドキュメントをご確認ください。
+* 古いキャッシュを削除(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1356)
+  * キャッシュの最大容量を`config.json`にて設定することができます。詳細はドキュメントをご確認ください。
+* レートリミットに関するバグが発生した際に、`リセット`コマンドで回避できるようになりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1359)
+* `リセット`コマンドで、キューを保持したままリセットの操作を行うことが可能になりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1359)
+## 機能修正/変更
+* `システム情報`コマンドの基本情報のパネルをローカライズに対応させる(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1341)
+* `キューループ`コマンドのエイリアスとして`queueloop`より`loopqueue`を優先するよう変更(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1344)
+  * これに伴いスラッシュコマンドも`loopqueue`に変更されました。
+* ボイスチャンネルからメンバーがいなくなった際に一時停止する機能で、最後に退出したメンバーが再参加した場合に自動的に再生を再開する(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1354)
+## バグ修正
+* プレイリスト処理時の間違ったメッセージを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1340)
+* `コマンド`コマンドで、重複したコマンド名が複数回出現するのを排除(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1345)
+* フォールバックした際の再生の問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1355)
+## 依存関係のアップデート
+* @discordjs/voice 0.15.0 => 0.16.0
+* i18next 22.4.13 => 22.4.14
+* oceanic.js 1.5.1 => 1.6.0
+* mongodb 5.1.0 => 5.2.0
+## ドキュメント
+* 英語版READMEへのリンクを追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1348)
+* チュートリアルを`v4`のものへ更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1352)
+* 設定についてのページを更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1360)
+* バッジを更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1368)
+## その他の変更
+* `compose.yml`の修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1338, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1339)
+* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1342, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1346, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1347, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1349, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1358, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1361)
 
 ## その他の特記事項
 * これはプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
