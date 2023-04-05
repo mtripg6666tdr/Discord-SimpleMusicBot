@@ -236,6 +236,8 @@
 ## 依存関係のアップデート
 * @discordjs/voice 0.15.0 => 0.16.0
 * i18next 22.4.13 => 22.4.14
+* oceanic.js 1.5.1 => 1.6.0
+* mongodb 5.1.0 => 5.2.0
 ## ドキュメント
 * 英語版READMEへのリンクを追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1348)
 * チュートリアルを`v4`のものへ更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1352)
