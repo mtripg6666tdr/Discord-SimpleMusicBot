@@ -171,7 +171,7 @@
   },
   "leaveclean": {
     "name": "leaveclean",
-    "description": "Clean up by removing queued songs requested by people who left your voice channel.",
+    "description": "Cleans up by removing queued songs requested by people who left your voice channel.",
     "allRemoved": "Removed all items",
     "queueEmpty": "Queue empty",
     "removed_one": "deleted {{count}} item",
@@ -230,7 +230,7 @@
   },
   "lyrics": {
     "name": "lyrics",
-    "description": "Find the lyrics of the specified song.",
+    "description": "Finds the lyrics of the specified song.",
     "examples": "l Into The Night",
     "usage": "l <ex. titles, artists and so on>",
     "args": {
@@ -248,20 +248,20 @@
     "usage": "move <from> <to>",
     "args": {
       "from": {
-        "description": "Index to move from. It is written together with the cue."
+        "description": "Index to move from. It is written together with the queue."
       },
       "to": {
-        "description": "Index to move to. It is written together with the cue."
+        "description": "Index to move to. It is written together with the queue."
       }
     },
-    "invalidArgumentCount": "Index to move to. It is written together with the cue.",
+    "invalidArgumentCount": "Index to move to. It is written together with the queue.",
     "invalidIndex": "You cannot specify 0 as the source or destination while the music is playing (and paused).",
     "moved": "Moved `{{title}}` from position `{{from}}` to `{{to}}`.",
     "originEqualsDestination": "The source and destination songs were the same.",
     "indexOutOfRange": "I failed. Argument is out of queue range."
   },
   "movelastsongtofirst": {
-    "name": "last song to top",
+    "name": "lastsongtotop",
     "description": "Move the last song in the queue to the top of the queue.",
     "usableWhen3orMoreQueue": "You can use this command when 3 or more items are present in queue.",
     "success": "Moved `{{title}}` from the end to the beginning of the queue."
@@ -375,7 +375,7 @@
   },
   "reset": {
     "name": "reset",
-    "description": "Reset all the data such as queue, settings and any other data.\n\\* The bot will disconnect from the voice channel if connected to.",
+    "description": "Resets all the data such as queue, settings and any other data. Specify true as an argument to preserve queue.\n\\* The bot will disconnect from the voice channel if connected to.",
     "success": "Successfully reset the server settings.",
     "usage": "reset true",
     "args": {
@@ -396,14 +396,14 @@
     "usage": "search <keyword>",
     "args": {
       "keyword": {
-        "description": "Keyword or URL of the video you want to search."
+        "description": "Keyword or URL of the video you want to search for."
       }
     },
     "noArgument": "Set the argument."
   },
   "searchqueue": {
     "name": "searchqueue",
-    "description": "Search in queue. Specify a keyword for the argument.",
+    "description": "Searches in queue. Specify keywords for the argument.",
     "examples": "seq pretender",
     "usage": "seq <keyword>",
     "args": {
@@ -421,7 +421,7 @@
     "usage": "ses <keyword>",
     "args": {
       "keyword": {
-        "description": "Keyword or URL of the song you want to search."
+        "description": "Keyword or URL of the song you want to search for."
       }
     }
   },
@@ -435,8 +435,8 @@
         "description": "Seek to time"
       }
     },
-    "unseekable": "シーク先に対応していない楽曲です。",
-    "invalidTime": "Seek to incorrect time.",
+    "unseekable": "The current playing song is not seek-able.",
+    "invalidTime": "Seeks to incorrect time.",
     "seeking": "Seeking",
     "success": "Seeked",
     "failed": "Seek failed"
@@ -462,7 +462,7 @@
     "usage": "thumbnail [a number in a search result]",
     "args": {
       "index": {
-        "description": "If you specify an index in the search panel, the thumbnail of that item will be displayed."
+        "description": "If you specify an index in the search result, the thumbnail of that item will be displayed."
       }
     },
     "noSearchPanelFound": "There are no thumbnails to show."
