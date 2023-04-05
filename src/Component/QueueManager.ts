@@ -679,6 +679,14 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     this.emit("changeWithoutCurrent");
   }
 
+  getRawQueueItems(){
+    return [...this._default];
+  }
+
+  addRawQueueItems(items: QueueContent[]){
+    this._default.push(...items);
+  }
+
   protected getDisplayNameFromMember(member: Member|AddedBy){
     return member instanceof Member ? Util.discordUtil.users.getDisplayName(member) : member.displayName;
   }
