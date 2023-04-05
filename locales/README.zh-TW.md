@@ -3,18 +3,18 @@
 > 開発用に使用されており、このブランチからボットをホストすることは推奨されていません。
 
 # Discord-SimpleMusicBot
-[![GitHub package.json dynamic](https://img.shields.io/github/package-json/version/mtripg6666tdr/Discord-SimpleMusicBot)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/package.json) [![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/mtripg6666tdr/Discord-SimpleMusicBot/eris)](https://github.com/abalabahaha/eris) [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml) [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml) [![Build Docker](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml) [![Discord Support](https://img.shields.io/discord/847435307582095360?label=discord&logo=discord&logoColor=white)](https://discord.gg/7DrAEXBMHe) [![GitHub License](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)](LICENSE)
+[![GitHub package.json dynamic](https://img.shields.io/github/package-json/version/mtripg6666tdr/Discord-SimpleMusicBot)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/package.json) [![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/mtripg6666tdr/Discord-SimpleMusicBot/eris)](https://github.com/abalabahaha/eris) [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml) [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml) [![Build Docker](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml) [![不和諧支持](https://img.shields.io/discord/847435307582095360?label=discord&logo=discord&logoColor=white)](https://discord.gg/7DrAEXBMHe) [![GitHub License](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)](LICENSE)
 
 [日本語](/README.md)・[English](/locales/README.en-US.md)
 
 <img alt="bot usage example" src="https://user-images.githubusercontent.com/56076195/218059644-2ebdf405-b9f8-4561-a3cc-2bcecf09f145.png" width="550" />
 
-Discord向け日本製シンプル音楽ボット。  
-YouTubeなどからの再生に対応。 選曲はキーワードで指定可能なのでURLを控える必要はありません。  
-このOSSのBotで、みんなで今すぐボイスチャンネルで音楽を楽しみましょう。  
-下部に掲載のサポートサーバーよりボットを試すことができます。お気軽にサポートサーバーにご参加ください。
+在日本為 Discord 製造的簡單音樂機器人。  
+支持從 YouTube 等播放。 歌曲選擇可以通過關鍵字指定，因此無需避免 URL。  
+有了這個 OSS 機器人，讓我們現在就可以在語音頻道上享受音樂。  
+您可以從下面列出的支持服務器試用該機器人。歡迎加入我們的支持服務器。
 
-## 機能
+## 功能
 - 🎵できる限り高音質で再生
 - ⌨️スラッシュコマンドおよび従来のメッセージベースのコマンドに両対応
 - 🔗 URLから再生
@@ -29,7 +29,7 @@ YouTubeなどからの再生に対応。 選曲はキーワードで指定可能
   - デフォルトのプレフィックスは`>`です。
   - ボットを自分でホストする場合、後述の`config.json`でボットレベルでデフォルトのプレフィックスを変更することができます。(複数文字に対応)
 - ▶️事前設定による音楽の自動再生
-- 👍 Botに関するサポート(下記)
+- 👍機器人支持（下）
 
 ## ガイド
 ボットの設定方法、コマンドなどはこちらからご覧になれます。
@@ -43,7 +43,7 @@ Issueのほか、下記のサポートサーバーでも各種お問い合わせ
 いづれかの手段でお気軽にどうぞ！
 
 ## ローカライズについて
-プロジェクトでは、Crowdinで多言語化をしています。ボットの翻訳に協力してくださる方々を随時募集しています。  
+該項目通過 Crowdin 實現了多語言化。ボットの翻訳に協力してくださる方々を随時募集しています。  
 現在、英語のみ対応予定がありますが、需要によってはほかの言語への翻訳も可能です。  
 [Crowdinのプロジェクトページ](https://crowdin.com/project/discord-simplemusicbot)
 
