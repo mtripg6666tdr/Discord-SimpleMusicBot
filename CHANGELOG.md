@@ -242,6 +242,7 @@
 * 英語版READMEへのリンクを追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1348)
 * チュートリアルを`v4`のものへ更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1352)
 * 設定についてのページを更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1360)
+* バッジを更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1368)
 ## その他の変更
 * `compose.yml`の修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1338, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1339)
 * 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1342, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1346, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1347, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1349, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1358, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1361)
