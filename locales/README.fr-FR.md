@@ -1,58 +1,58 @@
-> # :warning: このブランチは、v4の開発用ブランチです
+> # :warning: Cette branche est une branche de développement v4
 > 
-> 開発用に使用されており、このブランチからボットをホストすることは推奨されていません。
+> Il est utilisé pour le développement et l'hébergement de bots de cette branche n'est pas recommandé.
 
 # Discord-SimpleMusicBot
-[![GitHub package.json dynamic](https://img.shields.io/github/package-json/version/mtripg6666tdr/Discord-SimpleMusicBot)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/package.json) [![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/mtripg6666tdr/Discord-SimpleMusicBot/eris)](https://github.com/abalabahaha/eris) [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml) [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml) [![Build Docker](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml) [![Discord Support](https://img.shields.io/discord/847435307582095360?label=discord&logo=discord&logoColor=white)](https://discord.gg/7DrAEXBMHe) [![GitHub License](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)](LICENSE)
+[![GitHub package.json dynamique](https://img.shields.io/github/package-json/version/mtripg6666tdr/Discord-SimpleMusicBot/master)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/package.json) [![GitHub package.json dépendance version (prod)](https://img.shields.io/badge/dynamic/json?color=blue&label=oceanic.js&query=%24.dependencies%5B%22oceanic.js%22%5D&url=https%3A%2F%2Fraw.githubusercontent.com%2Fmtripg6666tdr%2FDiscord-SimpleMusicBot%2Fmaster%2Fpackage.json)](https://github.com/OceanicJS/Oceanic) [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml) [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml) [![Construire Docker](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml) [![Discord Support](https://img.shields.io/discord/847435307582095360?label=discord&logo=discord&logoColor=white)](https://discord.gg/7DrAEXBMHe) [![Licence GitHub](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)](LICENSE)
 
-[日本語](/README.md)・[English](/locales/README.en-US.md)
+[Japonais](/README.md)・[Anglais](/locales/README.en-US.md)
 
-<img alt="bot usage example" src="https://user-images.githubusercontent.com/56076195/218059644-2ebdf405-b9f8-4561-a3cc-2bcecf09f145.png" width="550" />
+<img alt="exemple d'utilisation de bot" src="https://user-images.githubusercontent.com/56076195/218059644-2ebdf405-b9f8-4561-a3cc-2bcecf09f145.png" width="550" />
 
-Discord向け日本製シンプル音楽ボット。  
-YouTubeなどからの再生に対応。 選曲はキーワードで指定可能なのでURLを控える必要はありません。  
-このOSSのBotで、みんなで今すぐボイスチャンネルで音楽を楽しみましょう。  
-下部に掲載のサポートサーバーよりボットを試すことができます。お気軽にサポートサーバーにご参加ください。
+Un bot musical simple fabriqué au Japon pour Discord.  
+La lecture à partir de YouTube, etc. est prise en charge. La sélection de chansons peut être spécifiée par mot-clé, il n'est donc pas nécessaire de s'abstenir d'URL.  
+Avec ce bot OSS, profitons tous de la musique sur le canal vocal dès maintenant.  
+Vous pouvez essayer le bot à partir du serveur d'assistance répertorié ci-dessous.N'hésitez pas à rejoindre notre serveur d'assistance.
 
-## 機能
-- 🎵できる限り高音質で再生
-- ⌨️スラッシュコマンドおよび従来のメッセージベースのコマンドに両対応
-- 🔗 URLから再生
-  - YouTubeの動画のリンク
-  - YouTubeのプレイリストのリンク
-  - SoundCloudの楽曲ページのリンク
-  - ニコニコ動画の再生ページへのリンク
-  - [などなど...](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/commands/overview)
-- 🔎 キーワードから検索して再生(YouTubeとSoundCloud)
-- 🔁 トラックごと及びキュー全体でループ
-- ❕ プレフィックス変更
-  - デフォルトのプレフィックスは`>`です。
-  - ボットを自分でホストする場合、後述の`config.json`でボットレベルでデフォルトのプレフィックスを変更することができます。(複数文字に対応)
-- ▶️事前設定による音楽の自動再生
-- 👍 Botに関するサポート(下記)
+## fonction
+- 🎵Jouez avec la meilleure qualité possible
+- ⌨️ Prend en charge les commandes slash et les commandes traditionnelles basées sur des messages
+- 🔗 Jouer à partir de l'URL
+  - Lien vidéo YouTube
+  - lien de la liste de lecture youtube
+  - Lien vers la page de la chanson SoundCloud
+  - Lien vers la page de lecture de Nico Nico Douga
+  - [etc...](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/commands/overview)
+- 🔎 Rechercher et lire par mot-clé (YouTube et SoundCloud)
+- 🔁 Boucle par piste et à travers les repères
+- ❕ Changement de préfixe
+  - Le préfixe par défaut est `>`.
+  - Si vous hébergez vous-même votre bot, vous pouvez modifier le préfixe par défaut au niveau du bot dans `config.json` ci-dessous.(prend en charge plusieurs caractères)
+- ▶️ Musique à lecture automatique préconfigurée
+- 👍 Prise en charge des bots (ci-dessous)
 
-## ガイド
-ボットの設定方法、コマンドなどはこちらからご覧になれます。
-- [ドキュメント](https://web.usamyon.moe/Discord-SimpleMusicBot/)
+## guide
+Vous pouvez voir comment configurer le bot, les commandes, etc. ici.
+- [document](https://web.usamyon.moe/Discord-SimpleMusicBot/)
 
-## 貢献について
-開発中のためバグが多々あります。  
-本リポジトリへの貢献は大歓迎です！  
-バグを発見した場合等も重複したIssueがないことを確認し、Issueをまず開いてください。可能な場合、Pull Requestをそのうえで開いてください。  
-Issueのほか、下記のサポートサーバーでも各種お問い合わせを受け付けています。  
-いづれかの手段でお気軽にどうぞ！
+## À propos de la cotisation
+Il y a beaucoup de bugs car il est en cours de développement.  
+Les contributions à ce référentiel sont les bienvenues !  
+Si vous trouvez un bogue, assurez-vous qu'il n'y a pas de problèmes en double et ouvrez d'abord le problème.Si possible, veuillez ouvrir une pull request en conséquence.  
+En plus des problèmes, diverses demandes sont également acceptées sur le serveur d'assistance ci-dessous.  
+N'hésitez pas à nous contacter par tous les moyens !
 
-## ローカライズについて
-プロジェクトでは、Crowdinで多言語化をしています。ボットの翻訳に協力してくださる方々を随時募集しています。  
-現在、英語のみ対応予定がありますが、需要によってはほかの言語への翻訳も可能です。  
-[Crowdinのプロジェクトページ](https://crowdin.com/project/discord-simplemusicbot)
+## À propos de la localisation
+Le projet est multilingue avec Crowdin.Nous sommes toujours à la recherche de personnes pour aider à traduire les bots.  
+Actuellement, seul l'anglais est prévu, mais la traduction dans d'autres langues est possible en fonction de la demande.  
+[Page du projet de Crowdin](https://crowdin.com/project/discord-simplemusicbot)
 
-## サポート
-Discordにて、インストール等のサポート、およびアップデートのお知らせ等を行っています。  
-ボットを試すこともできますので、興味を持たれた方はぜひご参加ください。  
-[サポートサーバーへの参加はこちら](https://discord.gg/7DrAEXBMHe)  
-[サポートされているバージョン](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
+## soutien
+Sur Discord, nous fournissons une assistance telle que l'installation et la notification des mises à jour.  
+Vous pouvez également essayer le bot, donc si vous êtes intéressé, rejoignez-nous.  
+[Cliquez ici pour rejoindre le serveur d'assistance](https://discord.gg/7DrAEXBMHe)  
+[Versions prises en charge](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
 
-## ライセンス
+## Licence
 GPLv3  
-詳細は[COPYING](COPYING)を参照。
+Voir [COPIER](COPYING) pour plus de détails.

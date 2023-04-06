@@ -81,58 +81,58 @@
   "export": {
     "name": "exporter",
     "description": "Exportez le contenu de la file d'attente afin qu'il puisse être importé.",
-    "queueEmpty": "キューが空なのでエクスポートできません。",
-    "exported": "エクスポートしました",
-    "compatiblity": "バージョン: v{{version}}互換",
-    "importInstruction": "インポート時は、「<{{url}}>」を`インポート`コマンドの引数に指定してください。"
+    "queueEmpty": "La file d'attente est vide et ne peut pas être exportée.",
+    "exported": "Exporté",
+    "compatiblity": "Version : v{{version}} compatible",
+    "importInstruction": "Lors de l'importation, spécifiez \"<{{url}}>\" comme argument de la commande `import`."
   },
   "frame": {
-    "name": "フレーム",
-    "examples": "フレーム 1:20",
-    "usage": "フレーム [時間]",
-    "description": "現在の再生位置の動画のフレーム画像を可能な場合取得します。引数が指定された場合その時点でのフレームを取得します。",
+    "name": "flamme",
+    "examples": "cadre 1:20",
+    "usage": "cadre [temps]",
+    "description": "Obtient une image d'image de la vidéo à la position de lecture actuelle, si possible. Obtient le cadre à ce point si un argument est spécifié.",
     "args": {
       "time": {
-        "description": "指定された場合その時点でのフレームを取得します。"
+        "description": "Obtient le cadre à ce point si spécifié."
       }
     },
-    "unsupported": "フレームのキャプチャ機能に非対応のソースです。",
-    "fallbacking": "通常とは異なる方法を使用しているため、現在この機能を使用できません。",
-    "liveStreamWithTime": "ライブストリームでは時間指定できません。",
-    "invalidTime": "時間の指定が正しくありません。",
-    "capturing": "取得中",
-    "finish": "完了!",
-    "timeAt": "{{hour}}:{{min}}:{{sec}}時点",
-    "failed": "取得に失敗しました..."
+    "unsupported": "La source ne prend pas en charge la fonction de capture d'image.",
+    "fallbacking": "Cette fonctionnalité n'est pas disponible actuellement car nous utilisons une méthode non conventionnelle.",
+    "liveStreamWithTime": "L'heure ne peut pas être spécifiée pour les diffusions en direct.",
+    "invalidTime": "Spécification de temps invalide.",
+    "capturing": "obtenir",
+    "finish": "achèvement!",
+    "timeAt": "à {{hour}}:{{min}}:{{sec}}",
+    "failed": "Échoué à obtenir..."
   },
   "help": {
-    "name": "ヘルプ",
-    "description": "ヘルプを表示します",
-    "embedDescription": "高音質な音楽で、Discordで最高のエクスペリエンスを得るために作られました",
-    "toLearnMore": "利用可能なコマンドを確認するには{{command}}を使用してください。",
-    "developer": "開発者",
-    "version": "バージョン",
-    "repository": "レポジトリ",
-    "sourceCode": "ソースコード",
-    "supportServer": "サポートサーバー",
-    "availableSources": "現在対応している音楽ソース",
-    "keywordSearch": "キーワード検索",
-    "videoUrl": "動画URL指定",
-    "playlistUrl": "プレイリストURL指定",
-    "musicPageUrl": "楽曲ページURL指定",
-    "discordAttachmentUrl": "音声ファイルの添付付きメッセージのURL指定",
-    "driveShareUrl": "音声ファイルの限定公開リンクのURL指定",
-    "tweetUrl": "ツイートURL指定",
-    "spotify": "曲のURL、およびプレイリストのURL。曲を推測してYouTubeから再生します。",
-    "custom": "オーディオファイルへの直URL",
-    "googleDrive": "Google ドライブ",
-    "niconico": "ニコニコ動画"
+    "name": "aider",
+    "description": "afficher l'aide",
+    "embedDescription": "Musique de haute qualité, conçue pour la meilleure expérience Discord",
+    "toLearnMore": "Utilisez {{command}} pour voir les commandes disponibles.",
+    "developer": "Développeur",
+    "version": "version",
+    "repository": "dépôt",
+    "sourceCode": "Code source",
+    "supportServer": "serveur d'assistance",
+    "availableSources": "Sources musicales actuellement prises en charge",
+    "keywordSearch": "Recherche par mot clé",
+    "videoUrl": "Spécifiez l'URL de la vidéo",
+    "playlistUrl": "Spécifiez l'URL de la liste de lecture",
+    "musicPageUrl": "Spécification de l'URL de la page de musique",
+    "discordAttachmentUrl": "Spécification de l'URL du message avec fichier audio en pièce jointe",
+    "driveShareUrl": "Spécification de l'URL du lien privé du fichier audio",
+    "tweetUrl": "Spécifiez l'URL du tweet",
+    "spotify": "URL des chansons et URL des listes de lecture. Devinez la chanson et écoutez-la depuis YouTube.",
+    "custom": "URL directe vers le fichier audio",
+    "googleDrive": "Google Drive",
+    "niconico": "Nico Nico Douga"
   },
   "import": {
-    "name": "インポート",
-    "messageCommandName": "インポート",
-    "description": "指定されたメッセージからキューをインポートします。`export`コマンドで出力されたファイルが添付されたURLを引数として指定してください。",
-    "examples": "import https://discord.com/channels/...",
+    "name": "importer",
+    "messageCommandName": "importer",
+    "description": "Importer une file d'attente à partir du message donné. Veuillez spécifier l'URL avec la sortie du fichier joint par la commande \"export\" comme argument.",
+    "examples": "importer https://discord.com/channels/...",
     "usage": "Importer <URL à importer depuis>",
     "args": {
       "url": {
@@ -146,20 +146,20 @@
     "notBotMessage": "Pas un message de robot",
     "versionIncompatible": "Le fichier spécifié ne peut pas être importé car les versions sont incompatibles.",
     "current": "en vigueur",
-    "file": "ファイル",
-    "contentNotIncludedInMessage": "対象の内容が見つかりませんでした。"
+    "file": "Déposer",
+    "contentNotIncludedInMessage": "Le contenu cible n'a pas été trouvé."
   },
   "invoke": {
-    "name": "インボーク",
-    "description": "指定されたコマンドを実行します。基本的に使用しないでください。",
-    "usage": "invoke <コマンド>",
-    "examples": "invoke play 夜に駆ける",
+    "name": "Invoquer",
+    "description": "Exécute la commande spécifiée. S'il vous plaît ne l'utilisez pas fondamentalement.",
+    "usage": "invoquer <commande>",
+    "examples": "Invoquer le jeu Courir dans la nuit",
     "args": {
       "command": {
-        "description": "実行するコマンド"
+        "description": "commande à exécuter"
       }
     },
-    "recursiveInvoke": "`インボーク`コマンドを`インボーク`コマンドで実行することはできません。",
+    "recursiveInvoke": "La commande `invoke` ne peut pas être exécutée par la commande `invoke`.",
     "executed": "実行しました",
     "commandNotFound": "コマンドが見つかりませんでした",
     "specialCommandNotFound": "特別コマンドが見つかりません。"
@@ -224,40 +224,40 @@
   },
   "loop": {
     "name": "ループ",
-    "description": "トラックごとのループを設定します。",
-    "disabled": "トラックリピートを無効にしました",
-    "enabled": "トラックリピートを有効にしました"
+    "description": "Définissez des boucles pour chaque piste.",
+    "disabled": "Répétition de piste désactivée",
+    "enabled": "Répétition de piste activée"
   },
   "lyrics": {
-    "name": "歌詞",
-    "description": "指定された楽曲の歌詞を検索します。",
-    "examples": "l 夜に駆ける",
-    "usage": "l <タイトル、アーティスト等>",
+    "name": "Paroles",
+    "description": "Trouver les paroles de la chanson spécifiée.",
+    "examples": "Je cours dans la nuit",
+    "usage": "l <titre, artiste, etc.>",
     "args": {
       "keyword": {
-        "description": "楽曲を検索するキーワード"
+        "description": "Mots-clés pour rechercher des chansons"
       }
     },
-    "embedTitle": "\"{{title}}\"({{artist}})の歌詞",
-    "failed": "失敗しました。曲名を確認してもう一度試してみてください。"
+    "embedTitle": "Paroles de \"{{title}}\"({{artist}})",
+    "failed": "J'ai échoué. Veuillez vérifier le nom de la chanson et réessayer."
   },
   "move": {
-    "name": "移動",
-    "description": "曲を指定された位置から指定された位置までキュー内で移動します。2番目の曲を5番目に移動したい場合は`mv 2 5`のようにします。",
-    "examples": "移動 2 5",
-    "usage": "移動 <from> <to>",
+    "name": "déplacer",
+    "description": "Déplace le morceau de la position spécifiée à la position spécifiée dans la file d'attente. Si vous voulez déplacer la 2ème chanson vers la 5ème, utilisez `mv 2 5`.",
+    "examples": "déplacer 2 5",
+    "usage": "Déplacer <from> <to>",
     "args": {
       "from": {
-        "description": "移動元のインデックス。キューに併記されているものです。"
+        "description": "Index de départ. Il est écrit avec la réplique."
       },
       "to": {
-        "description": "移動先のインデックス。キューに併記されているものです。"
+        "description": "Index vers lequel se déplacer. Il est écrit avec la réplique."
       }
     },
-    "invalidArgumentCount": "引数は`移動したい曲の元の番号 移動先の番号`のように指定します。",
-    "invalidIndex": "音楽の再生中(および一時停止中)は移動元または移動先に0を指定することはできません。",
-    "moved": "`{{title}}`を`{{from}}`番目から`{{to}}`番目に移動しました。",
-    "originEqualsDestination": "移動元と移動先の曲が同じでした。",
+    "invalidArgumentCount": "Les arguments sont spécifiés comme `numéro d'origine de la chanson que vous souhaitez déplacer, numéro de la destination`.",
+    "invalidIndex": "Vous ne pouvez pas spécifier 0 comme source ou destination pendant que la musique est en cours de lecture (et en pause).",
+    "moved": "Déplacement de `{{title}}` de `{{from}}` à `{{to}}`.",
+    "originEqualsDestination": "Les chansons source et destination étaient les mêmes.",
     "indexOutOfRange": "失敗しました。引数がキューの範囲外です。"
   },
   "movelastsongtofirst": {
