@@ -40,14 +40,14 @@ export async function onReady(this: MusicBot){
         type: discord.ActivityTypes.GAME,
         name: i18next.t("startingUp"),
       },
-    ]);
+    ]).catch(this.logger.error);
   }else{
     client.editStatus("dnd", [
       {
         type: discord.ActivityTypes.GAME,
         name: i18next.t("maintenance"),
       },
-    ]);
+    ]).catch(this.logger.error);
   }
 
   // Command instance preparing
@@ -115,6 +115,6 @@ export async function onReady(this: MusicBot){
         type: discord.ActivityTypes.LISTENING,
         name: i18next.t("music"),
       },
-    ]);
+    ]).catch(this.logger.error);
   }
 }

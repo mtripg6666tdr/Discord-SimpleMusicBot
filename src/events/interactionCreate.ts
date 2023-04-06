@@ -52,14 +52,14 @@ export async function onInteractionCreate(this: MusicBot, interaction: discord.A
 
   // コマンドインタラクション
   if(interaction instanceof discord.CommandInteraction){
-    handlers.handleCommandInteraction.call(this, server, interaction);
+    handlers.handleCommandInteraction.call(this, server, interaction).catch(this.logger.error);
   }else if(interaction instanceof discord.ComponentInteraction){
     if(interaction.data.componentType === discord.ComponentTypes.BUTTON){
       // ボタンインタラクション
-      handlers.handleButtonInteraction.call(this, server, interaction);
+      handlers.handleButtonInteraction.call(this, server, interaction).catch(this.logger.error);
     }else if(interaction.data.componentType === discord.ComponentTypes.STRING_SELECT){
       // セレクトメニューインタラクション
-      handlers.handleSelectMenuInteraction.call(this, server, interaction);
+      handlers.handleSelectMenuInteraction.call(this, server, interaction).catch(this.logger.error);
     }
   }
 }

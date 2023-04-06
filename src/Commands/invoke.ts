@@ -80,10 +80,10 @@ export default class Invoke extends BaseCommand {
         await CommandManager.instance.sync(context.client, true);
         break;
       case "removesca":
-        CommandManager.instance.removeAllApplicationCommand(context.client);
+        await CommandManager.instance.removeAllApplicationCommand(context.client);
         break;
       case "removescg":
-        CommandManager.instance.removeAllGuildCommand(context.client, message.guild.id);
+        await CommandManager.instance.removeAllGuildCommand(context.client, message.guild.id);
         break;
       case "purgememcache":
         context.bot.cache.purgeMemoryCache();

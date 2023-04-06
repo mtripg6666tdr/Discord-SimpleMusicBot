@@ -94,11 +94,11 @@ export class SkipManager extends ServerManagerBase<{}> {
     }
     if(this.agreeUsers.has(user.id)){
       this.agreeUsers.delete(user.id);
-      this.checkThreshold();
+      this.checkThreshold().catch(this.logger.error);
       return "cancelled";
     }else{
       this.agreeUsers.add(user.id);
-      this.checkThreshold();
+      this.checkThreshold().catch(this.logger.error);
       return "voted";
     }
   }

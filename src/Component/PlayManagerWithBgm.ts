@@ -89,12 +89,12 @@ export class PlayManagerWithBgm extends PlayManager {
     this._errorUrl = "";
     this._cost = 0;
     if(this.bgm){
-      this.server.queue.next();
+      await this.server.queue.next();
       if(this.server.queue.isBgmEmpty){
         this.logger.info("Queue empty");
         this.disconnect();
       }else{
-        this.play(0, true);
+        await this.play(0, true);
       }
     }else{
       return super.onStreamFinished();

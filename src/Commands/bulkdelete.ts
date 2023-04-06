@@ -52,7 +52,7 @@ export default class BulkDelete extends BaseCommand {
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     const count = Number(context.args[0]);
     if(isNaN(count)){
-      message.reply(`:warning:${t("commands:bulk-delete.invalidMessageCount")}`);
+      message.reply(`:warning:${t("commands:bulk-delete.invalidMessageCount")}`).catch(this.logger.error);
       return;
     }
     const reply = await message.reply(
@@ -125,7 +125,7 @@ export default class BulkDelete extends BaseCommand {
         reply.edit({
           content: t("commands:bulk-delete.cancel"),
           components: [],
-        });
+        }).catch(this.logger.error);
       });
     }
     catch(er){

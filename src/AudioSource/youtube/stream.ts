@@ -93,7 +93,7 @@ export function createRefreshableYTLiveStream(info: ytdl.videoInfo, url: string,
   const onError = (er: Error) => {
     console.error(er);
     if(er.message === "ENOTFOUND"){
-      refreshStream();
+      refreshStream().catch(onError);
     }else{
       destroyCurrentStream(er);
       stream.destroy(er);

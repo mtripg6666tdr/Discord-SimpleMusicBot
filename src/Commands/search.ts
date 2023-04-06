@@ -44,7 +44,7 @@ export abstract class SearchBase<T> extends BaseCommand {
     }
 
     // ボイスチャンネルへの参加の試みをしておく
-    context.server.joinVoiceChannel(message, {}, t);
+    context.server.joinVoiceChannel(message, {}, t).catch(this.logger.error);
 
     // 検索パネルがすでにあるなら
     if(context.server.searchPanel.has(message.member.id)){
@@ -71,7 +71,7 @@ export abstract class SearchBase<T> extends BaseCommand {
       if(responseMessage){
         const panel = context.server.searchPanel.get(message.member.id);
         collector.on("cancelSearch", interaction => {
-          panel.destroy({ quiet: true });
+          panel.destroy({ quiet: true }).catch(this.logger.error);
           interaction.createFollowup({
             content: `🚮${t("search.previousPanelRemoved")}:white_check_mark:`,
           }).catch(this.logger.error);

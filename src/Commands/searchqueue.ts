@@ -99,6 +99,6 @@ export default class Searchq extends BaseCommand {
       .setColor(getColor("SEARCH"))
       .toOceanic()
     ;
-    message.reply({ embeds: [embed] });
+    message.reply({ embeds: [embed] }).catch(this.logger.error);
   }
 }

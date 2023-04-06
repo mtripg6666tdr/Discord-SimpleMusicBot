@@ -90,7 +90,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     this._sourceCache.set(content.url, content);
     this.logger.info(`New memory cache added (total: ${this._sourceCache.size})`);
     if(this.enablePersistent && !fromPersistentCache){
-      this.addPersistentCache(this.createCacheId(content.url, "exportable"), content.exportData());
+      this.addPersistentCache(this.createCacheId(content.url, "exportable"), content.exportData()).catch(this.logger.error);
     }
   }
 
@@ -127,7 +127,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
 
   addSearch(keyword: string, result: ytsr.Video[]){
     if(this.enablePersistent){
-      this.addPersistentCache(this.createCacheId(keyword.toLowerCase(), "search"), result);
+      this.addPersistentCache(this.createCacheId(keyword.toLowerCase(), "search"), result).catch(this.logger.error);
     }
   }
 

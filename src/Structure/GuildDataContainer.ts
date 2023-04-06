@@ -685,7 +685,9 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           message: await message.reply(`${t("pleaseWait")}...`),
           cancellable,
         });
-        if(success) this.player.play();
+        if(success){
+          await this.player.play();
+        }
         return;
       }
       catch(er){
@@ -765,7 +767,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     }
     // 接続中なら再生を開始
     if(this.player.isConnecting && !this.player.isPlaying){
-      this.player.play();
+      await this.player.play();
     }
     // 二個目以上を処理
     for(let i = 0; i < rest.length; i++){

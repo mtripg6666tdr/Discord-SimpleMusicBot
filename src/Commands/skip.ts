@@ -59,7 +59,7 @@ export default class Skip extends BaseCommand {
         if(!server.skipSession){
           await server.createSkipSession(message);
         }else{
-          message.reply(`:red_circle:${t("commands:skip.votePanelAlreadyOpen")}`);
+          message.reply(`:red_circle:${t("commands:skip.votePanelAlreadyOpen")}`).catch(this.logger.error);
         }
         return;
       }

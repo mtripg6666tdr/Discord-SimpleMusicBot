@@ -49,7 +49,7 @@ export default class Related extends BaseCommand {
         .setColor(getColor("RELATIVE_SETUP"))
         .toOceanic()
       ;
-      message.reply({ embeds: [embed] });
+      message.reply({ embeds: [embed] }).catch(this.logger.error);
     }
   }
 }

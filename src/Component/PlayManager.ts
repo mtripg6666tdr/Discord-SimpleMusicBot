@@ -312,7 +312,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       }
     }
     catch(e){
-      this.handleError(e);
+      this.handleError(e).catch(this.logger.error);
     }
     return this;
   }
@@ -453,7 +453,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           this._errorUrl === this.currentAudioUrl ? this._errorCount : 0
         );
         if(this._playing){
-          this.onStreamFinished();
+          this.onStreamFinished().catch(this.logger.error);
         }
       }
     });
@@ -573,21 +573,26 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   rewind(): PlayManager{
     this.logger.info("Rewind called");
     this.emit("rewind");
-    this.stop(true).play();
+    this
+      .stop(true)
+      .play()
+      .catch(this.logger.error);
     return this;
   }
 
-  handleError(er: any){
+  async handleError(er: any){
     this.logger.error(er);
     this.emit("handledError", er);
 
     if(er instanceof Error){
       if("type" in er && er.type === "workaround"){
-        this.onStreamFailed(/* quiet */ true);
+        this
+          .onStreamFailed(/* quiet */ true)
+          .catch(this.logger.error);
         return;
       }
     }
-    this._errorReportChannel?.createMessage({
+    await this._errorReportChannel?.createMessage({
       content: `:tired_face:${i18next.t("components:play.failedToPlay", { lng: this.server.locale })}`
         + (
           this._errorCount + 1 >= this.retryLimit
@@ -595,7 +600,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
             : i18next.t("components:play.failedAndRetrying", { lng: this.server.locale })
         ),
     });
-    this.onStreamFailed();
+    await this.onStreamFailed();
   }
 
   resetError(){
@@ -630,12 +635,12 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.destroyStream();
     if(this.server.queue.loopEnabled){
       // 曲ループオンならばもう一度再生
-      this.play();
+      await this.play();
       return;
     }else if(this.server.queue.onceLoopEnabled){
       // ワンスループが有効ならもう一度同じものを再生
       this.server.queue.onceLoopEnabled = false;
-      this.play();
+      await this.play();
       return;
     }else{
       // キュー整理
@@ -646,7 +651,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       await this.onQueueEmpty();
     // なくなってないなら再生開始！
     }else{
-      this.play();
+      await this.play();
     }
   }
 
@@ -708,7 +713,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       if(this.server.queue.length === 1 && this.server.queue.queueLoopEnabled) this.server.queue.queueLoopEnabled = false;
       await this.server.queue.next();
     }
-    this.play(0, quiet);
+    await this.play(0, quiet);
   }
 
   override emit<U extends keyof PlayManagerEvents>(event: U, ...args: PlayManagerEvents[U]): boolean {
