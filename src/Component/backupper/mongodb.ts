@@ -114,9 +114,11 @@ export class MongoBackupper extends Backupper {
     });
   }
 
-  protected deleteGuildData(guildId: string){
-    this.collections.queue.deleteOne({ guildId });
-    this.collections.status.deleteOne({ guildId });
+  protected async deleteGuildData(guildId: string){
+    Promise.allSettled([
+      this.collections.queue.deleteOne({ guildId }),
+      this.collections.status.deleteOne({ guildId }),
+    ]).catch(this.logger.error);
   }
 
   @timeLoggedMethod
@@ -141,12 +143,12 @@ export class MongoBackupper extends Backupper {
   }
 
   @timeLoggedMethod
-  backupQueue(guildId: string){
+  async backupQueue(guildId: string){
     if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
     try{
       const queue = this.data.get(guildId).exportQueue();
       this.logger.info(`Backing up queue...(${guildId})`);
-      this.collections.queue.updateOne({ guildId }, {
+      await this.collections.queue.updateOne({ guildId }, {
         "$set": {
           guildId,
           ...queue,

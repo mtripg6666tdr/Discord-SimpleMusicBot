@@ -133,12 +133,16 @@ export default class Play extends BaseCommand {
       // 返信先のメッセージを確認
       const messageReference = message["_message"].referencedMessage;
       if(messageReference.inCachedGuildChannel()){
-        context.server.playFromMessage(message, messageReference, context, { first: !wasConnected }, t);
+        context.server
+          .playFromMessage(message, messageReference, context, { first: !wasConnected }, t)
+          .catch(this.logger.error);
       }
     }else if(message["_interaction"] && "type" in message["_interaction"].data && message["_interaction"].data.type === ApplicationCommandTypes.MESSAGE){
       const messageReference = message["_interaction"].data.resolved.messages.first();
       if(messageReference.inCachedGuildChannel()){
-        context.server.playFromMessage(message, messageReference, context, { first: !wasConnected }, t);
+        context.server
+          .playFromMessage(message, messageReference, context, { first: !wasConnected }, t)
+          .catch(this.logger.error);
       }
     }else if(server.queue.length >= 1){
       // なにもないからキューから再生

@@ -59,7 +59,9 @@ export async function onVoiceChannelLeave(
         // ならば、切断。
         this.logger.info(`audio left less than 10sec; automatically disconnected from VC (${server.connectingVoiceChannel?.id})`);
         server.player.disconnect();
-        if(!server.queue.onceLoopEnabled && !server.queue.loopEnabled) server.queue.next();
+        if(!server.queue.onceLoopEnabled && !server.queue.loopEnabled){
+          server.queue.next().catch(this.logger.error);
+        }
         await this._client.rest.channels.createMessage(
           server.boundTextChannel,
           {
@@ -102,5 +104,6 @@ export async function onVoiceChannelLeave(
       ).catch(this.logger.error);
     }
   }
-  server.skipSession?.checkThreshold();
+
+  server.skipSession?.checkThreshold().catch(this.logger.error);
 }

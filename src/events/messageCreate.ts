@@ -124,7 +124,7 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
       || message.content === "cancel"
       || message.content === i18next.t("cancel", { lng: server.locale })
     ){
-      panel.destroy();
+      await panel.destroy();
     }
     // searchコマンドの選択を捕捉
     else if(content.match(/^([0-9]\s?)+$/)){

@@ -149,7 +149,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
     if(this.message){
       this.message.edit({
         components: [],
-      });
+      }).catch(this.logger.error);
       this.message = null;
     }
     if(this.timer){

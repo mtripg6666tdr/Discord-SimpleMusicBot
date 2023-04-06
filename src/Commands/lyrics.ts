@@ -81,7 +81,7 @@ export default class Lyrics extends BaseCommand {
       msg.edit({
         content: "",
         embeds: embeds.map(embed => embed.toOceanic()),
-      });
+      }).catch(this.logger.error);
     }
     catch(e){
       this.logger.error(e);

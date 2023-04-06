@@ -99,6 +99,7 @@ const onTerminated = async function(code: string){
 });
 
 logger.info("Loading locales...");
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 initLocalization(config.debug, config.defaultLanguage).then(() => {
   // ボット開始
   bot.run();

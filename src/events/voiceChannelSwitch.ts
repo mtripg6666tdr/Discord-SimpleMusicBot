@@ -28,12 +28,14 @@ export async function onVoiceChannelSwitch(
   oldChannel: discord.VoiceChannel | discord.StageChannel | discord.Uncached
 ){
   if(!("guild" in newChannel)) return;
-  onVoiceChannelJoin.call(this, member, newChannel);
+
+  onVoiceChannelJoin.call(this, member, newChannel).catch(this.logger.error);
+
   if(member.id === this.client.user.id){
     if(this.guildData.has(member.guild.id)){
       this.getData.arguments(member.guild.id).connectingVoiceChannel = newChannel;
     }
   }else{
-    onVoiceChannelLeave.call(this, member, oldChannel);
+    onVoiceChannelLeave.call(this, member, oldChannel).catch(this.logger.error);
   }
 }

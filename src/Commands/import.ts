@@ -97,7 +97,7 @@ export default class Import extends BaseCommand {
       }
       catch(e){
         this.logger.error(e);
-        statusMessage?.edit(`:sob:${t("failed")}...`);
+        statusMessage?.edit(`:sob:${t("failed")}...`).catch(this.logger.error);
       }
     }
 
@@ -148,7 +148,7 @@ export default class Import extends BaseCommand {
     }
     catch(e){
       this.logger.error(e);
-      statusMessage?.edit(`:sob:${t("failed")}...`);
+      statusMessage?.edit(`:sob:${t("failed")}...`).catch(this.logger.error);
     }
     finally{
       context.server.unbindCancellation(cancellation);

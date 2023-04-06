@@ -47,7 +47,7 @@ export default class Rm extends BaseCommand {
       return;
     }
     if(context.args.includes("0") && context.server.player.isPlaying){
-      message.reply(t("commands:remove.invalidArgument"));
+      message.reply(t("commands:remove.invalidArgument")).catch(this.logger.error);
       return;
     }
 

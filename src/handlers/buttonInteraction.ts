@@ -63,6 +63,10 @@ export async function handleButtonInteraction(
       interaction.locale,
     );
     args.includeMention = true;
-    CommandManager.instance.resolve(command)?.checkAndRun(commandMessage, args);
+
+    CommandManager.instance
+      .resolve(command)
+      ?.checkAndRun(commandMessage, args)
+      .catch(this.logger.error);
   }
 }

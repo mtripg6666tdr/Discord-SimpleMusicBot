@@ -66,7 +66,8 @@ export async function onVoiceChannelJoin(
     }
   }
 
-  server.skipSession?.checkThreshold();
+  server.skipSession?.checkThreshold().catch(this.logger.error);
+
   if(
     server instanceof GuildDataContainerWithBgm
       && (
@@ -83,7 +84,7 @@ export async function onVoiceChannelJoin(
       )
   ){
     // BGMを再生する条件が整っている
-    server.playBgmTracks();
+    server.playBgmTracks().catch(this.logger.error);
   }else if(server.player.isPaused){
     // 自動で一時停止している場合には再開
     server.player.resume(member);

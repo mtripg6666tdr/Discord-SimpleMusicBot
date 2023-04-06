@@ -194,10 +194,7 @@ export function timeLoggedMethod<This, Args extends any[], Return>(
     try{
       result = originalMethod.call(this, ...args);
       if(result instanceof Promise){
-        result.then(f => {
-          endLog();
-          return f;
-        });
+        result.finally(endLog);
       }else{
         endLog();
       }

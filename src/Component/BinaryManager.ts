@@ -69,7 +69,7 @@ export class BinaryManager extends LogEmitter<{}> {
     if(options.checkImmediately){
       const latest = this.checkIsLatestVersion();
       if(!latest){
-        this.downloadBinary();
+        this.downloadBinary().catch(this.logger.error);
       }
     }
   }

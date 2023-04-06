@@ -40,7 +40,7 @@ export default class News extends BaseCommand {
 
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
-    context.server.joinVoiceChannel(message, {}, t);
+    context.server.joinVoiceChannel(message, {}, t).catch(this.logger.error);
     const url = Buffer.from(
       "aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTDNaUTVDcE51bFFrOC1wMENXbzl1Zkk4MUlkckdveU5a",
       "base64"

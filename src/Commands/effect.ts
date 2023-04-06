@@ -92,7 +92,7 @@ export default class Effect extends BaseCommand {
         reply.edit({
           embeds: [createEffectEmbed()],
           components: [createActionRow()],
-        });
+        }).catch(this.logger.error);
       };
       collector
         .on("reload", updateEffectEmbed)
