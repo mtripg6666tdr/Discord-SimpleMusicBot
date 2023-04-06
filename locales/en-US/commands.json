@@ -255,7 +255,7 @@
       }
     },
     "invalidArgumentCount": "Index to move to. It is written together with the queue.",
-    "invalidIndex": "You cannot specify 0 as the source or destination while the music is playing (and paused).",
+    "invalidIndex": "You cannot specify 0 as the source or destination while the music is playing (or paused).",
     "moved": "Moved `{{title}}` from position `{{from}}` to `{{to}}`.",
     "originEqualsDestination": "The source and destination songs were the same.",
     "indexOutOfRange": "I failed. Argument is out of queue range."
