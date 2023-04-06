@@ -10,7 +10,7 @@
 [![Discord Support](https://img.shields.io/discord/847435307582095360?label=discord&logo=discord&logoColor=white)](https://discord.gg/7DrAEXBMHe)
 [![GitHub License](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)](LICENSE)
 
-[日本語](/README.md)・[English](/locales/README.en-US.md)・[Français](/locales/README.fr-FR.md)
+[日本語](/README.md)・[English](/locales/README.en-US.md)
 
 <img alt="bot usage example" src="https://user-images.githubusercontent.com/56076195/218059644-2ebdf405-b9f8-4561-a3cc-2bcecf09f145.png" width="550">
 
