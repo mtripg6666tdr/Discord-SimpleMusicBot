@@ -93,3 +93,24 @@
 
 ### その他の特記事項
 - Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
+
+# v3.11.7
+## バグ修正
+* フォールバックした際に正しく再生ができないことがあったバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1371)
+## ドキュメント
+* README.mdのバッジをv3のバージョンに合わせて修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1367)
+## 依存関係のアップデート
+* @sinclair/typebox 0.26.5 => 0.26.8
+* candyget 0.5.3 => 0.5.4
+* ytdl-core 4.11.2 => 4.11.3
+* ytsr 3.8.0 => 3.8.1
+* mongodb 4.14.0 => 4.15.0
+## その他の変更
+* Dockerのイメージのタグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1307)
+
+### その他の特記事項
+- Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
