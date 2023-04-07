@@ -116,8 +116,6 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   connection: VoiceConnection;
   /** VC */
   connectingVoiceChannel: VoiceChannel | StageChannel;
-  /** VCのping */
-  vcPing: number;
 
   get locale(){
     const guild = this.bot.client.guilds.get(this.getGuildId());
@@ -156,7 +154,6 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     this.prefix = ">";
     this.equallyPlayback = false;
     this.connection = null;
-    this.vcPing = null;
     this.initPlayManager();
     this.initQueueManager();
     this.initSearchPanelManager();

@@ -22,6 +22,8 @@ import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
+import { getVoiceConnection } from "@discordjs/voice";
+
 import { BaseCommand } from ".";
 import { getColor } from "../Util/color";
 
@@ -50,8 +52,8 @@ export default class Uptime extends BaseCommand {
         `${message.guild.shard.latency === Infinity ? "-" : message.guild.shard.latency}ms`
       )
       .addField(
-        t("commands:ping.voiceUdpConnection"),
-        `${context.server.player.isConnecting && context.server.vcPing || "-"}ms`
+        t("commands:ping.voiceWsConnection"),
+        `${getVoiceConnection(context.server.getGuildId())?.ping.ws || "-"}ms`
       )
       .setTimestamp(Date.now())
       .setAuthor({
