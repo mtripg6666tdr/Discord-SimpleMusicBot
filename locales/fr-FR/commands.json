@@ -160,7 +160,7 @@
       }
     },
     "recursiveInvoke": "La commande `invoke` ne peut pas être exécutée par la commande `invoke`.",
-    "executed": "実行しました",
+    "executed": "réalisé",
     "commandNotFound": "コマンドが見つかりませんでした",
     "specialCommandNotFound": "特別コマンドが見つかりません。"
   },
