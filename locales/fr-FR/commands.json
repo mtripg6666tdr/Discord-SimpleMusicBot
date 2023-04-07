@@ -161,26 +161,26 @@
     },
     "recursiveInvoke": "La commande `invoke` ne peut pas être exécutée par la commande `invoke`.",
     "executed": "réalisé",
-    "commandNotFound": "コマンドが見つかりませんでした",
-    "specialCommandNotFound": "特別コマンドが見つかりません。"
+    "commandNotFound": "commande non trouvée",
+    "specialCommandNotFound": "Commande spéciale introuvable."
   },
   "join": {
-    "name": "接続",
-    "description": "ボイスチャンネルに参加します。",
-    "alreadyConnected": "すでにボイスチャンネルに接続中です。"
+    "name": "Connecter",
+    "description": "Rejoignez le canal vocal.",
+    "alreadyConnected": "Vous êtes déjà connecté à un canal vocal."
   },
   "leaveclean": {
-    "name": "キューを整理",
-    "description": "ボイスチャンネルから離脱した人がリクエストした曲をキューから削除して整理します。",
-    "allRemoved": "すべて削除しました",
-    "queueEmpty": "キューが空です",
-    "removed_one": "{{count}}曲削除しました",
-    "removed_other": "{{count}}曲削除しました",
-    "removedNothing": "削除するものはありませんでした。"
+    "name": "Organisez votre file d'attente",
+    "description": "Nettoyez en supprimant les chansons en file d'attente demandées par les personnes qui ont quitté votre canal vocal.",
+    "allRemoved": "Tout supprimé",
+    "queueEmpty": "la file d'attente est vide",
+    "removed_one": "{{count}} chansons supprimées",
+    "removed_other": "{{count}} chansons supprimées",
+    "removedNothing": "Il n'y avait rien à supprimer."
   },
   "log": {
-    "name": "システム情報",
-    "description": "ホストされているサーバーやプロセスに関する技術的な情報を表示します。引数(`mem`、`cpu`、`basic`、`log`のうちいずれか)を指定して特定の内容のみ取得することもできます。",
+    "name": "Informations système",
+    "description": "Affiche des informations techniques sur les serveurs hébergés et les processus. Vous pouvez également spécifier des arguments (un parmi `mem`, `cpu`, `basic` et `log`) pour obtenir uniquement un contenu spécifique.",
     "examples": "log mem",
     "usage": "log [mem|cpu|basic|log]",
     "args": {
@@ -196,7 +196,7 @@
     },
     "executing": "実行します",
     "guildName": "サーバー名",
-    "participatingGuildCount": "参加サーバー数",
+    "participatingGuildCount": "Nombre de serveurs participants",
     "registeredGuildCount": "データが保持されているサーバー数",
     "connectingGuildCount": "接続中サーバー数",
     "playingGuildCount": "再生中サーバー数(一時停止含む)",
