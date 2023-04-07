@@ -300,7 +300,7 @@
     "pingInfo": "Ping Info",
     "botMessageReceive": "Fetching Messages",
     "botWebSocketConnection": "Web Socket Connection",
-    "voiceUdpConnection": "UDP Connection of the Voice Channel"
+    "voiceWsConnection": "ボイスチャンネルWebSocket接続"
   },
   "play": {
     "name": "play",
