@@ -88,7 +88,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
         },
       };
     }else{
-      const stream = await stream_from_info(info, { quality: 2, discordPlayerCompatibility: true });
+      const stream = await stream_from_info(info, { quality: 999, discordPlayerCompatibility: true });
       return {
         ...partialResult,
         stream: {
