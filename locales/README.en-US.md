@@ -25,9 +25,9 @@ Enjoy your favorite songs with your friends, by using this OSS bot.
 - 🔎 Searches videos from keyword and play them (from YouTube and SoundCloud)
 - 🔁Track loop and queue loop
 - ❕The prefix is changeable
-  - ボットのニックネームを変更することで、サーバーごとにプレフィックスを変更できます。
-  - ボットを自分でホストする場合、設定ファイルからボットレベルでデフォルトのプレフィックスを設定できます。
-  - 複数文字に対応しています。
+  - Prefix is changeable by modifying the bot's nickname.
+  - If you are an owner of the bot, you can change the default prefix of the bot.
+  - Multiple letters' prefix is supported.
 - ▶️Autoplay songs, by pre-defined configuration
 - 👍 Support (Japanese and English available).
 
@@ -44,7 +44,7 @@ Feel free to contact us in any ways!
 
 ## Localization
 This project has a plan to be multi-lingualized via Crowdin.Translators are always welcomed.  
-現在、英語およびフランス語のみ対応予定がありますが、需要によってはほかの言語への翻訳も可能です。  
+We have a plan to translate into English and French, but we feel happy to translate in another language if it's needed.  
 [Project page on Crowdin](https://crowdin.com/project/discord-simplemusicbot)
 
 ## Support
