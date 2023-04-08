@@ -366,6 +366,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
             true
           )
         ;
+
         if(info.basicInfo.isYouTube() && info.basicInfo.IsFallbacked){
           embed.addField(
             `:warning:${i18next.t("attention", { lng: this.server.locale })}`,
@@ -379,6 +380,8 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         }
 
         const components: MessageActionRow[] = [];
+
+        // キャンセルボタンの作成
         const cancellable = !options.first && options.cancellable && !!options.addedBy;
         let collector: InteractionCollector = null;
         if(cancellable){
@@ -403,11 +406,19 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           );
 
           collectorCreateResult.collector.once("cancelLast", interaction => {
-            const item = this.get(this.length - 1);
-            this.removeAt(this.length - 1);
-            interaction.createFollowup({
-              content: `🚮${i18next.t("components:queue.cancelAdded", { title: item.basicInfo.title, lng: this.server.locale })}`,
-            }).catch(this.logger.error);
+            try{
+              const item = this.get(this.length - 1);
+              this.removeAt(this.length - 1);
+              interaction.createFollowup({
+                content: `🚮${i18next.t("components:queue.cancelAdded", { title: item.basicInfo.title, lng: this.server.locale })}`,
+              }).catch(this.logger.error);
+            }
+            catch(er){
+              this.logger.error(er);
+              interaction.createFollowup({
+                content: i18next.t("errorOccurred"),
+              }).catch(this.logger.error);
+            }
           });
 
           const destroyCollector = () => {
@@ -556,6 +567,9 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
    * @param offset 位置
    */
   removeAt(offset: number){
+    if(this.server.player.isPlaying && offset === 0){
+      throw new Error("The first item cannot be removed because it is being played right now.");
+    }
     this.logger.info(`RemoveAt Called (offset:${offset})`);
     this._default.splice(offset, 1);
     this.emit(offset === 0 ? "change" : "changeWithoutCurrent");
