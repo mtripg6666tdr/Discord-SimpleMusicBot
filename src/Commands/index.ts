@@ -142,14 +142,14 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         if(i18next.language === language) return;
         const localized: string = i18next.t(`commands:${this.asciiName}.description` as any, { lng: language }).substring(0, 100);
         if(localized === this._description) return;
-        this._descriptionLocalization[language as keyof typeof this._descriptionLocalization] = localized;
+        this._descriptionLocalization[language as keyof typeof this._descriptionLocalization] = localized.trim();
       });
 
       this._examples = examples ? {} : null;
       if(this._examples){
         availableLanguages().forEach(language => {
           this._examples[language as keyof typeof this._examples]
-            = i18next.t(`commands:${this.asciiName}.examples` as any, { lng: language });
+            = i18next.t(`commands:${this.asciiName}.examples` as any, { lng: language }).trim();
         });
       }
 
@@ -157,7 +157,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       if(this._usage){
         availableLanguages().forEach(language => {
           this._usage[language as keyof typeof this._usage]
-            = i18next.t(`commands:${this.asciiName}.usage` as any, { lng: language });
+            = i18next.t(`commands:${this.asciiName}.usage` as any, { lng: language }).trim();
         });
       }
 
@@ -168,7 +168,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           type: arg.type,
           name: arg.name,
           required: arg.required || false,
-          description: i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any),
+          description: i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any) as string,
           descriptionLocalization: {} as LocaleMap,
           choices: [] as LocalizedSlashCommandArgument["choices"],
         };
@@ -176,7 +176,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           if(i18next.language === language) return;
           const localized: string = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any, { lng: language }).substring(0, 100);
           if(localized === result.description) return;
-          result.descriptionLocalization[language as keyof typeof result.descriptionLocalization] = localized;
+          result.descriptionLocalization[language as keyof typeof result.descriptionLocalization] = localized.trim();
         });
 
         arg.choices?.forEach(choiceValue => {
@@ -189,7 +189,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
             if(i18next.language === language) return;
             const localized = i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}` as any, { lng: language });
             if(localized === resultChoice.name) return;
-            resultChoice.nameLocalizations[language as keyof LocaleMap] = localized;
+            resultChoice.nameLocalizations[language as keyof LocaleMap] = localized.trim();
           });
           result.choices.push(resultChoice);
         });
