@@ -253,3 +253,26 @@
 * Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
+
+# v4.0.0-beta.10
+**これは、プレリリースバージョンです**
+## 機能修正/変更
+* `ピング`コマンドでUDP接続のpingをWebSocket接続のpingに変更(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1376)
+* フォールバック時の音質をより高音質なものに修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1380)
+## バグ修正
+* `キャンセル`ボタンの挙動を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1378)
+* コマンドの同期のバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1381)
+## 依存関係のアップデート
+* @mtripg6666tdr/oceanic-command-resolver 1.0.0-alpha.9 => 1.0.0
+## ドキュメント
+* READMEにフランス語を追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1373, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1377)
+* ドキュメントの更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1379)
+## その他の変更
+* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1370, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1375)
+
+## その他の特記事項
+* これはプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
+* v4系では、Node.js v16.16以上が必須となります。
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
