@@ -253,9 +253,9 @@ export class CommandManager extends LogEmitter<{}> {
                 name: choice.name,
                 value: choice.value,
                 // @ts-expect-error
-                nameLocalizations: choice.nameLocalizations || choice.name_localizations,
+                nameLocalizations: choice.nameLocalizations || choice.name_localizations || null,
                 // @ts-expect-error
-                name_localizations: choice.nameLocalizations || choice.name_localizations,
+                name_localizations: choice.nameLocalizations || choice.name_localizations || null,
               })),
             };
           }else{
