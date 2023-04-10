@@ -305,7 +305,7 @@
   "play": {
     "name": "play",
     "messageCommandName": "Play",
-    "description": "Plays songs in queue. You can also specify keywords of URLs of songs on the supported site as an argument.",
+    "description": "Plays songs in queue. You can also specify keywords or URLs of songs as an argument.",
     "args": {
       "keyword": {
         "description": "Keyword or URL of the video to play. If not connected to VC, connect and play that song with priority. Adds to the end of the queue if it is connected. If paused, the option is ignored and playback resumes."
