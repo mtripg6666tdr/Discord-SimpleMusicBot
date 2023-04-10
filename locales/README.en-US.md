@@ -25,8 +25,9 @@ Enjoy your favorite songs with your friends, by using this OSS bot.
 - 🔎 Searches videos from keyword and play them (from YouTube and SoundCloud)
 - 🔁Track loop and queue loop
 - ❕The prefix is changeable
-  - The default prefix is "`>`".
-  - If you're running your own instance, you can change the bot's default prefix by editing `config.json`.(multiple letters' prefix is supported)
+  - Prefix is changeable by modifying the bot's nickname.
+  - If you are an owner of the bot, you can change the default prefix of the bot.
+  - Multiple letters' prefix is supported.
 - ▶️Autoplay songs, by pre-defined configuration
 - 👍 Support (Japanese and English available).
 
@@ -43,7 +44,7 @@ Feel free to contact us in any ways!
 
 ## Localization
 This project has a plan to be multi-lingualized via Crowdin.Translators are always welcomed.  
-We have a plan to translate in English by ourselves, but we feel happy to translate in another language if it's needed.  
+We have a plan to translate into English and French, but we feel happy to translate in another language if it's needed.  
 [Project page on Crowdin](https://crowdin.com/project/discord-simplemusicbot)
 
 ## Support
