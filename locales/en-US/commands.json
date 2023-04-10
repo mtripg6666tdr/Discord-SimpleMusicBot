@@ -80,7 +80,7 @@
   },
   "export": {
     "name": "export",
-    "description": "Export the contents of the queue so that it can be imported.",
+    "description": "Exports the contents of the queue so that it can be imported.",
     "queueEmpty": "Unable to export queue due to no items in queue.",
     "exported": "Exported",
     "compatiblity": "Version: v{{version}} compatible",
@@ -131,7 +131,7 @@
   "import": {
     "name": "import",
     "messageCommandName": "Import",
-    "description": "Import queue from the specified message. Specify the URL of the message that has a file exported by `export` command.",
+    "description": "Imports queue from the specified message. Specify the URL of the message that has a file exported by `export` command.",
     "examples": "import https://discord.com/channels/...",
     "usage": "import <URL>",
     "args": {
