@@ -1,8 +1,8 @@
 project_id: "569777"
 api_token_env: CROWDIN_API_TOKEN
-commit_message: "Change: update translations in %language%"
+commit_message: "Change(i18n): sync translations of %language%"
 append_commit_message: false
-pull_request_title: "Change: update translations"
+pull_request_title: "Change(i18n): sync translations from Crowdin"
 pull_request_labels:
   - language
 files:
