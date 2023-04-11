@@ -88,14 +88,14 @@ export abstract class SearchBase<T> extends BaseCommand {
       if(!searchPanel){
         return;
       }
-      await searchPanel.consumeSearchResult(this.searchContent(context.rawArgs, context), this.consumer, t);
+      await searchPanel.consumeSearchResult(this.searchContent(context.rawArgs, context, t), this.consumer, t);
     }else{
       await message.reply(t("commands:search.noArgument")).catch(this.logger.error);
     }
   }
 
   /** 検索を実行する関数 */
-  protected abstract searchContent(query: string, context: CommandArgs): Promise<T|{ result: T, transformedQuery: string }>;
+  protected abstract searchContent(query: string, context: CommandArgs, t: i18n["t"]): Promise<T|{ result: T, transformedQuery: string }>;
 
   /** 検索結果を検索パネルで使用できるデータに変換する関数 */
   protected abstract consumer(result: T, t: i18n["t"]): SongInfo[];
