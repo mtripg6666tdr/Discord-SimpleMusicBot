@@ -88,7 +88,7 @@ export class YouTube extends AudioSource<string> {
       const { result, resolved } = await attemptGetInfoForStrategies(url);
 
       // check if fallbacked
-      this.fallback = resolved !== 0;
+      this.fallback = resolved !== 0 && resolved !== 1;
 
       // check if upcoming
       const videoDetails = "videoDetails" in result.cache.data && result.cache.data.videoDetails;
@@ -116,7 +116,7 @@ export class YouTube extends AudioSource<string> {
   @timeLoggedMethod
   async fetch(forceUrl?: boolean): Promise<StreamInfo>{
     const { result, resolved } = await attemptFetchForStrategies(this.url, forceUrl, this.cache);
-    this.fallback = resolved !== 0;
+    this.fallback = resolved !== 0 && resolved !== 1;
     // store related videos
     this.relatedVideos = result.relatedVideos;
     this.importData(result.info);
