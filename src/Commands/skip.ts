@@ -40,6 +40,10 @@ export default class Skip extends BaseCommand {
     if(server.player.preparing){
       message.reply(t("commands:skip.preparing")).catch(this.logger.error);
       return;
+    }else if(server.player.isWaiting){
+      server.player.stop();
+      message.reply(t("canceled")).catch(this.logger.error);
+      return;
     }else if(!server.player.isPlaying){
       message.reply(t("notPlaying")).catch(this.logger.error);
       return;
@@ -67,7 +71,7 @@ export default class Skip extends BaseCommand {
       const title = item.basicInfo.title;
       server.player.stop(true);
       await server.queue.next();
-      await server.player.play();
+      server.player.play().catch(this.logger.error);
       await message.reply({
         content: `${
           context.includeMention
