@@ -72,10 +72,10 @@
     "success": "Deleted all items left in queue."
   },
   "equallyplayback": {
-    "name": "Equal play",
+    "name": "Evenly playing",
     "description": "Evenly plays songs in queue for each added user.",
-    "enabled": "Enabled 均等再生.",
-    "disabled": "Disabled 均等再生.",
+    "enabled": "Enabled evenly playing.",
+    "disabled": "Disabled evenly playing.",
     "featureDescription": "This is a function that makes it as even as possible for each user who added songs when playing songs."
   },
   "export": {
@@ -196,8 +196,8 @@
     },
     "executing": "Executing...",
     "guildName": "Server name",
-    "participatingGuildCount": "Server(s) Participating",
-    "registeredGuildCount": "Number of servers holding data",
+    "participatingGuildCount": "Servers Participating",
+    "registeredGuildCount": "Number of Servers Holding Data",
     "connectingGuildCount": "Server(s) Connecting",
     "playingGuildCount": "Server(s) Playing (include paused)",
     "pausedGuildCount": "Server(s) Paused",
