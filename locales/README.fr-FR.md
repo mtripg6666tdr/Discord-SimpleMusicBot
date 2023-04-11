@@ -26,9 +26,9 @@ Vous pouvez essayer le bot à partir du serveur d'assistance répertorié ci-des
 - 🔎 Rechercher et lire par mot-clé (YouTube et SoundCloud)
 - 🔁 Boucle par piste et à travers les repères
 - ❕ Changement de préfixe
-  - ボットのニックネームを変更することで、サーバーごとにプレフィックスを変更できます。
-  - ボットを自分でホストする場合、設定ファイルからボットレベルでデフォルトのプレフィックスを設定できます。
-  - 複数文字に対応しています。
+  - Le préfixe est modifiable en modifiant le surnom du bot.
+  - Si vous êtes propriétaire du bot, vous pouvez modifier le préfixe par défaut du bot.
+  - Le préfixe de plusieurs lettres est pris en charge.
 - ▶️ Musique à lecture automatique préconfigurée
 - 👍 Prise en charge des bots (ci-dessous)
 
@@ -45,7 +45,7 @@ N'hésitez pas à nous contacter par tous les moyens !
 
 ## À propos de la localisation
 Le projet est multilingue avec Crowdin.Nous sommes toujours à la recherche de personnes pour aider à traduire les bots.  
-現在、英語およびフランス語のみ対応予定がありますが、需要によってはほかの言語への翻訳も可能です。  
+Nous prévoyons de traduire en anglais et en français, mais nous nous ferons un plaisir de traduire dans une autre langue si nécessaire.  
 [Page du projet de Crowdin](https://crowdin.com/project/discord-simplemusicbot)
 
 ## soutien

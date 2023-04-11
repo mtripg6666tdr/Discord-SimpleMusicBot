@@ -60,27 +60,27 @@
     "description": "Shows an effect control panel.",
     "effectControllPanel": {
       "title": "Effect Control Panel",
-      "description": "You can configure audio effects.\n`-` The button styles may not show the actual current states. They will be updated when toggling the effect, or pressing the reload button.\n`-` All changes will be effected to the next songs.\nIf you'd like to apply to the current playing song, use the command `rewind`.\n",
+      "description": "You can enable/disable audio effects.\n`-` The button appearance may not show the actual current status. They will be updated when toggling the effect, or pressing the Update button.\n`-` All changes will be effected from the next song.\nIf you'd like to apply to the current playing song, use the command `rewind`.\n",
       "footer": "Choose an effect you want to apply and press the button.",
       "reload": "Update"
     }
   },
   "end": {
     "name": "end",
-    "description": "Removes all songs from queue except for the current song (or the song waiting to be played).",
+    "description": "Removes all songs from queue except for the current playing song (or the song waiting to be played).",
     "queueWasEmpty": "Nothing was removed because of no items or just one item in queue.",
     "success": "Deleted all items left in queue."
   },
   "equallyplayback": {
     "name": "Equal play",
-    "description": "Evenly play songs in the queue for each additional user.",
-    "enabled": "Turned on Equal Playback",
-    "disabled": "I turned off equal playback",
-    "featureDescription": "This is a function that makes it as even as possible for each user who added songs when adding songs."
+    "description": "Evenly plays songs in queue for each added user.",
+    "enabled": "Enabled 均等再生.",
+    "disabled": "Disabled 均等再生.",
+    "featureDescription": "This is a function that makes it as even as possible for each user who added songs when playing songs."
   },
   "export": {
     "name": "export",
-    "description": "Export the contents of the queue so that it can be imported.",
+    "description": "Exports the contents of the queue so that it can be imported.",
     "queueEmpty": "Unable to export queue due to no items in queue.",
     "exported": "Exported",
     "compatiblity": "Version: v{{version}} compatible",
@@ -131,12 +131,12 @@
   "import": {
     "name": "import",
     "messageCommandName": "Import",
-    "description": "Import queue from the specified message. Specify the URL of the message that has a file exported by `export` command.",
+    "description": "Imports queue from the specified message. Specify the URL of the message that has a file exported by `export` command.",
     "examples": "import https://discord.com/channels/...",
     "usage": "import <URL>",
     "args": {
       "url": {
-        "description": "URL of the message to import from. You can specify the URL of the message with the ymx file output by the export command attached."
+        "description": "URL of the message to import from. You can specify URL of the message with the ymx file attached output by export command."
       }
     },
     "invalidArgumentMessage": "Send the URL of a message as an argument that has an exported queue.",
@@ -239,7 +239,7 @@
       }
     },
     "embedTitle": "\"{{title}}\"({{artist}}) lyrics",
-    "failed": "I failed. Please check the song name and try again."
+    "failed": "Failed to show lyrics. Please check the song name and try again."
   },
   "move": {
     "name": "move",
@@ -255,20 +255,20 @@
       }
     },
     "invalidArgumentCount": "Index to move to. It is written together with the queue.",
-    "invalidIndex": "You cannot specify 0 as the source or destination while the music is playing (or paused).",
+    "invalidIndex": "You cannot specify 0 for moving from or to while the music is playing (or paused).",
     "moved": "Moved `{{title}}` from position `{{from}}` to `{{to}}`.",
     "originEqualsDestination": "The source and destination songs were the same.",
-    "indexOutOfRange": "I failed. Argument is out of queue range."
+    "indexOutOfRange": "Failed to move. The argument is out of queue range."
   },
   "movelastsongtofirst": {
     "name": "lastsongtotop",
     "description": "Move the last song in the queue to the top of the queue.",
     "usableWhen3orMoreQueue": "You can use this command when 3 or more items are present in queue.",
-    "success": "Moved `{{title}}` from the end to the beginning of the queue."
+    "success": "Moved `{{title}}` from the last to the top of queue."
   },
   "news": {
     "name": "news",
-    "description": "You can browse and watch news topics that are currently being distributed.",
+    "description": "Shows news topics that are currently being distributed.",
     "newsTopics": "News topic"
   },
   "nowplaying": {
@@ -276,7 +276,7 @@
     "description": "Displays information about the currently playing song. An argument of `l` (True for slash commands) displays a longer summary. (if possible)",
     "args": {
       "detailed": {
-        "description": "If set to True, show details longer than possible."
+        "description": "If set to True, show details as long as possible."
       }
     },
     "nowPlayingSong": "Now playing"
@@ -300,12 +300,12 @@
     "pingInfo": "Ping Info",
     "botMessageReceive": "Fetching Messages",
     "botWebSocketConnection": "Web Socket Connection",
-    "voiceWsConnection": "ボイスチャンネルWebSocket接続"
+    "voiceWsConnection": "WebSocket Connection to Voice Channel"
   },
   "play": {
     "name": "play",
     "messageCommandName": "Play",
-    "description": "Play songs in the queue. You can also specify the URL of the song on the corresponding site as an argument.",
+    "description": "Plays songs in queue. You can also specify keywords or URLs of songs as an argument.",
     "args": {
       "keyword": {
         "description": "Keyword or URL of the video to play. If not connected to VC, connect and play that song with priority. Adds to the end of the queue if it is connected. If paused, the option is ignored and playback resumes."
@@ -337,7 +337,7 @@
   },
   "related": {
     "name": "related",
-    "description": "Enables/disables the function that automatically adds related songs to the queue when a song from YouTube finishes playing.",
+    "description": "Enables/disables the function that automatically adds related songs to queue when a song from YouTube finishes playing.",
     "disabled": "Disabled autoplaying related songs.",
     "enabled": "Enabled autoplaying related songs.",
     "featureDescription": "This is a function that automatically adds related songs to the end of the queue when a song from YouTube finishes playing.",
@@ -350,16 +350,16 @@
     "usage": "remove <the position of the song you want to remove>",
     "args": {
       "index": {
-        "description": "The index to be deleted is the one that is listed alongside the queue. You can also use hyphens to specify a range like 2-5, or spaces to specify multiple like 1 4 8."
+        "description": "The index to be removed is the one that is listed with the queue. You can also use hyphen to specify a range like 2-5, or spaces to specify multiple like 1 4 8."
       }
     },
-    "noArgument": "Enter the offset (number) of the song to be erased in the argument.",
+    "noArgument": "Enter the offset (number) of the song to be removed in the argument.",
     "invalidArgument": "Unable to remove the current playing song.",
     "removedAt": "Removed the song(s) {{title}} at position {{indexes}}.",
     "removedMany": "Removed the specified songs.",
-    "unableToRemoveAt": "Unable to remove the songs at position {{indexes}}.",
-    "unableToRemoveMany": "Unable to remove some specified songs.",
-    "unableToRemoveAll": "No items could be removed. You may not meet the required permission to remove the requested songs."
+    "unableToRemoveAt": "Unable to remove the songs at position {{indexes}} due to lack of permission.",
+    "unableToRemoveMany": "Unable to remove some specified songs due to lack of permission.",
+    "unableToRemoveAll": "No items could be removed. You may not satisfy the required permission to remove the requested songs."
   },
   "removeall": {
     "name": "clear",
