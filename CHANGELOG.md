@@ -276,3 +276,41 @@
 * Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
+
+# v4.0.0-beta.11
+**これは、プレリリースバージョンです**
+## 機能修正/変更
+* `ニュース`コマンドをローカライズ(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1391)
+* より安定な再生ができるよう、第一段階のフォールバックをサポート対象に(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1400, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1402)
+## バグ修正
+* `ニュース`コマンドで、過去に送信された検索パネルを破棄するボタンを表示するよう修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1398)
+* 一部の言語をデフォルト言語にした場合、コマンド登録に失敗する問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1401)
+* ライブを待機時にスキップコマンド等で待機をキャンセルできない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1403)
+## 依存関係のアップデート
+* @sinclair/typebox 0.26.8 => 0.27.3
+## その他の変更
+* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1384, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1390)
+* 翻訳のコミットメッセージを変更(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1389)
+
+## その他の特記事項
+* これはプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
+* v4系では、Node.js v16.16以上が必須となります。
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
+
+<!-- 草稿 -->
+
+# v4.0.0
+## 機能追加
+## 機能変更/修正
+## バグ修正
+## 依存関係のアップデート
+*(省略)*
+## その他の変更
+
+## その他の特記事項
+* v4系では、Node.js v16.16以上が必須となります。
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
