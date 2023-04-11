@@ -114,3 +114,14 @@
 - Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
+
+# v3.11.8
+## バグ修正
+* `検索`コマンドにURLが渡された際に、 ボイスチャンネルに接続されてから処理するようにする(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1405)
+* `ニュース`コマンドで以前の検索結果を破棄するボタンが表示されないバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1409)
+## 依存関係のアップデート
+* @sinclair/typebox 0.26.8 => 0.27.3
+### その他の特記事項
+- Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
