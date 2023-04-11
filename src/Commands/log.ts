@@ -136,7 +136,7 @@ export default class SystemInfo extends BaseCommand {
           .setColor(getColor("UPTIME"))
           .setTitle("Server Info")
           .setDescription(
-            `${t("commands:log.guildName")}(NSFW LEVEL,ID)\r\n`
+            `**${t("commands:log.guildName")}(NSFW LEVEL,ID)**\r\n`
             + context.client.guilds.map(guild => `${guild.name.length > 17 ? guild.name.substring(0, 17) + "…" : guild.name} (${guild.nsfwLevel},${guild.id})`).join("\r\n")
           )
           .addField(t("commands:log.participatingGuildCount"), context.bot.client.guilds.size.toString(), true)
