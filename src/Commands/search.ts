@@ -30,11 +30,15 @@ import { Util } from "../Util";
 export abstract class SearchBase<T> extends BaseCommand {
   async run(message: CommandMessage, options: CommandArgs){
     options.server.updateBoundChannel(message);
-    options.server.joinVoiceChannel(message);
+
     if(this.urlCheck(options.rawArgs)){
+      await options.server.joinVoiceChannel(message);
       await options.server.playFromURL(message, options.args as string[], !options.server.player.isConnecting);
       return;
     }
+
+    options.server.joinVoiceChannel(message);
+
     if(options.server.hasSearchPanel(message.member.id)){
       const responseMessage = await message.reply({
         content: "✘既に開かれている検索窓があります",
