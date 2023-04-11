@@ -143,8 +143,13 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     return this._volume;
   }
 
+  /** 再生終了時に、アイドル状態のままボイスチャンネルに接続したままになってるかどうかを取得します */
   get finishTimeout(){
     return this._finishTimeout;
+  }
+
+  get isWaiting(){
+    return !!this._waitForLiveAbortController;
   }
 
   // コンストラクタ
