@@ -111,6 +111,10 @@ export class CommandManager extends LogEmitter {
   }
 
   async sync(client: Client, removeOutdated: boolean = false){
+    if(process.env.DISABLE_SYNC_SC){
+      this.Log("Skip syncing commands");
+      return;
+    }
     this.Log("Start syncing application commands");
     const registeredAppCommands = await client.getCommands();
     if(registeredAppCommands.length === 0){

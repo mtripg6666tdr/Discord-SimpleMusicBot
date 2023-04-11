@@ -27,5 +27,6 @@ declare namespace NodeJS {
     readonly DSL_ENABLE?: string;
     readonly BD_ENABLE?: string;
     readonly HIBIKI_ENABLE?: string;
+    readonly DISABLE_SYNC_SC?: string;
   }
 }
