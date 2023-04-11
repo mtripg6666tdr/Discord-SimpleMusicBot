@@ -41,10 +41,27 @@ export default class News extends BaseCommand {
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     context.server.joinVoiceChannel(message, {}, t).catch(this.logger.error);
-    const url = Buffer.from(
-      "aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTDNaUTVDcE51bFFrOC1wMENXbzl1Zkk4MUlkckdveU5a",
-      "base64"
-    ).toString();
+    // change news according to locale
+    let url: string = null;
+    switch(context.locale){
+      case "en-US":
+        url = Buffer.from("aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTDNaUTVDcE51bFFsZE9MM1Q4ZzhrMW1nV1d5c0pmRTl3", "base64").toString();
+        break;
+      case "en-GB":
+        url = Buffer.from("aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTDNaUTVDcE51bFFrMHkyTHVfdEs4Vkx4d29KTkNoaG45v", "base64").toString();
+        break;
+      case "fr":
+        url = Buffer.from("aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTDNaUTVDcE51bFFsYUtKcHktTmVHUFBWemJvZVNseW13", "base64").toString();
+        break;
+      case "th":
+        url = Buffer.from("aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTDNaUTVDcE51bFFtN2dIOGNtaVB5Z3kyT3llOE9nak1a", "base64").toString();
+        break;
+      case "zh-TW":
+        url = Buffer.from("aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTDNaUTVDcE51bFFrRXhUeGp6bEo4ekRvX1VfMXVNS0p1", "base64").toString();
+        break;
+      default:
+        url = Buffer.from("aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTDNaUTVDcE51bFFrOC1wMENXbzl1Zkk4MUlkckdveU5a", "base64").toString();
+    }
     if(context.server.searchPanel.has(message.member.id)){
       message.reply(t("search.alreadyOpen")).catch(this.logger.error);
       return;
