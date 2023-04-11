@@ -174,7 +174,8 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         };
         availableLanguages().forEach(language => {
           if(i18next.language === language) return;
-          const localized: string = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any, { lng: language }).substring(0, 100);
+          const localized: string = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any, { lng: language })
+            .substring(0, 100);
           if(localized === result.description) return;
           result.descriptionLocalization[language as keyof typeof result.descriptionLocalization] = localized.trim();
         });
@@ -266,11 +267,16 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   toApplicationCommandStructure(): CreateApplicationCommandOptions[] {
     if(this.unlist) throw new Error("This command cannot be listed due to private command!");
     const result: CreateApplicationCommandOptions[] = [];
+
+    // build options if any
     const options = this.argument?.map(arg => {
       const discordCommandStruct = {
         type: CommandManager.mapCommandOptionTypeToInteger(arg.type),
         name: arg.name,
-        description: arg.description.replace(/\r/g, "").replace(/\n/g, ""),
+        description: arg.description
+          .replace(/\r/g, "")
+          .replace(/\n/g, "")
+          .substring(0, 100),
         descriptionLocalizations: Object.entries(arg.descriptionLocalization).length > 0 ? arg.descriptionLocalization : null,
         required: arg.required,
         choices: arg.choices?.map(choice => ({
@@ -279,14 +285,22 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           nameLocalizations: Object.entries(choice.nameLocalizations).length > 0 ? choice.nameLocalizations : null,
         })) as ApplicationCommandOptionsChoice[],
       };
-      if(!discordCommandStruct.choices) delete discordCommandStruct.choices;
+
+      if(!discordCommandStruct.choices){
+        delete discordCommandStruct.choices;
+      }
+
       return discordCommandStruct as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean;
     });
+
     if(options && options.length > 0){
       result.push({
         type: ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
-        description: this.description.replace(/\r/g, "").replace(/\n/g, ""),
+        description: this.description
+          .replace(/\r/g, "")
+          .replace(/\n/g, "")
+          .substring(0, 100),
         descriptionLocalizations: Object.entries(this.descriptionLocalization).length > 0 ? this.descriptionLocalization : null,
         options,
       });
@@ -294,7 +308,10 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       result.push({
         type: ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
-        description: this.description.replace(/\r/g, "").replace(/\n/g, ""),
+        description: this.description
+          .replace(/\r/g, "")
+          .replace(/\n/g, "")
+          .substring(0, 100),
         descriptionLocalizations: Object.entries(this.descriptionLocalization).length > 0 ? this.descriptionLocalization : null,
       });
     }
