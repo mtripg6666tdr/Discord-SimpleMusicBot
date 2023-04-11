@@ -19,6 +19,8 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/CommandMessage";
 
+import { Helper } from "@mtripg6666tdr/eris-command-resolver";
+
 import * as ytpl from "ytpl";
 
 import { BaseCommand } from ".";
@@ -42,7 +44,26 @@ export default class News extends BaseCommand {
     options.server.joinVoiceChannel(message);
     const url = "https://www.youtube.com/playlist?list=PL3ZQ5CpNulQk8-p0CWo9ufI81IdrGoyNZ";
     if(options.server.hasSearchPanel(message.member.id)){
-      message.reply("✘既に開かれている検索窓があります").catch(e => Util.logger.log(e, "error"));
+      const responseMessage = await message.reply({
+        content: "✘既に開かれている検索窓があります",
+        components: [
+          new Helper.MessageActionRowBuilder()
+            .addComponents(
+              new Helper.MessageButtonBuilder()
+                .setCustomId(`cancel-search-${message.member.id}`)
+                .setLabel("以前の検索結果を破棄")
+                .setStyle("DANGER")
+            )
+            .toEris()
+        ]
+      }).catch(e => Util.logger.log(e, "error"));
+      if(responseMessage){
+        options.server.getSearchPanel(message.member.id).once("destroy", () => {
+          responseMessage.edit({
+            components: [],
+          });
+        });
+      }
       return;
     }
     const searchPanel = options.server.createSearchPanel(message, "ニューストピックス", true);
