@@ -190,7 +190,10 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         mes = await this.server.bot.client.rest.channels.createMessage(
           this.server.boundTextChannel,
           {
-            content: `:stopwatch:${i18next.t("components:play.waitingForLiveStream", { lng: this.server.locale })}`,
+            content: `:stopwatch:${i18next.t("components:play.waitingForLiveStream", {
+              lng: this.server.locale,
+              title: this.currentAudioInfo.title,
+            })}`,
           }
         );
         this.preparing = false;

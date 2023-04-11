@@ -17,14 +17,15 @@
  */
 
 import type { Cache } from "./strategies/base";
-import type { ytdlCoreStrategy } from "./strategies/ytdl-core";
 import type { StreamInfo } from "..";
 import type { i18n } from "i18next";
 import type { EmbedField } from "oceanic.js";
+import type { InfoData } from "play-dl";
 
 import * as ytdl from "ytdl-core";
 
-import { attemptGetInfoForStrategies, attemptFetchForStrategies, strategies } from "./strategies";
+import { attemptGetInfoForStrategies, attemptFetchForStrategies } from "./strategies";
+import { playDl } from "./strategies/play-dl";
 import { ytdlCore } from "./strategies/ytdl-core";
 import { SecondaryUserAgent } from "../../definition";
 import { timeLoggedMethod } from "../../logger";
@@ -91,17 +92,25 @@ export class YouTube extends AudioSource<string> {
       this.fallback = resolved !== 0 && resolved !== 1;
 
       // check if upcoming
-      const videoDetails = "videoDetails" in result.cache.data && result.cache.data.videoDetails;
-      if(
-        videoDetails
-        && videoDetails.liveBroadcastDetails
-        && videoDetails.liveBroadcastDetails.startTimestamp
-        && !videoDetails.liveBroadcastDetails.isLiveNow
-        && !videoDetails.liveBroadcastDetails.endTimestamp
-      ){
-        this.upcomingTimestamp = videoDetails.liveBroadcastDetails.startTimestamp;
-      }else{
-        this.upcomingTimestamp = null;
+      if(result.cache?.data){
+        if(
+          "videoDetails" in result.cache.data
+          && result.cache.data.videoDetails.liveBroadcastDetails
+          && result.cache.data.videoDetails.liveBroadcastDetails.startTimestamp
+          && !result.cache.data.videoDetails.liveBroadcastDetails.isLiveNow
+          && !result.cache.data.videoDetails.liveBroadcastDetails.endTimestamp
+        ){
+          this.upcomingTimestamp = result.cache.data.videoDetails.liveBroadcastDetails.startTimestamp;
+        }else if(
+          "LiveStreamData" in result.cache.data
+          && result.cache.data.LiveStreamData.isLive
+          && result.cache.data.video_details.upcoming
+          && typeof result.cache.data.video_details.upcoming === "object"
+        ){
+          this.upcomingTimestamp = result.cache.data.video_details.upcoming.toISOString();
+        }else{
+          this.upcomingTimestamp = null;
+        }
       }
 
       // store data as cache if requested
@@ -123,25 +132,43 @@ export class YouTube extends AudioSource<string> {
     if(forceUrl){
       this.logger.info("Returning a url instead of stream");
     }
-    if(result.cache) this.cache = result.cache;
+
+    if(result.cache){
+      this.cache = result.cache;
+    }
+
     return result.stream;
   }
 
   async fetchVideo(){
-    let info = this.cache?.type === ytdlCore && this.cache.data as ytdl.videoInfo || null;
-    if(!info){
-      info = await (strategies[0] as ytdlCoreStrategy).getInfo(this.url).then(result => (this.cache = result.cache).data);
+    if(this.cache?.type === ytdlCore){
+      const info = this.cache.data as ytdl.videoInfo;
+      const isLive = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
+      const format = ytdl.chooseFormat(info.formats, {
+        quality: isLive ? null : "highestvideo",
+        isHLS: isLive,
+      } as ytdl.chooseFormatOptions);
+      const { url } = format;
+      return {
+        url,
+        ua: SecondaryUserAgent,
+      };
+    }else if(this.cache?.type === playDl){
+      const info = this.cache.data as InfoData;
+      const format = info.format.filter(f => f.mimeType.startsWith("video")).sort((a, b) => b.bitrate - a.bitrate)[0];
+      const url = format.url || info.LiveStreamData.hlsManifestUrl;
+
+      if(!url){
+        throw new Error("No url found.");
+      }
+
+      return {
+        url,
+        ua: SecondaryUserAgent,
+      };
+    }else{
+      throw new Error("No available data found.");
     }
-    const isLive = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
-    const format = ytdl.chooseFormat(info.formats, {
-      quality: isLive ? null : "highestvideo",
-      isHLS: isLive,
-    } as ytdl.chooseFormatOptions);
-    const { url } = format;
-    return {
-      url,
-      ua: SecondaryUserAgent,
-    };
   }
 
   toField(verbose: boolean, t: i18n["t"]){
