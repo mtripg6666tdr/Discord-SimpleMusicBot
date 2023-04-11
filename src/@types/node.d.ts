@@ -29,5 +29,6 @@ declare namespace NodeJS {
     readonly HIBIKI_ENABLE?: string;
     readonly LOG_TRANSFER_PORT?: string;
     readonly CONSOLE_ENABLE?: string;
+    readonly DISABLE_SYNC_SC?: string;
   }
 }
