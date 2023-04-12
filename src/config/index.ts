@@ -28,7 +28,7 @@ import CJSON from "comment-json";
 
 import { ConfigSchema } from "./type";
 
-const DEVELOPMENT_PHASE = true;
+const DEVELOPMENT_PHASE = false;
 
 type ConfigObject = Static<typeof ConfigSchema> & {
   isBotAdmin: (userId: string) => boolean,
