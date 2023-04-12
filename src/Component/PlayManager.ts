@@ -380,11 +380,15 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       embed.setThumbnail("attachment://thumbnail." + this.currentAudioInfo.thumbnail.ext);
     }
     /* eslint-enable @typescript-eslint/indent */
-    if(this.currentAudioInfo.isYouTube() && this.currentAudioInfo.IsFallbacked){
-      embed.addField(
-        `:warning:${i18next.t("attention", { lng: this.server.locale })}`,
-        i18next.t("components:queue.fallbackNotice", { lng: this.server.locale })
-      );
+    if(this.currentAudioInfo.isYouTube()){
+      if(this.currentAudioInfo.isFallbacked){
+        embed.addField(
+          `:warning:${i18next.t("attention", { lng: this.server.locale })}`,
+          i18next.t("components:queue.fallbackNotice", { lng: this.server.locale })
+        );
+      }else if(this.currentAudioInfo.strategyId === 1){
+        embed.setTitle(`${embed.title}*`);
+      }
     }
 
     this.emit("playStartUIPrepared", embed);

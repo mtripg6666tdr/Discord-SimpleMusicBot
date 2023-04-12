@@ -60,7 +60,7 @@ export default class Frame extends BaseCommand {
     if(!vinfo.isYouTube()){
       await message.reply(`:warning:${t("commands:frame.unsupported")}`).catch(this.logger.error);
       return;
-    }else if(vinfo.fallback){
+    }else if(vinfo.isFallbacked){
       await message.reply(`:warning:${t("commands:frame.fallbacking")}`).catch(this.logger.error);
       return;
     }

@@ -367,11 +367,15 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           )
         ;
 
-        if(info.basicInfo.isYouTube() && info.basicInfo.IsFallbacked){
-          embed.addField(
-            `:warning:${i18next.t("attention", { lng: this.server.locale })}`,
-            i18next.t("components:queue.fallbackNotice", { lng: this.server.locale })
-          );
+        if(info.basicInfo.isYouTube()){
+          if(info.basicInfo.isFallbacked){
+            embed.addField(
+              `:warning:${i18next.t("attention", { lng: this.server.locale })}`,
+              i18next.t("components:queue.fallbackNotice", { lng: this.server.locale })
+            );
+          }else if(info.basicInfo.strategyId === 1){
+            embed.setTitle(`${embed.title}*`);
+          }
         }else if(info.basicInfo.isSpotify()){
           embed.addField(
             `:warning:${i18next.t("attention", { lng: this.server.locale })}`,
