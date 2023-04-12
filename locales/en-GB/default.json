@@ -25,9 +25,9 @@
     "manageGuild": "owning the permission of [Manage Server]",
     "onlyListener": "to be the only user in the voice channel",
     "noConnection": "the bot connects to no voice channels",
-    "onlyBotInVc": "the bot is only member in the voice channel",
+    "onlyBotInVc": "no members except for the bot in the voice channel the bot connects",
     "eitherOf": "{{things}}",
-    "needed": "This behavior needs to satisfy at least one requirement below; {{permissions}}"
+    "needed": "This behaviour needs to satisfy at least one requirement below; {{permissions}}"
   },
   "alias": "Alias",
   "permissionsToRun": "Requirements (at least one needs to be fulfilled)",
@@ -45,8 +45,8 @@
   "liveStream": "Livestream",
   "unknown": "Unknown",
   "cancel": "Cancel",
-  "canceling": "Canceled",
-  "canceled": "Canceled",
+  "canceling": "Cancelled",
+  "canceled": "Cancelled",
   "attention": "Attention",
   "pleaseWait": "Please wait",
   "loadingInfo": "Fetching data",

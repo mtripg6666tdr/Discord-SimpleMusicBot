@@ -12,7 +12,7 @@
 Un bot musical simple fabriqué au Japon pour Discord.  
 La lecture à partir de YouTube, etc. est prise en charge. La sélection de chansons peut être spécifiée par mot-clé, il n'est donc pas nécessaire de s'abstenir d'URL.  
 Avec ce bot OSS, profitons tous de la musique sur le canal vocal dès maintenant.  
-Vous pouvez essayer le bot à partir du serveur d'assistance répertorié ci-dessous.N'hésitez pas à rejoindre notre serveur d'assistance.
+Vous pouvez essayer le bot à partir du serveur d'assistance répertorié ci-dessous.
 
 ## fonction
 - 🎵Jouez avec la meilleure qualité possible
@@ -49,8 +49,7 @@ Nous prévoyons de traduire en anglais et en français, mais nous nous ferons un
 [Page du projet de Crowdin](https://crowdin.com/project/discord-simplemusicbot)
 
 ## soutien
-Sur Discord, nous fournissons une assistance telle que l'installation et la notification des mises à jour.  
-Vous pouvez également essayer le bot, donc si vous êtes intéressé, rejoignez-nous.  
+Sur Discord, nous fournissons une assistance telle que l'installation et la notification des mises à jour.   
 [Cliquez ici pour rejoindre le serveur d'assistance](https://discord.gg/7DrAEXBMHe)  
 [Versions prises en charge](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
 
