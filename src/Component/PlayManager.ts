@@ -488,13 +488,20 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
    * 停止します。切断するにはDisconnectを使用してください。
    * @returns this
   */
-  stop(force: boolean = false): PlayManager{
+  async stop({ force = false, wait = false }: { force?: boolean, wait?: boolean } = {}): Promise<PlayManager> {
     this.logger.info("Stop called");
     this._playing = false;
     if(this.server.connection){
       this._cost = 0;
-      this._player?.unpause();
-      this._player?.stop(force);
+      if(this._player){
+        this._player.unpause();
+        this._player.stop(force);
+        if(wait){
+          await entersState(this._player, AudioPlayerStatus.Idle, 10e3).catch(() => {
+            this._player.stop(true);
+          });
+        }
+      }
       this.emit("stop");
     }
     return this;
@@ -504,8 +511,8 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
    * 切断します。内部的にはStopも呼ばれています。これを呼ぶ前にStopを呼ぶ必要はありません。
    * @returns this
    */
-  disconnect(): PlayManager{
-    this.stop();
+  async disconnect(): Promise<PlayManager> {
+    await this.stop();
     this.emit("disconnectAttempt");
 
     if(this.server.connection){
@@ -578,13 +585,11 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
    * 頭出しをします。
    * @returns this
    */
-  rewind(): PlayManager{
+  async rewind(): Promise<PlayManager> {
     this.logger.info("Rewind called");
     this.emit("rewind");
-    this
-      .stop(true)
-      .play()
-      .catch(this.logger.error);
+    await this.stop({ wait: true });
+    await this.play().catch(this.logger.error);
     return this;
   }
 
@@ -627,7 +632,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       await entersState(this._player, AudioPlayerStatus.Idle, 20e3)
         .catch(() => {
           this.logger.warn("Stream has not ended in time and will force stream into destroying");
-          this.stop(true);
+          return this.stop({ force: true });
         })
       ;
     }
@@ -688,7 +693,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           .catch(this.logger.error)
         ;
       }
-      this.disconnect();
+      this.disconnect().catch(this.logger.error);
     }, 10 * 60 * 1000).unref();
     this._finishTimeout = true;
     const playHandler = () => {
@@ -715,7 +720,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     }
     this.logger.warn(`Play failed (${this._errorCount}times)`);
     this.preparing = false;
-    this.stop(true);
+    await this.stop({ wait: true });
     if(this._errorCount >= this.retryLimit){
       if(this.server.queue.loopEnabled) this.server.queue.loopEnabled = false;
       if(this.server.queue.length === 1 && this.server.queue.queueLoopEnabled) this.server.queue.queueLoopEnabled = false;
