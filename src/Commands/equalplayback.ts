@@ -28,7 +28,7 @@ import { getColor } from "../Util/color";
 export default class EquallyPlayback extends BaseCommand {
   constructor(){
     super({
-      alias: ["equalplayback", "equallyplayback", "eqpb", "equally"],
+      alias: ["equalplayback", "equallyplayback", "eqpb", "equal", "equally"],
       unlist: false,
       category: "playlist",
       requiredPermissionsOr: ["admin", "noConnection", "onlyListener", "dj"],
