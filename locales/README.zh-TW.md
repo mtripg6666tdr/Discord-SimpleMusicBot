@@ -12,7 +12,7 @@
 在日本為 Discord 製造的簡單音樂機器人。  
 支持從 YouTube 等播放。 歌曲選擇可以通過關鍵字指定，因此無需避免 URL。  
 有了這個 OSS 機器人，讓我們現在就可以在語音頻道上享受音樂。  
-您可以從下面列出的支持服務器試用該機器人。歡迎加入我們的支持服務器。
+您可以從下面列出的支持服務器試用該機器人。
 
 ## 功能
 - 🎵できる限り高音質で再生
@@ -49,8 +49,7 @@ Issueのほか、下記のサポートサーバーでも各種お問い合わせ
 [Crowdinのプロジェクトページ](https://crowdin.com/project/discord-simplemusicbot)
 
 ## サポート
-Discordにて、インストール等のサポート、およびアップデートのお知らせ等を行っています。  
-ボットを試すこともできますので、興味を持たれた方はぜひご参加ください。  
+Discordにて、インストール等のサポート、およびアップデートのお知らせ等を行っています。   
 [サポートサーバーへの参加はこちら](https://discord.gg/7DrAEXBMHe)  
 [サポートされているバージョン](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
 
