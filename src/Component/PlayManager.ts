@@ -498,6 +498,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         this._player.stop(force);
         if(wait){
           await entersState(this._player, AudioPlayerStatus.Idle, 10e3).catch(() => {
+            this.logger.warn("Player didn't stop in time; force-stopping");
             this._player.stop(true);
           });
         }
