@@ -72,10 +72,10 @@
     "success": "Deleted all items left in queue."
   },
   "equallyplayback": {
-    "name": "Evenly playing",
-    "description": "Evenly plays songs in queue for each added user.",
-    "enabled": "Enabled evenly playing.",
-    "disabled": "Disabled evenly playing.",
+    "name": "Equal playback",
+    "description": "Plays same amount of songs for each user.",
+    "enabled": "Enabled equal playback.",
+    "disabled": "Disabled equal playback.",
     "featureDescription": "This is a function that makes it as even as possible for each user who added songs when playing songs."
   },
   "export": {
