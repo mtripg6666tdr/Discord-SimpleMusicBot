@@ -76,7 +76,7 @@ export class CommandManager extends LogEmitter<{}> {
     this.logger.info("Initialized");
   }
 
-  checkDuplicate(){
+  private checkDuplicate(){
     const sets = new Map<string, BaseCommand>();
     const setCommand = (name: string, command: BaseCommand) => {
       if(sets.has(name)){

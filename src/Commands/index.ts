@@ -230,23 +230,31 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
   /** 権限の確認と実行を一括して行います */
   async checkAndRun(message: CommandMessage, context: Readonly<CommandArgs>){
-    const judgeIfPermissionMeeted = (perm: CommandPermission) => {
-      if(perm === "admin"){
-        return discordUtil.users.isPrivileged(message.member);
-      }else if(perm === "dj"){
-        return discordUtil.users.isDJ(message.member, context);
-      }else if(perm === "manageGuild"){
-        return message.member.permissions.has("MANAGE_GUILD");
-      }else if(perm === "manageMessages"){
-        return message.channel.permissionsOf(message.member).has("MANAGE_MESSAGES");
-      }else if(perm === "noConnection"){
-        return !context.server.player.isConnecting;
-      }else if(perm === "onlyListener"){
-        return discordUtil.channels.isOnlyListener(message.member, context);
-      }else if(perm === "sameVc"){
-        return discordUtil.channels.sameVC(message.member, context);
-      }else{
-        return false;
+    const judgeIfPermissionMeeted: ((perm: CommandPermission) => boolean) = (perm: CommandPermission) => {
+      switch(perm){
+        case "admin":
+          return discordUtil.users.isPrivileged(message.member);
+        case "dj":
+          return discordUtil.users.isDJ(message.member, context);
+        case "manageGuild":
+          return message.member.permissions.has("MANAGE_GUILD");
+        case "manageMessages":
+          return message.channel.permissionsOf(message.member).has("MANAGE_MESSAGES");
+        case "noConnection":
+          return !context.server.player.isConnecting;
+        case "onlyListener":
+          return discordUtil.channels.isOnlyListener(message.member, context);
+        case "sameVc":
+          return discordUtil.channels.sameVC(message.member, context);
+        case "onlyBotInVc": {
+          const member = discordUtil.channels.getVoiceMember(context);
+          if(!member){
+            return false;
+          }
+          return member.filter(m => !m.bot).length === 0;
+        }
+        default:
+          return false;
       }
     };
     if(this.requiredPermissionsOr.length !== 0 && !this.requiredPermissionsOr.some(judgeIfPermissionMeeted)){

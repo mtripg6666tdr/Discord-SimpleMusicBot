@@ -28,7 +28,7 @@ export default class Dc extends BaseCommand {
       unlist: false,
       alias: ["終了", "disconnect", "dc", "leave", "quit"] as const,
       category: "voice",
-      requiredPermissionsOr: ["admin", "sameVc"],
+      requiredPermissionsOr: ["admin", "sameVc", "onlyBotInVc"],
       shouldDefer: false,
     });
   }
