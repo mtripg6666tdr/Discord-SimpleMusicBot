@@ -2,6 +2,8 @@
 sidebar_position: 7
 ---
 # 言語の変更
+(v4.0.0で追加)
+
 ボットレベルのデフォルトの言語は、[`config.json`で設定できます](../../setup/installation/configuration#defaultlanguage-string)が、
 ボットはコマンドに応じて最適な言語を自動的に決定しようとします。
 

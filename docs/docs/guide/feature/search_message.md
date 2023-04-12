@@ -2,6 +2,8 @@
 sidebar_position: 3
 ---
 # 検索パネル
+(v1.0.0で追加)
+
 :::info
 ここで紹介されている機能は、Message Content Intentが有効になっている場合にのみ使用できます。([→使用する権限](../../setup/permission.md))  
 :::
