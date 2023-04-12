@@ -11,7 +11,8 @@
 
 A music bot for Discord, made in Japan.  
 This bot supports playing songs from YouTube. No need to copy and paste URLs, but you can find music by keywords.  
-Enjoy your favorite songs with your friends, by using this OSS bot.
+Enjoy your favorite songs with your friends, by using this OSS bot.  
+You can try to use the bot in the support server below.
 
 ## Features
 - 🎵Plays songs as the highest quality as the bot can
@@ -39,7 +40,7 @@ The documentation of the bot (Japanese).
 The bot is still in developing phase so very buggy.  
 Any contributions are welcome!  
 If you find any bugs, please confirm there's no duplicated issues at first and feel free to open a new issue.After that, open a pull request if you can.  
-Not only opening issues, we accept inquiries in the support server below.  
+Not only opening issues, we accept inquiries (Japanese or English) in the support server below.  
 Feel free to contact us in any ways!
 
 ## Localization
