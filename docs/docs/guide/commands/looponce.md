@@ -1,16 +1,16 @@
 ---
-sidebar_label: ワンスループ
+sidebar_label: looponce.name
 ---
-# `ワンスループ`コマンド
-現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。
+# `looponce.name`コマンド
+looponce.description
 
-スラッシュコマンドでは、`/onceloop`を使用してください。
+スラッシュコマンドでは、`/looponce`を使用してください。
 
 ## 別名
-`ワンスループ`以外にも以下の別名を使用できます。
+`looponce.name`以外にも以下の別名を使用できます。
 
-- onceloop
 - looponce
+- onceloop
 
 
 

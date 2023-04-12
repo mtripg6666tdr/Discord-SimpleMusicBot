@@ -1,14 +1,15 @@
 ---
-sidebar_label: 均等再生
+sidebar_label: equalplayback.name
 ---
-# `均等再生`コマンド
-追加ユーザーごとにキュー内の楽曲を均等に再生します。
+# `equalplayback.name`コマンド
+equalplayback.description
 
-スラッシュコマンドでは、`/equallyplayback`を使用してください。
+スラッシュコマンドでは、`/equalplayback`を使用してください。
 
 ## 別名
-`均等再生`以外にも以下の別名を使用できます。
+`equalplayback.name`以外にも以下の別名を使用できます。
 
+- equalplayback
 - equallyplayback
 - eqpb
 - equally
