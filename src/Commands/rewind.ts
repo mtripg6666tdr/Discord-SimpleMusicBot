@@ -38,13 +38,13 @@ export default class Rewind extends BaseCommand {
     if(!context.server.player.isPlaying){
       message.reply(t("notPlaying")).catch(this.logger.error);
     }else{
-      context.server.player.rewind();
-      message.reply({
+      await message.reply({
         content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:rewind:${t("commands:rewind.success")}:+1:`,
         allowedMentions: {
           users: false,
         },
       }).catch(this.logger.error);
+      context.server.player.rewind().catch(this.logger.error);
     }
   }
 }

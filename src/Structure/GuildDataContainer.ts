@@ -419,7 +419,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
             })
               .catch(this.logger.error);
           }
-          this.player.disconnect();
+          await this.player.disconnect().catch(this.logger.error);
           return false;
         }
       }else{

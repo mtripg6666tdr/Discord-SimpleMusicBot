@@ -41,7 +41,7 @@ export default class Dc extends BaseCommand {
       return;
     }
     // 停止しま～す
-    context.server.player.disconnect();
+    await context.server.player.disconnect();
     message.reply(`:postbox:${t("disconnected")}`).catch(this.logger.error);
   }
 }

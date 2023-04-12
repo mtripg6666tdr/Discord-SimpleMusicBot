@@ -41,7 +41,7 @@ export default class Skip extends BaseCommand {
       message.reply(t("commands:skip.preparing")).catch(this.logger.error);
       return;
     }else if(server.player.isWaiting){
-      server.player.stop();
+      await server.player.stop().catch(this.logger.error);
       message.reply(t("canceled")).catch(this.logger.error);
       return;
     }else if(!server.player.isPlaying){
@@ -68,10 +68,10 @@ export default class Skip extends BaseCommand {
         return;
       }
 
-      const title = item.basicInfo.title;
-      server.player.stop(true);
+      await server.player.stop({ wait: true });
       await server.queue.next();
-      server.player.play().catch(this.logger.error);
+
+      const title = item.basicInfo.title;
       await message.reply({
         content: `${
           context.includeMention
@@ -82,6 +82,8 @@ export default class Skip extends BaseCommand {
           users: false,
         },
       }).catch(this.logger.error);
+
+      server.player.play().catch(this.logger.error);
       if(server.queue.isEmpty){
         await server.player.onQueueEmpty();
       }

@@ -70,7 +70,7 @@ export default class Seek extends BaseCommand {
 
     try{
       const response = await message.reply(`:rocket:${t("commands:seek.seeking")}...`);
-      server.player.stop(true);
+      await server.player.stop({ wait: true });
       await server.player.play(time);
       await response.edit(`:white_check_mark:${t("commands:seek.success")}`).catch(this.logger.error);
     }

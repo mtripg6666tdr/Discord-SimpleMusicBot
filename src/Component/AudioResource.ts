@@ -91,12 +91,8 @@ export class FixedAudioResource extends NullMetaAudioResource {
     if(this.silenceRemaining === 0){
       return null;
     }else if(this.silenceRemaining > 0){
-      if(this.isStreamReadable){
-        this.silenceRemaining = -1;
-      }else{
-        this.silenceRemaining--;
-        return SILENCE_FRAME;
-      }
+      this.silenceRemaining--;
+      return SILENCE_FRAME;
     }
 
     if(this.playStream.readable){

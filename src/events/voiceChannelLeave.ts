@@ -38,7 +38,7 @@ export async function onVoiceChannelLeave(
   if(member.id === this._client.user.id){
     // サーバー側からのボットの切断
     this.logger.info(`forced to disconnect from VC (${server.connectingVoiceChannel?.id})`);
-    server.player.disconnect();
+    await server.player.disconnect().catch(this.logger.error);
     await this._client.rest.channels.createMessage(
       server.boundTextChannel,
       {
@@ -47,7 +47,7 @@ export async function onVoiceChannelLeave(
     ).catch(this.logger.error);
   }else if(oldChannel.voiceMembers.has(this._client.user.id) && oldChannel.voiceMembers.size === 1){
     if(server.queue instanceof QueueManagerWithBgm && server.queue.isBGM){
-      server.player.disconnect();
+      await server.player.disconnect().catch(this.logger.error);
     }else if(server.player.isPlaying && !config.twentyFourSeven.includes(oldChannel.id) && !config.alwaysTwentyFourSeven){
       // 誰も聞いてる人がいない
       if(
@@ -58,7 +58,7 @@ export async function onVoiceChannelLeave(
         // かつ、残り時間が10秒以内
         // ならば、切断。
         this.logger.info(`audio left less than 10sec; automatically disconnected from VC (${server.connectingVoiceChannel?.id})`);
-        server.player.disconnect();
+        await server.player.disconnect().catch(this.logger.error);
         if(!server.queue.onceLoopEnabled && !server.queue.loopEnabled){
           server.queue.next().catch(this.logger.error);
         }
@@ -87,7 +87,7 @@ export async function onVoiceChannelLeave(
                 content: `:postbox: ${i18next.t("autoDisconnect", { lng: server.locale })}`,
               }
             ).catch(this.logger.error);
-            server.player.disconnect();
+            server.player.disconnect().catch(this.logger.error);
           }
         }, 10 * 60 * 1000).unref();
         const playHandler = () => clearTimeout(timer);
@@ -95,7 +95,7 @@ export async function onVoiceChannelLeave(
         server.player.once("disconnect", playHandler);
       }
     }else if(server.player.finishTimeout){
-      server.player.disconnect();
+      await server.player.disconnect().catch(this.logger.error);
       await this._client.rest.channels.createMessage(
         server.boundTextChannel,
         {

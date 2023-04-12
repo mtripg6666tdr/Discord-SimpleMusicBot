@@ -118,11 +118,13 @@ export class SkipManager extends ServerManagerBase<{}> {
             embeds: [],
           });
           const title = this.server.queue.get(0).basicInfo.title;
-          this.server.player.stop(true);
+          await this.server.player.stop({ wait: true });
           await this.server.queue.next();
-          await this.server.player.play();
+
           response.edit(`:track_next:${i18next.t("components:skip.skipped", { title, lng: this.parent.locale })}:white_check_mark:`)
             .catch(this.logger.error);
+
+          await this.server.player.play();
         }
         catch(e){
           this.logger.error(e);
