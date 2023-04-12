@@ -3,19 +3,14 @@ sidebar_label: onceloop.name
 ---
 # `onceloop.name`コマンド
 onceloop.description
-sidebar_label: looponce.name
----
-# `looponce.name`コマンド
-looponce.description
 
-スラッシュコマンドでは、`/looponce`を使用してください。
+スラッシュコマンドでは、`/onceloop`を使用してください。
 
 ## 別名
 `onceloop.name`以外にも以下の別名を使用できます。
-`looponce.name`以外にも以下の別名を使用できます。
 
-- looponce
 - onceloop
+- looponce
 
 
 
