@@ -382,7 +382,6 @@
 * レートリミットに関するバグが発生した際に、`リセット`コマンドで回避できるようになりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1359)
 * `リセット`コマンドで、キューを保持したままリセットの操作を行うことが可能になりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1359)
 * ボイスチャンネルからメンバーがいなくなった際に一時停止する機能で、最後に退出したメンバーが再参加した場合に自動的に再生を再開する(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1354)
-* `均等再生`コマンドのエイリアスに`equal`が追加されました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1427)
 
 ## 機能修正/変更
 * `debug`が`true`の際にも、`config.json`に`errorChannel`が設定されていれば、チャンネルにログを送信する(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1131)
@@ -404,8 +403,9 @@
     * `onceloop` => `looponce` (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1424)
   * 過去のスラッシュコマンドはアップデートの後にも残ったままになります。整理するには`invoke sp;cleanupsc`をご使用ください。
 * 一部のコマンドが変更となりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1155)
-  * `ヘルプ`コマンドのエイリアスに`support`が追加されました。
+  * `ヘルプ`コマンドのエイリアスに`support`が追加されました
   * `アップタイム`コマンドの`ピング`確認機能が、`ピング`コマンドに分割されました。
+  * `均等再生`コマンドのエイリアスに`equal`が追加されました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1427)
 * 環境変数`GAS_URL`および`GAS_TOKEN`がそれぞれ`DB_URL`および`DB_TOKEN`に変更されました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1170)
 * `インポート`コマンドでキューの埋め込みからインポートすることはできなくなりました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1203)
 * `ピング`コマンドでUDP接続のpingをWebSocket接続のpingに変更(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1376)
