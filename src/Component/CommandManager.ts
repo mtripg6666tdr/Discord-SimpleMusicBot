@@ -72,14 +72,14 @@ export class CommandManager extends LogEmitter<{}> {
       })
       .filter(n => !n.disabled);
 
-    this.checkDuplicate({ report: useConfig().debug });
+    this.initializeMap({ reportDupes: useConfig().debug });
     this.logger.info("Initialized");
   }
 
-  private checkDuplicate({ report }: { report: boolean }){
+  private initializeMap({ reportDupes }: { reportDupes: boolean }){
     const sets = new Map<string, BaseCommand>();
     const setCommand = (name: string, command: BaseCommand) => {
-      if(sets.has(name) && report){
+      if(sets.has(name) && reportDupes){
         this.logger.warn(`Detected command ${command.name} the duplicated key ${name} with ${sets.get(name).name}; overwriting`);
       }
       sets.set(name, command);
