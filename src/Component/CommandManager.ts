@@ -38,6 +38,7 @@ import { timeLoggedMethod } from "../logger";
 // eslint-disable-next-line @typescript-eslint/ban-types
 export class CommandManager extends LogEmitter<{}> {
   private static _instance = null as CommandManager;
+
   /**
    * コマンドマネージャーの唯一のインスタンスを返します
    */
@@ -46,6 +47,7 @@ export class CommandManager extends LogEmitter<{}> {
     else return this._instance = new CommandManager();
   }
 
+  private readonly _commands = null as BaseCommand[];
   /**
    * コマンドを返します
    */
@@ -53,7 +55,7 @@ export class CommandManager extends LogEmitter<{}> {
     return this._commands;
   }
 
-  private readonly _commands = null as BaseCommand[];
+  private commandMap: Map<string, BaseCommand>;
 
   private constructor(){
     super("CommandsManager");
@@ -70,16 +72,14 @@ export class CommandManager extends LogEmitter<{}> {
       })
       .filter(n => !n.disabled);
 
-    if(useConfig().debug){
-      this.checkDuplicate();
-    }
+    this.checkDuplicate({ report: useConfig().debug });
     this.logger.info("Initialized");
   }
 
-  private checkDuplicate(){
+  private checkDuplicate({ report }: { report: boolean }){
     const sets = new Map<string, BaseCommand>();
     const setCommand = (name: string, command: BaseCommand) => {
-      if(sets.has(name)){
+      if(sets.has(name) && report){
         this.logger.warn(`Detected command ${command.name} the duplicated key ${name} with ${sets.get(name).name}; overwriting`);
       }
       sets.set(name, command);
@@ -88,6 +88,7 @@ export class CommandManager extends LogEmitter<{}> {
       setCommand(command.name, command);
       command.alias.forEach(name => setCommand(name, command));
     });
+    this.commandMap = sets;
   }
 
   /**
@@ -96,14 +97,7 @@ export class CommandManager extends LogEmitter<{}> {
    * @returns 解決されたコマンド
    */
   resolve(command: string){
-    this.logger.info("Resolving command");
-    let result = null;
-    for(let i = 0; i < this._commands.length; i++){
-      if(this._commands[i].name === command || this._commands[i].alias.includes(command)){
-        result = this._commands[i];
-        break;
-      }
-    }
+    const result = this.commandMap.get(command);
     if(result){
       this.logger.info(`Command "${command}" was resolved successfully`);
     }else{
