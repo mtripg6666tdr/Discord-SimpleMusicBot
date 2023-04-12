@@ -36,7 +36,7 @@ export async function handleAutoCompleteInteraction(
     option.value,
     interaction.data.options.raw
       .filter(opt => opt.name !== option.name && "value" in opt) as { name: string, value: string | number }[]
-  );
+  ).slice(0, 25);
 
   await interaction.result(
     possibleOptions.map(name => ({
