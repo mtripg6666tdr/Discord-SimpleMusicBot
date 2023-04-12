@@ -13,7 +13,7 @@
     "trackloop": "Loop track",
     "queueloop": "Loop queue",
     "autoplayRelated": "Autoplaying related songs",
-    "equallyplayback": "Evenly playing",
+    "equallyplayback": "Equal playback",
     "tooManyQueueItems": "Exceeding the maximum item count of queue.",
     "songAdded": "Song Added",
     "positionInQueue": "Position in Queue",
