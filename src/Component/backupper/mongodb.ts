@@ -115,10 +115,14 @@ export class MongoBackupper extends Backupper {
   }
 
   protected async deleteGuildData(guildId: string){
-    Promise.allSettled([
-      this.collections.queue.deleteOne({ guildId }),
-      this.collections.status.deleteOne({ guildId }),
-    ]).catch(this.logger.error);
+    if(this.collections && this.dbConnectionReady){
+      Promise.allSettled([
+        this.collections.queue.deleteOne({ guildId }),
+        this.collections.status.deleteOne({ guildId }),
+      ]).catch(this.logger.error);
+    }else{
+      this.logger.warn(`No data was removed (guildId: ${guildId}) due to no connection`);
+    }
   }
 
   @timeLoggedMethod
