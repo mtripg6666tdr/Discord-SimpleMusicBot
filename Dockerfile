@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-FROM node:18-buster-slim AS base
+FROM node:18-bullseye-slim AS base
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
     apt-get dist-upgrade -y && \
