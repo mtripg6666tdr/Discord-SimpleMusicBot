@@ -7,10 +7,6 @@ sidebar_position: 1
 ## 必要な環境
 このボットをクローンして実行するには、以下の要件が必要です。
 
-:::info
-ボットのバージョンによって、必要な環境は異なります。このページではv3.x系で必要になる環境を解説しています。v2.x系での実行環境については、[`v2`ブランチのREADME](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/v2#readme)を参照してください。
-:::
-
 ### 必須な環境
 
 - [Node.js](https://nodejs.org/) v16以上v18以下がサポートされていて、インストールされていること  
@@ -23,6 +19,7 @@ sidebar_position: 1
     - もしこれをしないでインストールした場合には、`npm i -g windows-build-tools`を実行するとよいようです。
   - Unix系の場合、そのOSのビルドツールを一発でインストールできる場合があります。
     - Ubuntuの場合、`apt install build-essential`でできます。
+    - CentOSの場合、`yum groupinstall "Development Tools"`でできます。
 
 :::note
 - `ffmpeg`は、インストール時に`npm`が自動的にダウンロードするため、事前にダウンロードしたり、パスを通したりする必要はありませんが、一部の環境ではこれが利用できない場合があります。その際には、後述の手順で、`npm install`したときに、その旨の表示がされます。この場合、自分で別途ffmpegをインストールする必要があります。  

@@ -2,6 +2,8 @@
 sidebar_position: 3
 ---
 # Replit Databaseを使用する
+(v4.0.0で追加)
+
 [Replit](https://replit.com)でのReplに組み込みの[Replit Database](https://docs.replit.com/hosting/databases/replit-database)を、バックアップ先のサーバーとして使用することができます。
 
 :::info
