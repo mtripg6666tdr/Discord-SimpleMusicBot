@@ -281,12 +281,6 @@
     },
     "nowPlayingSong": "Now playing"
   },
-  "onceloop": {
-    "name": "looponce",
-    "description": "After the current playback ends, play the same song again in a loop.",
-    "disabled": "Disabled loop once",
-    "enabled": "Enabled loop once"
-  },
   "pause": {
     "name": "pause",
     "description": "Pauses the current playing song.",
@@ -498,5 +492,11 @@
     "enabled": "Enabled queue loop.",
     "name": "loopqueue",
     "description": "Toggles looping the entire queue."
+  },
+  "looponce": {
+    "name": "looponce",
+    "description": "After the current playback ends, play the same song again in a loop.",
+    "disabled": "Disabled loop once",
+    "enabled": "Enabled loop once"
   }
 }
