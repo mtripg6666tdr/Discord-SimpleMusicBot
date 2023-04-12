@@ -9,7 +9,7 @@ sidebar_position: 1
 
 ### 必須な環境
 
-- [Node.js](https://nodejs.org/) v16以上v18以下がサポートされていて、インストールされていること  
+- [Node.js](https://nodejs.org/) (v16.16以上のv16.x、v18.x)がサポートされていて、インストールされていること。
 - [npm](https://www.npmjs.com/) が利用できること。
 - [ffmpeg](https://ffmpeg.org/) が利用できること。
 - [git](https://git-scm.com/) が利用できること。

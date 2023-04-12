@@ -2,6 +2,8 @@
 sidebar_position: 6
 ---
 # プレフィックスの変更
+(v1.0.0で追加)  
+(v3.10.0で複数文字のプレフィックス対応)  
 
 :::info
 この機能は、Message Content Intentが有効になっている場合にのみ使用できます。([→使用する権限](../../setup/permission.md))  
