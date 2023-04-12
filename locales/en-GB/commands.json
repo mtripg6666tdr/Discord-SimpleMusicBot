@@ -493,7 +493,7 @@
     "enabled": "Enabled loop once"
   },
   "equalplayback": {
-    "name": "Equal playback",
+    "name": "equalplayback",
     "description": "Plays same amount of songs for each user.",
     "enabled": "Enabled equal playback.",
     "disabled": "Disabled equal playback.",
