@@ -40,12 +40,12 @@ export class YouTube extends AudioSource<string> {
   protected channelUrl: string;
   protected upcomingTimestamp: string = null;
 
-  protected _fallback = false;
-  get fallback(){
-    return this._fallback;
+  protected _strategyId: number;
+  get strategyId(){
+    return this._strategyId;
   }
-  protected set fallback(value: boolean){
-    this._fallback = value;
+  protected set strategyId(value: number){
+    this._strategyId = value;
   }
 
   protected _isLiveStream: boolean;
@@ -68,11 +68,11 @@ export class YouTube extends AudioSource<string> {
     super("youtube");
   }
 
-  get IsFallbacked(){
-    return this.fallback;
+  get isFallbacked(){
+    return typeof this.strategyId === "number" && this.strategyId !== 0 && this.strategyId !== 1;
   }
 
-  get IsCached(){
+  get isCached(){
     return !!this.cache;
   }
 
@@ -89,7 +89,7 @@ export class YouTube extends AudioSource<string> {
       const { result, resolved } = await attemptGetInfoForStrategies(url);
 
       // check if fallbacked
-      this.fallback = resolved !== 0 && resolved !== 1;
+      this.strategyId = resolved;
 
       // check if upcoming
       if(result.cache?.data){
@@ -125,7 +125,7 @@ export class YouTube extends AudioSource<string> {
   @timeLoggedMethod
   async fetch(forceUrl?: boolean): Promise<StreamInfo>{
     const { result, resolved } = await attemptFetchForStrategies(this.url, forceUrl, this.cache);
-    this.fallback = resolved !== 0 && resolved !== 1;
+    this.strategyId = resolved;
     // store related videos
     this.relatedVideos = result.relatedVideos;
     this.importData(result.info);
