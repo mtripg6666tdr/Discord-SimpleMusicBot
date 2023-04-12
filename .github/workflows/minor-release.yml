@@ -8,16 +8,16 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: '16.x'
-      
+          node-version: '18.x'
+
       - name: Bump package version
         id: bump-version
         run: echo "VERSION=$(npm version minor --git-tag-version false)" >> $GITHUB_OUTPUT
-        
+
       - name: Check updated version
         run: echo $VERSION
         env:
@@ -31,7 +31,7 @@ jobs:
         run: node docs/frozen-version.js
         env:
           VERSION: ${{ steps.bump-version.outputs.VERSION }}
-      
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:

@@ -28,7 +28,7 @@ jobs:
             ${{ steps.npm-cache.outputs.dir }}
           key: npm-18.x-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
-      
+
       - name: Install dependencies
         run: npm ci
 

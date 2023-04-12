@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3.6.0
         with:
@@ -43,7 +43,7 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        
+
       - name: List dependencies
         run: npm list --all
         continue-on-error: true
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3.6.0
         with:
@@ -79,52 +79,6 @@ jobs:
 
       - name: Build
         run: npm run build
-
-  test-legacy:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'v3' }}
-    needs:
-      - build
-    strategy:
-      matrix:
-        node-version:
-          - '12.x'
-          - '14.x'
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup config for test
-        run: cp util/config-for-test.json config.json
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Get npm cache directory
-        id: npm-cache
-        run: |
-          echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
-
-      - name: Check npm cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ steps.npm-cache.outputs.dir }}
-          key: npm-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: npm-
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Test
-        run: npm test
-
-      - name: Test to load scripts to Node.js
-        run: node util/exec -r ./util/testLoad -e 'process.exit()'
 
   test:
     runs-on: ubuntu-latest
@@ -140,7 +94,7 @@ jobs:
 
       - name: Setup config for test
         run: cp util/config-for-test.json config.json
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3.6.0
         with:
@@ -170,14 +124,14 @@ jobs:
 
       - name: Test to load scripts to Node.js
         run: node util/exec -r ./util/testLoad -e 'process.exit()'
-        
+
   docs:
     runs-on: ubuntu-latest
     needs:
       - build
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3.6.0
         with:
@@ -198,20 +152,20 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Setup config for test
         run: cp util/config-for-test.json config.json
-        
+
       - name: Build document
         run: |
           npm run build
           npm run generatecommandlist
-      
+
       - name: Check if there are changes
         run: |
           git add .
           git diff --staged -w --exit-code
-        
+
       - name: Build documentation site
         if: ${{ github.event_name != 'pull_request' }}
         working-directory: "docs"
@@ -231,7 +185,7 @@ jobs:
       - name: Check failure
         if: env.WORKFLOW_CONCLUSION == 'failure'
         run: exit 1
-      
+
       - name: Success
         run: echo "All done"
         if: ${{ success() }}
