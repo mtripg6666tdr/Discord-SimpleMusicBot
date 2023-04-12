@@ -16,7 +16,32 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from "./autoCompleteInteraction";
-export * from "./commandInteraction";
-export * from "./buttonInteraction";
-export * from "./selectMenuInteraction";
+import type { MusicBot } from "../bot";
+import type { AutocompleteInteraction } from "oceanic.js";
+
+import { CommandManager } from "../Component/CommandManager";
+
+export async function handleAutoCompleteInteraction(
+  this: MusicBot,
+  interaction: AutocompleteInteraction,
+){
+  const option = interaction.data.options.getFocused();
+  if(!option){
+    return;
+  }
+  
+  const targetCommand = CommandManager.instance.resolve(interaction.data.name);
+  const possibleOptions = targetCommand?.handleAutoComplete(
+    option.name,
+    option.value,
+    interaction.data.options.raw
+      .filter(opt => opt.name !== option.name && "value" in opt) as { name: string, value: string | number }[]
+  );
+
+  await interaction.result(
+    possibleOptions.map(name => ({
+      name: name.toString(),
+      value: name.toString(),
+    }))
+  ).catch(this.logger.error);
+}

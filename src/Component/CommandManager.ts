@@ -270,6 +270,7 @@ export class CommandManager extends LogEmitter<{}> {
               description: option.description,
               descriptionLocalizations: option.descriptionLocalizations,
               required: !!option.required,
+              autocomplete: "autocomplete" in option && option.autocomplete || false,
             };
           }
         }),

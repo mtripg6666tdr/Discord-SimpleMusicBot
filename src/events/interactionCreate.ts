@@ -28,7 +28,11 @@ const config = useConfig();
 
 export async function onInteractionCreate(this: MusicBot, interaction: discord.AnyInteractionGateway){
   // コマンドインタラクションおよびコンポーネントインタラクション以外は処理せず終了
-  if(interaction.type !== InteractionTypes.APPLICATION_COMMAND && interaction.type !== InteractionTypes.MESSAGE_COMPONENT){
+  if(
+    interaction.type !== InteractionTypes.APPLICATION_COMMAND
+    && interaction.type !== InteractionTypes.MESSAGE_COMPONENT
+    && interaction.type !== InteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE
+  ){
     this.logger.debug(`Unknown interaction received: ${interaction.type}`);
     return;
   }
@@ -51,15 +55,28 @@ export async function onInteractionCreate(this: MusicBot, interaction: discord.A
   const server = this.initData(channel.guild.id, channel.id);
 
   // コマンドインタラクション
-  if(interaction instanceof discord.CommandInteraction){
-    handlers.handleCommandInteraction.call(this, server, interaction).catch(this.logger.error);
-  }else if(interaction instanceof discord.ComponentInteraction){
-    if(interaction.data.componentType === discord.ComponentTypes.BUTTON){
-      // ボタンインタラクション
-      handlers.handleButtonInteraction.call(this, server, interaction).catch(this.logger.error);
-    }else if(interaction.data.componentType === discord.ComponentTypes.STRING_SELECT){
-      // セレクトメニューインタラクション
-      handlers.handleSelectMenuInteraction.call(this, server, interaction).catch(this.logger.error);
+  switch(interaction.type){
+    case discord.InteractionTypes.APPLICATION_COMMAND:
+      handlers.handleCommandInteraction.call(this, server, interaction).catch(this.logger.error);
+      break;
+
+    case discord.InteractionTypes.MESSAGE_COMPONENT:
+    {
+      switch(interaction.data.componentType){
+        case discord.ComponentTypes.BUTTON:
+          // ボタンインタラクション
+          handlers.handleButtonInteraction.call(this, server, interaction).catch(this.logger.error);
+          break;
+        case discord.ComponentTypes.STRING_SELECT:
+          // セレクトメニューインタラクション
+          handlers.handleSelectMenuInteraction.call(this, server, interaction).catch(this.logger.error);
+          break;
+      }
+      break;
     }
+
+    case discord.InteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE:
+      handlers.handleAutoCompleteInteraction.call(this, interaction).catch(this.logger.error);
+      break;
   }
 }

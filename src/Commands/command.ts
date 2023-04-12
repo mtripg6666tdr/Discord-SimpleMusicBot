@@ -38,11 +38,14 @@ export default class Commands extends BaseCommand {
       unlist: false,
       alias: ["command", "commands", "cmd"],
       category: "bot",
-      argument: [{
-        type: "string",
-        name: "command",
-        required: false,
-      }],
+      argument: [
+        {
+          type: "string",
+          name: "command",
+          required: false,
+          autoCompleteEnabled: true,
+        },
+      ],
       requiredPermissionsOr: [],
       shouldDefer: false,
       usage: true,
@@ -133,6 +136,24 @@ export default class Commands extends BaseCommand {
       }else{
         await message.reply(`:face_with_raised_eyebrow:${t("commands:command.commandNotFound")}`);
       }
+    }
+  }
+
+  override handleAutoComplete(_: string, input: string): string[] {
+    if(input === ""){
+      return [
+        "play",
+        "search",
+        "queue",
+        "nowplaying",
+        "pause",
+        "disconnect",
+      ];
+    }else{
+      return CommandManager.instance.commands
+        .filter(command => !command.unlist)
+        .flatMap(command => [command.name, ...command.alias])
+        .filter(name => name.includes(input));
     }
   }
 }
