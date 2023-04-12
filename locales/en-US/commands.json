@@ -21,7 +21,7 @@
   },
   "cancel": {
     "name": "cancel",
-    "description": "Aborts all operations that can be canceled, if any.",
+    "description": "Aborts all operations that can be canceled.",
     "canceling": "Canceling all operations that can be canceled....",
     "noCancelable": "There's no task to be canceled."
   },
@@ -29,7 +29,7 @@
     "name": "Command",
     "usage": "command [name]",
     "examples": "command search",
-    "description": "Shows the list of commands. If you specify a command, shows details of the command.",
+    "description": "Shows list of commands. If you specify a command, shows details of the command.",
     "args": {
       "command": {
         "description": "The command to show the details."
@@ -53,11 +53,11 @@
   },
   "disconnect": {
     "name": "disconnect",
-    "description": "Disconnects from the voice channel."
+    "description": "Disconnects from voice channel."
   },
   "effect": {
     "name": "effect",
-    "description": "Shows an effect control panel.",
+    "description": "Shows effect control panel.",
     "effectControllPanel": {
       "title": "Effect Control Panel",
       "description": "You can enable/disable audio effects.\n`-` The button appearance may not show the actual current status. They will be updated when toggling the effect, or pressing the Update button.\n`-` All changes will be effected from the next song.\nIf you'd like to apply to the current playing song, use the command `rewind`.\n",
@@ -80,7 +80,7 @@
   },
   "export": {
     "name": "export",
-    "description": "Exports the contents of the queue so that it can be imported.",
+    "description": "Exports content of the queue so that it can be imported.",
     "queueEmpty": "Unable to export queue due to no items in queue.",
     "exported": "Exported",
     "compatiblity": "Version: v{{version}} compatible",
@@ -166,7 +166,7 @@
   },
   "join": {
     "name": "connect",
-    "description": "Joins the voice channel.",
+    "description": "Joins voice channel.",
     "alreadyConnected": "Already connected to the voice channel."
   },
   "leaveclean": {
@@ -230,7 +230,7 @@
   },
   "lyrics": {
     "name": "lyrics",
-    "description": "Finds the lyrics of the specified song.",
+    "description": "Finds lyrics of the specified song.",
     "examples": "l Into The Night",
     "usage": "l <ex. titles, artists and so on>",
     "args": {
@@ -262,7 +262,7 @@
   },
   "movelastsongtofirst": {
     "name": "lastsongtotop",
-    "description": "Move the last song in the queue to the top of the queue.",
+    "description": "Moves the last song in the queue to the top of the queue.",
     "usableWhen3orMoreQueue": "You can use this command when 3 or more items are present in queue.",
     "success": "Moved `{{title}}` from the last to the top of queue."
   },
