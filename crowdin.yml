@@ -10,4 +10,4 @@ files:
     translation: /locales/%locale%/%original_file_name%
     type: i18next_json
   - source: /README.md
-    translation: /locales/README.%locale%.md
+    translation: /locales/README.%two_letters_code%.md
