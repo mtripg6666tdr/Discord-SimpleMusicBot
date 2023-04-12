@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v3
         with:
           node-version: '18.x'
 
@@ -39,7 +39,9 @@ jobs:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
           key: npm-18.x-${{ hashFiles('package-lock.json') }}
-          restore-keys: npm-
+          restore-keys: |
+            npm-18.x-
+            npm-
 
       - name: Install dependencies
         run: npm ci
@@ -57,7 +59,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v3
         with:
           node-version: '18.x'
 
@@ -72,7 +74,9 @@ jobs:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
           key: npm-18.x-${{ hashFiles('package-lock.json') }}
-          restore-keys: npm-
+          restore-keys: |
+            npm-18.x-
+            npm-
 
       - name: Install dependencies
         run: npm ci
@@ -96,7 +100,7 @@ jobs:
         run: cp util/config-for-test.json config.json
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -111,7 +115,9 @@ jobs:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
           key: npm-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: npm-
+          restore-keys: |
+            npm-${{ matrix.node-version }}-
+            npm-
 
       - name: Install dependencies
         run: npm ci
@@ -133,7 +139,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v3
         with:
           node-version: '18.x'
 
@@ -148,7 +154,9 @@ jobs:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
           key: npm-18.x-${{ hashFiles('package-lock.json') }}
-          restore-keys: npm-
+          restore-keys: |
+            npm-18.x-
+            npm-
 
       - name: Install dependencies
         run: npm ci

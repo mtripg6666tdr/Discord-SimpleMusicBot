@@ -10,7 +10,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Get the current branch name
         shell: bash
@@ -37,6 +37,7 @@ jobs:
           envs: BRANCH
           script: |
             sudo systemctl restart musicbot-compose
+
       - name: Update deployment status
         uses: bobheadxi/deployments@v1
         with:

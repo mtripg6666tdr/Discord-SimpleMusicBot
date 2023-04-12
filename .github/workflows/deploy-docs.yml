@@ -39,7 +39,9 @@ jobs:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
           key: npm-docs-18.x-${{ hashFiles('package-lock.json') }}
-          restore-keys: npm-docs-
+          restore-keys: |
+            npm-docs-18.x
+            npm-docs-
 
       - name: Install dependencies on docs
         working-directory: "docs"
