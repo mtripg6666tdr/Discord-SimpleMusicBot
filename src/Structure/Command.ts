@@ -29,6 +29,7 @@ export type CommandPermission =
   | "manageGuild"
   | "onlyListener"
   | "noConnection"
+  | "onlyBotInVc"
 ;
 
 export type BaseCommandInitializeOptions = {

@@ -28,7 +28,7 @@ export default class Rmall extends BaseCommand {
       alias: ["removeall", "rmall", "allrm", "allremove", "clear"],
       unlist: false,
       category: "playlist",
-      requiredPermissionsOr: ["admin", "onlyListener", "dj"],
+      requiredPermissionsOr: ["admin", "onlyListener", "dj", "onlyBotInVc"],
       shouldDefer: false,
     });
   }
