@@ -38,7 +38,7 @@ export default class OnceLoop extends BaseCommand {
     if(context.server.queue.onceLoopEnabled){
       context.server.queue.onceLoopEnabled = false;
       message.reply({
-        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:${t("commands:onceloop.disabled")}:x:`,
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:${t("commands:looponce.disabled")}:x:`,
         allowedMentions: {
           users: false,
         },
@@ -46,7 +46,7 @@ export default class OnceLoop extends BaseCommand {
     }else{
       context.server.queue.onceLoopEnabled = true;
       message.reply({
-        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:${t("commands:onceloop.enabled")}:o:`,
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:${t("commands:looponce.enabled")}:o:`,
         allowedMentions: {
           users: false,
         },

@@ -40,12 +40,12 @@ export default class EquallyPlayback extends BaseCommand {
     options.server.updateBoundChannel(context);
     if(options.server.equallyPlayback){
       options.server.equallyPlayback = false;
-      context.reply(`❌${t("commands:equallyplayback.disabled")}`).catch(this.logger.error);
+      context.reply(`❌${t("commands:equalplayback.disabled")}`).catch(this.logger.error);
     }else{
       options.server.equallyPlayback = true;
       const embed = new MessageEmbedBuilder()
-        .setTitle(`⭕${t("commands:equallyplayback.enabled")}`)
-        .setDescription(t("commands:equallyplayback.featureDescription"))
+        .setTitle(`⭕${t("commands:equalplayback.enabled")}`)
+        .setDescription(t("commands:equalplayback.featureDescription"))
         .setColor(getColor("EQUALLY"))
         .toOceanic()
       ;

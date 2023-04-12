@@ -71,13 +71,6 @@
     "queueWasEmpty": "Il n'a pas été supprimé car la file d'attente est vide ou il n'y a qu'une seule chanson.",
     "success": "Chansons supprimées laissées dans la file d'attente."
   },
-  "equallyplayback": {
-    "name": "Jeu égal",
-    "description": "Jouez uniformément des chansons dans la file d'attente pour chaque utilisateur supplémentaire.",
-    "enabled": "Jeu égal activé",
-    "disabled": "J'ai désactivé la lecture égale",
-    "featureDescription": "Il s'agit d'une fonction qui le rend aussi uniforme que possible pour chaque utilisateur qui a ajouté des chansons lors de l'ajout de chansons."
-  },
   "export": {
     "name": "exporter",
     "description": "Exportez le contenu de la file d'attente afin qu'il puisse être importé.",
@@ -280,12 +273,6 @@
       }
     },
     "nowPlayingSong": "現在再生中の曲"
-  },
-  "onceloop": {
-    "name": "ワンスループ",
-    "description": "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
-    "disabled": "ワンスループを無効にしました",
-    "enabled": "ワンスループを有効にしました"
   },
   "pause": {
     "name": "一時停止",
@@ -498,5 +485,18 @@
     "enabled": "キューループを有効にしました。",
     "name": "キューループ",
     "description": "キュー内のループを設定します。"
+  },
+  "looponce": {
+    "name": "ワンスループ",
+    "description": "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
+    "disabled": "ワンスループを無効にしました",
+    "enabled": "ワンスループを有効にしました"
+  },
+  "equalplayback": {
+    "name": "Jeu égal",
+    "description": "Jouez uniformément des chansons dans la file d'attente pour chaque utilisateur supplémentaire.",
+    "enabled": "Jeu égal activé",
+    "disabled": "J'ai désactivé la lecture égale",
+    "featureDescription": "Il s'agit d'une fonction qui le rend aussi uniforme que possible pour chaque utilisateur qui a ajouté des chansons lors de l'ajout de chansons."
   }
 }
