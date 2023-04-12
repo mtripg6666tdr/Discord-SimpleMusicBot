@@ -25,6 +25,7 @@
     "manageGuild": "owning the permission of [Manage Server]",
     "onlyListener": "to be the only user in the voice channel",
     "noConnection": "the bot connects to no voice channels",
+    "onlyBotInVc": "ボットが接続しているボイスチャンネルにボット以外のメンバーがいないこと",
     "eitherOf": "{{things}}",
     "needed": "This behavior needs to satisfy at least one requirement below; {{permissions}}"
   },
