@@ -2,6 +2,8 @@
 sidebar_position: 4
 ---
 # 処理のキャンセル
+(v1.0.0で追加)
+
 :::info
 この機能は、Message Content Intentが有効になっている場合にのみ使用できます。([→使用する権限](../../setup/permission.md))  
 スラッシュコマンドでは、[`キャンセル`コマンド](../commands/cancel.md)を使用できます。
