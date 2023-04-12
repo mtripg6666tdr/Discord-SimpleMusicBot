@@ -38,11 +38,14 @@ export default class Commands extends BaseCommand {
       unlist: false,
       alias: ["command", "commands", "cmd"],
       category: "bot",
-      argument: [{
-        type: "string",
-        name: "command",
-        required: false,
-      }],
+      argument: [
+        {
+          type: "string",
+          name: "command",
+          required: false,
+          autoCompleteEnabled: true,
+        },
+      ],
       requiredPermissionsOr: [],
       shouldDefer: false,
       usage: true,

@@ -16,7 +16,14 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from "./autoCompleteInteraction";
-export * from "./commandInteraction";
-export * from "./buttonInteraction";
-export * from "./selectMenuInteraction";
+import type { GuildDataContainer } from "../Structure";
+import type { MusicBot } from "../bot";
+import type { AutocompleteInteraction } from "oceanic.js";
+
+export async function handleAutoCompleteInteraction(
+  this: MusicBot,
+  server: GuildDataContainer,
+  interaction: AutocompleteInteraction,
+){
+  console.log(interaction);
+}

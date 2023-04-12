@@ -19,7 +19,7 @@
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { ListCommandInitializeOptions, UnlistCommandOptions, ListCommandWithArgsOptions, CommandArgs, CommandPermission, LocalizedSlashCommandArgument } from "../Structure/Command";
 import type { LoggerObject } from "../logger";
-import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap } from "oceanic.js";
+import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, AutocompleteInteraction, CreateApplicationCommandOptions, LocaleMap } from "oceanic.js";
 
 import i18next from "i18next";
 import { TypedEmitter } from "oceanic.js";
@@ -42,6 +42,9 @@ interface CommandEvents {
 export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   /** ボットを実行します */
   protected abstract run(message: CommandMessage, context: Readonly<CommandArgs>, t: (typeof i18next)["t"]): Promise<void>;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  handleAutoComplete(_: AutocompleteInteraction){}
 
   protected readonly _name: string;
   public get name(){

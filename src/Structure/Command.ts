@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { categoriesList } from "../Commands/commands";
+import type { categoriesList } from "../Commands/command";
 import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
 import type { Client, LocaleMap } from "oceanic.js";
@@ -83,6 +83,7 @@ export type SlashCommandArgument = {
   name: string,
   required: boolean,
   choices?: [firstChoice: string, ...restChoices: string[]],
+  autoCompleteEnabled?: boolean,
 };
 
 export type LocalizedSlashCommandArgument = Omit<SlashCommandArgument, "choices"> & {
