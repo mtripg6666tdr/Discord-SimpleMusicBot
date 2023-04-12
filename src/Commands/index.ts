@@ -19,7 +19,7 @@
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { ListCommandInitializeOptions, UnlistCommandOptions, ListCommandWithArgsOptions, CommandArgs, CommandPermission, LocalizedSlashCommandArgument } from "../Structure/Command";
 import type { LoggerObject } from "../logger";
-import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, AutocompleteInteraction, CreateApplicationCommandOptions, LocaleMap } from "oceanic.js";
+import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap } from "oceanic.js";
 
 import i18next from "i18next";
 import { TypedEmitter } from "oceanic.js";
@@ -44,7 +44,9 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   protected abstract run(message: CommandMessage, context: Readonly<CommandArgs>, t: (typeof i18next)["t"]): Promise<void>;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handleAutoComplete(_: AutocompleteInteraction){}
+  handleAutoComplete(argname: string, input: string | number, otherOptions: { name: string, value: string | number }[]): string[] {
+    return [];
+  }
 
   protected readonly _name: string;
   public get name(){
@@ -167,13 +169,14 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       this._category = category;
 
       this._argument = argument ? argument.map(arg => {
-        const result = {
+        const result: LocalizedSlashCommandArgument = {
           type: arg.type,
           name: arg.name,
           required: arg.required || false,
           description: i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any) as string,
           descriptionLocalization: {} as LocaleMap,
           choices: [] as LocalizedSlashCommandArgument["choices"],
+          autoCompleteEnabled: arg.autoCompleteEnabled || false,
         };
         availableLanguages().forEach(language => {
           if(i18next.language === language) return;
@@ -295,9 +298,12 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           value: choice.value,
           nameLocalizations: Object.entries(choice.nameLocalizations).length > 0 ? choice.nameLocalizations : null,
         })) as ApplicationCommandOptionsChoice[],
+        autocomplete: arg.autoCompleteEnabled || false,
       };
 
-      if(!discordCommandStruct.choices){
+      if(discordCommandStruct.choices){
+        delete discordCommandStruct.autocomplete;
+      }else{
         delete discordCommandStruct.choices;
       }
 

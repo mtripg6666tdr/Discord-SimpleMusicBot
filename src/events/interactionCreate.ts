@@ -76,7 +76,7 @@ export async function onInteractionCreate(this: MusicBot, interaction: discord.A
     }
 
     case discord.InteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE:
-      handlers.handleAutoCompleteInteraction.call(this, server, interaction).catch(this.logger.error);
+      handlers.handleAutoCompleteInteraction.call(this, interaction).catch(this.logger.error);
       break;
   }
 }

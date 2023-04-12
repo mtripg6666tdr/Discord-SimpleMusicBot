@@ -138,4 +138,22 @@ export default class Commands extends BaseCommand {
       }
     }
   }
+
+  override handleAutoComplete(_: string, input: string): string[] {
+    if(input === ""){
+      return [
+        "play",
+        "search",
+        "queue",
+        "nowplaying",
+        "pause",
+        "disconnect",
+      ];
+    }else{
+      return CommandManager.instance.commands
+        .filter(command => !command.unlist)
+        .flatMap(command => [command.name, ...command.alias])
+        .filter(name => name.includes(input));
+    }
+  }
 }
