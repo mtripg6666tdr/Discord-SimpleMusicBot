@@ -71,13 +71,6 @@
     "queueWasEmpty": "Nothing was removed because of no items or just one item in queue.",
     "success": "Deleted all items left in queue."
   },
-  "equallyplayback": {
-    "name": "Equal playback",
-    "description": "Plays same amount of songs for each user.",
-    "enabled": "Enabled equal playback.",
-    "disabled": "Disabled equal playback.",
-    "featureDescription": "This is a function that makes it as even as possible for each user who added songs when playing songs."
-  },
   "export": {
     "name": "export",
     "description": "Exports content of the queue so that it can be imported.",
@@ -280,12 +273,6 @@
       }
     },
     "nowPlayingSong": "Now playing"
-  },
-  "onceloop": {
-    "name": "looponce",
-    "description": "After the current playback ends, play the same song again in a loop.",
-    "disabled": "Disabled loop once",
-    "enabled": "Enabled loop once"
   },
   "pause": {
     "name": "pause",
@@ -498,5 +485,18 @@
     "enabled": "Enabled queue loop.",
     "name": "loopqueue",
     "description": "Toggles looping the entire queue."
+  },
+  "looponce": {
+    "name": "looponce",
+    "description": "After the current playback ends, play the same song again in a loop.",
+    "disabled": "Disabled loop once",
+    "enabled": "Enabled loop once"
+  },
+  "equalplayback": {
+    "name": "Equal playback",
+    "description": "Plays same amount of songs for each user.",
+    "enabled": "Enabled equal playback.",
+    "disabled": "Disabled equal playback.",
+    "featureDescription": "This is a function that makes it as even as possible for each user who added songs when playing songs."
   }
 }
