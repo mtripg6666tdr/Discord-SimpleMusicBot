@@ -35,7 +35,7 @@ export default class Rmall extends BaseCommand {
 
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
-    context.server.player.disconnect();
+    await context.server.player.disconnect().catch(this.logger.error);
     context.server.queue.removeAll();
     await message.reply(`✅${t("commands:removeall.removed")}`).catch(this.logger.error);
   }

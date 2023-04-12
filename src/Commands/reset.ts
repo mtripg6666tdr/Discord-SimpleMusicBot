@@ -44,7 +44,7 @@ export default class Reset extends BaseCommand {
 
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     // VC接続中なら切断
-    context.server.player.disconnect();
+    await context.server.player.disconnect().catch(this.logger.error);
 
     const queueItems = context.args[0]?.toLowerCase() === "true" ? context.server.queue.getRawQueueItems() : null;
 
