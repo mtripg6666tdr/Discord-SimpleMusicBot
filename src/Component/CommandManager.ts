@@ -115,6 +115,11 @@ export class CommandManager extends LogEmitter<{}> {
 
   @timeLoggedMethod
   async sync(client: Client, removeOutdated: boolean = false){
+    if(process.env.DISABLE_SYNC_SC && !removeOutdated){
+      this.logger.info("Skip syncing commands");
+      return;
+    }
+
     this.logger.info("Start syncing application commands");
 
     // format local commands into the api-compatible well-formatted ones
