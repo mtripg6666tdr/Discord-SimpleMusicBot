@@ -25,7 +25,7 @@ import { BaseCommand } from ".";
 export default class OnceLoop extends BaseCommand {
   constructor(){
     super({
-      alias: ["onceloop", "looponce"],
+      alias: ["looponce", "onceloop"],
       unlist: false,
       category: "player",
       requiredPermissionsOr: ["admin", "noConnection", "sameVc"],
