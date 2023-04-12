@@ -12,6 +12,7 @@ sidebar_label: 均等再生
 - equalplayback
 - equallyplayback
 - eqpb
+- equal
 - equally
 
 
