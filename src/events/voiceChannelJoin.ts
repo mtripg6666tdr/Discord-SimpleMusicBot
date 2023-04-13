@@ -42,9 +42,8 @@ export async function onVoiceChannelJoin(
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const voiceChannel = this._client.getChannel(newChannel.id) as discord.VoiceChannel | discord.StageChannel;
       if(!("guild" in voiceChannel)) return;
-      voiceChannel.guild.editCurrentUserVoiceState({
-        channelID: newChannel.id,
-        suppress: false,
+      voiceChannel.guild.editMember(this._client.user.id, {
+        mute: false,
       }).catch(er => {
         this.logger.warn(er);
         voiceChannel.guild.editUserVoiceState(this._client.user.id, {
