@@ -472,3 +472,17 @@
 * Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
+
+# v4.0.1
+## バグ修正
+* 抑制されてるボイスチャンネルで、抑制を自ら解除できないバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1447)
+* BGM機能が壊れている問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1448)
+* エラーが正しく補足されない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1449)
+## その他の変更
+* `config.json.sample`のデフォルト値を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1446)
+
+### その他の特記事項
+* v4系では、Node.js v16.16以上が必須となります。
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
