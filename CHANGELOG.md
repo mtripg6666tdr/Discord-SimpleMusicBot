@@ -343,6 +343,25 @@
 
 ---
 
+# v4.0.0-beta.13
+**これは、プレリリースバージョンです**
+## バグ修正
+* オートコンプリートのアイテム数が最大数を超えることがある問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1434)
+* オートコンプリートの候補中の重複したアイテムを排除(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1439)
+* `コマンド`コマンドでエイリアスがない場合の表示を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1440)
+## 依存関係のアップデート
+* @sinclair/typebox 0.27.3 => 0.27.4
+## その他の変更
+* DockerのベースイメージのOSを更新しました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1433)
+* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1436)
+
+## その他の特記事項
+* これはプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
+* v4系では、Node.js v16.16以上が必須となります。
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
+
 <!-- 草稿 -->
 
 # v4.0.0
@@ -438,12 +457,13 @@
 * コアのライブラリを`eris`から`oceanic.js`に変更(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1126)
 * スラッシュコマンドの同期機能が改善されました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1159, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1160)
 * インタラクションの処理を改善しました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1161)
-* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1207, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1225, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1228, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1254, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1256, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1257, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1262, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1264, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1269, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1277, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1288, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1290, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1299, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1300, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1301, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1302, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1306, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1311, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1317, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1318, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1324, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1327, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1330, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1342, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1346, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1347, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1349, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1358, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1361, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1370, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1375, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1384, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1390, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1406, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1411, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1425, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1432)
+* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1207, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1225, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1228, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1254, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1256, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1257, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1262, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1264, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1269, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1277, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1288, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1290, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1299, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1300, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1301, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1302, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1306, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1311, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1317, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1318, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1324, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1327, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1330, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1342, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1346, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1347, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1349, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1358, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1361, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1370, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1375, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1384, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1390, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1406, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1411, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1425, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1432, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1436)
   * @nh-chitose さんをはじめ、Crowdinで翻訳に携わっていただいる（いただいた）すべての方々にこの場を借りてお礼させていただきます。ありがとうございます。
 * Docker-Composeで利用できるようサンプルファイルを追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1275, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1338, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1339)
 * Dockerイメージに一部のオプションの依存関係が欠落していた問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1276)
 * VSCode用のタブサイズの設定を追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1418)
 * コマンド解決のパフォーマンスを向上しました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1429)
+* DockerのベースイメージのOSを更新しました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1433)
 
 [**マイルストーン**](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/milestone/2?closed=1)
 
