@@ -26,7 +26,7 @@
     "noCancelable": "There's no task to be canceled."
   },
   "command": {
-    "name": "Command",
+    "name": "command",
     "usage": "command [name]",
     "examples": "command search",
     "description": "Shows list of commands. If you specify a command, shows details of the command.",
@@ -349,7 +349,7 @@
     "unableToRemoveAll": "No items could be removed. You may not satisfy the required permission to remove the requested songs."
   },
   "removeall": {
-    "name": "clear",
+    "name": "removeall",
     "description": "Removes all items from queue. (will disconnect from the voice channel if connected to.)",
     "removed": "Cleared"
   },
