@@ -343,6 +343,25 @@
 
 ---
 
+# v4.0.0-beta.13
+**これは、プレリリースバージョンです**
+## バグ修正
+* オートコンプリートのアイテム数が最大数を超えることがある問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1434)
+* オートコンプリートの候補中の重複したアイテムを排除(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1439)
+* `コマンド`コマンドでエイリアスがない場合の表示を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1440)
+## 依存関係のアップデート
+* @sinclair/typebox 0.27.3 => 0.27.4
+## その他の変更
+* DockerのベースイメージのOSを更新しました(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1433)
+* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1436)
+
+## その他の特記事項
+* これはプレリリースのベータ版です。**`config.json`で`debug`を`true`に設定しないと起動しないようになっています。**
+* v4系では、Node.js v16.16以上が必須となります。
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
+
 <!-- 草稿 -->
 
 # v4.0.0
