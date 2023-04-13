@@ -150,10 +150,12 @@ export default class Commands extends BaseCommand {
         "disconnect",
       ];
     }else{
-      return CommandManager.instance.commands
-        .filter(command => !command.unlist)
-        .flatMap(command => [command.name, ...command.alias])
-        .filter(name => name.includes(input));
+      return [...new Set(
+        CommandManager.instance.commands
+          .filter(command => !command.unlist)
+          .flatMap(command => [command.name, ...command.alias])
+          .filter(name => name.includes(input))
+      )];
     }
   }
 }
