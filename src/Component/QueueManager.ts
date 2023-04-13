@@ -240,7 +240,6 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
    * ユーザーへのインタラクションやキュー追加までを一括して行います
    * @returns 成功した場合はtrue、それ以外の場合はfalse
    */
-  @timeLoggedMethod
   async addQueue(options: {
     url: string,
     addedBy: Member|AddedBy|null|undefined,
