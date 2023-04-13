@@ -112,11 +112,17 @@ export default class Commands extends BaseCommand {
       const ci = CommandManager.instance.resolve(context.rawArgs);
       if(ci && !ci.unlist){
         const prefix = context.server ? context.server.prefix : ">";
+        const availableAlias = ci.alias.filter(a => a !== ci.name);
         const embed = new MessageEmbedBuilder()
           .setTitle(t("commands:command.commandExplanation", { command: ci.name }))
           .setDescription(ci.getLocalizedDescription(context.locale))
           .setColor(getColor("COMMAND"))
-          .addField(t("alias"), `\`${ci.alias.filter(a => a !== ci.name).join("`, `") || `*${t("none")}*`}\``)
+          .addField(
+            t("alias"),
+            availableAlias.length > 0
+              ? `\`${availableAlias.join("`, `")}\``
+              : `*${t("none")}*`
+          )
           .addField(t("permissionsToRun"), ci.getLocalizedPermissionDescription(context.locale))
         ;
         if(ci.usage){
