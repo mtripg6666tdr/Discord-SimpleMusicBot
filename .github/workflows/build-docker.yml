@@ -28,7 +28,7 @@ jobs:
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-        with:
+        with: 
           platforms: arm64
 
       - name: Set up Docker Buildx
@@ -44,7 +44,7 @@ jobs:
       - name: Set env vars for release
         run: echo "DOCKER_PLATFORMS=linux/amd64,linux/arm64" >> $GITHUB_ENV
         if: ${{ github.event_name == 'release' }}
-      
+
       - name: Set env vars for others
         run: echo "DOCKER_PLATFORMS=linux/amd64" >> $GITHUB_ENV
         if: ${{ github.event_name != 'release' }}

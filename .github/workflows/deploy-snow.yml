@@ -10,7 +10,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Get the current branch name
         shell: bash
@@ -36,11 +36,8 @@ jobs:
           key: ${{ secrets.SECRET_KEY }}
           envs: BRANCH
           script: |
-            sudo docker container stop dsmb-instance
-            sudo docker container rm dsmb-insntance
-            sudo docker pull ghcr.io/mtripg6666tdr/discord-music-bot:latest
-            sudo systemctl restart musicbot-docker
-            sudo systemctl enable musicbot-docker
+            sudo systemctl restart musicbot-compose
+
       - name: Update deployment status
         uses: bobheadxi/deployments@v1
         with:

@@ -16,18 +16,33 @@ permissions:
 jobs:
   deploy:
     environment:
-        name: github-pages
-        url: ${{ steps.deployment.outputs.page_url }}
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-      
+
+      - name: Get npm cache directory
+        id: npm-cache
+        run: |
+          echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+
+      - name: Check npm cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ steps.npm-cache.outputs.dir }}
+          key: npm-docs-18.x-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-docs-18.x
+            npm-docs-
+
       - name: Install dependencies on docs
         working-directory: "docs"
         run: npm ci
@@ -36,15 +51,15 @@ jobs:
         working-directory: "docs"
         run: |
           npm run build
-      
+
       - name: Setup Pages
         uses: actions/configure-pages@v3
-      
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           path: './docs/build'
-      
+
       - name: Deploy to GitHub Pages
         id: github-pages
         uses: actions/deploy-pages@v2

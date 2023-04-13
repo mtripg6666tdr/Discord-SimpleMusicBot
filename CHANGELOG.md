@@ -343,7 +343,7 @@
 
 ---
 
-# v4.0.0-beta.13
+# v4.0.0-beta.14
 **これは、プレリリースバージョンです**
 ## バグ修正
 * オートコンプリートのアイテム数が最大数を超えることがある問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1434)
