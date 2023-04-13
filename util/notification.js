@@ -4,7 +4,7 @@ const oceanic = require("oceanic.js");
 const candyget = require("candyget");
 /** @type {*} */
 const { TOKEN, CHANNEL_ID, GITHUB_REF } = process.env;
-if(!GITHUB_REF.includes("v3")){
+if(!GITHUB_REF.includes("v4")){
   console.log("No notification needed");
   process.exit(0);
 }
