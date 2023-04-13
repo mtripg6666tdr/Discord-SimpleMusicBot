@@ -44,7 +44,7 @@ export class PlayManagerWithBgm extends PlayManager {
 
   override async play(time?: number, bgm: boolean = false){
     if(this.server instanceof GuildDataContainerWithBgm){
-      if((this.server.queue.isBGM && !bgm || !this.server.queue.isBgmEmpty && bgm) && this._player.state.status === AudioPlayerStatus.Playing){
+      if((this.server.queue.isBGM && !bgm || !this.server.queue.isBgmEmpty && bgm) && this._player?.state.status === AudioPlayerStatus.Playing){
         await this.stop({ wait: true });
       }
       this.server.queue.setToPlayBgm(bgm);

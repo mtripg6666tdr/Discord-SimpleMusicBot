@@ -74,10 +74,10 @@ export class QueueManagerWithBgm extends QueueManager {
   override async addQueueOnly({
     url,
     addedBy,
-    method,
-    sourceType,
-    gotData,
-    preventCache,
+    method = "push",
+    sourceType = "unknown",
+    gotData = null,
+    preventCache = false,
   }: {
     url: string,
     addedBy: Member | AddedBy,
