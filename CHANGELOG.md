@@ -486,3 +486,17 @@
 * Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
+
+# v4.0.2
+## 依存関係のアップデート
+* ytsr 3.8.1 => 3.8.2
+* ytdl-core 4.11.3 => 4.11.4
+## その他の変更
+* コード上の問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1459)
+* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1451)
+* Dockerの`latest`タグが適切に付与されない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1461, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1462)
+
+### その他の特記事項
+* Dockerのイメージは、リリース後25～35分程度で公開されます。
+
+---
