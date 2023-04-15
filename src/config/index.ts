@@ -39,7 +39,7 @@ class ConfigLoader {
   protected static _instance: ConfigLoader = null;
   protected _config: ConfigObject = null;
 
-  constructor(){
+  protected constructor(){
     this.load();
   }
 
