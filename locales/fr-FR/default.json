@@ -16,9 +16,9 @@
   "currentPage_other": "{{count}}ページ目",
   "allPages_one": "{{count}}ページ中",
   "allPages_other": "{{count}}ページ中",
-  "prefixIs": "プレフィックスは`{{prefix}}`です。",
+  "prefixIs": "Le préfixe est `{{prefix}}`.",
   "permissions": {
-    "admin": "サーバー/チャンネルの管理権限を持っていること",
+    "admin": "Avoir des droits d'administrateur de serveur/canal",
     "dj": "同じボイスチャンネルに接続していてかつDJロールを保持していること",
     "sameVc": "同じボイスチャンネルに接続していること",
     "manageMessages": "メッセージの管理権限を持っていること",

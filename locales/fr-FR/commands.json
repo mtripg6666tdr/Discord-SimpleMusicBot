@@ -174,16 +174,16 @@
   "log": {
     "name": "Informations système",
     "description": "Affiche des informations techniques sur les serveurs hébergés et les processus. Vous pouvez également spécifier des arguments (un parmi `mem`, `cpu`, `basic` et `log`) pour obtenir uniquement un contenu spécifique.",
-    "examples": "log mem",
+    "examples": "journaliser",
     "usage": "log [mem|cpu|basic|log]",
     "args": {
       "content": {
-        "description": "basic,mem,cpu,logのどれかを指定できます。",
+        "description": "Peut être basic,mem,cpu,log.",
         "choices": {
-          "basic": "基本情報",
-          "mem": "メモリ",
+          "basic": "Informations de base",
+          "mem": "mémoire",
           "cpu": "CPU",
-          "log": "ログ(管理者のみ)"
+          "log": "Journaux (administrateurs uniquement)"
         }
       }
     },
@@ -216,7 +216,7 @@
     "incorrectArgument": "正しい引数を指定してください。"
   },
   "loop": {
-    "name": "ループ",
+    "name": "boucle",
     "description": "Définissez des boucles pour chaque piste.",
     "disabled": "Répétition de piste désactivée",
     "enabled": "Répétition de piste activée"
