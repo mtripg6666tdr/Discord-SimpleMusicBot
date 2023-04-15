@@ -59,7 +59,7 @@ jobs:
             type=sha,enable=${{ github.event_name == 'release' }}
             type=sha,format=long
             type=semver,pattern={{version}},enable=${{ github.event_name == 'release' }}
-            type=raw,value=latest,enable=${{ github.event_name == 'release' && !github.event.release.prerelease }}
+            type=raw,value=latest,enable=${{ github.event_name == 'release' && !github.event.release.prerelease && github.event.release.target_commitish == 'master' }}
             type=raw,value=beta,enable=${{ github.event_name == 'release' && github.event.release.prerelease }}
             type=raw,value=dev,enable=${{ github.event_name == 'workflow_dispatch' }}
 
