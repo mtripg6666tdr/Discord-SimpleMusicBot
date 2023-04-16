@@ -6,36 +6,39 @@
   "main": "dist/lib.js",
   "types": "typings/lib.d.ts",
   "dependencies": {
-    "@types/follow-redirects": "^1.13.1",
-    "@types/node": "^16.6.2",
-    "@types/ws": "^7.4.7",
     "discord.js": "^12.5.3",
-    "dotenv": "^10.0.0",
-    "follow-redirects": "^1.14.2",
-    "genius-lyrics": "^4.2.9",
-    "html-entities": "^2.3.2",
-    "https-proxy-agent": "^5.0.0",
-    "m3u8stream": "^0.8.4",
-    "miniget": "^4.2.1",
+    "follow-redirects": "^1.15.2",
+    "genius-lyrics": "^4.4.3",
+    "html-entities": "^2.3.3",
+    "https-proxy-agent": "^5.0.1",
+    "m3u8stream": "^0.8.6",
+    "miniget": "^4.2.2",
     "node-opus": "^0.3.3",
     "opusscript": "0.0.8",
-    "rimraf": "^3.0.2",
-    "soundcloud.ts": "^0.3.9",
-    "typescript": "^4.3.5",
-    "ytdl-core": "^4.9.1",
-    "ytpl": "^2.2.3",
-    "ytsr": "^3.5.3"
+    "soundcloud.ts": "^0.4.9",
+    "ytdl-core": "^4.11.4",
+    "ytpl": "^2.3.0",
+    "ytsr": "^3.8.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/follow-redirects": "^1.14.1",
+    "@types/node": "^18.15.11",
+    "@types/ws": "^8.5.4",
+    "@types/mocha": "^10.0.1",
+    "dotenv": "^16.0.3",
+    "patch-package": "^6.5.1",
+    "rimraf": "^5.0.0",
+    "typescript": "^4.3.5"
+  },
   "optionalDependencies": {
-    "ffmpeg-static": "^4.4.0"
+    "ffmpeg-static": "^5.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run build && npm run onlystart",
     "onlystart": "node dist/index.js",
     "build": "npm run cleanup && tsc",
-    "postinstall": "node preparelib.js",
+    "postinstall": "node preparelib.js && patch-package",
     "cleanup": "rimraf dist/ typings/"
   },
   "keywords": [],

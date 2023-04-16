@@ -11,7 +11,7 @@ log("[Entry]Discord-SimpleMusicBot by mtripg6666tdr");
 const bot = new MusicBot();
 
 // Webサーバーのインスタンス化
-http.createServer((req, res) => {
+const server = http.createServer((req, res) => {
   res.writeHead(200, { "Content-Type": "application/json" });
   const data = {
     status: 200,
@@ -35,9 +35,13 @@ process.on("uncaughtException", (error)=>{
       throw error;
     }
   }
-}).on("SIGINT", ()=>{
+});
+process.on("SIGINT", () => {
+  server.close();
   if(bot.Client){
-    (bot.Client.channels.resolve("846411633458806804") as TextChannel).send("Process terminated");
+    (bot.Client.channels.resolve("846411633458806804") as TextChannel).send("Process terminated").then(() => bot.destroy());
+  }else{
+    bot.destroy();
   }
 });
 

@@ -1,0 +1,19 @@
+diff --git a/node_modules/discord.js/src/client/voice/networking/VoiceUDPClient.js b/node_modules/discord.js/src/client/voice/networking/VoiceUDPClient.js
+index b86428a..0d81c11 100644
+--- a/node_modules/discord.js/src/client/voice/networking/VoiceUDPClient.js
++++ b/node_modules/discord.js/src/client/voice/networking/VoiceUDPClient.js
+@@ -131,8 +131,12 @@ class VoiceConnectionUDPClient extends EventEmitter {
+       socket.on('message', buffer => this.voiceConnection.receiver.packets.push(buffer));
+     });
+ 
+-    const blankMessage = Buffer.alloc(70);
+-    blankMessage.writeUIntBE(this.voiceConnection.authentication.ssrc, 0, 4);
++    const blankMessage = Buffer.alloc(74);
++    // ref: https://github.com/abalabahaha/eris/commit/135dc35e15784250559e0196a5aad1606bfc3503
++    // blankMessage.writeUIntBE(this.voiceConnection.authentication.ssrc, 0, 4);
++    blankMessage.writeUInt16BE(0x1, 0);
++    blankMessage.writeUInt16BE(70, 2);
++    blankMessage.writeUInt32BE(this.voiceConnection.authentication.ssrc, 4);
+     this.emit('debug', `Sending IP discovery packet: [${[...blankMessage]}]`);
+     await this.send(blankMessage);
+     this.emit('debug', `Successfully sent IP discovery packet`);

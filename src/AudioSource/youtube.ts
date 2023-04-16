@@ -116,20 +116,9 @@ export class YouTube extends AudioSource {
       const format = ytdl.chooseFormat(info.formats, {
         filter: this.LiveStream ? null : "audioonly",
         quality: this.LiveStream ? null : "highestaudio",
-        isHLS: this.LiveStream
+        isHLS: this.LiveStream,
       } as any);
-      let readable = null as Readable;
-      if(process.env.PROXY){
-        readable = ytdl.downloadFromInfo(info, {
-          format: format,
-          requestOptions: {agent},
-          lang: "ja"
-        });
-      }else{
-        readable = ytdl.downloadFromInfo(info, {
-          format: format
-        });
-      }
+      const readable = createChunkedYTStream(info, format, agent ? { requestOptions: { agent } } : undefined);
       this.fallback = false;
       return readable;
     }
@@ -515,4 +504,41 @@ interface Reactions {
 
 enum TargetCommitish {
   Master = "master",
+}
+
+export function createChunkedYTStream(info: ytdl.videoInfo, format: ytdl.videoFormat, options: ytdl.downloadOptions, chunkSize: number = 512 * 1024){
+  const stream = new PassThrough();
+  let current = -1;
+  const contentLength = Number(format.contentLength);
+  if(contentLength < chunkSize){
+    ytdl.downloadFromInfo(info, { format, ...options })
+      .on("error", er => !stream.destroyed ? stream.destroy(er) : stream.emit("error", er))
+      .pipe(stream)
+    ;
+    console.log("Stream was created as single stream");
+  }else{
+    const pipeNextStream = () => {
+      current++;
+      let end = chunkSize * (current + 1) - 1;
+      if(end >= contentLength) end = undefined;
+      const nextStream = ytdl.downloadFromInfo(info, { format, ...options, range: {
+        start: chunkSize * current, end,
+      } });
+      console.log(`Stream #${current + 1} was created.`);
+      nextStream
+        .on("error", er => !stream.destroyed ? stream.destroy(er) : stream.emit("error", er))
+        .pipe(stream, { end: end === undefined })
+      ;
+      if(end !== undefined){
+        nextStream.on("end", () => {
+          pipeNextStream();
+        });
+      }else{
+        console.log(`Last stream (total:${current + 1})`);
+      }
+    };
+    pipeNextStream();
+    console.log(`Stream was created as partial stream. ${Math.ceil((contentLength + 1) / chunkSize)} streams will be created.`);
+  }
+  return stream;
 }

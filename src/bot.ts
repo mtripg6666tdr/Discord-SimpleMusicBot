@@ -24,6 +24,7 @@ export class MusicBot {
   private EmbedPageToggle:PageToggle[] = [] as PageToggle[];
   private isReadyFinished = false;
   private queueModifiedGuilds = [] as string[];
+  private timeout: NodeJS.Timeout = null;
   get Toggles(){return this.EmbedPageToggle};
   get Client(){return this.client};
   get QueueModifiedGuilds(){return this.queueModifiedGuilds};
@@ -104,11 +105,11 @@ export class MusicBot {
 
       const tick = ()=>{
         this.Log();
-        setTimeout(tick, 4 * 60 * 1000);
+        this.timeout = setTimeout(tick, 4 * 60 * 1000);
         PageToggle.Organize(this.EmbedPageToggle, 5);
         this.BackupData();
       };
-      setTimeout(tick, 1 * 60 * 1000);
+      this.timeout = setTimeout(tick, 1 * 60 * 1000);
       this.isReadyFinished = true;
       log("Bot is ready");
     });
@@ -423,6 +424,13 @@ export class MusicBot {
     if(!this.data[message.guild.id].Manager.IsConnecting || (message.member.voice.channel && message.member.voice.channel.members.has(this.client.user.id)) || message.content.indexOf("join") >= 0){
       if(message.content !== (this.data[message.guild.id] ? this.data[message.guild.id].PersistentPref.Prefix : ">"))
       this.data[message.guild.id].boundTextChannel = message.channel.id;
+    }
+  }
+
+  destroy(){
+    this.client.destroy();
+    if(this.timeout){
+      clearTimeout(this.timeout);
     }
   }
 }
