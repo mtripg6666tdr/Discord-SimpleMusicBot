@@ -38,6 +38,10 @@ export async function handleAutoCompleteInteraction(
       .filter(opt => opt.name !== option.name && "value" in opt) as { name: string, value: string | number }[]
   ).slice(0, 25);
 
+  if(!targetOptions){
+    return;
+  }
+
   await interaction.result(
     possibleOptions.map(name => ({
       name: name.toString(),
