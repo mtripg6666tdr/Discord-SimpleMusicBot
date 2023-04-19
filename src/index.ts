@@ -94,6 +94,7 @@ const onTerminated = async function(code: string){
     process.exit(1);
   }, 5000).unref();
 };
+
 ["SIGINT", "SIGTERM", "SIGUSR2"].forEach(signal => {
   process.on(signal, onTerminated.bind(undefined, signal));
 });
