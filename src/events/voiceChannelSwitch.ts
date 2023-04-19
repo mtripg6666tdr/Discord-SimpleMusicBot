@@ -33,7 +33,9 @@ export async function onVoiceChannelSwitch(
 
   if(member.id === this.client.user.id){
     if(this.guildData.has(member.guild.id)){
-      this.getData(member.guild.id).connectingVoiceChannel = newChannel;
+      // work around
+      member.voiceState["_cachedChannel"] = null;
+      this.getData(member.guild.id).connectingVoiceChannel = member.voiceState.channel;
     }
   }else{
     onVoiceChannelLeave.call(this, member, oldChannel).catch(this.logger.error);
