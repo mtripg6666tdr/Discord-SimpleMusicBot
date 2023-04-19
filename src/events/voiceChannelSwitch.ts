@@ -33,7 +33,7 @@ export async function onVoiceChannelSwitch(
 
   if(member.id === this.client.user.id){
     if(this.guildData.has(member.guild.id)){
-      this.getData.arguments(member.guild.id).connectingVoiceChannel = newChannel;
+      this.getData(member.guild.id).connectingVoiceChannel = newChannel;
     }
   }else{
     onVoiceChannelLeave.call(this, member, oldChannel).catch(this.logger.error);
