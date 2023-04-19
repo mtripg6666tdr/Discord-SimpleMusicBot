@@ -30,8 +30,8 @@ export function createServer(client: Client, port: number){
     const data = {
       status: 200,
       message: "Discord bot is active now",
-      client: client?.user ? Buffer.from(client?.user.id).toString("base64") : null,
-      readyAt: client?.uptime ? Buffer.from(client.uptime.toString()).toString("base64") : null,
+      client: client.ready && client?.user ? Buffer.from(client?.user.id).toString("base64") : null,
+      readyAt: client.ready && client?.uptime ? Buffer.from(client.uptime.toString()).toString("base64") : null,
       guilds: client?.guilds.size || null,
     };
     logger.info("Received a http request");
