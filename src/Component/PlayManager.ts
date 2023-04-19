@@ -450,7 +450,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this._player = createAudioPlayer({
       debug: config.debug,
       behaviors: {
-        noSubscriber: NoSubscriberBehavior.Stop,
+        noSubscriber: NoSubscriberBehavior.Pause,
       },
     });
     if(config.debug){
@@ -464,9 +464,6 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           oldState.playbackDuration,
           this._errorUrl === this.currentAudioUrl ? this._errorCount : 0
         );
-        if(this._playing){
-          this.onStreamFinished().catch(this.logger.error);
-        }
       }
     });
     this.server.connection.subscribe(this._player);
