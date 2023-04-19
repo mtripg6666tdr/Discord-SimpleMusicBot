@@ -29,7 +29,12 @@ const config = useConfig();
 export async function onReady(this: MusicBot){
   const client = this._client;
   this.logger.info("Socket connection is ready now");
-  if(this["_isReadyFinished"]) return;
+
+  delete this.client.rest.handler.ratelimits["/interactions/:id/:token/callback"];
+
+  if(this["_isReadyFinished"]){
+    return;
+  }
 
   this.logger.info("Starting environment checking and preparation now");
 

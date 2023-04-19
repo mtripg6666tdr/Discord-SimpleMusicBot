@@ -69,6 +69,7 @@ export class MusicBot extends MusicBotBase {
     this.client.once("ready", eventHandlers.onReady.bind(this));
     this.once("ready", () => {
       this.client
+        .on("ready", eventHandlers.onReady.bind(this))
         .on("messageCreate", eventHandlers.onMessageCreate.bind(this))
         .on("interactionCreate", eventHandlers.onInteractionCreate.bind(this))
         .on("voiceChannelJoin", eventHandlers.onVoiceChannelJoin.bind(this))
