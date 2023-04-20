@@ -95,7 +95,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
         };
       }
 
-      const stream = await this.binaryManager.execStream(["-f", format.format_id, "-o", "-", url]);
+      const stream = await this.binaryManager.execStream(["-f", format.format_id, "--downloader", "ffmpeg", "-o", "-", url]);
 
       return {
         ...partialResult,
