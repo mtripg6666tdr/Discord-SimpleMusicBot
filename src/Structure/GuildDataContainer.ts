@@ -33,7 +33,6 @@ import type { Playlist } from "spotify-url-info";
 import { LockObj, lock } from "@mtripg6666tdr/async-lock";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
-import { joinVoiceChannel } from "@discordjs/voice";
 import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
 import Soundcloud from "soundcloud.ts";
 import * as ytpl from "ytpl";
@@ -306,10 +305,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    */
   async joinVoiceChannelOnly(channelId: string){
     const targetChannel = this.bot.client.getChannel<VoiceChannel | StageChannel>(channelId);
-    const connection = joinVoiceChannel({
-      guildId: targetChannel.guild.id,
-      channelId: targetChannel.id,
-      adapterCreator: targetChannel.guild.voiceAdapterCreator,
+    const connection = targetChannel.join({
       selfDeaf: true,
       debug: config.debug,
     });

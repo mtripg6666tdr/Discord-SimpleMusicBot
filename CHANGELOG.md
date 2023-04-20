@@ -500,3 +500,25 @@
 * Dockerのイメージは、リリース後25～35分程度で公開されます。
 
 ---
+
+# v4.0.3
+## バグ修正
+* 該当するコマンドが存在しなかった際のオートコンプリートの挙動を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1466)
+* 非同期処理の失敗によりプロセスがクラッシュする可能性があった問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1473)
+* ボイスチャンネルの切り替えをDiscordから行えない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1475)
+* クライアントが準備完了する前にウェブサーバーへアクセスがあると、クラッシュする問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1476)
+* 再生開始後すぐにストリームが破棄された際にクラッシュする問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1478)
+* Discordへの再接続時に、インタラクションのレートリミットのデータを消去する(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1481)
+## ドキュメント
+* キャッシュに関するドキュメントを追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1479, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1480)
+## 依存関係のアップデート
+* @sinclair/typebox 0.27.4 => 0.27.8
+* soundcloud.ts 0.4.9 => 0.5.0
+* mongodb 5.2.0 => 5.3.0
+## その他の変更
+* VSCodeで、カスタムで設定していたフォルダを隠す設定を削除(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1477)
+
+### その他の特記事項
+* Dockerのイメージは、リリース後25～35分程度で公開されます。
+
+---

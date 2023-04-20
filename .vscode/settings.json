@@ -7,15 +7,6 @@
     "docker-compose.yml.sample": "dockercompose"
   },
   "files.insertFinalNewline": true,
-  "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
-    "**/Thumbs.db": true,
-    "**/node_modules": true,
-  },
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "editor.tabSize": 2
 }

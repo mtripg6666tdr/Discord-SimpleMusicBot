@@ -30,6 +30,13 @@ import pEvent from "p-event";
 import { LogEmitter } from "../Structure";
 import { createPassThrough } from "../Util";
 
+const ffmpegStatic: string = (() => {
+  try{
+    return require("ffmpeg-static");
+  }
+  catch{/* empty */}
+})();
+
 type BinaryManagerOptions = {
   binaryName: string,
   localBinaryName: string,
@@ -141,7 +148,7 @@ export class BinaryManager extends LogEmitter<{}> {
     }
   }
 
-  async exec(args: readonly string[]): Promise<string>{
+  async exec(args: readonly string[], signal?: AbortSignal): Promise<string>{
     if(!fs.existsSync(this.binaryPath) || this.isStaleInfo){
       const latest = await this.checkIsLatestVersion();
       if(!latest){
@@ -177,6 +184,10 @@ export class BinaryManager extends LogEmitter<{}> {
           reject(err);
         });
         process.stderr.on("data", (chunk: Buffer) => this.logger.info(`[Child] ${chunk.toString()}`));
+        signal?.addEventListener("abort", () => {
+          reject("Aborted");
+          process.kill("SIGKILL");
+        });
       }
       catch(e){
         reject(e);
@@ -196,25 +207,39 @@ export class BinaryManager extends LogEmitter<{}> {
 
     setImmediate(() => {
       this.logger.info(`Passing arguments: ${args.join(" ")}`);
-      const process = spawn(this.binaryPath, args, {
+      const childProcess = spawn(this.binaryPath, args, {
         stdio: ["ignore", "pipe", "pipe"],
         shell: false,
         windowsHide: true,
+        env: {
+          ...process.env,
+          "TOKEN": "",
+          "DB_TOKEN": "",
+          "CSE_KEY": "",
+          "PATH": ffmpegStatic
+            ? `${process.env.PATH}${process.platform === "win32" ? ";" : ":"}${path.join(ffmpegStatic, "..")}`
+            : process.env.PATH,
+        },
       });
       let ended = false;
       const onEnd = () => {
         if(ended) return;
         ended = true;
-        if(process.connected){
-          process.kill("SIGTERM");
+        if(childProcess.connected){
+          childProcess.kill("SIGKILL");
         }
       };
-      process.stdout.pipe(stream);
-      process.on("exit", onEnd);
-      process.stdout.on("error", err => {
+      childProcess.stdout.pipe(stream);
+      childProcess.on("exit", onEnd);
+      childProcess.stdout.on("error", err => {
         stream.destroy(err);
       });
-      process.stderr.on("data", (chunk: Buffer) => this.logger.info(`[Child] ${chunk.toString()}`));
+      childProcess.stderr.on("data", (chunk: Buffer) => this.logger.info(`[Child] ${chunk.toString()}`));
+      stream.on("close", () => {
+        if(childProcess.connected){
+          childProcess.kill("SIGKILL");
+        }
+      });
     });
 
     return stream;

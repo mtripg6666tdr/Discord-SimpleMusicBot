@@ -32,7 +32,7 @@ const { debug, maxLogFiles } = useConfig();
 
 const tokens = {
   category: function(logEvent: LoggingEvent){
-    if(logEvent.context?.guildId){
+    if(logEvent.context?.id){
       return `${logEvent.categoryName}/${logEvent.context?.id}`;
     }else{
       return logEvent.categoryName;
@@ -194,7 +194,7 @@ export function timeLoggedMethod<This, Args extends any[], Return>(
     try{
       result = originalMethod.call(this, ...args);
       if(result instanceof Promise){
-        result.finally(endLog);
+        return result.finally(endLog) as any;
       }else{
         endLog();
       }

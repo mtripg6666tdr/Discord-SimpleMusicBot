@@ -35,18 +35,20 @@ export class Normalizer extends Readable {
     this.resumeHighWaterMark = this.readableHighWaterMark * 0.6;
 
     setImmediate(() => {
-      this.on("data", () => {
-        if(this.readableLength < this.resumeHighWaterMark){
-          this.resumeOrigin();
-        }else{
-          this.pauseOrigin();
-        }
-      });
-      this.origin.on("data", chunk => {
-        if(!this.push(chunk)){
-          this.pauseOrigin();
-        }
-      });
+      if(this.origin){
+        this.on("data", () => {
+          if(this.readableLength < this.resumeHighWaterMark){
+            this.resumeOrigin();
+          }else{
+            this.pauseOrigin();
+          }
+        });
+        this.origin.on("data", chunk => {
+          if(!this.push(chunk)){
+            this.pauseOrigin();
+          }
+        });
+      }
     }).unref();
     this.origin.once("end", () => this.push(null));
     this.origin.on("error", er => this.destroy(er));

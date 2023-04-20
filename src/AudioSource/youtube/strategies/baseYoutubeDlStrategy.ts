@@ -22,6 +22,7 @@ import type { BinaryManager } from "../../../Component/BinaryManager";
 import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 
 import { Strategy } from "./base";
+import { createFragmentalDownloadStream } from "../../../Util";
 
 export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, YoutubeDlInfo>, YoutubeDlInfo> {
   constructor(priority: number, protected id: T, protected binaryManager: BinaryManager){
@@ -95,13 +96,14 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
         };
       }
 
-      const stream = await this.binaryManager.execStream(["-f", format.format_id, "-o", "-", url]);
-
       return {
         ...partialResult,
         stream: {
           type: "readable",
-          stream,
+          stream: createFragmentalDownloadStream(format.url, {
+            contentLength: format.filesize,
+            userAgent: format.http_headers["User-Agent"],
+          }),
           streamType:
             format.ext === "webm" && format.acodec === "opus"
               ? "webm/opus"

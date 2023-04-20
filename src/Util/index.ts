@@ -29,7 +29,7 @@ import candyget from "candyget";
 import miniget from "miniget";
 import { debounce } from "throttle-debounce";
 
-import { DefaultUserAgent } from "../definition";
+import { DefaultUserAgent, SecondaryUserAgent } from "../definition";
 import { getLogger } from "../logger";
 
 export * as color from "./color";
@@ -335,4 +335,53 @@ export function createDebounceFunctionsFactroy<Key>(func: (key: Key) => void, de
       return fn;
     }
   };
+}
+
+export function createFragmentalDownloadStream(
+  streamGenerator: string | ((start: number, end?: number) => Readable),
+  { chunkSize = 512 * 1024, contentLength, userAgent = SecondaryUserAgent }: { chunkSize?: number, contentLength: number, userAgent?: string },
+){
+  const logger = getLogger("FragmentalDownloader");
+  logger.addContext("id", Date.now());
+  const stream = createPassThrough();
+  let current = -1;
+  if(contentLength < chunkSize){
+    const originStream = typeof streamGenerator === "string"
+      ? downloadAsReadable(streamGenerator, {
+        headers: {
+          "User-Agent": userAgent,
+        },
+      })
+      : streamGenerator(0);
+    originStream
+      .on("error", er => stream.destroy(er))
+      .pipe(stream);
+    logger.info("Stream was created as a single stream");
+  }else{
+    const pipeNextStream = () => {
+      current++;
+      let end = chunkSize * (current + 1) - 1;
+      if(end >= contentLength) end = undefined;
+      const nextStream = typeof streamGenerator === "string"
+        ? downloadAsReadable(streamGenerator, {
+          headers: {
+            "User-Agent": userAgent,
+            "Range": `bytes=${chunkSize * current}-${end ? end : ""}`,
+          },
+        })
+        : streamGenerator(chunkSize * current, end);
+      logger.info(`Stream #${current + 1} was created`);
+      nextStream
+        .on("error", er => stream.destroy(er))
+        .pipe(stream, { end: end === undefined });
+      if(end !== undefined){
+        nextStream.on("end", () => pipeNextStream());
+      }else{
+        logger.info(`Last stream (total: ${current + 1})`);
+      }
+    };
+    pipeNextStream();
+    logger.info(`Stream was created as partial stream. ${Math.ceil(contentLength / chunkSize)} streams will be created.`);
+  }
+  return stream;
 }
