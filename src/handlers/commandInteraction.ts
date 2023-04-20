@@ -29,7 +29,7 @@ import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBg
 import { discordUtil } from "../Util";
 
 export async function handleCommandInteraction(this: MusicBot, server: GuildDataContainer, interaction: discord.CommandInteraction){
-  this.logger.info("reveived command interaction");
+  this.logger.info("received command interaction");
   if(!interaction.inCachedGuildChannel()) return;
 
   if(
