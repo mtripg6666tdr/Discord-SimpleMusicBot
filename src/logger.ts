@@ -32,7 +32,7 @@ const { debug, maxLogFiles } = useConfig();
 
 const tokens = {
   category: function(logEvent: LoggingEvent){
-    if(logEvent.context?.guildId){
+    if(logEvent.context?.id){
       return `${logEvent.categoryName}/${logEvent.context?.id}`;
     }else{
       return logEvent.categoryName;
