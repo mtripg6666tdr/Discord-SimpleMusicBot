@@ -21,46 +21,23 @@ import type { Readable } from "stream";
 
 import * as ytdl from "ytdl-core";
 
-import { createPassThrough } from "../../Util";
+import { createFragmentalDownloadStream, createPassThrough } from "../../Util";
 import { getLogger } from "../../logger";
 
 const logger = getLogger("AudioSource:YouTubeStream");
 
 export function createChunkedYTStream(info: ytdl.videoInfo, format: ytdl.videoFormat, options: ytdl.downloadOptions, chunkSize: number = 512 * 1024){
-  const stream = createPassThrough();
-  let current = -1;
-  const contentLength = Number(format.contentLength);
-  if(contentLength < chunkSize){
-    ytdl.downloadFromInfo(info, { format, ...options })
-      .on("error", er => !stream.destroyed ? stream.destroy(er) : stream.emit("error", er))
-      .pipe(stream)
-    ;
-    logger.info("Stream was created as single stream");
-  }else{
-    const pipeNextStream = () => {
-      current++;
-      let end = chunkSize * (current + 1) - 1;
-      if(end >= contentLength) end = undefined;
-      const nextStream = ytdl.downloadFromInfo(info, { format, ...options, range: {
-        start: chunkSize * current, end,
-      } });
-      logger.info(`Stream #${current + 1} was created.`);
-      nextStream
-        .on("error", er => !stream.destroyed ? stream.destroy(er) : stream.emit("error", er))
-        .pipe(stream, { end: end === undefined })
-      ;
-      if(end !== undefined){
-        nextStream.on("end", () => {
-          pipeNextStream();
-        });
-      }else{
-        logger.info(`Last stream (total:${current + 1})`);
-      }
-    };
-    pipeNextStream();
-    logger.info(`Stream was created as partial stream. ${Math.ceil((contentLength + 1) / chunkSize)} streams will be created.`);
-  }
-  return stream;
+  return createFragmentalDownloadStream(
+    (start, end) => ytdl.downloadFromInfo(info, {
+      format,
+      ...options,
+      range: { start, end },
+    }),
+    {
+      chunkSize,
+      contentLength: Number(format.contentLength),
+    }
+  );
 }
 
 export function createRefreshableYTLiveStream(info: ytdl.videoInfo, url: string, options: ytdl.downloadOptions){

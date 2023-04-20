@@ -60,7 +60,6 @@ export class FixedAudioResource extends NullMetaAudioResource {
       .on("error", (er) => {
         this.logger.log(er.message || er.toString(), "error");
         this.error = true;
-        this.events.emit("error", er);
       })
       .on("end", () => {
         this.events.emit("end");

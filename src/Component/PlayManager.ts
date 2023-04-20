@@ -290,7 +290,6 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         }),
         this.currentAudioInfo.lengthSeconds - time
       );
-      resource.events.on("error", this.handleError.bind(this));
       this._dsLogger?.appendReadable(normalizer);
 
       this._player.play(resource);
