@@ -522,3 +522,18 @@
 * Dockerのイメージは、リリース後25～35分程度で公開されます。
 
 ---
+
+# v4.0.4
+## バグ修正
+* 一部のログのスペルが間違っているのを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1486)
+* ログのタグが正しく出力されていないバグを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1487)
+* フォールバックした状態での再生の問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1488)
+## ドキュメント
+* 表記ゆれを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1490)
+## 依存関係のアップデート
+* i18next 22.4.14 => 22.4.15
+
+### その他の特記事項
+* Dockerのイメージは、リリース後25～35分程度で公開されます。
+
+---
