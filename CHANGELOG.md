@@ -532,6 +532,7 @@
 * 表記ゆれを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1490)
 ## 依存関係のアップデート
 * i18next 22.4.14 => 22.4.15
+* @sinclair/typebox 0.27.8 => 0.28.1
 
 ### その他の特記事項
 * Dockerのイメージは、リリース後25～35分程度で公開されます。
