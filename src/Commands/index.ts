@@ -43,7 +43,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   /** ボットを実行します */
   protected abstract run(message: CommandMessage, context: Readonly<CommandArgs>, t: (typeof i18next)["t"]): Promise<void>;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line unused-imports/no-unused-vars
   handleAutoComplete(argname: string, input: string | number, otherOptions: { name: string, value: string | number }[]): string[] {
     return [];
   }

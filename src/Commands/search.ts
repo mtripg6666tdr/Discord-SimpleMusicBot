@@ -101,7 +101,7 @@ export abstract class SearchBase<T> extends BaseCommand {
   protected abstract consumer(result: T, t: i18n["t"]): SongInfo[];
 
   /** この検索が対象とするURLかを判断する関数 */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line unused-imports/no-unused-vars
   protected urlCheck(query: string){
     return false;
   }
