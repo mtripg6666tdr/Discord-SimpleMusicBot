@@ -34,6 +34,7 @@ export class Normalizer extends Readable {
 
     this.resumeHighWaterMark = this.readableHighWaterMark * 0.6;
 
+    const now = Date.now();
     setImmediate(() => {
       if(this.origin){
         this.on("data", () => {
@@ -47,6 +48,9 @@ export class Normalizer extends Readable {
           if(!this.push(chunk)){
             this.pauseOrigin();
           }
+        });
+        this.origin.once("data", chunk => {
+          this.logger.debug(`first chunk received; elapsed ${Date.now() - now}ms / ${chunk.length} bytes`);
         });
       }
     }).unref();
