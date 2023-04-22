@@ -106,3 +106,4 @@ updates:
     labels:
       - "dependencies"
       - "github_actions"
+      - "target:v3"
