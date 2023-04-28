@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 3
 ---
 # クローンして実行する
 リポジトリを [git](https://git-scm.com/) でクローンして実行することができます。
