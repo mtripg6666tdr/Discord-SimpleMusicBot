@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 1
 ---
 # Docker Composeを使用する
 [前のページ](./docker)で紹介したDockerを使用する方法に加え、`docker-compose.yml`を利用し`MongoDB`の立ち上げまでを一括して行える、
