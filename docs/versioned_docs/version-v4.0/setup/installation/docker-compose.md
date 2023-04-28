@@ -1,8 +1,8 @@
 ---
-sidebar_position: 3
+sidebar_position: 1
 ---
 # Docker Composeを使用する
-[前のページ](./docker)で紹介したDockerを使用する方法に加え、`docker-compose.yml`を利用し`MongoDB`の立ち上げまでを一括して行える、
+`docker-compose.yml`を利用し、`MongoDB`の立ち上げまでを一括して行える、
 [Docker Compose](https://docs.docker.com/compose/)を利用した方法を利用することができます。  
 また、この方法を使用すると、ボットの複数台の同時稼働も容易になります。
 
