@@ -55,6 +55,28 @@ updates:
       - dependency-name: "p-event"
         update-types: ["version-update:semver-major"]
 
+  # v1-lts branch
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    commit-message:
+      prefix: "Update:"
+    target-branch: "v1-lts-lol"
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "target:v1"
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-name: "discord.js"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "soundcloud.ts"
+        update-types: ["version-update:semver-major"]
+
   # documentation site (master)
   - package-ecosystem: npm
     directory: "/docs/"
