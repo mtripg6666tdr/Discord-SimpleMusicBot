@@ -74,6 +74,8 @@ updates:
     ignore:
       - dependency-name: "discord.js"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "soundcloud.ts"
+        update-types: ["version-update:semver-major"]
 
   # documentation site (master)
   - package-ecosystem: npm
