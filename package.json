@@ -34,7 +34,6 @@
     "ffmpeg-static": "^5.1.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run build && npm run onlystart",
     "onlystart": "node dist/index.js",
     "build": "npm run cleanup && tsc",
