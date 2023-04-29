@@ -63,9 +63,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup config for test
-        run: cp util/config-for-test.json config.json
-
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
