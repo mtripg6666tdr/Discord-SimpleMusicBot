@@ -25,7 +25,7 @@
     "@types/node": "^18.16.3",
     "@types/ws": "^8.5.4",
     "dotenv": "^16.0.3",
-    "patch-package": "^6.5.1",
+    "patch-package": "^7.0.0",
     "rimraf": "^5.0.0",
     "typescript": "^5.0.4"
   },
