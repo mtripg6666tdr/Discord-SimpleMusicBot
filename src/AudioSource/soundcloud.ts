@@ -1,15 +1,18 @@
-import { EmbedField } from "discord.js";
-import SoundCloud, { SoundcloudTrackV2 } from "soundcloud.ts";
-import { InitPassThrough } from "../Util/util";
+import type { EmbedField } from "discord.js";
+import type { SoundcloudTrackV2 } from "soundcloud.ts";
+
+import SoundCloud from "soundcloud.ts";
+
 import { AudioSource } from "./audiosource";
+import { InitPassThrough } from "../Util/util";
 
 export class SoundCloudS extends AudioSource {
   protected _lengthSeconds = 0;
   protected _serviceIdentifer = "soundcloud";
-  Author:string;
-  Thumnail:string;
+  Author: string;
+  Thumnail: string;
   
-  async init(url:string, prefetched?:exportableSoundCloud){
+  async init(url: string, prefetched?: exportableSoundCloud){
     this.Url = url;
     if(prefetched){
       this.Title = prefetched.title;
@@ -38,16 +41,16 @@ export class SoundCloudS extends AudioSource {
     return stream;
   }
 
-  toField(verbose:boolean = false){
+  toField(verbose: boolean = false){
     const fields = [] as EmbedField[];
     fields.push({
       name: ":musical_note:ユーザー",
       value: this.Author,
-      inline: false
+      inline: false,
     }, {
       name: ":asterisk:概要",
-      value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, (verbose ? 1000 : 300)) + "..." : this.Description,
-      inline: false
+      value: this.Description.length > (verbose ? 1000 : 350) ? this.Description.substring(0, verbose ? 1000 : 300) + "..." : this.Description,
+      inline: false,
     });
     return fields;
   }
@@ -56,32 +59,32 @@ export class SoundCloudS extends AudioSource {
     return "\r\nアーティスト:`" + this.Author + "`";
   }
 
-  exportData():exportableSoundCloud{
+  exportData(): exportableSoundCloud{
     return {
       url: this.Url,
       title: this.Title,
       description: this.Description,
       length: this._lengthSeconds,
       author: this.Author,
-      thumbnail: this.Thumnail
+      thumbnail: this.Thumnail,
     };
   }
 }
 
 export type exportableSoundCloud = {
-  url:string;
-  title:string;
-  description:string;
-  length:number;
-  author:string;
-  thumbnail:string;
-}
+  url: string,
+  title: string,
+  description: string,
+  length: number,
+  author: string,
+  thumbnail: string,
+};
 
 /**
  * SoundCloud API Track Collection
  */
 export interface SoundCloudTrackCollection {
   collection: SoundcloudTrackV2[];
-  next_href:  string;
-  query_urn:  null;
+  next_href: string;
+  query_urn: null;
 }

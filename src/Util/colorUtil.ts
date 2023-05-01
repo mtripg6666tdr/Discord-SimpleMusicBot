@@ -1,5 +1,5 @@
-export function getColor(key:colorkey):number{
-  const cmap:{[key in colorkey]:number} = {
+export function getColor(key: colorkey): number{
+  const cmap: { [key in colorkey]: number } = {
     "COMMAND": 0xE9506A,
     "HELP": 0x4898F0,
     "SEARCH": 0x60F246,
@@ -16,7 +16,7 @@ export function getColor(key:colorkey):number{
   return cmap[key];
 }
 
-type colorkey = 
+type colorkey =
 "COMMAND"|"HELP"|"SEARCH"|"NP"|"QUEUE"|
 "UPTIME"|"SONG_ADDED"|"LYRIC"|"AUTO_NP"|"PLAYLIST_COMPLETED"|
 "THUMB"|"RELATIVE_SETUP"

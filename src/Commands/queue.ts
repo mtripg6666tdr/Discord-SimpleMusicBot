@@ -1,6 +1,8 @@
+import type { CommandArgs, CommandInterface } from ".";
+import type { YouTube } from "../AudioSource/youtube";
+
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
-import { YouTube } from "../AudioSource/youtube";
+
 import { PageToggle } from "../Component/PageToggle";
 import { getColor } from "../Util/colorUtil";
 import { CalcHourMinSec, CalcMinSec, log } from "../Util/util";
@@ -11,7 +13,7 @@ export default class Queue implements CommandInterface {
   description = "キューを表示します。";
   unlist = false;
   category = "playlist";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message: discord.Message, options: CommandArgs){
     options.updateBoundChannel(message);
     const msg = await message.channel.send(":eyes: キューを確認しています。お待ちください...");
     const queue = options.data[message.guild.id].Queue;
@@ -20,7 +22,7 @@ export default class Queue implements CommandInterface {
       return;
     }
     // 合計所要時間の計算
-    let totalLength = queue.LengthSeconds;
+    const totalLength = queue.LengthSeconds;
     let _page = options.rawArgs === "" ? 1 : Number(options.rawArgs);
     if(isNaN(_page)) _page = 1;
     if(queue.length > 0 && _page > Math.ceil(queue.length / 10)){
@@ -30,21 +32,21 @@ export default class Queue implements CommandInterface {
     // 合計ページ数割り出し
     const totalpage = Math.ceil(queue.length / 10);
     // ページのキューを割り出す
-    const getQueueEmbed = (page:number)=>{
-      const fields:{name:string, value:string}[] = [];
+    const getQueueEmbed = (page: number)=>{
+      const fields: { name: string, value: string }[] = [];
       for(let i = 10 * (page - 1); i < 10 * page; i++){
         if(queue.length <= i){
           break;
         }
         const q = queue.get(i);
         const _t = Number(q.BasicInfo.LengthSeconds);
-        const [min,sec] = CalcMinSec(_t);
+        const [min, sec] = CalcMinSec(_t);
         fields.push({
           name: i !== 0 ? i.toString() : options.data[message.guild.id].Manager.IsPlaying ? "現在再生中" : "再生待ち",
           value: "[" + q.BasicInfo.Title + "](" + q.BasicInfo.Url + ") \r\n"
-          +"長さ: `" + ((q.BasicInfo.ServiceIdentifer === "youtube" && (q.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : min + ":" + sec) + " ` \r\n"
-          +"リクエスト: `" + q.AdditionalInfo.AddedBy.displayName + "` "
-          + q.BasicInfo.npAdditional()
+          + "長さ: `" + (q.BasicInfo.ServiceIdentifer === "youtube" && (q.BasicInfo as YouTube).LiveStream ? "ライブストリーム" : min + ":" + sec) + " ` \r\n"
+          + "リクエスト: `" + q.AdditionalInfo.AddedBy.displayName + "` "
+          + q.BasicInfo.npAdditional(),
         });
       }
       const [thour, tmin, tsec] = CalcHourMinSec(totalLength);
@@ -56,7 +58,7 @@ export default class Queue implements CommandInterface {
         .setFooter(queue.length + "曲 | 合計:" + thour + ":" + tmin + ":" + tsec + " | トラックループ:" + (queue.LoopEnabled ? "⭕" : "❌") + " | キューループ:" + (queue.QueueLoopEnabled ? "⭕" : "❌"))
         .setThumbnail(message.guild.iconURL())
         .setColor(getColor("QUEUE"));
-    }
+    };
 
     // 送信
     await msg.edit("", getQueueEmbed(_page)).catch(e => log(e, "error"));

@@ -1,5 +1,6 @@
-import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import type { CommandArgs, CommandInterface } from ".";
+import type * as discord from "discord.js";
+
 import { log } from "../Util/util";
 
 export default class Some implements CommandInterface {
@@ -8,7 +9,7 @@ export default class Some implements CommandInterface {
   description = "キューの最後の曲をキューの先頭に移動します。";
   unlist = false;
   category = "playlist";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message: discord.Message, options: CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.length <= 2){
       message.channel.send("キューに3曲以上追加されているときに使用できます。").catch(e=>log(e, "error"));

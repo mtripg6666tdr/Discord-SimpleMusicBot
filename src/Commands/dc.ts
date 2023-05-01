@@ -1,5 +1,6 @@
-import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import type { CommandArgs, CommandInterface } from ".";
+import type * as discord from "discord.js";
+
 import { log } from "../Util/util";
 
 export default class Dc implements CommandInterface {
@@ -8,7 +9,7 @@ export default class Dc implements CommandInterface {
   description = "ボイスチャンネルから切断します。";
   unlist = false;
   category = "voice";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message: discord.Message, options: CommandArgs){
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.data[message.guild.id].Manager.IsConnecting){
@@ -16,7 +17,7 @@ export default class Dc implements CommandInterface {
       return;
     }
     // 停止しま～す
-    options.data[message.guild.id].Manager.Disconnect();
+    await options.data[message.guild.id].Manager.Disconnect();
     message.channel.send(":postbox: 正常に切断しました").catch(e => log(e, "error"));
   }
 }

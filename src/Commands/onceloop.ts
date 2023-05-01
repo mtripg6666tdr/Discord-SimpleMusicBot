@@ -1,5 +1,6 @@
-import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import type { CommandArgs, CommandInterface } from ".";
+import type * as discord from "discord.js";
+
 import { log } from "../Util/util";
 
 export default class OnceLoop implements CommandInterface {
@@ -8,7 +9,7 @@ export default class OnceLoop implements CommandInterface {
   description = "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。";
   unlist = false;
   category = "player";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message: discord.Message, options: CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.OnceLoopEnabled){
       options.data[message.guild.id].Queue.OnceLoopEnabled = false;

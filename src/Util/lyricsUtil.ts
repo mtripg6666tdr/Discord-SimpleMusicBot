@@ -1,10 +1,12 @@
-import Genius from "genius-lyrics";
 import * as https from "https";
-import { decode } from "html-entities";
-import { DefaultAudioThumbnailURL } from "../definition";
-import { DownloadText } from "./util";
 
-export async function GetLyrics(keyword:string):Promise<songInfo>{
+import Genius from "genius-lyrics";
+import { decode } from "html-entities";
+
+import { DownloadText } from "./util";
+import { DefaultAudioThumbnailURL } from "../definition";
+
+export async function GetLyrics(keyword: string): Promise<songInfo>{
   try{
     const client = new Genius.Client();
     const song = (await client.songs.search(keyword))[0];
@@ -13,21 +15,21 @@ export async function GetLyrics(keyword:string):Promise<songInfo>{
       artwork: song.image,
       lyric: await song.lyrics(),
       title: song.title,
-      url: song.url
-    }
+      url: song.url,
+    };
   }
   catch(e){
     // Fallback to utaten
     const data = JSON.parse(await DownloadText("https://customsearch.googleapis.com/customsearch/v1?cx=89ebccacdc32461f2&key=" + process.env.CSE_KEY + "&q=" + encodeURIComponent(keyword))) as CSE_Result;
     const items = data.items?.filter(i => new URL(i.link).pathname.startsWith("/lyric/"));
-    if(!items || items.length === 0) {
-      throw "No lyric was found";
+    if(!items || items.length === 0){
+      throw Error("No lyric was found");
     }
     const url = items[0].link;
     let lyric = await DownloadWithoutRuby(url);
     let doc = "";
     [doc, lyric] = lyric.split("<div class=\"hiragana\" >");
-    [lyric, ] = lyric.split("</div>");
+    [lyric ] = lyric.split("</div>");
     lyric = lyric.replace(/<span class="rt rt_hidden">.+?<\/span>/g, "");
     lyric = lyric.replace(/\n/g, "");
     lyric = lyric.replace(/<br \/>/g, "\n");
@@ -40,13 +42,13 @@ export async function GetLyrics(keyword:string):Promise<songInfo>{
       artist: decode(match.groups.artist),
       title: decode(match.groups.title),
       artwork: artwork.startsWith("http") ? artwork : DefaultAudioThumbnailURL,
-      url: url
+      url: url,
     };
   }
 }
 
-function DownloadWithoutRuby(url:string):Promise<string>{
-  return new Promise((resolve,reject)=>{
+function DownloadWithoutRuby(url: string): Promise<string>{
+  return new Promise((resolve, reject)=>{
     const durl = new URL(url);
     const req = https.request({
       protocol: durl.protocol,
@@ -56,8 +58,8 @@ function DownloadWithoutRuby(url:string):Promise<string>{
       headers: {
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
         "Cookie": "lyric_ruby=off;",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"
-      }
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36",
+      },
     }, res => {
       let data = "";
       res.on("data", (chunk)=>{
@@ -73,20 +75,20 @@ function DownloadWithoutRuby(url:string):Promise<string>{
 }
 
 type songInfo = {
-  lyric:string;
-  artist:string;
-  title:string;
-  artwork:string;
-  url:string;
-}
+  lyric: string,
+  artist: string,
+  title: string,
+  artwork: string,
+  url: string,
+};
 
 interface CSE_Result {
-  kind:              string;
-  url:               URL;
-  queries:           Queries;
-  context:           Context;
+  kind: string;
+  url: URL;
+  queries: Queries;
+  context: Context;
   searchInformation: SearchInformation;
-  items:             Item[];
+  items: Item[];
 }
 
 interface Context {
@@ -94,34 +96,34 @@ interface Context {
 }
 
 interface Item {
-  kind:             any;
-  title:            string;
-  htmlTitle:        string;
-  link:             string;
-  displayLink:      any;
-  snippet:          string;
-  htmlSnippet:      string;
-  cacheId:          string;
-  formattedUrl:     string;
+  kind: any;
+  title: string;
+  htmlTitle: string;
+  link: string;
+  displayLink: any;
+  snippet: string;
+  htmlSnippet: string;
+  cacheId: string;
+  formattedUrl: string;
   htmlFormattedUrl: string;
-  pagemap:          Pagemap;
+  pagemap: Pagemap;
 }
 
 interface Pagemap {
   cse_thumbnail?: CSEThumbnail[];
-  metatags:       { [key: string]: string }[];
-  cse_image:      CSEImage[];
-  listitem?:      Listitem[];
-  Article?:       Article[];
+  metatags: { [key: string]: string }[];
+  cse_image: CSEImage[];
+  listitem?: Listitem[];
+  Article?: Article[];
 }
 
 interface Article {
   datePublished: string;
-  image:         string;
-  itemtype:      string;
-  description:   string;
-  dateModified:  string;
-  headline:      string;
+  image: string;
+  itemtype: string;
+  description: string;
+  dateModified: string;
+  headline: string;
 }
 
 interface CSEImage {
@@ -129,14 +131,14 @@ interface CSEImage {
 }
 
 interface CSEThumbnail {
-  src:    string;
-  width:  string;
+  src: string;
+  width: string;
   height: string;
 }
 
 interface Listitem {
-  item:     string;
-  name:     string;
+  item: string;
+  name: string;
   position: string;
 }
 
@@ -145,25 +147,25 @@ interface Queries {
 }
 
 interface Request {
-  title:          string;
-  totalResults:   string;
-  searchTerms:    string;
-  count:          number;
-  startIndex:     number;
-  inputEncoding:  string;
+  title: string;
+  totalResults: string;
+  searchTerms: string;
+  count: number;
+  startIndex: number;
+  inputEncoding: string;
   outputEncoding: string;
-  safe:           string;
-  cx:             string;
+  safe: string;
+  cx: string;
 }
 
 interface SearchInformation {
-  searchTime:            number;
-  formattedSearchTime:   string;
-  totalResults:          string;
+  searchTime: number;
+  formattedSearchTime: string;
+  totalResults: string;
   formattedTotalResults: string;
 }
 
 interface URL {
-  type:     string;
+  type: string;
   template: string;
 }

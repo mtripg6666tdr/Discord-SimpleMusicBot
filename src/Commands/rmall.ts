@@ -1,5 +1,6 @@
-import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import type { CommandArgs, CommandInterface } from ".";
+import type * as discord from "discord.js";
+
 import { log } from "../Util/util";
 
 export default class Rmall implements CommandInterface {
@@ -8,7 +9,7 @@ export default class Rmall implements CommandInterface {
   description = "キュー内の曲をすべて削除します。\r\n※接続中の場合ボイスチャンネルから離脱します。";
   unlist = false;
   category = "playlist";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message: discord.Message, options: CommandArgs){
     options.updateBoundChannel(message);
     if(!message.member.voice.channel || (message.member.voice.channel && !message.member.voice.channel.members.has(options.client.user.id))){
       if(!message.member.hasPermission("MANAGE_GUILD") && !message.member.hasPermission("MANAGE_CHANNELS")){
@@ -16,8 +17,8 @@ export default class Rmall implements CommandInterface {
         return;
       }
     }
-    options.data[message.guild.id].Manager.Disconnect();
+    await options.data[message.guild.id].Manager.Disconnect();
     options.data[message.guild.id].Queue.RemoveAll();
-    message.channel.send("✅すべて削除しました").catch(e => log(e, "error"))
+    message.channel.send("✅すべて削除しました").catch(e => log(e, "error"));
   }
 }
