@@ -1,5 +1,6 @@
-import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import type { CommandArgs, CommandInterface } from ".";
+import type * as discord from "discord.js";
+
 import { log } from "../Util/util";
 
 export default class QueueLoop implements CommandInterface {
@@ -8,7 +9,7 @@ export default class QueueLoop implements CommandInterface {
   description = "キュー内のループを設定します。";
   unlist = false;
   category = "player";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message: discord.Message, options: CommandArgs){
     options.updateBoundChannel(message);
     if(options.data[message.guild.id].Queue.QueueLoopEnabled){
       options.data[message.guild.id].Queue.QueueLoopEnabled = false;

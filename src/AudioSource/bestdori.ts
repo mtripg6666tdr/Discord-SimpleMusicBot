@@ -1,23 +1,24 @@
-import { EmbedField } from "discord.js";
-import { AddZero, DownloadText } from "../Util/util";
+import type { EmbedField } from "discord.js";
+
 import { AudioSource } from "./audiosource";
+import { AddZero, DownloadText } from "../Util/util";
 
 export class BestdoriS extends AudioSource {
   protected _lengthSeconds = 0;
   protected _serviceIdentifer = "bestdori";
   Thumnail = "";
   Artist = "";
-  Type:"anime"|"normal"|null = null;
-  lyricist:string;
-  composer:string;
-  arranger:string;
-  private id:number;
+  Type: "anime"|"normal"|null = null;
+  lyricist: string;
+  composer: string;
+  arranger: string;
+  private id: number;
 
-  async init(url:string, prefetched:exportableBestdori){
+  async init(url: string, prefetched: exportableBestdori){
     this.Url = url;
     await BestdoriApi.setupData();
     this.id = BestdoriApi.getAudioId(url);
-    if(!this.id) throw "Invalid streamable url";
+    if(!this.id) throw Error("Invalid streamable url");
     const data = bestdori.allsonginfo[this.id];
     this.Title = data.musicTitle[0];
     this.Type = data.tag;
@@ -39,54 +40,54 @@ export class BestdoriS extends AudioSource {
   }
 
   async fetch(){
-    return "https://bestdori.com/assets/jp/sound/bgm" + AddZero(this.id.toString(), 3) +  "_rip/bgm" + AddZero(this.id.toString(), 3) + ".mp3";
+    return "https://bestdori.com/assets/jp/sound/bgm" + AddZero(this.id.toString(), 3) + "_rip/bgm" + AddZero(this.id.toString(), 3) + ".mp3";
   }
 
   toField(){
     const typeMap = {
       anime: "カバー",
-      normal: "アニメ"
+      normal: "アニメ",
     };
     return [
       {
         name: "バンド名",
         value: this.Artist,
-        inline: false
+        inline: false,
       },
       {
         name: "ジャンル",
-        value: typeMap[this.Type]
+        value: typeMap[this.Type],
       },
       {
         name: "楽曲情報",
         value: "作詞: `" + (this.lyricist ?? "情報なし")
           + "` \r\n作曲: `" + (this.composer ?? "情報なし")
           + "` \r\n編曲: `" + (this.arranger ?? "情報なし") + "`",
-        inline: false
-      }
+        inline: false,
+      },
     ] as EmbedField[];
   }
 
-  npAdditional(){return "\r\nアーティスト:`" + this.Artist + "`"};
+  npAdditional(){return "\r\nアーティスト:`" + this.Artist + "`";}
 
-  exportData():exportableBestdori{
+  exportData(): exportableBestdori{
     return {
       url: this.Url,
       length: this.LengthSeconds,
       lyricist: this.lyricist,
       composer: this.composer,
-      arranger: this.arranger
+      arranger: this.arranger,
     };
   }
 }
 
 export type exportableBestdori = {
-  url:string;
-  length:number;
-  lyricist:string;
-  composer:string;
-  arranger:string;
-}
+  url: string,
+  length: number,
+  lyricist: string,
+  composer: string,
+  arranger: string,
+};
 
 /**
  * Bestdori ( https://bestdori.com )のAPIラッパ
@@ -97,7 +98,7 @@ export abstract class BestdoriApi {
    * @param url BestdoriのURL
    * @returns BestdoriのID
    */
-  static getAudioId(url:string):number{
+  static getAudioId(url: string): number{
     const match = url.match(/^https?:\/\/bestdori\.com\/info\/songs\/(?<Id>\d+)(\/.*)?$/);
     if(match){
       return Number(match.groups.Id);
@@ -115,25 +116,25 @@ export abstract class BestdoriApi {
     }
   }
 
-  static getAudioPage(id:number):string {
+  static getAudioPage(id: number): string {
     return "https://bestdori.com/info/songs/" + id;
   }
 
-  static async getDetailedInfo(id:number){
+  static async getDetailedInfo(id: number){
     const apiUrl = "https://bestdori.com/api/songs/" + id.toString() + ".json";
     return JSON.parse(await DownloadText(apiUrl)) as BestdoriDetailedSongInfo;
   }
 
-  static getThumbnail(id:number, jacketimage:string){
-    return "https://bestdori.com/assets/jp/musicjacket/musicjacket" + (Math.ceil(id / 10) * 10) + "_rip/assets-star-forassetbundle-startapp-musicjacket-musicjacket" + Math.ceil(id / 10) * 10 + "-" + jacketimage + "-jacket.png"
+  static getThumbnail(id: number, jacketimage: string){
+    return "https://bestdori.com/assets/jp/musicjacket/musicjacket" + (Math.ceil(id / 10) * 10) + "_rip/assets-star-forassetbundle-startapp-musicjacket-musicjacket" + Math.ceil(id / 10) * 10 + "-" + jacketimage + "-jacket.png";
   }
 }
 
 export const BestdoriAllSongInfoEndPoint = "https://bestdori.com/api/songs/all.5.json";
 export const BestdoriAllBandInfoEndPoint = "https://bestdori.com/api/bands/all.1.json";
 class BestdoriData {
-  allsonginfo:BestdoriAllSongInfo = null;
-  allbandinfo:BestdoriAllBandInfo = null;
+  allsonginfo: BestdoriAllSongInfo = null;
+  allbandinfo: BestdoriAllBandInfo = null;
 }
 export const bestdori = new BestdoriData();
 export type BandID = number;
@@ -146,88 +147,88 @@ export type SongID = number;
  * (一部改変)
  */
 export type BestdoriAllSongInfo = {
-  [key:number]:{
-      tag:"anime"|"normal",
-      bandId:BandID,
-      jacketImage:[string],
-      musicTitle:[string,string,string,string,string],
-      publishedAt:[string,string,string,string,string],
-      closedAt:[string,string,string,string,string],
-      difficulty:{[key in "0"|"1"|"2"|"3"|"4"]:{playLevel:number}}
-  }
-}
+  [key: number]: {
+    tag: "anime"|"normal",
+    bandId: BandID,
+    jacketImage: [string],
+    musicTitle: [string, string, string, string, string],
+    publishedAt: [string, string, string, string, string],
+    closedAt: [string, string, string, string, string],
+    difficulty: { [key in "0"|"1"|"2"|"3"|"4"]: { playLevel: number } },
+  },
+};
 export type BestdoriAllBandInfo = {
-  [key:number]:{
-      bandName:[string,string,string,string,string]
-  }
-}
+  [key: number]: {
+    bandName: [string, string, string, string, string],
+  },
+};
 export interface BestdoriDetailedSongInfo {
-  bgmId:        SongID;
-  bgmFile:      string;
-  tag:          Tag;
-  bandId:       BandID;
+  bgmId: SongID;
+  bgmFile: string;
+  tag: Tag;
+  bandId: BandID;
   achievements: Achievement[];
-  jacketImage:  string[];
-  seq:          number;
-  musicTitle:   Array<null | string>;
-  lyricist:     Array<null | string>;
-  composer:     Array<null | string>;
-  arranger:     Array<null | string>;
-  howToGet:     Array<null | string>;
-  publishedAt:  Array<null | string>;
-  closedAt:     Array<null | string>;
-  difficulty:   { [key: string]: Difficulty };
-  length:       number;
-  notes:        { [key: string]: number };
-  bpm:          { [key: string]: BPM[] };
+  jacketImage: string[];
+  seq: number;
+  musicTitle: (null | string)[];
+  lyricist: (null | string)[];
+  composer: (null | string)[];
+  arranger: (null | string)[];
+  howToGet: (null | string)[];
+  publishedAt: (null | string)[];
+  closedAt: (null | string)[];
+  difficulty: { [key: string]: Difficulty };
+  length: number;
+  notes: { [key: string]: number };
+  bpm: { [key: string]: BPM[] };
 }
 
 export interface Achievement {
-  musicId:         number;
+  musicId: number;
   achievementType: string;
-  rewardType:      RewardType;
-  quantity:        number;
-  rewardId?:       number;
+  rewardType: RewardType;
+  quantity: number;
+  rewardId?: number;
 }
 
 export enum RewardType {
   Coin = "coin",
   PracticeTicket = "practice_ticket",
-  Star = "star",
+  Star = "star"
 }
 
 export interface BPM {
-  bpm:   number;
+  bpm: number;
   start: number;
-  end:   number;
+  end: number;
 }
 
 export interface Difficulty {
-  playLevel:         number;
+  playLevel: number;
   multiLiveScoreMap: { [key: string]: MultiLiveScoreMap };
-  notesQuantity:     number;
-  scoreC:            number;
-  scoreB:            number;
-  scoreA:            number;
-  scoreS:            number;
-  scoreSS:           number;
+  notesQuantity: number;
+  scoreC: number;
+  scoreB: number;
+  scoreA: number;
+  scoreS: number;
+  scoreSS: number;
 }
 
 export interface MultiLiveScoreMap {
-  musicId:                 number;
-  musicDifficulty:         Tag;
-  multiLiveDifficultyId:   number;
-  scoreS:                  number;
-  scoreA:                  number;
-  scoreB:                  number;
-  scoreC:                  number;
+  musicId: number;
+  musicDifficulty: Tag;
+  multiLiveDifficultyId: number;
+  scoreS: number;
+  scoreA: number;
+  scoreB: number;
+  scoreC: number;
   multiLiveDifficultyType: string;
-  scoreSS:                 number;
+  scoreSS: number;
 }
 
 export enum Tag {
   Easy = "easy",
   Expert = "expert",
   Hard = "hard",
-  Normal = "normal",
+  Normal = "normal"
 }

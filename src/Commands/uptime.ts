@@ -1,5 +1,7 @@
+import type { CommandArgs, CommandInterface } from ".";
+
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+
 import { getColor } from "../Util/colorUtil";
 import { CalcTime, log } from "../Util/util";
 
@@ -9,7 +11,7 @@ export default class Uptime implements CommandInterface {
   description = "ボットのアップタイムおよびping時間(レイテンシ)を表示します。";
   unlist = false;
   category = "utility";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message: discord.Message, options: CommandArgs){
     options.updateBoundChannel(message);
     const now = new Date();
     const insta = CalcTime(now.getTime() - options.bot.InstantiatedTime.getTime());
@@ -19,8 +21,8 @@ export default class Uptime implements CommandInterface {
     embed.title = options.client.user.username + "のアップタイム";
     embed.addField("サーバー起動からの経過した時間", insta[0] + "時間" + insta[1] + "分" + insta[2] + "秒");
     embed.addField("Botが起動してからの経過時間", ready[0] + "時間" + ready[1] + "分" + ready[2] + "秒");
-    embed.addField("レイテンシ", 
-        (new Date().getTime() - message.createdAt.getTime()) + "ミリ秒(実測値)\r\n"
+    embed.addField("レイテンシ",
+      (new Date().getTime() - message.createdAt.getTime()) + "ミリ秒(実測値)\r\n"
       + options.client.ws.ping + "ミリ秒(取得値)"
     );
     embed.addField("データベースに登録されたサーバー数", Object.keys(options.data).length + "サーバー");

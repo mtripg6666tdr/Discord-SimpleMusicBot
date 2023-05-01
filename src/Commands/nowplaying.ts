@@ -1,6 +1,8 @@
+import type { CommandArgs, CommandInterface } from ".";
+import type { YouTube } from "../AudioSource/youtube";
+
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
-import { YouTube } from "../AudioSource/youtube";
+
 import { getColor } from "../Util/colorUtil";
 import { CalcMinSec, log } from "../Util/util";
 
@@ -10,7 +12,7 @@ export default class NowPlaying implements CommandInterface {
   description = "現在再生中の曲の情報を表示します。 `l`を引数にするとより長く概要を表示します(可能な場合)。";
   unlist = false;
   category = "player";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message: discord.Message, options: CommandArgs){
     options.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!options.data[message.guild.id].Manager.IsPlaying){
@@ -20,7 +22,7 @@ export default class NowPlaying implements CommandInterface {
     const _s = Math.floor(options.data[message.guild.id].Manager.CurrentTime / 1000);
     const _t = Number(options.data[message.guild.id].Manager.CurrentVideoInfo.LengthSeconds);
     const [min, sec] = CalcMinSec(_s);
-    const [tmin,tsec] = CalcMinSec(_t);
+    const [tmin, tsec] = CalcMinSec(_t);
     const info = options.data[message.guild.id].Manager.CurrentVideoInfo;
     const embed = new discord.MessageEmbed();
     embed.setColor(getColor("NP"));
@@ -28,7 +30,7 @@ export default class NowPlaying implements CommandInterface {
     embed.title = "現在再生中の曲:musical_note:";
     if(_t > 0){
       const progress = Math.floor(_s / _t * 20);
-      for(let i = 1 ; i < progress; i++){
+      for(let i = 1; i < progress; i++){
         progressBar += "=";
       }
       progressBar += "●";
@@ -36,10 +38,10 @@ export default class NowPlaying implements CommandInterface {
         progressBar += "=";
       }
     }
-    embed.description = "[" + info.Title + "](" + info.Url + ")\r\n" + progressBar + ((info.ServiceIdentifer === "youtube" && (info as YouTube).LiveStream) ? "(ライブストリーム)" : " `" + min + ":" + sec + "/" + (_t === 0 ? "(不明)" : tmin + ":" + tsec + "`"));
+    embed.description = "[" + info.Title + "](" + info.Url + ")\r\n" + progressBar + (info.ServiceIdentifer === "youtube" && (info as YouTube).LiveStream ? "(ライブストリーム)" : " `" + min + ":" + sec + "/" + (_t === 0 ? "(不明)" : tmin + ":" + tsec + "`"));
     embed.setThumbnail(info.Thumnail);
     embed.fields = info.toField(
-      (options.args[0] === "long" || options.args[0] === "l" || options.args[0] === "verbose") ? true : false
+      !!(options.args[0] === "long" || options.args[0] === "l" || options.args[0] === "verbose")
     );
     embed.addField(":link:URL", info.Url);
 

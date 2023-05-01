@@ -1,7 +1,8 @@
-import { EmbedField } from "discord.js";
-import { DefaultAudioThumbnailURL } from "../definition";
-import { DownloadText } from "../Util/util";
+import type { EmbedField } from "discord.js";
+
 import { AudioSource } from "./audiosource";
+import { DownloadText } from "../Util/util";
+import { DefaultAudioThumbnailURL } from "../definition";
 
 export class Streamable extends AudioSource {
   protected _lengthSeconds = 0;
@@ -9,10 +10,10 @@ export class Streamable extends AudioSource {
   Thumnail = DefaultAudioThumbnailURL;
   private streamUrl = "";
 
-  async init(url:string, prefetched?:exportableStreamable){
+  async init(url: string, prefetched?: exportableStreamable){
     this.Url = url;
     const id = StreamableApi.getVideoId(url);
-    if(!id) throw "Invalid streamable url";
+    if(!id) throw Error("Invalid streamable url");
     if(prefetched){
       this._lengthSeconds = prefetched.length;
       this.Thumnail = prefetched.thumbnail;
@@ -35,33 +36,33 @@ export class Streamable extends AudioSource {
   toField(){
     return [{
       name: ":link:URL",
-      value: this.Url
+      value: this.Url,
     }, {
       name: ":asterisk:詳細",
-      value: "Streamableにて共有されたファイル"
+      value: "Streamableにて共有されたファイル",
     }] as EmbedField[];
   }
 
-  npAdditional(){return ""};
+  npAdditional(){return "";}
 
-  exportData():exportableStreamable{
+  exportData(): exportableStreamable{
     return {
       url: this.Url,
       length: this.LengthSeconds,
       thumbnail: this.Thumnail,
       title: this.Title,
-      streamUrl: this.streamUrl
+      streamUrl: this.streamUrl,
     };
   }
 }
 
 export type exportableStreamable = {
-  url:string;
-  length:number;
-  thumbnail:string;
-  title:string;
-  streamUrl:string;
-}
+  url: string,
+  length: number,
+  thumbnail: string,
+  title: string,
+  streamUrl: string,
+};
 
 /**
  * Streamable (https://streamable.com)のAPIラッパ
@@ -72,16 +73,16 @@ export abstract class StreamableApi {
    * @param url 動画のURL
    * @returns 動画のID
    */
-  static getVideoId(url:string):string{
+  static getVideoId(url: string): string{
     const match = url.match(/^https?:\/\/streamable.com\/(?<Id>.+)$/);
     if(match){
-      return match.groups.Id
+      return match.groups.Id;
     }else{
       return null;
     }
   }
 
-  static async  getVideoDetails(id:string):Promise<StreamableAPIResult> {
+  static async getVideoDetails(id: string): Promise<StreamableAPIResult> {
     const BASE_API = "https://api.streamable.com/videos/";
     return JSON.parse(await DownloadText(BASE_API + id)) as StreamableAPIResult;
   }
@@ -93,30 +94,30 @@ export abstract class StreamableApi {
  * VSCode拡張 'Paste JSON as Code' (quicktype.quicktype)により生成 (https://quicktype.io)
  */
 export interface StreamableAPIResult {
-  status:        number;
-  percent:       number;
-  url:           string;
-  embed_code:    string;
-  message:       null;
-  files:         Files;
+  status: number;
+  percent: number;
+  url: string;
+  embed_code: string;
+  message: null;
+  files: Files;
   thumbnail_url: string;
-  title:         string;
-  source:        null;
+  title: string;
+  source: null;
 }
 
 interface Files {
-  mp4:          Mp4;
+  mp4: Mp4;
   "mp4-mobile": Mp4;
-  original:     Mp4;
+  original: Mp4;
 }
 
 interface Mp4 {
-  status?:   number;
-  url?:      string;
+  status?: number;
+  url?: string;
   framerate: number;
-  height:    number;
-  width:     number;
-  bitrate:   number;
-  size:      number;
-  duration:  number;
+  height: number;
+  width: number;
+  bitrate: number;
+  size: number;
+  duration: number;
 }

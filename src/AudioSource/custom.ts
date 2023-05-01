@@ -1,15 +1,16 @@
-import { EmbedField } from "discord.js";
-import { DefaultAudioThumbnailURL } from "../definition";
-import { isAvailableRawAudioURL } from "../Util/util";
+import type { EmbedField } from "discord.js";
+
 import { AudioSource } from "./audiosource";
+import { isAvailableRawAudioURL } from "../Util/util";
+import { DefaultAudioThumbnailURL } from "../definition";
 
 export class CustomStream extends AudioSource {
   protected _lengthSeconds = 0;
   protected _serviceIdentifer = "custom";
-  Thumnail:string = DefaultAudioThumbnailURL;
+  Thumnail: string = DefaultAudioThumbnailURL;
 
-  async init(url:string){
-    if(!isAvailableRawAudioURL(url)) throw "正しいストリームではありません"
+  async init(url: string){
+    if(!isAvailableRawAudioURL(url)) throw Error("正しいストリームではありません");
     this.Url = url;
     this.Title = "カスタムストリーム";
     return this;
@@ -22,22 +23,22 @@ export class CustomStream extends AudioSource {
   toField(){
     return [{
       name: ":link:URL",
-      value: this.Url
+      value: this.Url,
     }, {
       name: ":asterisk:詳細",
-      value: "カスタムストリーム"
+      value: "カスタムストリーム",
     }] as EmbedField[];
   }
 
-  npAdditional(){return ""};
+  npAdditional(){return "";}
 
-  exportData():exportableCustom{
+  exportData(): exportableCustom{
     return {
-      url:this.Url
+      url: this.Url,
     };
   }
 }
 
 export type exportableCustom = {
-  url: string;
-}
+  url: string,
+};

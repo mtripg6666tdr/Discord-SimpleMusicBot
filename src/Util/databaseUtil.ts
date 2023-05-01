@@ -2,19 +2,19 @@ import { https } from "follow-redirects";
 
 const MIME_JSON = "application/json";
 export abstract class DatabaseAPI {
-  private constructor(){};
+  private constructor(){}
 
-  static async SetIsSpeaking(data:{guildid:string, value:string}[]){
+  static async SetIsSpeaking(data: { guildid: string, value: string }[]){
     if(this.CanOperate){
       const ids = data.map(d => d.guildid).join(",");
-      let rawData = {} as {[key:string]:string};
+      const rawData = {} as { [key: string]: string };
       data.forEach(d => rawData[d.guildid] = d.value);
       try{
         const result = await this.HttpRequest("POST", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
           guildid: ids,
           data: JSON.stringify(rawData),
-          type: "j"
+          type: "j",
         } as requestBody, MIME_JSON);
         if(result.status === 200){
           return true;
@@ -30,16 +30,16 @@ export abstract class DatabaseAPI {
     }
   }
 
-  static async GetIsSpeaking(guildids:string[]){
+  static async GetIsSpeaking(guildids: string[]){
     if(this.CanOperate){
       try{
         const result = await this.HttpRequest("GET", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
           guildid: guildids.join(","),
-          type: "j"
+          type: "j",
         } as requestBody, MIME_JSON);
         if(result.status === 200){
-          return result.data as {[guildid:string]:string}
+          return result.data as { [guildid: string]: string };
         }else{
           return null;
         }
@@ -52,17 +52,17 @@ export abstract class DatabaseAPI {
     }
   }
 
-  static async SetQueueData(data:{guildid:string, queue:string}[]){
+  static async SetQueueData(data: { guildid: string, queue: string }[]){
     if(this.CanOperate){
       const ids = data.map(d => d.guildid).join(",");
-      let rawData = {} as {[guildis:string]:string};
+      const rawData = {} as { [guildis: string]: string };
       data.forEach(d => rawData[d.guildid] = d.queue);
       try{
         const result = await this.HttpRequest("POST", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
           guildid: ids,
           data: JSON.stringify(rawData),
-          type: "queue"
+          type: "queue",
         } as requestBody, MIME_JSON);
         return result.status === 200;
       }
@@ -74,16 +74,16 @@ export abstract class DatabaseAPI {
     }
   }
 
-  static async GetQueueData(guildids:string[]){
+  static async GetQueueData(guildids: string[]){
     if(this.CanOperate){
       try{
         const result = await this.HttpRequest("GET", process.env.GAS_URL, {
           token: process.env.GAS_TOKEN,
           guildid: guildids.join(","),
-          type: "queue"
+          type: "queue",
         } as requestBody, MIME_JSON);
         if(result.status === 200){
-          return result.data as {[guildid:string]:string};
+          return result.data as { [guildid: string]: string };
         }else return null;
       }
       catch{
@@ -95,10 +95,10 @@ export abstract class DatabaseAPI {
   }
 
   static get CanOperate(){
-    return Boolean(process.env.GAS_TOKEN && process.env.GAS_URL)
+    return Boolean(process.env.GAS_TOKEN && process.env.GAS_URL);
   }
 
-  static async HttpRequest(method:"GET"|"POST", url:string, data?:requestBody, mimeType?:string){
+  static async HttpRequest(method: "GET"|"POST", url: string, data?: requestBody, mimeType?: string){
     return new Promise<postResult>((resolve, reject) => {
       if(method === "GET"){
         url += "?token=" + data.token + "&guildid=" + data.guildid + "&type=" + data.type + "&data=" + data.data;
@@ -109,18 +109,18 @@ export abstract class DatabaseAPI {
         host: durl.host,
         path: durl.pathname + durl.search,
         method: method,
-      } as {[key:string]:any};
+      } as { [key: string]: any };
       if(mimeType){
         opt.headers = {
-          "Content-Type": mimeType
-        }
+          "Content-Type": mimeType,
+        };
       }
       const req = https.request(opt, (res) => {
-        let data = "";
-        res.on("data", (chunk) => data+=chunk);
+        let PayloadData = "";
+        res.on("data", (chunk) => PayloadData += chunk);
         res.on("end", ()=> {
           try{
-            resolve(JSON.parse(data) as postResult)
+            resolve(JSON.parse(PayloadData) as postResult);
           }
           catch{
             reject();
@@ -138,14 +138,14 @@ export abstract class DatabaseAPI {
 }
 
 type getResult = {
-  status: 200|404;
-}
+  status: 200|404,
+};
 type postResult = getResult & {
-  data:any;
-}
+  data: any,
+};
 type requestBody = {
-  token:string;
-  guildid:string;
-  data?:any;
-  type:"queue"|"j";
-}
+  token: string,
+  guildid: string,
+  data?: any,
+  type: "queue"|"j",
+};

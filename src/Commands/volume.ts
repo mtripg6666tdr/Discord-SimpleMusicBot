@@ -1,5 +1,6 @@
-import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import type { CommandArgs, CommandInterface } from ".";
+import type * as discord from "discord.js";
+
 import { log } from "../Util/util";
 
 export default class Volume implements CommandInterface {
@@ -10,7 +11,7 @@ export default class Volume implements CommandInterface {
   category = "voice";
   examples = "volume <音量>";
   usage = "volume 120";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message: discord.Message, options: CommandArgs){
     options.updateBoundChannel(message);
     if(!options.data[message.guild.id].Manager.IsPlaying){
       message.channel.send("なにも再生していません").catch(e => log(e, "error"));

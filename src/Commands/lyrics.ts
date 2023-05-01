@@ -1,5 +1,7 @@
+import type { CommandArgs, CommandInterface } from ".";
+
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+
 import { getColor } from "../Util/colorUtil";
 import { GetLyrics } from "../Util/lyricsUtil";
 import { log } from "../Util/util";
@@ -12,7 +14,7 @@ export default class Lyrics implements CommandInterface {
   category = "utility";
   examples = "l 夜に駆ける";
   usage = "l <タイトル、アーティスト等>";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message: discord.Message, options: CommandArgs){
     options.updateBoundChannel(message);
     if(!process.env.CSE_KEY) return;
     const msg = await message.channel.send("🔍検索中...");
@@ -22,20 +24,19 @@ export default class Lyrics implements CommandInterface {
       embed.title = "\"" + song.title + "\"(" + song.artist + ")の歌詞";
       embed.footer = {
         text: message.member.displayName,
-        iconURL: message.author.avatarURL()
+        iconURL: message.author.avatarURL(),
       };
       embed.setColor(getColor("LYRIC"));
       embed.description = song.lyric;
       embed.url = song.url;
       embed.thumbnail = {
-        url: song.artwork
-      }
-      msg.edit("", embed);
+        url: song.artwork,
+      };
+      await msg.edit("", embed);
     }
     catch(e){
       log(e, "error");
-      msg.edit(":confounded:失敗しました。曲名を確認してもう一度試してみてください。").catch(e => log(e, "error"));
-      return;
+      await msg.edit(":confounded:失敗しました。曲名を確認してもう一度試してみてください。");
     }
   }
 }

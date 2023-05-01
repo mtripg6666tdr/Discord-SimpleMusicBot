@@ -1,5 +1,6 @@
-import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+import type { CommandArgs, CommandInterface } from ".";
+import type * as discord from "discord.js";
+
 import { log } from "../Util/util";
 
 export default class Reset implements CommandInterface {
@@ -8,11 +9,11 @@ export default class Reset implements CommandInterface {
   description = "サーバーのキュー、設定やデータを削除して初期化します。\r\n※接続中の場合ボイスチャンネルから離脱します。";
   unlist = false;
   category = "utility";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message: discord.Message, options: CommandArgs){
     options.updateBoundChannel(message);
     // VC接続中なら切断
     if(options.data[message.guild.id].Manager.IsConnecting){
-      options.data[message.guild.id].Manager.Disconnect();
+      await options.data[message.guild.id].Manager.Disconnect();
     }
     // サーバープリファレンスをnullに
     options.data[message.guild.id] = null;

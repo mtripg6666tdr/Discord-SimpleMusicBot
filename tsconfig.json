@@ -1,12 +1,26 @@
 {
   "compilerOptions": {
-    "target": "ES2019",
+    "target": "ES2020",
     "module": "CommonJS",
-    "noImplicitAny": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
     "outDir": "dist/",
-    "sourceMap": true
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": false,
+    "strictBindCallApply": true,
+    "strictNullChecks": false,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "pretty": true,
+    "skipLibCheck": true,
   },
   "include": [
     "./src/**/*.ts"

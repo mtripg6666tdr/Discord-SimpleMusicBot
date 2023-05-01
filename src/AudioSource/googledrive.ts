@@ -1,39 +1,40 @@
-import { EmbedField } from "discord.js";
-import { DefaultAudioThumbnailURL } from "../definition";
+import type { exportableCustom } from "./custom";
+import type { EmbedField } from "discord.js";
+
 import { AudioSource } from "./audiosource";
-import { exportableCustom } from "./custom";
+import { DefaultAudioThumbnailURL } from "../definition";
 
 export class GoogleDrive extends AudioSource {
   protected _lengthSeconds = 0;
   protected _serviceIdentifer = "googledrive";
-  Thumnail:string = DefaultAudioThumbnailURL;
+  Thumnail: string = DefaultAudioThumbnailURL;
 
-  async init(url:string){
+  async init(url: string){
     this.Title = "Googleドライブストリーム";
     this.Url = url;
     return this;
   }
 
   async fetch(){
-    const match = this.Url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/);
+    const match = this.Url.match(/drive\.google\.com\/file\/d\/([^/?]+)(\/.+)?/);
     return "https://drive.google.com/uc?id=" + match[1];
   }
 
   toField(){
     return [{
       name: ":link:URL",
-      value: this.Url
+      value: this.Url,
     }, {
       name: ":asterisk:詳細",
-      value: "Googleドライブにて共有されたファイル"
+      value: "Googleドライブにて共有されたファイル",
     }] as EmbedField[];
   }
 
-  npAdditional(){return ""};
+  npAdditional(){return "";}
 
-  exportData():exportableCustom{
+  exportData(): exportableCustom{
     return {
-      url:this.Url
+      url: this.Url,
     };
   }
 }

@@ -1,6 +1,8 @@
+import type { CommandArgs, CommandInterface } from ".";
+
 import * as discord from "discord.js";
 import * as ytsr from "ytsr";
-import { CommandArgs, CommandInterface } from ".";
+
 import { getColor } from "../Util/colorUtil";
 import { log } from "../Util/util";
 
@@ -12,9 +14,9 @@ export default class Search implements CommandInterface {
   category = "playlist";
   examples = "検索 夜に駆ける";
   usage = "検索 <キーワード>";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message: discord.Message, options: CommandArgs){
     options.updateBoundChannel(message);
-    options.Join(message);
+    await options.Join(message);
     if(options.rawArgs.startsWith("http://") || options.rawArgs.startsWith("https://")){
       options.args.forEach(async u => {
         await options.PlayFromURL(message, u, !options.data[message.guild.id].Manager.IsConnecting);
@@ -33,15 +35,15 @@ export default class Search implements CommandInterface {
           id: msg.id,
           chId: msg.channel.id,
           userId: message.author.id,
-          userName: message.member.displayName
+          userName: message.member.displayName,
         },
-        Opts: {}
+        Opts: {},
       };
       try{
         const result = await ytsr.default(options.rawArgs, {
-          limit:12,
+          limit: 12,
           gl: "JP",
-          hl: "ja"
+          hl: "ja",
         });
         const embed = new discord.MessageEmbed();
         embed.title = "\"" + options.rawArgs + "\"の検索結果✨";
@@ -49,14 +51,14 @@ export default class Search implements CommandInterface {
         let desc = "";
         let index = 1;
         for(let i = 0; i < result.items.length; i++){
-          if(result.items[i].type == "video"){
-            const video = (result.items[i] as ytsr.Video);
+          if(result.items[i].type === "video"){
+            const video = result.items[i] as ytsr.Video;
             desc += "`" + index + ".` [" + video.title + "](" + video.url + ") `" + video.duration + "` - `" + video.author.name + "` \r\n\r\n";
             options.data[message.guild.id].SearchPanel.Opts[index] = {
               url: video.url,
               title: video.title,
               duration: video.duration,
-              thumbnail: video.bestThumbnail.url
+              thumbnail: video.bestThumbnail.url,
             };
             index++;
           }
@@ -69,13 +71,13 @@ export default class Search implements CommandInterface {
         embed.description = desc;
         embed.footer = {
           iconURL: message.author.avatarURL(),
-          text:"動画のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。"
+          text: "動画のタイトルを選択して数字を送信してください。キャンセルするにはキャンセルまたはcancelと入力します。",
         };
         await msg.edit("", embed);
       }
       catch(e){
         log(e, "error");
-        message.channel.send("✘内部エラーが発生しました").catch(e => log(e, "error"));
+        await message.channel.send("✘内部エラーが発生しました");
       }
     }else{
       message.channel.send("引数を指定してください").catch(e => log(e, "error"));

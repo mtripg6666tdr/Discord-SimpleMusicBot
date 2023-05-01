@@ -1,18 +1,27 @@
-import { Client, GuildMember, Message, MessageEmbed, TextChannel } from "discord.js";
+import type { AudioSource } from "../AudioSource/audiosource";
+import type { exportableBestdori } from "../AudioSource/bestdori";
+import type { exportableCustom } from "../AudioSource/custom";
+import type { exportableSoundCloud } from "../AudioSource/soundcloud";
+import type { exportableStreamable } from "../AudioSource/streamable";
+import type { exportableYouTube } from "../AudioSource/youtube";
+import type { GuildVoiceInfo } from "../definition";
+import type { Client, GuildMember, Message, TextChannel } from "discord.js";
+
+import { MessageEmbed } from "discord.js";
 import * as ytdl from "ytdl-core";
-import { AudioSource } from "../AudioSource/audiosource";
-import { BestdoriApi, BestdoriS, exportableBestdori } from "../AudioSource/bestdori";
-import { CustomStream, exportableCustom } from "../AudioSource/custom";
-import { GoogleDrive } from "../AudioSource/googledrive";
-import { Hibiki, HibikiApi } from "../AudioSource/hibiki";
-import { exportableSoundCloud, SoundCloudS } from "../AudioSource/soundcloud";
-import { exportableStreamable, Streamable, StreamableApi } from "../AudioSource/streamable";
-import { exportableYouTube, YouTube } from "../AudioSource/youtube";
-import { FallBackNotice, GuildVoiceInfo } from "../definition";
-import { getColor } from "../Util/colorUtil";
-import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log } from "../Util/util";
+
 import { ManagerBase } from "./ManagerBase";
 import { PageToggle } from "./PageToggle";
+import { BestdoriApi, BestdoriS } from "../AudioSource/bestdori";
+import { CustomStream } from "../AudioSource/custom";
+import { GoogleDrive } from "../AudioSource/googledrive";
+import { Hibiki, HibikiApi } from "../AudioSource/hibiki";
+import { SoundCloudS } from "../AudioSource/soundcloud";
+import { Streamable, StreamableApi } from "../AudioSource/streamable";
+import { YouTube } from "../AudioSource/youtube";
+import { getColor } from "../Util/colorUtil";
+import { CalcHourMinSec, CalcMinSec, isAvailableRawAudioURL, log } from "../Util/util";
+import { FallBackNotice } from "../definition";
 
 /**
  * サーバーごとのキューを管理するマネージャー。
@@ -20,22 +29,22 @@ import { PageToggle } from "./PageToggle";
  */
 export class QueueManager extends ManagerBase {
   // キューの本体
-  private _default:QueueContent[] = [];
+  private _default: QueueContent[] = [];
   // キューの本体のゲッタープロパティ
-  private get default():QueueContent[] {
+  private get default(): QueueContent[] {
     return this._default;
   }
   // トラックループが有効か?
-  LoopEnabled:boolean = false;
+  LoopEnabled: boolean = false;
   // キューループが有効か?
-  QueueLoopEnabled:boolean = false;
+  QueueLoopEnabled: boolean = false;
   // ワンスループが有効か?
-  OnceLoopEnabled:boolean = false;
+  OnceLoopEnabled: boolean = false;
   // キューの長さ
-  get length():number {
+  get length(): number {
     return this.default.length;
   }
-  get LengthSeconds():number{
+  get LengthSeconds(): number{
     let totalLength = 0;
     this.default.forEach(q => totalLength += Number(q.BasicInfo.LengthSeconds));
     return totalLength;
@@ -46,7 +55,7 @@ export class QueueManager extends ManagerBase {
     log("[QueueManager]Queue Manager instantiated");
   }
 
-  SetData(data:GuildVoiceInfo){
+  override SetData(data: GuildVoiceInfo){
     log("[QueueManager]Set data of guild id " + data.GuildID);
     super.SetData(data);
   }
@@ -56,7 +65,7 @@ export class QueueManager extends ManagerBase {
    * @param index インデックス
    * @returns 指定された位置にあるキューコンテンツ
    */
-  get(index:number){
+  get(index: number){
     return this.default[index];
   }
 
@@ -65,7 +74,7 @@ export class QueueManager extends ManagerBase {
    * @param predicate 条件を表す関数
    * @returns 条件に適合した要素の配列
    */
-  filter(predicate: (value: QueueContent, index: number, array: QueueContent[]) => unknown, thisArg?: any):QueueContent[]{
+  filter(predicate: (value: QueueContent, index: number, array: QueueContent[]) => unknown, thisArg?: any): QueueContent[]{
     return this.default.filter(predicate, thisArg);
   }
   /**
@@ -73,7 +82,7 @@ export class QueueManager extends ManagerBase {
    * @param predicate 条件
    * @returns インデックス
    */
-  findIndex(predicate: (value: QueueContent, index: number, obj: QueueContent[]) => unknown, thisArg?: any):number{
+  findIndex(predicate: (value: QueueContent, index: number, obj: QueueContent[]) => unknown, thisArg?: any): number{
     return this.default.findIndex(predicate, thisArg);
   }
   /**
@@ -81,27 +90,27 @@ export class QueueManager extends ManagerBase {
    * @param callbackfn 変換する関数
    * @returns 変換後の配列
    */
-  map<T>(callbackfn: (value: QueueContent, index: number, array: QueueContent[]) => T, thisArg?: any):T[]{
+  map<T>(callbackfn: (value: QueueContent, index: number, array: QueueContent[]) => T, thisArg?: any): T[]{
     return this.default.map(callbackfn, thisArg);
   }
 
   async AddQueue(
-      url:string, 
-      addedBy:GuildMember, 
-      method:"push"|"unshift" = "push", 
-      type:"youtube"|"custom"|"unknown" = "unknown", 
-      gotData:exportableCustom = null
-      ):Promise<QueueContent>{
+    url: string,
+    addedBy: GuildMember,
+    method: "push"|"unshift" = "push",
+    type: "youtube"|"custom"|"unknown" = "unknown",
+    gotData: exportableCustom = null
+  ): Promise<QueueContent>{
     log("[QueueManager/" + this.info.GuildID + "]AddQueue() called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     const result = {
-      BasicInfo:null,
-      AdditionalInfo:{
+      BasicInfo: null,
+      AdditionalInfo: {
         AddedBy: {
           userId: addedBy?.id ?? "0",
-          displayName: addedBy?.displayName ?? "不明"
-        }
-      }
+          displayName: addedBy?.displayName ?? "不明",
+        },
+      },
     } as QueueContent;
     
     if(type === "youtube" || (type === "unknown" && ytdl.validateURL(url))){
@@ -112,7 +121,7 @@ export class QueueManager extends ManagerBase {
       result.BasicInfo = await new CustomStream().init(url);
     }else if(type === "unknown"){
       // google drive
-      if(url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)(\/.+)?/)){
+      if(url.match(/drive\.google\.com\/file\/d\/([^/?]+)(\/.+)?/)){
         result.BasicInfo = await new GoogleDrive().init(url);
       }else if(url.match(/https?:\/\/soundcloud.com\/.+\/.+/)){
         // soundcloud
@@ -130,12 +139,12 @@ export class QueueManager extends ManagerBase {
     }
     if(result.BasicInfo){
       this._default[method](result);
-      if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+      if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
         this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
       }
       return result;
     }
-    throw "Provided URL was not resolved as available service";
+    throw Error("Provided URL was not resolved as available service");
   }
 
   /**
@@ -151,29 +160,29 @@ export class QueueManager extends ManagerBase {
    * @param gotData すでにデータを取得していて新たにフェッチする必要がなくローカルでキューコンテンツをインスタンス化する場合はここにデータを指定します
    */
   async AutoAddQueue(
-      client:Client, 
-      url:string, 
-      addedBy:GuildMember, 
-      type:"youtube"|"custom"|"unknown",
-      first:boolean = false, 
-      fromSearch:boolean = false, 
-      channel:TextChannel = null,
-      message:Message = null,
-      gotData:exportableCustom = null
-      ){
+    client: Client,
+    url: string,
+    addedBy: GuildMember,
+    type: "youtube"|"custom"|"unknown",
+    first: boolean = false,
+    fromSearch: boolean = false,
+    channel: TextChannel = null,
+    message: Message = null,
+    gotData: exportableCustom = null
+  ){
     log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Called");
-    let ch:TextChannel = null;
-    let msg:Message = null;
+    let ch: TextChannel = null;
+    let msg: Message = null;
     try{
       if(fromSearch && this.info.SearchPanel){
         // 検索パネルから
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() From search panel");
         ch = await client.channels.fetch(this.info.SearchPanel.Msg.chId) as TextChannel;
-        msg = await (ch as TextChannel).messages.fetch(this.info.SearchPanel.Msg.id);
+        msg = await ch.messages.fetch(this.info.SearchPanel.Msg.id);
         const tembed = new MessageEmbed();
         tembed.title = "お待ちください";
         tembed.description = "情報を取得しています...";
-        msg.edit("", tembed);
+        await msg.edit("", tembed);
       }else if(message){
         // すでに処理中メッセージがある
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Interaction message specified");
@@ -188,14 +197,14 @@ export class QueueManager extends ManagerBase {
       if(this.info.Queue.length > 999){
         // キュー上限
         log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Failed since too long queue", "warn");
-        throw "キューの上限を超えています";
+        throw Error("キューの上限を超えています");
       }
       const info = await this.info.Queue.AddQueue(url, addedBy, first ? "unshift" : "push", type, gotData ?? null);
       log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Added successfully");
       if(msg){
         // 曲の時間取得＆計算
         const _t = Number(info.BasicInfo.LengthSeconds);
-        const [min,sec] = CalcMinSec(_t);
+        const [min, sec] = CalcMinSec(_t);
         // キュー内のオフセット取得
         const index = first ? "0" : (this.info.Queue.length - 1).toString();
         // ETAの計算
@@ -204,10 +213,10 @@ export class QueueManager extends ManagerBase {
           .setColor(getColor("SONG_ADDED"))
           .setTitle("✅曲が追加されました")
           .setDescription("[" + info.BasicInfo.Title + "](" + info.BasicInfo.Url + ")")
-          .addField("長さ", ((info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).LiveStream) ? "ライブストリーム" : (_t !== 0 ? min + ":" + sec : "不明")), true)
+          .addField("長さ", info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).LiveStream ? "ライブストリーム" : _t !== 0 ? min + ":" + sec : "不明", true)
           .addField("リクエスト", addedBy?.displayName ?? "不明", true)
           .addField("キュー内の位置", index === "0" ? "再生中/再生待ち" : index, true)
-          .addField("再生されるまでの予想時間", index === "0" ? "-" : ((ehour === "0" ? "" : ehour + ":") + emin + ":" + esec), true)
+          .addField("再生されるまでの予想時間", index === "0" ? "-" : (ehour === "0" ? "" : ehour + ":") + emin + ":" + esec, true)
           .setThumbnail(info.BasicInfo.Thumnail);
         if(info.BasicInfo.ServiceIdentifer === "youtube" && (info.BasicInfo as YouTube).IsFallbacked){
           embed.addField(":warning:注意", FallBackNotice);
@@ -219,7 +228,7 @@ export class QueueManager extends ManagerBase {
       log("[QueueManager/" + this.info.GuildID + "]AutoAddQueue() Failed");
       log(e, "error");
       if(msg){
-        msg.edit(":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")").catch(e => log(e, "error"));
+        await msg.edit(":weary: キューの追加に失敗しました。追加できませんでした。(" + e + ")");
       }
     }
   }
@@ -235,17 +244,15 @@ export class QueueManager extends ManagerBase {
     this.info.Manager.errorUrl = "";
     if(this.QueueLoopEnabled){
       this.default.push(this.default[0]);
-    }else{
-      if(this.info.AddRelative && this.info.Manager.CurrentVideoInfo.ServiceIdentifer === "youtube"){
-        const relatedVideos = (this.info.Manager.CurrentVideoInfo as YouTube).relatedVideos;
-        if(relatedVideos.length >= 1){
-          const video = relatedVideos[0];
-          await this.info.Queue.AddQueue(video.url, null, "push", "youtube", video);
-        }
+    }else if(this.info.AddRelative && this.info.Manager.CurrentVideoInfo.ServiceIdentifer === "youtube"){
+      const relatedVideos = (this.info.Manager.CurrentVideoInfo as YouTube).relatedVideos;
+      if(relatedVideos.length >= 1){
+        const video = relatedVideos[0];
+        await this.info.Queue.AddQueue(video.url, null, "push", "youtube", video);
       }
     }
     this._default.shift();
-    if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+    if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
       this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
     }
   }
@@ -254,11 +261,11 @@ export class QueueManager extends ManagerBase {
    * 指定された位置のキューコンテンツを削除します
    * @param offset 位置
    */
-  RemoveAt(offset:number){
+  RemoveAt(offset: number){
     log("[QueueManager/" + this.info.GuildID + "]RemoveAt() Called (offset:" + offset + ")");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default.splice(offset, 1);
-    if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+    if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
       this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
     }
   }
@@ -270,7 +277,7 @@ export class QueueManager extends ManagerBase {
     log("[QueueManager/" + this.info.GuildID + "]RemoveAll() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default = [];
-    if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+    if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
       this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
     }
   }
@@ -282,7 +289,7 @@ export class QueueManager extends ManagerBase {
     log("[QueueManager/" + this.info.GuildID + "]RemoveFrom2() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     this._default = [this.default[0]];
-    if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+    if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
       this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
     }
   }
@@ -302,7 +309,7 @@ export class QueueManager extends ManagerBase {
     }else{
       this._default.sort(() => Math.random() - 0.5);
     }
-    if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+    if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
       this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
     }
   }
@@ -312,20 +319,20 @@ export class QueueManager extends ManagerBase {
    * @param validator 条件を表す関数
    * @returns 削除されたオフセットの一覧
    */
-  RemoveIf(validator:(q:QueueContent)=>Boolean){
+  RemoveIf(validator: (q: QueueContent) => boolean){
     log("[QueueManager/" + this.info.GuildID + "]RemoveIf() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(this._default.length === 0) return;
-    const first = this.info.Manager.IsPlaying ? 1 : 0
+    const first = this.info.Manager.IsPlaying ? 1 : 0;
     const rmIndex = [] as number[];
     for(let i = first; i < this._default.length; i++){
       if(validator(this._default[i])){
         rmIndex.push(i);
       }
     }
-    rmIndex.sort((a,b)=>b-a);
+    rmIndex.sort((a, b)=>b - a);
     rmIndex.forEach(n => this.RemoveAt(n));
-    if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+    if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
       this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
     }
     return rmIndex;
@@ -336,7 +343,7 @@ export class QueueManager extends ManagerBase {
    * @param from 移動元のインデックス
    * @param to 移動先のインデックス
    */
-  Move(from:number, to:number){
+  Move(from: number, to: number){
     log("[QueueManager/" + this.info.GuildID + "]Move() Called");
     PageToggle.Organize(this.info.Bot.Toggles, 5, this.info.GuildID);
     if(from < to){
@@ -350,7 +357,7 @@ export class QueueManager extends ManagerBase {
       //要素削除
       this.default.splice(from + 1, 1);
     }
-    if(this.info.Bot.QueueModifiedGuilds.indexOf(this.info.GuildID) < 0){
+    if(!this.info.Bot.QueueModifiedGuilds.includes(this.info.GuildID)){
       this.info.Bot.QueueModifiedGuilds.push(this.info.GuildID);
     }
   }
@@ -363,12 +370,12 @@ type QueueContent = {
   /**
    * 曲自体のメタ情報
    */
-  BasicInfo:AudioSource;
+  BasicInfo: AudioSource,
   /**
    * 曲の情報とは別の追加情報
    */
-  AdditionalInfo:AdditionalInfo;
-}
+  AdditionalInfo: AdditionalInfo,
+};
 
 /**
  * 曲の情報とは別の追加情報を示します。
@@ -377,14 +384,14 @@ type AdditionalInfo = {
   /**
    * 曲の追加者を示します
    */
-  AddedBy:{
+  AddedBy: {
     /**
      * 曲の追加者の表示名。表示名は追加された時点での名前になります。
      */
-    displayName:string,
+    displayName: string,
     /**
      * 曲の追加者のユーザーID
      */
-    userId:string
-  }
-}
+    userId: string,
+  },
+};

@@ -1,8 +1,14 @@
-import * as os from "os";
+import type { Client, Message } from "discord.js";
+import type { Readable } from "stream";
+
 import * as https from "https";
+import * as os from "os";
+import { PassThrough } from "stream";
+
+import { APIMessage, MessageFlags } from "discord.js";
 import * as miniget from "miniget";
-import { APIMessage, Client, Message, MessageFlags } from "discord.js";
-import { PassThrough, Readable } from "stream";
+
+
 export { log, logStore } from "./logUtil";
 
 /**
@@ -10,7 +16,7 @@ export { log, logStore } from "./logUtil";
  * @param _t 合計時間(秒)
  * @returns [ゼロ補完された分,ゼロ補完された秒]
  */
-export function CalcMinSec(_t:number){
+export function CalcMinSec(_t: number){
   const sec = _t % 60;
   const min = (_t - sec) / 60;
   return [AddZero(min.toString(), 2), AddZero(sec.toString(), 2)];
@@ -21,7 +27,7 @@ export function CalcMinSec(_t:number){
  * @param seconds 合計時間(秒)
  * @returns [時間, ゼロ補完された分, ゼロ補完された秒]
  */
-export function CalcHourMinSec(seconds:number){
+export function CalcHourMinSec(seconds: number){
   const sec = seconds % 60;
   const min = (seconds - sec) / 60 % 60;
   const hor = ((seconds - sec) / 60 - min) / 60;
@@ -34,7 +40,7 @@ export function CalcHourMinSec(seconds:number){
  * @param length 補完後の長さ
  * @returns 保管された文字列
  */
-export function AddZero(str:string, length:number){
+export function AddZero(str: string, length: number){
   if(str.length >= length) return str;
   while(str.length < length){
     str = "0" + str;
@@ -48,7 +54,7 @@ export function AddZero(str:string, length:number){
  * @param date 合計時間(ミリ秒)
  * @returns [時間,分,秒,ミリ秒]
  */
-export function CalcTime(date:number):number[]{
+export function CalcTime(date: number): number[]{
   const millisec = date % 1000;
   let ato = (date - millisec) / 1000;
   const sec = ato % 60;
@@ -61,14 +67,14 @@ export function CalcTime(date:number):number[]{
 /**
  * メモリ使用情報
  */
-type MemoryUsageInfo = {free:number,total:number,used:number,usage:number};
+type MemoryUsageInfo = { free: number, total: number, used: number, usage: number };
 
 /**
  * メモリ使用情報を取得します
  * @returns メモリ使用情報
  */
-export function GetMemInfo():MemoryUsageInfo{
-  let memory = {} as MemoryUsageInfo;
+export function GetMemInfo(): MemoryUsageInfo{
+  const memory = {} as MemoryUsageInfo;
   memory.free = GetMBytes(os.freemem());
   memory.total = GetMBytes(os.totalmem());
   memory.used = memory.total - memory.free;
@@ -81,7 +87,7 @@ export function GetMemInfo():MemoryUsageInfo{
  * @param bytes 指定されたバイト
  * @returns 返還後のメガバイト数
  */
-export function GetMBytes(bytes:number) {
+export function GetMBytes(bytes: number) {
   return Math.round(bytes / 1024/*KB*/ / 1024/*MB*/ * 100) / 100;
 }
 
@@ -91,7 +97,7 @@ export function GetMBytes(bytes:number) {
  * @param total 合計量
  * @returns 計算後のパーセンテージ
  */
-export function GetPercentage(part:number, total:number){
+export function GetPercentage(part: number, total: number){
   return Math.round(part / total * 100 * 100) / 100;
 }
 
@@ -100,7 +106,7 @@ export function GetPercentage(part:number, total:number){
  * @param txt エンコードする文字列
  * @returns Base64エンコードされた文字列
  */
-export function btoa(txt:string){
+export function btoa(txt: string){
   return Buffer.from(txt).toString("base64");
 }
 
@@ -109,15 +115,15 @@ export function btoa(txt:string){
  * @param url URL
  * @returns ダウンロードされたテキストデータ
  */
-export function DownloadText(url:string, headers?:{[key:string]:string}, requestBody?:any):Promise<string>{
-  return new Promise((resolve,reject)=>{
+export function DownloadText(url: string, headers?: { [key: string]: string }, requestBody?: any): Promise<string>{
+  return new Promise((resolve, reject)=>{
     const durl = new URL(url);
     const req = https.request({
       protocol: durl.protocol,
       host: durl.host,
       path: durl.pathname + durl.search,
       method: requestBody ? "POST" : "GET",
-      headers: headers ?? undefined
+      headers: headers ?? undefined,
     }, res => {
       let data = "";
       res.on("data", chunk =>{
@@ -137,13 +143,13 @@ export function DownloadText(url:string, headers?:{[key:string]:string}, request
  * @param str 検査対象のURL
  * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
  */
-export function isAvailableRawAudioURL(str:string){
-  const exts = [".mp3",".wav",".wma",".mov",".mp4"];
+export function isAvailableRawAudioURL(str: string){
+  const exts = [".mp3", ".wav", ".wma", ".mov", ".mp4"];
   return exts.filter(ext => str.endsWith(ext)).length > 0;
 }
 
-export function isAvailableRawVideoURL(str:string){
-  const exts = [".mov",".mp4"];
+export function isAvailableRawVideoURL(str: string){
+  const exts = [".mov", ".mp4"];
   return exts.filter(ext => str.endsWith(ext)).length > 0;
 }
 
@@ -154,18 +160,18 @@ export function isAvailableRawVideoURL(str:string){
  * @param token ボットのトークン
  * @returns supressEmbedsされたメッセージ
  */
-export function suppressMessageEmbeds(msg:Message, client:Client):Promise<Message>{
-    const flags = new MessageFlags(msg.flags);
-    flags.add(MessageFlags.FLAGS.SUPPRESS_EMBEDS);
-    const {data}:any = APIMessage.create(msg as any, {flags} as any).resolveData();
-    data.embed = undefined;
-    data.embeds = undefined;
-    // @ts-ignore
-    return client.api.channels[msg.channel.id].messages[msg.id].patch({data}).then(d => {
-      const clone = (msg as any)._clone();
-      clone._patch(d);
-      return clone as Message;
-    });
+export function suppressMessageEmbeds(msg: Message, client: Client): Promise<Message>{
+  const flags = new MessageFlags(msg.flags);
+  flags.add(MessageFlags.FLAGS.SUPPRESS_EMBEDS);
+  const { data }: any = APIMessage.create(msg as any, { flags } as any).resolveData();
+  data.embed = undefined;
+  data.embeds = undefined;
+  // @ts-ignore
+  return client.api.channels[msg.channel.id].messages[msg.id].patch({ data }).then(d => {
+    const clone = (msg as any)._clone();
+    clone._patch(d);
+    return clone as Message;
+  });
 }
 
 /**
@@ -173,7 +179,7 @@ export function suppressMessageEmbeds(msg:Message, client:Client):Promise<Messag
  * @param url URL
  * @returns Readableストリーム
  */
-export function DownloadAsReadable(url:string):Readable{
+export function DownloadAsReadable(url: string): Readable{
   const stream = InitPassThrough();
   const req = miniget.default(url, {
     maxReconnects: 6,
@@ -181,7 +187,7 @@ export function DownloadAsReadable(url:string):Readable{
     backoff: { inc: 500, max: 10000 },
   });
   req.on("error", (e)=>{
-    stream.emit("error",e);
+    stream.emit("error", e);
   }).pipe(stream);
   return stream;
 }
@@ -190,32 +196,35 @@ export function DownloadAsReadable(url:string):Readable{
  * 空のPassThroughを生成します
  * @returns PassThrough
  */
-export function InitPassThrough():PassThrough{
+export function InitPassThrough(): PassThrough{
   const stream = new PassThrough({
-    highWaterMark: 1024 * 512
+    highWaterMark: 1024 * 512,
   });
-  stream._destroy = () => { stream.destroyed = true };
+  stream._destroy = () => {
+    stream.destroyed = true;
+  };
   return stream;
 }
 
 /**
  * 文字列を正規化します
  */
-export function NormalizeText(rawText:string){
+export function NormalizeText(rawText: string){
   let result = rawText;
   ([
-    {key: /０/g, value: "0"},
-    {key: /１/g, value: "1"},
-    {key: /２/g, value: "2"},
-    {key: /３/g, value: "3"},
-    {key: /４/g, value: "4"},
-    {key: /５/g, value: "5"},
-    {key: /６/g, value: "6"},
-    {key: /７/g, value: "7"},
-    {key: /８/g, value: "8"},
-    {key: /９/g, value: "9"},
-    {key: /　/g, value: " "},
-  ] as {key:RegExp, value:string}[]).forEach(reg => {
+    { key: /０/g, value: "0" },
+    { key: /１/g, value: "1" },
+    { key: /２/g, value: "2" },
+    { key: /３/g, value: "3" },
+    { key: /４/g, value: "4" },
+    { key: /５/g, value: "5" },
+    { key: /６/g, value: "6" },
+    { key: /７/g, value: "7" },
+    { key: /８/g, value: "8" },
+    { key: /９/g, value: "9" },
+    // eslint-disable-next-line no-irregular-whitespace
+    { key: /　/g, value: " " },
+  ] as { key: RegExp, value: string }[]).forEach(reg => {
     result = result.replace(reg.key, reg.value);
   });
   return result;

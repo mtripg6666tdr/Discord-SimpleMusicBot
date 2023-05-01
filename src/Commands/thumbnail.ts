@@ -1,5 +1,7 @@
+import type { CommandArgs, CommandInterface } from ".";
+
 import * as discord from "discord.js";
-import { CommandArgs, CommandInterface } from ".";
+
 import { getColor } from "../Util/colorUtil";
 import { log, NormalizeText } from "../Util/util";
 
@@ -11,11 +13,11 @@ export default class Thumbnail implements CommandInterface {
   category = "player";
   examples = "サムネイル 5";
   usage = "サムネイル [検索パネル中のインデックス]";
-  async run(message:discord.Message, options:CommandArgs){
+  async run(message: discord.Message, options: CommandArgs){
     options.updateBoundChannel(message);
     const embed = new discord.MessageEmbed();
     embed.setColor(getColor("THUMB"));
-    if(options.rawArgs && options.data[message.guild.id].SearchPanel && Object.keys(options.data[message.guild.id].SearchPanel.Opts).indexOf(options.rawArgs === "" ? "n" : options.rawArgs) >= 0){
+    if(options.rawArgs && options.data[message.guild.id].SearchPanel && Object.keys(options.data[message.guild.id].SearchPanel.Opts).includes(options.rawArgs === "" ? "n" : options.rawArgs)){
       const opt = options.data[message.guild.id].SearchPanel.Opts[Number(NormalizeText(options.rawArgs))];
       embed.setImage(opt.thumbnail);
       embed.title = opt.title;
