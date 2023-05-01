@@ -86,7 +86,7 @@ updates:
       timezone: "Asia/Tokyo"
     commit-message:
       prefix: "Update(docs):"
-    target-branch: "v3"
+    target-branch: "master"
     labels:
       - "dependencies"
       - "javascript"
@@ -99,6 +99,8 @@ updates:
       - dependency-name: "react"
         update-types: ["version-update:semver-major"]
       - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "prism-react-renderer"
         update-types: ["version-update:semver-major"]
 
   # actions (master)
