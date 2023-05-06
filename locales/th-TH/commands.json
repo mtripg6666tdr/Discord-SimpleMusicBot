@@ -388,6 +388,18 @@
     },
     "noArgument": "引数を指定してください。"
   },
+  "searchniconico": {
+    "name": "ニコニコ動画を検索",
+    "description": "曲をニコニコ動画で検索します。",
+    "examples": "ニコニコを検索 セツナトリップ",
+    "usage": "ニコニコを検索 <キーワード>",
+    "args": {
+      "keyword": {
+        "description": "検索したい動画のキーワードまたはURL。"
+      }
+    },
+    "noArgument": "引数を指定してください。"
+  },
   "searchqueue": {
     "name": "キュー内を検索",
     "description": "キュー内を検索します。引数にキーワードを指定します。",
