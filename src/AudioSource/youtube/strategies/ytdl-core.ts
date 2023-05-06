@@ -20,7 +20,7 @@ import type { Cache } from "./base";
 import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Readable } from "stream";
 
-import HttpsProxyAgent from "https-proxy-agent";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 
 import { Strategy } from "./base";
@@ -34,7 +34,7 @@ export const ytdlCore: ytdlCore = "ytdlCore";
 const config = useConfig();
 
 export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, ytdl.videoInfo> {
-  protected agent = config.proxy ? HttpsProxyAgent(config.proxy) : undefined;
+  protected agent = config.proxy ? new HttpsProxyAgent(config.proxy) : undefined;
 
   get cacheType(){
     return ytdlCore;

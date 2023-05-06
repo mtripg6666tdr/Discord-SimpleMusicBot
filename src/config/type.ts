@@ -45,10 +45,10 @@ export const ConfigSchema = Type.Object({
     Type.Null(),
   ], { default: null }),
   maintenance: Type.Boolean(),
-  proxy: Type.Union([
+  proxy: Type.Optional(Type.Union([
     Type.RegEx(/^https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+$/),
     Type.Null(),
-  ], { default: null }),
+  ], { default: null })),
   prefix: Type.String({ minLength: 1, default: ">" }),
   webserver: Type.Boolean({ default: true }),
   bgm: Type.Record(Type.RegEx(/^\d+$/), GuildBGMContainer, { default: {} }),

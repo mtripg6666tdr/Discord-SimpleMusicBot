@@ -90,6 +90,7 @@ class ConfigLoader {
         disabledSources: [],
         cacheLimit: 500,
         maxLogFiles: 100,
+        proxy: null,
       },
       // loaded config
       config,
