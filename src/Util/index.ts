@@ -341,7 +341,7 @@ export function createFragmentalDownloadStream(
   streamGenerator: string | ((start: number, end?: number) => Readable),
   { chunkSize = 512 * 1024, contentLength, userAgent = SecondaryUserAgent }: { chunkSize?: number, contentLength: number, userAgent?: string },
 ){
-  const logger = getLogger("FragmentalDownloader");
+  const logger = getLogger("FragmentalDownloader", true);
   logger.addContext("id", Date.now());
   const stream = createPassThrough();
   let current = -1;
