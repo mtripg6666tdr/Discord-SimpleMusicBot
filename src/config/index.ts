@@ -33,6 +33,7 @@ const DEVELOPMENT_PHASE = false;
 type ConfigObject = Static<typeof ConfigSchema> & {
   isBotAdmin: (userId: string) => boolean,
   isDisabledSource: (sourceIdentifer: AudioSourceTypeIdentifer) => boolean,
+  isWhiteListedBot: (userId: string) => boolean,
 };
 
 class ConfigLoader {
@@ -91,6 +92,7 @@ class ConfigLoader {
         cacheLimit: 500,
         maxLogFiles: 100,
         proxy: null,
+        botWhiteList: [],
       },
       // loaded config
       config,
@@ -104,6 +106,7 @@ class ConfigLoader {
     this._config.isDisabledSource = (sourceIdentifer: AudioSourceTypeIdentifer) => {
       return this._config.disabledSources.includes(sourceIdentifer);
     };
+    this._config.isWhiteListedBot = (userId: string) => this._config.botWhiteList.includes(userId);
     Object.freeze(this._config);
   }
 }

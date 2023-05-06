@@ -58,7 +58,7 @@ export default class Import extends BaseCommand {
     let targetMessage: Message<AnyGuildTextChannel> = null;
     if(message["_interaction"] && "type" in message["_interaction"].data && message["_interaction"].data.type === ApplicationCommandTypes.MESSAGE){
       targetMessage = message["_interaction"].data.resolved.messages.first() as Message<AnyGuildTextChannel>;
-      if(targetMessage.author?.id !== context.client.user.id){
+      if(targetMessage.author?.id !== context.client.user.id && !config.isWhiteListedBot(targetMessage.author?.id)){
         await statusMessage.edit(`❌${t("commands:import.notBotMessage")}`);
         return;
       }
@@ -90,7 +90,7 @@ export default class Import extends BaseCommand {
         const targetMessageId = ids[ids.length - 1];
         const channel = await context.client.rest.channels.get<AnyGuildTextChannel>(targetChannelId);
         targetMessage = channel.guild && await channel.getMessage(targetMessageId);
-        if(targetMessage.author?.id !== context.client.user.id && !force){
+        if(targetMessage.author?.id !== context.client.user.id && !force && !config.isWhiteListedBot(targetMessage.author?.id)){
           await statusMessage.edit(`❌${t("commands:import.notBotMessage")}`);
           return;
         }

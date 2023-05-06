@@ -733,7 +733,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       // 添付ファイル付きか？
       await context.server.playFromURL(commandMessage, message.attachments.first().url, morePrefs, t);
       return;
-    }else if(message.author.id === context.client.user.id){
+    }else if(message.author.id === context.client.user.id || config.isWhiteListedBot(message.author.id)){
       // ボットのメッセージなら
       // 埋め込みを取得
       const embed = message.embeds[0];
