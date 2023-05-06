@@ -162,6 +162,7 @@ export function retriveHttpStatusCode(url: string, headers?: { [key: string]: st
       "User-Agent": DefaultUserAgent,
       ...headers,
     },
+    maxRedirects: 0,
   }).then(r => r.statusCode);
 }
 

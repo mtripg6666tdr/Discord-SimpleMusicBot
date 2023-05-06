@@ -628,6 +628,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
 
   async onStreamFinished(){
     if(!this.currentAudioUrl || !this._playing){
+      if(this.preparing){
+        await this.handleError(new Error("Something went wrong while playing stream"));
+      }
       return;
     }
     this._playing = false;
