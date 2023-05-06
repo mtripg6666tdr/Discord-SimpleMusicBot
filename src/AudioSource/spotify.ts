@@ -196,6 +196,23 @@ export class Spotify extends AudioSource<string> {
     return `https://open.spotify.com/${type}/${uri.replace(/spotify:(playlist|album):/, "")}`;
   }
 
+  static async expandShortenLink(url: string){
+    const result = await candyget.empty(url);
+    if(this.validatePlaylistUrl(result.url.href)){
+      return {
+        type: "playlist" as const,
+        url: result.url.href,
+      };
+    }else if(this.validateTrackUrl(result.url.href)){
+      return {
+        type: "track" as const,
+        url: result.url.href,
+      };
+    }else{
+      return null;
+    }
+  }
+
   static get client(){
     return client;
   }

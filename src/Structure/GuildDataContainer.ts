@@ -319,6 +319,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     connection.on("error", err => {
       connectionLogger.error(err);
     });
+
     this.connection = connection;
     if(config.debug){
       connection.on("debug", connectionLogger.trace);
@@ -462,6 +463,14 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       return;
     }
     setTimeout(() => message.suppressEmbeds(true).catch(this.logger.error), 4000).unref();
+
+    // Spotifyの短縮リンクを展開
+    if(rawArg.match(/https?:\/\/spotify.link\/[a-zA-Z\d]+/)){
+      const result = await Spotify.expandShortenLink(rawArg);
+      if(result){
+        rawArg = result.url;
+      }
+    }
 
     if(
       !config.isDisabledSource("custom")
