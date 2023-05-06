@@ -65,6 +65,7 @@ export const ConfigSchema = Type.Object({
   defaultLanguage: Type.String({ default: "ja" }),
   country: Type.String({ default: "JP" }),
   maxLogFiles: Type.Optional(Type.Number({ default: 100 })),
+  botWhiteList: Type.Optional(Type.Array(Type.RegEx(/^\d+$/), { default: [] })),
 });
 
 export type GuildBGMContainerType = Static<typeof GuildBGMContainer>;
