@@ -20,7 +20,7 @@ import type { Cache } from "./base";
 import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Readable } from "stream";
 
-import * as HttpsProxyAgent from "https-proxy-agent";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 
 import { Strategy } from "./base";
@@ -40,7 +40,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
 
   async getInfo(url: string){
     this.useLog();
-    const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
+    const agent = Util.config.proxy && new HttpsProxyAgent(Util.config.proxy);
     const requestOptions = agent ? {agent} : undefined;
     const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#getInfo`);
     let info = null as ytdl.videoInfo;
@@ -70,7 +70,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
         return cache.data as ytdl.videoInfo;
       }else{
         this.logger("[AudioSource:youtube] obtaining info");
-        const agent = Util.config.proxy && HttpsProxyAgent.default(Util.config.proxy);
+        const agent = Util.config.proxy && new HttpsProxyAgent(Util.config.proxy);
         const requestOptions = agent ? {agent} : undefined;
         const t = Util.time.timer.start(`YouTube(Strategy#${this.priority})#fetch`);
         // eslint-disable-next-line @typescript-eslint/no-shadow
