@@ -54,6 +54,8 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "p-event"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "https-proxy-agent"
+        update-types: ["version-update:semver-major"]
 
   # v1-lts branch
   - package-ecosystem: npm
@@ -75,6 +77,8 @@ updates:
       - dependency-name: "discord.js"
         update-types: ["version-update:semver-major"]
       - dependency-name: "soundcloud.ts"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "https-proxy-agent"
         update-types: ["version-update:semver-major"]
 
   # documentation site (master)
