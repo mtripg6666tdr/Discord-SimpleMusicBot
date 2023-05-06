@@ -45,7 +45,10 @@ export async function onVoiceChannelLeave(
         content: `:postbox: ${i18next.t("disconnected", { lng: server.locale })}`,
       }
     ).catch(this.logger.error);
-  }else if(oldChannel.voiceMembers.has(this._client.user.id) && oldChannel.voiceMembers.size === 1){
+  }else if(
+    oldChannel.voiceMembers.has(this._client.user.id)
+    && oldChannel.voiceMembers.filter(user => !user.bot).length === 0
+  ){
     if(server.queue instanceof QueueManagerWithBgm && server.queue.isBGM){
       await server.player.disconnect().catch(this.logger.error);
     }else if(server.player.isPlaying && !config.twentyFourSeven.includes(oldChannel.id) && !config.alwaysTwentyFourSeven){
