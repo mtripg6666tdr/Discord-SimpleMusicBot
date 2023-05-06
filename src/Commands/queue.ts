@@ -77,7 +77,7 @@ export default class Queue extends BaseCommand {
               ? t("components:nowplaying.nowplayingItemName")
               : t("components:nowplaying.waitForPlayingItemName"),
           value: [
-            `[${q.basicInfo.title}](${q.basicInfo.url})`,
+            q.basicInfo.isPrivateSource ? q.basicInfo.title : `[${q.basicInfo.title}](${q.basicInfo.url})`,
             `${t("length")}: \`${
               q.basicInfo.isYouTube() && q.basicInfo.isLiveStream
                 ? t("commands:log.liveStream")

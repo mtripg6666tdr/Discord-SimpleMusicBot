@@ -330,7 +330,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         const embed = new MessageEmbedBuilder()
           .setColor(getColor("SONG_ADDED"))
           .setTitle(`✅${i18next.t("components:queue.songAdded", { lng: this.server.locale })}`)
-          .setDescription(`[${info.basicInfo.title}](${info.basicInfo.url})`)
+          .setDescription(info.basicInfo.isPrivateSource ? info.basicInfo.title : `[${info.basicInfo.title}](${info.basicInfo.url})`)
           .addField(
             i18next.t("length", { lng: this.server.locale }),
             info.basicInfo.isYouTube() && info.basicInfo.isLiveStream

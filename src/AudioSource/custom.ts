@@ -44,6 +44,9 @@ export class CustomStream extends AudioSource<string> {
       }
       catch{ /* empty */ }
     }
+
+    this.isPrivateSource = this.url.startsWith("https://cdn.discordapp.com/ephemeral-attachments/");
+
     return this;
   }
 

@@ -69,7 +69,12 @@ export default class NowPlaying extends BaseCommand {
       .setColor(getColor("NP"))
       .setTitle(`${t("commands:nowplaying.nowPlayingSong")}:musical_note:`)
       .setDescription(
-        `[${info.title}](${info.url})\r\n${progressBar}${
+        (
+          info.isPrivateSource
+            ? info.title
+            : `[${info.title}](${info.url})`
+        )
+        + `\r\n${progressBar}${
           info.isYouTube() && info.isLiveStream
             ? `(${t("liveStream")})`
             : ` \`${min}:${sec}/${_t === 0 ? `(${t("unknown")})` : `${tmin}:${tsec}\``}`
