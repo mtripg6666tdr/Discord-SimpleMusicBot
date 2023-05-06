@@ -139,6 +139,7 @@ const audioExtensions = [
   ".ogg",
   ".m4a",
   ".webm",
+  ".flac",
 ] as const;
 /**
  * ローオーディオファイルのURLであるかどうかをURLの末尾の拡張子から判断します
