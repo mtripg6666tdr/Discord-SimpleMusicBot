@@ -153,26 +153,32 @@ export type LoggerObject = {
   warn: log4js.Logger["warn"],
   error: log4js.Logger["error"],
   fatal: log4js.Logger["fatal"],
+};
+export type LoggerObjectWithContext = LoggerObject & {
   addContext: log4js.Logger["addContext"],
 };
 
 const loggerMap = new Map<string, LoggerObject>();
 
-export function getLogger(tag: string){
-  if(loggerMap.has(tag)){
+export function getLogger(tag: string, createNew?: false): LoggerObject;
+export function getLogger(tag: string, createNew: true): LoggerObjectWithContext;
+export function getLogger(tag: string, createNew: boolean = false){
+  if(loggerMap.has(tag) && !createNew){
     return loggerMap.get(tag);
   }else{
     const log4jsLogger = log4js.getLogger(tag);
-    const logger: LoggerObject = {
+    const logger: LoggerObject | LoggerObjectWithContext = {
       trace: log4jsLogger.trace.bind(log4jsLogger),
       debug: log4jsLogger.debug.bind(log4jsLogger),
       info: log4jsLogger.info.bind(log4jsLogger),
       warn: log4jsLogger.warn.bind(log4jsLogger),
       error: log4jsLogger.error.bind(log4jsLogger),
       fatal: log4jsLogger.fatal.bind(log4jsLogger),
-      addContext: log4jsLogger.addContext.bind(log4jsLogger),
+      addContext: createNew ? log4jsLogger.addContext.bind(log4jsLogger) : undefined,
     };
-    loggerMap.set(tag, logger);
+    if(!createNew){
+      loggerMap.set(tag, logger);
+    }
     return logger;
   }
 }

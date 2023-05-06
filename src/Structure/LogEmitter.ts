@@ -17,18 +17,18 @@
  */
 
 import type { EventDictionary } from "./TypedEmitter";
-import type { LoggerObject } from "../logger";
+import type { LoggerObjectWithContext } from "../logger";
 
 import TypedEventEmitter from "./TypedEmitter";
 import { getLogger } from "../logger";
 
 export abstract class LogEmitter<Events extends EventDictionary> extends TypedEventEmitter<Events> {
-  protected logger: LoggerObject;
+  protected logger: LoggerObjectWithContext;
   private guildId: string = null;
 
   constructor(tag: string, id?: string){
     super();
-    this.logger = getLogger(tag);
+    this.logger = getLogger(tag, true);
     if(id){
       this.setGuildId(id);
     }
