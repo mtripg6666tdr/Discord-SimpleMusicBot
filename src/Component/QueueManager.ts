@@ -108,6 +108,13 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
   }
 
   /**
+   * プライベートトラックを除いたキューの長さ（トラック数）
+   */
+  get publicLength(): number{
+    return this.default.reduce((prev, current) => prev + (current.basicInfo.isPrivateSource ? 0 : 1), 0);
+  }
+
+  /**
    * キューの長さ（時間秒）
    * ライブストリームが含まれていた場合、NaNとなります
    */

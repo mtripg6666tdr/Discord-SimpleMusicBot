@@ -202,10 +202,12 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   exportQueue(): YmxFormat{
     return {
       version: YmxVersion,
-      data: this.queue.map(q => ({
-        ...q.basicInfo.exportData(),
-        addBy: q.additionalInfo.addedBy,
-      })),
+      data: this.queue
+        .filter(item => !item.basicInfo.isPrivateSource)
+        .map(q => ({
+          ...q.basicInfo.exportData(),
+          addBy: q.additionalInfo.addedBy,
+        })),
     };
   }
 
