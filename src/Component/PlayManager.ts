@@ -334,12 +334,16 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     const embed = new MessageEmbedBuilder()
       .setTitle(`:cd:${i18next.t("components:nowplaying.nowplayingTitle", { lng: this.server.locale })}:musical_note:`)
       .setDescription(
-          `[${this.currentAudioInfo.title}](${this.currentAudioUrl}) \``
+        (
+          this.currentAudioInfo.isPrivateSource
+            ? `${this.currentAudioInfo.title} \``
+            : `[${this.currentAudioInfo.title}](${this.currentAudioUrl}) \``
+        )
         + (
           this.currentAudioInfo.isYouTube() && this.currentAudioInfo.isLiveStream
             ? `(${i18next.t("liveStream", { lng: this.server.locale })})`
             : _t === 0 ? `(${i18next.t("unknown", { lng: this.server.locale })})` : min + ":" + sec
-          )
+        )
         + "`"
       )
       .setColor(getColor("AUTO_NP"))

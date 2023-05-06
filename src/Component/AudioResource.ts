@@ -24,7 +24,8 @@ import type { VolumeTransformer } from "prism-media";
 import { EventEmitter } from "stream";
 
 import * as voice from "@discordjs/voice";
-import { getLogger } from "log4js";
+
+import { getLogger } from "../logger";
 
 class NullMetaAudioResource extends voice.AudioResource<null> {}
 
@@ -52,18 +53,18 @@ export class FixedAudioResource extends NullMetaAudioResource {
 
   constructor(...args: ConstructorParameters<typeof NullMetaAudioResource>){
     super(...args);
-    this.logger.log("instantiated");
+    this.logger.info("instantiated");
     this.events = new AudioResourceEvent({
       captureRejections: false,
     });
     this.playStream
       .on("error", (er) => {
-        this.logger.log(er.message || er.toString(), "error");
+        this.logger.info(er.message || er.toString(), "error");
         this.error = true;
       })
       .on("end", () => {
         this.events.emit("end");
-        this.logger.log(`Pushed total ${this.readLength} bytes${this.estimatedLengthSeconds !== 0 ? ` (average ${Math.round(this.readLength / this.estimatedLengthSeconds * 8 / 100) / 10} kbps)` : ""}`);
+        this.logger.info(`Pushed total ${this.readLength} bytes${this.estimatedLengthSeconds !== 0 ? ` (average ${Math.round(this.readLength / this.estimatedLengthSeconds * 8 / 100) / 10} kbps)` : ""}`);
       })
     ;
   }

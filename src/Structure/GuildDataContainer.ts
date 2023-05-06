@@ -35,7 +35,7 @@ import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/hel
 
 import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
 import Soundcloud from "soundcloud.ts";
-import * as ytpl from "ytpl";
+import ytpl from "ytpl";
 
 import { LogEmitter } from "./LogEmitter";
 import { YmxVersion } from "./YmxFormat";
@@ -202,10 +202,12 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   exportQueue(): YmxFormat{
     return {
       version: YmxVersion,
-      data: this.queue.map(q => ({
-        ...q.basicInfo.exportData(),
-        addBy: q.additionalInfo.addedBy,
-      })),
+      data: this.queue
+        .filter(item => !item.basicInfo.isPrivateSource)
+        .map(q => ({
+          ...q.basicInfo.exportData(),
+          addBy: q.additionalInfo.addedBy,
+        })),
     };
   }
 
@@ -529,7 +531,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       const cancellation = this.bindCancellation(new TaskCancellationManager());
       try{
         const id = await ytpl.getPlaylistID(rawArg);
-        const result = await ytpl.default(id, {
+        const result = await ytpl(id, {
           gl: "JP",
           hl: "ja",
           limit: 999 - this.queue.length,
@@ -558,7 +560,15 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           const embed = new MessageEmbedBuilder()
             .setTitle(`✅${t("components:queue.processingPlaylistCompleted")}`)
             // \`(${result.author.name})\` author has been null lately
-            .setDescription(`[${result.title}](${result.url}) \r\n${t("components:queue.songsAdded", { count: index })}`)
+            .setDescription(
+              `${
+                result.visibility === "unlisted"
+                  ? result.title
+                  : `[${result.title}](${result.url})`
+              }\r\n${
+                t("components:queue.songsAdded", { count: index })
+              }`
+            )
             .setThumbnail(result.bestThumbnail.url)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({
@@ -709,18 +719,22 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     t: i18n["t"],
   ){
     const prefixLength = context.server.prefix.length;
+
     if(message.content.startsWith("http://") || message.content.startsWith("https://")){
       // URLのみのメッセージか？
       await context.server.playFromURL(commandMessage, message.content, morePrefs, t);
+      return;
     }else if(
       message.content.substring(prefixLength).startsWith("http://")
         || message.content.substring(prefixLength).startsWith("https://")
     ){
       // プレフィックス+URLのメッセージか？
       await context.server.playFromURL(commandMessage, message.content.substring(prefixLength), morePrefs, t);
+      return;
     }else if(message.attachments.size > 0){
       // 添付ファイル付きか？
       await context.server.playFromURL(commandMessage, message.attachments.first().url, morePrefs, t);
+      return;
     }else if(message.author.id === context.client.user.id || config.isWhiteListedBot(message.author.id)){
       // ボットのメッセージなら
       // 埋め込みを取得
@@ -733,15 +747,16 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       ){
         // 曲関連のメッセージならそれをキューに追加
         const url = embed.description.match(/^\[.+\]\((?<url>https?.+)\)/)?.groups.url;
-        await context.server.playFromURL(commandMessage, url, morePrefs, t);
-      }else{
-        await commandMessage.reply(`:face_with_raised_eyebrow:${t("commands:play.noContent")}`)
-          .catch(this.logger.error);
+
+        if(url){
+          await context.server.playFromURL(commandMessage, url, morePrefs, t);
+          return;
+        }
       }
-    }else{
-      await commandMessage.reply(`:face_with_raised_eyebrow:${t("commands:play.noContent")}`)
-        .catch(this.logger.error);
     }
+
+    await commandMessage.reply(`:face_with_raised_eyebrow:${t("commands:play.noContent")}`)
+      .catch(this.logger.error);
   }
 
   /**

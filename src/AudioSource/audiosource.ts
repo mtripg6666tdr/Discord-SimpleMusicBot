@@ -58,6 +58,8 @@ export type DynamicThumbnail = {
 type ThumbnailType = string | DynamicThumbnail;
 
 export abstract class AudioSource<T extends ThumbnailType> {
+  // リソースのURL
+  // リソースに対して不変で、かつ一意である必要があります
   private _url: string;
   get url(){
     return this._url;
@@ -66,6 +68,7 @@ export abstract class AudioSource<T extends ThumbnailType> {
     this._url = value;
   }
 
+  // 曲のタイトル
   private _title: string;
   get title(){
     return this._title;
@@ -74,6 +77,7 @@ export abstract class AudioSource<T extends ThumbnailType> {
     this._title = value;
   }
 
+  // 曲の長さ
   private _lengthSeconds: number = 0;
   get lengthSeconds(): number{
     return this._lengthSeconds;
@@ -82,6 +86,7 @@ export abstract class AudioSource<T extends ThumbnailType> {
     this._lengthSeconds = value;
   }
 
+  // 曲の説明
   private _description: string;
   get description(){
     return this._description;
@@ -90,6 +95,7 @@ export abstract class AudioSource<T extends ThumbnailType> {
     this._description = value;
   }
 
+  // キャッシュできないかどうかを表すフラグ
   protected _unableToCache: boolean = false;
   get unableToCache(){
     return this._unableToCache;
@@ -104,11 +110,22 @@ export abstract class AudioSource<T extends ThumbnailType> {
     this._thumbnail = value;
   }
 
+  // サービス識別子
   private readonly _serviceIdentifer: AudioSourceTypeIdentifer;
   protected get serviceIdentifer(): AudioSourceTypeIdentifer{
     return this._serviceIdentifer;
   }
 
+  // 非公開ソースかどうかを表すフラグ
+  private _isPrivateSource: boolean = false;
+  get isPrivateSource(){
+    return this._isPrivateSource;
+  }
+  protected set isPrivateSource(value: boolean){
+    this._isPrivateSource = value;
+  }
+
+  // ロガー
   protected logger: LoggerObject;
 
   constructor(serviceType: AudioSourceTypeIdentifer){

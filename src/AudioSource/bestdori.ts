@@ -57,6 +57,9 @@ export class BestdoriS extends AudioSource<string> {
       this.composer = detailed.composer[0];
       this.arranger = detailed.arranger[0];
     }
+
+    this.isPrivateSource = true;
+
     return this;
   }
 

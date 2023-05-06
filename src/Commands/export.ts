@@ -36,7 +36,7 @@ export default class Export extends BaseCommand {
 
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
-    if(context.server.queue.length === 0){
+    if(context.server.queue.publicLength === 0){
       message.reply(t("commands:export.queueEmpty")).catch(this.logger.error);
       return;
     }
