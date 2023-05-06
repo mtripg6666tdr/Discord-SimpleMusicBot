@@ -1,13 +1,13 @@
 # インストール＆実行
-本ボットを実行するには、[直接リポジトリをクローンする方法](./normal)と
+本ボットを実行するには、[Docker Composeを使用する方法](./docker-compose)と
 [Dockerを使用する方法](./docker)、
-および[Docker Composeを使用する方法](./docker-compose)
+および[直接リポジトリをクローンする方法](./normal)
 があります。  
 ご利用の環境やニーズに合わせて、いずれかを選んでください。
 
 :::note
 
-どちらも利用可能な場合は、[Docker Composeを使用した方法](./docker-compose)を選択することをお勧めします。
+いずれも利用可能な場合は、[Docker Composeを使用した方法](./docker-compose)を選択することをお勧めします。
 
 :::
 
