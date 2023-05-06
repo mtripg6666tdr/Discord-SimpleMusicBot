@@ -73,16 +73,15 @@ export function transformThroughFFmpeg(
       );
     }else{
       outputArgs.push(
-        "-f",
-        "s16le",
+        "-f", "s16le",
+        "-ar", "48000",
+        "-ac", "2",
       );
     }
     if(effectArgs.length !== 2 || !effectArgs[1].includes("loudnorm")){
       bitrateArgs.push(
         "-vbr", "on",
         "-b:a", bitrate.toString(),
-        "-ar", "48000",
-        "-ac", "2",
       );
     }
   }
