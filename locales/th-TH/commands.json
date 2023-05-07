@@ -308,6 +308,12 @@
     "alreadyPlaying": "すでに再生中です。",
     "queueEmpty": "キューが空です。再生するコンテンツがありません。"
   },
+  "play_private": {
+    "description": "URLを非公開のまま音楽をキューの末尾に追加し、状況に応じて再生を開始します。",
+    "noInteraction": "このコマンドをメッセージから実行することはできません",
+    "modalTitle": "再生したいURLを入力",
+    "inputLabel": "再生したいURL"
+  },
   "queue": {
     "name": "キュー",
     "description": "キューを表示します",
@@ -381,18 +387,6 @@
     "description": "曲をYouTubeで検索します。",
     "examples": "検索 夜に駆ける",
     "usage": "検索 <キーワード>",
-    "args": {
-      "keyword": {
-        "description": "検索したい動画のキーワードまたはURL。"
-      }
-    },
-    "noArgument": "引数を指定してください。"
-  },
-  "searchniconico": {
-    "name": "ニコニコ動画を検索",
-    "description": "曲をニコニコ動画で検索します。",
-    "examples": "ニコニコを検索 セツナトリップ",
-    "usage": "ニコニコを検索 <キーワード>",
     "args": {
       "keyword": {
         "description": "検索したい動画のキーワードまたはURL。"
@@ -510,5 +504,17 @@
     "enabled": "均等再生をオンにしました",
     "disabled": "均等再生をオフにしました",
     "featureDescription": "楽曲追加時に、楽曲を追加したユーザーごとにできるだけ均等になるようにする機能です。"
+  },
+  "searchnico": {
+    "name": "ニコニコ動画を検索",
+    "description": "曲をニコニコ動画で検索します。",
+    "examples": "ニコニコを検索 セツナトリップ",
+    "usage": "ニコニコを検索 <キーワード>",
+    "args": {
+      "keyword": {
+        "description": "検索したい動画のキーワードまたはURL。"
+      }
+    },
+    "noArgument": "引数を指定してください。"
   }
 }

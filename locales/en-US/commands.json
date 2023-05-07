@@ -308,6 +308,12 @@
     "alreadyPlaying": "It's playing just now.",
     "queueEmpty": "Queue is empty. No content to play."
   },
+  "play_private": {
+    "description": "Adds a new song from the URL to queue secretly, and starts playing if possible.",
+    "noInteraction": "Unable to use this command by text-based-message.",
+    "modalTitle": "What would you like to play?",
+    "inputLabel": "URL of the song you'd like to play."
+  },
   "queue": {
     "name": "queue",
     "description": "Shows queue.",
@@ -381,18 +387,6 @@
     "description": "Shows a list of songs that match the search query on YouTube.",
     "examples": "search Into The Night",
     "usage": "search <keyword>",
-    "args": {
-      "keyword": {
-        "description": "Keyword or URL of the video you want to search for."
-      }
-    },
-    "noArgument": "Set the argument."
-  },
-  "searchniconico": {
-    "name": "searchniconicodouga",
-    "description": "Search videos on Nico-Nico Douga.",
-    "examples": "searchniconicodouga setsuna trip",
-    "usage": "searchniconicodouga <keyword>",
     "args": {
       "keyword": {
         "description": "Keyword or URL of the video you want to search for."
@@ -510,5 +504,17 @@
     "enabled": "Enabled equal playback.",
     "disabled": "Disabled equal playback.",
     "featureDescription": "This is a function that makes it as even as possible for each user who added songs when playing songs."
+  },
+  "searchnico": {
+    "name": "searchnico",
+    "description": "Searches songs on Nico-Nico Douga.",
+    "examples": "searchnico setsuna trip",
+    "usage": "searchnico <keyword>",
+    "args": {
+      "keyword": {
+        "description": "Keyword or URL of the song you want to search for."
+      }
+    },
+    "noArgument": "Set the argument."
   }
 }

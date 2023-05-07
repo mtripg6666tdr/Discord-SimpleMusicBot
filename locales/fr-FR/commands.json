@@ -308,6 +308,12 @@
     "alreadyPlaying": "すでに再生中です。",
     "queueEmpty": "キューが空です。再生するコンテンツがありません。"
   },
+  "play_private": {
+    "description": "URLを非公開のまま音楽をキューの末尾に追加し、状況に応じて再生を開始します。",
+    "noInteraction": "このコマンドをメッセージから実行することはできません",
+    "modalTitle": "再生したいURLを入力",
+    "inputLabel": "再生したいURL"
+  },
   "queue": {
     "name": "キュー",
     "description": "キューを表示します",
@@ -387,18 +393,6 @@
       }
     },
     "noArgument": "Mot-clé ou URL de la vidéo que vous souhaitez rechercher."
-  },
-  "searchniconico": {
-    "name": "ニコニコ動画を検索",
-    "description": "曲をニコニコ動画で検索します。",
-    "examples": "ニコニコを検索 セツナトリップ",
-    "usage": "ニコニコを検索 <キーワード>",
-    "args": {
-      "keyword": {
-        "description": "検索したい動画のキーワードまたはURL。"
-      }
-    },
-    "noArgument": "引数を指定してください。"
   },
   "searchqueue": {
     "name": "Rechercher dans la file d'attente",
@@ -510,5 +504,17 @@
     "enabled": "Jeu égal activé",
     "disabled": "J'ai désactivé la lecture égale",
     "featureDescription": "Il s'agit d'une fonction qui le rend aussi uniforme que possible pour chaque utilisateur qui a ajouté des chansons lors de l'ajout de chansons."
+  },
+  "searchnico": {
+    "name": "ニコニコ動画を検索",
+    "description": "曲をニコニコ動画で検索します。",
+    "examples": "ニコニコを検索 セツナトリップ",
+    "usage": "ニコニコを検索 <キーワード>",
+    "args": {
+      "keyword": {
+        "description": "検索したい動画のキーワードまたはURL。"
+      }
+    },
+    "noArgument": "引数を指定してください。"
   }
 }
