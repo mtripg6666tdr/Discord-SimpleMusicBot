@@ -470,9 +470,9 @@
     "name": "uptime",
     "description": "Shows bot's uptime.",
     "embedTitle": "{{name}} uptime",
-    "elapsedAfterInstantiated": "Elapsed Time from Bot Starts",
-    "elapsedAfterConnected": "Elapsed Time from Connecting to Discord",
-    "registeredServerCount": "Number of servers holding data",
+    "elapsedAfterInstantiated": "Elapsed Time since Bot Starts",
+    "elapsedAfterConnected": "Elapsed Time since Connection Established",
+    "registeredServerCount": "Number of Servers Holding Data",
     "datetimeLabel": "{{hour}} hours {{min}} minutes {{sec}} seconds",
     "serverCount_one": "{{count}} server",
     "serverCount_other": "{{count}} servers"
