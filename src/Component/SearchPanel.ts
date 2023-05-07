@@ -82,9 +82,8 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
 
     let reply: ResponseMessage = null;
     try{
-      const replyPromise = this._commandMessage.reply(`🔍${t("search.searching")}...`);
-      const waitedPromiseResult = await searchPromise;
-      reply = await replyPromise;
+      let waitedPromiseResult: T | { result: T, transformedQuery: string } = null;
+      [reply, waitedPromiseResult] = await Promise.all([this._commandMessage.reply(`🔍${t("search.searching")}...`), searchPromise]);
       if("transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string })){
         this.query = (waitedPromiseResult as { result: T, transformedQuery: string }).transformedQuery;
       }

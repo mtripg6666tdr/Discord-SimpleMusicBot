@@ -156,17 +156,20 @@ export class SourceCache extends LogEmitter<CacheEvents> {
 
   getPersistentCacheSize(){
     return fs.promises.readdir(this.cacheDirPath, { withFileTypes: true })
-      .then(files => Promise.all(
+      .then(files => Promise.allSettled(
         files
           .filter(file => file.isFile())
           .map(file => fs.promises.stat(path.join(this.cacheDirPath, file.name)))
       ))
-      .then(sizes => sizes.reduce((prev, current) => prev + current.size, 0));
+      .then(sizes =>
+        (sizes.filter(d => d.status === "fulfilled") as PromiseFulfilledResult<fs.Stats>[])
+          .reduce((prev, current) => prev + current.value.size, 0)
+      );
   }
 
   purgePersistentCache(){
     return fs.promises.readdir(this.cacheDirPath, { withFileTypes: true })
-      .then(files => Promise.all(
+      .then(files => Promise.allSettled(
         files
           .filter(file => file.isFile())
           .map(file => fs.promises.unlink(path.join(this.cacheDirPath, file.name)))
@@ -260,7 +263,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
       this.logger.info(`Configured cache limit is ${config.cacheLimit}MB`);
 
       const items = await fs.promises.readdir(this.cacheDirPath, { withFileTypes: true });
-      const files = await Promise.all(
+      const files = await Promise.allSettled(
         items.filter(d => d.isFile()).map(async d => {
           const filePath = path.join(this.cacheDirPath, d.name);
           const stats = await fs.promises.stat(filePath);
@@ -270,7 +273,8 @@ export class SourceCache extends LogEmitter<CacheEvents> {
             size: stats.size,
           };
         })
-      );
+      )
+        .then(ss => ss.map(d => "value" in d ? d.value : null).filter(d => d));
       files.sort((a, b) => a.lastAccess - b.lastAccess);
 
       const currentTotalSize = files.reduce((prev, current) => prev + current.size, 0);
@@ -291,7 +295,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
 
         this.logger.info(`${removePaths.length} caches will be purged and ${getMBytes(current)}MB disk space will be freed.`);
 
-        await Promise.all(removePaths.map(logPath => fs.promises.unlink(logPath)));
+        await Promise.allSettled(removePaths.map(logPath => fs.promises.unlink(logPath)));
         this.logger.info("Cleaning up completed.");
       }else{
         this.logger.info("Skip deleting");

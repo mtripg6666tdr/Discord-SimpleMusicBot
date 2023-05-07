@@ -91,7 +91,7 @@ export class ReplitBackupper extends IntervalBackupper {
   override async getQueueDataFromBackup(guildIds: string[]): Promise<Map<string, YmxFormat>> {
     const result = new Map<string, YmxFormat>();
     try{
-      await Promise.all(
+      await Promise.allSettled(
         guildIds.map(async id => {
           const queue = await this.db.get<YmxFormat>(this.getDbKey("queue", id));
           if(queue){
@@ -112,7 +112,7 @@ export class ReplitBackupper extends IntervalBackupper {
   override async getStatusFromBackup(guildIds: string[]): Promise<Map<string, exportableStatuses>> {
     const result = new Map<string, exportableStatuses>();
     try{
-      await Promise.all(
+      await Promise.allSettled(
         guildIds.map(async id => {
           const status = await this.db.get<exportableStatuses>(this.getDbKey("status", id));
           if(status){
