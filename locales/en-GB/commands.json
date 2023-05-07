@@ -308,6 +308,12 @@
     "alreadyPlaying": "It's playing just now.",
     "queueEmpty": "Queue is empty. No content to play."
   },
+  "play_private": {
+    "description": "URLを非公開のまま音楽をキューの末尾に追加し、状況に応じて再生を開始します。",
+    "noInteraction": "このコマンドをメッセージから実行することはできません",
+    "modalTitle": "再生したいURLを入力",
+    "inputLabel": "再生したいURL"
+  },
   "queue": {
     "name": "queue",
     "description": "Shows queue.",
@@ -387,18 +393,6 @@
       }
     },
     "noArgument": "Set the argument."
-  },
-  "searchniconico": {
-    "name": "ニコニコ動画を検索",
-    "description": "曲をニコニコ動画で検索します。",
-    "examples": "ニコニコを検索 セツナトリップ",
-    "usage": "ニコニコを検索 <キーワード>",
-    "args": {
-      "keyword": {
-        "description": "検索したい動画のキーワードまたはURL。"
-      }
-    },
-    "noArgument": "引数を指定してください。"
   },
   "searchqueue": {
     "name": "searchqueue",
@@ -510,5 +504,17 @@
     "enabled": "Enabled equal playback.",
     "disabled": "Disabled equal playback.",
     "featureDescription": "This is a function that makes it as even as possible for each user who added songs when playing songs."
+  },
+  "searchnico": {
+    "name": "ニコニコ動画を検索",
+    "description": "曲をニコニコ動画で検索します。",
+    "examples": "ニコニコを検索 セツナトリップ",
+    "usage": "ニコニコを検索 <キーワード>",
+    "args": {
+      "keyword": {
+        "description": "検索したい動画のキーワードまたはURL。"
+      }
+    },
+    "noArgument": "引数を指定してください。"
   }
 }
