@@ -37,7 +37,7 @@ type AudioSourceBasicInfo = {
 const { isDisabledSource } = useConfig();
 const logger = getLogger("Resolver");
 
-export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCache, t: i18n["t"]){
+export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCache, preventSourceCache: boolean, t: i18n["t"]){
   let basicInfo = null as AudioSource.AudioSource<any>;
 
   const type = info.type;
@@ -97,7 +97,9 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
     }
   }
 
-  if(basicInfo && !isNaN(basicInfo.lengthSeconds) && !basicInfo.unableToCache){
+  if(preventSourceCache){
+    logger.debug("Skipping source-caching due to private source");
+  }else if(basicInfo && !isNaN(basicInfo.lengthSeconds) && !basicInfo.unableToCache){
     cacheManager.addSource(basicInfo, fromPersistentCache);
   }
 
