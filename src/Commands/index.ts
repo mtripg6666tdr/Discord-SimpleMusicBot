@@ -23,9 +23,7 @@ import type { LoggerObject } from "../logger";
 import type { AnyGuildTextChannel, ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap, ModalSubmitInteraction, PermissionName } from "oceanic.js";
 
 import i18next from "i18next";
-import { Permissions } from "oceanic.js";
-import { TypedEmitter } from "oceanic.js";
-import { ApplicationCommandTypes } from "oceanic.js";
+import { InteractionTypes, Permissions, TypedEmitter, ApplicationCommandTypes } from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
 import { discordUtil } from "../Util";
@@ -288,14 +286,27 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     };
     if(this.requiredPermissionsOr.length !== 0 && !this.requiredPermissionsOr.some(judgeIfPermissionMeeted)){
       await message.reply({
-        content: i18next.t("permissions.needed", {
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}${i18next.t("permissions.needed", {
           permissions: this.getLocalizedPermissionDescription(context.locale),
           lng: context.locale,
-        }),
+        })}`,
         ephemeral: true,
+        allowedMentions: {
+          users: false,
+        },
       });
       return;
     }
+
+    // 遅延処理するべき時には遅延させる
+    if(this.shouldDefer && !message["_interaction"].acknowledged){
+      if(message["_interaction"].type === InteractionTypes.APPLICATION_COMMAND){
+        await message["_interaction"].defer();
+      }else if(message["_interaction"].type === InteractionTypes.MESSAGE_COMPONENT){
+        await message["_interaction"].deferUpdate();
+      }
+    }
+
     this.emit("run", context);
     await this.run(message, context, i18next.getFixedT(context.locale));
   }
