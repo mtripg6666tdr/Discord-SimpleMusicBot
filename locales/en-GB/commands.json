@@ -309,10 +309,10 @@
     "queueEmpty": "Queue is empty. No content to play."
   },
   "play_private": {
-    "description": "URLを非公開のまま音楽をキューの末尾に追加し、状況に応じて再生を開始します。",
-    "noInteraction": "このコマンドをメッセージから実行することはできません",
-    "modalTitle": "再生したいURLを入力",
-    "inputLabel": "再生したいURL"
+    "description": "Adds a new song from the URL to queue secretly, and starts playing if possible.",
+    "noInteraction": "Unable to use this command by text-based-message.",
+    "modalTitle": "What would you like to play?",
+    "inputLabel": "URL of the song you'd like to play."
   },
   "queue": {
     "name": "queue",
@@ -464,9 +464,9 @@
     "name": "uptime",
     "description": "Shows bot's uptime.",
     "embedTitle": "{{name}} uptime",
-    "elapsedAfterInstantiated": "Elapsed Time from Bot Starts",
-    "elapsedAfterConnected": "Elapsed Time from Connecting to Discord",
-    "registeredServerCount": "Number of servers holding data",
+    "elapsedAfterInstantiated": "Elapsed Time since Bot Starts",
+    "elapsedAfterConnected": "Elapsed Time since Connection Established",
+    "registeredServerCount": "Number of Servers Holding Data",
     "datetimeLabel": "{{hour}} hours {{min}} minutes {{sec}} seconds",
     "serverCount_one": "{{count}} server",
     "serverCount_other": "{{count}} servers"
@@ -506,15 +506,15 @@
     "featureDescription": "This is a function that makes it as even as possible for each user who added songs when playing songs."
   },
   "searchnico": {
-    "name": "ニコニコ動画を検索",
-    "description": "曲をニコニコ動画で検索します。",
-    "examples": "ニコニコを検索 セツナトリップ",
-    "usage": "ニコニコを検索 <キーワード>",
+    "name": "searchnico",
+    "description": "Searches songs on Nico-Nico Douga.",
+    "examples": "searchnico setsuna trip",
+    "usage": "searchnico <keyword>",
     "args": {
       "keyword": {
-        "description": "検索したい動画のキーワードまたはURL。"
+        "description": "Keyword or URL of the song you want to search for."
       }
     },
-    "noArgument": "引数を指定してください。"
+    "noArgument": "Set the argument."
   }
 }
