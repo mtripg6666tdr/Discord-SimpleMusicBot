@@ -32,7 +32,7 @@ export async function handleButtonInteraction(
   this.logger.info("received button interaction");
 
   // コレクターで処理できるか？
-  if(this.collectors.interactionCreate(interaction)){
+  if(this.collectors.onInteractionCreate(interaction)){
     return;
   }
 

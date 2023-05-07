@@ -32,8 +32,9 @@ export async function onInteractionCreate(this: MusicBot, interaction: discord.A
     interaction.type !== InteractionTypes.APPLICATION_COMMAND
     && interaction.type !== InteractionTypes.MESSAGE_COMPONENT
     && interaction.type !== InteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE
+    && interaction.type !== InteractionTypes.MODAL_SUBMIT
   ){
-    this.logger.debug(`Unknown interaction received: ${interaction.type}`);
+    this.logger.debug(`Unknown interaction received: ${(interaction as any).type}`);
     return;
   }
   // メンテナンスモードでかつボット管理者以外なら終了
@@ -78,5 +79,8 @@ export async function onInteractionCreate(this: MusicBot, interaction: discord.A
     case discord.InteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE:
       handlers.handleAutoCompleteInteraction.call(this, interaction).catch(this.logger.error);
       break;
+
+    case discord.InteractionTypes.MODAL_SUBMIT:
+      handlers.handleModalSubmitInteraction.call(this, server, interaction).catch(this.logger.error);
   }
 }

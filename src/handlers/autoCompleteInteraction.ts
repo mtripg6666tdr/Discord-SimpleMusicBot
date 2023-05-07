@@ -29,7 +29,7 @@ export async function handleAutoCompleteInteraction(
   if(!option){
     return;
   }
-  
+
   const targetCommand = CommandManager.instance.resolve(interaction.data.name);
   const possibleOptions = targetCommand?.handleAutoComplete(
     option.name,
