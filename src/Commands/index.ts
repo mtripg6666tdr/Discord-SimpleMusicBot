@@ -19,7 +19,7 @@
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { ListCommandInitializeOptions, UnlistCommandOptions, ListCommandWithArgsOptions, CommandArgs, CommandPermission, LocalizedSlashCommandArgument } from "../Structure/Command";
 import type { LoggerObject } from "../logger";
-import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap } from "oceanic.js";
+import { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap, PermissionName, Permissions } from "oceanic.js";
 
 import i18next from "i18next";
 import { TypedEmitter } from "oceanic.js";
@@ -113,6 +113,16 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     return this._messageCommand;
   }
 
+  protected readonly _interactionOnly: boolean = false;
+  get interactionOnly(){
+    return this._interactionOnly;
+  }
+
+  protected readonly _defaultMemberPermission: PermissionName[] = null;
+  get defaultMemberPermission(){
+    return this._defaultMemberPermission;
+  }
+
   /** スラッシュコマンドの名称として登録できる旧基準を満たしたコマンド名を取得します */
   get asciiName(){
     return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
@@ -122,12 +132,17 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
   constructor(opts: ListCommandInitializeOptions|UnlistCommandOptions){
     super();
+    this._messageCommand = "messageCommand" in opts && opts.messageCommand || false;
+    this._interactionOnly = "interactionOnly" in opts && opts.interactionOnly || false;
     this._alias = opts.alias;
-    this._name = "name" in opts ? opts.name : i18next.t(`commands:${this.asciiName}.name` as any);
+    this._name = "name" in opts
+      ? opts.name
+      : this._interactionOnly
+        ? opts.alias[0]
+        : i18next.t(`commands:${this.asciiName}.name` as any);
     this._unlist = opts.unlist;
     this._shouldDefer = opts.shouldDefer;
     this._disabled = opts.disabled || false;
-    this._messageCommand = "messageCommand" in opts && opts.messageCommand;
     if(!this._unlist){
       if(!this.asciiName){
         throw new Error("Command has not ascii name");
@@ -320,6 +335,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           .substring(0, 100),
         descriptionLocalizations: Object.entries(this.descriptionLocalization).length > 0 ? this.descriptionLocalization : null,
         options,
+        defaultMemberPermissions: this.defaultMemberPermission.reduce((prev, current) => prev | Permissions[current], 0n).toString(),
       });
     }else{
       result.push({

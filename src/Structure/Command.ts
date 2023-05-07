@@ -19,7 +19,7 @@
 import type { categoriesList } from "../Commands/command";
 import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
-import type { Client, LocaleMap } from "oceanic.js";
+import type { Client, LocaleMap, PermissionName } from "oceanic.js";
 
 export type CommandPermission =
   | "admin"
@@ -38,24 +38,25 @@ export type BaseCommandInitializeOptions = {
   disabled?: boolean,
 };
 
-export type ListCommandWithArgsOptions = BaseCommandInitializeOptions & {
+type BaseListCommand = BaseCommandInitializeOptions & {
   unlist: false,
-  examples: boolean,
-  usage: boolean,
   category: typeof categoriesList[number],
-  argument: [firstArgument: SlashCommandArgument, ...restArguments: SlashCommandArgument[]],
   requiredPermissionsOr: CommandPermission[],
   messageCommand?: boolean,
+  interactionOnly?: boolean,
+  defaultMemberPermission?: PermissionName[],
 };
 
-export type ListCommandWithoutArgsOptions = BaseCommandInitializeOptions & {
-  unlist: false,
-  usage?: never,
-  examples?: never,
-  category: typeof categoriesList[number],
-  requiredPermissionsOr: CommandPermission[],
-  messageCommand?: boolean,
+type CommandHelp = {
+  examples: boolean,
+  usage: boolean,
 };
+
+export type ListCommandWithArgsOptions = BaseListCommand & CommandHelp & {
+  argument: [firstArgument: SlashCommandArgument, ...restArguments: SlashCommandArgument[]],
+};
+
+export type ListCommandWithoutArgsOptions = BaseListCommand & Partial<CommandHelp>;
 
 export type ListCommandInitializeOptions =
   | ListCommandWithArgsOptions
