@@ -1,29 +1,28 @@
 ---
-sidebar_label: searchniconico.name
+sidebar_label: ニコニコ動画を検索
 ---
-# `searchniconico.name`コマンド
-searchniconico.description
+# `ニコニコ動画を検索`コマンド
+曲をニコニコ動画で検索します。
 
-スラッシュコマンドでは、`/searchniconico`を使用してください。
+スラッシュコマンドでは、`/searchnico`を使用してください。
 
 ## 別名
-`searchniconico.name`以外にも以下の別名を使用できます。
+`ニコニコ動画を検索`以外にも以下の別名を使用できます。
 
 - ニコニコを検索
-- ニコニコ動画を検索
 - ニコ動を検索
-- searchniconico
 - searchnico
+- searchniconico
 - searchn
 
 ## 使い方
 ```
-searchniconico.usage
+ニコニコを検索 <キーワード>
 ```
 
 ## 使用例
 ```
-searchniconico.examples
+ニコニコを検索 セツナトリップ
 ```
 
 

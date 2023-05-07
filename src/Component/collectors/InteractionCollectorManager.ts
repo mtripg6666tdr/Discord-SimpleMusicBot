@@ -71,7 +71,12 @@ export class InteractionCollectorManager extends LogEmitter<InteractionCollector
     return collector;
   }
 
-  interactionCreate(interaction: ComponentInteraction<any, AnyGuildTextChannel>){
+  /**
+   * インタラクションを受信し、対応するコレクターに処理を渡します。
+   * @param interaction インタラクション
+   * @returns 対応するコレクターが存在し、処理が渡った場合はtrue、それ以外の場合はfalse
+   */
+  onInteractionCreate(interaction: ComponentInteraction<any, AnyGuildTextChannel>){
     const collector = this.collectors.get(interaction.data.customID);
     if(!collector){
       return false;

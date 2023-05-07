@@ -19,7 +19,6 @@
 import type { SongInfo } from "../Component/SearchPanel";
 import type { i18n } from "i18next";
 
-
 import candyget from "candyget";
 
 import { SearchBase } from "./search";
@@ -32,7 +31,7 @@ const config = useConfig();
 export default class SearchN extends SearchBase<Datum[]> {
   constructor() {
     super({
-      alias: ["ニコニコを検索", "ニコニコ動画を検索", "ニコ動を検索", "searchniconico", "searchnico", "searchn"],
+      alias: ["ニコニコを検索", "ニコ動を検索", "searchnico", "searchniconico", "searchn"],
       unlist: false,
       category: "playlist",
       argument: [

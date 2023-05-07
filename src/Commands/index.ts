@@ -17,13 +17,13 @@
  */
 
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { GuildDataContainer } from "../Structure";
 import type { ListCommandInitializeOptions, UnlistCommandOptions, ListCommandWithArgsOptions, CommandArgs, CommandPermission, LocalizedSlashCommandArgument } from "../Structure/Command";
 import type { LoggerObject } from "../logger";
-import type { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap } from "oceanic.js";
+import type { AnyGuildTextChannel, ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap, ModalSubmitInteraction, PermissionName } from "oceanic.js";
 
 import i18next from "i18next";
-import { TypedEmitter } from "oceanic.js";
-import { ApplicationCommandTypes } from "oceanic.js";
+import { InteractionTypes, Permissions, TypedEmitter, ApplicationCommandTypes } from "oceanic.js";
 
 import { CommandManager } from "../Component/CommandManager";
 import { discordUtil } from "../Util";
@@ -46,6 +46,10 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   // eslint-disable-next-line unused-imports/no-unused-vars
   handleAutoComplete(argname: string, input: string | number, otherOptions: { name: string, value: string | number }[]): string[] {
     return [];
+  }
+
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  async handleModalSubmitInteraction(interaction: ModalSubmitInteraction<AnyGuildTextChannel>, server: GuildDataContainer){
   }
 
   protected readonly _name: string;
@@ -113,6 +117,16 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     return this._messageCommand;
   }
 
+  protected readonly _interactionOnly: boolean = false;
+  get interactionOnly(){
+    return this._interactionOnly;
+  }
+
+  protected readonly _defaultMemberPermission: PermissionName[] | "NONE" = "NONE";
+  get defaultMemberPermission(){
+    return this._defaultMemberPermission;
+  }
+
   /** スラッシュコマンドの名称として登録できる旧基準を満たしたコマンド名を取得します */
   get asciiName(){
     return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
@@ -122,12 +136,17 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
   constructor(opts: ListCommandInitializeOptions|UnlistCommandOptions){
     super();
+    this._messageCommand = "messageCommand" in opts && opts.messageCommand || false;
+    this._interactionOnly = "interactionOnly" in opts && opts.interactionOnly || false;
     this._alias = opts.alias;
-    this._name = "name" in opts ? opts.name : i18next.t(`commands:${this.asciiName}.name` as any);
+    this._name = "name" in opts
+      ? opts.name
+      : this._interactionOnly
+        ? opts.alias[0]
+        : i18next.t(`commands:${this.asciiName}.name` as any);
     this._unlist = opts.unlist;
     this._shouldDefer = opts.shouldDefer;
     this._disabled = opts.disabled || false;
-    this._messageCommand = "messageCommand" in opts && opts.messageCommand;
     if(!this._unlist){
       if(!this.asciiName){
         throw new Error("Command has not ascii name");
@@ -139,6 +158,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         category,
         argument,
         requiredPermissionsOr,
+        defaultMemberPermission,
       } = opts as ListCommandWithArgsOptions;
 
       this._description = i18next.t(`commands:${this.asciiName}.description` as any);
@@ -209,6 +229,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       }) : null;
 
       this._requiredPermissionsOr = requiredPermissionsOr || [];
+      this._defaultMemberPermission = defaultMemberPermission || "NONE";
     }
     this.logger = getLogger(`Command(${this.asciiName})`);
     this.logger.debug(`${this.name} loaded`);
@@ -265,14 +286,27 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     };
     if(this.requiredPermissionsOr.length !== 0 && !this.requiredPermissionsOr.some(judgeIfPermissionMeeted)){
       await message.reply({
-        content: i18next.t("permissions.needed", {
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}${i18next.t("permissions.needed", {
           permissions: this.getLocalizedPermissionDescription(context.locale),
           lng: context.locale,
-        }),
+        })}`,
         ephemeral: true,
+        allowedMentions: {
+          users: false,
+        },
       });
       return;
     }
+
+    // 遅延処理するべき時には遅延させる
+    if(this.shouldDefer && !message["_interaction"].acknowledged){
+      if(message["_interaction"].type === InteractionTypes.APPLICATION_COMMAND){
+        await message["_interaction"].defer();
+      }else if(message["_interaction"].type === InteractionTypes.MESSAGE_COMPONENT){
+        await message["_interaction"].deferUpdate();
+      }
+    }
+
     this.emit("run", context);
     await this.run(message, context, i18next.getFixedT(context.locale));
   }
@@ -281,6 +315,9 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   toApplicationCommandStructure(): CreateApplicationCommandOptions[] {
     if(this.unlist) throw new Error("This command cannot be listed due to private command!");
     const result: CreateApplicationCommandOptions[] = [];
+    const defaultMemberPermissions = this.defaultMemberPermission === "NONE"
+      ? null
+      : this.defaultMemberPermission.reduce((prev, current) => prev | Permissions[current], 0n).toString();
 
     // build options if any
     const options = this.argument?.map(arg => {
@@ -320,6 +357,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           .substring(0, 100),
         descriptionLocalizations: Object.entries(this.descriptionLocalization).length > 0 ? this.descriptionLocalization : null,
         options,
+        defaultMemberPermissions,
       });
     }else{
       result.push({
@@ -330,6 +368,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           .replace(/\n/g, "")
           .substring(0, 100),
         descriptionLocalizations: Object.entries(this.descriptionLocalization).length > 0 ? this.descriptionLocalization : null,
+        defaultMemberPermissions,
       });
     }
 
@@ -338,6 +377,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         type: ApplicationCommandTypes.MESSAGE as const,
         name: this.asciiName,
         nameLocalizations: {} as LocaleMap,
+        defaultMemberPermissions,
       };
       availableLanguages().forEach(language => {
         messageCommand.nameLocalizations[language as keyof LocaleMap] = i18next.t(`commands:${this.asciiName}.messageCommandName` as any, { lng: language });

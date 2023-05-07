@@ -67,11 +67,6 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
     return;
   }
 
-  // 応答遅延するべきコマンドならば遅延
-  if(command.shouldDefer){
-    await interaction.defer();
-  }
-
   // メッセージライクに解決してコマンドメッセージに
   const commandMessage = CommandMessage.createFromInteraction(interaction);
   // プレフィックス更新

@@ -57,6 +57,10 @@ export type DynamicThumbnail = {
 
 type ThumbnailType = string | DynamicThumbnail;
 
+/**
+ * 音楽ボットで解釈できるオーディオファイルのソースを表します。
+ * @template T サムネイルの種類
+ */
 export abstract class AudioSource<T extends ThumbnailType> {
   // リソースのURL
   // リソースに対して不変で、かつ一意である必要があります
@@ -125,7 +129,7 @@ export abstract class AudioSource<T extends ThumbnailType> {
     this._isPrivateSource = value;
   }
 
-  // ロガー
+  /** オーディオソースの種類に対して生成されるロガーを表します */
   protected logger: LoggerObject;
 
   constructor(serviceType: AudioSourceTypeIdentifer){
@@ -133,38 +137,51 @@ export abstract class AudioSource<T extends ThumbnailType> {
     this.logger = getLogger(this.constructor.name);
   }
 
-  // 現在再生中の曲を示すEmbedField
+  /** 現在再生中の曲を示すEmbedFieldを生成します。 */
   abstract toField(verbose: boolean, t: i18n["t"]): EmbedField[];
-  // クラスを初期化する非同期メソッド
+  /** クラスを非同期で初期化します。 */
   abstract init(url: string, prefetched: exportableCustom, t: i18n["t"]): Promise<AudioSource<T>>;
-  // 再生するためのストリームをフェッチ
+  /** 再生するためのストリームをフェッチします。 */
   abstract fetch(url?: boolean, t?: i18n["t"]): Promise<StreamInfo>;
-  // 現在再生中の曲に関する追加データ
+  /** 現在再生中の曲に関する追加データを生成します。 */
   abstract npAdditional(t: i18n["t"]): string;
-  // データをエクスポート
+  /** データをプレーンなオブジェクトにエクスポートします。 */
   abstract exportData(): exportableCustom;
 
-  purgeCache(){
-  }
+  /**
+   * 内部情報のキャッシュに対応しているソースに対して、キャッシュデータの削除を実行します。
+   * それ以外のソースではこの関数は何もしません。
+   */
+  purgeCache(){}
 
+  /** ソースがYouTubeのストリームであるかどうかを表します。 */
   isYouTube(): this is Sources.YouTube{
     return this.serviceIdentifer === "youtube";
   }
 
+  /** ソースがSoundCloudのストリームであるかどうかを表します */
   isSoundCloudS(): this is Sources.SoundCloudS{
     return this.serviceIdentifer === "soundcloud";
   }
 
+  /** ソースがニコニコ動画のストリームであるかどうかを表します。 */
   isNicoNicoS(): this is Sources.NicoNicoS{
     return this.serviceIdentifer === "niconico";
   }
 
+  /** ソースがSpotifyのストリームであるかどうかを表します。 */
   isSpotify(): this is Sources.Spotify{
     return this.serviceIdentifer === "spotify";
   }
 
+  /** ソースがシークできるかどうかを表します */
   isUnseekable(){
     return this.isSoundCloudS() || this.isNicoNicoS();
+  }
+
+  /** プライベートなソースとして設定します */
+  markAsPrivateSource(){
+    this.isPrivateSource = true;
   }
 }
 

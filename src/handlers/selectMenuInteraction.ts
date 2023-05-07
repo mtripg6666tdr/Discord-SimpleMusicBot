@@ -31,7 +31,7 @@ export async function handleSelectMenuInteraction(
   if(!interaction.inCachedGuildChannel()) return;
   this.logger.info("received selectmenu interaction");
 
-  if(this.collectors.interactionCreate(interaction)){
+  if(this.collectors.onInteractionCreate(interaction)){
     return;
   }
 

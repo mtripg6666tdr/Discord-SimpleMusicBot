@@ -30,10 +30,9 @@ export async function handleButtonInteraction(
   interaction: discord.ComponentInteraction<ComponentTypes.BUTTON, discord.AnyGuildTextChannel>,
 ){
   this.logger.info("received button interaction");
-  await interaction.deferUpdate();
 
   // コレクターで処理できるか？
-  if(this.collectors.interactionCreate(interaction)){
+  if(this.collectors.onInteractionCreate(interaction)){
     return;
   }
 

@@ -202,6 +202,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     sourceType = "unknown",
     gotData = null,
     preventCache = false,
+    preventSourceCache = false,
   }: {
     url: string,
     addedBy: Member|AddedBy,
@@ -209,6 +210,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     sourceType?: KnownAudioSourceIdentifer,
     gotData?: AudioSource.exportableCustom,
     preventCache?: boolean,
+    preventSourceCache?: boolean,
   }): Promise<QueueContent & { index: number }>{
     return lock(this.addQueueLocker, async () => {
       this.logger.info("AddQueue called");
@@ -221,6 +223,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
             forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000),
           },
           this.server.bot.cache,
+          preventSourceCache,
           i18next.getFixedT(this.server.locale)
         ),
         additionalInfo: {
@@ -255,6 +258,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     first?: boolean,
     gotData?: AudioSource.exportableCustom,
     cancellable?: boolean,
+    privateSource?: boolean,
   } & (
     {
       fromSearch: ResponseMessage,
@@ -269,7 +273,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       message?: undefined,
       channel: AnyGuildTextChannel,
     })
-  ): Promise<boolean>{
+  ): Promise<QueueContent>{
     this.logger.info("AutoAddQueue Called");
     let uiMessage: Message<AnyGuildTextChannel>|ResponseMessage = null;
 
@@ -319,7 +323,13 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         method: options.first ? "unshift" : "push",
         sourceType: options.sourceType || "unknown",
         gotData: options.gotData || null,
+        preventSourceCache: options.privateSource,
       });
+
+      if(options.privateSource){
+        info.basicInfo.markAsPrivateSource();
+      }
+
       this.logger.info("AutoAddQueue worked successfully");
 
       // UIを表示する
@@ -467,6 +477,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         const lastReply = await uiMessage.edit(messageContent);
         collector?.setMessage(lastReply);
       }
+      return info;
     }
     catch(e){
       this.logger.error("AutoAddQueue failed", e);
@@ -478,9 +489,8 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           .catch(this.logger.error)
         ;
       }
-      return false;
+      return null;
     }
-    return true;
   }
 
   /**
@@ -508,8 +518,9 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     title: string,
     totalCount: number,
     exportableConsumer: (track: T) => Promise<exportableCustom>|exportableCustom
-  ): Promise<number>{
+  ): Promise<QueueContent[]>{
     let index = 0;
+    const result: QueueContent[] = [];
     for(let i = 0; i < totalCount; i++){
       const item = playlist[i];
       if(!item) continue;
@@ -520,8 +531,11 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         sourceType: identifer,
         method: first ? "unshift" : "push",
         gotData: exportable,
-      });
-      if(_result) index++;
+      }).catch(this.logger.error);
+      if(_result){
+        index++;
+        result.push(_result);
+      }
       if(
         index % 50 === 0
         || totalCount <= 50 && index % 10 === 0
@@ -542,7 +556,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         break;
       }
     }
-    return index;
+    return result;
   }
 
   /**
