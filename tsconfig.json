@@ -1,7 +1,8 @@
 {
+  "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
-    "target": "ES2019",
     "module": "CommonJS",
+    "strict": false,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
@@ -14,13 +15,6 @@
     "outDir": "dist/",
     "allowJs": false,
     "skipLibCheck": true,
-    "lib": [
-      "ES2019",
-      "ES2020.Promise",
-      "ES2020.BigInt",
-      "ES2020.String",
-    ],
-    "moduleResolution": "node",
     "strictBindCallApply": true,
     "resolveJsonModule": true,
     "noEmit": true
