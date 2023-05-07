@@ -99,10 +99,12 @@ export class Normalizer extends Readable {
       }
       this.origin = null;
       try{
-        // @ts-expect-error 2339
-        this._readableState?.buffer.clear();
-        // @ts-expect-error 2339
-        this._readableState?.length = 0;
+        if("_readableState" in this){
+          // @ts-expect-error 2339
+          this._readableState.buffer.clear();
+          // @ts-expect-error 2339
+          this._readableState.length = 0;
+        }
       }
       catch{/* empty */}
     }
