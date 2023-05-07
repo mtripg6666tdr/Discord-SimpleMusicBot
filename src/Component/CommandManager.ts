@@ -163,9 +163,13 @@ export class CommandManager extends LogEmitter<{}> {
     // search commands that should be added newly
     const commandsToAdd = apiCompatibleCommands.filter(expected => {
       if(expected.type === ApplicationCommandTypes.CHAT_INPUT){
-        return registeredAppCommands.findIndex(reg => reg.type === ApplicationCommandTypes.CHAT_INPUT && reg.name === expected.name) < 0;
+        return !registeredAppCommands.some(
+          reg => reg.type === ApplicationCommandTypes.CHAT_INPUT && reg.name === expected.name
+        );
       }else if(expected.type === ApplicationCommandTypes.MESSAGE){
-        return registeredAppCommands.findIndex(reg => reg.type === ApplicationCommandTypes.MESSAGE && reg.name === expected.name) < 0;
+        return !registeredAppCommands.some(
+          reg => reg.type === ApplicationCommandTypes.MESSAGE && reg.name === expected.name
+        );
       }else{
         return false;
       }
@@ -228,11 +232,17 @@ export class CommandManager extends LogEmitter<{}> {
   }
 
   protected apiToApplicationCommand(apiCommand: AnyApplicationCommand) {
+    const defaultMemberPermissions
+      = apiCommand.defaultMemberPermissions && typeof apiCommand.defaultMemberPermissions === "object"
+        ? apiCommand.defaultMemberPermissions.allow.toString()
+        : apiCommand.defaultMemberPermissions as unknown as string;
+
     if(apiCommand.type === ApplicationCommandTypes.MESSAGE){
       return {
         type: apiCommand.type,
         name: apiCommand.name,
         nameLocalizations: apiCommand.nameLocalizations,
+        defaultMemberPermissions,
       };
     }else if(apiCommand.options){
       return {
@@ -240,6 +250,7 @@ export class CommandManager extends LogEmitter<{}> {
         name: apiCommand.name,
         description: apiCommand.description,
         descriptionLocalizations: apiCommand.descriptionLocalizations,
+        defaultMemberPermissions,
         options: apiCommand.options.map(option => {
           if("choices" in option && option.choices){
             return {
@@ -275,6 +286,7 @@ export class CommandManager extends LogEmitter<{}> {
         name: apiCommand.name,
         description: apiCommand.description,
         descriptionLocalizations: apiCommand.descriptionLocalizations,
+        defaultMemberPermissions,
       };
     }
   }

@@ -33,7 +33,7 @@ export async function handleButtonInteraction(
   await interaction.deferUpdate();
 
   // コレクターで処理できるか？
-  if(this.collectors.interactionCreate(interaction)){
+  if(this.collectors.onInteractionCreate(interaction)){
     return;
   }
 

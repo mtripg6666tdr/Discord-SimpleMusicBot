@@ -16,8 +16,21 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from "./autoCompleteInteraction";
-export * from "./commandInteraction";
-export * from "./buttonInteraction";
-export * from "./modalSubmitInteraction";
-export * from "./selectMenuInteraction";
+import type { GuildDataContainer } from "../Structure";
+import type { MusicBot } from "../bot";
+import type * as discord from "oceanic.js";
+
+import { CommandManager } from "../Component/CommandManager";
+
+export async function handleModalSubmitInteraction(
+  this: MusicBot,
+  server: GuildDataContainer,
+  interaction: discord.ModalSubmitInteraction,
+){
+  if(!interaction.inCachedGuildChannel()) return;
+  this.logger.info("received modalsubmit interaction");
+
+  const targetCommand = CommandManager.instance.resolve(interaction.data.customID);
+
+  await targetCommand?.handleModalSubmitInteraction(interaction, server);
+}

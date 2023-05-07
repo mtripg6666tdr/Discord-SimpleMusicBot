@@ -17,11 +17,13 @@
  */
 
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { GuildDataContainer } from "../Structure";
 import type { ListCommandInitializeOptions, UnlistCommandOptions, ListCommandWithArgsOptions, CommandArgs, CommandPermission, LocalizedSlashCommandArgument } from "../Structure/Command";
 import type { LoggerObject } from "../logger";
-import { ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap, PermissionName, Permissions } from "oceanic.js";
+import type { AnyGuildTextChannel, ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap, ModalSubmitInteraction, PermissionName } from "oceanic.js";
 
 import i18next from "i18next";
+import { Permissions } from "oceanic.js";
 import { TypedEmitter } from "oceanic.js";
 import { ApplicationCommandTypes } from "oceanic.js";
 
@@ -46,6 +48,10 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   // eslint-disable-next-line unused-imports/no-unused-vars
   handleAutoComplete(argname: string, input: string | number, otherOptions: { name: string, value: string | number }[]): string[] {
     return [];
+  }
+
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  async handleModalSubmitInteraction(interaction: ModalSubmitInteraction<AnyGuildTextChannel>, server: GuildDataContainer){
   }
 
   protected readonly _name: string;
@@ -118,7 +124,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     return this._interactionOnly;
   }
 
-  protected readonly _defaultMemberPermission: PermissionName[] = null;
+  protected readonly _defaultMemberPermission: PermissionName[] | "NONE" = "NONE";
   get defaultMemberPermission(){
     return this._defaultMemberPermission;
   }
@@ -154,6 +160,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         category,
         argument,
         requiredPermissionsOr,
+        defaultMemberPermission,
       } = opts as ListCommandWithArgsOptions;
 
       this._description = i18next.t(`commands:${this.asciiName}.description` as any);
@@ -224,6 +231,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       }) : null;
 
       this._requiredPermissionsOr = requiredPermissionsOr || [];
+      this._defaultMemberPermission = defaultMemberPermission || "NONE";
     }
     this.logger = getLogger(`Command(${this.asciiName})`);
     this.logger.debug(`${this.name} loaded`);
@@ -296,6 +304,9 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   toApplicationCommandStructure(): CreateApplicationCommandOptions[] {
     if(this.unlist) throw new Error("This command cannot be listed due to private command!");
     const result: CreateApplicationCommandOptions[] = [];
+    const defaultMemberPermissions = this.defaultMemberPermission === "NONE"
+      ? null
+      : this.defaultMemberPermission.reduce((prev, current) => prev | Permissions[current], 0n).toString();
 
     // build options if any
     const options = this.argument?.map(arg => {
@@ -335,7 +346,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           .substring(0, 100),
         descriptionLocalizations: Object.entries(this.descriptionLocalization).length > 0 ? this.descriptionLocalization : null,
         options,
-        defaultMemberPermissions: this.defaultMemberPermission.reduce((prev, current) => prev | Permissions[current], 0n).toString(),
+        defaultMemberPermissions,
       });
     }else{
       result.push({
@@ -346,6 +357,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           .replace(/\n/g, "")
           .substring(0, 100),
         descriptionLocalizations: Object.entries(this.descriptionLocalization).length > 0 ? this.descriptionLocalization : null,
+        defaultMemberPermissions,
       });
     }
 
@@ -354,6 +366,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         type: ApplicationCommandTypes.MESSAGE as const,
         name: this.asciiName,
         nameLocalizations: {} as LocaleMap,
+        defaultMemberPermissions,
       };
       availableLanguages().forEach(language => {
         messageCommand.nameLocalizations[language as keyof LocaleMap] = i18next.t(`commands:${this.asciiName}.messageCommandName` as any, { lng: language });

@@ -308,6 +308,12 @@
     "alreadyPlaying": "すでに再生中です。",
     "queueEmpty": "キューが空です。再生するコンテンツがありません。"
   },
+  "play_private": {
+    "description": "音楽ソースを非公開のまま音楽を再生します。",
+    "noInteraction": "このコマンドをメッセージから実行することはできません",
+    "modalTitle": "再生したいURLを入力",
+    "inputLabel": "再生したいURL"
+  },
   "queue": {
     "name": "キュー",
     "description": "キューを表示します",

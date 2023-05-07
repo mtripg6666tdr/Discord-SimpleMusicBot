@@ -44,7 +44,7 @@ type BaseListCommand = BaseCommandInitializeOptions & {
   requiredPermissionsOr: CommandPermission[],
   messageCommand?: boolean,
   interactionOnly?: boolean,
-  defaultMemberPermission?: PermissionName[],
+  defaultMemberPermission?: PermissionName[] | "NONE",
 };
 
 type CommandHelp = {

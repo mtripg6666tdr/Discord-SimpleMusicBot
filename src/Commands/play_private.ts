@@ -16,7 +16,16 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { CommandArgs } from ".";
+import type { GuildDataContainer } from "../Structure";
+import type { i18n } from "i18next";
+import type { AnyGuildTextChannel, ModalSubmitInteraction } from "oceanic.js";
+
+import i18next from "i18next";
+import { ComponentTypes, InteractionTypes, TextInputStyles } from "oceanic.js";
+
 import { BaseCommand } from ".";
+import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 
 export default class PlayPrivate extends BaseCommand {
   constructor(){
@@ -26,6 +35,57 @@ export default class PlayPrivate extends BaseCommand {
       category: "player",
       requiredPermissionsOr: [],
       shouldDefer: false,
+      interactionOnly: true,
+      defaultMemberPermission: [],
     });
+  }
+
+  protected override async run(message: CommandMessage, context: Readonly<CommandArgs>, t: i18n["t"]){
+    if(message["isMessage"] || !message["_interaction"]){
+      await message.reply(`:x: ${t("commands:play_private.noInteraction")}`).catch(this.logger.error);
+      return;
+    }
+
+    const interaction = message["_interaction"];
+    if(interaction.type !== InteractionTypes.APPLICATION_COMMAND) return;
+    await interaction.createModal({
+      title: t("commands:play_private.modalTitle"),
+      customID: "play_private",
+      components: [
+        {
+          type: ComponentTypes.ACTION_ROW,
+          components: [
+            {
+              type: ComponentTypes.TEXT_INPUT,
+              label: t("commands:play_private.inputLabel"),
+              required: true,
+              placeholder: "https://",
+              style: TextInputStyles.SHORT,
+              customID: "url",
+            },
+          ],
+        },
+      ],
+    }).catch(this.logger.error);
+  }
+
+  override async handleModalSubmitInteraction(interaction: ModalSubmitInteraction<AnyGuildTextChannel>, server: GuildDataContainer){
+    const value = interaction.data.components[0]?.components[0]?.value;
+
+    if(value){
+      const message = CommandMessage.createFromInteraction(interaction, "play_private", [value], value);
+      const fixedT = i18next.getFixedT(interaction.locale);
+
+      await server.playFromURL(
+        message,
+        value,
+        {},
+        fixedT,
+      );
+
+      if(!await server.joinVoiceChannel(message, {}, fixedT)){
+        return;
+      }
+    }
   }
 }
