@@ -31,7 +31,7 @@ const config = useConfig();
 export default class SearchN extends SearchBase<Datum[]> {
   constructor() {
     super({
-      alias: ["ニコニコを検索", "ニコ動を検索", "searchnico", "searchniconico", "searchnico", "searchn"],
+      alias: ["ニコニコを検索", "ニコ動を検索", "searchnico", "searchniconico", "searchn"],
       unlist: false,
       category: "playlist",
       argument: [
