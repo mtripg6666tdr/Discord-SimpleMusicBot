@@ -18,6 +18,7 @@
 
 import type { AudioEffect } from "./AudioEffect";
 import type { CommandArgs } from "./Command";
+import type { QueueContent } from "./QueueContent";
 import type { YmxFormat } from "./YmxFormat";
 import type { exportableCustom, exportableSpotify } from "../AudioSource";
 import type { SearchPanel } from "../Component/SearchPanel";
@@ -441,28 +442,43 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   async playFromURL(
     message: CommandMessage,
     rawArg: string|string[],
-    { first = true, cancellable = false }: { first?: boolean, cancellable?: boolean },
+    {
+      first = true,
+      cancellable = false,
+      privateSource = false,
+    }: {
+      first?: boolean,
+      cancellable?: boolean,
+      privateSource?: boolean,
+    },
     t: i18n["t"]
-  ){
+  ): Promise<QueueContent[]> {
     if(Array.isArray(rawArg)){
       const [firstUrl, ...restUrls] = rawArg
         .flatMap(fragment => Util.normalizeText(fragment).split(" "))
         .filter(url => url.startsWith("http"));
+      const results: QueueContent[] = [];
 
       if(firstUrl){
-        await this.playFromURL(message, firstUrl, { first, cancellable: false }, t);
+        results.push.apply(
+          results.push,
+          await this.playFromURL(message, firstUrl, { first, cancellable: false }, t)
+        );
 
         if(restUrls){
           for(let i = 0; i < restUrls.length; i++){
-            await this.queue.addQueue({
-              url: restUrls[i],
-              addedBy: message.member,
-              channel: message.channel,
-            });
+            results.push(
+              await this.queue.addQueue({
+                url: restUrls[i],
+                addedBy: message.member,
+                channel: message.channel,
+                privateSource,
+              })
+            );
           }
         }
       }
-      return;
+      return results;
     }
     setTimeout(() => message.suppressEmbeds(true).catch(this.logger.error), 4000).unref();
 
@@ -474,6 +490,8 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       }
     }
 
+
+    // 各種特殊ソースの解釈
     if(
       !config.isDisabledSource("custom")
       && rawArg.match(/^https?:\/\/(www\.|canary\.|ptb\.)?discord(app)?\.com\/channels\/[0-9]+\/[0-9]+\/[0-9]+$/)
@@ -497,38 +515,50 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           throw new Error(t("guildDataContainer.attachmentNotFound"));
         }
 
-        await this.queue.addQueue({
+        const item = await this.queue.addQueue({
           url: msg.attachments.first().url,
           addedBy: message.member,
           first,
           message: smsg,
+          privateSource,
         });
         await this.player.play();
-        return;
+        return [item];
       }
       catch(e){
         this.logger.error(e);
         await smsg.edit(`✘${t("components:queue.failedToAdd")}`)
           .catch(this.logger.error);
+        return [];
       }
-    }else if(!config.isDisabledSource("custom") && Util.isAvailableRawAudioURL(rawArg)){
-      // オーディオファイルへの直リンク？
-      await this.queue.addQueue({
+    }
+
+
+    // オーディオファイルへの直リンク？
+    else if(!config.isDisabledSource("custom") && Util.isAvailableRawAudioURL(rawArg)){
+      const item = await this.queue.addQueue({
         url: rawArg,
         addedBy: message.member,
         sourceType: "custom",
         first,
         message: await message.reply(t("pleaseWait")),
+        privateSource,
       });
       await this.player.play();
-    }else if(
+      return [item];
+    }
+
+
+    // youtubeのプレイリストへのリンク
+    else if(
       !config.isDisabledSource("youtube")
       && !rawArg.includes("v=")
       && !rawArg.includes("/channel/")
-      && ytpl.validateID(rawArg)){
-      //違うならYouTubeプレイリストの直リンクか？
+      && ytpl.validateID(rawArg)
+    ){
       const msg = await message.reply(`:hourglass_flowing_sand:${t("components:queue.processingPlaylistBefore")}`);
       const cancellation = this.bindCancellation(new TaskCancellationManager());
+      let items: QueueContent[] = null;
       try{
         const id = await ytpl.getPlaylistID(rawArg);
         const result = await ytpl(id, {
@@ -536,7 +566,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           hl: "ja",
           limit: 999 - this.queue.length,
         });
-        const index = await this.queue.processPlaylist(
+        items = await this.queue.processPlaylist(
           msg,
           cancellation,
           false,
@@ -566,7 +596,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
                   ? result.title
                   : `[${result.title}](${result.url})`
               }\r\n${
-                t("components:queue.songsAdded", { count: index })
+                t("components:queue.songsAdded", { count: items.length })
               }`
             )
             .setThumbnail(result.bestThumbnail.url)
@@ -587,13 +617,19 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         this.unbindCancellation(cancellation);
       }
       await this.player.play();
-    }else if(!config.isDisabledSource("soundcloud") && SoundCloudS.validatePlaylistUrl(rawArg)){
+      return items;
+    }
+
+
+    // SoundCloudのプレイリスト
+    else if(!config.isDisabledSource("soundcloud") && SoundCloudS.validatePlaylistUrl(rawArg)){
       const msg = await message.reply(`:hourglass_flowing_sand:${t("components:queue.processingPlaylistBefore")}`);
       const sc = new Soundcloud();
       const playlist = await sc.playlists.getV2(rawArg);
       const cancellation = this.bindCancellation(new TaskCancellationManager());
+      let items: QueueContent[] = null;
       try{
-        const index = await this.queue.processPlaylist(
+        items = await this.queue.processPlaylist(
           msg,
           cancellation,
           false,
@@ -620,7 +656,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
             .setTitle(`✅${t("components:queue.processingPlaylistCompleted")}`)
             .setDescription(
               `[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n`
-              + `${t("components:queue.songsAdded", { count: index })}`
+              + `${t("components:queue.songsAdded", { count: items.length })}`
             )
             .setThumbnail(playlist.artwork_url)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
@@ -637,13 +673,19 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         this.unbindCancellation(cancellation);
       }
       await this.player.play();
-    }else if(!config.isDisabledSource("spotify") && Spotify.validatePlaylistUrl(rawArg) && Spotify.available){
+      return items;
+    }
+
+
+    // Spotifyのプレイリスト
+    else if(!config.isDisabledSource("spotify") && Spotify.validatePlaylistUrl(rawArg) && Spotify.available){
       const msg = await message.reply(`:hourglass_flowing_sand:${t("components:queue.processingPlaylistBefore")}`);
       const cancellation = this.bindCancellation(new TaskCancellationManager());
+      let items: QueueContent[] = null;
       try{
         const playlist = await Spotify.client.getData(rawArg) as Playlist;
         const tracks = playlist.trackList;
-        const index = await this.queue.processPlaylist(
+        items = await this.queue.processPlaylist(
           msg,
           cancellation,
           false,
@@ -668,7 +710,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
             .setDescription(
               `[${playlist.title}](${
                 Spotify.getPlaylistUrl(playlist.uri, playlist.type)
-              }) \`(${playlist.subtitle})\` \r\n${t("components:queue.songsAdded", { count: index })}`
+              }) \`(${playlist.subtitle})\` \r\n${t("components:queue.songsAdded", { count: items.length })}`
             )
             .setThumbnail(playlist.coverArt.sources[0].url)
             .setFields({
@@ -688,7 +730,12 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         this.unbindCancellation(cancellation);
       }
       await this.player.play();
-    }else{
+      return items;
+    }
+
+
+    // その他の通常のURLを解釈
+    else{
       try{
         const success = await this.queue.addQueue({
           url: rawArg,
@@ -696,17 +743,19 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           first,
           message: await message.reply(`${t("pleaseWait")}...`),
           cancellable,
+          privateSource,
         });
         if(success){
           await this.player.play();
         }
-        return;
+        return [success];
       }
       catch(er){
         this.logger.error(er);
         // なに指定したし…
         await message.reply(`🔭${t("guildDataContainer.invalidUrl")}`)
           .catch(this.logger.error);
+        return [];
       }
     }
   }

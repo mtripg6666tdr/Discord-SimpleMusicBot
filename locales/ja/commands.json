@@ -309,7 +309,7 @@
     "queueEmpty": "キューが空です。再生するコンテンツがありません。"
   },
   "play_private": {
-    "description": "音楽ソースを非公開のまま音楽を再生します。",
+    "description": "URLを非公開のまま音楽をキューの末尾に追加し、状況に応じて再生を開始します。",
     "noInteraction": "このコマンドをメッセージから実行することはできません",
     "modalTitle": "再生したいURLを入力",
     "inputLabel": "再生したいURL"

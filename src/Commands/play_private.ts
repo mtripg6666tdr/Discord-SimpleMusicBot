@@ -74,18 +74,21 @@ export default class PlayPrivate extends BaseCommand {
 
     if(value){
       const message = CommandMessage.createFromInteraction(interaction, "play_private", [value], value);
-      const fixedT = i18next.getFixedT(interaction.locale);
+      // ここの型注釈を外すとTSサーバーがとんでもなく重くなる
+      const fixedT: i18n["t"] = i18next.getFixedT(interaction.locale);
 
-      await server.playFromURL(
+      const items = await server.playFromURL(
         message,
         value,
-        {},
+        { privateSource: true, first: false },
         fixedT,
       );
 
-      if(!await server.joinVoiceChannel(message, {}, fixedT)){
+      if(items.length <= 0 || !await server.joinVoiceChannel(message, {}, fixedT)){
         return;
       }
+
+      await server.player.play();
     }
   }
 }

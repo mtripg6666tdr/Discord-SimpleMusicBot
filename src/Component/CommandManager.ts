@@ -79,7 +79,7 @@ export class CommandManager extends LogEmitter<{}> {
   private initializeMap({ reportDupes }: { reportDupes: boolean }){
     const sets = new Map<string, BaseCommand>();
     const setCommand = (name: string, command: BaseCommand) => {
-      if(sets.has(name) && reportDupes){
+      if(sets.has(name) && reportDupes && !command.interactionOnly){
         this.logger.warn(`Detected command ${command.name} the duplicated key ${name} with ${sets.get(name).name}; overwriting`);
       }
       sets.set(name, command);
