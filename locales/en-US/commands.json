@@ -388,6 +388,18 @@
     },
     "noArgument": "Set the argument."
   },
+  "searchniconico": {
+    "name": "searchniconicodouga",
+    "description": "Search videos on Nico-Nico Douga.",
+    "examples": "searchniconicodouga setsuna trip",
+    "usage": "searchniconicodouga <keyword>",
+    "args": {
+      "keyword": {
+        "description": "Keyword or URL of the video you want to search for."
+      }
+    },
+    "noArgument": "Set the argument."
+  },
   "searchqueue": {
     "name": "searchqueue",
     "description": "Searches in queue. Specify keywords for the argument.",
