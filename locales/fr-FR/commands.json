@@ -5,6 +5,15 @@
     "listOfPresetBGM": "Liste de musiques prédéfinies"
   },
   "bulk-delete": {
+    "name": "バルク削除",
+    "description": "ボットが送信したメッセージを一括削除します。過去1000件のメッセージを遡って検索します。",
+    "args": {
+      "count": {
+        "description": "削除するメッセージの上限数。100以下で設定してください。"
+      }
+    },
+    "usage": "バルク削除 <メッセージ数>",
+    "examples": "バルク削除 10",
     "invalidMessageCount": "Nombre de messages spécifié non valide.",
     "loading": "obtenir",
     "hitCount_one": "{{count}} visites",
