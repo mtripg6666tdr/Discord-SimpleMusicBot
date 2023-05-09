@@ -187,7 +187,7 @@ export class CommandManager extends LogEmitter<{}> {
       }
       for(let i = 0; i < commandsToAdd.length; i++){
         const commandToRegister = commandsToAdd[i];
-        this.logger.info(`command adding ${Math.floor((i + 1) / commandsToEdit.length * 1000) / 10}% completed`);
+        this.logger.info(`command adding ${Math.floor((i + 1) / commandsToAdd.length * 1000) / 10}% completed`);
         await client.application.createGlobalCommand(commandToRegister);
       }
       this.logger.info("Updating completed.");
