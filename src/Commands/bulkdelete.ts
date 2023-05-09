@@ -29,23 +29,19 @@ import { BaseCommand } from ".";
 export default class BulkDelete extends BaseCommand {
   constructor(){
     super({
-      name: "バルク削除",
-      alias: ["bulk-delete", "bulkdelete"],
-      description: "ボットが送信したメッセージを一括削除します。過去1000件のメッセージを遡って検索します。",
-      unlist: true,
+      alias: ["bulk_delete", "bulk-delete", "bulkdelete"],
+      unlist: false,
       category: "utility",
-      usage: "バルク削除 <メッセージ数>",
-      examples: "バルク削除 10",
       argument: [
         {
           type: "integer",
           name: "count",
-          description: "削除するメッセージの上限数。100以下で設定してください。",
           required: true,
         },
       ],
       requiredPermissionsOr: ["admin", "manageMessages"],
       shouldDefer: false,
+      defaultMemberPermission: ["MANAGE_MESSAGES"],
     });
   }
 
