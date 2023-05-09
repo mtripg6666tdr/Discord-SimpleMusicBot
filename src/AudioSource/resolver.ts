@@ -82,7 +82,7 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
     }else if(!isDisabledSource("streamable") && AudioSource.StreamableApi.getVideoId(url)){
       // Streamable
       basicInfo = await new AudioSource.Streamable().init(url, gotData as AudioSource.exportableStreamable);
-    }else if(process.env.BD_ENABLE && AudioSource.BestdoriApi.getAudioId(url)){
+    }else if(process.env.BD_ENABLE && AudioSource.BestdoriApi.instance.getAudioId(url)){
       // Bestdori
       basicInfo = await new AudioSource.BestdoriS().init(url, gotData as AudioSource.exportableBestdori);
     }else if(process.env.HIBIKI_ENABLE && AudioSource.HibikiApi.validateURL(url)){
