@@ -88,7 +88,7 @@ export abstract class SearchBase<T> extends BaseCommand {
       if(!searchPanel){
         return;
       }
-      await searchPanel.consumeSearchResult(this.searchContent(context.rawArgs, context, t), this.consumer, t);
+      await searchPanel.consumeSearchResult(this.searchContent(context.rawArgs, context, t), this.consumer.bind(this), t);
     }else{
       await message.reply(t("commands:search.noArgument")).catch(this.logger.error);
     }
