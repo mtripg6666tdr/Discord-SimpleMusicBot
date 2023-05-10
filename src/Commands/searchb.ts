@@ -16,10 +16,15 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { BestdoriAllBandInfo, BestdoriAllSongInfo } from "../AudioSource";
+
 import { SearchBase } from "./search";
-import { bestdori, BestdoriApi } from "../AudioSource";
+import { BestdoriApi } from "../AudioSource";
 
 export default class Searchb extends SearchBase<string[]> {
+  private songInfoCache: BestdoriAllSongInfo = null;
+  private bandInfoCache: BestdoriAllBandInfo = null;
+
   constructor(){
     super({
       name: "searchb",
@@ -31,24 +36,25 @@ export default class Searchb extends SearchBase<string[]> {
   }
 
   protected async searchContent(query: string){
-    await BestdoriApi.setupData();
-    const keys = Object.keys(bestdori.allsonginfo);
+    this.songInfoCache = await BestdoriApi.instance.getSongInfo();
+    this.bandInfoCache = await BestdoriApi.instance.getBandInfo();
+    const keys = Object.keys(this.songInfoCache);
     const q = query.toLowerCase();
     return keys.filter(k => {
-      const info = bestdori.allsonginfo[Number(k)];
+      const info = this.songInfoCache[Number(k)];
       if(!info.musicTitle[0]) return false;
-      return (info.musicTitle[0] + bestdori.allbandinfo[info.bandId].bandName[0]).toLowerCase().includes(q);
+      return (info.musicTitle[0] + this.bandInfoCache[info.bandId].bandName[0]).toLowerCase().includes(q);
     });
   }
 
   protected consumer(items: string[]){
     return items.map(item => ({
-      title: bestdori.allsonginfo[Number(item)].musicTitle[0],
-      url: BestdoriApi.getAudioPage(Number(item)),
-      duration: "0",
-      thumbnail: BestdoriApi.getThumbnail(Number(item), bestdori.allsonginfo[Number(item)].jacketImage[0]),
-      author: bestdori.allbandinfo[bestdori.allsonginfo[Number(item)].bandId].bandName[0],
-      description: `バンド名: ${bestdori.allbandinfo[bestdori.allsonginfo[Number(item)].bandId].bandName[0]}`,
+      title: this.songInfoCache[Number(item)].musicTitle[0],
+      url: BestdoriApi.instance.getAudioPage(Number(item)),
+      duration: String.fromCharCode(0x200b),
+      thumbnail: BestdoriApi.instance.getThumbnailUrl(Number(item), this.songInfoCache[Number(item)].jacketImage[0]),
+      author: this.bandInfoCache[this.songInfoCache[Number(item)].bandId].bandName[0],
+      description: `バンド名: ${this.bandInfoCache[this.songInfoCache[Number(item)].bandId].bandName[0]}`,
     })).filter(item => item.title);
   }
 }
