@@ -4,7 +4,7 @@ sidebar_label: play_private
 # `play_private`コマンド
 URLを非公開のまま音楽をキューの末尾に追加し、状況に応じて再生を開始します。
 
-スラッシュコマンドでは、`/play private`を使用してください。
+スラッシュコマンドでは、`/play_private`を使用してください。
 
 ## 別名
 `play_private`以外にも以下の別名を使用できます。
