@@ -4,21 +4,6 @@
     "description": "開発者が勝手に作った勉強用・作業用BGMのプリセットプレイリストを表示し、聞きたいものを選択して再生することができます。",
     "listOfPresetBGM": "プリセットBGM一覧"
   },
-  "bulk-delete": {
-    "invalidMessageCount": "指定されたメッセージ数が無効です。",
-    "loading": "取得中",
-    "hitCount_one": "{{count}}件ヒット",
-    "hitCount_other": "{{count}}件ヒット",
-    "inCount_one": "取得した{{count}}件中",
-    "inCount_other": "取得した{{count}}件中",
-    "found_one": "{{count}}件見つかりました。",
-    "found_other": "{{count}}件見つかりました。",
-    "confirm": "一括削除を確定するにはボタンを押してください。\r\n押されないと一定時間後にキャンセルされます。",
-    "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
-    "auditLog_other": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
-    "finish": "完了!(このメッセージは自動的に消去されます)",
-    "cancel": "削除をキャンセルしました"
-  },
   "cancel": {
     "name": "キャンセル",
     "description": "実行中のキャンセル可能な処理がある場合それをすべて中止します。",
@@ -516,5 +501,29 @@
       }
     },
     "noArgument": "引数を指定してください。"
+  },
+  "bulk_delete": {
+    "name": "バルク削除",
+    "usage": "バルク削除 <メッセージ数>",
+    "examples": "バルク削除 10",
+    "description": "ボットが送信したメッセージを一括削除します。過去1000件のメッセージを遡って検索します。",
+    "invalidMessageCount": "指定されたメッセージ数が無効です。",
+    "found_one": "{{count}}件見つかりました。",
+    "inCount_other": "取得した{{count}}件中",
+    "inCount_one": "取得した{{count}}件中",
+    "found_other": "{{count}}件見つかりました。",
+    "confirm": "一括削除を確定するにはボタンを押してください。\n押されないと一定時間後にキャンセルされます。",
+    "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
+    "auditLog_other": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
+    "finish": "完了!(このメッセージは自動的に消去されます)",
+    "cancel": "削除をキャンセルしました",
+    "hitCount_other": "{{count}}件ヒット",
+    "hitCount_one": "{{count}}件ヒット",
+    "loading": "取得中",
+    "args": {
+      "count": {
+        "description": "削除するメッセージの上限数。100以下で設定してください。"
+      }
+    }
   }
 }

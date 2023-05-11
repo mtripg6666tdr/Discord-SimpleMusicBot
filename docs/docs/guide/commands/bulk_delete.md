@@ -1,13 +1,13 @@
 ---
-sidebar_label: bulk_delete.name
+sidebar_label: バルク削除
 ---
-# `bulk_delete.name`コマンド
-bulk_delete.description
+# `バルク削除`コマンド
+ボットが送信したメッセージを一括削除します。過去1000件のメッセージを遡って検索します。
 
-スラッシュコマンドでは、`/bulk delete`を使用してください。
+スラッシュコマンドでは、`/bulk_delete`を使用してください。
 
 ## 別名
-`bulk_delete.name`以外にも以下の別名を使用できます。
+`バルク削除`以外にも以下の別名を使用できます。
 
 - bulk_delete
 - bulk-delete

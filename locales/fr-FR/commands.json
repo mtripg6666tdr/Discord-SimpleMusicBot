@@ -4,21 +4,6 @@
     "description": "Vous pouvez afficher une liste de lecture prédéfinie de BGM pour l'étude et le travail créé par le développeur, et sélectionner et lire ce que vous voulez entendre.",
     "listOfPresetBGM": "Liste de musiques prédéfinies"
   },
-  "bulk-delete": {
-    "invalidMessageCount": "Nombre de messages spécifié non valide.",
-    "loading": "obtenir",
-    "hitCount_one": "{{count}} visites",
-    "hitCount_other": "{{count}} visites",
-    "inCount_one": "sur {{count}} récupérés",
-    "inCount_other": "sur {{count}} récupérés",
-    "found_one": "{{count}} trouvé.",
-    "found_other": "{{count}} trouvé.",
-    "confirm": "Appuyez sur le bouton pour confirmer la suppression en bloc.\nS'il n'est pas enfoncé, il sera annulé après un certain temps.",
-    "auditLog_one": "{{count}} messages dont la suppression a été demandée par {{issuer}}.",
-    "auditLog_other": "{{count}} messages dont la suppression a été demandée par {{issuer}}.",
-    "finish": "Terminé ! (Ce message sera effacé automatiquement)",
-    "cancel": "Suppression annulée"
-  },
   "cancel": {
     "name": "Annuler",
     "description": "Abandonne toutes les opérations annulables en cours.",
@@ -516,5 +501,29 @@
       }
     },
     "noArgument": "引数を指定してください。"
+  },
+  "bulk_delete": {
+    "name": "バルク削除",
+    "usage": "バルク削除 <メッセージ数>",
+    "examples": "バルク削除 10",
+    "description": "ボットが送信したメッセージを一括削除します。過去1000件のメッセージを遡って検索します。",
+    "invalidMessageCount": "Nombre de messages spécifié non valide.",
+    "found_one": "{{count}} trouvé.",
+    "inCount_other": "sur {{count}} récupérés",
+    "inCount_one": "sur {{count}} récupérés",
+    "found_other": "{{count}} trouvé.",
+    "confirm": "Appuyez sur le bouton pour confirmer la suppression en bloc.\nS'il n'est pas enfoncé, il sera annulé après un certain temps.",
+    "auditLog_one": "{{count}} messages dont la suppression a été demandée par {{issuer}}.",
+    "auditLog_other": "{{count}} messages dont la suppression a été demandée par {{issuer}}.",
+    "finish": "Terminé ! (Ce message sera effacé automatiquement)",
+    "cancel": "Suppression annulée",
+    "hitCount_other": "{{count}} visites",
+    "hitCount_one": "{{count}} visites",
+    "loading": "obtenir",
+    "args": {
+      "count": {
+        "description": "削除するメッセージの上限数。100以下で設定してください。"
+      }
+    }
   }
 }

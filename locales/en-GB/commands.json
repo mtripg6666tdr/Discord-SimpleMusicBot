@@ -4,21 +4,6 @@
     "description": "Shows BGM playlists that the developer of this bot shares, and you can choose and play them.",
     "listOfPresetBGM": "Available BGM Presets"
   },
-  "bulk-delete": {
-    "invalidMessageCount": "Provided message count is invalid.",
-    "loading": "Fetching",
-    "hitCount_one": "{{count}} message found.",
-    "hitCount_other": "{{count}} messages found.",
-    "inCount_one": "in {{count}} message",
-    "inCount_other": "in {{count}} messages",
-    "found_one": "{{count}} message found.",
-    "found_other": "{{count}} messages found.",
-    "confirm": "Press the button below to confirm bulk-deletion of messages.\nIf not, the operation will be automatically cancelled after a while.",
-    "auditLog_one": "Because {{issuer}} requested to delete {{count}} message.",
-    "auditLog_other": "Because {{issuer}} requested to delete {{count}} messages.",
-    "finish": "Done! (This message will be deleted automatically)",
-    "cancel": "Canceled the deletions."
-  },
   "cancel": {
     "name": "cancel",
     "description": "Aborts all operations that can be canceled.",
@@ -516,5 +501,29 @@
       }
     },
     "noArgument": "Set the argument."
+  },
+  "bulk_delete": {
+    "name": "バルク削除",
+    "usage": "バルク削除 <メッセージ数>",
+    "examples": "バルク削除 10",
+    "description": "ボットが送信したメッセージを一括削除します。過去1000件のメッセージを遡って検索します。",
+    "invalidMessageCount": "Provided message count is invalid.",
+    "found_one": "{{count}} message found.",
+    "inCount_other": "in {{count}} messages",
+    "inCount_one": "in {{count}} message",
+    "found_other": "{{count}} messages found.",
+    "confirm": "Press the button below to confirm bulk-deletion of messages.\nIf not, the operation will be automatically cancelled after a while.",
+    "auditLog_one": "Because {{issuer}} requested to delete {{count}} message.",
+    "auditLog_other": "Because {{issuer}} requested to delete {{count}} messages.",
+    "finish": "Done! (This message will be deleted automatically)",
+    "cancel": "Canceled the deletions.",
+    "hitCount_other": "{{count}} messages found.",
+    "hitCount_one": "{{count}} message found.",
+    "loading": "Fetching",
+    "args": {
+      "count": {
+        "description": "削除するメッセージの上限数。100以下で設定してください。"
+      }
+    }
   }
 }

@@ -48,11 +48,11 @@ export default class BulkDelete extends BaseCommand {
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     const count = Number(context.args[0]);
     if(isNaN(count)){
-      message.reply(`:warning:${t("commands:bulk-delete.invalidMessageCount")}`).catch(this.logger.error);
+      message.reply(`:warning:${t("commands:bulk_delete.invalidMessageCount")}`).catch(this.logger.error);
       return;
     }
     const reply = await message.reply(
-      t("commands:bulk-delete.loading") + "..."
+      t("commands:bulk_delete.loading") + "..."
     ).catch(this.logger.error) as ResponseMessage;
     try{
       // collect messages
@@ -73,10 +73,10 @@ export default class BulkDelete extends BaseCommand {
         before = allMsgs.at(-1).id;
         i++;
         await reply.edit(
-          `:mag:${t("commands:bulk-delete.loading")}(${
-            t("commands:bulk-delete.hitCount", { count: messages.length })
+          `:mag:${t("commands:bulk_delete.loading")}(${
+            t("commands:bulk_delete.hitCount", { count: messages.length })
           }/${
-            t("commands:bulk-delete.inCount", { count: i * 100 })
+            t("commands:bulk_delete.inCount", { count: i * 100 })
           })...`);
       } while(messages.length < count && i <= 10);
       if(messages.length > count) messages.splice(count);
@@ -90,8 +90,8 @@ export default class BulkDelete extends BaseCommand {
         });
       await reply.edit({
         content: [
-          t("commands:bulk-delete.found", { count: messages.length }),
-          t("commands:bulk-delete.confirm"),
+          t("commands:bulk_delete.found", { count: messages.length }),
+          t("commands:bulk_delete.confirm"),
         ].join("\r\n"),
         components: [
           new MessageActionRowBuilder()
@@ -109,17 +109,17 @@ export default class BulkDelete extends BaseCommand {
         // bulk delete
         await message.channel.deleteMessages(
           messages.map(msg => msg.id),
-          t("commands:bulk-delete.auditLog", { issuer: message.member.username, count })
+          t("commands:bulk_delete.auditLog", { issuer: message.member.username, count })
         );
         await reply.edit({
-          content: `:sparkles:${t("commands:bulk-delete.finish")}`,
+          content: `:sparkles:${t("commands:bulk_delete.finish")}`,
           components: [],
         });
         setTimeout(() => reply.delete().catch(() => {}), 10 * 1000).unref();
       });
       collector.on("timeout", () => {
         reply.edit({
-          content: t("commands:bulk-delete.cancel"),
+          content: t("commands:bulk_delete.cancel"),
           components: [],
         }).catch(this.logger.error);
       });
