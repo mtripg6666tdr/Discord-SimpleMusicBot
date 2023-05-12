@@ -72,7 +72,7 @@
     "ffmpeg-static": "^5.1.0",
     "libsodium-wrappers": "^0.7.11",
     "mongodb": "^5.5.0",
-    "opusscript": "^0.0.8",
+    "opusscript": "^0.1.0",
     "pako": "^2.1.0",
     "play-dl": "^1.9.6",
     "sodium": "^3.0.2",
