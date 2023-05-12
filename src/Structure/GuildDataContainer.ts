@@ -483,7 +483,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     setTimeout(() => message.suppressEmbeds(true).catch(this.logger.error), 4000).unref();
 
     // Spotifyの短縮リンクを展開
-    if(rawArg.match(/https?:\/\/spotify.link\/[a-zA-Z\d]+/)){
+    if(rawArg.match(/^https?:\/\/spotify.link\/[a-zA-Z\d]+$/)){
       const result = await Spotify.expandShortenLink(rawArg);
       if(result){
         rawArg = result.url;
