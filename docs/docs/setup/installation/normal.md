@@ -93,7 +93,7 @@ npm run start
 :::caution
 
 v3からv4の更新の際に、config.jsonでの設定内容が追加されています。
-追加しないと起動しないようになっていますので、必ずドキュメントサイトやconfig.json.sampleを参照の上更新してください。
+追加しないと起動しないようになっていますので、必ずドキュメントサイトや[config.json.sample](../../../../config.json.sample)を参照の上更新してください。
 
 :::
 
