@@ -89,7 +89,7 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
       relatedVideos: info.related_videos.map(video => ({
         url: "https://www.youtube.com/watch?v=" + video.id,
         title: video.title,
-        description: "関連動画として取得したため詳細は表示されません",
+        description: "No description due to being fetched via related-videos.",
         length: video.length_seconds,
         channel: (video.author as ytdl.Author)?.name,
         channelUrl: (video.author as ytdl.Author)?.channel_url,

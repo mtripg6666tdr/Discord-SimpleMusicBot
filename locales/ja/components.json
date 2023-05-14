@@ -6,7 +6,8 @@
     "waitForPlayingItemName": "再生待ち",
     "requestedBy": "リクエスト",
     "nextSong": "次の曲",
-    "noNextSong": "次の曲がまだ登録されていません"
+    "noNextSong": "次の曲がまだ登録されていません",
+    "inRadio": "ラジオを再生しています。"
   },
   "queue": {
     "queueTitle": "{{server}}のキュー",

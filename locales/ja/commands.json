@@ -313,6 +313,20 @@
     "songCount_other": "{{count}}曲",
     "total": "合計"
   },
+  "radio": {
+    "name": "ラジオ",
+    "description": "指定されたYouTubeのURLの楽曲からラジオ（ミックスリスト）の再生を開始または停止します。開始時にはURLを指定する必要があります。",
+    "args": {
+      "url": {
+        "description": "ラジオのもととなる楽曲のYouTubeのURL"
+      }
+    },
+    "alreadyEnabled": "すでに有効になっています。別の曲のラジオを開始するには、現在再生されているミックスをいったんオフにする必要があります。",
+    "noUrlSpecified": "もととなる楽曲のURLをひとつ指定してください。",
+    "invalidUrl": "指定されたURLは有効なYouTubeのURLではありません。",
+    "started": "指定された楽曲でラジオを開始しました。",
+    "stopped": "ラジオを終了しました。"
+  },
   "related": {
     "name": "関連動画",
     "description": "YouTubeから楽曲を再生終了時に、関連曲をキューに自動で追加する機能の有効/無効を設定します。",

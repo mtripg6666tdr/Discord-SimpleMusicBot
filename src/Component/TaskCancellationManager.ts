@@ -26,14 +26,14 @@ export class TaskCancellationManager {
   /**
    * キャンセルが要求されたかどうかを取得します
    */
-  get Cancelled(){
+  get cancelled(){
     return this._cancelled;
   }
 
   /**
    * キャンセル時に渡されたメッセージを取得します
    */
-  get Message(){
+  get message(){
     return this._message;
   }
 

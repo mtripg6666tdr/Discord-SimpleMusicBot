@@ -584,7 +584,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
             title: c.title,
           } as exportableCustom)
         );
-        if(cancellation.Cancelled){
+        if(cancellation.cancelled){
           await msg.edit(`✅${t("canceled")}`);
         }else{
           const embed = new MessageEmbedBuilder()
@@ -649,7 +649,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
             } as exportableCustom;
           }
         );
-        if(cancellation.Cancelled){
+        if(cancellation.cancelled){
           await msg.edit(`✅${t("canceled")}`);
         }else{
           const embed = new MessageEmbedBuilder()
@@ -702,7 +702,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
             } as exportableSpotify;
           }
         );
-        if(cancellation.Cancelled){
+        if(cancellation.cancelled){
           await msg.edit(`✅${t("canceled")}`);
         }else{
           const embed = new MessageEmbedBuilder()
