@@ -46,7 +46,7 @@
     "ytsr": "^3.8.2"
   },
   "devDependencies": {
-    "@tsconfig/node16": "^1.0.3",
+    "@tsconfig/node16": "^1.0.4",
     "@types/follow-redirects": "^1.14.1",
     "@types/html-to-text": "^9.0.0",
     "@types/mocha": "^10.0.1",
