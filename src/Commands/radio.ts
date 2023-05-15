@@ -63,13 +63,14 @@ export default class Radio extends BaseCommand {
         }
 
         // validate provided url
-        if(!ytdl.validateURL(context.rawArgs)){
+        const videoId = this.getVideoId(context.rawArgs);
+        if(!videoId){
           await message.reply(t("commands:radio.invalidUrl")).catch(this.logger.error);
           return;
         }
 
         // setup and start to play
-        await context.server.queue.enableMixPlaylist(context.rawArgs, message.member);
+        await context.server.queue.enableMixPlaylist(`https://www.youtube.com/watch?v=${videoId}`, message.member);
         await message.reply(`:white_check_mark:${t("commands:radio.started")}`);
         await context.server.player.play();
       }
@@ -84,6 +85,28 @@ export default class Radio extends BaseCommand {
     catch(er){
       await message.reply(t("errorOccurred"));
       this.logger.error(er);
+    }
+  }
+
+  protected getVideoId(url: string){
+    if(ytdl.validateURL(url)){
+      return ytdl.getURLVideoID(url);
+    }else{
+      try{
+        const urlObject = new URL(url);
+        if(
+          (urlObject.protocol === "http:" || urlObject.protocol === "https:")
+          && urlObject.hostname === "www.youtube.com"
+          && urlObject.pathname === "/playlist"
+          && urlObject.searchParams.get("list")?.startsWith("RD")
+        ){
+          return urlObject.searchParams.get("list").substring(2);
+        }
+      }
+      catch{
+        /* empty */
+      }
+      return null;
     }
   }
 }
