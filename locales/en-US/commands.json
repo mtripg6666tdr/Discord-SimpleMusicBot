@@ -357,18 +357,18 @@
     "total": "Total"
   },
   "radio": {
-    "name": "ラジオ",
-    "description": "指定されたYouTubeのURLの楽曲からラジオ（ミックスリスト）の再生を開始または停止します。開始時にはURLを指定する必要があります。",
+    "name": "radio",
+    "description": "Starts or stops to play the mix list based on the specified URL of the song. If you want to start a radio, you must specify a URL.",
     "args": {
       "url": {
-        "description": "ラジオのもととなる楽曲のYouTubeのURL"
+        "description": "The URL on YouTube of the song that the radio is being based on."
       }
     },
-    "alreadyEnabled": "すでに有効になっています。別の曲のラジオを開始するには、現在再生されているミックスをいったんオフにする必要があります。",
-    "noUrlSpecified": "もととなる楽曲のURLをひとつ指定してください。",
-    "invalidUrl": "指定されたURLは有効なYouTubeのURLではありません。",
-    "started": "指定された楽曲でラジオを開始しました。",
-    "stopped": "ラジオを終了しました。"
+    "alreadyEnabled": "The radio is already enabled. If you want to start a new radio based on another song, first you must disable the mix list that is currently played.",
+    "noUrlSpecified": "Please give one URL of the song a radio should be based on.",
+    "invalidUrl": "The given URL is not valid one on YouTube.",
+    "started": "Radio started based on the specified song.",
+    "stopped": "Radio stopped."
   },
   "related": {
     "name": "related",
