@@ -4,6 +4,30 @@
     "description": "開発者が勝手に作った勉強用・作業用BGMのプリセットプレイリストを表示し、聞きたいものを選択して再生することができます。",
     "listOfPresetBGM": "プリセットBGM一覧"
   },
+  "bulk_delete": {
+    "name": "バルク削除",
+    "usage": "バルク削除 <メッセージ数>",
+    "examples": "バルク削除 10",
+    "description": "ボットが送信したメッセージを一括削除します。過去1000件のメッセージを遡って検索します。",
+    "invalidMessageCount": "指定されたメッセージ数が無効です。",
+    "found_one": "{{count}}件見つかりました。",
+    "inCount_other": "取得した{{count}}件中",
+    "inCount_one": "取得した{{count}}件中",
+    "found_other": "{{count}}件見つかりました。",
+    "confirm": "一括削除を確定するにはボタンを押してください。\n押されないと一定時間後にキャンセルされます。",
+    "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
+    "auditLog_other": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
+    "finish": "完了!(このメッセージは自動的に消去されます)",
+    "cancel": "削除をキャンセルしました",
+    "hitCount_other": "{{count}}件ヒット",
+    "hitCount_one": "{{count}}件ヒット",
+    "loading": "取得中",
+    "args": {
+      "count": {
+        "description": "削除するメッセージの上限数。100以下で設定してください。"
+      }
+    }
+  },
   "cancel": {
     "name": "キャンセル",
     "description": "実行中のキャンセル可能な処理がある場合それをすべて中止します。",
@@ -55,6 +79,13 @@
     "description": "現在再生中の曲(再生待ちの曲)をのぞいてほかの曲をすべて削除します。",
     "queueWasEmpty": "キューが空、もしくは一曲しかないため削除されませんでした。",
     "success": "キューに残された曲を削除しました。"
+  },
+  "equalplayback": {
+    "name": "均等再生",
+    "description": "追加ユーザーごとにキュー内の楽曲を均等に再生します。",
+    "enabled": "均等再生をオンにしました",
+    "disabled": "均等再生をオフにしました",
+    "featureDescription": "楽曲追加時に、楽曲を追加したユーザーごとにできるだけ均等になるようにする機能です。"
   },
   "export": {
     "name": "エクスポート",
@@ -205,6 +236,18 @@
     "description": "トラックごとのループを設定します。",
     "disabled": "トラックリピートを無効にしました",
     "enabled": "トラックリピートを有効にしました"
+  },
+  "looponce": {
+    "name": "ワンスループ",
+    "description": "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
+    "disabled": "ワンスループを無効にしました",
+    "enabled": "ワンスループを有効にしました"
+  },
+  "loopqueue": {
+    "disabled": "キューループを無効にしました。",
+    "enabled": "キューループを有効にしました。",
+    "name": "キューループ",
+    "description": "キュー内のループを設定します。"
   },
   "lyrics": {
     "name": "歌詞",
@@ -393,6 +436,18 @@
     },
     "noArgument": "引数を指定してください。"
   },
+  "searchnico": {
+    "name": "ニコニコ動画を検索",
+    "description": "曲をニコニコ動画で検索します。",
+    "examples": "ニコニコを検索 セツナトリップ",
+    "usage": "ニコニコを検索 <キーワード>",
+    "args": {
+      "keyword": {
+        "description": "検索したい動画のキーワードまたはURL。"
+      }
+    },
+    "noArgument": "引数を指定してください。"
+  },
   "searchqueue": {
     "name": "キュー内を検索",
     "description": "キュー内を検索します。引数にキーワードを指定します。",
@@ -484,60 +539,5 @@
     "outOfRange": "音量を変更する際は1から200の数字で指定してください。",
     "changed": "音量を**{{volume}}**に変更しました。",
     "appliedFromNext": "次の曲から適用されます。現在再生中の曲に設定を適用するには、`頭出し`コマンドなどを使用してください。"
-  },
-  "loopqueue": {
-    "disabled": "キューループを無効にしました。",
-    "enabled": "キューループを有効にしました。",
-    "name": "キューループ",
-    "description": "キュー内のループを設定します。"
-  },
-  "looponce": {
-    "name": "ワンスループ",
-    "description": "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
-    "disabled": "ワンスループを無効にしました",
-    "enabled": "ワンスループを有効にしました"
-  },
-  "equalplayback": {
-    "name": "均等再生",
-    "description": "追加ユーザーごとにキュー内の楽曲を均等に再生します。",
-    "enabled": "均等再生をオンにしました",
-    "disabled": "均等再生をオフにしました",
-    "featureDescription": "楽曲追加時に、楽曲を追加したユーザーごとにできるだけ均等になるようにする機能です。"
-  },
-  "searchnico": {
-    "name": "ニコニコ動画を検索",
-    "description": "曲をニコニコ動画で検索します。",
-    "examples": "ニコニコを検索 セツナトリップ",
-    "usage": "ニコニコを検索 <キーワード>",
-    "args": {
-      "keyword": {
-        "description": "検索したい動画のキーワードまたはURL。"
-      }
-    },
-    "noArgument": "引数を指定してください。"
-  },
-  "bulk_delete": {
-    "name": "バルク削除",
-    "usage": "バルク削除 <メッセージ数>",
-    "examples": "バルク削除 10",
-    "description": "ボットが送信したメッセージを一括削除します。過去1000件のメッセージを遡って検索します。",
-    "invalidMessageCount": "指定されたメッセージ数が無効です。",
-    "found_one": "{{count}}件見つかりました。",
-    "inCount_other": "取得した{{count}}件中",
-    "inCount_one": "取得した{{count}}件中",
-    "found_other": "{{count}}件見つかりました。",
-    "confirm": "一括削除を確定するにはボタンを押してください。\n押されないと一定時間後にキャンセルされます。",
-    "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
-    "auditLog_other": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
-    "finish": "完了!(このメッセージは自動的に消去されます)",
-    "cancel": "削除をキャンセルしました",
-    "hitCount_other": "{{count}}件ヒット",
-    "hitCount_one": "{{count}}件ヒット",
-    "loading": "取得中",
-    "args": {
-      "count": {
-        "description": "削除するメッセージの上限数。100以下で設定してください。"
-      }
-    }
   }
 }
