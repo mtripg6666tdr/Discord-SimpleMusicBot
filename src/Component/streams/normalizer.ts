@@ -20,6 +20,7 @@ import type { ReadableOptions } from "stream";
 
 import { Readable } from "stream";
 
+import { bindThis } from "../../Util/decorators";
 import { getLogger } from "../../logger";
 
 export class Normalizer extends Readable {
@@ -57,7 +58,6 @@ export class Normalizer extends Readable {
     this.origin.once("end", () => this.push(null));
     this.origin.on("error", er => this.destroy(er));
 
-    this._onDestroy = this._onDestroy.bind(this);
     this.once("close", this._onDestroy);
     this.once("end", this._onDestroy);
 
@@ -84,6 +84,7 @@ export class Normalizer extends Readable {
     }
   }
 
+  @bindThis
   protected _onDestroy(){
     if(this._destroyed){
       return;

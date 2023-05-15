@@ -36,6 +36,7 @@ import * as AudioSource from "../AudioSource";
 import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
+import { bindThis } from "../Util/decorators";
 import { useConfig } from "../config";
 import { timeLoggedMethod } from "../logger";
 
@@ -664,7 +665,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     }
   }
 
-  @Util.boundThis
+  @bindThis
   disableMixPlaylist(){
     this._mixPlaylist = null;
     this.server.player.off("disconnect", this.disableMixPlaylist);

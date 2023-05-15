@@ -388,13 +388,3 @@ export function createFragmentalDownloadStream(
   return stream;
 }
 
-export function boundThis(_originalMethod: any, context: ClassMethodDecoratorContext) {
-  const methodName = context.name;
-  if(context.private){
-    throw new Error(`'bound' cannot decorate private properties like ${methodName as string}.`);
-  }
-  context.addInitializer(function() {
-    // eslint-disable-next-line @typescript-eslint/no-invalid-this
-    (this as any)[methodName] = (this as any)[methodName].bind(this);
-  });
-}
