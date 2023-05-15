@@ -37,7 +37,12 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: 'https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/tree/master/docs/',
+          editUrl: (context) => {
+            if(context.docPath.startsWith("guide/commands/") && context.docPath !== "guide/commands/overview.md"){
+              return undefined;
+            }
+            return `https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/edit/master/docs/${context.versionDocsDirPath}/${context.docPath}`
+          },
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
