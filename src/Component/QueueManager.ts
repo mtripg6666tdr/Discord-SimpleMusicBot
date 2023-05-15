@@ -29,11 +29,15 @@ import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } fr
 
 import i18next from "i18next";
 import { Member } from "oceanic.js";
+import ytmpl from "yt-mix-playlist";
+import ytdl from "ytdl-core";
 
 import * as AudioSource from "../AudioSource";
 import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
+import { bindThis } from "../Util/decorators";
+import { useConfig } from "../config";
 import { timeLoggedMethod } from "../logger";
 
 export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"spotify"|"unknown";
@@ -43,7 +47,10 @@ interface QueueManagerEvents {
   changeWithoutCurrent: [];
   add: [content:QueueContent];
   settingsChanged: [];
+  mixPlaylistEnabledChanged: [enabled: boolean];
 }
+
+const config = useConfig();
 
 /**
  * サーバーごとのキューを管理するマネージャー。
@@ -99,7 +106,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     this._onceLoopEnabled = value;
     this.emit("settingsChanged");
   }
-  
+
   /**
    * キューの長さ（トラック数）
    */
@@ -131,6 +138,23 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
 
   get isEmpty(): boolean{
     return this.length === 0;
+  }
+
+  protected _mixPlaylist: Awaited<ReturnType<typeof ytmpl>>;
+  get mixPlaylist(): Awaited<ReturnType<typeof ytmpl>> {
+    return this._mixPlaylist;
+  }
+  set mixPlaylist(value: Awaited<ReturnType<typeof ytmpl>>){
+    const oldState = this.mixPlaylistEnabled;
+    this._mixPlaylist = value;
+    const newState = this.mixPlaylistEnabled;
+    if(newState !== oldState){
+      this.emit("mixPlaylistEnabledChanged", newState);
+    }
+  }
+
+  get mixPlaylistEnabled(){
+    return !!this._mixPlaylist;
   }
 
   constructor(parent: GuildDataContainer){
@@ -195,7 +219,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
   private readonly addQueueLocker = new LockObj();
 
   @timeLoggedMethod
-  async addQueueOnly({
+  async addQueueOnly<T extends AudioSource.exportableCustom = AudioSource.exportableCustom>({
     url,
     addedBy,
     method = "push",
@@ -208,7 +232,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     addedBy: Member|AddedBy,
     method?: "push"|"unshift",
     sourceType?: KnownAudioSourceIdentifer,
-    gotData?: AudioSource.exportableCustom,
+    gotData?: T,
     preventCache?: boolean,
     preventSourceCache?: boolean,
   }): Promise<QueueContent & { index: number }>{
@@ -278,9 +302,9 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     let uiMessage: Message<AnyGuildTextChannel>|ResponseMessage = null;
 
     try{
-      // UI表示するためのメッセージを特定する
+      // UI表示するためのメッセージを特定する作業
       if(options.fromSearch){
-        // 検索パネルから
+        // 検索パネルからの場合
         this.logger.info("AutoAddQueue from search panel");
         uiMessage = options.fromSearch;
         await uiMessage.edit({
@@ -297,11 +321,11 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           components: [],
         });
       }else if(options.message){
-        // すでに処理中メッセージがある
+        // すでに処理中メッセージがある場合
         this.logger.info("AutoAddQueue will report statuses to the specified message");
         uiMessage = options.message;
       }else if(options.channel){
-        // まだないので生成
+        // まだないの場合（新しくUI用のメッセージを生成する）
         this.logger.info("AutoAddQueue will make a message that will be used to report statuses");
         uiMessage = await options.channel.createMessage({
           content: i18next.t("loadingInfoPleaseWait", { lng: this.server.locale }),
@@ -326,6 +350,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         preventSourceCache: options.privateSource,
       });
 
+      // 非公開ソースで追加する場合には非公開ソースとしてマーク
       if(options.privateSource){
         info.basicInfo.markAsPrivateSource();
       }
@@ -552,7 +577,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
             })
           }`);
       }
-      if(cancellation.Cancelled){
+      if(cancellation.cancelled){
         break;
       }
     }
@@ -574,17 +599,76 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       const relatedVideos = this.server.player.currentAudioInfo.relatedVideos;
       if(relatedVideos.length >= 1){
         const video = relatedVideos[0];
-        await this.addQueueOnly({
-          url: video.url,
-          addedBy: null,
-          method: "push",
-          sourceType: "youtube",
-          gotData: video,
-        });
+        if(typeof video === "string"){
+          await this.addQueueOnly({
+            url: video,
+            addedBy: null,
+            method: "push",
+            sourceType: "youtube",
+          });
+        }else{
+          await this.addQueueOnly({
+            url: video.url,
+            addedBy: null,
+            method: "push",
+            sourceType: "youtube",
+            gotData: video,
+          });
+        }
       }
     }
     this._default.shift();
     this.emit("change");
+  }
+
+  async enableMixPlaylist(url: string, request: Member){
+    this._mixPlaylist = await ytmpl(ytdl.getURLVideoID(url), {
+      gl: config.country,
+      hl: config.defaultLanguage,
+    });
+    await this.addQueueOnly({
+      url: url,
+      addedBy: request,
+      method: "push",
+      sourceType: "youtube",
+    });
+    await this.prepareNextMixItem();
+    this.server.player.once("disconnect", this.disableMixPlaylist);
+  }
+
+  async prepareNextMixItem(){
+    if(!this.mixPlaylistEnabled) throw new Error("Mix playlist is currently disabled");
+    // select and obtain the next song
+    this._mixPlaylist = await this.mixPlaylist.select(this.mixPlaylist.currentIndex + 1);
+    const item = this.mixPlaylist.items[this.mixPlaylist.currentIndex];
+
+    // if a new song fetched, add it to the last in queue.
+    if(item){
+      await this.addQueueOnly({
+        url: item.url,
+        addedBy: null,
+        method: "push",
+        sourceType: "youtube",
+        gotData: {
+          url: item.url,
+          title: item.title,
+          description: "No description due to being fetched via mix-list",
+          length: item.duration.split(":").reduce((prev, current) => prev * 60 + Number(current), 0),
+          channel: item.author.name,
+          channelUrl: item.author.url,
+          thumbnail: item.thumbnails[0].url,
+          isLive: false,
+        },
+      });
+    }else{
+      this.disableMixPlaylist();
+    }
+  }
+
+  @bindThis
+  disableMixPlaylist(){
+    this._mixPlaylist = null;
+    this.server.player.off("disconnect", this.disableMixPlaylist);
   }
 
   /**
