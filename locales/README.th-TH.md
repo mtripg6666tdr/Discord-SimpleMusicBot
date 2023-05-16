@@ -18,7 +18,7 @@ YouTubeなどからの再生に対応。 選曲はキーワードで指定可能
   - YouTubeのプレイリストのリンク
   - SoundCloudの楽曲ページのリンク
   - ニコニコ動画の再生ページへのリンク
-  - [などなど...](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/commands/overview)
+  - [などなど...](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/guide/commands/overview)
 - 🔎 キーワードから検索して再生(YouTubeとSoundCloud)
 - 🔁 トラックごと及びキュー全体でループ
 - ❕ プレフィックス変更
@@ -26,7 +26,7 @@ YouTubeなどからの再生に対応。 選曲はキーワードで指定可能
   - ボットを自分でホストする場合、設定ファイルからボットレベルでデフォルトのプレフィックスを設定できます。
   - 複数文字に対応しています。
 - ▶️事前設定による音楽の自動再生
-- 👍 Botに関するサポート(下記)
+- 👍 Botに関する[サポート](##サポート)(下記)
 
 ## ガイド
 ボットの設定方法、コマンドなどはこちらからご覧になれます。
