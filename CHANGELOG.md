@@ -24,8 +24,12 @@
 * ドキュメントの継続的な更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1531, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1630, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1632, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1610)
 * 環境変数`PORT`に関する説明を追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1588, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1637, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1638)
 ## 依存関係のアップデート
+* @mtripg6666tdr/oceanic-command-resolver 1.0.0 => 1.1.1
+* @sinclair/typebox 0.28.1 => 0.28.10
+* https-proxy-agent 5.0.1 => 6.1.0
+* spotify-url-info 3.2.3 => 3.2.4
 ## その他の変更
-* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1580, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1584, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1590)
+* 継続的な翻訳(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1580, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1584, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1590, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1620)
 * TypeScriptの構成を最適化(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1582)
 
 ### その他の特記事項
