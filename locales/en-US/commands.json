@@ -8,7 +8,7 @@
     "name": "bulkdelete",
     "usage": "bulkdelete <message count>",
     "examples": "bulkdelete 10",
-    "description": "Find messages sent by the bot by fetching and filtering recent 1000 messages and delete all of them.",
+    "description": "Deletes messages the bot sent. Fetches and finds in recent 1000 messages.",
     "invalidMessageCount": "Provided message count is invalid.",
     "found_one": "{{count}} message found.",
     "inCount_other": "in {{count}} messages",
@@ -361,12 +361,12 @@
     "description": "Starts or stops a radio (mix list) based on the specified URL of the song. If you specified nothing, starts a new radio from the current playing song.",
     "args": {
       "url": {
-        "description": "The URL on YouTube of the song that the radio is being based on."
+        "description": "URL on YouTube of the song that the radio is based on."
       }
     },
-    "alreadyEnabled": "The radio is already enabled. If you want to start a new radio based on another song, first you must disable the mix list that is currently played.",
-    "noUrlSpecified": "Please give one URL of the song a radio should be based on.",
-    "invalidUrl": "The given URL is not valid one on YouTube.",
+    "alreadyEnabled": "The radio is already enabled. If you want to start a new radio based on another song, you need to disable the mix list that is currently played at first.",
+    "noUrlSpecified": "Provide a URL of the song that the radio will be based on.",
+    "invalidUrl": "The provided URL is not valid one on YouTube.",
     "started": "Started a radio based on the specified song.",
     "startedFromCurrentSong": "Started a radio based on the current playing song.",
     "stopped": "Radio stopped."
