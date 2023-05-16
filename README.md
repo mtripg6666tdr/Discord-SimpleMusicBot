@@ -4,7 +4,7 @@
 [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml)
 [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml)
 [![Build Docker](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml)
-[![Discord Support](https://img.shields.io/discord/847435307582095360?label=discord&logo=discord&logoColor=white)](https://discord.gg/7DrAEXBMHe)
+[![Discord Support](https://img.shields.io/discord/847435307582095360?label=discord&logo=discord&logoColor=white)](https://myon.page.link/8QZw)
 [![GitHub License](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)](LICENSE)
 
 [日本語](/README.md)・[English](/locales/README.en-US.md)・[Français](/locales/README.fr-FR.md)
@@ -54,7 +54,7 @@ Issueのほか、下記のサポートサーバーでも各種お問い合わせ
 ## サポート
 Discordにて、インストール等のサポート、およびアップデートのお知らせ等を行っています。  
 ボットを試すこともできますので、興味を持たれた方はぜひご参加ください。  
-[サポートサーバーへの参加はこちら](https://discord.gg/7DrAEXBMHe)  
+[サポートサーバーへの参加はこちら](https://myon.page.link/8QZw)  
 [サポートされているバージョン](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
 
 ## ライセンス
