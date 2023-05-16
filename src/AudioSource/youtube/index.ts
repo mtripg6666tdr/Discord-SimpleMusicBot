@@ -56,11 +56,11 @@ export class YouTube extends AudioSource<string> {
     this._isLiveStream = value;
   }
 
-  _relatedVideos: readonly exportableYouTube[] = [];
-  get relatedVideos(): readonly exportableYouTube[] {
+  _relatedVideos: readonly exportableYouTube[] | readonly string[] = [];
+  get relatedVideos(): readonly exportableYouTube[] | readonly string[] {
     return this._relatedVideos;
   }
-  protected set relatedVideos(value: readonly exportableYouTube[]){
+  protected set relatedVideos(value: readonly exportableYouTube[] | readonly string[]){
     this._relatedVideos = value;
   }
 

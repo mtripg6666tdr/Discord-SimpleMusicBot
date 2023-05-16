@@ -133,10 +133,12 @@ export default class Import extends BaseCommand {
               })
             );
           }
-          if(cancellation.Cancelled) break;
+          if(cancellation.cancelled){
+            break;
+          }
         }
 
-        if(!cancellation.Cancelled){
+        if(!cancellation.cancelled){
           await statusMessage.edit(`✅${t("songProcessingCompleted", { count: qs.length })}`);
         }else{
           await statusMessage.edit(`✅${t("canceled")}`);

@@ -269,8 +269,6 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       this._errorReportChannel = mes?.channel as TextChannel;
       this._cost = cost;
       this._lastMember = null;
-
-      // 再生
       this.prepareAudioPlayer();
       const normalizer = new Normalizer(stream, this.volume !== 100);
       normalizer.once("end", this.onStreamFinished.bind(this));
@@ -292,6 +290,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       );
       this._dsLogger?.appendReadable(normalizer);
 
+      // start to play!
       this._player.play(resource);
 
       // setup volume
@@ -316,6 +315,10 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
             components: [],
           }).catch(this.logger.error);
         });
+      }
+
+      if(this.server.queue.mixPlaylistEnabled){
+        await this.server.queue.prepareNextMixItem();
       }
     }
     catch(e){
@@ -368,20 +371,23 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         this.server.queue.loopEnabled
           ? i18next.t("components:play.willLoop", { lng: this.server.locale })
           : `${i18next.t(
-            "currentSongCount",
-            {
-              count: this.server.queue.length - 1,
-              lng: this.server.locale,
-            }
-          )}(${Util.time.HourMinSecToString(queueTimeFragments, i18next.getFixedT(this.server.locale))})`,
+              "currentSongCount",
+              {
+                count: this.server.queue.length - 1,
+                lng: this.server.locale,
+              }
+            )}(${Util.time.HourMinSecToString(queueTimeFragments, i18next.getFixedT(this.server.locale))})`
+            + (this.server.queue.mixPlaylistEnabled ? `(${i18next.t("components:nowplaying.inRadio")})` : "")
+          ,
         true
-      )
-    ;
+      );
+
     if(typeof this.currentAudioInfo.thumbnail === "string"){
       embed.setThumbnail(this.currentAudioInfo.thumbnail);
     }else{
       embed.setThumbnail("attachment://thumbnail." + this.currentAudioInfo.thumbnail.ext);
     }
+
     /* eslint-enable @typescript-eslint/indent */
     if(this.currentAudioInfo.isYouTube()){
       if(this.currentAudioInfo.isFallbacked){

@@ -53,7 +53,7 @@ export abstract class Strategy<T extends Cache<any, U>, U> {
   abstract fetch(url: string, forceCache?: boolean, cache?: Cache<any, any>): Promise<{
     stream: StreamInfo,
     info: exportableYouTube,
-    relatedVideos: exportableYouTube[],
+    relatedVideos: exportableYouTube[] | string[],
     cache: T,
   }>;
 
