@@ -358,7 +358,7 @@
   },
   "radio": {
     "name": "radio",
-    "description": "指定されたYouTubeのURLの楽曲からラジオ（ミックスリスト）の再生を開始または停止します。何も指定しないと現在再生中の楽曲からラジオを開始します。",
+    "description": "Starts or stops a radio (mix list) based on the specified URL of the song. If you specified nothing, starts a new radio from the current playing song.",
     "args": {
       "url": {
         "description": "The URL on YouTube of the song that the radio is being based on."
