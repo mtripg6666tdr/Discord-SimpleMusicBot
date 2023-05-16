@@ -96,7 +96,7 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
   詳細は、[BGM機能](../feature/bgm)を参照してください。
 
 ### `noMessageContent` (boolean)
-  Message Content IntentがDiscord Developers Portalで無効になっている場合は、`true`に設定してください。  
+  Message Content Intentが[Discord Developer Portal](https://discord.com/developers/applications)で無効になっている場合は、`true`に設定してください。  
   デフォルトは`false`です。  
 
 ### `twentyFourSeven` (string[])
