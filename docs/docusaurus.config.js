@@ -38,7 +38,7 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl: (context) => {
-            if(context.docPath.startsWith("guide/commands/") && context.docPath !== "guide/commands/overview.md"){
+            if(context.docPath.startsWith("guide/commands/")){
               return undefined;
             }
             return `https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/edit/master/docs/${context.versionDocsDirPath}/${context.docPath}`
