@@ -49,13 +49,13 @@ export default class Radio extends BaseCommand {
       if(context.rawArgs !== "" && context.server.queue.mixPlaylistEnabled){
         await message.reply(t("commands:radio.alreadyEnabled")).catch(this.logger.error);
         return;
-      }else if(context.rawArgs === "" && !context.server.queue.mixPlaylistEnabled){
+      }else if(context.rawArgs === "" && !context.server.queue.mixPlaylistEnabled && !context.server.player.isPlaying){
         await message.reply(t("commands:radio.noUrlSpecified")).catch(this.logger.error);
         return;
       }
 
       // if url specified, enable the feature
-      if(context.rawArgs !== ""){
+      if(context.rawArgs !== "" || context.server.player.isPlaying){
         // first, attempt to join to the vc
         const joinResult = await context.server.joinVoiceChannel(message, { reply: false, replyOnFail: true }, t);
         if(!joinResult){
@@ -63,14 +63,14 @@ export default class Radio extends BaseCommand {
         }
 
         // validate provided url
-        const videoId = this.getVideoId(context.rawArgs);
+        const videoId = this.getVideoId(context.rawArgs || context.server.player.currentAudioUrl);
         if(!videoId){
           await message.reply(t("commands:radio.invalidUrl")).catch(this.logger.error);
           return;
         }
 
         // setup and start to play
-        await context.server.queue.enableMixPlaylist(`https://www.youtube.com/watch?v=${videoId}`, message.member);
+        await context.server.queue.enableMixPlaylist(`https://www.youtube.com/watch?v=${videoId}`, message.member, !context.rawArgs);
         await message.reply(`:white_check_mark:${t("commands:radio.started")}`);
         await context.server.player.play();
       }
