@@ -26,7 +26,7 @@ You can try to use the bot in the support server below.
   - If you are an owner of the bot, you can change the default prefix of the bot.
   - Multiple letters' prefix is supported.
 - ▶️Autoplay songs, by pre-defined configuration
-- 👍 Botに関する[サポート](##サポート)(下記)
+- 👍 [Support](##サポート)(Japanese and English Available).
 
 ## Guide
 The documentation of the bot (Japanese).
