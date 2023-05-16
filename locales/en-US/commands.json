@@ -367,7 +367,8 @@
     "alreadyEnabled": "The radio is already enabled. If you want to start a new radio based on another song, first you must disable the mix list that is currently played.",
     "noUrlSpecified": "Please give one URL of the song a radio should be based on.",
     "invalidUrl": "The given URL is not valid one on YouTube.",
-    "started": "Radio started based on the specified song.",
+    "started": "Started a radio based on the specified song.",
+    "startedFromCurrentSong": "Started a radio based on the current playing song.",
     "stopped": "Radio stopped."
   },
   "related": {
