@@ -368,6 +368,7 @@
     "noUrlSpecified": "もととなる楽曲のURLをひとつ指定してください。",
     "invalidUrl": "指定されたURLは有効なYouTubeのURLではありません。",
     "started": "指定された楽曲でラジオを開始しました。",
+    "startedFromCurrentSong": "現在再生中の楽曲でラジオを開始しました。",
     "stopped": "ラジオを終了しました。"
   },
   "related": {

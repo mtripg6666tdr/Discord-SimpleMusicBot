@@ -38,3 +38,7 @@
 [data-theme='dark'] footer.footer--dark {
   --ifm-footer-background-color: #1f1d17;
 }
+
+div.no-wrap-table {
+  white-space: nowrap;
+}

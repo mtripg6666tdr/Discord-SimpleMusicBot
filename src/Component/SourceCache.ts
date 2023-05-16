@@ -64,8 +64,9 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     if(count % 5 === 0 || config.debug){
       const now = Date.now();
       let purgeCount = 0;
-      this._expireMap.forEach((expiresAt, url) => {
-        if(now > expiresAt){
+      const shouldPurgeCount = this._sourceCache.size - 300;
+      [...this._expireMap.entries()].sort((a, b) => a[1] - b[1]).forEach(([url, expiresAt]) => {
+        if(now > expiresAt || purgeCount < shouldPurgeCount){
           this._sourceCache.delete(url);
           this._expireMap.delete(url);
           purgeCount++;
