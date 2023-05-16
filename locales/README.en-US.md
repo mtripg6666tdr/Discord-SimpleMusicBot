@@ -18,7 +18,7 @@ You can try to use the bot in the support server below.
   - YouTube's playlist URL
   - SoundCloud's music page URL
   - NicoNico video's watch page URL
-  - [and so on...](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/commands/overview)
+  - [and so on...](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/guide/commands/overview)
 - 🔎 Searches videos from keyword and play them (from YouTube and SoundCloud)
 - 🔁Track loop and queue loop
 - ❕The prefix is changeable
@@ -26,7 +26,7 @@ You can try to use the bot in the support server below.
   - If you are an owner of the bot, you can change the default prefix of the bot.
   - Multiple letters' prefix is supported.
 - ▶️Autoplay songs, by pre-defined configuration
-- 👍 Support (Japanese and English available).
+- 👍 Botに関する[サポート](##サポート)(下記)
 
 ## Guide
 The documentation of the bot (Japanese).
