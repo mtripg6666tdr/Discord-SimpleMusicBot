@@ -18,7 +18,7 @@ Vous pouvez essayer le bot à partir du serveur d'assistance répertorié ci-des
   - lien de la liste de lecture youtube
   - Lien vers la page de la chanson SoundCloud
   - Lien vers la page de lecture de Nico Nico Douga
-  - [etc...](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/commands/overview)
+  - [etc...](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/guide/commands/overview)
 - 🔎 Rechercher et lire par mot-clé (YouTube et SoundCloud)
 - 🔁 Boucle par piste et à travers les repères
 - ❕ Changement de préfixe

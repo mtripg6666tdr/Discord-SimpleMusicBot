@@ -18,7 +18,7 @@
   - YouTubeのプレイリストのリンク
   - SoundCloudの楽曲ページのリンク
   - ニコニコ動画の再生ページへのリンク
-  - [などなど...](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/commands/overview)
+  - [などなど...](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/guide/commands/overview)
 - 🔎 キーワードから検索して再生(YouTubeとSoundCloud)
 - 🔁 トラックごと及びキュー全体でループ
 - ❕ プレフィックス変更
