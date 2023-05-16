@@ -55,7 +55,7 @@ export default class Radio extends BaseCommand {
       }
 
       // if url specified, enable the feature
-      if(context.rawArgs !== "" || context.server.player.isPlaying){
+      if(context.rawArgs !== "" || (!context.server.queue.mixPlaylistEnabled && context.server.player.isPlaying)){
         // first, attempt to join to the vc
         const joinResult = await context.server.joinVoiceChannel(message, { reply: false, replyOnFail: true }, t);
         if(!joinResult){
@@ -71,7 +71,11 @@ export default class Radio extends BaseCommand {
 
         // setup and start to play
         await context.server.queue.enableMixPlaylist(`https://www.youtube.com/watch?v=${videoId}`, message.member, !context.rawArgs);
-        await message.reply(`:white_check_mark:${t("commands:radio.started")}`);
+        await message.reply(`:white_check_mark:${
+          context.rawArgs
+            ? t("commands:radio.started")
+            : t("commands:radio.startedFromCurrentSong")
+        }`);
         await context.server.player.play();
       }
 
