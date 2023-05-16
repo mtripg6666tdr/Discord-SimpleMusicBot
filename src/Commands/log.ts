@@ -27,8 +27,6 @@ import * as os from "os";
 
 import { BaseCommand } from ".";
 import * as Util from "../Util";
-import { getColor } from "../Util/color";
-import { getMBytes } from "../Util/system";
 import { useConfig } from "../config";
 import { getLogs } from "../logger";
 
@@ -67,7 +65,7 @@ export default class SystemInfo extends BaseCommand {
     const embeds = [] as EmbedOptions[];
 
     if(context.args.includes("basic") || context.args.length === 0){
-      const cacheState = context.bot.cache.getMemoryCacheState();
+      const cacheState = await context.bot.cache.getMemoryCacheState();
       embeds.push(
         new MessageEmbedBuilder()
           .setTitle("Discord-SimpleMusicBot")
@@ -76,15 +74,20 @@ export default class SystemInfo extends BaseCommand {
           .addField(t("commands:log.managedCollectorsID"), `\`${context.bot.collectors.customIdLength}\``, true)
           .addField(t("commands:log.managedCollectors"), `\`${context.bot.collectors.collectorLength}\``, true)
           .addField(t("commands:log.totalCost"), `\`${context.bot.totalTransformingCost}\``, true)
-          .addField(t("commands:log.memCacheTotal"), `\`${cacheState.totalCount}\``, true)
+          .addField(
+            t("commands:log.memCacheTotal"),
+            `\`${cacheState.totalCount}\` (${Util.system.getMBytes(cacheState.totalSize)}MiB)`,
+            true
+          )
           .addField(t("commands:log.memCacheGarbage"), `\`${cacheState.purgeScheduled}\``, true)
+          .addField(t("commands:uptime.registeredServerCount"), `\`${context.bot.databaseCount}\``, true)
           .addField(
             t("commands:log.persistentCache"),
             `\`${
               await context.bot.cache.getPersistentCacheSize()
-                .then(size => getMBytes(size))
+                .then(size => Util.system.getMBytes(size))
                 .catch(() => "unknown")
-            }MB\``,
+            }MiB\``,
             true
           )
           .addField(t("commands:log.modules"), [
@@ -107,7 +110,7 @@ export default class SystemInfo extends BaseCommand {
             })
             .join("\r\n")
           )
-          .setColor(getColor("UPTIME"))
+          .setColor(Util.color.getColor("UPTIME"))
           .toOceanic()
       );
     }
@@ -123,7 +126,7 @@ export default class SystemInfo extends BaseCommand {
       // Process Logs
       embeds.push(
         new MessageEmbedBuilder()
-          .setColor(getColor("UPTIME"))
+          .setColor(Util.color.getColor("UPTIME"))
           .setTitle("Log")
           .setDescription(`Last ${logs.length}bot logs\r\n\`\`\`\r\n${logs.join("\r\n")}\r\n\`\`\``)
           .toOceanic()
@@ -133,7 +136,7 @@ export default class SystemInfo extends BaseCommand {
     if(config.isBotAdmin(message.member.id) && (context.args.includes("servers") || context.args.length === 0)){
       embeds.push(
         new MessageEmbedBuilder()
-          .setColor(getColor("UPTIME"))
+          .setColor(Util.color.getColor("UPTIME"))
           .setTitle("Server Info")
           .setDescription(
             `**${t("commands:log.guildName")}(NSFW LEVEL,ID)**\r\n`
@@ -153,7 +156,7 @@ export default class SystemInfo extends BaseCommand {
       const data = context.bot.getData(context.args[1]);
       embeds.push(
         new MessageEmbedBuilder()
-          .setColor(getColor("HELP"))
+          .setColor(Util.color.getColor("HELP"))
           .setTitle(t("commands:log.guildSearchResult"))
           .addField(t("commands:log.guildName"), target.name, true)
           .addField(t("commands:log.guildId"), target.id, true)
@@ -178,7 +181,7 @@ export default class SystemInfo extends BaseCommand {
     if(context.args.includes("cpu") || context.args.length === 0){
       // Process CPU Info
       const cpuInfoEmbed = new MessageEmbedBuilder();
-      cpuInfoEmbed.setColor(getColor("UPTIME")).setTitle("CPU Info");
+      cpuInfoEmbed.setColor(Util.color.getColor("UPTIME")).setTitle("CPU Info");
       const cpus = os.cpus();
       for(let i = 0; i < cpus.length; i++){
         const all = cpus[i].times.user + cpus[i].times.sys + cpus[i].times.nice + cpus[i].times.irq + cpus[i].times.idle;
@@ -203,7 +206,7 @@ export default class SystemInfo extends BaseCommand {
       const ext = Util.system.getMBytes(nMem.external);
       embeds.push(
         new MessageEmbedBuilder()
-          .setColor(getColor("UPTIME"))
+          .setColor(Util.color.getColor("UPTIME"))
           .setTitle("Memory Info")
           .addField("Total Memory",
             "Total: `" + memory.total + "MB`\r\n"

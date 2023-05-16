@@ -28,6 +28,8 @@ import path from "path";
 import { pipeline, Readable } from "stream";
 import zlib from "zlib";
 
+import sizeof from "object-sizeof";
+
 import { LogEmitter } from "../Structure";
 import { getMBytes } from "../Util/system";
 import { useConfig } from "../config";
@@ -142,10 +144,11 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     return this.getPersistentCache(this.createCacheId(keyword, "search")) as Promise<ytsr.Video[]>;
   }
 
-  getMemoryCacheState(){
+  async getMemoryCacheState(){
     return {
       totalCount: this._sourceCache.size,
       purgeScheduled: this._expireMap.size,
+      totalSize: await new Promise<number>(resolve => setImmediate(() => resolve(sizeof(this._sourceCache) + sizeof(this._sourceCache)))),
     };
   }
 
