@@ -57,12 +57,20 @@ export default class Help extends BaseCommand {
         + "\r\n"
         + t("commands:help.toLearnMore", { command: `\`${config.noMessageContent ? "/" : context.server.prefix}command\`` }))
       .addField(t("commands:help.developer"), `[${developer || "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`)
-      .addField(t("commands:help.version"), `\`${context.bot.version}\``)
-      .addField(
+      .addField(t("commands:help.version"), `\`${context.bot.version}\``);
+
+    if(!process.env.HIDE_REPO_URL){
+      embed.addField(
         `${t("commands:help.repository")}/${t("commands:help.sourceCode")}`,
         "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot"
-      )
-      .addField(t("commands:help.supportServer"), "https://discord.gg/7DrAEXBMHe")
+      );
+    }
+
+    if(!process.env.HIDE_SUPPORT_SERVER_URL){
+      embed.addField(t("commands:help.supportServer"), process.env.SUPPORT_SERVER_URL || "https://discord.gg/7DrAEXBMHe");
+    }
+
+    embed
       .addField(t("commands:help.availableSources"), [
         !isDisabledSource("youtube") && `・YouTube(${t("commands:help.keywordSearch")})`,
         !isDisabledSource("youtube") && `・YouTube(${t("commands:help.videoUrl")})`,
@@ -78,8 +86,7 @@ export default class Help extends BaseCommand {
         !isDisabledSource("custom") && `・${t("commands:help.custom")}`,
       ].filter(d => d).join("\r\n"))
       .setColor(getColor("HELP"))
-      .toOceanic()
     ;
-    await message.reply({ embeds: [embed] }).catch(this.logger.error);
+    await message.reply({ embeds: [embed.toOceanic()] }).catch(this.logger.error);
   }
 }
