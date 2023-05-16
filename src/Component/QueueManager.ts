@@ -621,17 +621,19 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     this.emit("change");
   }
 
-  async enableMixPlaylist(url: string, request: Member){
+  async enableMixPlaylist(url: string, request: Member, skipAddingBase: boolean = false){
     this._mixPlaylist = await ytmpl(ytdl.getURLVideoID(url), {
       gl: config.country,
       hl: config.defaultLanguage,
     });
-    await this.addQueueOnly({
-      url: url,
-      addedBy: request,
-      method: "push",
-      sourceType: "youtube",
-    });
+    if(!skipAddingBase){
+      await this.addQueueOnly({
+        url: url,
+        addedBy: request,
+        method: "push",
+        sourceType: "youtube",
+      });
+    }
     await this.prepareNextMixItem();
     this.server.player.once("disconnect", this.disableMixPlaylist);
   }
