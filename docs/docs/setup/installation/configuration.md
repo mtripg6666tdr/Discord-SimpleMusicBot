@@ -21,9 +21,9 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
 :::
 
 ### `TOKEN`  
-  ボットのトークンです。Discord Developer Portalから取得してください。
+  ボットのトークンです。[Discord Developer Portal](https://discord.com/developers/applications)から取得してください。
 ### `CSE_KEY`  
-  歌詞検索に使用するGoogle Custom Searchのkeyです。(任意指定)
+  歌詞検索に使用する[Google Custom Search](https://developers.google.com/custom-search/v1/introduction?hl=ja)のkeyです。(任意指定)
 ### `DB_URL`  
   「キューやループの有効無効等のデータのバックアップ」に使用するデータベースサーバーのURLです。(任意指定)  
   サーバーの仕様等については[バックアップ](../backup/overview.md)を参照してください。
@@ -96,7 +96,7 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
   詳細は、[BGM機能](../feature/bgm)を参照してください。
 
 ### `noMessageContent` (boolean)
-  Message Content IntentがDiscord Developers Portalで無効になっている場合は、`true`に設定してください。  
+  Message Content Intentが[Discord Developer Portal](https://discord.com/developers/applications)で無効になっている場合は、`true`に設定してください。  
   デフォルトは`false`です。  
 
 ### `twentyFourSeven` (string[])
