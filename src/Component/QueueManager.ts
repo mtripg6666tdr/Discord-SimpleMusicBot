@@ -633,6 +633,8 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         method: "push",
         sourceType: "youtube",
       });
+    }else{
+      await this.prepareNextMixItem();
     }
     await this.prepareNextMixItem();
     this.server.player.once("disconnect", this.disableMixPlaylist);

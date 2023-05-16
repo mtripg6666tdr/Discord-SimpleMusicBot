@@ -70,7 +70,7 @@ export default class Radio extends BaseCommand {
         }
 
         // setup and start to play
-        await context.server.queue.enableMixPlaylist(`https://www.youtube.com/watch?v=${videoId}`, message.member);
+        await context.server.queue.enableMixPlaylist(`https://www.youtube.com/watch?v=${videoId}`, message.member, !context.rawArgs);
         await message.reply(`:white_check_mark:${t("commands:radio.started")}`);
         await context.server.player.play();
       }
