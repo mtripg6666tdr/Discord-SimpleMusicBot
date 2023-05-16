@@ -20,15 +20,18 @@ declare namespace NodeJS {
   interface ProcessEnv {
     readonly TOKEN: string;
     readonly CSE_KEY?: string;
-    readonly CLIENT_ID?: string;
-    readonly GUILD_ID?: string;
     readonly DB_URL?: string;
     readonly DB_TOKEN?: string;
+    readonly PORT?: string;
+    readonly LOG_TRANSFER_PORT?: string;
+    /* undocumented flags */
     readonly DSL_ENABLE?: string;
     readonly BD_ENABLE?: string;
     readonly HIBIKI_ENABLE?: string;
-    readonly LOG_TRANSFER_PORT?: string;
     readonly CONSOLE_ENABLE?: string;
     readonly DISABLE_SYNC_SC?: string;
+    readonly HIDE_REPO_URL?: string;
+    readonly SUPPORT_SERVER_URL?: string;
+    readonly HIDE_SUPPORT_SERVER_URL?: string;
   }
 }
