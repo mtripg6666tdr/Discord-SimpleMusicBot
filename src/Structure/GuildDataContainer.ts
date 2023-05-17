@@ -461,7 +461,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
 
       if(firstUrl){
         results.push.apply(
-          results.push,
+          results,
           await this.playFromURL(message, firstUrl, { first, cancellable: false }, t)
         );
 
