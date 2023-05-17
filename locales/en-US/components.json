@@ -6,7 +6,8 @@
     "waitForPlayingItemName": "Waiting to be played",
     "requestedBy": "Requested by",
     "nextSong": "Up Next",
-    "noNextSong": "Nothing added yet."
+    "noNextSong": "Nothing added yet.",
+    "inRadio": "Playing a radio."
   },
   "queue": {
     "queueTitle": "Queue for {{server}}",

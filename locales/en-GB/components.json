@@ -6,7 +6,8 @@
     "waitForPlayingItemName": "Waiting to be played",
     "requestedBy": "Requested by",
     "nextSong": "Up Next",
-    "noNextSong": "Nothing added yet."
+    "noNextSong": "Nothing added yet.",
+    "inRadio": "Playing a radio."
   },
   "queue": {
     "queueTitle": "Queue for {{server}}",
@@ -39,7 +40,7 @@
   },
   "play": {
     "waitingForLiveStream": "Waiting for {{title}} `(livestream)`",
-    "waitingForLiveCanceled": "Canceled waiting.",
+    "waitingForLiveCanceled": "Cancelled waiting.",
     "preparing": "Preparing to play {{title}}",
     "failedToPlay": "Failed to play a song...",
     "failedAndSkipping": "Skipping",

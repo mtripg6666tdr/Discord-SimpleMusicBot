@@ -4,6 +4,30 @@
     "description": "Shows BGM playlists that the developer of this bot shares, and you can choose and play them.",
     "listOfPresetBGM": "Available BGM Presets"
   },
+  "bulk_delete": {
+    "name": "bulkdelete",
+    "usage": "bulkdelete <message count>",
+    "examples": "bulkdelete 10",
+    "description": "Deletes messages the bot sent. Fetches and finds in recent 1000 messages.",
+    "invalidMessageCount": "Provided message count is invalid.",
+    "found_one": "{{count}} message found.",
+    "inCount_other": "in {{count}} messages",
+    "inCount_one": "in {{count}} message",
+    "found_other": "{{count}} messages found.",
+    "confirm": "Press the button below to confirm bulk-deletion of messages.\nIf not, the operation will be automatically cancelled after a while.",
+    "auditLog_one": "Because {{issuer}} requested to delete {{count}} message.",
+    "auditLog_other": "Because {{issuer}} requested to delete {{count}} messages.",
+    "finish": "Done! (This message will be deleted automatically)",
+    "cancel": "Canceled the deletions.",
+    "hitCount_other": "{{count}} messages found.",
+    "hitCount_one": "{{count}} message found.",
+    "loading": "Fetching",
+    "args": {
+      "count": {
+        "description": "The maximum number of messages to be deleted. This should be 100 or less."
+      }
+    }
+  },
   "cancel": {
     "name": "cancel",
     "description": "Aborts all operations that can be canceled.",
@@ -55,6 +79,13 @@
     "description": "Removes all songs from queue except for the current playing song (or the song waiting to be played).",
     "queueWasEmpty": "Nothing was removed because of no items or just one item in queue.",
     "success": "Deleted all items left in queue."
+  },
+  "equalplayback": {
+    "name": "equalplayback",
+    "description": "Plays same amount of songs for each user.",
+    "enabled": "Enabled equal playback.",
+    "disabled": "Disabled equal playback.",
+    "featureDescription": "This is a function that makes it as even as possible for each user who added songs when playing songs."
   },
   "export": {
     "name": "export",
@@ -206,6 +237,18 @@
     "disabled": "Disabled track loop.",
     "enabled": "Enabled track loop."
   },
+  "looponce": {
+    "name": "looponce",
+    "description": "After the current playback ends, play the same song again in a loop.",
+    "disabled": "Disabled loop once",
+    "enabled": "Enabled loop once"
+  },
+  "loopqueue": {
+    "disabled": "Disabled queue loop.",
+    "enabled": "Enabled queue loop.",
+    "name": "loopqueue",
+    "description": "Toggles looping the entire queue."
+  },
   "lyrics": {
     "name": "lyrics",
     "description": "Finds lyrics of the specified song.",
@@ -313,6 +356,21 @@
     "songCount_other": "{{count}} songs",
     "total": "Total"
   },
+  "radio": {
+    "name": "radio",
+    "description": "Starts or stops a radio (mix list) based on the specified URL of the song. If you specified nothing, starts a new radio from the current playing song.",
+    "args": {
+      "url": {
+        "description": "URL on YouTube of the song that the radio is based on."
+      }
+    },
+    "alreadyEnabled": "The radio is already enabled. If you want to start a new radio based on another song, you need to disable the mix list that is currently played at first.",
+    "noUrlSpecified": "Provide a URL of the song that the radio will be based on.",
+    "invalidUrl": "The provided URL is not valid one on YouTube.",
+    "started": "Started a radio based on the specified song.",
+    "startedFromCurrentSong": "Started a radio based on the current playing song.",
+    "stopped": "Radio stopped."
+  },
   "related": {
     "name": "related",
     "description": "Enables/disables the function that automatically adds related songs to queue when a song from YouTube finishes playing.",
@@ -375,6 +433,18 @@
     "args": {
       "keyword": {
         "description": "Keyword or URL of the video you want to search for."
+      }
+    },
+    "noArgument": "Set the argument."
+  },
+  "searchnico": {
+    "name": "searchnico",
+    "description": "Searches songs on Nico-Nico Douga.",
+    "examples": "searchnico setsuna trip",
+    "usage": "searchnico <keyword>",
+    "args": {
+      "keyword": {
+        "description": "Keyword or URL of the song you want to search for."
       }
     },
     "noArgument": "Set the argument."
@@ -470,60 +540,5 @@
     "outOfRange": "Please provide the value between 1 and 200.",
     "changed": "Changed the volume to **{{volume}}**.",
     "appliedFromNext": "It will be applied from the next song. If you'd like to apply to the current playing song, use command `rewind`."
-  },
-  "loopqueue": {
-    "disabled": "Disabled queue loop.",
-    "enabled": "Enabled queue loop.",
-    "name": "loopqueue",
-    "description": "Toggles looping the entire queue."
-  },
-  "looponce": {
-    "name": "looponce",
-    "description": "After the current playback ends, play the same song again in a loop.",
-    "disabled": "Disabled loop once",
-    "enabled": "Enabled loop once"
-  },
-  "equalplayback": {
-    "name": "equalplayback",
-    "description": "Plays same amount of songs for each user.",
-    "enabled": "Enabled equal playback.",
-    "disabled": "Disabled equal playback.",
-    "featureDescription": "This is a function that makes it as even as possible for each user who added songs when playing songs."
-  },
-  "searchnico": {
-    "name": "searchnico",
-    "description": "Searches songs on Nico-Nico Douga.",
-    "examples": "searchnico setsuna trip",
-    "usage": "searchnico <keyword>",
-    "args": {
-      "keyword": {
-        "description": "Keyword or URL of the song you want to search for."
-      }
-    },
-    "noArgument": "Set the argument."
-  },
-  "bulk_delete": {
-    "name": "bulkdelete",
-    "usage": "bulkdelete <message count>",
-    "examples": "bulkdelete 10",
-    "description": "Find messages sent by the bot by fetching and filtering recent 1000 messages and delete all of them.",
-    "invalidMessageCount": "Provided message count is invalid.",
-    "found_one": "{{count}} message found.",
-    "inCount_other": "in {{count}} messages",
-    "inCount_one": "in {{count}} message",
-    "found_other": "{{count}} messages found.",
-    "confirm": "Press the button below to confirm bulk-deletion of messages.\nIf not, the operation will be automatically cancelled after a while.",
-    "auditLog_one": "Because {{issuer}} requested to delete {{count}} message.",
-    "auditLog_other": "Because {{issuer}} requested to delete {{count}} messages.",
-    "finish": "Done! (This message will be deleted automatically)",
-    "cancel": "Canceled the deletions.",
-    "hitCount_other": "{{count}} messages found.",
-    "hitCount_one": "{{count}} message found.",
-    "loading": "Fetching",
-    "args": {
-      "count": {
-        "description": "The maximum number of messages to be deleted. This should be 100 or less."
-      }
-    }
   }
 }

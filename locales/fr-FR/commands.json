@@ -4,6 +4,30 @@
     "description": "Vous pouvez afficher une liste de lecture prédéfinie de BGM pour l'étude et le travail créé par le développeur, et sélectionner et lire ce que vous voulez entendre.",
     "listOfPresetBGM": "Liste de musiques prédéfinies"
   },
+  "bulk_delete": {
+    "name": "バルク削除",
+    "usage": "バルク削除 <メッセージ数>",
+    "examples": "バルク削除 10",
+    "description": "ボットが送信したメッセージを一括削除します。過去1000件のメッセージを遡って検索します。",
+    "invalidMessageCount": "Nombre de messages spécifié non valide.",
+    "found_one": "{{count}} trouvé.",
+    "inCount_other": "sur {{count}} récupérés",
+    "inCount_one": "sur {{count}} récupérés",
+    "found_other": "{{count}} trouvé.",
+    "confirm": "Appuyez sur le bouton pour confirmer la suppression en bloc.\nS'il n'est pas enfoncé, il sera annulé après un certain temps.",
+    "auditLog_one": "{{count}} messages dont la suppression a été demandée par {{issuer}}.",
+    "auditLog_other": "{{count}} messages dont la suppression a été demandée par {{issuer}}.",
+    "finish": "Terminé ! (Ce message sera effacé automatiquement)",
+    "cancel": "Suppression annulée",
+    "hitCount_other": "{{count}} visites",
+    "hitCount_one": "{{count}} visites",
+    "loading": "obtenir",
+    "args": {
+      "count": {
+        "description": "削除するメッセージの上限数。100以下で設定してください。"
+      }
+    }
+  },
   "cancel": {
     "name": "Annuler",
     "description": "Abandonne toutes les opérations annulables en cours.",
@@ -55,6 +79,13 @@
     "description": "Supprime toutes les chansons sauf la chanson en cours de lecture (en attente de lecture).",
     "queueWasEmpty": "Il n'a pas été supprimé car la file d'attente est vide ou il n'y a qu'une seule chanson.",
     "success": "Chansons supprimées laissées dans la file d'attente."
+  },
+  "equalplayback": {
+    "name": "Jeu égal",
+    "description": "Jouez uniformément des chansons dans la file d'attente pour chaque utilisateur supplémentaire.",
+    "enabled": "Jeu égal activé",
+    "disabled": "J'ai désactivé la lecture égale",
+    "featureDescription": "Il s'agit d'une fonction qui le rend aussi uniforme que possible pour chaque utilisateur qui a ajouté des chansons lors de l'ajout de chansons."
   },
   "export": {
     "name": "exporter",
@@ -206,6 +237,18 @@
     "disabled": "Répétition de piste désactivée",
     "enabled": "Répétition de piste activée"
   },
+  "looponce": {
+    "name": "ワンスループ",
+    "description": "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
+    "disabled": "ワンスループを無効にしました",
+    "enabled": "ワンスループを有効にしました"
+  },
+  "loopqueue": {
+    "disabled": "キューループを無効にしました。",
+    "enabled": "キューループを有効にしました。",
+    "name": "キューループ",
+    "description": "キュー内のループを設定します。"
+  },
   "lyrics": {
     "name": "Paroles",
     "description": "Trouver les paroles de la chanson spécifiée.",
@@ -313,6 +356,21 @@
     "songCount_other": "{{count}}曲",
     "total": "合計"
   },
+  "radio": {
+    "name": "ラジオ",
+    "description": "指定されたYouTubeのURLの楽曲からラジオ（ミックスリスト）の再生を開始または停止します。何も指定しないと現在再生中の楽曲からラジオを開始します。",
+    "args": {
+      "url": {
+        "description": "ラジオのもととなる楽曲のYouTubeのURL"
+      }
+    },
+    "alreadyEnabled": "すでに有効になっています。別の曲のラジオを開始するには、現在再生されているミックスをいったんオフにする必要があります。",
+    "noUrlSpecified": "もととなる楽曲のURLをひとつ指定してください。",
+    "invalidUrl": "指定されたURLは有効なYouTubeのURLではありません。",
+    "started": "指定された楽曲でラジオを開始しました。",
+    "startedFromCurrentSong": "現在再生中の楽曲でラジオを開始しました。",
+    "stopped": "ラジオを終了しました。"
+  },
   "related": {
     "name": "関連動画",
     "description": "YouTubeから楽曲を再生終了時に、関連曲をキューに自動で追加する機能の有効/無効を設定します。",
@@ -378,6 +436,18 @@
       }
     },
     "noArgument": "Mot-clé ou URL de la vidéo que vous souhaitez rechercher."
+  },
+  "searchnico": {
+    "name": "ニコニコ動画を検索",
+    "description": "曲をニコニコ動画で検索します。",
+    "examples": "ニコニコを検索 セツナトリップ",
+    "usage": "ニコニコを検索 <キーワード>",
+    "args": {
+      "keyword": {
+        "description": "検索したい動画のキーワードまたはURL。"
+      }
+    },
+    "noArgument": "引数を指定してください。"
   },
   "searchqueue": {
     "name": "Rechercher dans la file d'attente",
@@ -470,60 +540,5 @@
     "outOfRange": "音量を変更する際は1から200の数字で指定してください。",
     "changed": "音量を**{{volume}}**に変更しました。",
     "appliedFromNext": "次の曲から適用されます。現在再生中の曲に設定を適用するには、`頭出し`コマンドなどを使用してください。"
-  },
-  "loopqueue": {
-    "disabled": "キューループを無効にしました。",
-    "enabled": "キューループを有効にしました。",
-    "name": "キューループ",
-    "description": "キュー内のループを設定します。"
-  },
-  "looponce": {
-    "name": "ワンスループ",
-    "description": "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
-    "disabled": "ワンスループを無効にしました",
-    "enabled": "ワンスループを有効にしました"
-  },
-  "equalplayback": {
-    "name": "Jeu égal",
-    "description": "Jouez uniformément des chansons dans la file d'attente pour chaque utilisateur supplémentaire.",
-    "enabled": "Jeu égal activé",
-    "disabled": "J'ai désactivé la lecture égale",
-    "featureDescription": "Il s'agit d'une fonction qui le rend aussi uniforme que possible pour chaque utilisateur qui a ajouté des chansons lors de l'ajout de chansons."
-  },
-  "searchnico": {
-    "name": "ニコニコ動画を検索",
-    "description": "曲をニコニコ動画で検索します。",
-    "examples": "ニコニコを検索 セツナトリップ",
-    "usage": "ニコニコを検索 <キーワード>",
-    "args": {
-      "keyword": {
-        "description": "検索したい動画のキーワードまたはURL。"
-      }
-    },
-    "noArgument": "引数を指定してください。"
-  },
-  "bulk_delete": {
-    "name": "バルク削除",
-    "usage": "バルク削除 <メッセージ数>",
-    "examples": "バルク削除 10",
-    "description": "ボットが送信したメッセージを一括削除します。過去1000件のメッセージを遡って検索します。",
-    "invalidMessageCount": "Nombre de messages spécifié non valide.",
-    "found_one": "{{count}} trouvé.",
-    "inCount_other": "sur {{count}} récupérés",
-    "inCount_one": "sur {{count}} récupérés",
-    "found_other": "{{count}} trouvé.",
-    "confirm": "Appuyez sur le bouton pour confirmer la suppression en bloc.\nS'il n'est pas enfoncé, il sera annulé après un certain temps.",
-    "auditLog_one": "{{count}} messages dont la suppression a été demandée par {{issuer}}.",
-    "auditLog_other": "{{count}} messages dont la suppression a été demandée par {{issuer}}.",
-    "finish": "Terminé ! (Ce message sera effacé automatiquement)",
-    "cancel": "Suppression annulée",
-    "hitCount_other": "{{count}} visites",
-    "hitCount_one": "{{count}} visites",
-    "loading": "obtenir",
-    "args": {
-      "count": {
-        "description": "削除するメッセージの上限数。100以下で設定してください。"
-      }
-    }
   }
 }
