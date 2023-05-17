@@ -5,10 +5,10 @@
     "listOfPresetBGM": "Available BGM Presets"
   },
   "bulk_delete": {
-    "name": "バルク削除",
-    "usage": "バルク削除 <メッセージ数>",
-    "examples": "バルク削除 10",
-    "description": "ボットが送信したメッセージを一括削除します。過去1000件のメッセージを遡って検索します。",
+    "name": "bulkdelete",
+    "usage": "bulkdelete <message count>",
+    "examples": "bulkdelete 10",
+    "description": "Deletes messages the bot sent. Fetches and finds in recent 1000 messages.",
     "invalidMessageCount": "Provided message count is invalid.",
     "found_one": "{{count}} message found.",
     "inCount_other": "in {{count}} messages",
@@ -24,7 +24,7 @@
     "loading": "Fetching",
     "args": {
       "count": {
-        "description": "削除するメッセージの上限数。100以下で設定してください。"
+        "description": "The maximum number of messages to be deleted. This should be 100 or less."
       }
     }
   },
@@ -357,19 +357,19 @@
     "total": "Total"
   },
   "radio": {
-    "name": "ラジオ",
-    "description": "指定されたYouTubeのURLの楽曲からラジオ（ミックスリスト）の再生を開始または停止します。何も指定しないと現在再生中の楽曲からラジオを開始します。",
+    "name": "radio",
+    "description": "Starts or stops a radio (mix list) based on the specified URL of the song. If you specified nothing, starts a new radio from the current playing song.",
     "args": {
       "url": {
-        "description": "ラジオのもととなる楽曲のYouTubeのURL"
+        "description": "URL on YouTube of the song that the radio is based on."
       }
     },
-    "alreadyEnabled": "すでに有効になっています。別の曲のラジオを開始するには、現在再生されているミックスをいったんオフにする必要があります。",
-    "noUrlSpecified": "もととなる楽曲のURLをひとつ指定してください。",
-    "invalidUrl": "指定されたURLは有効なYouTubeのURLではありません。",
-    "started": "指定された楽曲でラジオを開始しました。",
-    "startedFromCurrentSong": "現在再生中の楽曲でラジオを開始しました。",
-    "stopped": "ラジオを終了しました。"
+    "alreadyEnabled": "The radio is already enabled. If you want to start a new radio based on another song, you need to disable the mix list that is currently played at first.",
+    "noUrlSpecified": "Provide a URL of the song that the radio will be based on.",
+    "invalidUrl": "The provided URL is not valid one on YouTube.",
+    "started": "Started a radio based on the specified song.",
+    "startedFromCurrentSong": "Started a radio based on the current playing song.",
+    "stopped": "Radio stopped."
   },
   "related": {
     "name": "related",
