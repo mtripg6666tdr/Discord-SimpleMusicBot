@@ -299,7 +299,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     }
 
     // 遅延処理するべき時には遅延させる
-    if(this.shouldDefer && !message["_interaction"].acknowledged){
+    if(this.shouldDefer && message["_interaction"] && !message["_interaction"].acknowledged){
       if(message["_interaction"].type === InteractionTypes.APPLICATION_COMMAND){
         await message["_interaction"].defer();
       }else if(message["_interaction"].type === InteractionTypes.MESSAGE_COMPONENT){
