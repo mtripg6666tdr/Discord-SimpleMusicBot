@@ -35,3 +35,15 @@
 ### その他の特記事項
 - Dockerのイメージは、リリース後30～40分程度で公開されます。
 - Node.js v20を正式にサポートしました。
+
+---
+
+# v4.1.1
+## バグ修正
+* `ヘルプ`コマンドにニコニコ動画の検索を追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1645)
+* 一部のメッセージベースのコマンドが反応しない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1646)
+
+### その他の特記事項
+- Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
