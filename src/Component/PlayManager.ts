@@ -161,7 +161,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   setVolume(val: number){
     this._volume = val;
     if(this._resource?.volumeTransformer){
-      this._resource.volumeTransformer.setVolume(val / 100);
+      this._resource.volumeTransformer.setVolumeLogarithmic(val / 100);
       return true;
     }
     return false;
