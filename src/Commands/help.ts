@@ -81,6 +81,7 @@ export default class Help extends BaseCommand {
         !isDisabledSource("custom") && `・Discord(${t("commands:help.discordAttachmentUrl")})`,
         !isDisabledSource("googledrive") && `・${t("commands:help.googleDrive")}(${t("commands:help.driveShareUrl")})`,
         !isDisabledSource("niconico") && `・${t("commands:help.niconico")}(${t("commands:help.videoUrl")})`,
+        !isDisabledSource("niconico") && `・${t("commands:help.niconico")}(${t("commands:help.keywordSearch")})`,
         !isDisabledSource("twitter") && `・Twitter(${t("commands:help.tweetUrl")})`,
         !isDisabledSource("spotify") && Spotify.available && `・Spotify(${t("commands:help.spotify")})`,
         !isDisabledSource("custom") && `・${t("commands:help.custom")}`,
