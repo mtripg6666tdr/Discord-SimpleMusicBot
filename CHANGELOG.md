@@ -21,7 +21,7 @@
 * コマンドの権限が満たしていない場合の挙動を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1586)
 ## ドキュメント
 * インストール方法の順序を、推奨される順番に変更(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1530)
-* ドキュメントの継続的な更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1531, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1630, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1632, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1610, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1640)
+* ドキュメントの継続的な更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1531, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1630, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1632, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1610, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1640, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1642)
 * 環境変数`PORT`に関する説明を追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1588, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1637, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1638)
 ## 依存関係のアップデート
 * @mtripg6666tdr/oceanic-command-resolver 1.0.0 => 1.1.1
