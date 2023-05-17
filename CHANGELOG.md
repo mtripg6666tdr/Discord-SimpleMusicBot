@@ -48,6 +48,7 @@
 
 ---
 
+
 ## バグ修正
 * ボタンを押すとクラッシュする場合がある問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1649)
 
