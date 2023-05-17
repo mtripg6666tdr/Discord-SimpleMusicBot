@@ -460,8 +460,9 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       const results: QueueContent[] = [];
 
       if(firstUrl){
+        // eslint-disable-next-line prefer-spread
         results.push.apply(
-          results.push,
+          results,
           await this.playFromURL(message, firstUrl, { first, cancellable: false }, t)
         );
 
