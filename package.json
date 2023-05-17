@@ -22,7 +22,7 @@
   "devDependencies": {
     "@types/follow-redirects": "^1.14.1",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^20.1.5",
+    "@types/node": "^20.1.7",
     "@types/ws": "^8.5.4",
     "dotenv": "^16.0.3",
     "patch-package": "^7.0.0",
