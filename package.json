@@ -26,7 +26,7 @@
     "genius-lyrics": "^4.4.3",
     "html-entities": "^2.3.3",
     "html-to-text": "^9.0.5",
-    "https-proxy-agent": "^6.1.0",
+    "https-proxy-agent": "^6.2.0",
     "i18next": "^22.5.0",
     "i18next-fs-backend": "^2.1.2",
     "log4js": "^6.9.1",
