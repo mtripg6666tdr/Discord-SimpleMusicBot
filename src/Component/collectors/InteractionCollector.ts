@@ -18,7 +18,7 @@
 
 import type { InteractionCollectorManager } from "./InteractionCollectorManager";
 import type { ResponseMessage } from "../commandResolver/ResponseMessage";
-import type { AnyGuildTextChannel, ComponentInteraction, ComponentTypes, Message } from "oceanic.js";
+import type { AnyTextableGuildChannel, ComponentInteraction, ComponentTypes, Message } from "oceanic.js";
 
 import { LogEmitter } from "../../Structure";
 import { generateUUID } from "../../Util";
@@ -40,7 +40,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
   protected destroyed = false;
   protected _collectorId: string = null;
   protected resetTimeoutOnInteraction = false;
-  protected message: Message<AnyGuildTextChannel> | ResponseMessage = null;
+  protected message: Message<AnyTextableGuildChannel> | ResponseMessage = null;
 
   getCustomIds(){
     return [...this.customIdMap.keys()];
@@ -115,7 +115,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
     };
   }
 
-  handleInteraction(interaction: ComponentInteraction<any, AnyGuildTextChannel>){
+  handleInteraction(interaction: ComponentInteraction<any, AnyTextableGuildChannel>){
     const componentId = this.customIdMap.get(interaction.data.customID);
     if(!componentId){
       this.logger.warn(`unknown custom id: ${interaction.data.customID}`);
@@ -135,7 +135,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
     }
   }
 
-  setMessage(message: Message<AnyGuildTextChannel> | ResponseMessage){
+  setMessage(message: Message<AnyTextableGuildChannel> | ResponseMessage){
     this.message = message;
     return message;
   }

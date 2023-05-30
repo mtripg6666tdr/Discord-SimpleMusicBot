@@ -20,7 +20,7 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { YmxFormat } from "../Structure";
 import type { i18n } from "i18next";
-import type { AnyGuildTextChannel, Message } from "oceanic.js";
+import type { AnyTextableGuildChannel, Message } from "oceanic.js";
 
 import candyget from "candyget";
 import { ApplicationCommandTypes } from "oceanic.js";
@@ -55,9 +55,9 @@ export default class Import extends BaseCommand {
     context.server.updateBoundChannel(message);
 
     const statusMessage = await message.reply(`🔍${t("commands:import.loadingMessage")}...`);
-    let targetMessage: Message<AnyGuildTextChannel> = null;
+    let targetMessage: Message<AnyTextableGuildChannel> = null;
     if(message["_interaction"] && "type" in message["_interaction"].data && message["_interaction"].data.type === ApplicationCommandTypes.MESSAGE){
-      targetMessage = message["_interaction"].data.resolved.messages.first() as Message<AnyGuildTextChannel>;
+      targetMessage = message["_interaction"].data.resolved.messages.first() as Message<AnyTextableGuildChannel>;
       if(targetMessage.author?.id !== context.client.user.id && !config.isWhiteListedBot(targetMessage.author?.id)){
         await statusMessage.edit(`❌${t("commands:import.notBotMessage")}`);
         return;
@@ -88,7 +88,7 @@ export default class Import extends BaseCommand {
         // get the message
         const targetChannelId = ids[ids.length - 2];
         const targetMessageId = ids[ids.length - 1];
-        const channel = await context.client.rest.channels.get<AnyGuildTextChannel>(targetChannelId);
+        const channel = await context.client.rest.channels.get<AnyTextableGuildChannel>(targetChannelId);
         targetMessage = channel.guild && await channel.getMessage(targetMessageId);
         if(targetMessage.author?.id !== context.client.user.id && !force && !config.isWhiteListedBot(targetMessage.author?.id)){
           await statusMessage.edit(`❌${t("commands:import.notBotMessage")}`);

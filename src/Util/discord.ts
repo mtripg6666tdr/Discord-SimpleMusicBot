@@ -17,7 +17,7 @@
  */
 
 import type { CommandArgs } from "../Commands";
-import type { AnyGuildTextChannel, Member, PermissionName } from "oceanic.js";
+import type { AnyTextableGuildChannel, Member, PermissionName } from "oceanic.js";
 
 export const users = {
   getDisplayName(member: Member){
@@ -43,7 +43,7 @@ const requirePermissions = [
 ] as Readonly<PermissionName[]>;
 
 export const channels = {
-  checkSendable(channel: AnyGuildTextChannel, userId: string){
+  checkSendable(channel: AnyTextableGuildChannel, userId: string){
     const permissions = channel.permissionsOf(userId);
     return requirePermissions.every(permission => permissions.has(permission));
   },

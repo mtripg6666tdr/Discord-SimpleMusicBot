@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { AnyGuildTextChannel, ComponentInteraction } from "oceanic.js";
+import type { AnyTextableGuildChannel, ComponentInteraction } from "oceanic.js";
 
 import { InteractionCollector } from "./InteractionCollector";
 import { Pagenation } from "./Pagenation";
@@ -76,7 +76,7 @@ export class InteractionCollectorManager extends LogEmitter<InteractionCollector
    * @param interaction インタラクション
    * @returns 対応するコレクターが存在し、処理が渡った場合はtrue、それ以外の場合はfalse
    */
-  async onInteractionCreate(interaction: ComponentInteraction<any, AnyGuildTextChannel>){
+  async onInteractionCreate(interaction: ComponentInteraction<any, AnyTextableGuildChannel>){
     const collector = this.collectors.get(interaction.data.customID);
     if(!collector){
       return false;

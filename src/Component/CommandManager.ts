@@ -108,7 +108,7 @@ export class CommandManager extends LogEmitter<{}> {
   }
 
   @timeLoggedMethod
-  async sync(client: Client, removeOutdated: boolean = false){
+  async sync(client: Readonly<Client>, removeOutdated: boolean = false){
     if(process.env.DISABLE_SYNC_SC && !removeOutdated){
       this.logger.info("Skip syncing commands");
       return;
@@ -212,13 +212,13 @@ export class CommandManager extends LogEmitter<{}> {
     }
   }
 
-  async removeAllApplicationCommand(client: Client){
+  async removeAllApplicationCommand(client: Readonly<Client>){
     this.logger.info("Removing all application commands");
     await client.application.bulkEditGlobalCommands([]);
     this.logger.info("Successfully removed all application commands");
   }
 
-  async removeAllGuildCommand(client: Client, guildId: string){
+  async removeAllGuildCommand(client: Readonly<Client>, guildId: string){
     this.logger.info("Removing all guild commands of " + guildId);
     await client.application.bulkEditGuildCommands(guildId, []);
     this.logger.info("Successfully removed all guild commands");

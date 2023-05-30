@@ -27,7 +27,7 @@ import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 export async function handleButtonInteraction(
   this: MusicBot,
   server: GuildDataContainer,
-  interaction: discord.ComponentInteraction<ComponentTypes.BUTTON, discord.AnyGuildTextChannel>,
+  interaction: discord.ComponentInteraction<ComponentTypes.BUTTON, discord.AnyTextableGuildChannel>,
 ){
   this.logger.info("received button interaction");
 
