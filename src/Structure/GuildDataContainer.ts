@@ -31,10 +31,9 @@ import type { AnyTextableGuildChannel, Message, StageChannel, VoiceChannel } fro
 import type { TextChannel } from "oceanic.js";
 import type { Playlist } from "spotify-url-info";
 
+import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
 import { LockObj, lock } from "@mtripg6666tdr/async-lock";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
-
-import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
 import Soundcloud from "soundcloud.ts";
 import ytpl from "ytpl";
 

@@ -217,9 +217,9 @@ export class MongoBackupper extends Backupper {
         })),
       });
       const result = new Map<string, exportableStatuses>();
-      await dbResult.forEach(doc => {
+      for await(const doc of dbResult){
         result.set(doc.guildId, doc);
-      });
+      }
       return result;
     }
     catch(er){
@@ -243,9 +243,9 @@ export class MongoBackupper extends Backupper {
         })),
       });
       const result = new Map<string, YmxFormat>();
-      await dbResult.forEach(doc => {
+      for await(const doc of dbResult){
         result.set(doc.guildId, doc);
-      });
+      }
       return result;
     }
     catch(er){
