@@ -22,7 +22,6 @@ export function bindThis(_originalMethod: any, context: ClassMethodDecoratorCont
     throw new Error(`Unable to decorate private property:${methodName as string}.`);
   }
   context.addInitializer(function() {
-    // eslint-disable-next-line @typescript-eslint/no-invalid-this
     (this as any)[methodName] = (this as any)[methodName].bind(this);
   });
 }

@@ -20,9 +20,9 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { i18n } from "i18next";
 
+import { getVoiceConnection } from "@discordjs/voice";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
-import { getVoiceConnection } from "@discordjs/voice";
 
 import { BaseCommand } from ".";
 import { getColor } from "../Util/color";

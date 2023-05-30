@@ -21,9 +21,10 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import type { i18n } from "i18next";
 import type { EmbedOptions } from "oceanic.js";
 
+import * as os from "os";
+
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
-import * as os from "os";
 
 import { BaseCommand } from ".";
 import * as Util from "../Util";

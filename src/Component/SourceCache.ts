@@ -20,13 +20,14 @@ import type { AudioSource, exportableCustom } from "../AudioSource";
 import type { MusicBotBase } from "../botBase";
 import type ytsr from "ytsr";
 
-import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import { pipeline, Readable } from "stream";
 import zlib from "zlib";
+
+import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 
 import { LogEmitter } from "../Structure";
 import { getMBytes } from "../Util/system";

@@ -21,7 +21,6 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
-
 import candyget from "candyget";
 import * as Genius from "genius-lyrics";
 import { decode } from "html-entities";

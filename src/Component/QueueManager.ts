@@ -26,7 +26,6 @@ import type { AnyTextableGuildChannel, EditMessageOptions, Message, MessageActio
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
-
 import i18next from "i18next";
 import { Member } from "oceanic.js";
 import ytmpl from "yt-mix-playlist";
