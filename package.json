@@ -14,7 +14,7 @@
     "@sinclair/typebox": "^0.28.14",
     "candyget": "^0.5.4",
     "comment-json": "^4.2.3",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.1.0",
     "eris": "^0.17.2",
     "genius-lyrics": "^4.4.3",
     "html-entities": "^2.3.3",
