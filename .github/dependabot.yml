@@ -17,11 +17,14 @@ updates:
       - dependency-type: "direct"
     ignore:
       - dependency-name: "sodium-native"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
       - dependency-name: "p-queue"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
       - dependency-name: "p-event"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
 
   # v3 branch
   - package-ecosystem: npm
@@ -41,21 +44,33 @@ updates:
       - dependency-type: "direct"
     ignore:
       - dependency-name: "html-to-text"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
       - dependency-name: "pako"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
       - dependency-name: "sodium-native"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
       - dependency-name: "rimraf"
-        update-types: ["version-update:semver-major"]
+        update-types: 
+          - "version-update:semver-major"
       - dependency-name: "mongodb"
-        update-types: ["version-update:semver-major"]
+        update-types: 
+          - "version-update:semver-major"
       - dependency-name: "p-queue"
-        update-types: ["version-update:semver-major"]
+        update-types: 
+          - "version-update:semver-major"
       - dependency-name: "p-event"
-        update-types: ["version-update:semver-major"]
+        update-types: 
+          - "version-update:semver-major"
       - dependency-name: "https-proxy-agent"
-        update-types: ["version-update:semver-major"]
+        update-types: 
+          - "version-update:semver-major"
+      - dependency-name: "typescript"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
 
   # v1-lts branch
   - package-ecosystem: npm
@@ -75,11 +90,14 @@ updates:
       - dependency-type: "direct"
     ignore:
       - dependency-name: "discord.js"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
       - dependency-name: "soundcloud.ts"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
       - dependency-name: "https-proxy-agent"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
 
   # documentation site (master)
   - package-ecosystem: npm
@@ -99,13 +117,17 @@ updates:
       - dependency-type: "direct"
     ignore:
       - dependency-name: "@mdx-js/react"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
       - dependency-name: "react"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
       - dependency-name: "react-dom"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
       - dependency-name: "prism-react-renderer"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
 
   # actions (master)
   - package-ecosystem: github-actions
