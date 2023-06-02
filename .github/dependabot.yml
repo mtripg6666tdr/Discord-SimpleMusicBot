@@ -98,10 +98,6 @@ updates:
       - dependency-name: "https-proxy-agent"
         update-types:
           - "version-update:semver-major"
-      - dependency-name: "typescript"
-        update-types:
-          - "version-update:semver-major"
-          - "version-update:semver-minor"
 
   # documentation site (master)
   - package-ecosystem: npm
