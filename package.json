@@ -28,7 +28,7 @@
     "soundcloud.ts": "^0.5.0",
     "spotify-url-info": "^3.2.5",
     "throttle-debounce": "^5.0.0",
-    "tslib": "^2.5.2",
+    "tslib": "^2.5.3",
     "twitter-url-direct": "^1.0.9",
     "ytdl-core": "^4.11.4",
     "ytpl": "^2.3.0",
