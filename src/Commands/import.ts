@@ -112,7 +112,6 @@ export default class Import extends BaseCommand {
           }
         }else{
           await smsg.edit("❌キューの埋め込みもしくは添付ファイルが見つかりませんでした");
-          return;
         }
       }
       catch(e){
