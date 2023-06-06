@@ -145,7 +145,6 @@ export default class Import extends BaseCommand {
         }
       }else{
         await statusMessage.edit(`❌${t("commands:import.contentNotIncludedInMessage")}`);
-        return;
       }
     }
     catch(e){
