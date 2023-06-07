@@ -17,7 +17,7 @@
     "dotenv": "^16.1.4",
     "eris": "^0.17.2",
     "genius-lyrics": "^4.4.3",
-    "html-entities": "^2.3.3",
+    "html-entities": "^2.3.5",
     "html-to-text": "^8.2.1",
     "https-proxy-agent": "^5.0.1",
     "miniget": "^4.2.2",
