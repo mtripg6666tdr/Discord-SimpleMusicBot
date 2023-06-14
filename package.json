@@ -24,7 +24,7 @@
     "comment-json": "^4.2.3",
     "dotenv": "^16.1.4",
     "genius-lyrics": "^4.4.3",
-    "html-entities": "^2.3.5",
+    "html-entities": "^2.3.6",
     "html-to-text": "^9.0.5",
     "https-proxy-agent": "^7.0.0",
     "i18next": "^22.5.1",
