@@ -25,6 +25,9 @@ updates:
       - dependency-name: "p-event"
         update-types:
           - "version-update:semver-major"
+      - dependency-name: "i18next"
+        update-types:
+          - "version-update:semver-major"
 
   # v3 branch
   - package-ecosystem: npm
