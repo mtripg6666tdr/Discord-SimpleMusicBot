@@ -12,7 +12,7 @@
     "html-entities": "^2.3.6",
     "https-proxy-agent": "^5.0.1",
     "m3u8stream": "^0.8.6",
-    "miniget": "^4.2.2",
+    "miniget": "^4.2.3",
     "opusscript": "0.0.8",
     "soundcloud.ts": "^0.5.0",
     "ytdl-core": "^4.11.4",
