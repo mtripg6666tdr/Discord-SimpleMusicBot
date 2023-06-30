@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@mtripg6666tdr/eslint-config": "^1.0.14",
-    "@tsconfig/node16": "^1.0.4",
+    "@tsconfig/node16": "^16.1.0",
     "@types/html-to-text": "^9.0.1",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.3.2",
