@@ -28,7 +28,7 @@
     "@tsconfig/docusaurus": "^1.0.7",
     "pretty-js": "^0.2.2",
     "recursive-copy": "^2.0.14",
-    "typescript": "^5.1.3"
+    "typescript": "^5.1.6"
   },
   "browserslist": {
     "production": [
