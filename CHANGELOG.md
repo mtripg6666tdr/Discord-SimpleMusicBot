@@ -74,7 +74,7 @@
 * 検索が失敗することの回避策として、代替ライブラリによるフォールバック検索を追加することにより修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1814)
 * リソースの取得中に再生がキャンセルされた場合、準備中かどうかを判断するフラグを確実にリセットする(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1815)
 ## ドキュメント
-* BGM昨日は、v4.0.0で正式機能になっているため、表記を更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1673)
+* BGM機能は、v4.0.0で正式機能になっているため、表記を更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1673)
 ## 依存関係のアップデート
 * @mtripg6666tdr/oceanic-command-resolver 1.1.1 => 1.2.0
 * @sinclair/typebox 0.28.10 => 0.29.1
