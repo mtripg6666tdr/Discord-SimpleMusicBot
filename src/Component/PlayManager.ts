@@ -247,8 +247,13 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       const rawStream = await this.currentAudioInfo.fetch(time > 0);
 
       // 情報からストリームを作成
+      // 万が一ストリームのfetch中に切断された場合には、リソース開放してplayを抜ける
       const voiceChannel = this.server.connectingVoiceChannel;
       if(!voiceChannel){
+        if(rawStream.type === "readable"){
+          rawStream.stream.once("error", () => {});
+          rawStream.stream.destroy();
+        }
         return this;
       }
       const { stream, streamType, cost, streams } = await resolveStreamToPlayable(rawStream, {
@@ -323,6 +328,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     }
     catch(e){
       this.handleError(e).catch(this.logger.error);
+    }
+    finally{
+      this.preparing = false;
     }
     return this;
   }
