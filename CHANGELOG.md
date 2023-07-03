@@ -63,4 +63,37 @@
 
 ### その他の特記事項
 - Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
+
+# v4.1.4
+## バグ修正
+* 一部の環境で、`ログ log`コマンドが動作しない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1812)
+* `リセット`コマンドの挙動を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1813, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1817)
+* 切断時に、リソースを確実に破棄するよう修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1817)
+* 検索が失敗することの回避策として、代替ライブラリによるフォールバック検索を追加することにより修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1814)
+* リソースの取得中に再生がキャンセルされた場合、準備中かどうかを判断するフラグを確実にリセットする(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1815)
+## ドキュメント
+* BGM機能は、v4.0.0で正式機能になっているため、表記を更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1673)
+## 依存関係のアップデート
+* @mtripg6666tdr/oceanic-command-resolver 1.1.1 => 1.2.0
+* @sinclair/typebox 0.28.10 => 0.29.1
+* dotenv 16.0.3 => 16.3.1
+* html-entities 2.3.3 => 2.4.0
+* https-proxy-agent 6.1.0 => 7.0.0
+* i18next 22.4.15 => 22.5.1
+* i18next-fs-backend 2.1.1 => 2.1.5
+* miniget 4.2.2 => 4.2.3
+* oceanic.js 1.6.0 => 1.7.1
+* soundcloud.ts 0.5.0 => 0.5.1
+* spotify-url-info 3.2.4 => 3.2.5
+* tslib 2.5.0 => 2.6.0
+### Optional
+* mongodb 5.5.0 => 5.6.0
+## その他の変更
+* 不要な依存関係(@types/follow-redirects)を削除(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1720)
+
+### その他の特記事項
+- Dockerのイメージは、リリース後30～40分程度で公開されます。
+
 ---
