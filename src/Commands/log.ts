@@ -117,7 +117,7 @@ export default class SystemInfo extends BaseCommand {
       let logs: string[] = [...getLogs()];
       logs.reverse();
       for(let i = 0; i < logs.length; i++){
-        if(logs.join("\r\n").length < 1950) break;
+        if(logs.join("\r\n").length < 3950) break;
         logs = logs.slice(0, -1);
       }
       logs.reverse();
@@ -225,7 +225,7 @@ export default class SystemInfo extends BaseCommand {
           .toOceanic()
       );
     }
-    
+
     if(embeds.length > 0){
       await message.channel.createMessage({ embeds }).catch(this.logger.error);
     }
