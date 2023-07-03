@@ -24,7 +24,6 @@ import type * as discord from "oceanic.js";
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import util from "util";
 
 import { RateLimitController } from "./Component/RateLimitController";
 import { SourceCache } from "./Component/SourceCache";
@@ -222,9 +221,6 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
     this.logger.info(
       `[Tick] (System) Memory RSS: ${rss}MB, Heap total: ${Util.system.getMBytes(nMem.heapTotal)}MB, Total: ${Util.getPercentage(rss + ext, memory.total)}%`
     );
-
-    // for debug purpose
-    this.logger.trace("ratelimits", util.inspect(this.client.rest.handler.ratelimits, { showHidden: true, depth: Infinity }));
   }
 
   abstract run(debugLog: boolean, debugLogStoreLength?: number): void;
