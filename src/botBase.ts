@@ -231,7 +231,10 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
   protected initData(guildid: string, boundChannelId: string){
     const prev = this.guildData.get(guildid);
     if(!prev){
-      const server = new GuildDataContainer(guildid, boundChannelId, this);
+      const config = useConfig();
+      const server = config.bgm[guildid]
+        ? new GuildDataContainerWithBgm(guildid, boundChannelId, this, config.bgm[guildid])
+        : new GuildDataContainer(guildid, boundChannelId, this);
       this.guildData.set(guildid, server);
       this.emit("guildDataAdded", server);
       return server;
