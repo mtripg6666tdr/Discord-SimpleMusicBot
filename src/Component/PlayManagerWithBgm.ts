@@ -36,6 +36,7 @@ export class PlayManagerWithBgm extends PlayManager {
       this.setVolume(this._originalVolume);
     }
     this._bgm = value;
+    this.logger.debug(`BGM state changed: ${value ? "active" : "inactive"}`);
   }
 
   override get isPlaying(): boolean{
@@ -54,12 +55,13 @@ export class PlayManagerWithBgm extends PlayManager {
   }
 
   protected override getIsBadCondition(bgm: boolean = this.bgm){
+    this.logger.debug(`Condition: { connecting: ${this.isConnecting}, playing: ${this.isPlaying}, empty: ${this.server.queue.isEmpty}, bgm: ${bgm}, bgmEmpty: ${this.server.queue.isBgmEmpty} }`);
     // 接続していない
     return !this.isConnecting
       // なにかしら再生中
       || this.isPlaying
       // キューが空
-      || this.server.queue.isEmpty && (!bgm || this.server.queue.isBgmEmpty)
+      || (this.server.queue.isEmpty && (!bgm || this.server.queue.isBgmEmpty))
       // 準備中
       || this.preparing
     ;

@@ -16,6 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type * as dYtsr from "@distube/ytsr";
 import type * as ytsr from "ytsr";
 
 import * as path from "path";
@@ -52,7 +53,7 @@ export type workerGetInfoSuccessMessage = {
 };
 export type workerSearchSuccessMessage = {
   type: "searchOk",
-  data: ytsr.Result,
+  data: ytsr.Result | dYtsr.VideoResult,
 };
 export type workerErrorMessage = {
   type: "error",

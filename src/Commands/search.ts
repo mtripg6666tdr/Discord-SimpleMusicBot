@@ -19,6 +19,7 @@
 import type { CommandArgs } from ".";
 import type { SongInfo } from "../Component/SearchPanel";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type * as dYtsr from "@distube/ytsr";
 import type { i18n } from "i18next";
 import type * as ytsr from "ytsr";
 
@@ -109,7 +110,7 @@ export abstract class SearchBase<T> extends BaseCommand {
 
 const config = useConfig();
 
-export default class Search extends SearchBase<ytsr.Video[]> {
+export default class Search extends SearchBase<ytsr.Video[] | dYtsr.Video[]> {
   constructor(){
     super({
       alias: ["search", "se"],
@@ -131,18 +132,18 @@ export default class Search extends SearchBase<ytsr.Video[]> {
   protected override async searchContent(query: string, context: CommandArgs){
     return searchYouTube(query)
       .then(result => {
-        const videos = result.items.filter(item => item.type === "video") as ytsr.Video[];
+        const videos = (result.items as (ytsr.Item | dYtsr.Video)[]).filter(item => item.type === "video") as ytsr.Video[] | dYtsr.Video[];
         context.bot.cache.addSearch(query, videos);
         return videos;
       });
   }
 
-  protected override consumer(items: ytsr.Video[], t: i18n["t"]){
+  protected override consumer(items: ytsr.Video[] | dYtsr.Video[], t: i18n["t"]){
     return items.map(item => ({
       url: item.url,
-      title: item.title,
+      title: "title" in item ? item.title : `\\*${item.name}`,
       duration: item.duration,
-      thumbnail: item.bestThumbnail.url,
+      thumbnail: "bestThumbnail" in item ? item.bestThumbnail.url : item.thumbnail,
       author: item.author.name,
       description: `${t("length")}: ${item.duration}, ${t("channelName")}: ${item.author.name}`,
     })).filter(n => n);

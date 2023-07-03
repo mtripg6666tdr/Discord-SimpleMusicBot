@@ -479,6 +479,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   }
 
   protected getIsBadCondition(){
+    if(config.debug){
+      this.logger.debug(`Condition: { connecting: ${this.isConnecting}, playing: ${this.isPlaying}, empty: ${this.server.queue.isEmpty}, preparing: ${this.preparing} }`);
+    }
     // 再生できる状態か確認
     return /* 接続していない */ !this.isConnecting
       // なにかしら再生中

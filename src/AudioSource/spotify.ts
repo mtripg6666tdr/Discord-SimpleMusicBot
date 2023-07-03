@@ -18,6 +18,7 @@
 
 import type { StreamInfo } from "./audiosource";
 import type { exportableCustom } from "./custom";
+import type dYtsr from "@distube/ytsr";
 import type { EmbedField } from "oceanic.js";
 import type { Track } from "spotify-url-info";
 import type ytsr from "ytsr";
@@ -81,7 +82,7 @@ export class Spotify extends AudioSource<string> {
 
       // extract videos that seem to be ok
       this.logger.debug("Extracting the valid item...");
-      const items = searchResult.items.filter(({ type }) => type === "video") as ytsr.Video[];
+      const items = (searchResult.items as (ytsr.Item | dYtsr.Video)[]).filter(({ type }) => type === "video") as ytsr.Video[];
       const target = this.extractBestItem(items);
 
       if(!target) throw new Error("Not Found");

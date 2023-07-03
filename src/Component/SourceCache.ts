@@ -18,8 +18,8 @@
 
 import type { AudioSource, exportableCustom } from "../AudioSource";
 import type { MusicBotBase } from "../botBase";
+import type dYtsr from "@distube/ytsr";
 import type ytsr from "ytsr";
-
 
 import crypto from "crypto";
 import fs from "fs";
@@ -127,7 +127,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
       .catch(() => null) as Promise<T>;
   }
 
-  addSearch(keyword: string, result: ytsr.Video[]){
+  addSearch(keyword: string, result: ytsr.Video[] | dYtsr.Video[]){
     if(this.enablePersistent){
       this.addPersistentCache(this.createCacheId(keyword.toLowerCase(), "search"), result).catch(this.logger.error);
     }
