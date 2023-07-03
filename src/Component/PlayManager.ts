@@ -534,7 +534,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
    * @returns this
    */
   async disconnect(): Promise<PlayManager> {
-    await this.stop();
+    await this.stop({ force: true });
     this.emit("disconnectAttempt");
 
     if(this.server.connection){

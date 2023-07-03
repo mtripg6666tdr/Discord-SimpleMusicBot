@@ -63,6 +63,8 @@ export async function onVoiceChannelJoin(
       });
       this.emit("onBotVoiceChannelJoin", voiceChannel);
     }
+
+    return;
   }
 
   server.skipSession?.checkThreshold().catch(this.logger.error);
