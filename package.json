@@ -20,7 +20,7 @@
     "@distube/ytsr": "^1.1.9",
     "@mtripg6666tdr/async-lock": "^1.1.0",
     "@mtripg6666tdr/oceanic-command-resolver": "^1.2.0",
-    "@sinclair/typebox": "^0.29.1",
+    "@sinclair/typebox": "^0.29.3",
     "candyget": "^0.5.4",
     "comment-json": "^4.2.3",
     "dotenv": "^16.3.1",
