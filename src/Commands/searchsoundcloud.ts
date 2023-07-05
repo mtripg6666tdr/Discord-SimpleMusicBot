@@ -61,7 +61,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
       let nextUrl = "";
       let rawResult = await this.soundcloud.api.getV2(`users/${user.id}/tracks`) as SoundCloudTrackCollection;
       result.push(...rawResult.collection);
-      nextUrl = rawResult.next_href + "&client_id=" + await this.soundcloud.api.getClientID();
+      nextUrl = `${rawResult.next_href}&client_id=${await this.soundcloud.api.getClientId()}`;
       while(nextUrl && result.length < 10){
         rawResult = await candyget.json(nextUrl, {
           headers: {
@@ -69,7 +69,9 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
           },
         }).then(({ body }) => body as SoundCloudTrackCollection);
         result.push(...rawResult.collection);
-        nextUrl = rawResult.next_href ? `${rawResult.next_href}&client_id=${await this.soundcloud.api.getClientID()}` : rawResult.next_href;
+        nextUrl = rawResult.next_href
+          ? `${rawResult.next_href}&client_id=${await this.soundcloud.api.getClientId()}`
+          : rawResult.next_href;
       }
     }else{
       // 楽曲検索

@@ -95,7 +95,10 @@ export abstract class SearchBase<T> extends BaseCommand {
     }
   }
 
-  /** 検索を実行する関数 */
+  /**
+   * 検索を実行する関数  
+   * 検索時にクエリーの変換を行う場合は、変換後のクエリをtransfomedQueryとして返す必要があります。
+   */
   protected abstract searchContent(query: string, context: CommandArgs, t: i18n["t"]): Promise<T|{ result: T, transformedQuery: string }>;
 
   /** 検索結果を検索パネルで使用できるデータに変換する関数 */
