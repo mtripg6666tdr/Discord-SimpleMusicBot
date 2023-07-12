@@ -48,7 +48,7 @@
     "ytsr": "^3.8.2"
   },
   "devDependencies": {
-    "@mtripg6666tdr/eslint-config": "^1.0.15",
+    "@mtripg6666tdr/eslint-config": "^1.0.16",
     "@tsconfig/node16": "^16.1.0",
     "@types/html-to-text": "^9.0.1",
     "@types/mocha": "^10.0.1",
