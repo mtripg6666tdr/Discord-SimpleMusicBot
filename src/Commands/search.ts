@@ -144,7 +144,7 @@ export default class Search extends SearchBase<ytsr.Video[] | dYtsr.Video[]> {
   protected override consumer(items: ytsr.Video[] | dYtsr.Video[], t: i18n["t"]){
     return items.map(item => ({
       url: item.url,
-      title: "title" in item ? item.title : `\\*${item.name}`,
+      title: "title" in item ? item.title : `*${item.name}`,
       duration: item.duration,
       thumbnail: "bestThumbnail" in item ? item.bestThumbnail.url : item.thumbnail,
       author: item.author.name,
