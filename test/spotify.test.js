@@ -10,26 +10,26 @@ const spotifyUrlInfo = (() => {
   }
 })();
 
-if(spotifyUrlInfo){
+if(spotifyUrlInfo && !process.env.CI){
   const spotifyClient = spotifyUrlInfo((url, init) => candyget(url, "string", init).then(r => ({text: () => r.body})));
 
-  // describe("#Spotify Playlist", function(){
-  //   it("#0,1,2 is ok", async function(){
-  //     const [zero, one, two] = await spotifyClient.getTracks("https://open.spotify.com/playlist/37i9dQZF1DX10JY0qJoWDu");
-  //     assert.equal(zero.artist, "Kristen Bell, Agatha Lee Monn, Katie Lopez");
-  //     assert.equal(zero.duration, 206506);
-  //     assert.equal(zero.name, "Do You Want to Build a Snowman? - From \"Frozen\"/Soundtrack Version");
-  //     assert.equal(zero.uri, "spotify:track:2yi7HZrBOC4bMUSTcs4VK6");
-  //     assert.equal(one.artist, "DCappella");
-  //     assert.equal(one.duration, 97573);
-  //     assert.equal(one.name, "Deck the Halls");
-  //     assert.equal(one.uri, "spotify:track:5jtvS4uu9odCpRC4XvI29B");
-  //     assert.equal(two.artist, "Josh Gad");
-  //     assert.equal(two.duration, 110986);
-  //     assert.equal(two.name, "In Summer - From \"Frozen\"/Soundtrack Version");
-  //     assert.equal(two.uri, "spotify:track:7bG6SQBGZthPDG5QJL5Gf7");
-  //   });
-  // });
+  describe("#Spotify Playlist", function(){
+    it("#0,1,2 is ok", async function(){
+      const [zero, one, two] = await spotifyClient.getTracks("https://open.spotify.com/playlist/37i9dQZF1DX10JY0qJoWDu");
+      assert.equal(zero.artist, "Kristen Bell, Agatha Lee Monn, Katie Lopez");
+      assert.equal(zero.duration, 206506);
+      assert.equal(zero.name, "Do You Want to Build a Snowman? - From \"Frozen\"/Soundtrack Version");
+      assert.equal(zero.uri, "spotify:track:2yi7HZrBOC4bMUSTcs4VK6");
+      assert.equal(one.artist, "DCappella");
+      assert.equal(one.duration, 97573);
+      assert.equal(one.name, "Deck the Halls");
+      assert.equal(one.uri, "spotify:track:5jtvS4uu9odCpRC4XvI29B");
+      assert.equal(two.artist, "Josh Gad");
+      assert.equal(two.duration, 110986);
+      assert.equal(two.name, "In Summer - From \"Frozen\"/Soundtrack Version");
+      assert.equal(two.uri, "spotify:track:7bG6SQBGZthPDG5QJL5Gf7");
+    });
+  });
 
   describe("#Spotify Track", function(){
     it("Track info is ok", async function(){
