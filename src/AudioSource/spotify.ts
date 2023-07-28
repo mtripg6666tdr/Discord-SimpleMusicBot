@@ -60,7 +60,7 @@ export class Spotify extends AudioSource<string> {
       this.referenceUrl = prefetched.referenceUrl;
       this.thumbnail = prefetched.thumbnail || this.thumbnail;
     }else{
-      this.url = url;
+      this.url = url = Spotify.formatUrl(url);
       const track = await client.getData(url) as Track;
       this.lengthSeconds = Math.floor(track.duration / 1000);
       this.title = track.name;
@@ -82,7 +82,8 @@ export class Spotify extends AudioSource<string> {
 
       // extract videos that seem to be ok
       this.logger.debug("Extracting the valid item...");
-      const items = (searchResult.items as (ytsr.Item | dYtsr.Video)[]).filter(({ type }) => type === "video") as ytsr.Video[];
+      const items = (searchResult.items as (ytsr.Item | dYtsr.Video)[])
+        .filter(({ type }) => type === "video") as (ytsr.Video | dYtsr.Video)[];
       const target = this.extractBestItem(items);
 
       if(!target) throw new Error("Not Found");
@@ -100,7 +101,7 @@ export class Spotify extends AudioSource<string> {
     return result.stream;
   }
 
-  protected extractBestItem(items: ytsr.Video[]){
+  protected extractBestItem(items: (ytsr.Video | dYtsr.Video)[]){
     this.logger.debug("result", items);
     const normalize = (text: string) => {
       return text.toLowerCase()
@@ -120,7 +121,7 @@ export class Spotify extends AudioSource<string> {
         .every(p => text1.includes(p))
       ;
     };
-    const validate = (item: ytsr.Video) => {
+    const validate = (item: { title: string }) => {
       return (
         // 関連のないタイトルを除外
         includes(item.title, this.title.replace(/feat\.\s?.+?(\s|$)/, "").toLowerCase())
@@ -134,25 +135,37 @@ export class Spotify extends AudioSource<string> {
       && !includes(item.title.toLowerCase(), "#shorts")
       && (this.title.toLowerCase().includes("remix") || !includes(item.title.toLowerCase(), "remix"));
     };
-    const validItems = items.filter(validate);
+    const validItems = items
+      .map(item => {
+        if("name" in item){
+          (item as dYtsr.Video & { title: string }).title = item.name;
+        }
+        return item as dYtsr.Video & { title: string };
+      })
+      .filter(validate);
     this.logger.debug("valid", validItems);
     if(validItems.length === 0) return items[0];
+
     // official channel
     let filtered = validItems.filter(item => item.author.ownerBadges.length > 0 || item.author.verified || item.author.name.endsWith("Topic") || item.author.name.endsWith("トピック"));
     this.logger.debug("official ch", filtered);
     if(filtered[0]) return filtered[0];
+
     // official item
     filtered = validItems.filter(item => includes(item.title, "official") || includes(item.title, "公式"));
     this.logger.debug("official item", filtered);
     if(filtered[0]) return filtered[0];
+
     // pv /mv
     filtered = validItems.filter(item => includes(item.title, "pv") || includes(item.title, "mv"));
     this.logger.debug("PV/MV", filtered);
     if(filtered[0]) return filtered[0];
+
     // no live
     filtered = validItems.filter(item => !includes(item.title, "live") && !includes(item.title, "ライブ"));
     this.logger.debug("no live", filtered);
     if(filtered[0]) return filtered[0];
+
     // other
     if(validItems[0]) return validItems[0];
     return items[0];
@@ -181,12 +194,18 @@ export class Spotify extends AudioSource<string> {
     this.referenceUrl = null;
   }
 
-  static validateTrackUrl(url: string){
-    return !!url.match(/^https?:\/\/open\.spotify\.com\/track\/([a-zA-Z0-9]+)(\?.*)?$/);
+  protected static readonly validateTrackUrlRegExp = /^https?:\/\/open\.spotify\.com\/(intl-[a-z]{2}\/)?track\/([a-zA-Z0-9]+)(\?.*)?$/;
+  static validateTrackUrl(url: string): boolean {
+    return this.validateTrackUrlRegExp.test(url);
   }
 
-  static validatePlaylistUrl(url: string){
-    return !!url.match(/^https?:\/\/open\.spotify\.com\/(playlist|album)\/([a-zA-Z0-9]+)(\?.*)?$/);
+  protected static readonly validatePlaylistUrlRegExp = /^https?:\/\/open\.spotify\.com\/(playlist|album)\/([a-zA-Z0-9]+)(\?.*)?$/;
+  static validatePlaylistUrl(url: string): boolean {
+    return this.validatePlaylistUrlRegExp.test(url);
+  }
+
+  static formatUrl(url: string): string {
+    return url.replace(/intl-[a-z]{2}\//, "");
   }
 
   static getTrackUrl(uri: string){
