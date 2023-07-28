@@ -301,8 +301,17 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       // setup volume
       this.setVolume(this.volume);
 
-      // wait for entering playing state
-      await entersState(this._player, AudioPlayerStatus.Playing, 10e3);
+      // wait for player entering the playing state
+      const waitSuccess = await entersState(this._player, AudioPlayerStatus.Playing, 10e3)
+        .then(() => true)
+        .catch(() => false);
+      // when occurring one or more error(s) while waiting for player,
+      // the error(s) should be also emitted from AudioPlayer and handled by PlayManager#handleError
+      // so simply ignore the error(s) here.
+      if(!waitSuccess){
+        return this;
+      }
+
       this.preparing = false;
       this._playing = true;
       this.emit("playStarted");
