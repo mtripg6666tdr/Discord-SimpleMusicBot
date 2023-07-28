@@ -97,3 +97,29 @@
 - Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
+
+# v4.1.5
+## バグ修正
+* 検索結果の表示が奇妙なのを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1862)
+* 一部環境でのエラー発生時に表示が荒れる問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1871)
+* SpotifyのURLからの再生に関するいくつかの問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1872)
+* 新しいユーザー名システムの導入に関する問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1874)
+* BGM機能が有効になっているサーバーで発生するバグの調査で見つかった問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1875)
+* Twitter (X) からの音楽ソースが再生されない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1876)
+## ドキュメント
+* flacファイルのサポートを明記(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1824)
+* ドキュメントの継続的な更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1849, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1850)
+## 依存関係のアップデート
+* @sinclair/typebox 0.29.1 => 0.29.6
+* https-proxy-agent 7.0.0 => 7.0.1
+* soundcloud.ts 0.5.1 => 0.5.2
+* tslib 2.6.0 => 2.6.1
+* ytdl-core 4.11.4 => 4.11.5
+### Optional
+* mongodb 5.6.0 => 5.7.0
+## その他の変更
+* `package-lock.json`のバージョンをアップデート(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/1818)
+## その他の特記事項
+- Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
