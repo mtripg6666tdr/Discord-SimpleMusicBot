@@ -19,9 +19,11 @@
 import type { exportableCustom, UrlStreamInfo } from ".";
 import type { i18n } from "i18next";
 
-import twitterDl from "twitter-url-direct";
+import candyget from "candyget";
+import * as htmlEntities from "html-entities";
 
 import { AudioSource } from "./audiosource";
+import { retriveLengthSeconds } from "../Util";
 
 export class Twitter extends AudioSource<string> {
   private streamUrl = "";
@@ -39,24 +41,17 @@ export class Twitter extends AudioSource<string> {
       this.streamUrl = prefetched.streamUrl;
     }else{
       const streamInfo = await twitterDl(url.split("?")[0]);
-      if(!streamInfo.found){
-        throw new Error("error" in streamInfo && streamInfo.error);
+
+      try{
+        this.lengthSeconds = await retriveLengthSeconds(streamInfo.videoUrl);
+      }
+      catch{
+        /* empty */
       }
 
-      this.lengthSeconds = Math.floor(streamInfo.duration);
-      this.title = t("audioSources.tweet", { name: streamInfo.tweet_user.name, id: streamInfo.tweet_user.username });
-      if(!streamInfo.download){
-        throw new Error("No media found");
-      }
-      this.streamUrl = streamInfo.download.sort((a, b) => {
-        const getDimensionFactor = (dimension: string) => dimension.split("x").reduce((prev, current) => prev + Number(current), 1);
-        return getDimensionFactor(b.dimension) - getDimensionFactor(a.dimension);
-      })[0]?.url;
-      this.description = streamInfo.tweet_user.text;
-
-      if(!this.streamUrl){
-        throw new Error("No format found");
-      }
+      this.title = t("audioSources.tweet", { name: streamInfo.displayName, id: streamInfo.screenName });
+      this.streamUrl = streamInfo.videoUrl;
+      this.description = streamInfo.content;
     }
     return this;
   }
@@ -105,3 +100,46 @@ export class Twitter extends AudioSource<string> {
 export type exportableTwitter = exportableCustom & {
   streamUrl: string,
 };
+
+type Tweet = {
+  displayName: string,
+  screenName: string,
+  content: string,
+  videoUrl: string,
+};
+
+const mediaTypeRegExp = /<meta\s+property="twitter:card"\s+content="(?<type>.+?)"\/>/;
+const twitterSiteRegExp = /<meta\s+property="twitter:site"\s+content="@(?<id>.+?)"\/>/;
+const twitterTitleRegExp = /<meta\s+property="twitter:title"\s+content="(?<title>.+?)"\/>/;
+const ogDescriptionRegExp = /<meta\s+property="og:description"\s+content="(?<content>.+?)"\/>/s;
+const ogVideoRegExp = /<meta\s+property="og:video"\s+content="(?<url>.+?)"\/>/;
+async function twitterDl(url: string): Promise<Tweet> {
+  const result = await candyget.string(url.replace("twitter.com", "fxtwitter.com"), {
+    headers: Object.assign({}, candyget.defaultOptions.headers, {
+      "User-Agent": "Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)",
+    }),
+  });
+
+  if(result.statusCode !== 200){
+    throw new Error("An error occurred while fetching data.");
+  }
+
+  const type = mediaTypeRegExp.exec(result.body)?.groups?.type;
+  if(type !== "player"){
+    throw new Error("Provided URL includes no videos.");
+  }
+
+  const screenName = twitterSiteRegExp.exec(result.body)?.groups?.id;
+  const displayName = (twitterTitleRegExp.exec(result.body)?.groups?.title || "")
+    .replace(new RegExp(`\\(@${screenName}\\)$`), "")
+    .trimEnd();
+  const content = htmlEntities.decode(ogDescriptionRegExp.exec(result.body)?.groups?.content);
+  const videoUrl = ogVideoRegExp.exec(result.body)?.groups?.url;
+
+  return {
+    displayName,
+    screenName,
+    content,
+    videoUrl,
+  };
+}
