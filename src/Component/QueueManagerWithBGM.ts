@@ -91,8 +91,8 @@ export class QueueManagerWithBgm extends QueueManager {
         basicInfo: await new AudioSource.FsStream().init(url, null, i18next.getFixedT(this.server.locale)),
         additionalInfo: {
           addedBy: {
-            userId: this.getUserIdFromMember(addedBy) ?? "0",
-            displayName: this.getDisplayNameFromMember(addedBy) ?? "不明",
+            userId: this.getUserIdFromMember(addedBy) || "0",
+            displayName: addedBy.displayName || "不明",
           },
         },
       } as QueueContent;

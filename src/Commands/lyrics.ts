@@ -27,7 +27,7 @@ import { decode } from "html-entities";
 import { convert } from "html-to-text";
 
 import { BaseCommand } from ".";
-import { discordUtil, color } from "../Util";
+import { color } from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
 
 export default class Lyrics extends BaseCommand {
@@ -73,7 +73,7 @@ export default class Lyrics extends BaseCommand {
       ;
       embeds[embeds.length - 1]
         .setFooter({
-          text: discordUtil.users.getDisplayName(message.member),
+          text: message.member.displayName,
           iconURL: message.member.avatarURL(),
         })
       ;

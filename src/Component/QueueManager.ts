@@ -252,7 +252,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         additionalInfo: {
           addedBy: {
             userId: addedBy && this.getUserIdFromMember(addedBy) || "0",
-            displayName: addedBy && this.getDisplayNameFromMember(addedBy) || i18next.t("unknown", { lng: this.server.locale }),
+            displayName: addedBy?.displayName || i18next.t("unknown", { lng: this.server.locale }),
           },
         },
       } as QueueContent;
@@ -383,7 +383,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           )
           .addField(
             i18next.t("components:nowplaying.requestedBy", { lng: this.server.locale }),
-            this.getDisplayNameFromMember(options.addedBy) || i18next.t("unknown", { lng: this.server.locale }),
+            options.addedBy.displayName || i18next.t("unknown", { lng: this.server.locale }),
             true
           )
           .addField(
@@ -811,10 +811,6 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
 
   addRawQueueItems(items: QueueContent[]){
     this._default.push(...items);
-  }
-
-  protected getDisplayNameFromMember(member: Member|AddedBy){
-    return member instanceof Member ? Util.discordUtil.users.getDisplayName(member) : member.displayName;
   }
 
   protected getUserIdFromMember(member: Member|AddedBy){

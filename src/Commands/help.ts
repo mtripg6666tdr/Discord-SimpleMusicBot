@@ -46,7 +46,7 @@ export default class Help extends BaseCommand {
     const developer = cachedUser
       ? cachedUser.username
       : await context.client.rest.users.get(developerId)
-        .then(user => user.username)
+        .then(user => user.globalName || user.username)
         .catch(() => null as string)
       ;
     const { isDisabledSource } = config;
