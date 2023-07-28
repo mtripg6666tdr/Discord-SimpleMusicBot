@@ -20,9 +20,6 @@ import type { CommandArgs } from "../Commands";
 import type { AnyTextableGuildChannel, Member, PermissionName } from "oceanic.js";
 
 export const users = {
-  getDisplayName(member: Member){
-    return member.nick || member.username;
-  },
   isDJ(member: Member, options: CommandArgs){
     return channels.sameVC(member, options) && member.roles.some(roleId => member.guild.roles.get(roleId).name === "DJ");
   },
