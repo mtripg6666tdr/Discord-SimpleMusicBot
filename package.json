@@ -38,7 +38,7 @@
     "p-queue": "^6.6.2",
     "prism-media": "^1.3.5",
     "soundcloud.ts": "^0.5.2",
-    "spotify-url-info": "^3.2.5",
+    "spotify-url-info": "^3.2.6",
     "throttle-debounce": "^5.0.0",
     "tslib": "^2.6.1",
     "yt-mix-playlist": "^1.0.1",
