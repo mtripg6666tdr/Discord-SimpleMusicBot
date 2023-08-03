@@ -132,7 +132,7 @@
 * @sinclair/typebox 0.29.6 => 0.30.2
 * spotify-url-info 3.2.5 => 3.2.6
 ## その他の特記事項
-* BGM機能で、エラーが発生した際にリカバリーが効かない問題(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/issues/1757)は、v4.1.5で加えた変更で修正されたようです。
+* BGM機能で、エラーが発生した際にリカバリーが効かない問題(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/issues/1757 )は、v4.1.5で加えた変更で修正されたようです。
 * Dockerのイメージは、リリース後30～40分程度で公開されます。
 
 ---
