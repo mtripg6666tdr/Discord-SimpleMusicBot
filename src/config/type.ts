@@ -35,36 +35,53 @@ const GuildBGMContainer = Type.Object({
 
 export const ConfigSchema = Type.Object({
   adminId: Type.Union([
-    Type.RegEx(/^\d+$/),
+    Type.RegExp(/^\d+$/),
     Type.Array(Type.RegEx(/^\d+$/)),
     Type.Null(),
   ], { default: false }),
+
   debug: Type.Boolean({ default: false }),
+
   errorChannel: Type.Union([
-    Type.RegEx(/^\d+$/),
+    Type.RegExp(/^\d+$/),
     Type.Null(),
   ], { default: null }),
+
   maintenance: Type.Boolean(),
+
   proxy: Type.Optional(Type.Union([
-    Type.RegEx(/^https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+$/),
+    Type.RegExp(/^https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+$/),
     Type.Null(),
   ], { default: null })),
+
   prefix: Type.String({ minLength: 1, default: ">" }),
+
   webserver: Type.Boolean({ default: true }),
-  bgm: Type.Record(Type.RegEx(/^\d+$/), GuildBGMContainer, { default: {} }),
+
+  bgm: Type.Record(Type.RegExp(/^\d+$/), GuildBGMContainer, { default: {} }),
+
   noMessageContent: Type.Boolean({ default: false }),
-  twentyFourSeven: Type.Array(Type.RegEx(/^\d+$/), { default: [] }),
+
+  twentyFourSeven: Type.Array(Type.RegExp(/^\d+$/), { default: [] }),
+
   alwaysTwentyFourSeven: Type.Boolean({ default: false }),
+
   disabledSources: Type.Optional(Type.Array(Type.String(), { default: [] })),
+
   cacheLevel: Type.Union([
     Type.Literal("memory"),
     Type.Literal("persistent"),
     //Type.Literal("full"),
   ], { default: "memory" }),
+
   cacheLimit: Type.Optional(Type.Number({ default: 500 })),
+
   defaultLanguage: Type.String({ default: "ja" }),
+
   country: Type.String({ default: "JP" }),
+
   maxLogFiles: Type.Optional(Type.Number({ default: 100 })),
+
   botWhiteList: Type.Optional(Type.Array(Type.RegEx(/^\d+$/), { default: [] })),
 });
 
