@@ -21,7 +21,7 @@ import type { Static } from "@sinclair/typebox";
 import { Type } from "@sinclair/typebox";
 
 const GuildBGMContainer = Type.Object({
-  voiceChannelId: Type.RegEx(/^\d+$/),
+  voiceChannelId: Type.RegExp(/^\d+$/),
   allowEditQueue: Type.Boolean(),
   enableQueueLoop: Type.Boolean(),
   items: Type.Array(Type.String({ minLength: 1 })),
@@ -36,7 +36,7 @@ const GuildBGMContainer = Type.Object({
 export const ConfigSchema = Type.Object({
   adminId: Type.Union([
     Type.RegExp(/^\d+$/),
-    Type.Array(Type.RegEx(/^\d+$/)),
+    Type.Array(Type.RegExp(/^\d+$/)),
     Type.Null(),
   ], { default: false }),
 
@@ -82,7 +82,7 @@ export const ConfigSchema = Type.Object({
 
   maxLogFiles: Type.Optional(Type.Number({ default: 100 })),
 
-  botWhiteList: Type.Optional(Type.Array(Type.RegEx(/^\d+$/), { default: [] })),
+  botWhiteList: Type.Optional(Type.Array(Type.RegExp(/^\d+$/), { default: [] })),
 });
 
 export type GuildBGMContainerType = Static<typeof GuildBGMContainer>;
