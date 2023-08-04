@@ -26,17 +26,11 @@ jobs:
           env: snow
 
       - name: Deploy
-        uses: appleboy/ssh-action@master
+        run: node util/deploy
         env:
-          BRANCH: ${{ steps.current-branch.outputs.branch }}
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          port: ${{ secrets.SSH_PORT }}
-          key: ${{ secrets.SECRET_KEY }}
-          envs: BRANCH
-          script: |
-            sudo systemctl restart musicbot-compose
+          HOOK_URL: ${{ secrets.HOOK_URL }}
+          HOOK_CLIENT_ID: ${{ secrets.HOOK_CLIENT_ID }}
+          HOOK_CLIENT_SECRET: ${{ secrets.HOOK_CLIENT_SECRET }}
 
       - name: Update deployment status
         uses: bobheadxi/deployments@v1
