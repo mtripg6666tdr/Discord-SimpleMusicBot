@@ -44,7 +44,7 @@ export default class Help extends BaseCommand {
     const developerId = "593758391395155978";
     const cachedUser = context.client.users.get(developerId);
     const developer = cachedUser
-      ? cachedUser.username
+      ? cachedUser.globalName || cachedUser.username
       : await context.client.rest.users.get(developerId)
         .then(user => user.globalName || user.username)
         .catch(() => null as string)
