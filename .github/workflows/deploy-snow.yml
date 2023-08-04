@@ -12,11 +12,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get the current branch name
-        shell: bash
-        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
-        id: current-branch
-
       - name: Start deployment
         uses: bobheadxi/deployments@v1
         id: deployment
@@ -25,8 +20,14 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           env: snow
 
-      - name: Deploy
-        run: node util/deploy
+      - name: Prepare deployment
+        run: |
+          npm init -y
+          npm i candyget@0.5.4
+          curl -Lo deploy.js https://github.com/${{ github.repository }}/raw/${{ github.ref_name }}/util/deploy.js
+
+      - name: Hook deploying
+        run: node deploy
         env:
           HOOK_URL: ${{ secrets.HOOK_URL }}
           HOOK_CLIENT_ID: ${{ secrets.HOOK_CLIENT_ID }}
