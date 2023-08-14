@@ -44,7 +44,7 @@
     "yt-mix-playlist": "^1.0.1",
     "ytdl-core": "^4.11.5",
     "ytpl": "^2.3.0",
-    "ytsr": "^3.8.2"
+    "ytsr": "^3.8.4"
   },
   "devDependencies": {
     "@mtripg6666tdr/eslint-config": "^2.0.4",
