@@ -28,6 +28,11 @@ updates:
       - dependency-name: "i18next"
         update-types:
           - "version-update:semver-major"
+    groups:
+      oceanic:
+        patterns:
+          - "oceanic.js"
+          - "@mtripg6666tdr/oceanic-command-resolver"
 
   # v3 branch
   - package-ecosystem: npm
