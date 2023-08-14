@@ -19,7 +19,7 @@
     "@discordjs/voice": "^0.16.0",
     "@distube/ytsr": "^1.1.9",
     "@mtripg6666tdr/async-lock": "^1.1.0",
-    "@mtripg6666tdr/oceanic-command-resolver": "^1.2.0",
+    "@mtripg6666tdr/oceanic-command-resolver": "^1.3.0",
     "@sinclair/typebox": "^0.31.0",
     "candyget": "^0.5.4",
     "comment-json": "^4.2.3",
