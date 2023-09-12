@@ -24,7 +24,7 @@
     "candyget": "^0.5.5",
     "comment-json": "^4.2.3",
     "dotenv": "^16.3.1",
-    "genius-lyrics": "^4.4.3",
+    "genius-lyrics": "^4.4.6",
     "html-entities": "^2.4.0",
     "html-to-text": "^9.0.5",
     "https-proxy-agent": "^7.0.2",
