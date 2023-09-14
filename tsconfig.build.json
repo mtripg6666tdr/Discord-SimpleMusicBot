@@ -1,7 +1,6 @@
 {
   "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
-    "module": "CommonJS",
     "strict": false,
     "noImplicitAny": true,
     "noImplicitThis": true,
