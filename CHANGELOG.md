@@ -138,6 +138,8 @@
 ---
 
 # v3.11.10
+## バグ修正
+* Twitterの動画が再生できない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2005)
 ## 依存関係のアップデート
 * @sinclair/typebox 0.27.4 => 0.31.14
 * candyget 0.5.4 => 0.5.5
