@@ -43,7 +43,11 @@ export class PlayManagerWithBgm extends PlayManager {
     return super.isPlaying && !this.server.queue.isBGM;
   }
 
-  override async play(time?: number, quiet: boolean = false, bgm: boolean = false){
+  override async play(time?: number, quiet: boolean = false, bgm?: boolean){
+    if(typeof bgm === "undefined"){
+      // if bgm is undefined, set the current state
+      bgm = this.bgm;
+    }
     if(this.server instanceof GuildDataContainerWithBgm){
       if((this.server.queue.isBGM && !bgm || !this.server.queue.isBgmEmpty && bgm) && this._player?.state.status === AudioPlayerStatus.Playing){
         await this.stop({ wait: true });
