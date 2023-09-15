@@ -54,7 +54,7 @@ jobs:
         id: meta
         with:
           images: ghcr.io/${{ github.actor }}/discord-music-bot
-          flavor: latest=auto
+          flavor: latest=false
           tags: |
             type=sha,enable=${{ github.event_name == 'release' }}
             type=sha,format=long
