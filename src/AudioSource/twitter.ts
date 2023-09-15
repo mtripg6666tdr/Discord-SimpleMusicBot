@@ -93,7 +93,7 @@ export class Twitter extends AudioSource<string> {
   }
 
   static validateUrl(url: string){
-    return !!url.match(/^https?:\/\/twitter\.com\/[a-zA-Z0-9_-]+\/status\/\d+(\?.+)?$/);
+    return !!url.match(/^https?:\/\/(twitter|x)\.com\/[a-zA-Z0-9_-]+\/status\/\d+(\?.+)?$/);
   }
 }
 
@@ -114,7 +114,7 @@ const twitterTitleRegExp = /<meta\s+property="twitter:title"\s+content="(?<title
 const ogDescriptionRegExp = /<meta\s+property="og:description"\s+content="(?<content>.+?)"\/>/s;
 const ogVideoRegExp = /<meta\s+property="og:video"\s+content="(?<url>.+?)"\/>/;
 async function twitterDl(url: string): Promise<Tweet> {
-  const result = await candyget.string(url.replace("twitter.com", "fxtwitter.com"), {
+  const result = await candyget.string(url.replace(/https?:\/\/(x|twitter)\.com/, "https://fxtwitter.com"), {
     headers: Object.assign({}, candyget.defaultOptions.headers, {
       "User-Agent": "Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)",
     }),
