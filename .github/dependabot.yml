@@ -90,6 +90,10 @@ updates:
       - dependency-name: "prism-react-renderer"
         update-types:
           - "version-update:semver-major"
+    groups:
+      docusaurus:
+        patterns:
+          - "@docusaurus/*"
 
   # actions (master)
   - package-ecosystem: github-actions
