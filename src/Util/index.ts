@@ -157,13 +157,23 @@ export function isAvailableRawAudioURL(str: string){
  * @returns ステータスコード
  */
 export function retriveHttpStatusCode(url: string, headers?: { [key: string]: string }){
+  return requestHead(url, headers).then(d => d.statusCode);
+}
+
+/**
+ * 指定されたURLにHEADリクエストを行います。
+ * @param url URL
+ * @param headers 追加のカスタムリクエストヘッダ
+ * @returns レスポンス
+ */
+export function requestHead(url: string, headers: { [key: string]: string } = {}){
   return candyget("HEAD", url, "string", {
     headers: {
       "User-Agent": DefaultUserAgent,
       ...headers,
     },
     maxRedirects: 0,
-  }).then(r => r.statusCode);
+  });
 }
 
 const httpAgent = new HttpAgent({ keepAlive: false });
@@ -174,7 +184,7 @@ const httpsAgent = new HttpsAgent({ keepAlive: false });
  * @param url URL
  * @returns Readableストリーム
  */
-export function downloadAsReadable(url: string, options: miniget.Options = {}): Readable{
+export function downloadAsReadable(url: string, options: miniget.Options = { headers: { "User-Agent": DefaultUserAgent } }): Readable{
   const logger = getLogger("Util");
   return miniget(url, {
     maxReconnects: 10,
@@ -346,45 +356,47 @@ export function createFragmentalDownloadStream(
   const logger = getLogger("FragmentalDownloader", true);
   logger.addContext("id", Date.now());
   const stream = createPassThrough();
-  let current = -1;
-  if(contentLength < chunkSize){
-    const originStream = typeof streamGenerator === "string"
-      ? downloadAsReadable(streamGenerator, {
-        headers: {
-          "User-Agent": userAgent,
-        },
-      })
-      : streamGenerator(0);
-    originStream
-      .on("error", er => stream.destroy(er))
-      .pipe(stream);
-    logger.info("Stream was created as a single stream");
-  }else{
-    const pipeNextStream = () => {
-      current++;
-      let end = chunkSize * (current + 1) - 1;
-      if(end >= contentLength) end = undefined;
-      const nextStream = typeof streamGenerator === "string"
+  setImmediate(() => {
+    let current = -1;
+    if(contentLength < chunkSize){
+      const originStream = typeof streamGenerator === "string"
         ? downloadAsReadable(streamGenerator, {
           headers: {
             "User-Agent": userAgent,
-            "Range": `bytes=${chunkSize * current}-${end ? end : ""}`,
           },
         })
-        : streamGenerator(chunkSize * current, end);
-      logger.info(`Stream #${current + 1} was created`);
-      nextStream
+        : streamGenerator(0);
+      originStream
         .on("error", er => stream.destroy(er))
-        .pipe(stream, { end: end === undefined });
-      if(end !== undefined){
-        nextStream.on("end", () => pipeNextStream());
-      }else{
-        logger.info(`Last stream (total: ${current + 1})`);
-      }
-    };
-    pipeNextStream();
-    logger.info(`Stream was created as partial stream. ${Math.ceil(contentLength / chunkSize)} streams will be created.`);
-  }
+        .pipe(stream);
+      logger.info("Stream was created as a single stream");
+    }else{
+      const pipeNextStream = () => {
+        current++;
+        let end = chunkSize * (current + 1) - 1;
+        if(end >= contentLength) end = undefined;
+        const nextStream = typeof streamGenerator === "string"
+          ? downloadAsReadable(streamGenerator, {
+            headers: {
+              "User-Agent": userAgent,
+              "Range": `bytes=${chunkSize * current}-${end ? end : ""}`,
+            },
+          })
+          : streamGenerator(chunkSize * current, end);
+        logger.info(`Stream #${current + 1} was created`);
+        nextStream
+          .on("error", er => stream.destroy(er))
+          .pipe(stream, { end: end === undefined });
+        if(end !== undefined){
+          nextStream.on("end", () => pipeNextStream());
+        }else{
+          logger.info(`Last stream (total: ${current + 1})`);
+        }
+      };
+      pipeNextStream();
+      logger.info(`Stream was created as partial stream. ${Math.ceil(contentLength / chunkSize)} streams will be created.`);
+    }
+  });
   return stream;
 }
 
