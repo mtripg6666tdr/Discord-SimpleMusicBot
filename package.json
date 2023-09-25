@@ -68,7 +68,7 @@
     "mongodb": "^6.1.0",
     "opusscript": "^0.0.8",
     "pako": "^2.1.0",
-    "play-dl": "^1.9.6",
+    "play-dl": "^1.9.7",
     "sodium": "^3.0.2",
     "sodium-native": "^3.4.1",
     "tweetnacl": "^1.0.3",
