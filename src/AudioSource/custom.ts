@@ -37,6 +37,7 @@ export class CustomStream extends AudioSource<string> {
       if(!isAvailableRawAudioURL(url)){
         throw new Error(t("audioSources.invalidStream"));
       }
+
       this.url = url;
       this.title = this.extractFilename() || t("audioSources.customStream");
       try{
@@ -99,8 +100,8 @@ export class CustomStream extends AudioSource<string> {
   }
 
   private extractFilename(){
-    const paths = this.url.split("/");
-    return paths[paths.length - 1];
+    const url = new URL(this.url);
+    return url.pathname.split("/").at(-1);
   }
 }
 
