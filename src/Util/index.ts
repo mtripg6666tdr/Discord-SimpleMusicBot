@@ -143,11 +143,20 @@ const audioExtensions = [
 ] as const;
 /**
  * ローオーディオファイルのURLであるかどうかをURLの末尾の拡張子から判断します
- * @param str 検査対象のURL
+ * @param url 検査対象のURL
  * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
  */
-export function isAvailableRawAudioURL(str: string){
-  return str && audioExtensions.some(ext => str.endsWith(ext));
+export function isAvailableRawAudioURL(url: string){
+  // check if the url variable is valid string object.
+  if(!url || typeof url !== "string"){
+    return false;
+  }
+
+  const urlObject = new URL(url);
+
+  // check if the url has a valid protocol and if its pathname ends with a valid extension.
+  return (urlObject.protocol === "https:" || urlObject.protocol === "http:")
+    && audioExtensions.some(ext => urlObject.pathname.endsWith(ext));
 }
 
 /**
