@@ -1,0 +1,16 @@
+{
+  "LABEL": {
+    "name": "",
+    "color": "EEEEEE"
+  },
+  "CHECKS": {
+    "regexp": "^(Chore|Change|Improve|Fix|Update|Feat|Perf|Add|Docs|Remove|Rename|Revert|Bump)(\\(.+?\\))?:\\s",
+    "regexpFlags": "",
+    "ignoreLabels" : []
+  },
+  "MESSAGES": {
+    "success": "",
+    "failure": "",
+    "notice": ""
+  }
+}
