@@ -16,11 +16,11 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { UrlStreamInfo } from ".";
+import type { StreamInfo } from ".";
 import type { i18n } from "i18next";
 
 import { AudioSource } from "./audiosource";
-import { isAvailableRawAudioURL, retriveLengthSeconds } from "../Util";
+import { createFragmentalDownloadStream, downloadAsReadable, isAvailableRawAudioURL, requestHead, retriveLengthSeconds } from "../Util";
 
 export class CustomStream extends AudioSource<string> {
   constructor(){
@@ -50,10 +50,25 @@ export class CustomStream extends AudioSource<string> {
     return this;
   }
 
-  async fetch(): Promise<UrlStreamInfo>{
+  async fetch(url?: boolean): Promise<StreamInfo>{
+    if(url){
+      return {
+        type: "url",
+        url: this.url,
+        streamType: "unknown",
+      };
+    }
+
+    const headRes = await requestHead(this.url);
+    const acceptRanges = headRes.headers["accept-ranges"];
+    const contentLengthStr = headRes.headers["content-length"];
+    const stream = acceptRanges?.includes("bytes") && /^\d+$/.test(contentLengthStr)
+      ? createFragmentalDownloadStream(this.url, { contentLength: Number(contentLengthStr) })
+      : downloadAsReadable(this.url);
+
     return {
-      type: "url",
-      url: this.url,
+      type: "readable",
+      stream,
       streamType: "unknown",
     };
   }
