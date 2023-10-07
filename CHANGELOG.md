@@ -167,3 +167,30 @@
 * 引き続きバグ修正は最優先事項として対処していきますので、バグを発見された際はお気軽にissueを開くか、サポートサーバーまでお知らせください。
 
 ---
+
+# v4.1.8
+## バグ修正
+* カスタムストリームで、再生中にabortエラーが発生する問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2033)
+* カスタムストリームで、クエリ文字列付加時に再生が失敗する問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2048)
+## ドキュメント
+* ドキュメントの継続的な更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2015, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2034, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2050, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2050, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2053)
+## 依存関係のアップデート
+* @distube/ytsr 1.1.11 => 1.2.0
+* @mtripg6666tdr/oceanic-command-resolver 1.2.0 => 1.3.0
+* @sinclair/typebox 0.31.15 => 0.31.17
+* i18next-fs-backend 2.1.5 => 2.2.0
+* oceanic.js 1.7.1 => 1.8.1
+* spotify-url-info 3.2.6 => 3.2.8
+* play-dl 1.9.6 => 1.9.7
+## 特記事項
+### Dockerについて
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
+### Node.js v16.x.xについて（再掲）
+* Node.js v16のサポート終了に伴い、Oceanic.jsがNode.js v16でのサポートを打ち切る発表をしておりますが、本ボットでは引き続きNode.js v16.16.0以上の環境で動作するようサポートを行っていく予定です。
+  * ただし、このサポートは、あくまでNode.js v18以上がインストールできない環境でボットを使用しているユーザーの方々のためです。Node.js v16には脆弱性があり、使用は推奨されていないため、Node.js v18以上を使用できる環境をご使用の場合には、必ずNode.js v18以上を使用してください。
+### 本ボットの開発状況について（再掲）
+* 現在、私(mtripg6666tdr)が非常に忙しく、本ボットの機能強化に時間を割くことができない状態です。現在、多くの機能要望等をいただいておりますが、今しばらくお待ちいただければ幸いです。今後ともよろしくお願いいたします。
+* 引き続きバグ修正は最優先事項として対処していきますので、バグを発見された際はお気軽にissueを開くか、サポートサーバーまでお知らせください。
+* 随時Pull Requestも受け付けております。開発にご協力いただける方は、ぜひともよろしくお願いします。
+
+---
