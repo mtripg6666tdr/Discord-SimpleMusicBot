@@ -14,7 +14,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: '20.x'
 
       - name: Check npm cache directory
         id: npm-cache
@@ -26,9 +26,9 @@ jobs:
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-18.x-${{ hashFiles('package-lock.json') }}
+          key: npm-20.x-${{ hashFiles('package-lock.json') }}
           restore-keys: |
-            npm-18.x-
+            npm-20.x-
             npm-
 
       - name: Install dependencies
