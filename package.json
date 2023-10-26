@@ -51,7 +51,7 @@
     "@tsconfig/node16": "^16.1.1",
     "@types/html-to-text": "^9.0.3",
     "@types/mocha": "^10.0.3",
-    "@types/node": "^20.8.8",
+    "@types/node": "^20.8.9",
     "@types/throttle-debounce": "^5.0.1",
     "@types/ws": "^8.5.8",
     "eslint": "^8.52.0",
