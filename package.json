@@ -72,7 +72,7 @@
     "sodium": "^3.0.2",
     "sodium-native": "^3.4.1",
     "tweetnacl": "^1.0.3",
-    "zlib-sync": "^0.1.8"
+    "zlib-sync": "^0.1.9"
   },
   "keywords": [],
   "author": "mtripg6666tdr",
