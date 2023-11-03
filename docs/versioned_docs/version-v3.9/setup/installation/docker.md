@@ -22,7 +22,7 @@ docker pull ghcr.io/mtripg6666tdr/discord-music-bot:latest
 イメージが用意されているのは、v3.4.0以降です。  
 :::
 
-:::warning
+:::danger
 GitHub Packagesに公開されているパッケージのうち、`3.4.0`のようなバージョンの文字列でタグ付けされていないバージョンは、開発段階のイメージですので、使用しないでください。
 :::
 
