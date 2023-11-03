@@ -113,7 +113,7 @@ const config = {
             items: [
               {
                 label: 'Discord',
-                href: 'https://discord.com/invite/7DrAEXBMHe',
+                href: 'https://sr.usamyon.moe/8QZw',
               },
             ],
           },
