@@ -83,7 +83,7 @@ touch Procfile
 任意のエディタで`Procfile`を修正します。
 次の1行のみ記入すればOK  
 
-:::warning
+:::danger
 
 npm run startとすると不要なトランスパイルが発生し、依存関係の解決でクラッシュしてしまう
 

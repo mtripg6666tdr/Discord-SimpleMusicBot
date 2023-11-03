@@ -37,7 +37,7 @@
   },
   "theme.admonition.caution": {
     "message": "警告",
-    "description": "The default label used for the Caution admonition (:::caution)"
+    "description": "The default label used for the Caution admonition (:::warning)"
   },
   "theme.BackToTopButton.buttonAriaLabel": {
     "message": "最上部に戻る",
