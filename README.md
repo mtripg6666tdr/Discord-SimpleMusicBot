@@ -1,3 +1,9 @@
+# :warning: このブランチのバージョン(v3.x)は、現在サポートされていません。
+機能追加・バグ修正は今後行われません。  
+
+> サポートが終了していても、何かご意見ご要望等、ございましたら、個別にお問い合わせください。  
+> ※対応いたしかねる場合もあります。
+
 # Discord-SimpleMusicBot 
 [![GitHub package.json dynamic](https://img.shields.io/github/package-json/version/mtripg6666tdr/Discord-SimpleMusicBot/v3)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/v3/package.json)
 [![GitHub package.json dependency version (prod)](https://img.shields.io/badge/dynamic/json?color=blue&label=eris&query=%24.dependencies.eris&url=https%3A%2F%2Fraw.githubusercontent.com%2Fmtripg6666tdr%2FDiscord-SimpleMusicBot%2Fv3%2Fpackage.json)](https://github.com/abalabahaha/eris)
