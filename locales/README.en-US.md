@@ -26,7 +26,7 @@ You can try to use the bot in the support server below.
   - If you are an owner of the bot, you can change the default prefix of the bot.
   - Multiple letters' prefix is supported.
 - ▶️Autoplay songs, by pre-defined configuration
-- 👍 [Support](##サポート)(Japanese and English Available).
+- 👍 Botに関する[サポート](#サポート)(下記)
 
 ## Guide
 The documentation of the bot (Japanese).
@@ -46,8 +46,8 @@ We have a plan to translate into English and French, but we feel happy to transl
 
 ## Support
 You can receive notifications on Discord when new version is available.   
-[Support server](https://myon.page.link/8QZw)  
-[Supported versions](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
+[サポートサーバーへの参加はこちら](https://sr.usamyon.moe/8QZw)  
+[サポートされているバージョン](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
 
 ## License
 GPLv3  
