@@ -26,7 +26,7 @@ Vous pouvez essayer le bot à partir du serveur d'assistance répertorié ci-des
   - Si vous êtes propriétaire du bot, vous pouvez modifier le préfixe par défaut du bot.
   - Le préfixe de plusieurs lettres est pris en charge.
 - ▶️ Musique à lecture automatique préconfigurée
-- 👍 Botに関する[サポート](##サポート)(下記)
+- 👍 Botに関する[サポート](#サポート)(下記)
 
 ## guide
 Vous pouvez voir comment configurer le bot, les commandes, etc. ici.
@@ -46,7 +46,7 @@ Nous prévoyons de traduire en anglais et en français, mais nous nous ferons un
 
 ## soutien
 Sur Discord, nous fournissons une assistance telle que l'installation et la notification des mises à jour.   
-[サポートサーバーへの参加はこちら](https://myon.page.link/8QZw)  
+[サポートサーバーへの参加はこちら](https://sr.usamyon.moe/8QZw)  
 [サポートされているバージョン](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support)
 
 ## Licence
