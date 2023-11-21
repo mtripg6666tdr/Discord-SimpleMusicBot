@@ -50,7 +50,7 @@
     "@mtripg6666tdr/eslint-config": "^3.0.8",
     "@tsconfig/node16": "^16.1.1",
     "@types/html-to-text": "^9.0.4",
-    "@types/mocha": "^10.0.4",
+    "@types/mocha": "^10.0.5",
     "@types/node": "^20.8.10",
     "@types/throttle-debounce": "^5.0.2",
     "@types/ws": "^8.5.9",
