@@ -1,20 +1,20 @@
 {
   "bgm": {
     "name": "BGM",
-    "description": "開発者が勝手に作った勉強用・作業用BGMのプリセットプレイリストを表示し、聞きたいものを選択して再生することができます。",
-    "listOfPresetBGM": "プリセットBGM一覧"
+    "description": "Bu botun geliştiricisinin paylaştığı BGM oynatma listelerini gösterir ve bunları seçip oynatabilirsiniz.",
+    "listOfPresetBGM": "Kullanılabilir BGM Ön Ayarları"
   },
   "bulk_delete": {
-    "name": "バルク削除",
-    "usage": "バルク削除 <メッセージ数>",
-    "examples": "バルク削除 10",
-    "description": "ボットが送信したメッセージを一括削除します。過去1000件のメッセージを遡って検索します。",
-    "invalidMessageCount": "指定されたメッセージ数が無効です。",
-    "found_one": "{{count}}件見つかりました。",
+    "name": "toplusil",
+    "usage": "toplusil <mesaj sayısı>",
+    "examples": "toplusil 10",
+    "description": "Botun gönderdiği mesajları siler. Son 1000 mesajı arar ve bulur.",
+    "invalidMessageCount": "Belirtilen mesaj sayısı geçersiz.",
+    "found_one": "{{count}} mesaj bulundu.",
     "inCount_other": "取得した{{count}}件中",
     "inCount_one": "取得した{{count}}件中",
-    "found_other": "{{count}}件見つかりました。",
-    "confirm": "一括削除を確定するにはボタンを押してください。\n押されないと一定時間後にキャンセルされます。",
+    "found_other": "{{count}} mesaj bulundu.",
+    "confirm": "Mesajların toplu olarak silinmesini onaylamak için aşağıdaki düğmeye basın.\nAksi takdirde işlem bir süre sonra otomatik olarak iptal edilecektir.",
     "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
     "auditLog_other": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
     "finish": "完了!(このメッセージは自動的に消去されます)",
@@ -221,24 +221,24 @@
     "currentTransformingCost": "現在の変換コスト",
     "liveStream": "ライブストリーム",
     "memberCount": "メンバー数",
-    "version": "バージョン",
+    "version": "Sürüm",
     "managedCollectorsID": "保持されているコレクターのIDの合計",
     "managedCollectors": "保持されているコレクター数",
     "totalCost": "総変換コスト",
     "memCacheTotal": "メモリキャッシュ数",
     "memCacheGarbage": "廃棄メモリキャッシュ数",
     "persistentCache": "恒常キャッシュサイズ",
-    "modules": "モジュール",
+    "modules": "Modüller",
     "incorrectArgument": "正しい引数を指定してください。"
   },
   "loop": {
-    "name": "ループ",
+    "name": "tekrarla",
     "description": "トラックごとのループを設定します。",
-    "disabled": "トラックリピートを無効にしました",
-    "enabled": "トラックリピートを有効にしました"
+    "disabled": "Parça döngüsü devre dışı bırakıldı.",
+    "enabled": "Parça döngüsü etkinleştirildi."
   },
   "looponce": {
-    "name": "ワンスループ",
+    "name": "birkeztekrarla",
     "description": "現在再生中の再生が終了後、もう一度だけ同じ曲をループ再生します。",
     "disabled": "ワンスループを無効にしました",
     "enabled": "ワンスループを有効にしました"
@@ -250,7 +250,7 @@
     "description": "キュー内のループを設定します。"
   },
   "lyrics": {
-    "name": "歌詞",
+    "name": "şarkısözleri",
     "description": "指定された楽曲の歌詞を検索します。",
     "examples": "l 夜に駆ける",
     "usage": "l <タイトル、アーティスト等>",
@@ -263,10 +263,10 @@
     "failed": "失敗しました。曲名を確認してもう一度試してみてください。"
   },
   "move": {
-    "name": "移動",
+    "name": "taşı",
     "description": "曲を指定された位置から指定された位置までキュー内で移動します。2番目の曲を5番目に移動したい場合は`mv 2 5`のようにします。",
-    "examples": "移動 2 5",
-    "usage": "移動 <from> <to>",
+    "examples": "taşı 2 5",
+    "usage": "taşı <buradan> <şuraya>",
     "args": {
       "from": {
         "description": "移動元のインデックス。キューに併記されているものです。"
@@ -288,19 +288,19 @@
     "success": "`{{title}}`を一番最後からキューの先頭に移動しました。"
   },
   "news": {
-    "name": "ニュース",
+    "name": "haberler",
     "description": "現在配信されているニューストピックスを閲覧・視聴できます。",
-    "newsTopics": "ニューストピックス"
+    "newsTopics": "Haber başlıkları"
   },
   "nowplaying": {
-    "name": "現在再生中",
+    "name": "şimdioynatılıyor",
     "description": "現在再生中の曲の情報を表示します。 `l`(スラッシュコマンドの場合はTrue)を引数にするとより長く概要を表示します。(可能な場合)",
     "args": {
       "detailed": {
         "description": "Trueが指定された場合、可能な場合より長く詳細を表示します。"
       }
     },
-    "nowPlayingSong": "現在再生中の曲"
+    "nowPlayingSong": "Şimdi oynatılıyor"
   },
   "pause": {
     "name": "一時停止",
@@ -410,7 +410,7 @@
     "noSongRemoved": "削除できる楽曲がありませんでした。"
   },
   "reset": {
-    "name": "リセット",
+    "name": "sıfırla",
     "description": "サーバーのキュー、設定やデータを削除して初期化します。オプションとして`true`を指定してキューを保持したままにできます。\n※接続中の場合ボイスチャンネルから離脱します。",
     "success": "サーバーの設定を初期化しました。",
     "usage": "リセット true",
@@ -426,7 +426,7 @@
     "success": "再生中の楽曲を頭出ししました。"
   },
   "search": {
-    "name": "検索",
+    "name": "ara",
     "description": "曲をYouTubeで検索します。",
     "examples": "検索 夜に駆ける",
     "usage": "検索 <キーワード>",
