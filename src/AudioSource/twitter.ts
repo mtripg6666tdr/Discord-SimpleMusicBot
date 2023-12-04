@@ -23,7 +23,7 @@ import candyget from "candyget";
 import * as htmlEntities from "html-entities";
 
 import { AudioSource } from "./audiosource";
-import { retriveLengthSeconds } from "../Util";
+import { retrieveRemoteAudioInfo } from "../Util";
 
 export class Twitter extends AudioSource<string> {
   private streamUrl = "";
@@ -41,13 +41,8 @@ export class Twitter extends AudioSource<string> {
       this.streamUrl = prefetched.streamUrl;
     }else{
       const streamInfo = await twitterDl(url.split("?")[0]);
-
-      try{
-        this.lengthSeconds = await retriveLengthSeconds(streamInfo.videoUrl);
-      }
-      catch{
-        /* empty */
-      }
+      const audioInfo = await retrieveRemoteAudioInfo(streamInfo.videoUrl);
+      this.lengthSeconds = audioInfo.lengthSeconds;
 
       this.title = t("audioSources.tweet", { name: streamInfo.displayName, id: streamInfo.screenName });
       this.streamUrl = streamInfo.videoUrl;

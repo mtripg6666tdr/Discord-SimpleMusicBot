@@ -24,7 +24,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { AudioSource } from "./audiosource";
-import { retriveLengthSeconds } from "../Util";
+import { retrieveRemoteAudioInfo } from "../Util";
 
 export class FsStream extends AudioSource<string> {
   constructor(){
@@ -33,11 +33,9 @@ export class FsStream extends AudioSource<string> {
 
   async init(url: string, _: exportableCustom, t: i18n["t"]){
     this.url = url;
-    this.title = t("audioSources.customStream");
-    try{
-      this.lengthSeconds = await retriveLengthSeconds(url);
-    }
-    catch{ /* empty */ }
+    const info = await retrieveRemoteAudioInfo(url);
+    this.title = info.displayTitle || t("audioSources.customStream");
+    this.lengthSeconds = info.lengthSeconds || 0;
     return this;
   }
 

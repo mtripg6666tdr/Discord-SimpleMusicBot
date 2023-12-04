@@ -21,7 +21,7 @@ import type { exportableCustom } from "./custom";
 import type { i18n } from "i18next";
 
 import { AudioSource } from "./audiosource";
-import { retriveHttpStatusCode, retriveLengthSeconds } from "../Util";
+import { retrieveHttpStatusCode, retrieveRemoteAudioInfo } from "../Util";
 
 export class GoogleDrive extends AudioSource<string> {
   constructor(){
@@ -37,13 +37,11 @@ export class GoogleDrive extends AudioSource<string> {
     }else{
       this.title = t("audioSources.driveStream");
       this.url = url;
-      if(await retriveHttpStatusCode(this.url) !== 200){
+      if(await retrieveHttpStatusCode(this.url) !== 200){
         throw new Error(t("urlNotFound"));
       }
-      try{
-        this.lengthSeconds = await retriveLengthSeconds((await this.fetch()).url);
-      }
-      catch{ /* empty */ }
+      const info = await retrieveRemoteAudioInfo((await this.fetch()).url);
+      this.lengthSeconds = info.lengthSeconds || 0;
     }
     return this;
   }

@@ -130,6 +130,24 @@ export function getPercentage(part: number, total: number){
   return Math.round(part / total * 100 * 100) / 100;
 }
 
+type ExtendArrayToPromiseArray<T extends any[], C extends any[] = []> =
+  C["length"] extends T["length"]
+    ? C
+    : ExtendArrayToPromiseArray<T, [...C, Promise<T[C["length"]]> | (() => Promise<T[C["length"]]>) | T[C["length"]]]>;
+type ArrayToUnion<T extends any[]> = T[number];
+
+/**
+ * 与えられたPromiseから、最初に成功したものの結果を返します。
+ */
+export function pickFirstSettled<T extends any[]>(promises: ExtendArrayToPromiseArray<T>): Promise<ArrayToUnion<T>>;
+export function pickFirstSettled(promises: (Promise<any> | (() => Promise<any>) | (() => any))[]) {
+  const logger = getLogger("Util");
+  return promises.reduce<Promise<any>>((p, c) => p.catch(er => {
+    logger.trace("Failed attempt:", er);
+    return typeof c === "function" ? c() : c;
+  }), Promise.reject());
+}
+
 const audioExtensions = [
   ".mp3",
   ".wav",
@@ -146,7 +164,9 @@ const audioExtensions = [
  * @param url 検査対象のURL
  * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
  */
-export function isAvailableRawAudioURL(url: string){
+export function isAvailableRawAudioURL(url: string, { checkResponse }?: { checkResponse: false }): boolean;
+export function isAvailableRawAudioURL(url: string, { checkResponse }: { checkResponse: true }): Promise<boolean>;
+export function isAvailableRawAudioURL(url: string, { checkResponse = false } = {}){
   // check if the url variable is valid string object.
   if(!url || typeof url !== "string"){
     return false;
@@ -155,8 +175,16 @@ export function isAvailableRawAudioURL(url: string){
   const urlObject = new URL(url);
 
   // check if the url has a valid protocol and if its pathname ends with a valid extension.
-  return (urlObject.protocol === "https:" || urlObject.protocol === "http:")
+  const urlIsOk = (urlObject.protocol === "https:" || urlObject.protocol === "http:")
     && audioExtensions.some(ext => urlObject.pathname.endsWith(ext));
+
+  if(!checkResponse || !urlIsOk){
+    return urlIsOk;
+  }
+
+  return requestHead(url).then(({ headers }) =>
+    headers["content-type"].startsWith("audio/")
+  );
 }
 
 /**
@@ -165,7 +193,7 @@ export function isAvailableRawAudioURL(url: string){
  * @param headers 追加のカスタムリクエストヘッダ
  * @returns ステータスコード
  */
-export function retriveHttpStatusCode(url: string, headers?: { [key: string]: string }){
+export function retrieveHttpStatusCode(url: string, headers?: { [key: string]: string }){
   return requestHead(url, headers).then(d => d.statusCode);
 }
 
@@ -206,21 +234,75 @@ export function downloadAsReadable(url: string, options: miniget.Options = { hea
   ;
 }
 
+type RemoteAudioInfo = {
+  lengthSeconds: number | null,
+  title: string | null,
+  artist: string | null,
+  displayTitle: string | null,
+};
+const durationMatcher = /^\s+Duration: (?<length>(\d+:)*\d+(\.\d+)?),/m;
+const titleMatcher = /^\s+title\s+:(?<title>.+)$/m;
+const artistMatcher = /^\s+artist\s+:(?<artist>.+)$/m;
 /**
- * URLからリソースの長さを秒数で取得します
+ * URLからリモートのオーディオリソースの情報を取得します
  * @param url リソースのURL
- * @returns 取得された秒数
+ * @returns 取得されたリソースの情報
  */
-export function retriveLengthSeconds(url: string){
-  return retrieveLengthSecondsInternal(url, () => require("ffmpeg-static")).catch(() => {
-    return retrieveLengthSecondsInternal(url, () => "ffmpeg");
-  });
+export async function retrieveRemoteAudioInfo(url: string): Promise<RemoteAudioInfo> {
+  // FFmpegに食わせて標準出力を取得する
+  const ffmpegOut = await pickFirstSettled<[string, string]>([
+    retrieveFFmpegStdoutFromUrl(url, () => require("ffmpeg-static")),
+    retrieveFFmpegStdoutFromUrl(url, () => "ffmpeg"),
+  ]).catch(() => {});
+
+  const result: RemoteAudioInfo = {
+    lengthSeconds: null,
+    title: null,
+    artist: null,
+    displayTitle: null,
+  };
+
+  if(!ffmpegOut){
+    return result;
+  }else if(ffmpegOut.includes("HTTP error")){
+    throw new Error("Failed to fetch data due to HTTP error.");
+  }
+
+  if(durationMatcher.test(ffmpegOut)){
+    const match = durationMatcher.exec(ffmpegOut);
+    result.lengthSeconds = Math.ceil(
+      match.groups.length
+        .split(":")
+        .map(n => Number(n))
+        .reduce((prev, current) => prev * 60 + current)
+    ) || null;
+  }
+
+  if(titleMatcher.test(ffmpegOut)){
+    const match = titleMatcher.exec(ffmpegOut);
+    result.title = match.groups.title?.trim() || null;
+  }
+
+  if(artistMatcher.test(ffmpegOut)){
+    const match = artistMatcher.exec(ffmpegOut);
+    result.artist = match.groups.artist?.trim() || null;
+  }
+
+  // construct displayTitle
+  if(result.title){
+    result.displayTitle = result.artist
+      ? `${result.artist} - ${result.title}`
+      : result.title;
+  }
+
+  return result;
 }
 
-function retrieveLengthSecondsInternal(url: string, ffmpeg: () => string){
-  return new Promise<number>((resolve, reject) => {
+function retrieveFFmpegStdoutFromUrl(url: string, ffmpegPathGenerator: () => string){
+  return new Promise<string>((resolve, reject) => {
+    const ffmpegPath = ffmpegPathGenerator();
     let data = "";
-    const proc = spawn(ffmpeg(), [
+    const proc = spawn(ffmpegPath, [
       "-i", url,
       "-user_agent", DefaultUserAgent,
     ], {
@@ -228,22 +310,13 @@ function retrieveLengthSecondsInternal(url: string, ffmpeg: () => string){
       stdio: ["ignore", "ignore", "pipe"],
     })
       .on("exit", () => {
-        if(data.length === 0) reject("zero");
-        const match = data.match(/Duration: (?<length>(\d+:)*\d+(\.\d+)?),/i);
-        if(match){
-          const lengthSec = match.groups.length
-            .split(":")
-            .map(n => Number(n))
-            .reduce((prev, current) => prev * 60 + current)
-            ;
-          resolve(Math.ceil(lengthSec));
-        }else{
-          reject("not match");
+        if(data.length === 0){
+          reject(new Error("FFmpeg emit nothing."));
         }
+
+        resolve(data);
       });
-    proc.stderr.on("data", (chunk) => {
-      data += chunk;
-    });
+    proc.stderr.on("data", chunk => data += chunk);
   });
 }
 
