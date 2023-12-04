@@ -54,7 +54,7 @@
     "@types/node": "^20.9.4",
     "@types/throttle-debounce": "^5.0.2",
     "@types/ws": "^8.5.10",
-    "eslint": "^8.53.0",
+    "eslint": "^8.55.0",
     "eslint-plugin-license-header": "^0.6.0",
     "mocha": "^10.2.0",
     "rimraf": "^5.0.5",
