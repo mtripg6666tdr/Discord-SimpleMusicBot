@@ -1,5 +1,5 @@
 # Discord-SimpleMusicBot
-[![GitHub package.json dynamic](https://img.shields.io/github/package-json/version/mtripg6666tdr/Discord-SimpleMusicBot/master)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/package.json) [![GitHub package.json dependency version (prod)](https://img.shields.io/badge/dynamic/json?color=blue&label=oceanic.js&query=%24.dependencies%5B%22oceanic.js%22%5D&url=https%3A%2F%2Fraw.githubusercontent.com%2Fmtripg6666tdr%2FDiscord-SimpleMusicBot%2Fmaster%2Fpackage.json)](https://github.com/OceanicJS/Oceanic) [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml) [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml) [![Build Docker](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml) [![Discord Support](https://img.shields.io/discord/847435307582095360?label=discord&logo=discord&logoColor=white)](https://myon.page.link/8QZw) [![GitHub License](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)](LICENSE)
+[![GitHub package.json dynamic](https://img.shields.io/github/package-json/version/mtripg6666tdr/Discord-SimpleMusicBot/master)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/package.json) [![GitHub package.json dependency version (prod)](https://img.shields.io/badge/dynamic/json?color=blue&label=oceanic.js&query=%24.dependencies%5B%22oceanic.js%22%5D&url=https%3A%2F%2Fraw.githubusercontent.com%2Fmtripg6666tdr%2FDiscord-SimpleMusicBot%2Fmaster%2Fpackage.json)](https://github.com/OceanicJS/Oceanic) [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml) [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml) [![Build Docker](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml) [![Discord Support](https://img.shields.io/discord/847435307582095360?label=discord&logo=discord&logoColor=white)](https://sr.usamyon.moe/8QZw) [![Crowdin](https://badges.crowdin.net/discord-simplemusicbot/localized.svg)](https://crowdin.com/project/discord-simplemusicbot) [![GitHub License](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)](LICENSE)
 
 [日本語](/README.md)・[English](/locales/README.en-US.md)・[Français](/locales/README.fr-FR.md)
 
@@ -40,8 +40,17 @@ Issueのほか、下記のサポートサーバーでも各種お問い合わせ
 いづれかの手段でお気軽にどうぞ！
 
 ## ローカライズについて
-プロジェクトでは、Crowdinで多言語化をしています。ボットの翻訳に協力してくださる方々を随時募集しています。  
-現在、英語およびフランス語のみ対応予定がありますが、需要によってはほかの言語への翻訳も可能です。  
+プロジェクトでは、Crowdinで多言語化をしています。ボットの翻訳に協力してくださる方と、日本語か英語を話せる校正者の方を随時募集しています。  
+翻訳元の言語は日本語です。翻訳先の言語は以下の通りです。
+* アメリカ英語
+* イギリス英語(READMEは除く)
+* 繁体中文
+* フランス語
+* タイ語
+* トルコ語
+
+ここに掲載されていない言語であっても、翻訳を希望される場合はお気軽にお問い合わせください。
+
 [Crowdinのプロジェクトページ](https://crowdin.com/project/discord-simplemusicbot)
 
 ## サポート
