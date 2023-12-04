@@ -36,7 +36,7 @@ export class CustomStream extends AudioSource<string> {
     }else if(isAvailableRawAudioURL(url)){
       this.url = url;
       const info = await retrieveRemoteAudioInfo(url);
-      this.title = info.title || this.extractFilename() || t("audioSources.customStream");
+      this.title = info.displayTitle || this.extractFilename() || t("audioSources.customStream");
       this.lengthSeconds = info.lengthSeconds || 0;
     }else{
       throw new Error(t("audioSources.invalidStream"));
