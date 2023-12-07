@@ -28,7 +28,7 @@ import { getColor } from "../Util/color";
 interface EffectManagerEvents {
 }
 
-export const audioEffectNames = ["bassBoost", "reverb", "loudnessEq"] as const;
+export const audioEffectNames = ["bassBoost", "reverb", "loudnessEq", "3d", "karaoke", "nightcore"] as const;
 export type AudioEffectNames = (typeof audioEffectNames)[number];
 
 type AudioEffect = {
@@ -53,6 +53,21 @@ const audioEffects = {
     arg: "loudnorm",
     shouldDisableVbr: true,
   },
+  "3d": {
+    name: "3D",
+    arg: "apulsator=hz=0.125:amount=0.8",
+    shouldDisableVbr: false,
+  },
+  karaoke: {
+    name: "Karaoke",
+    arg: "stereotools=mlev=0.1",
+    shouldDisableVbr: false,
+  },
+  nightcore: {
+    name: "Nightcore",
+    arg: "asetrate=48000*1.2,aresample=48000,bass=g=5",
+    shouldDisableVbr: false,
+  },
 } satisfies Record<AudioEffectNames, AudioEffect>;
 
 export type ExportedAudioEffect = {
@@ -65,11 +80,9 @@ export class AudioEffectManager extends ServerManagerBase<EffectManagerEvents> {
     super("EffectManager", parent);
   }
 
-  protected data: Record<AudioEffectNames, boolean> = {
-    bassBoost: false,
-    reverb: false,
-    loudnessEq: false,
-  };
+  protected data: Record<AudioEffectNames, boolean> = Object.fromEntries(
+    audioEffectNames.map(name => [name, false])
+  ) as Record<AudioEffectNames, boolean>;
 
   toggle(effectName: AudioEffectNames){
     return this.data[effectName] = !this.data[effectName];
