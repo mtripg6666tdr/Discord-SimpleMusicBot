@@ -88,6 +88,10 @@ export class AudioEffectManager extends ServerManagerBase<EffectManagerEvents> {
     return this.data[effectName] = !this.data[effectName];
   }
 
+  getEnabled(effectName: AudioEffectNames){
+    return this.data[effectName];
+  }
+
   export(): ExportedAudioEffect{
     const effectArgs: string[] = [];
     let shouldDisableVbr = false;
