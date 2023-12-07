@@ -40,18 +40,18 @@ Not only opening issues, we accept inquiries (Japanese or English) in the suppor
 Feel free to contact us in any ways!
 
 ## Localization
-This project has a plan to be multi-lingualized via Crowdin.ボットの翻訳に協力してくださる方と、日本語か英語を話せる校正者の方を随時募集しています。  
-翻訳元の言語は日本語です。翻訳先の言語は以下の通りです。
-* アメリカ英語
-* イギリス英語(READMEは除く)
-* 繁体中文
-* フランス語
-* タイ語
-* トルコ語
+This project has a plan to be multi-lingualized via Crowdin.We are looking for translators and proofreaders who can speak Japanese or English.  
+The original language in the project is Japanese.Languages we are going to support are following:
+* American English
+* British English(except for the README file)
+* Taiwanese
+* French
+* Thai
+* Turkish
 
-ここに掲載されていない言語であっても、翻訳を希望される場合はお気軽にお問い合わせください。
+If you hope for the project to support a language that is not listed above, please feel free to contact us, so we can add a language on Crowdin.
 
-[Crowdinのプロジェクトページ](https://crowdin.com/project/discord-simplemusicbot)
+[Open the project page on Crowdin](https://crowdin.com/project/discord-simplemusicbot)
 
 ## Support
 You can receive notifications on Discord when new version is available.   
