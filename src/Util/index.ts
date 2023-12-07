@@ -20,7 +20,6 @@ import type { TransformOptions } from "stream";
 import type { Readable } from "stream";
 
 import { spawn } from "child_process";
-import * as crypto from "crypto";
 import { Agent as HttpAgent } from "http";
 import { Agent as HttpsAgent } from "https";
 import { PassThrough } from "stream";
@@ -37,26 +36,6 @@ export * as discordUtil from "./discord";
 export * as effectUtil from "./effect";
 export * as system from "./system";
 export * as time from "./time";
-
-/**
- * 指定された文字列を指定された桁数になるまでゼロ補完します。
- * @param str 補完する文字列
- * @param length 補完後の長さ
- * @returns 保管された文字列
- */
-export function padZero(str: string, length: number){
-  if(str.length >= length) return str;
-  return `${"0".repeat(length - str.length)}${str}`;
-}
-
-/**
- * 文字列をBase64エンコードします
- * @param txt エンコードする文字列
- * @returns Base64エンコードされた文字列
- */
-export function btoa(txt: string){
-  return Buffer.from(txt).toString("base64");
-}
 
 /**
  * オブジェクトを可能な限り文字列化します
@@ -101,23 +80,6 @@ export function createPassThrough(opts: TransformOptions = {}): PassThrough{
     callback(er);
   };
   return stream;
-}
-
-const UUID_TEMPLATE = "10000000-1000-4000-8000-100000000000";
-/**
- * UUIDを生成します
- * @returns 生成されたUUID
- */
-export function generateUUID(){
-  if(typeof crypto.randomUUID === "function"){
-    return crypto.randomUUID();
-  }else{
-    // ref: https://www.30secondsofcode.org/js/s/uuid-generator-node
-    return UUID_TEMPLATE.replace(/[018]/g, c => {
-      const cn = Number(c);
-      return (cn ^ crypto.randomBytes(1)[0] & 15 >> cn / 4).toString(16);
-    });
-  }
 }
 
 /**
