@@ -16,7 +16,6 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { AudioEffect } from "./AudioEffect";
 import type { CommandArgs } from "./Command";
 import type { QueueContent } from "./QueueContent";
 import type { YmxFormat } from "./YmxFormat";
@@ -41,10 +40,11 @@ import { LogEmitter } from "./LogEmitter";
 import { YmxVersion } from "./YmxFormat";
 import { Spotify } from "../AudioSource";
 import { SoundCloudS } from "../AudioSource";
+import { AudioEffectManager } from "../Component/AudioEffectManager";
 import { PlayManager } from "../Component/PlayManager";
 import { QueueManager } from "../Component/QueueManager";
 import { SearchPanelManager } from "../Component/SearchPanelManager";
-import { SkipManager } from "../Component/SkipManager";
+import { SkipSession } from "../Component/SkipSession";
 import { TaskCancellationManager } from "../Component/TaskCancellationManager";
 import * as Util from "../Util";
 import { useConfig } from "../config";
@@ -69,26 +69,36 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   /** プレフィックス */
   prefix: string;
 
+  // キューマネージャー
   protected _queue: QueueManager;
   /** キューマネジャ */
   get queue(){
     return this._queue;
   }
 
+  // プレーマネージャー
   protected _player: PlayManager;
   /** 再生マネジャ */
   get player(){
     return this._player;
   }
 
+  // 検索パネルマネージャー
   protected _searchPanel: SearchPanelManager;
-  /** 検索窓の格納します */
+  /** 検索パネルマネジャ */
   get searchPanel(){
     return this._searchPanel;
   }
 
-  protected _skipSession: SkipManager;
-  /** Skipマネージャ */
+  protected _audioEffects: AudioEffectManager;
+  /** オーディオエフェクトマネジャ */
+  get audioEffects(){
+    return this._audioEffects;
+  }
+
+  // スキップセッション
+  protected _skipSession: SkipSession = null;
+  /** スキップマネージャ */
   get skipSession(){
     return this._skipSession;
   }
@@ -105,8 +115,6 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
 
   /** メインボット */
   readonly bot: MusicBotBase;
-  /** オーディオエフェクトエフェクトの設定 */
-  readonly effectPrefs: AudioEffect;
   /** 関連動画自動追加が有効 */
   addRelated: boolean;
   /** 均等再生が有効 */
@@ -141,21 +149,17 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     }
     this.boundTextChannel = boundchannelid;
     if(!this.boundTextChannel){
-      throw new Error("invalid bound textchannel id was given");
+      throw new Error("Invalid bound textchannel id was given");
     }
     this.bot = bot;
     this.addRelated = false;
-    this.effectPrefs = {
-      BassBoost: false,
-      Reverb: false,
-      LoudnessEqualization: false,
-    };
     this.prefix = ">";
     this.equallyPlayback = false;
     this.connection = null;
     this.initPlayManager();
     this.initQueueManager();
     this.initSearchPanelManager();
+    this.initAudioEffectManager();
   }
 
   // 子クラスでオーバーライドされる可能性があるので必要
@@ -163,14 +167,19 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     this._player = new PlayManager(this);
   }
 
-  // 子クラスでオーバーライドされる可能性があるので必要
+  // 同上
   protected initQueueManager(){
     this._queue = new QueueManager(this);
   }
 
-  // 子クラスでオーバーライドされる可能性があるので必要
+  // 同上
   protected initSearchPanelManager(){
     this._searchPanel = new SearchPanelManager(this);
+  }
+
+  // 同上
+  protected initAudioEffectManager(){
+    this._audioEffects = new AudioEffectManager(this);
   }
 
   /**
@@ -870,7 +879,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    * @param message ベースとなるコマンドメッセージ
    */
   async createSkipSession(message: CommandMessage){
-    this._skipSession = new SkipManager(this);
+    this._skipSession = new SkipSession(this);
     await this._skipSession.init(message);
     const destroy = () => {
       this._skipSession?.destroy();
