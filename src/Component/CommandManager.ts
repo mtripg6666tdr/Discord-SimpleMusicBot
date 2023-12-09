@@ -125,7 +125,7 @@ export class CommandManager extends LogEmitter<{}> {
     // Get registered commands
     const registeredAppCommands = await client.application.getGlobalCommands({ withLocalizations: true });
 
-    this.logger.info(`Successfully get ${registeredAppCommands.length} commands`);
+    this.logger.info(`Successfully get ${registeredAppCommands.length} commands registered.`);
 
     const commandsToEdit = await this.filterCommandsToBeEdited(apiCompatibleCommands, registeredAppCommands);
     const commandsToAdd = await this.filterCommandsToBeAdded(apiCompatibleCommands, registeredAppCommands);
@@ -147,25 +147,25 @@ export class CommandManager extends LogEmitter<{}> {
         const commandToRegister = commandsToEdit[i];
         const id = registeredAppCommands.find(cmd => cmd.type === commandToRegister.type && cmd.name === commandToRegister.name).id;
         await client.application.editGlobalCommand(id, commandToRegister);
-        this.logger.info(`command editing ${Math.floor((i + 1) / commandsToEdit.length * 1000) / 10}% completed`);
+        this.logger.info(`editing ${Math.floor((i + 1) / commandsToEdit.length * 1000) / 10}% completed`);
       }
       for(let i = 0; i < commandsToAdd.length; i++){
         const commandToRegister = commandsToAdd[i];
         await client.application.createGlobalCommand(commandToRegister);
-        this.logger.info(`command adding ${Math.floor((i + 1) / commandsToAdd.length * 1000) / 10}% completed`);
+        this.logger.info(`adding ${Math.floor((i + 1) / commandsToAdd.length * 1000) / 10}% completed`);
       }
-      this.logger.info("Updating completed.");
+      this.logger.info("Updating succeeded.");
     }else{
       this.logger.info("Detected no command that should be updated");
     }
 
-    // remove outdated commands (that doesn't recognized as the bot's command)
+    // remove outdated commands (which are not recognized as the bot's command)
     if(removeOutdated){
       if(commandsToRemove.length > 0){
         this.logger.info(`Detected ${commandsToRemove.length} commands that should be removed; removing...`);
-        this.logger.info(`These are ${commandsToRemove.map(command => command.name)}`);
+        this.logger.info(commandsToRemove.map(command => command.name));
         await client.application.bulkEditGlobalCommands(apiCompatibleCommands);
-        this.logger.info("Removing success.");
+        this.logger.info("Removal succeeded.");
       }else{
         this.logger.info("Detected no command that should be removed");
       }
