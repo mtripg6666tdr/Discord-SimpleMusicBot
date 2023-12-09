@@ -34,6 +34,7 @@ type ConfigObject = Static<typeof ConfigSchema> & {
   isBotAdmin: (userId: string) => boolean,
   isDisabledSource: (sourceIdentifer: AudioSourceTypeIdentifer) => boolean,
   isWhiteListedBot: (userId: string) => boolean,
+  djRoleNames: string[],
 };
 
 class ConfigLoader {
@@ -76,8 +77,9 @@ class ConfigLoader {
     }
 
     if(DEVELOPMENT_PHASE && (typeof config !== "object" || !("debug" in config) || !config.debug)){
-      console.error("This is still a development phase, and running without debug mode is currently disabled.");
+      console.error("This is still in a development phase, and running without the debug mode is currently disabled.");
       console.error("You should use the latest version instead of the current branch.");
+      console.error("If you understand exactly what you are doing, please enable the debug mode.");
       process.exit(1);
     }
 
@@ -93,6 +95,7 @@ class ConfigLoader {
         maxLogFiles: 100,
         proxy: null,
         botWhiteList: [],
+        djRoleNames: ["DJ"],
       },
       // loaded config
       config,
