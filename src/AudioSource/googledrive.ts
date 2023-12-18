@@ -20,6 +20,9 @@ import type { UrlStreamInfo } from ".";
 import type { exportableCustom } from "./custom";
 import type { i18n } from "i18next";
 
+import candyget from "candyget";
+import * as htmlEntities from "html-entities";
+
 import { AudioSource } from "./audiosource";
 import { retrieveHttpStatusCode, retrieveRemoteAudioInfo } from "../Util";
 
@@ -35,7 +38,7 @@ export class GoogleDrive extends AudioSource<string> {
       this.url = url;
       this.lengthSeconds = prefetched.length;
     }else{
-      this.title = t("audioSources.driveStream");
+      this.title = await GoogleDrive.retriveFilename(url);
       this.url = url;
       if(await retrieveHttpStatusCode(this.url) !== 200){
         throw new Error(t("urlNotFound"));
@@ -83,5 +86,20 @@ export class GoogleDrive extends AudioSource<string> {
   static getId(url: string){
     const match = url.match(/^https?:\/\/drive\.google\.com\/file\/d\/(?<id>[^/?]+)(\/.+)?$/);
     return match ? match.groups.id : null;
+  }
+
+  static async retriveFilename(url: string){
+    const source = await candyget.get(url, "string", { maxRedirects: 0 });
+    if(source.statusCode !== 200){
+      throw new Error("The requested file is not available right now.");
+    }
+
+    const name = source.body.match(/<meta property="og:title" content="(?<name>.+?)">/)?.groups?.name;
+
+    if(!name){
+      throw new Error("Something went wrong while fetching the file data.");
+    }
+
+    return htmlEntities.decode(name);
   }
 }
