@@ -20,7 +20,7 @@ import type { CommandArgs } from ".";
 import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
-import { CommandManager } from "../Component/CommandManager";
+import { CommandManager } from "../Component/commandManager";
 import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import { useConfig } from "../config";
 import { getLogs } from "../logger";

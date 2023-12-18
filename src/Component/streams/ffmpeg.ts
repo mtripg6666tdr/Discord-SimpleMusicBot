@@ -17,7 +17,7 @@
  */
 
 import type { StreamInfo } from "../../AudioSource";
-import type { ExportedAudioEffect } from "../AudioEffectManager";
+import type { ExportedAudioEffect } from "../audioEffectManager";
 
 import { FFmpeg } from "prism-media";
 

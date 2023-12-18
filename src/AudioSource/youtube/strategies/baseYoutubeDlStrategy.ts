@@ -18,7 +18,7 @@
 
 import type { Cache } from "./base";
 import type { exportableYouTube } from "..";
-import type { BinaryManager } from "../../../Component/BinaryManager";
+import type { BinaryManager } from "../../../Component/binaryManager";
 import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
 
 import { Strategy } from "./base";

@@ -17,7 +17,7 @@
  */
 
 import type { ReadableStreamInfo, StreamInfo, StreamTypeIdentifer, UrlStreamInfo } from "../../AudioSource";
-import type { ExportedAudioEffect } from "../AudioEffectManager";
+import type { ExportedAudioEffect } from "../audioEffectManager";
 import type { Readable } from "stream";
 
 import { opus } from "prism-media";
