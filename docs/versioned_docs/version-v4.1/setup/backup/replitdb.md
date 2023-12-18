@@ -21,7 +21,7 @@ Replitの登録および使用には、Replitが定める規約等の同意が�
 ## ボットに構成する
 Replitでボットを起動させている場合には、`.env`の`DB_URL`を`replit+local`に設定します。  
 
-```env title=.env
+```env title=".env"
 DB_URL=replit+local
 ```
 
@@ -46,6 +46,6 @@ echo $REPLIT_DB_URL
 ### 2. ボットに構成します
 `.env`でボットに構成します。例えば、前の手順でコピーしたURLが`https://example.com/foobar`だった場合には、以下のように`.env`を設定します。
 
-```env title=.env
+```env title=".env"
 DB_URL=replit+https://example.com/foobar
 ```
