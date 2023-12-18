@@ -52,7 +52,9 @@ export default class NowPlaying extends BaseCommand {
 
     // create progress bar
     const _s = Math.floor(context.server.player.currentTime / 1000);
-    const _t = Number(context.server.player.currentAudioInfo.lengthSeconds);
+    const _t = Number(context.server.player.currentAudioInfo.lengthSeconds * (
+      context.server.audioEffects.getEnabled("nightcore") ? 5 / 6 : 1
+    ));
     const [min, sec] = Util.time.calcMinSec(_s);
     const [tmin, tsec] = Util.time.calcMinSec(_t);
     const info = context.server.player.currentAudioInfo;
