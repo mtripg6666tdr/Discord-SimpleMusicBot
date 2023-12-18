@@ -25,12 +25,12 @@ import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
 
-import { RateLimitController } from "./Component/RateLimitController";
-import { SourceCache } from "./Component/SourceCache";
 import { HttpBackupper } from "./Component/backupper/httpBased";
 import { MongoBackupper } from "./Component/backupper/mongodb";
 import { ReplitBackupper } from "./Component/backupper/replit";
 import { InteractionCollectorManager } from "./Component/collectors/InteractionCollectorManager";
+import { RateLimitController } from "./Component/rateLimitController";
+import { SourceCache } from "./Component/sourceCache";
 import { GuildDataContainer } from "./Structure";
 import { LogEmitter } from "./Structure";
 import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";

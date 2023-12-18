@@ -35,7 +35,7 @@ let overview = `# コマンド一覧
 `;
 
 require("../dist/i18n").initLocalization(false, config.defaultLanguage).then(() => {
-  const { CommandManager } = require("../dist/Component/CommandManager");
+  const { CommandManager } = require("../dist/Component/commandManager");
   // const { categories, categoriesList } = require("../dist/Commands/commands");
 
   const commandDocPath = path.join(__dirname, "../docs/docs/guide/commands/");

@@ -25,7 +25,7 @@ import type { AnyTextableGuildChannel, ApplicationCommandOptionsBoolean, Applica
 import i18next from "i18next";
 import { InteractionTypes, Permissions, TypedEmitter, ApplicationCommandTypes } from "oceanic.js";
 
-import { CommandManager } from "../Component/CommandManager";
+import { CommandManager } from "../Component/commandManager";
 import { discordUtil } from "../Util";
 import { availableLanguages } from "../i18n";
 import { getLogger } from "../logger";

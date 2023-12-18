@@ -26,7 +26,7 @@ import candyget from "candyget";
 import { ApplicationCommandTypes } from "oceanic.js";
 
 import { BaseCommand } from ".";
-import { TaskCancellationManager } from "../Component/TaskCancellationManager";
+import { TaskCancellationManager } from "../Component/taskCancellationManager";
 import { YmxVersion } from "../Structure";
 import { useConfig } from "../config";
 

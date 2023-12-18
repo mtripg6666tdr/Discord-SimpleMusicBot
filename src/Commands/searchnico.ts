@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { SongInfo } from "../Component/SearchPanel";
+import type { SongInfo } from "../Component/searchPanel";
 import type { i18n } from "i18next";
 
 import candyget from "candyget";

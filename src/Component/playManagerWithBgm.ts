@@ -18,7 +18,7 @@
 
 import { AudioPlayerStatus, entersState } from "@discordjs/voice";
 
-import { PlayManager } from "./PlayManager";
+import { PlayManager } from "./playManager";
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 
 export class PlayManagerWithBgm extends PlayManager {

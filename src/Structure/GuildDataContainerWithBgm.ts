@@ -22,8 +22,8 @@ import type { GuildBGMContainerType } from "../config";
 import i18next from "i18next";
 
 import { GuildDataContainer } from "./GuildDataContainer";
-import { PlayManagerWithBgm } from "../Component/PlayManagerWithBgm";
-import { QueueManagerWithBgm } from "../Component/QueueManagerWithBGM";
+import { PlayManagerWithBgm } from "../Component/playManagerWithBgm";
+import { QueueManagerWithBgm } from "../Component/queueManagerWithBGM";
 
 export class GuildDataContainerWithBgm extends GuildDataContainer {
   protected override _queue: QueueManagerWithBgm;

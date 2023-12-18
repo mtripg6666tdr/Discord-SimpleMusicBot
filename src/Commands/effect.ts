@@ -24,7 +24,7 @@ import type { MessageActionRow } from "oceanic.js";
 import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
-import { audioEffectNames, type AudioEffectNames } from "../Component/AudioEffectManager";
+import { audioEffectNames, type AudioEffectNames } from "../Component/audioEffectManager";
 
 export default class Effect extends BaseCommand {
   constructor(){
