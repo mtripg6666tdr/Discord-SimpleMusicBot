@@ -24,7 +24,7 @@ import candyget from "candyget";
 import * as htmlEntities from "html-entities";
 
 import { AudioSource } from "./audiosource";
-import { retriveLengthSeconds } from "../Util";
+import { retrieveHttpStatusCode, retrieveRemoteAudioInfo } from "../Util";
 
 export class GoogleDrive extends AudioSource<string> {
   constructor(){
@@ -40,11 +40,11 @@ export class GoogleDrive extends AudioSource<string> {
     }else{
       this.title = await GoogleDrive.retriveFilename(url);
       this.url = url;
-
-      try{
-        this.lengthSeconds = await retriveLengthSeconds((await this.fetch()).url);
+      if(await retrieveHttpStatusCode(this.url) !== 200){
+        throw new Error(t("urlNotFound"));
       }
-      catch{ /* empty */ }
+      const info = await retrieveRemoteAudioInfo((await this.fetch()).url);
+      this.lengthSeconds = info.lengthSeconds || 0;
     }
     return this;
   }
