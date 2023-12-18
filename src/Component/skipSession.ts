@@ -32,7 +32,7 @@ import { ServerManagerBase } from "../Structure";
 type voteResult = "voted"|"cancelled"|"ignored";
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export class SkipManager extends ServerManagerBase<{}> {
+export class SkipSession extends ServerManagerBase<{}> {
   protected inited = false;
   protected readonly agreeUsers = new Set<string>();
   protected reply: ResponseMessage = null;

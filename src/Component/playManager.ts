@@ -28,14 +28,13 @@ import { AudioPlayerStatus, createAudioResource, createAudioPlayer, entersState,
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 import i18next from "i18next";
 
-import { FixedAudioResource } from "./AudioResource";
+import { FixedAudioResource } from "./audioResource";
 import { resolveStreamToPlayable } from "./streams";
 import { DSL } from "./streams/dsl";
 import { Normalizer } from "./streams/normalizer";
 import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
-import { getFFmpegEffectArgs } from "../Util/effect";
 import { useConfig } from "../config";
 import { timeLoggedMethod } from "../logger";
 
@@ -257,7 +256,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         return this;
       }
       const { stream, streamType, cost, streams } = await resolveStreamToPlayable(rawStream, {
-        effectArgs: getFFmpegEffectArgs(this.server),
+        effects: this.server.audioEffects.export(),
         seek: this._seek,
         volumeTransformEnabled: this.volume !== 100,
         bitrate: voiceChannel.bitrate,

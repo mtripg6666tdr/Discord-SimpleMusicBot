@@ -20,8 +20,9 @@ import type { InteractionCollectorManager } from "./InteractionCollectorManager"
 import type { ResponseMessage } from "../commandResolver/ResponseMessage";
 import type { AnyTextableGuildChannel, ComponentInteraction, ComponentTypes, Message } from "oceanic.js";
 
+import * as crypto from "crypto";
+
 import { LogEmitter } from "../../Structure";
-import { generateUUID } from "../../Util";
 
 export interface InteractionCollectorEvents {
   customIdsCreate: [customIds: string[]];
@@ -51,7 +52,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
   }
 
   constructor(protected parent: InteractionCollectorManager){
-    const collectorId = generateUUID();
+    const collectorId = crypto.randomUUID();
     super("InteractionCollector", collectorId);
     this._collectorId = collectorId;
   }
@@ -101,7 +102,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
     if(componentIds.some(id => existingComponentIds.includes(id as string))){
       throw new Error("Duplicated key");
     }
-    const customIds = Array.from({ length: componentIds.length }, () => `collector-${generateUUID()}`);
+    const customIds = Array.from({ length: componentIds.length }, () => `collector-${crypto.randomUUID()}`);
     const componentIdCustomIdMap = {} as { [key in keyof U]: string };
     customIds.forEach((customId, i) => {
       this.customIdMap.set(customId, componentIds[i] as string);

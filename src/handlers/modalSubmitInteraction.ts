@@ -20,7 +20,7 @@ import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
 import type * as discord from "oceanic.js";
 
-import { CommandManager } from "../Component/CommandManager";
+import { CommandManager } from "../Component/commandManager";
 
 export async function handleModalSubmitInteraction(
   this: MusicBot,

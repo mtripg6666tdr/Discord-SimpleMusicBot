@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { KnownAudioSourceIdentifer } from "./QueueManager";
+import type { KnownAudioSourceIdentifer } from "./queueManager";
 import type { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 import type { AddedBy, QueueContent } from "../Structure/QueueContent";
 import type { Member } from "oceanic.js";
@@ -26,7 +26,7 @@ import * as path from "path";
 
 import i18next from "i18next";
 
-import { QueueManager } from "./QueueManager";
+import { QueueManager } from "./queueManager";
 import * as AudioSource from "../AudioSource";
 
 export class QueueManagerWithBgm extends QueueManager {

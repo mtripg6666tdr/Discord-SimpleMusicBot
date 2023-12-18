@@ -21,7 +21,7 @@ import type { MusicBot } from "../bot";
 import i18next from "i18next";
 import * as discord from "oceanic.js";
 
-import { CommandManager } from "../Component/CommandManager";
+import { CommandManager } from "../Component/commandManager";
 import { useConfig } from "../config";
 
 const config = useConfig();

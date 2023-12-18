@@ -21,7 +21,7 @@ import type { MusicBot } from "../bot";
 import type { ComponentTypes } from "oceanic.js";
 import type * as discord from "oceanic.js";
 
-import { CommandManager } from "../Component/CommandManager";
+import { CommandManager } from "../Component/commandManager";
 import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 
 export async function handleButtonInteraction(

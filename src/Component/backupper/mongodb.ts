@@ -25,7 +25,7 @@ import type * as mongo from "mongodb";
 import { Backupper } from ".";
 import { createDebounceFunctionsFactroy, waitForEnteringState } from "../../Util";
 import { timeLoggedMethod } from "../../logger";
-import { CommandManager } from "../CommandManager";
+import { CommandManager } from "../commandManager";
 
 const MongoClient = (() => {
   try{
