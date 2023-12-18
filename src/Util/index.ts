@@ -91,24 +91,6 @@ export function getPercentage(part: number, total: number){
   return Math.round(part / total * 100 * 100) / 100;
 }
 
-type ExtendArrayToPromiseArray<T extends any[], C extends any[] = []> =
-  C["length"] extends T["length"]
-    ? C
-    : ExtendArrayToPromiseArray<T, [...C, Promise<T[C["length"]]> | (() => Promise<T[C["length"]]>) | T[C["length"]]]>;
-type ArrayToUnion<T extends any[]> = T[number];
-
-/**
- * 与えられたPromiseから、最初に成功したものの結果を返します。
- */
-export function pickFirstSettled<T extends any[]>(promises: ExtendArrayToPromiseArray<T>): Promise<ArrayToUnion<T>>;
-export function pickFirstSettled(promises: (Promise<any> | (() => Promise<any>) | (() => any))[]) {
-  const logger = getLogger("Util");
-  return promises.reduce<Promise<any>>((p, c) => p.catch(er => {
-    logger.trace("Failed attempt:", er);
-    return typeof c === "function" ? c() : c;
-  }), Promise.reject());
-}
-
 const audioExtensions = [
   ".mp3",
   ".wav",
@@ -211,10 +193,11 @@ const artistMatcher = /^\s+artist\s+:(?<artist>.+)$/m;
  */
 export async function retrieveRemoteAudioInfo(url: string): Promise<RemoteAudioInfo> {
   // FFmpegに食わせて標準出力を取得する
-  const ffmpegOut = await pickFirstSettled<[string, string]>([
-    retrieveFFmpegStdoutFromUrl(url, () => require("ffmpeg-static")),
-    retrieveFFmpegStdoutFromUrl(url, () => "ffmpeg"),
-  ]).catch(() => {});
+  const ffmpegOut = await retrieveFFmpegStdoutFromUrl(url, () => require("ffmpeg-static"))
+    .catch(er => {
+      getLogger("Util").info(`Failed: ${stringifyObject(er)}`);
+      return retrieveFFmpegStdoutFromUrl(url, () => "ffmpeg");
+    });
 
   const result: RemoteAudioInfo = {
     lengthSeconds: null,
