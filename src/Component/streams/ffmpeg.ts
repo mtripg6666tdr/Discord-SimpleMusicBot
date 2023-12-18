@@ -17,6 +17,7 @@
  */
 
 import type { StreamInfo } from "../../AudioSource";
+import type { ExportedAudioEffect } from "../audioEffectManager";
 
 import { FFmpeg } from "prism-media";
 
@@ -38,12 +39,12 @@ export function transformThroughFFmpeg(
   readable: StreamInfo,
   {
     bitrate,
-    effectArgs,
+    effects,
     seek,
     output,
   }: {
     bitrate: number,
-    effectArgs: string[],
+    effects: ExportedAudioEffect,
     seek: number,
     output: "webm"|"ogg"|"pcm",
   }
@@ -57,40 +58,42 @@ export function transformThroughFFmpeg(
   ] : [];
   const outputArgs: string[] = [];
   const bitrateArgs: string[] = [];
+
   if(
-    effectArgs.length === 0
+    effects.args.length === 0
     && ((output === "webm" && readable.streamType === "webm/opus") || (output === "ogg" && readable.streamType === "ogg/opus"))
   ){
     outputArgs.push(
       "-f", output === "ogg" ? "opus" : "webm",
       "-acodec", "copy",
     );
+  }else if(output === "ogg" || output === "webm"){
+    outputArgs.push(
+      "-f", output === "ogg" ? "opus" : "webm",
+      "-acodec", "libopus",
+    );
   }else{
-    if(output === "ogg" || output === "webm"){
-      outputArgs.push(
-        "-f", output === "ogg" ? "opus" : "webm",
-        "-acodec", "libopus",
-      );
-    }else{
-      outputArgs.push(
-        "-f", "s16le",
-        "-ar", "48000",
-        "-ac", "2",
-      );
-    }
-    if(effectArgs.length !== 2 || !effectArgs[1].includes("loudnorm")){
-      bitrateArgs.push(
-        "-vbr", "on",
-        "-b:a", bitrate.toString(),
-      );
-    }
+    outputArgs.push(
+      "-f", "s16le",
+      "-ar", "48000",
+      "-ac", "2",
+    );
   }
+
+  if(!effects.shouldDisableVbr){
+    bitrateArgs.push(
+      "-vbr", "on",
+    );
+  }
+
+  bitrateArgs.push("-b:a", bitrate.toString());
+
   const args = [
     "-analyzeduration", "0",
     ...ffmpegNetworkArgs,
     ...ffmpegSeekArgs,
     "-i", readable.type === "readable" ? "-" : readable.url,
-    ...effectArgs,
+    ...effects.args,
     "-vn",
     ...outputArgs,
     ...bitrateArgs,

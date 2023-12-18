@@ -21,12 +21,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '20.x'
 
       - name: Get npm cache directory
         id: npm-cache
@@ -38,9 +38,9 @@ jobs:
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-docs-18.x-${{ hashFiles('package-lock.json') }}
+          key: npm-docs-20.x-${{ hashFiles('package-lock.json') }}
           restore-keys: |
-            npm-docs-18.x
+            npm-docs-20.x
             npm-docs-
 
       - name: Install dependencies on docs
@@ -53,13 +53,13 @@ jobs:
           npm run build
 
       - name: Setup Pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v4
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v2
         with:
           path: './docs/build'
 
       - name: Deploy to GitHub Pages
         id: github-pages
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v3

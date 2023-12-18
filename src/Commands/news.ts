@@ -21,7 +21,6 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import type { i18n } from "i18next";
 
 import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
-
 import * as ytpl from "ytpl";
 
 import { BaseCommand } from ".";

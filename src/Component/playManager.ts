@@ -22,20 +22,19 @@ import type { AudioPlayer } from "@discordjs/voice";
 import type { Member, Message, TextChannel } from "oceanic.js";
 import type { Readable } from "stream";
 
-import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { NoSubscriberBehavior } from "@discordjs/voice";
 import { AudioPlayerStatus, createAudioResource, createAudioPlayer, entersState, StreamType, VoiceConnectionStatus } from "@discordjs/voice";
+import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 import i18next from "i18next";
 
-import { FixedAudioResource } from "./AudioResource";
+import { FixedAudioResource } from "./audioResource";
 import { resolveStreamToPlayable } from "./streams";
 import { DSL } from "./streams/dsl";
 import { Normalizer } from "./streams/normalizer";
 import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
-import { getFFmpegEffectArgs } from "../Util/effect";
 import { useConfig } from "../config";
 import { timeLoggedMethod } from "../logger";
 
@@ -247,12 +246,17 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       const rawStream = await this.currentAudioInfo.fetch(time > 0);
 
       // 情報からストリームを作成
+      // 万が一ストリームのfetch中に切断された場合には、リソース開放してplayを抜ける
       const voiceChannel = this.server.connectingVoiceChannel;
       if(!voiceChannel){
+        if(rawStream.type === "readable"){
+          rawStream.stream.once("error", () => {});
+          rawStream.stream.destroy();
+        }
         return this;
       }
       const { stream, streamType, cost, streams } = await resolveStreamToPlayable(rawStream, {
-        effectArgs: getFFmpegEffectArgs(this.server),
+        effects: this.server.audioEffects.export(),
         seek: this._seek,
         volumeTransformEnabled: this.volume !== 100,
         bitrate: voiceChannel.bitrate,
@@ -296,8 +300,17 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       // setup volume
       this.setVolume(this.volume);
 
-      // wait for entering playing state
-      await entersState(this._player, AudioPlayerStatus.Playing, 10e3);
+      // wait for player entering the playing state
+      const waitSuccess = await entersState(this._player, AudioPlayerStatus.Playing, 10e3)
+        .then(() => true)
+        .catch(() => false);
+      // when occurring one or more error(s) while waiting for player,
+      // the error(s) should be also emitted from AudioPlayer and handled by PlayManager#handleError
+      // so simply ignore the error(s) here.
+      if(!waitSuccess){
+        return this;
+      }
+
       this.preparing = false;
       this._playing = true;
       this.emit("playStarted");
@@ -323,6 +336,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     }
     catch(e){
       this.handleError(e).catch(this.logger.error);
+    }
+    finally{
+      this.preparing = false;
     }
     return this;
   }
@@ -479,6 +495,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   }
 
   protected getIsBadCondition(){
+    if(config.debug){
+      this.logger.debug(`Condition: { connecting: ${this.isConnecting}, playing: ${this.isPlaying}, empty: ${this.server.queue.isEmpty}, preparing: ${this.preparing} }`);
+    }
     // 再生できる状態か確認
     return /* 接続していない */ !this.isConnecting
       // なにかしら再生中
@@ -523,7 +542,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
    * @returns this
    */
   async disconnect(): Promise<PlayManager> {
-    await this.stop();
+    await this.stop({ force: true });
     this.emit("disconnectAttempt");
 
     if(this.server.connection){

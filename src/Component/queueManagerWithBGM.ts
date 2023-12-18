@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { KnownAudioSourceIdentifer } from "./QueueManager";
+import type { KnownAudioSourceIdentifer } from "./queueManager";
 import type { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 import type { AddedBy, QueueContent } from "../Structure/QueueContent";
 import type { Member } from "oceanic.js";
@@ -26,7 +26,7 @@ import * as path from "path";
 
 import i18next from "i18next";
 
-import { QueueManager } from "./QueueManager";
+import { QueueManager } from "./queueManager";
 import * as AudioSource from "../AudioSource";
 
 export class QueueManagerWithBgm extends QueueManager {
@@ -91,8 +91,8 @@ export class QueueManagerWithBgm extends QueueManager {
         basicInfo: await new AudioSource.FsStream().init(url, null, i18next.getFixedT(this.server.locale)),
         additionalInfo: {
           addedBy: {
-            userId: this.getUserIdFromMember(addedBy) ?? "0",
-            displayName: this.getDisplayNameFromMember(addedBy) ?? "不明",
+            userId: this.getUserIdFromMember(addedBy) || "0",
+            displayName: addedBy.displayName || "不明",
           },
         },
       } as QueueContent;

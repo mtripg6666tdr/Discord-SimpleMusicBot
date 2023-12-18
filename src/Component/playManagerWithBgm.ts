@@ -18,7 +18,7 @@
 
 import { AudioPlayerStatus, entersState } from "@discordjs/voice";
 
-import { PlayManager } from "./PlayManager";
+import { PlayManager } from "./playManager";
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 
 export class PlayManagerWithBgm extends PlayManager {
@@ -36,13 +36,18 @@ export class PlayManagerWithBgm extends PlayManager {
       this.setVolume(this._originalVolume);
     }
     this._bgm = value;
+    this.logger.debug(`BGM state changed: ${value ? "active" : "inactive"}`);
   }
 
   override get isPlaying(): boolean{
     return super.isPlaying && !this.server.queue.isBGM;
   }
 
-  override async play(time?: number, bgm: boolean = false){
+  override async play(time?: number, quiet: boolean = false, bgm?: boolean){
+    if(typeof bgm === "undefined"){
+      // if bgm is undefined, set the current state
+      bgm = this.bgm;
+    }
     if(this.server instanceof GuildDataContainerWithBgm){
       if((this.server.queue.isBGM && !bgm || !this.server.queue.isBgmEmpty && bgm) && this._player?.state.status === AudioPlayerStatus.Playing){
         await this.stop({ wait: true });
@@ -50,16 +55,17 @@ export class PlayManagerWithBgm extends PlayManager {
       this.server.queue.setToPlayBgm(bgm);
     }
     if(!this.getIsBadCondition(bgm)) this.bgm = bgm;
-    return super.play(time);
+    return super.play(time, quiet);
   }
 
   protected override getIsBadCondition(bgm: boolean = this.bgm){
+    this.logger.debug(`Condition: { connecting: ${this.isConnecting}, playing: ${this.isPlaying}, empty: ${this.server.queue.isEmpty}, bgm: ${bgm}, bgmEmpty: ${this.server.queue.isBgmEmpty} }`);
     // 接続していない
     return !this.isConnecting
       // なにかしら再生中
       || this.isPlaying
       // キューが空
-      || this.server.queue.isEmpty && (!bgm || this.server.queue.isBgmEmpty)
+      || (this.server.queue.isEmpty && (!bgm || this.server.queue.isBgmEmpty))
       // 準備中
       || this.preparing
     ;
@@ -94,7 +100,7 @@ export class PlayManagerWithBgm extends PlayManager {
         this.logger.info("Queue empty");
         await this.disconnect();
       }else{
-        await this.play(0, true);
+        await this.play(0, /* quiet */ true, /* BGM */ true);
       }
     }else{
       return super.onStreamFinished();

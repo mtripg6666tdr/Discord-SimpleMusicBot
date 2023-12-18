@@ -16,8 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { KnownAudioSourceIdentifer } from "../Component/QueueManager";
-import type { SourceCache } from "../Component/SourceCache";
+import type { KnownAudioSourceIdentifer } from "../Component/queueManager";
+import type { SourceCache } from "../Component/sourceCache";
 import type { i18n } from "i18next";
 
 import * as ytdl from "ytdl-core";

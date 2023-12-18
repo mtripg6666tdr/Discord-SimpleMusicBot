@@ -82,13 +82,15 @@ export default class Searchq extends BaseCommand {
         name: index === "0"
           ? `${t("components:nowplaying.nowplayingItemName")}/${t("components:nowplaying.waitForPlayingItemName")}`
           : index,
-        value: `[${c.basicInfo.title}](${c.basicInfo.url})\r\n`
-          + `${t("components:nowplaying.requestedBy")}: \`${c.additionalInfo.addedBy.displayName}\` \r\n`
-          + `${t("length")}: ${
+        value: [
+          c.basicInfo.isPrivateSource ? c.basicInfo.title : `[${c.basicInfo.title}](${c.basicInfo.url})`,
+          `${t("components:nowplaying.requestedBy")}: \`${c.additionalInfo.addedBy.displayName}\` `,
+          `${t("length")}: ${
             c.basicInfo.isYouTube() && c.basicInfo.isLiveStream
               ? `(${t("liveStream")})`
               : ` \`${_t === 0 ? `(${t("unknown")})` : `${min}:${sec}`}\`)`
           }`,
+        ].join("\r\n"),
         inline: false,
       } as EmbedField;
     });

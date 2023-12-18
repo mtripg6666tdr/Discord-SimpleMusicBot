@@ -20,12 +20,12 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import type { GuildDataContainer } from "../Structure";
 import type { ListCommandInitializeOptions, UnlistCommandOptions, ListCommandWithArgsOptions, CommandArgs, CommandPermission, LocalizedSlashCommandArgument } from "../Structure/Command";
 import type { LoggerObject } from "../logger";
-import type { AnyGuildTextChannel, ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap, ModalSubmitInteraction, PermissionName } from "oceanic.js";
+import type { AnyTextableGuildChannel, ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap, ModalSubmitInteraction, PermissionName } from "oceanic.js";
 
 import i18next from "i18next";
 import { InteractionTypes, Permissions, TypedEmitter, ApplicationCommandTypes } from "oceanic.js";
 
-import { CommandManager } from "../Component/CommandManager";
+import { CommandManager } from "../Component/commandManager";
 import { discordUtil } from "../Util";
 import { availableLanguages } from "../i18n";
 import { getLogger } from "../logger";
@@ -49,7 +49,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
-  async handleModalSubmitInteraction(interaction: ModalSubmitInteraction<AnyGuildTextChannel>, server: GuildDataContainer){
+  async handleModalSubmitInteraction(interaction: ModalSubmitInteraction<AnyTextableGuildChannel>, server: GuildDataContainer){
   }
 
   protected readonly _name: string;

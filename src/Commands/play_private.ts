@@ -19,7 +19,7 @@
 import type { CommandArgs } from ".";
 import type { GuildDataContainer } from "../Structure";
 import type { i18n } from "i18next";
-import type { AnyGuildTextChannel, ModalSubmitInteraction } from "oceanic.js";
+import type { AnyTextableGuildChannel, ModalSubmitInteraction } from "oceanic.js";
 
 import i18next from "i18next";
 import { ComponentTypes, InteractionTypes, TextInputStyles } from "oceanic.js";
@@ -69,7 +69,7 @@ export default class PlayPrivate extends BaseCommand {
     }).catch(this.logger.error);
   }
 
-  override async handleModalSubmitInteraction(interaction: ModalSubmitInteraction<AnyGuildTextChannel>, server: GuildDataContainer){
+  override async handleModalSubmitInteraction(interaction: ModalSubmitInteraction<AnyTextableGuildChannel>, server: GuildDataContainer){
     const value = interaction.data.components[0]?.components[0]?.value;
 
     if(value){

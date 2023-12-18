@@ -1,6 +1,3 @@
----
-sidebar_position: 1
----
 # 各種機能ガイド
 このセクションでは、ボットの機能についての説明をご覧になれます。
 
@@ -19,7 +16,8 @@ sidebar_position: 1
     - .wma
     - .mov
     - .mp4
-    - .ogg
+    - .ogg (v2.0.0以降)
+    - .flac (v4.1.0以降)
 - Googleドライブ(音声ファイルの限定公開リンクのURL指定)
 - ニコニコ動画(動画ページURL指定)
 - Twitter(ツイートのURL指定)
@@ -30,7 +28,8 @@ sidebar_position: 1
     - .wma
     - .mov
     - .mp4
-    - .ogg
+    - .ogg (v2.0.0以降)
+    - .flac (v4.1.0以降)
 - Spotify(曲のURL、およびプレイリストのURL)
   - 曲を推測してYouTubeから再生します。
   - Node.js v14以上でのみ対応しています。

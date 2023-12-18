@@ -12,11 +12,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get the current branch name
-        shell: bash
-        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
-        id: current-branch
-
       - name: Start deployment
         uses: bobheadxi/deployments@v1
         id: deployment
@@ -25,18 +20,18 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           env: snow
 
-      - name: Deploy
-        uses: appleboy/ssh-action@master
+      - name: Prepare deployment
+        run: |
+          npm init -y
+          npm i candyget@0.5.4
+          curl -Lo deploy.js https://github.com/${{ github.repository }}/raw/${{ github.ref_name }}/util/deploy.js
+
+      - name: Hook deploying
+        run: node deploy
         env:
-          BRANCH: ${{ steps.current-branch.outputs.branch }}
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          port: ${{ secrets.SSH_PORT }}
-          key: ${{ secrets.SECRET_KEY }}
-          envs: BRANCH
-          script: |
-            sudo systemctl restart musicbot-compose
+          HOOK_URL: ${{ secrets.HOOK_URL }}
+          HOOK_CLIENT_ID: ${{ secrets.HOOK_CLIENT_ID }}
+          HOOK_CLIENT_SECRET: ${{ secrets.HOOK_CLIENT_SECRET }}
 
       - name: Update deployment status
         uses: bobheadxi/deployments@v1

@@ -21,9 +21,10 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import type { i18n } from "i18next";
 import type { EmbedOptions } from "oceanic.js";
 
+import * as os from "os";
+
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
-import * as os from "os";
 
 import { BaseCommand } from ".";
 import * as Util from "../Util";
@@ -116,7 +117,7 @@ export default class SystemInfo extends BaseCommand {
       let logs: string[] = [...getLogs()];
       logs.reverse();
       for(let i = 0; i < logs.length; i++){
-        if(logs.join("\r\n").length < 1950) break;
+        if(logs.join("\r\n").length < 3950) break;
         logs = logs.slice(0, -1);
       }
       logs.reverse();
@@ -224,7 +225,7 @@ export default class SystemInfo extends BaseCommand {
           .toOceanic()
       );
     }
-    
+
     if(embeds.length > 0){
       await message.channel.createMessage({ embeds }).catch(this.logger.error);
     }

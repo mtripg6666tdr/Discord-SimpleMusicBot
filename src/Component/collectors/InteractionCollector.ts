@@ -18,10 +18,11 @@
 
 import type { InteractionCollectorManager } from "./InteractionCollectorManager";
 import type { ResponseMessage } from "../commandResolver/ResponseMessage";
-import type { AnyGuildTextChannel, ComponentInteraction, ComponentTypes, Message } from "oceanic.js";
+import type { AnyTextableGuildChannel, ComponentInteraction, ComponentTypes, Message } from "oceanic.js";
+
+import * as crypto from "crypto";
 
 import { LogEmitter } from "../../Structure";
-import { generateUUID } from "../../Util";
 
 export interface InteractionCollectorEvents {
   customIdsCreate: [customIds: string[]];
@@ -40,7 +41,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
   protected destroyed = false;
   protected _collectorId: string = null;
   protected resetTimeoutOnInteraction = false;
-  protected message: Message<AnyGuildTextChannel> | ResponseMessage = null;
+  protected message: Message<AnyTextableGuildChannel> | ResponseMessage = null;
 
   getCustomIds(){
     return [...this.customIdMap.keys()];
@@ -51,7 +52,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
   }
 
   constructor(protected parent: InteractionCollectorManager){
-    const collectorId = generateUUID();
+    const collectorId = crypto.randomUUID();
     super("InteractionCollector", collectorId);
     this._collectorId = collectorId;
   }
@@ -101,7 +102,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
     if(componentIds.some(id => existingComponentIds.includes(id as string))){
       throw new Error("Duplicated key");
     }
-    const customIds = Array.from({ length: componentIds.length }, () => `collector-${generateUUID()}`);
+    const customIds = Array.from({ length: componentIds.length }, () => `collector-${crypto.randomUUID()}`);
     const componentIdCustomIdMap = {} as { [key in keyof U]: string };
     customIds.forEach((customId, i) => {
       this.customIdMap.set(customId, componentIds[i] as string);
@@ -115,7 +116,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
     };
   }
 
-  handleInteraction(interaction: ComponentInteraction<any, AnyGuildTextChannel>){
+  handleInteraction(interaction: ComponentInteraction<any, AnyTextableGuildChannel>){
     const componentId = this.customIdMap.get(interaction.data.customID);
     if(!componentId){
       this.logger.warn(`unknown custom id: ${interaction.data.customID}`);
@@ -135,7 +136,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
     }
   }
 
-  setMessage(message: Message<AnyGuildTextChannel> | ResponseMessage){
+  setMessage(message: Message<AnyTextableGuildChannel> | ResponseMessage){
     this.message = message;
     return message;
   }

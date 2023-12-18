@@ -20,7 +20,6 @@ import type { TransformOptions } from "stream";
 import type { Readable } from "stream";
 
 import { spawn } from "child_process";
-import * as crypto from "crypto";
 import { Agent as HttpAgent } from "http";
 import { Agent as HttpsAgent } from "https";
 import { PassThrough } from "stream";
@@ -34,29 +33,8 @@ import { getLogger } from "../logger";
 
 export * as color from "./color";
 export * as discordUtil from "./discord";
-export * as effectUtil from "./effect";
 export * as system from "./system";
 export * as time from "./time";
-
-/**
- * 指定された文字列を指定された桁数になるまでゼロ補完します。
- * @param str 補完する文字列
- * @param length 補完後の長さ
- * @returns 保管された文字列
- */
-export function padZero(str: string, length: number){
-  if(str.length >= length) return str;
-  return `${"0".repeat(length - str.length)}${str}`;
-}
-
-/**
- * 文字列をBase64エンコードします
- * @param txt エンコードする文字列
- * @returns Base64エンコードされた文字列
- */
-export function btoa(txt: string){
-  return Buffer.from(txt).toString("base64");
-}
 
 /**
  * オブジェクトを可能な限り文字列化します
@@ -103,23 +81,6 @@ export function createPassThrough(opts: TransformOptions = {}): PassThrough{
   return stream;
 }
 
-const UUID_TEMPLATE = "10000000-1000-4000-8000-100000000000";
-/**
- * UUIDを生成します
- * @returns 生成されたUUID
- */
-export function generateUUID(){
-  if(typeof crypto.randomUUID === "function"){
-    return crypto.randomUUID();
-  }else{
-    // ref: https://www.30secondsofcode.org/js/s/uuid-generator-node
-    return UUID_TEMPLATE.replace(/[018]/g, c => {
-      const cn = Number(c);
-      return (cn ^ crypto.randomBytes(1)[0] & 15 >> cn / 4).toString(16);
-    });
-  }
-}
-
 /**
  * パーセンテージを計算します
  * @param part 計算対象の量
@@ -143,11 +104,20 @@ const audioExtensions = [
 ] as const;
 /**
  * ローオーディオファイルのURLであるかどうかをURLの末尾の拡張子から判断します
- * @param str 検査対象のURL
+ * @param url 検査対象のURL
  * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
  */
-export function isAvailableRawAudioURL(str: string){
-  return str && audioExtensions.some(ext => str.endsWith(ext));
+export function isAvailableRawAudioURL(url: string){
+  // check if the url variable is valid string object.
+  if(!url || typeof url !== "string"){
+    return false;
+  }
+
+  const urlObject = new URL(url);
+
+  // check if the url has a valid protocol and if its pathname ends with a valid extension.
+  return (urlObject.protocol === "https:" || urlObject.protocol === "http:")
+    && audioExtensions.some(ext => urlObject.pathname.endsWith(ext));
 }
 
 /**
@@ -157,13 +127,23 @@ export function isAvailableRawAudioURL(str: string){
  * @returns ステータスコード
  */
 export function retriveHttpStatusCode(url: string, headers?: { [key: string]: string }){
+  return requestHead(url, headers).then(d => d.statusCode);
+}
+
+/**
+ * 指定されたURLにHEADリクエストを行います。
+ * @param url URL
+ * @param headers 追加のカスタムリクエストヘッダ
+ * @returns レスポンス
+ */
+export function requestHead(url: string, headers: { [key: string]: string } = {}){
   return candyget("HEAD", url, "string", {
     headers: {
       "User-Agent": DefaultUserAgent,
       ...headers,
     },
     maxRedirects: 0,
-  }).then(r => r.statusCode);
+  });
 }
 
 const httpAgent = new HttpAgent({ keepAlive: false });
@@ -174,7 +154,7 @@ const httpsAgent = new HttpsAgent({ keepAlive: false });
  * @param url URL
  * @returns Readableストリーム
  */
-export function downloadAsReadable(url: string, options: miniget.Options = {}): Readable{
+export function downloadAsReadable(url: string, options: miniget.Options = { headers: { "User-Agent": DefaultUserAgent } }): Readable{
   const logger = getLogger("Util");
   return miniget(url, {
     maxReconnects: 10,
@@ -346,45 +326,47 @@ export function createFragmentalDownloadStream(
   const logger = getLogger("FragmentalDownloader", true);
   logger.addContext("id", Date.now());
   const stream = createPassThrough();
-  let current = -1;
-  if(contentLength < chunkSize){
-    const originStream = typeof streamGenerator === "string"
-      ? downloadAsReadable(streamGenerator, {
-        headers: {
-          "User-Agent": userAgent,
-        },
-      })
-      : streamGenerator(0);
-    originStream
-      .on("error", er => stream.destroy(er))
-      .pipe(stream);
-    logger.info("Stream was created as a single stream");
-  }else{
-    const pipeNextStream = () => {
-      current++;
-      let end = chunkSize * (current + 1) - 1;
-      if(end >= contentLength) end = undefined;
-      const nextStream = typeof streamGenerator === "string"
+  setImmediate(() => {
+    let current = -1;
+    if(contentLength < chunkSize){
+      const originStream = typeof streamGenerator === "string"
         ? downloadAsReadable(streamGenerator, {
           headers: {
             "User-Agent": userAgent,
-            "Range": `bytes=${chunkSize * current}-${end ? end : ""}`,
           },
         })
-        : streamGenerator(chunkSize * current, end);
-      logger.info(`Stream #${current + 1} was created`);
-      nextStream
+        : streamGenerator(0);
+      originStream
         .on("error", er => stream.destroy(er))
-        .pipe(stream, { end: end === undefined });
-      if(end !== undefined){
-        nextStream.on("end", () => pipeNextStream());
-      }else{
-        logger.info(`Last stream (total: ${current + 1})`);
-      }
-    };
-    pipeNextStream();
-    logger.info(`Stream was created as partial stream. ${Math.ceil(contentLength / chunkSize)} streams will be created.`);
-  }
+        .pipe(stream);
+      logger.info("Stream was created as a single stream");
+    }else{
+      const pipeNextStream = () => {
+        current++;
+        let end = chunkSize * (current + 1) - 1;
+        if(end >= contentLength) end = undefined;
+        const nextStream = typeof streamGenerator === "string"
+          ? downloadAsReadable(streamGenerator, {
+            headers: {
+              "User-Agent": userAgent,
+              "Range": `bytes=${chunkSize * current}-${end ? end : ""}`,
+            },
+          })
+          : streamGenerator(chunkSize * current, end);
+        logger.info(`Stream #${current + 1} was created`);
+        nextStream
+          .on("error", er => stream.destroy(er))
+          .pipe(stream, { end: end === undefined });
+        if(end !== undefined){
+          nextStream.on("end", () => pipeNextStream());
+        }else{
+          logger.info(`Last stream (total: ${current + 1})`);
+        }
+      };
+      pipeNextStream();
+      logger.info(`Stream was created as partial stream. ${Math.ceil(contentLength / chunkSize)} streams will be created.`);
+    }
+  });
   return stream;
 }
 

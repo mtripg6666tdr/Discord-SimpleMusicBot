@@ -18,12 +18,11 @@
 
 import type { Readable } from "stream";
 
-import { lock, LockObj } from "@mtripg6666tdr/async-lock";
-
 import { spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 
+import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 import candyget from "candyget";
 import pEvent from "p-event";
 

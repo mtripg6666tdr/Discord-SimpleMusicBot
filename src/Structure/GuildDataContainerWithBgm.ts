@@ -22,8 +22,8 @@ import type { GuildBGMContainerType } from "../config";
 import i18next from "i18next";
 
 import { GuildDataContainer } from "./GuildDataContainer";
-import { PlayManagerWithBgm } from "../Component/PlayManagerWithBgm";
-import { QueueManagerWithBgm } from "../Component/QueueManagerWithBGM";
+import { PlayManagerWithBgm } from "../Component/playManagerWithBgm";
+import { QueueManagerWithBgm } from "../Component/queueManagerWithBGM";
 
 export class GuildDataContainerWithBgm extends GuildDataContainer {
   protected override _queue: QueueManagerWithBgm;
@@ -86,7 +86,7 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
       this.queue.resetBgmTracks();
     }
     return this.joinVoiceChannelOnly(this.bgmConfig.voiceChannelId)
-      .then(() => this.player.play(0, /* BGM */ true))
+      .then(() => this.player.play(0, /* quiet */ true, /* BGM */ true))
       .catch(this.logger.error);
   }
 }

@@ -16,17 +16,16 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { TaskCancellationManager } from "./TaskCancellationManager";
 import type { InteractionCollector } from "./collectors/InteractionCollector";
 import type { ResponseMessage } from "./commandResolver/ResponseMessage";
+import type { TaskCancellationManager } from "./taskCancellationManager";
 import type { exportableCustom } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { AddedBy, QueueContent } from "../Structure/QueueContent";
-import type { AnyGuildTextChannel, EditMessageOptions, Message, MessageActionRow } from "oceanic.js";
+import type { AnyTextableGuildChannel, EditMessageOptions, Message, MessageActionRow } from "oceanic.js";
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
-
 import i18next from "i18next";
 import { Member } from "oceanic.js";
 import ytmpl from "yt-mix-playlist";
@@ -253,7 +252,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         additionalInfo: {
           addedBy: {
             userId: addedBy && this.getUserIdFromMember(addedBy) || "0",
-            displayName: addedBy && this.getDisplayNameFromMember(addedBy) || i18next.t("unknown", { lng: this.server.locale }),
+            displayName: addedBy?.displayName || i18next.t("unknown", { lng: this.server.locale }),
           },
         },
       } as QueueContent;
@@ -295,11 +294,11 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     } | {
       fromSearch?: undefined,
       message?: undefined,
-      channel: AnyGuildTextChannel,
+      channel: AnyTextableGuildChannel,
     })
   ): Promise<QueueContent>{
     this.logger.info("AutoAddQueue Called");
-    let uiMessage: Message<AnyGuildTextChannel>|ResponseMessage = null;
+    let uiMessage: Message<AnyTextableGuildChannel>|ResponseMessage = null;
 
     try{
       // UI表示するためのメッセージを特定する作業
@@ -384,7 +383,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           )
           .addField(
             i18next.t("components:nowplaying.requestedBy", { lng: this.server.locale }),
-            this.getDisplayNameFromMember(options.addedBy) || i18next.t("unknown", { lng: this.server.locale }),
+            options.addedBy.displayName || i18next.t("unknown", { lng: this.server.locale }),
             true
           )
           .addField(
@@ -812,10 +811,6 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
 
   addRawQueueItems(items: QueueContent[]){
     this._default.push(...items);
-  }
-
-  protected getDisplayNameFromMember(member: Member|AddedBy){
-    return member instanceof Member ? Util.discordUtil.users.getDisplayName(member) : member.displayName;
   }
 
   protected getUserIdFromMember(member: Member|AddedBy){

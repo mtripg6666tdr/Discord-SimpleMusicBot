@@ -16,15 +16,16 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type * as dYtsr from "@distube/ytsr";
 import type * as ytsr from "ytsr";
 
+import * as crypto from "crypto";
 import * as path from "path";
 import { Worker, isMainThread } from "worker_threads";
 
 import PQueue from "p-queue";
 
 import { type exportableYouTube, YouTube } from "..";
-import { generateUUID } from "../../Util";
 import { getLogger } from "../../logger";
 
 const worker = isMainThread ? new Worker(path.join(__dirname, "./worker.js")).on("error", console.error) : null;
@@ -52,7 +53,7 @@ export type workerGetInfoSuccessMessage = {
 };
 export type workerSearchSuccessMessage = {
   type: "searchOk",
-  data: ytsr.Result,
+  data: ytsr.Result | dYtsr.VideoResult,
 };
 export type workerErrorMessage = {
   type: "error",
@@ -89,7 +90,7 @@ const jobTriggerQueue = new PQueue({
 function doJob(message: spawnerGetInfoMessage): Promise<workerGetInfoSuccessMessage>;
 function doJob(message: spawnerSearchMessage): Promise<workerSearchSuccessMessage>;
 function doJob(message: spawnerJobMessage): Promise<workerSuccessMessage>{
-  const uuid = generateUUID();
+  const uuid = crypto.randomUUID();
   logger.debug(`Job(${uuid}) Scheduled`);
   return jobTriggerQueue.add(() => new Promise((resolve, reject) => {
     worker.postMessage({

@@ -18,15 +18,16 @@
 
 import type { AudioSource, exportableCustom } from "../AudioSource";
 import type { MusicBotBase } from "../botBase";
+import type dYtsr from "@distube/ytsr";
 import type ytsr from "ytsr";
-
-import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import { pipeline, Readable } from "stream";
 import zlib from "zlib";
+
+import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 
 import { LogEmitter } from "../Structure";
 import { getMBytes } from "../Util/system";
@@ -126,7 +127,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
       .catch(() => null) as Promise<T>;
   }
 
-  addSearch(keyword: string, result: ytsr.Video[]){
+  addSearch(keyword: string, result: ytsr.Video[] | dYtsr.Video[]){
     if(this.enablePersistent){
       this.addPersistentCache(this.createCacheId(keyword.toLowerCase(), "search"), result).catch(this.logger.error);
     }

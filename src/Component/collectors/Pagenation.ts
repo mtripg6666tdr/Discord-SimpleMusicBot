@@ -18,7 +18,7 @@
 
 import type { InteractionCollectorEvents } from "./InteractionCollector";
 import type { CommandMessage } from "../commandResolver/CommandMessage";
-import type { AnyGuildTextChannel, ComponentInteraction, ComponentTypes, EmbedOptions } from "oceanic.js";
+import type { AnyTextableGuildChannel, ComponentInteraction, ComponentTypes, EmbedOptions } from "oceanic.js";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
@@ -38,8 +38,8 @@ type MessageEmbedsResolvable =
   | ((pagenum: number) => Promise<EmbedOptions>);
 
 interface PagenationEvents extends InteractionCollectorEvents {
-  arrowLeft: [interaction: ComponentInteraction<ComponentTypes.BUTTON, AnyGuildTextChannel>];
-  arrowRight: [interaction: ComponentInteraction<ComponentTypes.BUTTON, AnyGuildTextChannel>];
+  arrowLeft: [interaction: ComponentInteraction<ComponentTypes.BUTTON, AnyTextableGuildChannel>];
+  arrowRight: [interaction: ComponentInteraction<ComponentTypes.BUTTON, AnyTextableGuildChannel>];
 }
 
 export class Pagenation extends InteractionCollector<PagenationEvents> {
@@ -88,7 +88,7 @@ export class Pagenation extends InteractionCollector<PagenationEvents> {
     return this;
   }
 
-  protected async edit(page: number, interaction?: ComponentInteraction<ComponentTypes.BUTTON, AnyGuildTextChannel>){
+  protected async edit(page: number, interaction?: ComponentInteraction<ComponentTypes.BUTTON, AnyTextableGuildChannel>){
     this._currentPage = page;
     const messageContent = {
       content: "",

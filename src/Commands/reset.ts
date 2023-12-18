@@ -23,6 +23,7 @@ import type { i18n } from "i18next";
 import { Routes } from "oceanic.js";
 
 import { BaseCommand } from ".";
+import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 
 export default class Reset extends BaseCommand {
   constructor(){
@@ -68,6 +69,11 @@ export default class Reset extends BaseCommand {
 
     // データあたらしく初期化
     const newServer = context.initData(message.guild.id, message.channel.id);
+
+    // BGMキューの初期化
+    if(newServer instanceof GuildDataContainerWithBgm){
+      await newServer.initBgmTracks();
+    }
 
     // キューの復元を試みる
     if(queueItems){

@@ -36,6 +36,7 @@ interface TypedEventEmitter<T extends EventDictionary> extends EventEmitter {
   rawListeners<U extends keyof T>(event: U): ((...args: T[U]) => void)[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 class TypedEventEmitter<T extends EventDictionary> extends EventEmitter {
   eitherOnce(events: (keyof T)[], listener: () => void){
     const handler = () => {

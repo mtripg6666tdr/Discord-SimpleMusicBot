@@ -18,29 +18,34 @@
 
 import type { i18n } from "i18next";
 
-import { padZero } from ".";
-
 /**
  * 合計時間(秒)からゼロ補完された分および秒を計算します。
- * @param _t 合計時間(秒)
+ * @param totalSec 合計時間(秒)
  * @returns [ゼロ補完された分,ゼロ補完された秒]
  */
-export function calcMinSec(_t: number){
-  const sec = _t % 60;
-  const min = (_t - sec) / 60;
-  return [padZero(min.toString(), 2), padZero(sec.toString(), 2)];
+export function calcMinSec(totalSec: number){
+  const sec = totalSec % 60;
+  const min = (totalSec - sec) / 60;
+  return [
+    min.toString().padStart(2, "0"),
+    sec.toString().padStart(2, "0"),
+  ];
 }
 
 /**
  * 合計時間(秒)から時間、ゼロ補完された分および秒を計算します。
- * @param seconds 合計時間(秒)
+ * @param totalSec 合計時間(秒)
  * @returns [時間, ゼロ補完された分, ゼロ補完された秒]
  */
-export function calcHourMinSec(seconds: number): [string, string, string]{
-  const sec = seconds % 60;
-  const min = (seconds - sec) / 60 % 60;
-  const hor = ((seconds - sec) / 60 - min) / 60;
-  return [hor.toString(), padZero(min.toString(), 2), padZero(sec.toString(), 2)];
+export function calcHourMinSec(totalSec: number): [string, string, string]{
+  const sec = totalSec % 60;
+  const min = (totalSec - sec) / 60 % 60;
+  const hr = ((totalSec - sec) / 60 - min) / 60;
+  return [
+    hr.toString(),
+    min.toString().padStart(2, "0"),
+    sec.toString().padStart(2, "0"),
+  ];
 }
 
 /**

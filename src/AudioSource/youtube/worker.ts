@@ -20,10 +20,19 @@ import type { WithId, spawnerJobMessage, workerMessage } from "./spawner";
 
 import { parentPort } from "worker_threads";
 
-import * as ytsr from "ytsr";
+import dYtsr from "@distube/ytsr";
+import ytsr from "ytsr";
 
 import { YouTube } from ".";
 import { stringifyObject } from "../../Util";
+import { useConfig } from "../../config";
+
+const config = useConfig();
+const searchOptions = {
+  limit: 12,
+  gl: config.country,
+  hl: config.defaultLanguage,
+};
 
 parentPort.unref();
 
@@ -57,17 +66,26 @@ function onMessage(message: WithId<spawnerJobMessage>){
       });
   }else if(message.type === "search"){
     const id = message.id;
-    ytsr.default(message.keyword, {
-      limit: 12,
-      gl: "JP",
-      hl: "ja",
-    })
-      .then((result) => {
+    ytsr(message.keyword, searchOptions)
+      .then(result => {
         postMessage({
           type: "searchOk",
           data: result,
           id,
         });
+      })
+      .catch((er) => {
+        console.error(er);
+        return dYtsr(message.keyword, searchOptions);
+      })
+      .then(result => {
+        if(result){
+          postMessage({
+            type: "searchOk",
+            data: result,
+            id,
+          });
+        }
       })
       .catch((er) => {
         postMessage({

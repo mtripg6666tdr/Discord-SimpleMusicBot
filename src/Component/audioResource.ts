@@ -33,10 +33,12 @@ const SILENCE_FRAME = Buffer.from([0xf8, 0xff, 0xfe]);
 const TIMEOUT = 20 * 1000;
 
 // hide 'volume' property trick
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface FixedAudioResource extends NullMetaAudioResource {
   volume: never;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class FixedAudioResource extends NullMetaAudioResource {
   public error = false;
   public readonly events = null as AudioResourceEvent;

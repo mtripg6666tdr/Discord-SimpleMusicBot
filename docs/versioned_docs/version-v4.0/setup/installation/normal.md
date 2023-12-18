@@ -90,7 +90,7 @@ npm run start
 なお、スラッシュコマンドは、起動時に自動的に追加されるようになりました。スラッシュコマンドについての詳細は、[あとのページ](../feature/slashcommand.md)で解説しています。
 
 ## コードの更新
-:::caution
+:::warning
 
 v3からv4の更新の際に、config.jsonでの設定内容が追加されています。
 追加しないと起動しないようになっていますので、必ずドキュメントサイトや[config.json.sample](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/config.json.sample)を参照の上更新してください。

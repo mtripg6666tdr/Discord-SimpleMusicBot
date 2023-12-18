@@ -21,7 +21,6 @@ import type { exportableCustom, UrlStreamInfo } from ".";
 import candyget from "candyget";
 
 import { AudioSource } from "./audiosource";
-import { padZero } from "../Util";
 
 export class BestdoriS extends AudioSource<string> {
   protected artist = "";
@@ -63,10 +62,11 @@ export class BestdoriS extends AudioSource<string> {
   }
 
   async fetch(): Promise<UrlStreamInfo>{
+    const paddedId = this.id.toString().padStart(3, "0");
     return {
       type: "url",
       streamType: "mp3",
-      url: "https://bestdori.com/assets/jp/sound/bgm" + padZero(this.id.toString(), 3) + "_rip/bgm" + padZero(this.id.toString(), 3) + ".mp3",
+      url: `https://bestdori.com/assets/jp/sound/bgm${paddedId}_rip/bgm${paddedId}.mp3`,
     };
   }
 

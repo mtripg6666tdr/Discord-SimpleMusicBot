@@ -17,6 +17,7 @@
  */
 
 import type { ReadableStreamInfo, StreamInfo, StreamTypeIdentifer, UrlStreamInfo } from "../../AudioSource";
+import type { ExportedAudioEffect } from "../audioEffectManager";
 import type { Readable } from "stream";
 
 import { opus } from "prism-media";
@@ -45,19 +46,19 @@ const logger = getLogger("StreamResolver");
 export async function resolveStreamToPlayable(
   originalStreamInfo: StreamInfo,
   {
-    effectArgs,
+    effects,
     seek,
     volumeTransformEnabled,
     bitrate,
   }: {
-    effectArgs: string[],
+    effects: ExportedAudioEffect,
     seek: number,
     volumeTransformEnabled: boolean,
     bitrate: number,
   }
 ): Promise<PlayableStreamInfo> {
   /** エフェクトが有効になっているか */
-  const effectEnabled = effectArgs.length !== 0;
+  const effectEnabled = effects.args.length !== 0;
   /** シークが有効になっているか  */
   const seekEnabled = seek > 0;
   /** Node.js側でダウンロードすべきかどうか */
@@ -120,13 +121,12 @@ export async function resolveStreamToPlayable(
       // Unknown --(FFmpeg)--> PCM
       //              2
       logger.info(`stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg) --> PCM`);
-      const ffmpeg = transformThroughFFmpeg(streamInfo, { bitrate, effectArgs, seek, output: "pcm" });
+      const ffmpeg = transformThroughFFmpeg(streamInfo, { bitrate, effects, seek, output: "pcm" });
 
       ffmpeg
         .on("error", e => destroyStream(pcmStream, e))
         .pipe(pcmStream)
-        .once("close", () => destroyStream(ffmpeg))
-      ;
+        .once("close", () => destroyStream(ffmpeg));
 
       if(streamInfo.type === "readable"){
         streams.push(streamInfo.stream);
@@ -145,7 +145,7 @@ export async function resolveStreamToPlayable(
     // Unknown --(FFmpeg)--> Ogg/Opus
     logger.info(`stream edges: raw(${streamInfo.streamType || "unknown"}) --(FFmpeg)--> Webm/Ogg`);
     const ffmpegOutput = streamInfo.streamType === "webm/opus" ? "webm" : "ogg";
-    const ffmpeg = transformThroughFFmpeg(streamInfo, { bitrate, effectArgs, seek, output: ffmpegOutput });
+    const ffmpeg = transformThroughFFmpeg(streamInfo, { bitrate, effects: effects, seek, output: ffmpegOutput });
     const passThrough = createPassThrough();
     ffmpeg
       .on("error", e => destroyStream(passThrough, e))

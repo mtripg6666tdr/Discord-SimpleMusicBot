@@ -20,7 +20,7 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { ResponseMessage } from "../Component/commandResolver/ResponseMessage";
 import type { i18n } from "i18next";
-import type { AnyGuildTextChannel, Message } from "oceanic.js";
+import type { AnyTextableGuildChannel, Message } from "oceanic.js";
 
 import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -60,7 +60,7 @@ export default class BulkDelete extends BaseCommand {
       const messages = [] as Message[];
       let i = 0;
       do{
-        const allMsgs: Message<AnyGuildTextChannel>[] = await message.channel.getMessages(before ? {
+        const allMsgs: Message<AnyTextableGuildChannel>[] = await message.channel.getMessages(before ? {
           limit: 100,
           before,
         } : {

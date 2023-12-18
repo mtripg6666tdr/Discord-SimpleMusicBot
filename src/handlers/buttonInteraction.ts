@@ -21,18 +21,18 @@ import type { MusicBot } from "../bot";
 import type { ComponentTypes } from "oceanic.js";
 import type * as discord from "oceanic.js";
 
-import { CommandManager } from "../Component/CommandManager";
+import { CommandManager } from "../Component/commandManager";
 import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 
 export async function handleButtonInteraction(
   this: MusicBot,
   server: GuildDataContainer,
-  interaction: discord.ComponentInteraction<ComponentTypes.BUTTON, discord.AnyGuildTextChannel>,
+  interaction: discord.ComponentInteraction<ComponentTypes.BUTTON, discord.AnyTextableGuildChannel>,
 ){
   this.logger.info("received button interaction");
 
   // コレクターで処理できるか？
-  if(this.collectors.onInteractionCreate(interaction)){
+  if(await this.collectors.onInteractionCreate(interaction)){
     return;
   }
 

@@ -24,14 +24,13 @@ import type * as discord from "oceanic.js";
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import util from "util";
 
-import { RateLimitController } from "./Component/RateLimitController";
-import { SourceCache } from "./Component/SourceCache";
 import { HttpBackupper } from "./Component/backupper/httpBased";
 import { MongoBackupper } from "./Component/backupper/mongodb";
 import { ReplitBackupper } from "./Component/backupper/replit";
 import { InteractionCollectorManager } from "./Component/collectors/InteractionCollectorManager";
+import { RateLimitController } from "./Component/rateLimitController";
+import { SourceCache } from "./Component/sourceCache";
 import { GuildDataContainer } from "./Structure";
 import { LogEmitter } from "./Structure";
 import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";
@@ -222,9 +221,6 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
     this.logger.info(
       `[Tick] (System) Memory RSS: ${rss}MB, Heap total: ${Util.system.getMBytes(nMem.heapTotal)}MB, Total: ${Util.getPercentage(rss + ext, memory.total)}%`
     );
-
-    // for debug purpose
-    this.logger.trace("ratelimits", util.inspect(this.client.rest.handler.ratelimits, { showHidden: true, depth: Infinity }));
   }
 
   abstract run(debugLog: boolean, debugLogStoreLength?: number): void;
@@ -235,7 +231,10 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
   protected initData(guildid: string, boundChannelId: string){
     const prev = this.guildData.get(guildid);
     if(!prev){
-      const server = new GuildDataContainer(guildid, boundChannelId, this);
+      const config = useConfig();
+      const server = config.bgm[guildid]
+        ? new GuildDataContainerWithBgm(guildid, boundChannelId, this, config.bgm[guildid])
+        : new GuildDataContainer(guildid, boundChannelId, this);
       this.guildData.set(guildid, server);
       this.emit("guildDataAdded", server);
       return server;

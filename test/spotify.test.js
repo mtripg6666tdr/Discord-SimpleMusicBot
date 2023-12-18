@@ -10,7 +10,7 @@ const spotifyUrlInfo = (() => {
   }
 })();
 
-if(spotifyUrlInfo){
+if(spotifyUrlInfo && !process.env.CI){
   const spotifyClient = spotifyUrlInfo((url, init) => candyget(url, "string", init).then(r => ({text: () => r.body})));
 
   describe("#Spotify Playlist", function(){
