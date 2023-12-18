@@ -1,0 +1,73 @@
+{
+  "nowplaying": {
+    "nowplaying": "Şimdi oynatılıyor",
+    "nowplayingTitle": "Şimdi oynatılıyor",
+    "nowplayingItemName": "Şimdi oynatılıyor",
+    "waitForPlayingItemName": "Oynatma bekleniyor",
+    "requestedBy": "リクエスト",
+    "nextSong": "Sonraki Şarkı",
+    "noNextSong": "Henüz hiçbir şey eklenmedi.",
+    "inRadio": "Radyo oynatılıyor."
+  },
+  "queue": {
+    "queueTitle": "{{server}}のキュー",
+    "trackloop": "Parçayı tekrarla",
+    "queueloop": "Oynatma kuyruğunu tekrarla",
+    "autoplayRelated": "İlgili şarkılar otomatik olarak oynatılıyor",
+    "equallyplayback": "均等再生",
+    "tooManyQueueItems": "Oynatma kuyruğu için izin verilen azami öğe sayısı aşıldı.",
+    "songAdded": "Şarkı Eklendi",
+    "positionInQueue": "Kuyruktaki Konumu",
+    "etaToPlay": "Oynatmak için kalan süre",
+    "fallbackNotice": "現在、通常の方法で情報を取得できなかったため、代わりの方法を使用しました。これが異常だと思われる場合はサポートまでお問い合わせください。\n処理に時間がかかる、突然終了するなど、正常な動作をしない場合があります。この場合の動作はサポート対象外です。問題が発生した場合、`リセット`コマンドを使用すると、サーバーのデータをすべて初期化することができます。",
+    "spotifyNotice": "Spotify'daki şarkılar doğru şekilde OYNATILAMAYABİLİR.",
+    "cancelAdded": "`{{title}}` eklenmesi iptal edildi",
+    "failedToAdd": "Sıraya eklenemedi.",
+    "processingPlaylistBefore": "Oynatma listesi işleniyor...",
+    "processingPlaylist": "`{{title}}` oynatma listesi işleniyor.",
+    "noDescriptionInPlaylist": "Oynatma listesinden içe aktarıldığı için ayrıntılar kullanılamıyor.",
+    "processingPlaylistCompleted": "Oynatma listesi başarıyla işlendi.",
+    "songsAdded_one": "{{count}}曲が追加されました",
+    "songsAdded_other": "{{count}}曲が追加されました"
+  },
+  "search": {
+    "resultTitle": "\"{{query}}\"の検索結果",
+    "resultFooterInteraction": "再生したい項目を、下から選択してください。キャンセルするには、下から\"キャンセル\"を選択してください。また、サムネイルコマンドを使用してサムネイルを確認することもできます。",
+    "resultFooterMessage": "再生したい項目を選択して数字を送信するか、下から選択してください。キャンセルするには「キャンセル」または「cancel」と選択/入力します。また、サムネイルコマンドを使用してサムネイルを確認できます。",
+    "select": "ここから選択...",
+    "typeOrSelect": "数字を直接送信するか、ここから選択...",
+    "maximumSearch": "すでに開いている検索パネルが上限を超えています。"
+  },
+  "play": {
+    "waitingForLiveStream": "{{title}} `(ライブストリーム)`の開始を待機中...",
+    "waitingForLiveCanceled": "待機をキャンセルしました",
+    "preparing": "{{title}}の再生準備中",
+    "failedToPlay": "曲の再生に失敗しました...。",
+    "failedAndSkipping": "スキップします",
+    "failedAndRetrying": "Tekrar deneniyor",
+    "queueEmpty": "Oynatma kuyruğu boş",
+    "queueEmptyAndExiting": "Bot boşta kaldığı için bağlantısı kesiliyor.",
+    "songsInQueue": "再生待ちの曲",
+    "willLoop": "Tekrarla"
+  },
+  "skip": {
+    "skipping": "Atlanıyor",
+    "skipped": "`{{title}}` atlandı",
+    "failed": "Atlama başarısız oldu.",
+    "embedTitle": "Atlatma Oyu",
+    "howToUseSkipVote": "`{{title}}` atlanmasını onaylıyorsanız aşağıdaki düğmeye basın.",
+    "skipVoteDescription": "賛成がボイスチャンネルに参加している人数の過半数を超えると、スキップされます。",
+    "currentStatus": "Mevcut durum",
+    "skipRequirement_one": "Bu şarkıyı atlamak için {{count}} oya daha ihtiyaç var.",
+    "skipRequirement_other": "Bu şarkıyı atlamak için {{count}} oya daha ihtiyaç var.",
+    "skipIssuer": "{{issuer}} bu şarkının atlanmasını öneriyor.",
+    "agree": "Oy ver"
+  },
+  "controlPanel": {
+    "rewind": "Geri sar",
+    "play": "Oynat",
+    "pause": "Duraklat",
+    "skip": "Atla",
+    "onceloop": "Bir kez tekrarla"
+  }
+}
