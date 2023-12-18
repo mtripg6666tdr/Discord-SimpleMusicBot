@@ -86,7 +86,7 @@ type BgmItem = {
   url: string,
 };
 
-const bgms = JSON.parse<BgmItem[]>(`[
+const bgms: BgmItem[] = JSON.parse(`[
   {
     "title": "【勉強用・作業用BGM】α波で超集中・記憶力アップ【波の音×オルゴール】",
     "author": {

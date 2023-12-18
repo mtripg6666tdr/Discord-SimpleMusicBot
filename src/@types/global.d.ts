@@ -22,9 +22,4 @@ import type { Worker } from "worker_threads";
 
 declare global {
   var workerThread: Worker;
-
-  interface JSON {
-    // eslint-disable-next-line @typescript-eslint/method-signature-style
-    parse<T>(text: string, reviver?: (this: any, key: string, value: any) => any): T;
-  }
 }
