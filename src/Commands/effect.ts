@@ -19,11 +19,12 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { i18n } from "i18next";
+import type { MessageActionRow } from "oceanic.js";
 
 import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
-import { audioEffectNames, type AudioEffectNames } from "../Component/AudioEffectManager";
+import { audioEffectNames, type AudioEffectNames } from "../Component/audioEffectManager";
 
 export default class Effect extends BaseCommand {
   constructor(){
@@ -43,34 +44,47 @@ export default class Effect extends BaseCommand {
         .setAuthorIdFilter(message.member.id)
         .setMaxInteraction(Infinity)
         .setTimeout(5 * 60 * 1000)
-        .createCustomIds({
-          reload: "button",
-          bassBoost: "button",
-          reverb: "button",
-          loudnessEq: "button",
-        } satisfies Record<"reload" | AudioEffectNames, "button">);
-      const createActionRow = () => new MessageActionRowBuilder()
-        .addComponents(
+        .createCustomIds(
+          Object.fromEntries(
+            [
+              ["reload", "button"],
+              ...audioEffectNames.map(name => [name, "button" as const]),
+            ]
+          ) as Record<"reload" | AudioEffectNames, "button">
+        );
+      const createActionRow = () => {
+        const rows: MessageActionRow[] = [];
+        const components = [
           new MessageButtonBuilder()
             .setCustomId(customIdMap.reload)
             .setStyle("PRIMARY")
             .setEmoji("🔁")
             .setLabel(t("commands:effect.effectControllPanel.reload")),
           ...context.server.audioEffects.createMessageButtons(customIdMap),
-        )
-        .toOceanic();
+        ];
+        for(let i = 0; i < Math.ceil(components.length / 5); i++){
+          rows.push(
+            new MessageActionRowBuilder()
+              .addComponents(...components.slice(i * 5, (i + 1) * 5))
+              .toOceanic()
+          );
+        }
+
+        return rows;
+      };
 
       const reply = await message.reply({
         embeds: [context.server.audioEffects.createEmbed(message.member.avatarURL(), t)],
-        components: [createActionRow()],
+        components: createActionRow(),
       });
-      const updateEffectEmbed = () => {
+      const updateEffectEmbed = (emptyrow = false) => {
         reply.edit({
           embeds: [context.server.audioEffects.createEmbed(message.member.avatarURL(), t)],
-          components: [createActionRow()],
+          components: emptyrow ? [] : createActionRow(),
         }).catch(this.logger.error);
       };
-      collector.on("reload", updateEffectEmbed);
+      collector.on("reload", () => updateEffectEmbed());
+      collector.on("timeout", () => updateEffectEmbed(true));
 
       for(const effectName of audioEffectNames){
         collector.on(effectName, () => {

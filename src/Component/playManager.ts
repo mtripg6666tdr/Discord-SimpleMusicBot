@@ -28,7 +28,7 @@ import { AudioPlayerStatus, createAudioResource, createAudioPlayer, entersState,
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 import i18next from "i18next";
 
-import { FixedAudioResource } from "./AudioResource";
+import { FixedAudioResource } from "./audioResource";
 import { resolveStreamToPlayable } from "./streams";
 import { DSL } from "./streams/dsl";
 import { Normalizer } from "./streams/normalizer";
@@ -160,7 +160,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   setVolume(val: number){
     this._volume = val;
     if(this._resource?.volumeTransformer){
-      this._resource.volumeTransformer.setVolume(val / 100);
+      this._resource.volumeTransformer.setVolumeLogarithmic(val / 100);
       return true;
     }
     return false;

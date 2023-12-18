@@ -16,11 +16,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { KnownAudioSourceIdentifer } from "../Component/QueueManager";
-import type { SourceCache } from "../Component/SourceCache";
+import type { KnownAudioSourceIdentifer } from "../Component/queueManager";
+import type { SourceCache } from "../Component/sourceCache";
 import type { i18n } from "i18next";
-
-import * as ytdl from "ytdl-core";
 
 import * as AudioSource from ".";
 import { isAvailableRawAudioURL } from "../Util";
@@ -63,7 +61,7 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
     logger.debug("initializing source from scratch");
   }
 
-  if(!isDisabledSource("youtube") && (type === "youtube" || type === "unknown" && ytdl.validateURL(url))){
+  if(!isDisabledSource("youtube") && (type === "youtube" || type === "unknown" && AudioSource.YouTube.validateURL(url))){
     // youtube
     basicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.exportableYouTube, cache);
   }else if(!isDisabledSource("custom") && (type === "custom" || type === "unknown" && isAvailableRawAudioURL(url))){

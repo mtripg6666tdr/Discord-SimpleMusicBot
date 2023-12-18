@@ -20,7 +20,7 @@ import type { CommandMessage } from "./commandResolver/CommandMessage";
 import type { GuildDataContainer } from "../Structure";
 import type { i18n } from "i18next";
 
-import { SearchPanel } from "./SearchPanel";
+import { SearchPanel } from "./searchPanel";
 import { ServerManagerBase } from "../Structure";
 
 interface SearchPanelManagerEvents {

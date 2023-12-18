@@ -33,9 +33,11 @@ import { AudioSource } from "../audiosource";
 
 export * from "./spawner";
 
+const cacheTimeout = 5 * 60 * 60 * 1000;
+
 export class YouTube extends AudioSource<string> {
   // サービス識別子（固定）
-  protected cache: Cache<any, any> = null;
+  protected cache: { data: Cache<any, any>, date: number } = null;
   protected channelName: string;
   protected channelUrl: string;
   protected upcomingTimestamp: string = null;
@@ -72,8 +74,8 @@ export class YouTube extends AudioSource<string> {
     return typeof this.strategyId === "number" && this.strategyId !== 0 && this.strategyId !== 1;
   }
 
-  get isCached(){
-    return !!this.cache;
+  get cacheIsStale(){
+    return !this.cache || this.cache.date + cacheTimeout < Date.now();
   }
 
   get availableAfter(){
@@ -82,49 +84,63 @@ export class YouTube extends AudioSource<string> {
 
   @timeLoggedMethod
   async init(url: string, prefetched: exportableYouTube, _: i18n["t"], forceCache?: boolean){
-    this.url = "https://www.youtube.com/watch?v=" + ytdl.getVideoID(url);
+    this.url = url = YouTube.normalizeUrl(url);
     if(prefetched){
       this.importData(prefetched);
     }else{
-      const { result, resolved } = await attemptGetInfoForStrategies(url);
-
-      // check if fallbacked
-      this.strategyId = resolved;
-
-      // check if upcoming
-      if(result.cache?.data){
-        if(
-          "videoDetails" in result.cache.data
-          && result.cache.data.videoDetails.liveBroadcastDetails
-          && result.cache.data.videoDetails.liveBroadcastDetails.startTimestamp
-          && !result.cache.data.videoDetails.liveBroadcastDetails.isLiveNow
-          && !result.cache.data.videoDetails.liveBroadcastDetails.endTimestamp
-        ){
-          this.upcomingTimestamp = result.cache.data.videoDetails.liveBroadcastDetails.startTimestamp;
-        }else if(
-          "LiveStreamData" in result.cache.data
-          && result.cache.data.LiveStreamData.isLive
-          && result.cache.data.video_details.upcoming
-          && typeof result.cache.data.video_details.upcoming === "object"
-        ){
-          this.upcomingTimestamp = result.cache.data.video_details.upcoming.toISOString();
-        }else{
-          this.upcomingTimestamp = null;
-        }
-      }
-
-      // store data as cache if requested
-      if(forceCache) this.cache = result.cache;
-
-      // import data to the current instance
-      this.importData(result.data);
+      await this.refreshInfo(forceCache);
     }
+
     return this;
+  }
+
+  private async refreshInfo(forceCache?: boolean){
+    const { result, resolved } = await attemptGetInfoForStrategies(this.url);
+
+    // check if fallbacked
+    this.strategyId = resolved;
+
+    // check if the video is upcoming
+    if(result.cache?.data){
+      if(
+        "videoDetails" in result.cache.data
+        && result.cache.data.videoDetails.liveBroadcastDetails
+        && result.cache.data.videoDetails.liveBroadcastDetails.startTimestamp
+        && !result.cache.data.videoDetails.liveBroadcastDetails.isLiveNow
+        && !result.cache.data.videoDetails.liveBroadcastDetails.endTimestamp
+      ){
+        this.upcomingTimestamp = result.cache.data.videoDetails.liveBroadcastDetails.startTimestamp;
+      }else if(
+        "LiveStreamData" in result.cache.data
+        && result.cache.data.LiveStreamData.isLive
+        && result.cache.data.video_details.upcoming
+        && typeof result.cache.data.video_details.upcoming === "object"
+      ){
+        this.upcomingTimestamp = result.cache.data.video_details.upcoming.toISOString();
+      }else{
+        this.upcomingTimestamp = null;
+      }
+    }
+
+    // store data as cache if requested
+    if(forceCache){
+      this.cache = {
+        data: result.cache,
+        date: Date.now(),
+      };
+    }
+
+    // import data to the current instance
+    this.importData(result.data);
   }
 
   @timeLoggedMethod
   async fetch(forceUrl?: boolean): Promise<StreamInfo>{
-    const { result, resolved } = await attemptFetchForStrategies(this.url, forceUrl, this.cache);
+    if(this.cacheIsStale){
+      this.purgeCache();
+    }
+
+    const { result, resolved } = await attemptFetchForStrategies(this.url, forceUrl, this.cache.data);
     this.strategyId = resolved;
     // store related videos
     this.relatedVideos = result.relatedVideos;
@@ -134,15 +150,22 @@ export class YouTube extends AudioSource<string> {
     }
 
     if(result.cache){
-      this.cache = result.cache;
+      this.cache = {
+        data: result.cache,
+        date: Date.now(),
+      };
     }
 
     return result.stream;
   }
 
   async fetchVideo(){
-    if(this.cache?.type === ytdlCore){
-      const info = this.cache.data as ytdl.videoInfo;
+    if(this.cacheIsStale){
+      await this.refreshInfo(true);
+    }
+
+    if(this.cache?.data.type === ytdlCore){
+      const info = this.cache.data.data as ytdl.videoInfo;
       const isLive = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
       const format = ytdl.chooseFormat(info.formats, {
         quality: isLive ? null : "highestvideo",
@@ -153,8 +176,8 @@ export class YouTube extends AudioSource<string> {
         url,
         ua: SecondaryUserAgent,
       };
-    }else if(this.cache?.type === playDl){
-      const info = this.cache.data as InfoData;
+    }else if(this.cache?.data.type === playDl){
+      const info = this.cache.data.data as InfoData;
       const format = info.format.filter(f => f.mimeType.startsWith("video")).sort((a, b) => b.bitrate - a.bitrate)[0];
       const url = format.url || info.LiveStreamData.hlsManifestUrl;
 
@@ -254,6 +277,31 @@ export class YouTube extends AudioSource<string> {
       };
       checkForLive();
     });
+  }
+
+  private static readonly youtubeLiveUrlRegExp = /^https?:\/\/(www\.)?youtube\.com\/live\/(?<id>[a-zA-Z0-9-_]{11})$/;
+
+  static validateURL(url: string): boolean {
+    return ytdl.validateURL(url) || this.youtubeLiveUrlRegExp.test(url);
+  }
+
+  static getVideoID(url: string): string {
+    if(this.youtubeLiveUrlRegExp.test(url)){
+      const id = this.youtubeLiveUrlRegExp.exec(url).groups.id;
+      if(ytdl.validateID(id)){
+        return id;
+      }
+    }
+
+    return ytdl.getVideoID(url);
+  }
+
+  static normalizeUrl(url: string){
+    if(this.validateURL(url)){
+      return `https://www.youtube.com/watch?v=${YouTube.getVideoID(url)}`;
+    }
+
+    throw new Error("Invalid URL provided.");
   }
 }
 
