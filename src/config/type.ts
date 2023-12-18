@@ -82,7 +82,12 @@ export const ConfigSchema = Type.Object({
 
   maxLogFiles: Type.Optional(Type.Number({ default: 100 })),
 
-  botWhiteList: Type.Optional(Type.Array(Type.RegExp(/^\d+$/), { default: [] })),
+  botWhiteList: Type.Optional(Type.Union([
+    Type.Array(Type.RegExp(/^\d+$/), { default: [] }),
+    Type.Null(),
+  ], { default: null })),
+
+  djRoleNames: Type.Optional(Type.Array(Type.String(), { default: ["DJ"] })),
 });
 
 export type GuildBGMContainerType = Static<typeof GuildBGMContainer>;

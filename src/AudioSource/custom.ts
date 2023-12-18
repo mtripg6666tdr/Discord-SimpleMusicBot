@@ -20,7 +20,7 @@ import type { StreamInfo } from ".";
 import type { i18n } from "i18next";
 
 import { AudioSource } from "./audiosource";
-import { createFragmentalDownloadStream, downloadAsReadable, isAvailableRawAudioURL, requestHead, retriveLengthSeconds } from "../Util";
+import { createFragmentalDownloadStream, downloadAsReadable, isAvailableRawAudioURL, requestHead, retrieveRemoteAudioInfo } from "../Util";
 
 export class CustomStream extends AudioSource<string> {
   constructor(){
@@ -33,17 +33,13 @@ export class CustomStream extends AudioSource<string> {
       this.title = prefetched.title || t("audioSources.customStream");
       this.url = url;
       this.lengthSeconds = prefetched.length;
-    }else{
-      if(!isAvailableRawAudioURL(url)){
-        throw new Error(t("audioSources.invalidStream"));
-      }
-
+    }else if(isAvailableRawAudioURL(url)){
       this.url = url;
-      this.title = this.extractFilename() || t("audioSources.customStream");
-      try{
-        this.lengthSeconds = await retriveLengthSeconds(url);
-      }
-      catch{ /* empty */ }
+      const info = await retrieveRemoteAudioInfo(url);
+      this.title = info.displayTitle || this.extractFilename() || t("audioSources.customStream");
+      this.lengthSeconds = info.lengthSeconds || 0;
+    }else{
+      throw new Error(t("audioSources.invalidStream"));
     }
 
     this.isPrivateSource = this.url.startsWith("https://cdn.discordapp.com/ephemeral-attachments/");

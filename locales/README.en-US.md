@@ -1,5 +1,5 @@
 # Discord-SimpleMusicBot
-[![GitHub package.json dynamic](https://img.shields.io/github/package-json/version/mtripg6666tdr/Discord-SimpleMusicBot/master)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/package.json) [![GitHub package.json dependency version (prod)](https://img.shields.io/badge/dynamic/json?color=blue&label=oceanic.js&query=%24.dependencies%5B%22oceanic.js%22%5D&url=https%3A%2F%2Fraw.githubusercontent.com%2Fmtripg6666tdr%2FDiscord-SimpleMusicBot%2Fmaster%2Fpackage.json)](https://github.com/OceanicJS/Oceanic) [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml) [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml) [![Build Docker](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml) [![Discord Support](https://img.shields.io/discord/847435307582095360?label=discord&logo=discord&logoColor=white)](https://myon.page.link/8QZw) [![GitHub License](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)](LICENSE)
+[![GitHub package.json dynamic](https://img.shields.io/github/package-json/version/mtripg6666tdr/Discord-SimpleMusicBot/master)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/package.json) [![GitHub package.json dependency version (prod)](https://img.shields.io/badge/dynamic/json?color=blue&label=oceanic.js&query=%24.dependencies%5B%22oceanic.js%22%5D&url=https%3A%2F%2Fraw.githubusercontent.com%2Fmtripg6666tdr%2FDiscord-SimpleMusicBot%2Fmaster%2Fpackage.json)](https://github.com/OceanicJS/Oceanic) [![CI](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/test.yml) [![CodeQL](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/codeql-analysis.yml) [![Build Docker](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml/badge.svg)](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/actions/workflows/build-docker.yml) [![Discord Support](https://img.shields.io/discord/847435307582095360?label=discord&logo=discord&logoColor=white)](https://sr.usamyon.moe/8QZw) [![Crowdin](https://badges.crowdin.net/discord-simplemusicbot/localized.svg)](https://crowdin.com/project/discord-simplemusicbot) [![GitHub License](https://img.shields.io/github/license/mtripg6666tdr/Discord-SimpleMusicBot)](LICENSE)
 
 [日本語](/README.md)・[English](/locales/README.en-US.md)・[Français](/locales/README.fr-FR.md)
 
@@ -40,9 +40,18 @@ Not only opening issues, we accept inquiries (Japanese or English) in the suppor
 Feel free to contact us in any ways!
 
 ## Localization
-This project has a plan to be multi-lingualized via Crowdin.Translators are always welcomed.  
-We have a plan to translate into English and French, but we feel happy to translate in another language if it's needed.  
-[Project page on Crowdin](https://crowdin.com/project/discord-simplemusicbot)
+This project has a plan to be multi-lingualized via Crowdin.We are looking for translators and proofreaders who can speak Japanese or English.  
+The original language in the project is Japanese.Languages we are going to support are following:
+* American English
+* British English(except for the README file)
+* Taiwanese
+* French
+* Thai
+* Turkish
+
+If you hope for the project to support a language that is not listed above, please feel free to contact us, so we can add a language on Crowdin.
+
+[Open the project page on Crowdin](https://crowdin.com/project/discord-simplemusicbot)
 
 ## Support
 You can receive notifications on Discord when new version is available.   
