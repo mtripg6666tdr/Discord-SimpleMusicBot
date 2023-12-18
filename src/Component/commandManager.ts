@@ -125,18 +125,58 @@ export class CommandManager extends LogEmitter<{}> {
     // Get registered commands
     const registeredAppCommands = await client.application.getGlobalCommands({ withLocalizations: true });
 
-    // no registered commands, bulk-registering them
-    if(registeredAppCommands.length === 0){
-      this.logger.info("Detected no command registered; bulk-registering slash-commands");
+    this.logger.info(`Successfully get ${registeredAppCommands.length} commands registered.`);
+
+    const commandsToEdit = await this.filterCommandsToBeEdited(apiCompatibleCommands, registeredAppCommands);
+    const commandsToAdd = await this.filterCommandsToBeAdded(apiCompatibleCommands, registeredAppCommands);
+    const commandsToRemove = await this.filterCommandsToBeRemoved(apiCompatibleCommands, registeredAppCommands);
+
+    // if the app has the known commands or has no command and there are too many diffs, bulk-registering them
+    if(commandsToEdit.length + commandsToAdd.length > 3 && (registeredAppCommands.length === 0 || commandsToRemove.length === 0)){
+      this.logger.info("Bulk-registering application-commands");
       await client.application.bulkEditGlobalCommands(apiCompatibleCommands);
       this.logger.info("Successfully registered");
       return;
     }
 
-    this.logger.info(`Successfully get ${registeredAppCommands.length} commands`);
+    // if there are any commands that should be added or updated
+    if(commandsToEdit.length > 0 || commandsToAdd.length > 0){
+      this.logger.info(`Detected ${commandsToEdit.length + commandsToAdd.length} commands that should be updated; updating`);
+      this.logger.info([...commandsToEdit, ...commandsToAdd].map(command => command.name));
+      for(let i = 0; i < commandsToEdit.length; i++){
+        const commandToRegister = commandsToEdit[i];
+        const id = registeredAppCommands.find(cmd => cmd.type === commandToRegister.type && cmd.name === commandToRegister.name).id;
+        await client.application.editGlobalCommand(id, commandToRegister);
+        this.logger.info(`editing ${Math.floor((i + 1) / commandsToEdit.length * 1000) / 10}% completed`);
+      }
+      for(let i = 0; i < commandsToAdd.length; i++){
+        const commandToRegister = commandsToAdd[i];
+        await client.application.createGlobalCommand(commandToRegister);
+        this.logger.info(`adding ${Math.floor((i + 1) / commandsToAdd.length * 1000) / 10}% completed`);
+      }
+      this.logger.info("Updating succeeded.");
+    }else{
+      this.logger.info("Detected no command that should be updated");
+    }
 
-    // search commands that should be updated
-    const commandsToEdit = apiCompatibleCommands.filter(expected => {
+    // remove outdated commands (which are not recognized as the bot's command)
+    if(removeOutdated){
+      if(commandsToRemove.length > 0){
+        this.logger.info(`Detected ${commandsToRemove.length} commands that should be removed; removing...`);
+        this.logger.info(commandsToRemove.map(command => command.name));
+        await client.application.bulkEditGlobalCommands(apiCompatibleCommands);
+        this.logger.info("Removal succeeded.");
+      }else{
+        this.logger.info("Detected no command that should be removed");
+      }
+    }
+  }
+
+  private async filterCommandsToBeEdited(
+    apiCompatibleCommands: CreateApplicationCommandOptions[],
+    registeredAppCommands: AnyApplicationCommand[],
+  ){
+    return apiCompatibleCommands.filter(expected => {
       if(expected.type === ApplicationCommandTypes.CHAT_INPUT){
         const actual = registeredAppCommands.find(
           command => command.type === ApplicationCommandTypes.CHAT_INPUT && command.name === expected.name
@@ -144,7 +184,7 @@ export class CommandManager extends LogEmitter<{}> {
         if(!actual){
           return false;
         }else{
-          return !this.sameCommand(actual, expected);
+          return !this.isSameCommand(actual, expected);
         }
       }else if(expected.type === ApplicationCommandTypes.MESSAGE){
         const actual = registeredAppCommands.find(
@@ -153,15 +193,19 @@ export class CommandManager extends LogEmitter<{}> {
         if(!actual){
           return false;
         }else{
-          return !this.sameCommand(actual, expected);
+          return !this.isSameCommand(actual, expected);
         }
       }else{
         return false;
       }
     });
+  }
 
-    // search commands that should be added newly
-    const commandsToAdd = apiCompatibleCommands.filter(expected => {
+  private async filterCommandsToBeAdded(
+    apiCompatibleCommands: CreateApplicationCommandOptions[],
+    registeredAppCommands: AnyApplicationCommand[],
+  ){
+    return apiCompatibleCommands.filter(expected => {
       if(expected.type === ApplicationCommandTypes.CHAT_INPUT){
         return !registeredAppCommands.some(
           reg => reg.type === ApplicationCommandTypes.CHAT_INPUT && reg.name === expected.name
@@ -174,42 +218,16 @@ export class CommandManager extends LogEmitter<{}> {
         return false;
       }
     });
+  }
 
-    // if there are any commands that should be added or updated
-    if(commandsToEdit.length > 0 || commandsToAdd.length > 0){
-      this.logger.info(`Detected ${commandsToEdit.length + commandsToAdd.length} commands that should be updated; updating`);
-      this.logger.info([...commandsToEdit, ...commandsToAdd].map(command => command.name));
-      for(let i = 0; i < commandsToEdit.length; i++){
-        const commandToRegister = commandsToEdit[i];
-        const id = registeredAppCommands.find(cmd => cmd.type === commandToRegister.type && cmd.name === commandToRegister.name).id;
-        this.logger.info(`command editing ${Math.floor((i + 1) / commandsToEdit.length * 1000) / 10}% completed`);
-        await client.application.editGlobalCommand(id, commandToRegister);
-      }
-      for(let i = 0; i < commandsToAdd.length; i++){
-        const commandToRegister = commandsToAdd[i];
-        this.logger.info(`command adding ${Math.floor((i + 1) / commandsToAdd.length * 1000) / 10}% completed`);
-        await client.application.createGlobalCommand(commandToRegister);
-      }
-      this.logger.info("Updating completed.");
-    }else{
-      this.logger.info("Detected no command that should be updated");
-    }
-
-    // remove outdated commands (that doesn't recognized as the bot's command)
-    if(removeOutdated){
-      const commandsToRemove = registeredAppCommands.filter(registered => {
-        const index = apiCompatibleCommands.findIndex(command =>registered.type === command.type && registered.name === command.name);
-        return index < 0;
-      });
-      if(commandsToRemove.length > 0){
-        this.logger.info(`Detected ${commandsToRemove.length} commands that should be removed; removing...`);
-        this.logger.info(`These are ${commandsToRemove.map(command => command.name)}`);
-        await client.application.bulkEditGlobalCommands(apiCompatibleCommands);
-        this.logger.info("Removing success.");
-      }else{
-        this.logger.info("Detected no command that should be removed");
-      }
-    }
+  private async filterCommandsToBeRemoved(
+    apiCompatibleCommands: CreateApplicationCommandOptions[],
+    registeredAppCommands: AnyApplicationCommand[],
+  ){
+    return registeredAppCommands.filter(registered => {
+      const index = apiCompatibleCommands.findIndex(command =>registered.type === command.type && registered.name === command.name);
+      return index < 0;
+    });
   }
 
   async removeAllApplicationCommand(client: Readonly<Client>){
@@ -224,7 +242,7 @@ export class CommandManager extends LogEmitter<{}> {
     this.logger.info("Successfully removed all guild commands");
   }
 
-  sameCommand(actual: ChatInputApplicationCommand | MessageApplicationCommand, expected: CreateApplicationCommandOptions): boolean{
+  isSameCommand(actual: ChatInputApplicationCommand | MessageApplicationCommand, expected: CreateApplicationCommandOptions): boolean{
     return util.isDeepStrictEqual(
       this.apiToApplicationCommand(actual),
       expected
