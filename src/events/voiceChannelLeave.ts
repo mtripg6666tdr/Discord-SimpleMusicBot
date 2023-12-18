@@ -21,7 +21,7 @@ import type * as discord from "oceanic.js";
 
 import i18next from "i18next";
 
-import { QueueManagerWithBgm } from "../Component/QueueManagerWithBGM";
+import { QueueManagerWithBgm } from "../Component/queueManagerWithBGM";
 import { useConfig } from "../config";
 
 const config = useConfig();

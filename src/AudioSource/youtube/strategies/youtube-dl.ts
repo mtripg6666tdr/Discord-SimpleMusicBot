@@ -17,7 +17,7 @@
  */
 
 import { baseYoutubeDlStrategy } from "./baseYoutubeDlStrategy";
-import { BinaryManager } from "../../../Component/BinaryManager";
+import { BinaryManager } from "../../../Component/binaryManager";
 
 const youtubeDlBinaryManager = new BinaryManager({
   binaryName: "youtube-dl",

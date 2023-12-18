@@ -17,8 +17,8 @@
  */
 
 import type { CommandArgs } from ".";
-import type { SongInfo } from "../Component/SearchPanel";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { SongInfo } from "../Component/searchPanel";
 import type * as dYtsr from "@distube/ytsr";
 import type { i18n } from "i18next";
 import type * as ytsr from "ytsr";

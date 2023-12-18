@@ -24,7 +24,7 @@ import type { EmbedField } from "oceanic.js";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
-import { CommandManager } from "../Component/CommandManager";
+import { CommandManager } from "../Component/commandManager";
 import { getColor } from "../Util/color";
 import { useConfig } from "../config";
 
