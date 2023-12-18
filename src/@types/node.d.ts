@@ -24,6 +24,7 @@ declare namespace NodeJS {
     readonly DB_TOKEN?: string;
     readonly PORT?: string;
     readonly LOG_TRANSFER_PORT?: string;
+    readonly DISABLE_TELEMETRY?: string;
     /* undocumented flags */
     readonly DSL_ENABLE?: string;
     readonly BD_ENABLE?: string;
