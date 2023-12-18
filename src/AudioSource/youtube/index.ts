@@ -82,7 +82,7 @@ export class YouTube extends AudioSource<string> {
 
   @timeLoggedMethod
   async init(url: string, prefetched: exportableYouTube, _: i18n["t"], forceCache?: boolean){
-    this.url = "https://www.youtube.com/watch?v=" + ytdl.getVideoID(url);
+    this.url = url = YouTube.normalizeUrl(url);
     if(prefetched){
       this.importData(prefetched);
     }else{
@@ -254,6 +254,31 @@ export class YouTube extends AudioSource<string> {
       };
       checkForLive();
     });
+  }
+
+  private static readonly youtubeLiveUrlRegExp = /^https?:\/\/(www\.)?youtube\.com\/live\/(?<id>[a-zA-Z0-9-_]{11})$/;
+
+  static validateURL(url: string): boolean {
+    return ytdl.validateURL(url) || this.youtubeLiveUrlRegExp.test(url);
+  }
+
+  static getVideoID(url: string): string {
+    if(this.youtubeLiveUrlRegExp.test(url)){
+      const id = this.youtubeLiveUrlRegExp.exec(url).groups.id;
+      if(ytdl.validateID(id)){
+        return id;
+      }
+    }
+
+    return ytdl.getVideoID(url);
+  }
+
+  static normalizeUrl(url: string){
+    if(this.validateURL(url)){
+      return `https://www.youtube.com/watch?v=${YouTube.getVideoID(url)}`;
+    }
+
+    throw new Error("Invalid URL provided.");
   }
 }
 
