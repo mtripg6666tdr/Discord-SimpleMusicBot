@@ -209,7 +209,7 @@ export class HttpBackupper extends IntervalBackupper {
           const res = new Map<string, YmxFormat>();
           Object.keys(frozenQueues).forEach(key => {
             try{
-              const ymx = JSON.parse(decodeURIComponent(frozenQueues[key]));
+              const ymx = JSON.parse<YmxFormat>(decodeURIComponent(frozenQueues[key]));
               res.set(key, ymx);
             }
             catch{ /* empty */ }
