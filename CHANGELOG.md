@@ -17,6 +17,7 @@
 ## ドキュメント
 * リンク切れを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2090)
 * 音声エフェクトのドキュメントを追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2148)
+* Replitのガイドは継続して保守できないと判断し削除(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2166)
 * ドキュメントの継続的な更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2126)
 ## 依存関係のアップデート
 * @discordjs/voice 0.16.0 => 0.16.1
