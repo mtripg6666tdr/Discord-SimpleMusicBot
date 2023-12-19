@@ -140,7 +140,7 @@ export class YouTube extends AudioSource<string> {
       this.purgeCache();
     }
 
-    const { result, resolved } = await attemptFetchForStrategies(this.url, forceUrl, this.cache.data);
+    const { result, resolved } = await attemptFetchForStrategies(this.url, forceUrl, this.cache?.data);
     this.strategyId = resolved;
     // store related videos
     this.relatedVideos = result.relatedVideos;
