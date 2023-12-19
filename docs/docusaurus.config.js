@@ -44,6 +44,20 @@ const config = {
             }
             return `https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/edit/master/docs/${context.versionDocsDirPath}/${context.docPath}`
           },
+          rehypePlugins: [
+            () => {
+              return async (tree, file) => {
+                const { visit } = await import("unist-util-visit");
+                visit(tree, "element", node => {
+                  if(node.tagName === "section" && node.properties.dataFootnotes){
+                    const txt = node.children[0].children[0];
+                    if(txt.value !== "Footnotes") throw new Error(`Unexpected text: ${txt.value}`);
+                    txt.value = "脚注"
+                  }
+                })
+              }
+            }
+          ]
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
