@@ -23,19 +23,12 @@ import type { DataType, MusicBotBase } from "../../botBase";
 import type * as mongo from "mongodb";
 
 import { Backupper } from ".";
-import { createDebounceFunctionsFactroy, waitForEnteringState } from "../../Util";
+import { createDebounceFunctionsFactroy, requireIfAny, waitForEnteringState } from "../../Util";
 import { timeLoggedMethod } from "../../logger";
 import { CommandManager } from "../commandManager";
 
-const MongoClient = (() => {
-  try{
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    return require("mongodb") as typeof import("mongodb");
-  }
-  catch{
-    return null;
-  }
-})()?.MongoClient;
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+const MongoClient = (requireIfAny("mongodb") as typeof import("mongodb"))?.MongoClient;
 
 type Collectionate<T> = T & { guildId: string };
 type Analytics = Collectionate<{

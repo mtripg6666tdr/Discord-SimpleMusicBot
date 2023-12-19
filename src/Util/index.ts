@@ -426,3 +426,15 @@ export function createFragmentalDownloadStream(
   return stream;
 }
 
+export function requireIfAny(id: string): unknown {
+  try{
+    return require(id);
+  }
+  catch(e){
+    const logger = getLogger("Util");
+
+    logger.info(`The module "${id}" couldn't be loaded because of the error: ${stringifyObject(e)}`);
+
+    return null;
+  }
+}

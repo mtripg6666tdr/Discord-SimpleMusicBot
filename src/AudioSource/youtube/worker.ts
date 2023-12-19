@@ -20,12 +20,14 @@ import type { WithId, spawnerJobMessage, workerMessage } from "./spawner";
 
 import { parentPort } from "worker_threads";
 
-import dYtsr from "@distube/ytsr";
 import ytsr from "ytsr";
 
 import { YouTube } from ".";
-import { stringifyObject } from "../../Util";
+import { requireIfAny, stringifyObject } from "../../Util";
 import { useConfig } from "../../config";
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+const dYtsr = requireIfAny("@distube/ytsr") as typeof import("@distube/ytsr");
 
 const config = useConfig();
 const searchOptions = {
@@ -76,7 +78,11 @@ function onMessage(message: WithId<spawnerJobMessage>){
       })
       .catch((er) => {
         console.error(er);
-        return dYtsr(message.keyword, searchOptions);
+        if(dYtsr){
+          return dYtsr(message.keyword, searchOptions);
+        }else{
+          throw er;
+        }
       })
       .then(result => {
         if(result){

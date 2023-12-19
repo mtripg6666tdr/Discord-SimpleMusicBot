@@ -33,6 +33,21 @@
       ],
       "program": "${workspaceFolder}/dist/index.js",
       "outputCapture": "std"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Program (Main, skip building)",
+      "runtimeArgs": [
+        "--enable-source-maps",
+        "--expose-gc",
+        "--inspect=8889",
+      ],
+      "skipFiles": [
+          "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}/dist/index.js",
+      "outputCapture": "std"
     }
   ]
 }

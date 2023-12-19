@@ -27,14 +27,10 @@ import candyget from "candyget";
 import pEvent from "p-event";
 
 import { LogEmitter } from "../Structure";
-import { createPassThrough } from "../Util";
+import { createPassThrough, requireIfAny } from "../Util";
 
-const ffmpegStatic: string = (() => {
-  try{
-    return require("ffmpeg-static");
-  }
-  catch{/* empty */}
-})();
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+const ffmpegStatic: string = requireIfAny("ffmpeg-static") as typeof import("ffmpeg-static").default;
 
 type BinaryManagerOptions = {
   binaryName: string,

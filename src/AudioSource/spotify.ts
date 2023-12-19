@@ -24,23 +24,14 @@ import type { Track } from "spotify-url-info";
 import type ytsr from "ytsr";
 
 import candyget from "candyget";
+import spotifyUrlInfo from "spotify-url-info";
 
 import { AudioSource } from "./audiosource";
 import { searchYouTube } from "./youtube/spawner";
 import { attemptFetchForStrategies } from "./youtube/strategies";
 import { DefaultAudioThumbnailURL } from "../definition";
 
-const spotifyUrlInfo = (() => {
-  try{
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    return require("spotify-url-info") as typeof import("spotify-url-info");
-  }
-  catch{
-    return null;
-  }
-})();
-
-const client = spotifyUrlInfo?.((url, opts) => candyget(url, "string", opts).then(res => ({ text: () => res.body })));
+const client = spotifyUrlInfo((url, opts) => candyget(url, "string", opts).then(res => ({ text: () => res.body })));
 
 export class Spotify extends AudioSource<string> {
   protected artist = "";
