@@ -25,7 +25,7 @@ jobs:
           echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
       - name: Check npm cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
