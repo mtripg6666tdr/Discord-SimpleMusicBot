@@ -43,12 +43,18 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
 こちらにはボットの設定情報などを記述します。  
 
 :::warning
-任意指定の設定に関しては、**値をnullにしてください("null"ではなくnull)**  
+任意指定の設定に関して、値を設定しない場合には、**値をnullにしてください("null"ではなくnull)**  
 例：
 
 ```json title="config.json"
 {
-  "proxy": null
+  "errorChannel": null
+}
+```
+以下は間違った例です。このように設定した場合正しく動作しません。
+```json title="config.json"
+{
+  "errorChannel": "null"
 }
 ```
 :::
