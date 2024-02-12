@@ -22,7 +22,7 @@
     "@sinclair/typebox": "^0.32.13",
     "candyget": "^0.5.6",
     "comment-json": "^4.2.3",
-    "dotenv": "^16.3.1",
+    "dotenv": "^16.4.2",
     "genius-lyrics": "^4.4.6",
     "html-entities": "^2.4.0",
     "html-to-text": "^9.0.5",
