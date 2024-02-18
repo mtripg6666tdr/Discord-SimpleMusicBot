@@ -1,6 +1,9 @@
 {
-  "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES2021",
+    "lib": ["ES2021"],
+    "moduleResolution": "Bundler",
     "strict": false,
     "noImplicitAny": true,
     "noImplicitThis": true,
@@ -11,7 +14,7 @@
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
-    "outDir": "dist/",
+    "outDir": "build/",
     "allowJs": false,
     "skipLibCheck": true,
     "strictBindCallApply": true

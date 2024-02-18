@@ -15,9 +15,9 @@ COPY --link package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci
 COPY --link ./src ./src
-COPY --link ./tsconfig.build.json ./bakeDynamicImports.mjs build.mjs ./
+COPY --link ./tsconfig.bundle.json ./bakeDynamicImports.mjs build.mjs ./
 RUN node bakeDynamicImports.mjs && \
-    npx tsc -p tsconfig.build.json && \
+    npx tsc -p tsconfig.bundle.json && \
     node build.mjs && \
     mv ./dist/index.min.js ./dist/index.js && \
     mv ./dist/worker.min.js ./dist/worker.js

@@ -10,3 +10,4 @@ docs
 *.temp.*
 *.tmp.*
 *.mjs
+_index.ts
