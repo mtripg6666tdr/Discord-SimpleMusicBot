@@ -80,8 +80,6 @@ export default commands;
 `.trimStart());
 }
 
-console.log("Discord-SimpleMusicBot Build Tool");
-
 switch(process.argv[2]){
   case "bake":
     bakeDynamicImports();
