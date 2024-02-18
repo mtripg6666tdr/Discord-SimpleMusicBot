@@ -28,10 +28,6 @@ import { useConfig } from "./config";
 import { initLocalization } from "./i18n";
 import { createServer } from "./server";
 
-if(typeof global.BUNDLED === "undefined"){
-  global.BUNDLED = false;
-}
-
 const logger = log4js.getLogger("Entry");
 const config = useConfig();
 

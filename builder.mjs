@@ -45,17 +45,17 @@ async function bundleAssets(){
     createDefaultBuilder("build/AudioSource/youtube/worker.js")(),
   ]);
 
-  if(!fs.existsSync(url.fileURLToPath(resolveRelativePath("./dist")))){
-    await fs.promises.mkdir(url.fileURLToPath(resolveRelativePath("./dist")))
+  if(!fs.existsSync(resolveRelativePath("./dist"))){
+    await fs.promises.mkdir(resolveRelativePath("./dist"));
   }
   await Promise.all([
-    fs.promises.writeFile(url.fileURLToPath(resolveRelativePath("./dist/index.js")), mainCompilation.bundled),
-    fs.promises.writeFile(url.fileURLToPath(resolveRelativePath("./dist/index.min.js")), mainCompilation.minified),
-    fs.promises.writeFile(url.fileURLToPath(resolveRelativePath("./dist/worker.js")), workerCompilation.bundled),
-    fs.promises.writeFile(url.fileURLToPath(resolveRelativePath("./dist/worker.min.js")), workerCompilation.minified),
+    fs.promises.writeFile(resolveRelativePath("./dist/index.js"), mainCompilation.bundled),
+    fs.promises.writeFile(resolveRelativePath("./dist/index.min.js"), mainCompilation.minified),
+    fs.promises.writeFile(resolveRelativePath("./dist/worker.js"), workerCompilation.bundled),
+    fs.promises.writeFile(resolveRelativePath("./dist/worker.min.js"), workerCompilation.minified),
   ]);
 
-  await rimraf(url.fileURLToPath(resolveRelativePath("./build")));
+  await rimraf(resolveRelativePath("./build"));
 };
 
 function bakeDynamicImports(){
