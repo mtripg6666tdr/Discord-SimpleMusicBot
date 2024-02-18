@@ -14,6 +14,9 @@ import { rimraf } from "rimraf"
     packages: "external",
     external: ["node_modules/*"],
     write: false,
+    define: {
+      "BUNDLED": "true"
+    },
   });
 
   const minified = await minify(res.outputFiles[0].text, {

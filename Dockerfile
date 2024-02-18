@@ -15,8 +15,10 @@ COPY --link package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci
 COPY --link ./src ./src
-COPY --link ./tsconfig.build.json ./
-RUN npx tsc -p tsconfig.build.json
+COPY --link ./tsconfig.build.json ./bakeCommands.mjs build.mjs ./
+RUN node bakeCommands.mjs && \
+    npx tsc -p tsconfig.build.json && \
+    node build.mjs
 
 
 FROM base AS deps
@@ -39,7 +41,7 @@ RUN mkdir logs && \
     echo DOCKER_BUILD_IMAGE>DOCKER_BUILD_IMAGE
 COPY --link package.json package-lock.json ./
 COPY --link --from=deps /app/node_modules /app/node_modules
-COPY --link --from=builder /app/dist /app/dist
+COPY --link --from=builder /app/dist/index.min.js /app/dist/
 COPY --link ./locales ./locales
 
 CMD ["/bin/bash", "-c", "service nscd start; exec node --dns-result-order=ipv4first dist/index.js"]

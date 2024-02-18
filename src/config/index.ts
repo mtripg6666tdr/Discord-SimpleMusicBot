@@ -61,7 +61,7 @@ class ConfigLoader {
     const checker = TypeCompiler.Compile(ConfigSchema);
 
     const config = CJSON.parse(
-      fs.readFileSync(path.join(__dirname, "../../config.json"), { encoding: "utf-8" }),
+      fs.readFileSync(path.join(__dirname, BUNDLED ? "../config.json" : "../../config.json"), { encoding: "utf-8" }),
       null,
       true
     );
