@@ -24,7 +24,10 @@ import { rimraf } from "rimraf"
   if(!fs.existsSync(url.fileURLToPath(import.meta.resolve("./dist")))){
     await fs.promises.mkdir(url.fileURLToPath(import.meta.resolve("./dist")))
   }
-  await fs.promises.writeFile(url.fileURLToPath(import.meta.resolve("./dist/index.js")), minified.code);
+  await Promise.all([
+    fs.promises.writeFile(url.fileURLToPath(import.meta.resolve("./dist/index.js")), res.outputFiles[0].text),
+    fs.promises.writeFile(url.fileURLToPath(import.meta.resolve("./dist/index.min.js")), minified.code),
+  ]);
 
   await rimraf(url.fileURLToPath(import.meta.resolve("./build")));
 })()
