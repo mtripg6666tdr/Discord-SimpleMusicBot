@@ -35,7 +35,7 @@ function createDefaultBuilder(path){
 (async () => {
   const [mainCompilation, workerCompilation] = await Promise.all([
     createDefaultBuilder("build/index.js")(),
-    createDefaultBuilder("build/AudioSource/worker.js")(),
+    createDefaultBuilder("build/AudioSource/youtube/worker.js")(),
   ]);
 
   if(!fs.existsSync(url.fileURLToPath(import.meta.resolve("./dist")))){
