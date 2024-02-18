@@ -3,6 +3,13 @@ import { build } from "esbuild";
 import { minify } from "@swc/core";
 import url from "url";
 import { rimraf } from "rimraf"
+import path from "path";
+
+function resolveRelativePath(spec){
+  return import.meta.resolve
+    ? url.fileURLToPath(import.meta.resolve(spec))
+    : path.join(url.fileURLToPath(import.meta.url), spec);
+}
 
 /** @param {string} path */
 function createDefaultBuilder(path){
@@ -38,15 +45,15 @@ function createDefaultBuilder(path){
     createDefaultBuilder("build/AudioSource/youtube/worker.js")(),
   ]);
 
-  if(!fs.existsSync(url.fileURLToPath(import.meta.resolve("./dist")))){
-    await fs.promises.mkdir(url.fileURLToPath(import.meta.resolve("./dist")))
+  if(!fs.existsSync(url.fileURLToPath(resolveRelativePath("./dist")))){
+    await fs.promises.mkdir(url.fileURLToPath(resolveRelativePath("./dist")))
   }
   await Promise.all([
-    fs.promises.writeFile(url.fileURLToPath(import.meta.resolve("./dist/index.js")), mainCompilation.bundled),
-    fs.promises.writeFile(url.fileURLToPath(import.meta.resolve("./dist/index.min.js")), mainCompilation.minified),
-    fs.promises.writeFile(url.fileURLToPath(import.meta.resolve("./dist/worker.js")), workerCompilation.bundled),
-    fs.promises.writeFile(url.fileURLToPath(import.meta.resolve("./dist/worker.min.js")), workerCompilation.minified),
+    fs.promises.writeFile(url.fileURLToPath(resolveRelativePath("./dist/index.js")), mainCompilation.bundled),
+    fs.promises.writeFile(url.fileURLToPath(resolveRelativePath("./dist/index.min.js")), mainCompilation.minified),
+    fs.promises.writeFile(url.fileURLToPath(resolveRelativePath("./dist/worker.js")), workerCompilation.bundled),
+    fs.promises.writeFile(url.fileURLToPath(resolveRelativePath("./dist/worker.min.js")), workerCompilation.minified),
   ]);
 
-  await rimraf(url.fileURLToPath(import.meta.resolve("./build")));
+  await rimraf(url.fileURLToPath(resolveRelativePath("./build")));
 })()
