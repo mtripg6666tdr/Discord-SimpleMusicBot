@@ -21,3 +21,4 @@ logs/*
 !**/.gitkeep
 cache
 docker-compose.yml
+build

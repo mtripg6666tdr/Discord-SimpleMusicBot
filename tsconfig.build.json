@@ -11,7 +11,7 @@
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
-    "outDir": "dist/",
+    "outDir": "build/",
     "allowJs": false,
     "skipLibCheck": true,
     "strictBindCallApply": true
