@@ -24,7 +24,6 @@ import util from "util";
 
 import { ApplicationCommandOptionTypes, ApplicationCommandTypes } from "oceanic.js";
 
-import commands from "../Commands/_index";
 import { LogEmitter } from "../Structure";
 import { useConfig } from "../config";
 import { timeLoggedMethod } from "../logger";
@@ -60,7 +59,8 @@ export class CommandManager extends LogEmitter<{}> {
     super("CommandsManager");
     this.logger.info("Initializing");
 
-    this._commands = commands.filter(n => !n.disabled);
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    this._commands = (require("../Commands/_index") as typeof import("../Commands/_index")).default.filter(n => !n.disabled);
 
     this.initializeMap({ reportDupes: useConfig().debug });
     this.logger.info("Initialized");

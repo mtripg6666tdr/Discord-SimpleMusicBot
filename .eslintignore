@@ -9,5 +9,4 @@ dist/*
 docs
 *.temp.*
 *.tmp.*
-build.mjs
-bakeCommands.mjs
+*.mjs

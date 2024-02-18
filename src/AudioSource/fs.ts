@@ -42,7 +42,7 @@ export class FsStream extends AudioSource<string> {
   async fetch(): Promise<ReadableStreamInfo>{
     return {
       type: "readable",
-      stream: fs.createReadStream(path.join(__dirname, "../../", this.url)),
+      stream: fs.createReadStream(path.join(__dirname, BUNDLED ? "../" : "../../", this.url)),
       streamType: "unknown",
     };
   }

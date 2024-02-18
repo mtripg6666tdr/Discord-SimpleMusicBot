@@ -10,7 +10,8 @@
     "test": "mocha",
     "start": "npm run build && npm run onlystart",
     "onlystart": "node util/exec dist",
-    "build": "rimraf dist/ typings/ build/ && node bakeCommands.mjs && tsc -p tsconfig.build.json && node build.mjs",
+    "build": "rimraf dist/ typings/ build/ && tsc -p tsconfig.build.json",
+    "build:bundled": "rimraf dist/ typings/ build/ && node bakeDynamicImports.mjs && tsc -p tsconfig.build.json && node build.mjs",
     "lint": "tsc && eslint .",
     "cleanup": "rimraf dist/ typings/",
     "generatecommandlist": "node util/generateCommandList"
