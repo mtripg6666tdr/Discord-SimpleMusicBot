@@ -10,11 +10,11 @@
     "test": "mocha",
     "start": "npm run build && npm run onlystart",
     "onlystart": "node util/exec dist",
-    "build": "rimraf dist/ typings/ build/ && node bakeDynamicImports.mjs && tsc -p tsconfig.build.json",
-    "build:bundled": "rimraf dist/ typings/ build/ && node bakeDynamicImports.mjs && tsc -p tsconfig.bundle.json && node build.mjs",
-    "prelint": "node bakeDynamicImports.mjs",
+    "build": "npm run cleanup && node builder.mjs bake && tsc -p tsconfig.build.json",
+    "build:bundled": "npm run cleanup && node builder.mjs bake && tsc -p tsconfig.bundle.json && node builder.mjs build",
+    "prelint": "node builder.mjs build",
     "lint": "tsc && eslint .",
-    "cleanup": "rimraf dist/ typings/",
+    "cleanup": "rimraf dist/ typings/ build/",
     "generatecommandlist": "node util/generateCommandList"
   },
   "dependencies": {
