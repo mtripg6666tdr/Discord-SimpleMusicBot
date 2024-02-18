@@ -8,7 +8,7 @@ import path from "path";
 function resolveRelativePath(spec){
   return import.meta.resolve
     ? url.fileURLToPath(import.meta.resolve(spec))
-    : path.join(url.fileURLToPath(import.meta.url), spec);
+    : path.join(url.fileURLToPath(import.meta.url), "..", spec);
 }
 
 /** @param {string} path */

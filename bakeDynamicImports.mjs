@@ -8,7 +8,7 @@ const commandNames = fs.readdirSync(path.join(url.fileURLToPath(import.meta.url)
   .filter(n => n.endsWith(".ts") && n !== "index.ts" && n !== "_index.ts")
   .map(n => n.slice(0, -3));
 
-fs.writeFileSync(path.join(url.fileURLToPath(import.meta.url), "./src/Commands/_index.ts"), `
+fs.writeFileSync(path.join(url.fileURLToPath(import.meta.url), "..", "./src/Commands/_index.ts"), `
 // This file was generated automatically
 // Do not edit manually
 // If you want to make this file up-to-date, please run 'npm run build'
