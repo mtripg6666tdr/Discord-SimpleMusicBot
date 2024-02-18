@@ -44,7 +44,7 @@ type BinaryManagerOptions = {
 // eslint-disable-next-line @typescript-eslint/ban-types
 export class BinaryManager extends LogEmitter<{}> {
   protected readonly checkUpdateTimeout = this.options.checkUpdateTimeout || 1000 * 60 /* 1 min */ * 60 /* 1 hour */ * 3/* 3 hour */;
-  protected baseUrl = path.join(__dirname, BUNDLED ? "../bin" : "../../bin");
+  protected baseUrl = path.join(__dirname, global.BUNDLED ? "../bin" : "../../bin");
   protected lastChecked: number = 0;
   protected releaseInfo: GitHubRelease = null;
 
@@ -65,7 +65,7 @@ export class BinaryManager extends LogEmitter<{}> {
       catch(e){
         this.logger.warn(e);
         this.logger.info("Fallbacking to the root directory");
-        this.baseUrl = path.join(__dirname, BUNDLED ? "../" : "../../");
+        this.baseUrl = path.join(__dirname, global.BUNDLED ? "../" : "../../");
       }
     }
     if(options.checkImmediately){

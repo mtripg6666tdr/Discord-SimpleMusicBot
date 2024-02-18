@@ -28,7 +28,7 @@ import { useConfig } from "./config";
 import { initLocalization } from "./i18n";
 import { createServer } from "./server";
 
-if(typeof BUNDLED === "undefined"){
+if(typeof global.BUNDLED === "undefined"){
   global.BUNDLED = false;
 }
 
