@@ -28,7 +28,7 @@ import PQueue from "p-queue";
 import { type exportableYouTube, YouTube } from "..";
 import { getLogger } from "../../logger";
 
-const worker = isMainThread ? new Worker(path.join(__dirname, "./worker.js")).on("error", console.error) : null;
+const worker = isMainThread ? new Worker(path.join(__dirname, BUNDLED && __filename.includes("min") ? "./worker.min.js" : "./worker.js")).on("error", console.error) : null;
 global.workerThread = worker;
 
 const logger = getLogger("Spawner");
