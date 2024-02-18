@@ -39,7 +39,7 @@ function createDefaultBuilder(path){
   };
 }
 
-async function buildAssets(){
+async function bundleAssets(){
   const [mainCompilation, workerCompilation] = await Promise.all([
     createDefaultBuilder("build/index.js")(),
     createDefaultBuilder("build/AudioSource/youtube/worker.js")(),
@@ -86,8 +86,8 @@ switch(process.argv[2]){
   case "bake":
     bakeDynamicImports();
     break;
-  case "build":
-    void buildAssets();
+  case "bundle":
+    void bundleAssets();
     break;
   default:
     console.error("Invalid verb.");

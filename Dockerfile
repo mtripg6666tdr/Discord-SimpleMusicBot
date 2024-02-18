@@ -18,7 +18,7 @@ COPY --link ./src ./src
 COPY --link ./tsconfig.bundle.json builder.mjs ./
 RUN node builder.mjs bake && \
     npx tsc -p tsconfig.bundle.json && \
-    node builder.mjs build && \
+    node builder.mjs bundle && \
     mv ./dist/index.min.js ./dist/index.js && \
     mv ./dist/worker.min.js ./dist/worker.js
 

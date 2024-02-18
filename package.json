@@ -11,8 +11,8 @@
     "start": "npm run build && npm run onlystart",
     "onlystart": "node util/exec dist",
     "build": "npm run cleanup && node builder.mjs bake && tsc -p tsconfig.build.json",
-    "build:bundled": "npm run cleanup && node builder.mjs bake && tsc -p tsconfig.bundle.json && node builder.mjs build",
-    "prelint": "node builder.mjs build",
+    "build:bundled": "npm run cleanup && node builder.mjs bake && tsc -p tsconfig.bundle.json && node builder.mjs bundle",
+    "prelint": "node builder.mjs bake",
     "lint": "tsc && eslint .",
     "cleanup": "rimraf dist/ typings/ build/",
     "generatecommandlist": "node util/generateCommandList"
