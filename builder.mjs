@@ -40,7 +40,7 @@ function createDefaultBuilder(path){
   };
 }
 
-async function bundleAssets(){
+async function bundleAssets({ leaveBuildArtifact }){
   const [mainCompilation, workerCompilation] = await Promise.all([
     createDefaultBuilder("build/index.js")(),
     createDefaultBuilder("build/AudioSource/youtube/worker.js")(),
@@ -56,7 +56,9 @@ async function bundleAssets(){
     fs.promises.writeFile(resolveRelativePath("./dist/worker.min.js"), workerCompilation.minified),
   ]);
 
-  await rimraf(resolveRelativePath("./build"));
+  if(!leaveBuildArtifact){
+    await rimraf(resolveRelativePath("./build"));
+  }
 };
 
 function bakeDynamicImports(){
@@ -86,7 +88,7 @@ switch(process.argv[2]){
     bakeDynamicImports();
     break;
   case "bundle":
-    void bundleAssets();
+    void bundleAssets({ leaveBuildArtifact: process.argv[3] === "--leave-build-artifact" });
     break;
   default:
     console.error("Invalid verb.");

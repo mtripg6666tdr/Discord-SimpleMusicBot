@@ -16,10 +16,16 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { PlayManagerPlayOptions } from "./playManager";
+
 import { AudioPlayerStatus, entersState } from "@discordjs/voice";
 
 import { PlayManager } from "./playManager";
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
+
+type PlayManagerWithBgmPlayOptions = PlayManagerPlayOptions & {
+  bgm?: boolean,
+};
 
 export class PlayManagerWithBgm extends PlayManager {
   protected override server: GuildDataContainerWithBgm;
@@ -43,7 +49,7 @@ export class PlayManagerWithBgm extends PlayManager {
     return super.isPlaying && !this.server.queue.isBGM;
   }
 
-  override async play(time?: number, quiet: boolean = false, bgm?: boolean){
+  override async play({ bgm, ...options }: PlayManagerWithBgmPlayOptions = {}){
     if(typeof bgm === "undefined"){
       // if bgm is undefined, set the current state
       bgm = this.bgm;
@@ -55,7 +61,10 @@ export class PlayManagerWithBgm extends PlayManager {
       this.server.queue.setToPlayBgm(bgm);
     }
     if(!this.getIsBadCondition(bgm)) this.bgm = bgm;
-    return super.play(time, quiet);
+
+    this.logger.debug(`BGM state { player: ${this.bgm}, queue: ${this.server.queue.isBGM} }`);
+
+    return super.play(options);
   }
 
   protected override getIsBadCondition(bgm: boolean = this.bgm){
@@ -100,7 +109,7 @@ export class PlayManagerWithBgm extends PlayManager {
         this.logger.info("Queue empty");
         await this.disconnect();
       }else{
-        await this.play(0, /* quiet */ true, /* BGM */ true);
+        await this.play({ quietOnError: true, bgm: true });
       }
     }else{
       return super.onStreamFinished();

@@ -58,6 +58,15 @@ interface PlayManagerEvents {
   all: [...any[]];
 }
 
+/** PlayManager#playに渡せるオプションを指定します */
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type PlayManagerPlayOptions = Record<string & {}, string | boolean | number> & {
+  /** シークする際に、シーク先の秒数を指定します */
+  time?: number,
+  /** エラーが発生した際にエラーを紐づけテキストチャンネルに送信するかどうかを指定します */
+  quietOnError?: boolean,
+};
+
 const config = useConfig();
 
 /**
@@ -154,7 +163,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   // コンストラクタ
   constructor(parent: GuildDataContainer){
     super("PlayManager", parent);
-    this.logger.info("Play Manager instantiated");
+    this.logger.info("PlayManager instantiated");
   }
 
   setVolume(val: number){
@@ -170,23 +179,26 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
    *  再生します
    */
   @timeLoggedMethod
-  async play(time: number = 0, quiet: boolean = false): Promise<PlayManager>{
+  async play(options: PlayManagerPlayOptions = {}): Promise<PlayManager>{
+    let time = options.time || 0;
+    const quietOnError = options.quietOnError || false;
+
     this.emit("playCalled", time);
 
     // 再生できる状態か確認
     if(this.getIsBadCondition()){
-      this.logger.warn("Play called but operated nothing");
+      this.logger.warn("#play called but operated nothing");
       return this;
     }
 
-    this.logger.info("Play called");
+    this.logger.info("#play called");
     this.emit("playPreparing", time);
     this.preparing = true;
     let mes: Message = null;
     this._currentAudioInfo = this.server.queue.get(0).basicInfo;
 
     // 通知メッセージを送信する（可能なら）
-    if(this.getNoticeNeeded() && !quiet){
+    if(this.getNoticeNeeded() && !quietOnError){
       const [min, sec] = Util.time.calcMinSec(this.currentAudioInfo.lengthSeconds);
       const isLive = this.currentAudioInfo.isYouTube() && this.currentAudioInfo.isLiveStream;
       if(this._currentAudioInfo.isYouTube() && this._currentAudioInfo.availableAfter){
@@ -315,9 +327,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       this._playing = true;
       this.emit("playStarted");
 
-      this.logger.info("Play started successfully");
+      this.logger.info("Playback started successfully");
 
-      if(mes && !quiet){
+      if(mes && !quietOnError){
         // 再生開始メッセージ
         const messageContent = this.createNowPlayingMessage();
 
@@ -652,15 +664,19 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   }
 
   async onStreamFinished(){
+    // 再生状態でないときに発生したエラーは基本的に無視する
     if(!this.currentAudioUrl || !this._playing){
+      // ただし、ストリームの準備中に発生したエラーはエラーハンドリングして再試行に回す
       if(this.preparing){
         await this.handleError(new Error("Something went wrong while playing stream"));
       }
       return;
     }
+
     this._playing = false;
     this.logger.info("onStreamFinished called");
 
+    // まだ状態が再生中のままであるときには、再生停止中になるまで、最大20秒間待機する
     if(this.server.connection && this._player.state.status === AudioPlayerStatus.Playing){
       await entersState(this._player, AudioPlayerStatus.Idle, 20e3)
         .catch(() => {
@@ -674,11 +690,12 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.logger.info("Stream finished");
     this.emit("playCompleted");
 
-    // 再生が終わったら
+    // 各種リセット、ストリームの破棄
     this._errorCount = 0;
     this._errorUrl = "";
     this._cost = 0;
     this.destroyStream();
+
     if(this.server.queue.loopEnabled){
       // 曲ループオンならばもう一度再生
       await this.play();
@@ -705,6 +722,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.logger.info("Queue empty");
     this.destroyStream();
 
+    // 紐づけチャンネルが存在する場合、キューが空になった旨をレポートする
     if(this.server.boundTextChannel){
       await this.server.bot.client.rest.channels
         .createMessage(this.server.boundTextChannel, {
@@ -751,7 +769,8 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       this._errorUrl = this.currentAudioInfo.url;
       this.currentAudioInfo.purgeCache();
     }
-    this.logger.warn(`Play failed (${this._errorCount}times)`);
+
+    this.logger.warn(`Playback failed (${this._errorCount}times)`);
     this.preparing = false;
     this.stop({ force: true }).catch(this.logger.error);
     if(this._errorCount >= this.retryLimit){
@@ -759,7 +778,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       if(this.server.queue.length === 1 && this.server.queue.queueLoopEnabled) this.server.queue.queueLoopEnabled = false;
       await this.server.queue.next();
     }
-    await this.play(0, quiet);
+    await this.play({ quietOnError: quiet });
   }
 
   override emit<U extends keyof PlayManagerEvents>(event: U, ...args: PlayManagerEvents[U]): boolean {

@@ -88,7 +88,7 @@ export default class PlayPrivate extends BaseCommand {
         return;
       }
 
-      await server.player.play();
+      await server.player.play({ bgm: false });
     }
   }
 }
