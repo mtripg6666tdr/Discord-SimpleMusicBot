@@ -38,14 +38,14 @@ const logger = getLogger("Strategies");
 const config = useConfig();
 
 export const strategies: strategies[] = [
-  "./ytdl-core",
-  "./play-dl",
-  "./youtube-dl",
-  "./yt-dlp",
-  "./ytdl-patched_youtube-dl",
-].map((path, i) => {
+  () => require("./ytdl-core"),
+  () => require("./play-dl"),
+  () => require("./youtube-dl"),
+  () => require("./yt-dlp"),
+  () => require("./ytdl-patched_youtube-dl"),
+].map((_import, i) => {
   try{
-    const { default: Module } = require(path);
+    const { default: Module } = _import();
     return new Module(i);
   }
   catch(e){

@@ -42,7 +42,7 @@ export class DSL extends LogEmitter<{}> {
     super("DSL");
     this.logger.warn("CSV based detailed log enabled.");
     if(options.enableFileLog){
-      this.logFileName = path.join(__dirname, `../../../logs/stream-${Date.now()}.csv`);
+      this.logFileName = path.join(__dirname, `${global.BUNDLED ? "../" : "../../"}../logs/stream-${Date.now()}.csv`);
       this.logFileStream = fs.createWriteStream(this.logFileName);
       this.logFileStream.once("close", () => this.logger.info("CSV file closed"));
       this.logger.warn(`CSV filename will be ${this.logFileName}`);

@@ -86,7 +86,7 @@ export class QueueManagerWithBgm extends QueueManager {
     gotData?: AudioSource.exportableCustom,
     preventCache?: boolean,
   }): Promise<QueueContent & { index: number }> {
-    if(!url.startsWith("http://") && !url.startsWith("https://") && fs.existsSync(path.join(__dirname, "../../", url))){
+    if(!url.startsWith("http://") && !url.startsWith("https://") && fs.existsSync(path.join(__dirname, global.BUNDLED ? "../" : "../../", url))){
       const result = {
         basicInfo: await new AudioSource.FsStream().init(url, null, i18next.getFixedT(this.server.locale)),
         additionalInfo: {

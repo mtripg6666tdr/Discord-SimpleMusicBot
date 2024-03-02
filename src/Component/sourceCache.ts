@@ -53,7 +53,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     super("Cache");
     this._sourceCache = new Map();
     this._expireMap = new Map();
-    this.cacheDirPath = path.join(__dirname, "../../cache/");
+    this.cacheDirPath = path.join(__dirname, global.BUNDLED ? "../cache/" : "../../cache/");
     if(!fs.existsSync(this.cacheDirPath)){
       fs.mkdirSync(this.cacheDirPath);
     }

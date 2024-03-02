@@ -100,7 +100,7 @@ export default class SystemInfo extends BaseCommand {
           ]
             .map(mod => {
               try{
-                return `\`${mod}\`@v${require(`../../node_modules/${mod}/package.json`).version}`;
+                return `\`${mod}\`@v${require(`${mod}/package.json`).version}`;
               }
               catch{
                 return `\`${mod}\`@unknown`;

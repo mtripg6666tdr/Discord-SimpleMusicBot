@@ -20,8 +20,6 @@ import type { BaseCommand } from "../Commands";
 import type { CommandOptionsTypes } from "../Structure";
 import type { AnyApplicationCommand, ChatInputApplicationCommand, Client, CreateApplicationCommandOptions, MessageApplicationCommand } from "oceanic.js";
 
-import * as fs from "fs";
-import * as path from "path";
 import util from "util";
 
 import { ApplicationCommandOptionTypes, ApplicationCommandTypes } from "oceanic.js";
@@ -61,16 +59,8 @@ export class CommandManager extends LogEmitter<{}> {
     super("CommandsManager");
     this.logger.info("Initializing");
 
-    this._commands = fs.readdirSync(path.join(__dirname, "../Commands/"), { withFileTypes: true })
-      .filter(d => d.isFile())
-      .map(d => d.name)
-      .filter(n => n.endsWith(".js") && n !== "index.js")
-      .map(n => n.slice(0, -3))
-      .map(n => {
-        // eslint-disable-next-line new-cap
-        return new (require(path.join(__dirname, "../Commands/", n)).default)() as BaseCommand;
-      })
-      .filter(n => !n.disabled);
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    this._commands = (require("../Commands/_index") as typeof import("../Commands/_index")).default.filter(n => !n.disabled);
 
     this.initializeMap({ reportDupes: useConfig().debug });
     this.logger.info("Initialized");
