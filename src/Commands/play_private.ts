@@ -70,7 +70,7 @@ export default class PlayPrivate extends BaseCommand {
   }
 
   override async handleModalSubmitInteraction(interaction: ModalSubmitInteraction<AnyTextableGuildChannel>, server: GuildDataContainer){
-    const value = interaction.data.components[0]?.components[0]?.value;
+    const value = interaction.data.components.getTextInput("url");
 
     if(value){
       const message = CommandMessage.createFromInteraction(interaction, "play_private", [value], value);
