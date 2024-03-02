@@ -26,6 +26,7 @@ function createDefaultBuilder(path){
       define: {
         "global.BUNDLED": "true"
       },
+      sourcemap: "inline",
     });
 
     const bundled = res.outputFiles[0].text;
