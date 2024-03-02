@@ -69,7 +69,7 @@ function bakeDynamicImports(){
   fs.writeFileSync(path.join(url.fileURLToPath(import.meta.url), "..", "./src/Commands/_index.ts"), `
 // This file was generated automatically
 // Do not edit manually
-// If you want to make this file up-to-date, please run 'npm run build'
+// If you want to make this file up-to-date, please run 'npm run build:bundled'
 import type { BaseCommand } from ".";
 ${commandNames.map((n, i) => `import _${n} from "./${n}";`).join("\n")}
 
