@@ -101,6 +101,7 @@ export default class Play extends BaseCommand {
 
         try{
           let videos: ytsr.Video[] | dYtsr.Video[] = null;
+
           if(context.bot.cache.hasSearch(context.rawArgs)){
             videos = await context.bot.cache.getSearch(context.rawArgs);
           }else{
@@ -108,13 +109,18 @@ export default class Play extends BaseCommand {
             videos = (result.items as (ytsr.Item | dYtsr.Video)[]).filter(it => it.type === "video") as (ytsr.Video[] | dYtsr.Video[]);
             context.bot.cache.addSearch(context.rawArgs, videos);
           }
+
           if(videos.length === 0){
-            await message.reply(`:face_with_monocle:${t("commands:play.noMusicFound")}`);
-            await msg.delete();
+            await Promise.allSettled([
+              message.reply(`:face_with_monocle:${t("commands:play.noMusicFound")}`),
+              msg.delete(),
+            ]);
             return;
           }
-          await context.server.playFromURL(message, videos[0].url, { first: !wasConnected, cancellable: context.server.queue.length >= 1 }, t);
-          await msg.delete();
+          await Promise.allSettled([
+            context.server.playFromURL(message, videos[0].url, { first: !wasConnected, cancellable: context.server.queue.length >= 1 }, t),
+            msg.delete(),
+          ]);
         }
         catch(e){
           this.logger.error(e);
@@ -149,7 +155,7 @@ export default class Play extends BaseCommand {
       // なにもないからキューから再生
       if(!server.player.isPlaying && !server.player.preparing){
         await message.reply(t("commands:play.playing")).catch(this.logger.error);
-        await server.player.play();
+        await server.player.play({ bgm: false });
       }else{
         await message.reply(t("commands:play.alreadyPlaying")).catch(this.logger.error);
       }

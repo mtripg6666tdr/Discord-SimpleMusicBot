@@ -531,7 +531,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           message: smsg,
           privateSource,
         });
-        await this.player.play();
+        await this.player.play({ bgm: false });
         return [item];
       }
       catch(e){
@@ -553,7 +553,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         message: await message.reply(t("pleaseWait")),
         privateSource,
       });
-      await this.player.play();
+      await this.player.play({ bgm: false });
       return [item];
     }
 
@@ -625,7 +625,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       finally{
         this.unbindCancellation(cancellation);
       }
-      await this.player.play();
+      await this.player.play({ bgm: false });
       return items;
     }
 
@@ -681,7 +681,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       finally{
         this.unbindCancellation(cancellation);
       }
-      await this.player.play();
+      await this.player.play({ bgm: false });
       return items;
     }
 
@@ -738,7 +738,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       finally{
         this.unbindCancellation(cancellation);
       }
-      await this.player.play();
+      await this.player.play({ bgm: false });
       return items;
     }
 
@@ -755,7 +755,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           privateSource,
         });
         if(success){
-          await this.player.play();
+          await this.player.play({ bgm: false });
         }
         return [success];
       }
@@ -824,11 +824,14 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    */
   async playFromSearchPanelOptions(nums: string[], panel: SearchPanel, t: i18n["t"]){
     const includingNums = panel.filterOnlyIncludes(nums.map(n => Number(n)).filter(n => !isNaN(n)));
+
     const {
       urls: items,
       responseMessage,
     } = panel.decideItems(includingNums);
+
     const [first, ...rest] = items;
+
     // いっこめをしょり
     await this.queue.addQueue({
       url: first,
@@ -836,15 +839,18 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       fromSearch: responseMessage,
       cancellable: this.queue.length >= 1,
     });
+
     // 現在の状態を確認してVCに接続中なら接続試行
     if(panel.commandMessage.member.voiceState?.channelID){
       await this.joinVoiceChannel(panel.commandMessage, {}, t);
     }
+
     // 接続中なら再生を開始
     if(this.player.isConnecting && !this.player.isPlaying){
-      await this.player.play();
+      await this.player.play({ bgm: false });
     }
-    // 二個目以上を処理
+
+    // 二個目以降を処理
     for(let i = 0; i < rest.length; i++){
       await this.queue.addQueue({
         url: rest[i],

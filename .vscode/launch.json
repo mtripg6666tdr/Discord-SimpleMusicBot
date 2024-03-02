@@ -7,7 +7,7 @@
     {
         "type": "node",
         "request": "launch",
-        "name": "Launch Program (Main)",
+        "name": "Launch Program",
         "preLaunchTask": "Transpile TypeScript",
         "runtimeArgs": [
           "--enable-source-maps",
@@ -21,7 +21,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program (Main, on exposed GC)",
+      "name": "Launch Program with exposed gc.collect()",
       "runtimeArgs": [
         "--enable-source-maps",
         "--expose-gc",
@@ -37,7 +37,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program (Main, skip building)",
+      "name": "Launch Program (skip building)",
       "runtimeArgs": [
         "--enable-source-maps",
         "--expose-gc",
