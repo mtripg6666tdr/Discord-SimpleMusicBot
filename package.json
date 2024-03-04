@@ -56,7 +56,7 @@
     "@types/node": "^20.11.24",
     "@types/throttle-debounce": "^5.0.2",
     "@types/ws": "^8.5.10",
-    "esbuild": "^0.20.0",
+    "esbuild": "^0.20.1",
     "eslint": "^8.57.0",
     "eslint-plugin-license-header": "^0.6.0",
     "mocha": "^10.2.0",
