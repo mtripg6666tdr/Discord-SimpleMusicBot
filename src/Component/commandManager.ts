@@ -59,7 +59,6 @@ export class CommandManager extends LogEmitter<{}> {
     super("CommandsManager");
     this.logger.info("Initializing");
 
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     this._commands = (require("../Commands/_index") as typeof import("../Commands/_index")).default.filter(n => !n.disabled);
 
     this.initializeMap({ reportDupes: useConfig().debug });

@@ -29,7 +29,6 @@ import pEvent from "p-event";
 import { LogEmitter } from "../Structure";
 import { createPassThrough, requireIfAny } from "../Util";
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 const ffmpegStatic: string = requireIfAny("ffmpeg-static") as typeof import("ffmpeg-static").default;
 
 type BinaryManagerOptions = {

@@ -34,12 +34,12 @@ import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
 import { LockObj, lock } from "@mtripg6666tdr/async-lock";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 import Soundcloud from "soundcloud.ts";
-import ytpl from "ytpl";
 
 import { LogEmitter } from "./LogEmitter";
 import { YmxVersion } from "./YmxFormat";
 import { Spotify } from "../AudioSource";
 import { SoundCloudS } from "../AudioSource";
+import { Playlist as ytpl } from "../AudioSource/youtube/playlist";
 import { AudioEffectManager } from "../Component/audioEffectManager";
 import { PlayManager } from "../Component/playManager";
 import { QueueManager } from "../Component/queueManager";
@@ -582,14 +582,14 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           /* known source */ "youtube",
           /* result */ result.items,
           /* playlist name */ result.title,
-          /* tracks count */ result.estimatedItemCount,
+          /* tracks count */ result.itemCount,
           /* consumer */ (c) => ({
             url: c.url,
-            channel: c.author.name,
+            channel: c.author,
             description: t("components:queue.noDescriptionInPlaylist"),
             isLive: c.isLive,
-            length: c.durationSec,
-            thumbnail: c.thumbnails[0].url,
+            length: c.duration,
+            thumbnail: c.thumbnail,
             title: c.title,
           } as exportableCustom)
         );
@@ -608,7 +608,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
                 t("components:queue.songsAdded", { count: items.length })
               }`
             )
-            .setThumbnail(result.bestThumbnail.url)
+            .setThumbnail(result.url)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({
             content: "",

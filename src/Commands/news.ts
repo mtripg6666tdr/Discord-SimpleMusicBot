@@ -21,9 +21,9 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import type { i18n } from "i18next";
 
 import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
-import * as ytpl from "ytpl";
 
 import { BaseCommand } from ".";
+import { Playlist } from "../AudioSource/youtube/playlist";
 import { useConfig } from "../config";
 
 const config = useConfig();
@@ -122,18 +122,15 @@ export default class News extends BaseCommand {
     const searchPanel = context.server.searchPanel.create(message, t("commands:news.newsTopics"), t, true);
     if(!searchPanel) return;
     await searchPanel.consumeSearchResult(
-      ytpl.default(url, {
+      Playlist(url, {
         gl: config.country,
         hl: context.locale,
         limit: 20,
       }),
       ({ items }) => items.map(item => ({
-        title: item.title,
-        author: item.author.name,
-        description: `${t("length")}: ${item.duration}, ${t("channelName")}: ${item.author.name}`,
-        duration: item.duration,
-        thumbnail: item.thumbnails[0].url,
-        url: item.url,
+        ...item,
+        duration: item.durationText,
+        description: `${t("length")}: ${item.duration}, ${t("channelName")}: ${item.author}`,
       })),
       t
     );
