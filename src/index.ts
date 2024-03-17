@@ -18,6 +18,7 @@
 
 import "./dotenv";
 import "./logger";
+import "./polyfill";
 import type * as http from "http";
 
 import log4js from "log4js";
