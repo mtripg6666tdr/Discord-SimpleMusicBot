@@ -11,7 +11,8 @@
   ],
   "rules": {
     "license-header/header": ["warn", "./util/license.js"],
-    "no-process-exit": "off"
+    "no-process-exit": "off",
+    "@typescript-eslint/consistent-type-imports": "off"
   },
   "overrides": [
     {

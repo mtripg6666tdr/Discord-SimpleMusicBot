@@ -26,7 +26,6 @@ import { YouTube } from ".";
 import { requireIfAny, stringifyObject } from "../../Util";
 import { useConfig } from "../../config";
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 const dYtsr = requireIfAny("@distube/ytsr") as typeof import("@distube/ytsr");
 
 const config = useConfig();

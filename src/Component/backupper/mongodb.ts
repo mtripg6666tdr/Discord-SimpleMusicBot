@@ -27,7 +27,6 @@ import { createDebounceFunctionsFactroy, requireIfAny, waitForEnteringState } fr
 import { timeLoggedMethod } from "../../logger";
 import { CommandManager } from "../commandManager";
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 const MongoClient = (requireIfAny("mongodb") as typeof import("mongodb"))?.MongoClient;
 
 type Collectionate<T> = T & { guildId: string };
