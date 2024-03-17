@@ -70,26 +70,38 @@ if(!config.debug){
 let terminating = false;
 const onTerminated = async function(code: string){
   if(terminating) return;
+
   terminating = true;
+
   logger.info(`${code} detected`);
-  logger.info("Shutting down the bot...");
+
   await bot.stop();
+
   if(server && server.listening){
     logger.info("Shutting down the server...");
     await new Promise(resolve => server.close(resolve));
   }
+
   // 強制終了を報告
   if(bot.client && config.errorChannel){
     bot.client.rest.channels.createMessage(config.errorChannel, {
       content: "Process terminated",
     }).catch(() => {});
   }
+
   if(global.workerThread){
     logger.info("Shutting down worker...");
     await global.workerThread.terminate();
   }
+
   logger.info("Shutting down completed");
-  log4js.shutdown((er) => console.error(er));
+
+  log4js.shutdown((er) => {
+    if(er){
+      console.error(er);
+    }
+  });
+
   setTimeout(() => {
     console.error("Killing... (forced)");
     process.exit(1);
