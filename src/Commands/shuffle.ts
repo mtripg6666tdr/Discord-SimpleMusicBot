@@ -36,7 +36,7 @@ export default class Shuffle extends BaseCommand {
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(context.server.queue.length === 0){
-      message.reply(t("commands:shuffle.queueEmpty")).catch(this.logger.error);
+      message.reply(t("commands:shuffle.queueEmpty")!).catch(this.logger.error);
       return;
     }
     context.server.queue.shuffle();

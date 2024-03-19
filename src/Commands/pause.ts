@@ -37,7 +37,7 @@ export default class Pause extends BaseCommand {
     context.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!context.server.player.isPlaying){
-      await message.reply(t("notPlaying")).catch(this.logger.error);
+      await message.reply(t("notPlaying")!).catch(this.logger.error);
       return;
     }
     if(context.server.player.isPaused){
