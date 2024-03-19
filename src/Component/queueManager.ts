@@ -569,8 +569,8 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
             i18next.t("components:queue.processingPlaylist", { title, lng: this.server.locale })
           }${i18next.t("pleaseWait", { lng: this.server.locale })}${
             i18next.t("default:songProcessingInProgress", {
-              totalSongCount: i18next.t("totalSongCount", { count: totalCount, lng: this.server.locale }),
-              currentSongCount: i18next.t("currentSongCount", { count: index, lng: this.server.locale }),
+              totalSongCount: i18next.t("default:totalSongCount", { count: totalCount, lng: this.server.locale }),
+              currentSongCount: i18next.t("default:currentSongCount", { count: index, lng: this.server.locale }),
               lng: this.server.locale,
             })
           }`);

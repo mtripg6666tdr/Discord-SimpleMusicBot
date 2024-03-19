@@ -15,7 +15,7 @@
     "allowJs": false,
     "skipLibCheck": true,
     "strictBindCallApply": true,
-    "resolveJsonModule": true,
+    "resolveJsonModule": false,
     "noEmit": true
   },
   "include": [
