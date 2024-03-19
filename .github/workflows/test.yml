@@ -192,7 +192,10 @@ jobs:
       - test
       - docs
     steps:
-      - uses: technote-space/workflow-conclusion-action@v3
+      - uses: im-open/workflow-conclusion@v2.2.2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Check failure
         if: env.WORKFLOW_CONCLUSION == 'failure'
         run: exit 1
