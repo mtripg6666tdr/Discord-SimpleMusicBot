@@ -28,6 +28,9 @@ updates:
       - dependency-name: "i18next"
         update-types:
           - "version-update:semver-major"
+      - dependency-name: "undici"
+        update-types:
+          - "version-update:semver-major"
     groups:
       oceanic:
         patterns:
