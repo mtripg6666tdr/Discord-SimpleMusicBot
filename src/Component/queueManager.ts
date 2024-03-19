@@ -531,7 +531,6 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
    * @param exportableConsumer トラックをexportableCustomに処理する関数
    * @returns 追加に成功した楽曲数
    */
-  // @ts-expect-error
   @timeLoggedMethod
   async processPlaylist<T>(
     msg: ResponseMessage,
