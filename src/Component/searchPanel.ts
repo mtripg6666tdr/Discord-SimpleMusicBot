@@ -71,7 +71,6 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     }
   }
 
-  // @ts-expect-error
   @timeLoggedMethod
   async consumeSearchResult<T>(searchPromise: Promise<T|{ result: T, transformedQuery: string }>, consumer: (result: T, t: i18n["t"]) => SongInfo[], t: i18n["t"]){
     if(this.status !== "init"){
