@@ -193,6 +193,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           type: arg.type,
           name: arg.name,
           required: arg.required || false,
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
           description: i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any) as string,
           descriptionLocalization: {} as LocaleMap,
           choices: [] as LocalizedSlashCommandArgument["choices"],
