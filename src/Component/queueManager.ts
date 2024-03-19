@@ -19,7 +19,7 @@
 import type { InteractionCollector } from "./collectors/InteractionCollector";
 import type { ResponseMessage } from "./commandResolver/ResponseMessage";
 import type { TaskCancellationManager } from "./taskCancellationManager";
-import type { exportableCustom } from "../AudioSource";
+import type { AudioSourceBasicJsonFormat } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { AddedBy, QueueContent } from "../Structure/QueueContent";
 import type { AnyTextableGuildChannel, EditMessageOptions, Message, MessageActionRow } from "oceanic.js";
@@ -218,7 +218,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
   private readonly addQueueLocker = new LockObj();
 
   @timeLoggedMethod
-  async addQueueOnly<T extends AudioSource.exportableCustom = AudioSource.exportableCustom>({
+  async addQueueOnly<T extends AudioSourceBasicJsonFormat = AudioSourceBasicJsonFormat>({
     url,
     addedBy,
     method = "push",
@@ -228,10 +228,10 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     preventSourceCache = false,
   }: {
     url: string,
-    addedBy: Member|AddedBy,
-    method?: "push"|"unshift",
+    addedBy?: Member | AddedBy | null,
+    method?: "push" | "unshift",
     sourceType?: KnownAudioSourceIdentifer,
-    gotData?: T,
+    gotData?: T | null,
     preventCache?: boolean,
     preventSourceCache?: boolean,
   }): Promise<QueueContent & { index: number }>{
@@ -279,7 +279,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     addedBy: Member|AddedBy|null|undefined,
     sourceType?: KnownAudioSourceIdentifer,
     first?: boolean,
-    gotData?: AudioSource.exportableCustom,
+    gotData?: AudioSourceBasicJsonFormat,
     cancellable?: boolean,
     privateSource?: boolean,
   } & (
@@ -296,9 +296,9 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       message?: undefined,
       channel: AnyTextableGuildChannel,
     })
-  ): Promise<QueueContent>{
+  ): Promise<QueueContent | null> {
     this.logger.info("AutoAddQueue Called");
-    let uiMessage: Message<AnyTextableGuildChannel>|ResponseMessage = null;
+    let uiMessage: Message<AnyTextableGuildChannel> | ResponseMessage | null = null;
 
     try{
       // UI表示するためのメッセージを特定する作業
@@ -327,7 +327,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         // まだないの場合（新しくUI用のメッセージを生成する）
         this.logger.info("AutoAddQueue will make a message that will be used to report statuses");
         uiMessage = await options.channel.createMessage({
-          content: i18next.t("loadingInfoPleaseWait", { lng: this.server.locale }),
+          content: i18next.t("loadingInfoPleaseWait", { lng: this.server.locale })!,
         });
       }
 
@@ -383,7 +383,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           )
           .addField(
             i18next.t("components:nowplaying.requestedBy", { lng: this.server.locale }),
-            options.addedBy.displayName || i18next.t("unknown", { lng: this.server.locale }),
+            options.addedBy?.displayName || i18next.t("unknown", { lng: this.server.locale }),
             true
           )
           .addField(
@@ -428,11 +428,11 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
 
         // キャンセルボタンの作成
         const cancellable = !options.first && options.cancellable && !!options.addedBy;
-        let collector: InteractionCollector = null;
+        let collector: InteractionCollector | null = null;
         if(cancellable){
           const collectorCreateResult = this.server.bot.collectors
             .create()
-            .setAuthorIdFilter(this.getUserIdFromMember(options.addedBy))
+            .setAuthorIdFilter(options.addedBy ? this.getUserIdFromMember(options.addedBy) : null)
             .setTimeout(5 * 60 * 1000)
             .createCustomIds({
               cancelLast: "button",
@@ -461,7 +461,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
             catch(er){
               this.logger.error(er);
               interaction.createFollowup({
-                content: i18next.t("errorOccurred"),
+                content: i18next.t("errorOccurred")!,
               }).catch(this.logger.error);
             }
           });
@@ -469,13 +469,13 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           const destroyCollector = () => {
             this.off("change", destroyCollector);
             this.off("changeWithoutCurrent", destroyCollector);
-            collector.destroy();
+            collector?.destroy();
           };
           this.once("change", destroyCollector);
           this.once("changeWithoutCurrent", destroyCollector);
         }
 
-        let messageContent: EditMessageOptions = null;
+        let messageContent: EditMessageOptions | null = null;
         if(typeof info.basicInfo.thumbnail === "string"){
           embed.setThumbnail(info.basicInfo.thumbnail);
           messageContent = {
@@ -508,7 +508,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       if(uiMessage){
         uiMessage.edit({
           content: `:weary:${i18next.t("components:queue.failedToAdd", { lng: this.server.locale })}${typeof e === "object" && "message" in e ? `(${e.message})` : ""}`,
-          embeds: null,
+          embeds: [],
         })
           .catch(this.logger.error)
         ;
@@ -540,7 +540,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     playlist: T[],
     title: string,
     totalCount: number,
-    exportableConsumer: (track: T) => Promise<exportableCustom>|exportableCustom
+    exportableConsumer: (track: T) => Promise<AudioSourceBasicJsonFormat>|AudioSourceBasicJsonFormat
   ): Promise<QueueContent[]>{
     let index = 0;
     const result: QueueContent[] = [];
@@ -593,7 +593,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
 
     if(this.queueLoopEnabled){
       this._default.push(this.default[0]);
-    }else if(this.server.addRelated && this.server.player.currentAudioInfo.isYouTube()){
+    }else if(this.server.addRelated && this.server.player.currentAudioInfo instanceof AudioSource.YouTube){
       const relatedVideos = this.server.player.currentAudioInfo.relatedVideos;
       if(relatedVideos.length >= 1){
         const video = relatedVideos[0];
@@ -638,14 +638,19 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     this.server.player.once("disconnect", this.disableMixPlaylist);
   }
 
-  async prepareNextMixItem(){
+  async prepareNextMixItem(): Promise<void> {
     if(!this.mixPlaylistEnabled) throw new Error("Mix playlist is currently disabled");
+
     // select and obtain the next song
-    this._mixPlaylist = await this.mixPlaylist.select(this.mixPlaylist.currentIndex + 1);
-    const item = this.mixPlaylist.items[this.mixPlaylist.currentIndex];
+    this._mixPlaylist = await this.mixPlaylist!.select(this.mixPlaylist!.currentIndex + 1);
+    const item = this.mixPlaylist!.items[this.mixPlaylist!.currentIndex];
 
     // if a new song fetched, add it to the last in queue.
     if(item){
+      if(!item.url){
+        return this.prepareNextMixItem();
+      }
+
       await this.addQueueOnly({
         url: item.url,
         addedBy: null,
@@ -656,8 +661,8 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           title: item.title,
           description: "No description due to being fetched via mix-list",
           length: item.duration.split(":").reduce((prev, current) => prev * 60 + Number(current), 0),
-          channel: item.author.name,
-          channelUrl: item.author.url,
+          channel: item.author?.name || "unknown",
+          channelUrl: item.author?.url || "unknown",
           thumbnail: item.thumbnails[0].url,
           isLive: false,
         },
@@ -720,7 +725,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
 
     if(this.server.player.isPlaying || this.server.player.preparing){
       // 再生中/準備中には、キューの一番最初のアイテムの位置を変えずにそれ以外をシャッフルする
-      const first = this._default.shift();
+      const first = this._default.shift()!;
       this._default.sort(() => Math.random() - 0.5);
       this._default.unshift(first);
       this.emit("changeWithoutCurrent");
@@ -812,7 +817,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     this._default.push(...items);
   }
 
-  protected getUserIdFromMember(member: Member|AddedBy){
+  protected getUserIdFromMember(member: Member | AddedBy){
     return member instanceof Member ? member.id : member.userId;
   }
 }

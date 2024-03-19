@@ -34,7 +34,7 @@ export default class Radio extends BaseCommand {
       shouldDefer: true,
       argument: [
         {
-          type: "string",
+          type: "string" as const,
           name: "url",
           required: false,
         },
@@ -47,10 +47,10 @@ export default class Radio extends BaseCommand {
 
     try{
       if(context.rawArgs !== "" && context.server.queue.mixPlaylistEnabled){
-        await message.reply(t("commands:radio.alreadyEnabled")).catch(this.logger.error);
+        await message.reply(t("commands:radio.alreadyEnabled")!).catch(this.logger.error);
         return;
       }else if(context.rawArgs === "" && !context.server.queue.mixPlaylistEnabled && !context.server.player.isPlaying){
-        await message.reply(t("commands:radio.noUrlSpecified")).catch(this.logger.error);
+        await message.reply(t("commands:radio.noUrlSpecified")!).catch(this.logger.error);
         return;
       }
 
@@ -65,7 +65,7 @@ export default class Radio extends BaseCommand {
         // validate provided url
         const videoId = this.getVideoId(context.rawArgs || context.server.player.currentAudioUrl);
         if(!videoId){
-          await message.reply(t("commands:radio.invalidUrl")).catch(this.logger.error);
+          await message.reply(t("commands:radio.invalidUrl")!).catch(this.logger.error);
           return;
         }
 
@@ -87,7 +87,7 @@ export default class Radio extends BaseCommand {
       }
     }
     catch(er){
-      await message.reply(t("errorOccurred"));
+      await message.reply(t("errorOccurred")!);
       this.logger.error(er);
     }
   }
@@ -104,7 +104,7 @@ export default class Radio extends BaseCommand {
           && urlObject.pathname === "/playlist"
           && urlObject.searchParams.get("list")?.startsWith("RD")
         ){
-          return urlObject.searchParams.get("list").substring(2);
+          return urlObject.searchParams.get("list")!.substring(2);
         }
       }
       catch{

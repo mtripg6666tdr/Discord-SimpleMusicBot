@@ -33,7 +33,7 @@ export default class NowPlaying extends BaseCommand {
       unlist: false,
       category: "player",
       argument: [{
-        type: "bool",
+        type: "bool" as const,
         name: "detailed",
         required: false,
       }],
@@ -46,7 +46,7 @@ export default class NowPlaying extends BaseCommand {
     context.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!context.server.player.isPlaying){
-      message.reply(t("notPlaying")).catch(this.logger.error);
+      message.reply(t("notPlaying")!).catch(this.logger.error);
       return;
     }
 

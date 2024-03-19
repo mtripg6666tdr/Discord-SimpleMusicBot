@@ -55,7 +55,7 @@ export default class Import extends BaseCommand {
     context.server.updateBoundChannel(message);
 
     const statusMessage = await message.reply(`🔍${t("commands:import.loadingMessage")}...`);
-    let targetMessage: Message<AnyTextableGuildChannel> = null;
+    let targetMessage: Message<AnyTextableGuildChannel> | null = null;
     if(message["_interaction"] && "type" in message["_interaction"].data && message["_interaction"].data.type === ApplicationCommandTypes.MESSAGE){
       targetMessage = message["_interaction"].data.resolved.messages.first() as Message<AnyTextableGuildChannel>;
       if(targetMessage.author?.id !== context.client.user.id && !config.isWhiteListedBot(targetMessage.author?.id)){
@@ -69,10 +69,12 @@ export default class Import extends BaseCommand {
       }
       let force = false;
       let url = context.rawArgs;
+
       if(context.args.length >= 2 && context.args[0] === "force" && config.isBotAdmin(message.member.id)){
         force = true;
         url = context.args[1];
       }
+
       if(!url.startsWith("http://discord.com/channels/") && !url.startsWith("https://discord.com/channels/")){
         await message.reply(`❌${t("commands:import.noDiscordLink")}`).catch(this.logger.error);
         return;
@@ -98,6 +100,7 @@ export default class Import extends BaseCommand {
       catch(e){
         this.logger.error(e);
         statusMessage?.edit(`:sob:${t("failed")}...`).catch(this.logger.error);
+        return;
       }
     }
 
@@ -127,10 +130,11 @@ export default class Import extends BaseCommand {
           });
           if(qs.length <= 10 || i % 10 === 9){
             await statusMessage.edit(
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
               t("songProcessingInProgress", {
                 totalSongCount: t("totalSongCount", { count: qs.length }),
                 currentSongCount: t("currentSongCount", { count: i + 1 }),
-              })
+              })!
             );
           }
           if(cancellation.cancelled){

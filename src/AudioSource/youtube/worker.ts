@@ -26,6 +26,10 @@ import { YouTube } from ".";
 import { requireIfAny, stringifyObject } from "../../Util";
 import { useConfig } from "../../config";
 
+if(!parentPort){
+  throw new Error("This file should be run in worker thread.");
+}
+
 const dYtsr = requireIfAny("@distube/ytsr") as typeof import("@distube/ytsr");
 
 const config = useConfig();
@@ -38,7 +42,8 @@ const searchOptions = {
 parentPort.unref();
 
 function postMessage(message: workerMessage|WithId<workerMessage>){
-  parentPort.postMessage(message);
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  parentPort!.postMessage(message);
 }
 
 function onMessage(message: WithId<spawnerJobMessage>){
@@ -51,6 +56,7 @@ function onMessage(message: WithId<spawnerJobMessage>){
     youtube.init(url, prefetched, null, forceCache)
       .then(() => {
         const data = Object.assign({}, youtube);
+        // @ts-expect-error
         delete data["logger"];
         postMessage({
           type: "initOk",

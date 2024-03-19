@@ -41,13 +41,13 @@ export interface FixedAudioResource extends NullMetaAudioResource {
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class FixedAudioResource extends NullMetaAudioResource {
   public error = false;
-  public readonly events = null as AudioResourceEvent;
+  public readonly events: AudioResourceEvent;
   private readLength = 0;
   private estimatedLengthSeconds = 0;
   private readonly logger = getLogger("FixedAudioResource");
   private dataUnreadableAt = -1;
   private timedout = false;
-  protected _volume: VolumeTransformer = null;
+  protected _volume: VolumeTransformer | null = null;
 
   get volumeTransformer(){
     return this._volume;
@@ -129,7 +129,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
   static fromAudioResource(resource: voice.AudioResource, estimatedLengthSeconds: number){
     const _this = new this(resource.edges, [resource.playStream], null, resource.silencePaddingFrames);
     _this.estimatedLengthSeconds = estimatedLengthSeconds;
-    _this._volume = resource.volume;
+    _this._volume = resource.volume || null;
     return _this;
   }
 }

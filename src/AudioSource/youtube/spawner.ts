@@ -25,7 +25,7 @@ import { Worker, isMainThread } from "worker_threads";
 
 import PQueue from "p-queue";
 
-import { type exportableYouTube, YouTube } from "..";
+import { type YouTubeJsonFormat, YouTube } from "..";
 import { getLogger } from "../../logger";
 
 const worker = isMainThread ? new Worker(path.join(__dirname, global.BUNDLED && __filename.includes("min") ? "./worker.min.js" : "./worker.js")).on("error", console.error) : null;
@@ -38,7 +38,7 @@ export type spawnerJobMessage = spawnerGetInfoMessage | spawnerSearchMessage;
 export type spawnerGetInfoMessage = {
   type: "init",
   url: string,
-  prefetched: exportableYouTube,
+  prefetched: YouTubeJsonFormat,
   forceCache: boolean,
 };
 export type spawnerSearchMessage = {
@@ -111,7 +111,7 @@ function doJob(message: spawnerJobMessage): Promise<workerSuccessMessage>{
   }));
 }
 
-export async function initYouTube(url: string, prefetched: exportableYouTube, forceCache?: boolean){
+export async function initYouTube(url: string, prefetched: YouTubeJsonFormat, forceCache?: boolean){
   const result = await doJob({
     type: "init",
     url,

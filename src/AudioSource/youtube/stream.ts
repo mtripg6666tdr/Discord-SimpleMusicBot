@@ -79,9 +79,11 @@ export function createRefreshableYTLiveStream(info: ytdl.videoInfo, url: string,
 
   // destroy the current stream safely
   const destroyCurrentStream = (er?: Error) => {
-    currentStream.removeAllListeners("error");
-    currentStream.on("error", () => {});
-    currentStream.destroy(er);
+    if(currentStream){
+      currentStream.removeAllListeners("error");
+      currentStream.on("error", () => {});
+      currentStream.destroy(er);
+    }
   };
 
   // indicates if the stream is refreshing now or not.
@@ -110,7 +112,7 @@ export function createRefreshableYTLiveStream(info: ytdl.videoInfo, url: string,
     }
   };
 
-  let currentStream: Readable = null;
+  let currentStream: Readable | null = null;
   const timeout = setInterval(refreshStream, 40 * 60 * 1000).unref();
   const stream = createPassThrough({
     allowHalfOpen: true,

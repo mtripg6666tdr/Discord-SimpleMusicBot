@@ -42,7 +42,8 @@ export default class Bgm extends BaseCommand {
 
     // check existing search panel
     if(context.server.searchPanel.has(message.member.id)){
-      message.reply(t("search.alreadyOpen")).catch(this.logger.error);
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+      message.reply(t("search.alreadyOpen")!).catch(this.logger.error);
       return;
     }
 

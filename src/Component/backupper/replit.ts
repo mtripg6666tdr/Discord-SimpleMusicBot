@@ -27,7 +27,7 @@ import { IntervalBackupper } from ".";
 import { timeLoggedMethod } from "../../logger";
 
 export class ReplitBackupper extends IntervalBackupper {
-  protected readonly db: ReplitClient = null;
+  protected readonly db: ReplitClient = null!;
 
   static get backuppable(){
     return process.env.DB_URL?.startsWith("replit+http");
@@ -36,7 +36,7 @@ export class ReplitBackupper extends IntervalBackupper {
   constructor(bot: MusicBotBase, getData: () => DataType){
     super(bot, getData, "Replit");
 
-    this.db = new ReplitClient(process.env.DB_URL.substring("replit+".length));
+    this.db = new ReplitClient(process.env.DB_URL!.substring("replit+".length));
 
     this.bot.client.on("guildDelete", ({ id }) => {
       Promise.allSettled([
@@ -58,7 +58,8 @@ export class ReplitBackupper extends IntervalBackupper {
       const guildId = filteredGuildIds[i];
       try{
         this.logger.info(`Backing up status...(${guildId})`);
-        const currentStatus = this.data.get(guildId).exportStatus();
+        const currentStatus = this.data.get(guildId)?.exportStatus();
+        if(!currentStatus) continue;
         await this.db.set(this.getDbKey("status", guildId), currentStatus);
         this.updateStatusCache(guildId, currentStatus);
       }
@@ -77,7 +78,9 @@ export class ReplitBackupper extends IntervalBackupper {
       const guildId = modifiedGuildIds[i];
       try{
         this.logger.info(`Backing up queue...(${guildId})`);
-        await this.db.set(this.getDbKey("queue", guildId), this.data.get(guildId).exportQueue());
+        const queue = this.data.get(guildId)?.exportQueue();
+        if(!queue) continue;
+        await this.db.set(this.getDbKey("queue", guildId), queue);
         this.unmarkQueueModifiedGuild(guildId);
       }
       catch(er){
@@ -88,7 +91,7 @@ export class ReplitBackupper extends IntervalBackupper {
   }
 
   @timeLoggedMethod
-  override async getQueueDataFromBackup(guildIds: string[]): Promise<Map<string, YmxFormat>> {
+  override async getQueueDataFromBackup(guildIds: string[]) {
     const result = new Map<string, YmxFormat>();
     try{
       await Promise.allSettled(
@@ -109,7 +112,7 @@ export class ReplitBackupper extends IntervalBackupper {
   }
 
   @timeLoggedMethod
-  override async getStatusFromBackup(guildIds: string[]): Promise<Map<string, exportableStatuses>> {
+  override async getStatusFromBackup(guildIds: string[]) {
     const result = new Map<string, exportableStatuses>();
     try{
       await Promise.allSettled(
@@ -142,11 +145,8 @@ class ReplitClient {
   protected baseUrl: string;
   protected queue: PQueue;
 
-  constructor(baseUrl?: string){
+  constructor(baseUrl: string){
     this.baseUrl = baseUrl;
-    if(baseUrl === "local" || !this.baseUrl){
-      this.baseUrl = process.env.REPLIT_DB_URL;
-    }
 
     if(!this.baseUrl){
       throw new Error("No URL found");
@@ -163,7 +163,7 @@ class ReplitClient {
 
   get(key: string, options: { raw: true }): Promise<string>;
   get<T = any>(key: string, options?: { raw: false }): Promise<T>;
-  get<T = any>(key: string, options?: { raw: boolean }){
+  get(key: string, options?: { raw: boolean }){
     return this.queue.add(async () => {
       const shouldRaw = options?.raw || false;
       const { body } = await candyget(`${this.baseUrl}/${key}`, "string");
@@ -172,7 +172,7 @@ class ReplitClient {
       }else if(shouldRaw){
         return body;
       }else{
-        return JSON.parse(body) as T;
+        return JSON.parse(body);
       }
     });
   }

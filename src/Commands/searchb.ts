@@ -22,8 +22,8 @@ import { SearchBase } from "./search";
 import { BestdoriApi } from "../AudioSource";
 
 export default class Searchb extends SearchBase<string[]> {
-  private songInfoCache: BestdoriAllSongInfo = null;
-  private bandInfoCache: BestdoriAllBandInfo = null;
+  private songInfoCache: BestdoriAllSongInfo = null!;
+  private bandInfoCache: BestdoriAllBandInfo = null!;
 
   constructor(){
     super({

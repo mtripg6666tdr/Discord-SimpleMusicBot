@@ -63,7 +63,7 @@ export default class SystemInfo extends BaseCommand {
     context.server.updateBoundChannel(message);
     // Run default logger
     context.bot.logGeneralInfo();
-    await message.reply(t("commands:log.executing"));
+    await message.reply(t("commands:log.executing")!);
 
     const embeds = [] as EmbedOptions[];
 
@@ -150,7 +150,7 @@ export default class SystemInfo extends BaseCommand {
     }
 
     if(config.isBotAdmin(message.member.id) && (context.args[0] === "server" && context.args[1] && context.client.guilds.has(context.args[1]))){
-      const target = context.client.guilds.get(context.args[1]);
+      const target = context.client.guilds.get(context.args[1])!;
       const data = context.bot.getData(context.args[1]);
       embeds.push(
         new MessageEmbedBuilder()
@@ -171,7 +171,7 @@ export default class SystemInfo extends BaseCommand {
             data?.player.currentAudioInfo?.isYouTube() && data?.player.currentAudioInfo.isLiveStream ? t("yes") : t("no"),
             true
           )
-          .setThumbnail(target.iconURL())
+          .setThumbnail(target.iconURL()!)
           .toOceanic()
       );
     }
@@ -230,7 +230,7 @@ export default class SystemInfo extends BaseCommand {
       await message.channel.createMessage({ embeds }).catch(this.logger.error);
     }
     if(embeds.length === 0){
-      await message.channel.createMessage({ content: t("commands:log.incorrectArgument") }).catch(this.logger.error);
+      await message.channel.createMessage({ content: t("commands:log.incorrectArgument")! }).catch(this.logger.error);
     }
   }
 }

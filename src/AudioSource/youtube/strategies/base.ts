@@ -16,9 +16,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { exportableYouTube } from "..";
+import type { YouTubeJsonFormat } from "..";
 import type { LoggerObject } from "../../../logger";
-import type { StreamInfo } from "../../audiosource";
+import type { StreamInfo, UrlStreamInfo } from "../../audiosource";
 
 import { getLogger } from "../../../logger";
 
@@ -34,7 +34,7 @@ export type Cache<T extends string, U> = {
 
 /**
  * 戦略を示します
- * @template T キャッシュの種類を指定します
+ * @template T 戦略で使用されるキャッシュの型を指定します
  * @template U 各戦略に固有のキャッシュの構造
  */
 export abstract class Strategy<T extends Cache<any, U>, U> {
@@ -46,21 +46,25 @@ export abstract class Strategy<T extends Cache<any, U>, U> {
   }
 
   abstract getInfo(url: string): Promise<{
-    data: exportableYouTube,
+    data: YouTubeJsonFormat,
     cache: T,
   }>;
 
-  abstract fetch(url: string, forceCache?: boolean, cache?: Cache<any, any>): Promise<{
-    stream: StreamInfo,
-    info: exportableYouTube,
-    relatedVideos: exportableYouTube[] | string[],
-    cache: T,
-  }>;
+  abstract fetch(url: string, forceCache: true, cache?: Cache<any, any>): Promise<StrategyFetchResult<T, UrlStreamInfo>>;
+  abstract fetch(url: string, forceCache?: boolean, cache?: Cache<any, any>): Promise<StrategyFetchResult<T, StreamInfo>>;
 
   /** 戦略が使用されたことを示すログを出力します */
   protected logStrategyUsed(){
     this.logger.info("using strategy #" + this.priority);
   }
 
-  protected abstract mapToExportable(url: string, info: U): exportableYouTube;
+  protected abstract mapToExportable(url: string, info: U): YouTubeJsonFormat;
+  protected abstract cacheIsValid(cache?: Cache<any, any>): cache is T;
 }
+
+export type StrategyFetchResult<T extends Cache<any, any>, U extends StreamInfo> = {
+  stream: U,
+  info: YouTubeJsonFormat,
+  relatedVideos: YouTubeJsonFormat[] | string[] | null,
+  cache: T,
+};

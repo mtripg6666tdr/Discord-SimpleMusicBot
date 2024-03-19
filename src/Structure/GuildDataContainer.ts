@@ -19,7 +19,7 @@
 import type { CommandArgs } from "./Command";
 import type { QueueContent } from "./QueueContent";
 import type { YmxFormat } from "./YmxFormat";
-import type { exportableCustom, exportableSpotify } from "../AudioSource";
+import type { exportableCustom, SpotifyJsonFormat } from "../AudioSource";
 import type { exportableStatuses } from "../Component/backupper";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { SearchPanel } from "../Component/searchPanel";
@@ -708,7 +708,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
               title: track.title,
               artist: track.subtitle,
               length: Math.floor(track.duration / 1000),
-            } as exportableSpotify;
+            } as SpotifyJsonFormat;
           }
         );
         if(cancellation.cancelled){

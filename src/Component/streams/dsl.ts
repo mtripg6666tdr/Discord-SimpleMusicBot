@@ -33,10 +33,10 @@ type DSLOptions = {
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
 export class DSL extends LogEmitter<{}> {
-  protected csvLog: string[] = null;
+  protected csvLog: string[] | null = null;
   protected logStreams: Readable[] = [];
-  protected logFileName: string = null;
-  protected logFileStream: fs.WriteStream = null;
+  protected logFileName: string | null = null;
+  protected logFileStream: fs.WriteStream | null = null;
 
   constructor(protected options: DSLOptions){
     super("DSL");
@@ -52,7 +52,7 @@ export class DSL extends LogEmitter<{}> {
     this.appendCsvLog("type,datetime,id,total,current");
   }
 
-  getCsvLog(): readonly string[] {
+  getCsvLog(): readonly string[] | null {
     return this.csvLog;
   }
 
@@ -70,7 +70,7 @@ export class DSL extends LogEmitter<{}> {
         if(inx >= 0){
           this.logStreams.splice(inx, 1);
           this.logger.info(this.logStreams);
-          if(this.logStreams.length === 0 && !this.logFileStream.destroyed){
+          if(this.logStreams.length === 0 && this.logFileStream && !this.logFileStream.destroyed){
             this.logFileStream.destroy();
             this.logger.info("CSV log saved successfully");
           }

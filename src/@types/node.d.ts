@@ -28,7 +28,6 @@ declare namespace NodeJS {
     /* undocumented flags */
     readonly DSL_ENABLE?: string;
     readonly BD_ENABLE?: string;
-    readonly HIBIKI_ENABLE?: string;
     readonly CONSOLE_ENABLE?: string;
     readonly DISABLE_SYNC_SC?: string;
     readonly HIDE_REPO_URL?: string;

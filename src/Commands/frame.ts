@@ -52,7 +52,8 @@ export default class Frame extends BaseCommand {
 
     // そもそも再生状態ではない場合
     if(!server.player.isConnecting || !server.player.isPlaying){
-      await message.reply(t("notPlaying")).catch(this.logger.error);
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+      await message.reply(t("notPlaying")!).catch(this.logger.error);
       return;
     }
 
@@ -74,7 +75,8 @@ export default class Frame extends BaseCommand {
 
     if(context.rawArgs !== "" && vinfo.isLiveStream){
       await message.channel.createMessage({
-        content: t("commands:frame.liveStreamWithTime"),
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        content: t("commands:frame.liveStreamWithTime")!,
       });
       return;
     }
@@ -132,7 +134,7 @@ function getFrame(url: string, time: number, ua: string){
     logger.debug(`Passing args: ${args.join(" ")}`);
     const bufs = [] as Buffer[];
     const ffmpeg = new FFmpeg({ args });
-    ffmpeg.process.stderr.on("data", logger.debug);
+    ffmpeg.process.stderr?.on("data", logger.debug);
     ffmpeg
       .on("error", (er) => {
         if(!ffmpeg.destroyed) ffmpeg.destroy(er);

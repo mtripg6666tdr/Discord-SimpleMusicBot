@@ -42,14 +42,14 @@ type Analytics = Collectionate<{
 }>;
 
 export class MongoBackupper extends Backupper {
-  private readonly client: mongo.MongoClient = null;
+  private readonly client: mongo.MongoClient = null!;
   private dbConnectionReady = false;
-  private dbError: Error = null;
+  private dbError: Error | null = null;
   collections: {
     status: mongo.Collection<Collectionate<exportableStatuses>>,
     queue: mongo.Collection<Collectionate<YmxFormat>>,
     analytics: mongo.Collection<Analytics>,
-  } = null;
+  } = null!;
 
   static get backuppable(){
     return process.env.DB_URL && (process.env.DB_URL.startsWith("mongodb://") || process.env.DB_URL.startsWith("mongodb+srv://"));
@@ -61,7 +61,7 @@ export class MongoBackupper extends Backupper {
     this.logger.info("Initializing Mongo DB backup server adapter...");
 
     // prepare mongodb client
-    this.client = new MongoClient(process.env.DB_URL, {
+    this.client = new MongoClient(process.env.DB_URL!, {
       appName: `mtripg6666tdr/Discord-SimpleMusicBot#${this.bot.version || "unknown"} MondoDB backup server adapter`,
     });
     this.client.connect()
@@ -122,7 +122,8 @@ export class MongoBackupper extends Backupper {
     if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
     try{
       this.logger.info(`Backing up status...(${guildId})`);
-      const status = this.data.get(guildId).exportStatus();
+      const status = this.data.get(guildId)?.exportStatus();
+      if(!status) return;
       await this.collections.status.updateOne({ guildId }, {
         "$set": {
           guildId,
@@ -142,7 +143,8 @@ export class MongoBackupper extends Backupper {
   async backupQueue(guildId: string){
     if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
     try{
-      const queue = this.data.get(guildId).exportQueue();
+      const queue = this.data.get(guildId)?.exportQueue();
+      if(!queue) return;
       this.logger.info(`Backing up queue...(${guildId})`);
       await this.collections.queue.updateOne({ guildId }, {
         "$set": {
@@ -196,7 +198,7 @@ export class MongoBackupper extends Backupper {
   }
 
   @timeLoggedMethod
-  override async getStatusFromBackup(guildIds: string[]): Promise<Map<string, exportableStatuses>>{
+  override async getStatusFromBackup(guildIds: string[]){
     if(!this.dbConnectionReady && !this.dbError) await waitForEnteringState(() => this.dbConnectionReady || !!this.dbError, Infinity);
     if(this.dbError){
       this.logger.warn("Database connecting failed!!");
@@ -222,7 +224,7 @@ export class MongoBackupper extends Backupper {
   }
 
   @timeLoggedMethod
-  override async getQueueDataFromBackup(guildids: string[]): Promise<Map<string, YmxFormat>>{
+  override async getQueueDataFromBackup(guildids: string[]){
     if(!this.dbConnectionReady && !this.dbError) await waitForEnteringState(() => this.dbConnectionReady || !!this.dbError, Infinity);
     if(this.dbError){
       this.logger.warn("Database connecting failed!!");
@@ -249,7 +251,7 @@ export class MongoBackupper extends Backupper {
 
   async destroy(){
     await this.client.close();
-    this.collections = null;
+    this.collections = null!;
     this.dbConnectionReady = false;
   }
 }

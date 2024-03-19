@@ -16,14 +16,15 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Cache } from "./base";
-import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
+import type { Cache, StrategyFetchResult } from "./base";
+import type { ReadableStreamInfo, StreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Readable } from "stream";
 
 import { HttpsProxyAgent } from "https-proxy-agent";
 import * as ytdl from "ytdl-core";
 
 import { Strategy } from "./base";
+import { YouTubeJsonFormat } from "..";
 import { useConfig } from "../../../config";
 import { SecondaryUserAgent } from "../../../definition";
 import { createChunkedYTStream, createRefreshableYTLiveStream } from "../stream";
@@ -33,7 +34,9 @@ export const ytdlCore: ytdlCore = "ytdlCore";
 
 const config = useConfig();
 
-export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, ytdl.videoInfo> {
+type ytdlCoreCache = Cache<ytdlCore, ytdl.videoInfo>;
+
+export class ytdlCoreStrategy extends Strategy<ytdlCoreCache, ytdl.videoInfo> {
   protected agent = config.proxy ? new HttpsProxyAgent(config.proxy) : undefined;
 
   get cacheType(){
@@ -42,9 +45,10 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
 
   async getInfo(url: string){
     this.logStrategyUsed();
+
     const requestOptions = this.agent ? { agent: this.agent } : undefined;
-    let info = null as ytdl.videoInfo;
-    info = await ytdl.getInfo(url, {
+
+    const info = await ytdl.getInfo(url, {
       lang: "ja",
       requestOptions,
     });
@@ -57,37 +61,35 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
     };
   }
 
-  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
+  async fetch(url: string, forceurl: true, cache?: Cache<any, any>): Promise<StrategyFetchResult<ytdlCoreCache, UrlStreamInfo>>;
+  async fetch(url: string, forceurl?: boolean, cache?: Cache<any, any>): Promise<StrategyFetchResult<ytdlCoreCache, StreamInfo>>;
+  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>): Promise<StrategyFetchResult<ytdlCoreCache, StreamInfo>> {
     this.logStrategyUsed();
-    const info = await (async () => {
-      if(cache && cache.type === "ytdlCore"){
-        this.logger.info("using cache without obtaining");
-        return cache.data as ytdl.videoInfo;
-      }else{
-        this.logger.info("obtaining info");
-        const requestOptions = this.agent ? { agent: this.agent } : undefined;
-        // eslint-disable-next-line @typescript-eslint/no-shadow
-        let info = null as ytdl.videoInfo;
-        info = await ytdl.getInfo(url, {
-          lang: "ja",
-          requestOptions,
-        });
-        return info;
-      }
-    })();
+
+    const availableCache = this.cacheIsValid(cache) && cache.data;
+
+    this.logger.info(availableCache ? "using cache without obtaining" : "obtaining info");
+
+    const info = availableCache || await ytdl.getInfo(url, {
+      lang: config.defaultLanguage,
+    });
+
+
     const format = ytdl.chooseFormat(info.formats, info.videoDetails.liveBroadcastDetails?.isLiveNow ? {
-      filter: null,
-      quality: null,
+      filter: undefined,
+      quality: undefined,
       isHLS: false,
     } as ytdl.chooseFormatOptions : {
       filter: "audioonly",
       quality: "highestaudio",
     });
+
     this.logger.info(`format: ${format.itag}, bitrate: ${format.bitrate}bps, audio codec:${format.audioCodec}, container: ${format.container}`);
+
     const partialResult = {
       info: this.mapToExportable(url, info),
-      relatedVideos: info.related_videos.map(video => ({
-        url: "https://www.youtube.com/watch?v=" + video.id,
+      relatedVideos: info.related_videos.filter(v => !v.isLive).map(video => ({
+        url: `https://www.youtube.com/watch?v=${video.id}`,
         title: video.title,
         description: "No description due to being fetched via related-videos.",
         length: video.length_seconds,
@@ -95,8 +97,9 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
         channelUrl: (video.author as ytdl.Author)?.channel_url,
         thumbnail: video.thumbnails[0].url,
         isLive: video.isLive,
-      })).filter(v => !v.isLive),
+      }) as YouTubeJsonFormat),
     };
+
     if(forceUrl){
       return {
         ...partialResult,
@@ -114,12 +117,10 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
         },
       };
     }else{
-      let readable = null as Readable;
-      if(info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow){
-        readable = createRefreshableYTLiveStream(info, url, { format, lang: "ja" });
-      }else{
-        readable = createChunkedYTStream(info, format, { lang: "ja" }, 1 * 1024 * 1024);
-      }
+      const readable: Readable = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow
+        ? createRefreshableYTLiveStream(info, url, { format, lang: config.defaultLanguage })
+        : createChunkedYTStream(info, format, { lang: config.defaultLanguage }, 1 * 1024 * 1024);
+
       return {
         ...partialResult,
         stream: {
@@ -142,13 +143,17 @@ export class ytdlCoreStrategy extends Strategy<Cache<ytdlCore, ytdl.videoInfo>, 
     return {
       url,
       title: info.videoDetails.title,
-      description: info.videoDetails.description,
+      description: info.videoDetails.description || "",
       length: Number(info.videoDetails.lengthSeconds),
       channel: info.videoDetails.ownerChannelName,
       channelUrl: info.videoDetails.author.channel_url,
       thumbnail: info.videoDetails.thumbnails[0].url,
       isLive: !!(info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails?.isLiveNow),
     };
+  }
+
+  protected override cacheIsValid(cache?: Cache<any, any> | undefined): cache is Cache<ytdlCore, ytdl.videoInfo> {
+    return cache?.type === ytdlCore;
   }
 }
 

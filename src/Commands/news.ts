@@ -25,6 +25,7 @@ import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oc
 import { BaseCommand } from ".";
 import { Playlist } from "../AudioSource/youtube/playlist";
 import { useConfig } from "../config";
+import { DefaultAudioThumbnailURL } from "../definition";
 
 const config = useConfig();
 
@@ -43,7 +44,7 @@ export default class News extends BaseCommand {
     context.server.updateBoundChannel(message);
     context.server.joinVoiceChannel(message, {}, t).catch(this.logger.error);
     // change news according to locale
-    let url: string = null;
+    let url: string = null!;
     switch(context.locale){
       case "en-US":
         url = Buffer.from(
@@ -91,7 +92,7 @@ export default class News extends BaseCommand {
         });
 
       const responseMessage = await message.reply({
-        content: t("search.alreadyOpen"),
+        content: t("search.alreadyOpen")!,
         components: [
           new MessageActionRowBuilder()
             .addComponents(
@@ -106,6 +107,8 @@ export default class News extends BaseCommand {
 
       if(responseMessage){
         const panel = context.server.searchPanel.get(message.member.id);
+
+        if(!panel) return;
 
         collector.on("cancelSearch", interaction => {
           panel.destroy({ quiet: true }).catch(this.logger.error);
@@ -129,6 +132,7 @@ export default class News extends BaseCommand {
       }),
       ({ items }) => items.map(item => ({
         ...item,
+        thumbnail: item.thumbnail || DefaultAudioThumbnailURL,
         duration: item.durationText,
         description: `${t("length")}: ${item.duration}, ${t("channelName")}: ${item.author}`,
       })),

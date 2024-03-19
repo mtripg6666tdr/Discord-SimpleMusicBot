@@ -35,13 +35,13 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
   protected customIdMap = new Map<string, string>();
   protected receivedCount = 0;
   protected maxReceiveCount = 1;
-  protected userId: string = null;
-  protected timer: NodeJS.Timeout = null;
-  protected timeout: number = null;
+  protected userId: string | null = null;
+  protected timer: NodeJS.Timeout | null = null;
+  protected timeout: number | null = null;
   protected destroyed = false;
-  protected _collectorId: string = null;
+  protected _collectorId: string;
   protected resetTimeoutOnInteraction = false;
-  protected message: Message<AnyTextableGuildChannel> | ResponseMessage = null;
+  protected message: Message<AnyTextableGuildChannel> | ResponseMessage | null = null;
 
   getCustomIds(){
     return [...this.customIdMap.keys()];
@@ -76,7 +76,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
     return this;
   }
 
-  setAuthorIdFilter(userId: string){
+  setAuthorIdFilter(userId: string | null = null){
     this.userId = userId;
     this.logger.debug(`author filter: ${this.userId}`);
     return this;
@@ -126,7 +126,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
       return;
     }
     this.logger.debug(`id mapped ${interaction.data.customID} => ${componentId}`);
-    if(this.resetTimeoutOnInteraction){
+    if(this.resetTimeoutOnInteraction && this.timeout){
       this.setTimeout(this.timeout);
     }
     this.emit(componentId as any, interaction);

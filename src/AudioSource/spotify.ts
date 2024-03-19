@@ -16,8 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { StreamInfo } from "./audiosource";
-import type { exportableCustom } from "./custom";
+import type { AudioSourceBasicJsonFormat, StreamInfo } from "./audiosource";
 import type dYtsr from "@distube/ytsr";
 import type { EmbedField } from "oceanic.js";
 import type { Track } from "spotify-url-info";
@@ -33,15 +32,15 @@ import { DefaultAudioThumbnailURL } from "../definition";
 
 const client = spotifyUrlInfo((url, opts) => candyget(url, "string", opts).then(res => ({ text: () => res.body })));
 
-export class Spotify extends AudioSource<string> {
+export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
   protected artist = "";
-  protected referenceUrl: string = null;
+  protected referenceUrl: string | null = null;
 
   constructor(){
     super("spotify");
   }
 
-  override async init(url: string, prefetched: exportableSpotify): Promise<Spotify>{
+  override async init(url: string, prefetched: SpotifyJsonFormat): Promise<Spotify>{
     if(!Spotify.validateTrackUrl(url)) throw new Error("Invalid url");
     if(prefetched){
       this.url = prefetched.url;
@@ -138,7 +137,12 @@ export class Spotify extends AudioSource<string> {
     if(validItems.length === 0) return items[0];
 
     // official channel
-    let filtered = validItems.filter(item => item.author.ownerBadges.length > 0 || item.author.verified || item.author.name.endsWith("Topic") || item.author.name.endsWith("トピック"));
+    let filtered = validItems.filter(item =>
+      (item.author && item.author.ownerBadges.length > 0)
+      || item.author?.verified
+      || item.author?.name.endsWith("Topic")
+      || item.author?.name.endsWith("トピック")
+    );
     this.logger.debug("official ch", filtered);
     if(filtered[0]) return filtered[0];
 
@@ -162,7 +166,7 @@ export class Spotify extends AudioSource<string> {
     return items[0];
   }
 
-  override exportData(): exportableSpotify{
+  override exportData(): SpotifyJsonFormat{
     return {
       url: this.url,
       title: this.title,
@@ -233,8 +237,8 @@ export class Spotify extends AudioSource<string> {
   }
 }
 
-export type exportableSpotify = exportableCustom & {
+export type SpotifyJsonFormat = AudioSourceBasicJsonFormat & {
   artist: string,
-  referenceUrl: string,
+  referenceUrl: string | null,
   thumbnail: string,
 };

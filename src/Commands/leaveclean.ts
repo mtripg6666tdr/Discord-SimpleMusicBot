@@ -41,7 +41,7 @@ export default class LeaveClean extends BaseCommand {
       message.reply(`✅${t("commands:leaveclean.allRemoved")}`).catch(this.logger.error);
       return;
     }else if(context.server.queue.length === 0){
-      message.reply(t("commands:leaveclean.queueEmpty")).catch(this.logger.error);
+      message.reply(t("commands:leaveclean.queueEmpty")!).catch(this.logger.error);
       return;
     }
     const memberIds = context.server.connectingVoiceChannel.voiceMembers.map(member => member.id);
@@ -49,7 +49,7 @@ export default class LeaveClean extends BaseCommand {
     await message.reply(
       removed >= 1
         ? `✅${t("commands:leaveclean.removed", { count: removed })}`
-        : t("commands:leaveclean.removedNothing")
+        : t("commands:leaveclean.removedNothing")!
     ).catch(this.logger.error);
   }
 }

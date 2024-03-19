@@ -31,7 +31,7 @@ const endpoint = Buffer.from("aHR0cHM6Ly9kc21iLW1ldHJpY3MudXNhbXlvbi5tb2U=", "ba
 
 export class Telemetry extends LogEmitter<Record<never, never>> {
   private errors: string[] = [];
-  private hash: string = null;
+  private hash: string | null = null;
   private _paused: boolean = false;
 
   get paused(){

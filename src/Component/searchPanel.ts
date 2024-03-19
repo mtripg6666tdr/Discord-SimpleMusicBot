@@ -47,8 +47,11 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     if(val === "destroyed") this.emit("destroy");
   }
 
-  protected _options: SongInfo[] = null;
-  get options(): Readonly<SongInfo[]>{
+  protected _options: SongInfo[] | null = null;
+  get options(): Readonly<SongInfo[]> {
+    if(!this._options){
+      throw new Error("Search has not been done yet.");
+    }
     return this._options;
   }
 
@@ -56,7 +59,7 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     return this._commandMessage;
   }
 
-  protected _responseMessage: ResponseMessage = null;
+  protected _responseMessage: ResponseMessage | null = null;
 
   get responseMesasge(){
     return this._responseMessage;
@@ -79,9 +82,9 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     this.status = "consumed";
     this.t = t;
 
-    let reply: ResponseMessage = null;
+    let reply: ResponseMessage | null = null;
     try{
-      let waitedPromiseResult: T | { result: T, transformedQuery: string } = null;
+      let waitedPromiseResult: T | { result: T, transformedQuery: string } = null!;
       [reply, waitedPromiseResult] = await Promise.all([this._commandMessage.reply(`🔍${t("search.searching")}...`), searchPromise]);
       if("transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string })){
         this.query = (waitedPromiseResult as { result: T, transformedQuery: string }).transformedQuery;
@@ -162,13 +165,13 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
   }
 
   filterOnlyIncludes(nums: number[]){
-    return nums.filter(n => 0 < n && n <= this._options.length);
+    return nums.filter(n => 0 < n && n <= this.options.length);
   }
 
   decideItems(nums: number[]){
     this.status = "destroyed";
     return {
-      urls: nums.map(n => this._options[n - 1].url),
+      urls: nums.map(n => this.options[n - 1].url),
       responseMessage: this._responseMessage,
     };
   }
@@ -177,11 +180,13 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     const quiet = option?.quiet || false;
     if(this.status !== "consumed") return;
     if(!quiet){
-      await this._responseMessage.channel.createMessage({
+      await this._responseMessage?.channel.createMessage({
         content: `✅${this.t("canceling")}`,
       }).catch(this.logger.error);
     }
-    await this._responseMessage.delete().catch(this.logger.error);
+
+    await this._responseMessage?.delete().catch(this.logger.error);
+
     this.status = "destroyed";
   }
 }

@@ -43,11 +43,11 @@ export default class Help extends BaseCommand {
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     const developerId = "593758391395155978";
     const cachedUser = context.client.users.get(developerId);
-    const developer = cachedUser
+    const developer: string | null = cachedUser
       ? cachedUser.globalName || cachedUser.username
       : await context.client.rest.users.get(developerId)
         .then(user => user.globalName || user.username)
-        .catch(() => null as string)
+        .catch(() => null)
       ;
     const { isDisabledSource } = config;
     const embed = new MessageEmbedBuilder()

@@ -157,6 +157,7 @@ export async function resolveStreamToPlayable(
       stream: passThrough,
       streamType: ffmpegOutput === "webm" ? "webm/opus" : "ogg/opus",
       cost: 2 + 1,
+      // @ts-expect-error undefined will be filtered by Array#filter
       streams: [streamInfo.type === "readable" ? streamInfo.stream : undefined, ffmpeg, passThrough].filter(d => d),
     };
   }

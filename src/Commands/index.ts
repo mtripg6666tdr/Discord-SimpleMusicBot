@@ -62,7 +62,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     return this._alias;
   }
 
-  protected readonly _description: string = null;
+  protected readonly _description: string;
   public get description(){
     return this._description;
   }
@@ -72,17 +72,17 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     return this._unlist;
   }
 
-  protected readonly _examples: LocaleMap = null;
+  protected readonly _examples: LocaleMap | null;
   public get examples(){
     return this._examples;
   }
 
-  protected readonly _usage: LocaleMap = null;
+  protected readonly _usage: LocaleMap | null;
   public get usage(){
     return this._usage;
   }
 
-  protected readonly _category: string = null;
+  protected readonly _category: string;
   public get category(){
     return this._category;
   }
@@ -92,17 +92,17 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     return this._shouldDefer;
   }
 
-  protected readonly _argument: Readonly<LocalizedSlashCommandArgument[]> = null;
+  protected readonly _argument: Readonly<LocalizedSlashCommandArgument[]> | null;
   public get argument(){
     return this._argument;
   }
 
-  protected readonly _requiredPermissionsOr: CommandPermission[] = null;
+  protected readonly _requiredPermissionsOr: CommandPermission[];
   public get requiredPermissionsOr(){
     return this._requiredPermissionsOr || [];
   }
 
-  protected readonly _descriptionLocalization: LocaleMap = null;
+  protected readonly _descriptionLocalization: LocaleMap;
   get descriptionLocalization(){
     return this._descriptionLocalization;
   }
@@ -173,7 +173,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       this._examples = examples ? {} : null;
       if(this._examples){
         availableLanguages().forEach(language => {
-          this._examples[language as keyof typeof this._examples]
+          this._examples![language as keyof typeof this._examples]
             = i18next.t(`commands:${this.asciiName}.examples` as any, { lng: language }).trim();
         });
       }
@@ -181,7 +181,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       this._usage = usage ? {} : null;
       if(this._usage){
         availableLanguages().forEach(language => {
-          this._usage[language as keyof typeof this._usage]
+          this._usage![language as keyof typeof this._usage]
             = i18next.t(`commands:${this.asciiName}.usage` as any, { lng: language }).trim();
         });
       }
@@ -193,10 +193,9 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           type: arg.type,
           name: arg.name,
           required: arg.required || false,
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-          description: i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any) as string,
+          description: i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any),
           descriptionLocalization: {} as LocaleMap,
-          choices: [] as LocalizedSlashCommandArgument["choices"],
+          choices: [],
           autoCompleteEnabled: arg.autoCompleteEnabled || false,
         };
         availableLanguages().forEach(language => {
@@ -219,10 +218,10 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
             if(localized === resultChoice.name) return;
             resultChoice.nameLocalizations[language as keyof LocaleMap] = localized.trim();
           });
-          result.choices.push(resultChoice);
+          result.choices!.push(resultChoice);
         });
 
-        if(result.choices.length === 0){
+        if(result.choices!.length === 0){
           delete result.choices;
         }
 
@@ -337,15 +336,15 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           nameLocalizations: Object.entries(choice.nameLocalizations).length > 0 ? choice.nameLocalizations : null,
         })) as ApplicationCommandOptionsChoice[],
         autocomplete: arg.autoCompleteEnabled || false,
-      };
+      } as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean;
 
-      if(discordCommandStruct.choices){
+      if("choices" in discordCommandStruct){
         delete discordCommandStruct.autocomplete;
-      }else{
+      }else if("autocomplete" in discordCommandStruct){
         delete discordCommandStruct.choices;
       }
 
-      return discordCommandStruct as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean;
+      return discordCommandStruct;
     });
 
     if(options && options.length > 0){
@@ -381,7 +380,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         defaultMemberPermissions,
       };
       availableLanguages().forEach(language => {
-        messageCommand.nameLocalizations[language as keyof LocaleMap] = i18next.t(`commands:${this.asciiName}.messageCommandName` as any, { lng: language });
+        messageCommand.nameLocalizations[language as keyof LocaleMap] = i18next.t(`commands:${this.asciiName}.messageCommandName` as any, { lng: language })!;
       });
       result.push(messageCommand);
     }

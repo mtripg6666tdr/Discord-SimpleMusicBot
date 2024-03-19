@@ -43,10 +43,10 @@ interface PagenationEvents extends InteractionCollectorEvents {
 }
 
 export class Pagenation extends InteractionCollector<PagenationEvents> {
-  protected _embedsResolvable: MessageEmbedsResolvable = null;
-  protected _embeds: EmbedOptions[] = null;
-  protected _arrowLeftCustomId: string = null;
-  protected _arrowRightCustomId: string = null;
+  protected _embedsResolvable: MessageEmbedsResolvable | null = null;
+  protected _embeds: EmbedOptions[] | null = null;
+  protected _arrowLeftCustomId: string | null = null;
+  protected _arrowRightCustomId: string | null = null;
   protected _currentPage: number;
   protected _totalPage: number;
 
@@ -61,6 +61,7 @@ export class Pagenation extends InteractionCollector<PagenationEvents> {
     if(!this._embeds || !this._embedsResolvable){
       throw new Error("server or embeds not set");
     }
+
     const { customIdMap } = this
       .setMaxInteraction(Infinity)
       .setResetTimeoutOnInteraction(true)
@@ -72,12 +73,15 @@ export class Pagenation extends InteractionCollector<PagenationEvents> {
     this._arrowLeftCustomId = customIdMap.arrowLeft;
     this._arrowRightCustomId = customIdMap.arrowRight;
     this._currentPage = initialPage;
+
+    const firstEmbed = await this.resolvePageEmbed(this._currentPage);
+
+    if(!firstEmbed) throw new Error("Initlal page was invalid.");
+
     this.setMessage(
       await message.reply({
         content: "",
-        embeds: [
-          await this.resolvePageEmbed(this._currentPage),
-        ],
+        embeds: [firstEmbed],
         components: [
           this.createMessageComponents(this._currentPage),
         ],
@@ -89,24 +93,34 @@ export class Pagenation extends InteractionCollector<PagenationEvents> {
   }
 
   protected async edit(page: number, interaction?: ComponentInteraction<ComponentTypes.BUTTON, AnyTextableGuildChannel>){
+    const embed = await this.resolvePageEmbed(page);
+
+    if(!embed) return;
+
     this._currentPage = page;
+
     const messageContent = {
       content: "",
-      embeds: [
-        await this.resolvePageEmbed(page),
-      ],
+      embeds: [embed],
       components: [
         this.createMessageComponents(page),
       ],
     };
+
     if(interaction){
       this.setMessage(await interaction.editOriginal(messageContent));
-    }else{
+    }else if(this.message){
       await this.message.edit(messageContent);
+    }else{
+      throw new Error("The message has not been sent yet.");
     }
   }
 
-  protected async resolvePageEmbed(page: number){
+  protected resolvePageEmbed(page: number){
+    if(!this._embeds || !this._embedsResolvable){
+      throw new Error("server or embeds not set");
+    }
+
     if(page < 0 || page >= this._totalPage){
       return null;
     }else if(this._embeds[page]){
@@ -119,11 +133,20 @@ export class Pagenation extends InteractionCollector<PagenationEvents> {
         return this._embeds[page] = embed;
       }
     }else{
-      return this._embeds[page] = await this._embedsResolvable(page);
+      const res = this._embedsResolvable(page);
+      if(res instanceof Promise){
+        return res.then(embed => this._embeds![page] = embed);
+      }else{
+        return this._embeds[page] = this._embedsResolvable(page) as EmbedOptions;
+      }
     }
   }
 
   protected createMessageComponents(page: number){
+    if(!this._arrowLeftCustomId || !this._arrowRightCustomId){
+      throw new Error("Message has not been sent yet.");
+    }
+
     return (
       new MessageActionRowBuilder()
         .addComponents(

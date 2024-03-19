@@ -26,7 +26,6 @@ export * from "./custom";
 export * from "./fs";
 export * from "./googledrive";
 export * from "./niconico";
-export * from "./hibiki";
 export * from "./soundcloud";
 export * from "./spotify";
 export * from "./streamable";

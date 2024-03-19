@@ -35,7 +35,7 @@ export default class Reset extends BaseCommand {
       shouldDefer: false,
       argument: [
         {
-          type: "bool",
+          type: "bool" as const,
           name: "preservequeue",
           required: false,
         },

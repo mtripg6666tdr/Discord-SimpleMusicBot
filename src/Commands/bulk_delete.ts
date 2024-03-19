@@ -34,7 +34,7 @@ export default class BulkDelete extends BaseCommand {
       category: "utility",
       argument: [
         {
-          type: "integer",
+          type: "integer" as const,
           name: "count",
           required: true,
         },
@@ -70,7 +70,8 @@ export default class BulkDelete extends BaseCommand {
         const msgs = allMsgs.filter(_msg => _msg.author.id === context.client.user.id && _msg.id !== reply.id);
         msgs.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
         messages.push(...msgs);
-        before = allMsgs.at(-1).id;
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        before = allMsgs.at(-1)!.id;
         i++;
         await reply.edit(
           `:mag:${t("commands:bulk_delete.loading")}(${
@@ -109,7 +110,8 @@ export default class BulkDelete extends BaseCommand {
         // bulk delete
         await message.channel.deleteMessages(
           messages.map(msg => msg.id),
-          t("commands:bulk_delete.auditLog", { issuer: message.member.username, count })
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+          t("commands:bulk_delete.auditLog", { issuer: message.member.username, count })!
         );
         await reply.edit({
           content: `:sparkles:${t("commands:bulk_delete.finish")}`,
@@ -119,7 +121,8 @@ export default class BulkDelete extends BaseCommand {
       });
       collector.on("timeout", () => {
         reply.edit({
-          content: t("commands:bulk_delete.cancel"),
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+          content: t("commands:bulk_delete.cancel")!,
           components: [],
         }).catch(this.logger.error);
       });
@@ -127,7 +130,8 @@ export default class BulkDelete extends BaseCommand {
     catch(er){
       this.logger.error(er);
       if(reply){
-        await reply.edit(t("failed")).catch(this.logger.error);
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        await reply.edit(t("failed")!).catch(this.logger.error);
       }
     }
   }

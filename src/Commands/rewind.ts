@@ -36,7 +36,7 @@ export default class Rewind extends BaseCommand {
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(!context.server.player.isPlaying){
-      message.reply(t("notPlaying")).catch(this.logger.error);
+      message.reply(t("notPlaying")!).catch(this.logger.error);
     }else{
       await message.reply({
         content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:rewind:${t("commands:rewind.success")}:+1:`,

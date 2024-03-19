@@ -53,7 +53,7 @@ type CommandHelp = {
 };
 
 export type ListCommandWithArgsOptions = BaseListCommand & CommandHelp & {
-  argument: [firstArgument: SlashCommandArgument, ...restArguments: SlashCommandArgument[]],
+  argument: SlashCommandArgument[],
 };
 
 export type ListCommandWithoutArgsOptions = BaseListCommand & Partial<CommandHelp>;
@@ -90,7 +90,7 @@ export type SlashCommandArgument = {
 export type LocalizedSlashCommandArgument = Omit<SlashCommandArgument, "choices"> & {
   description: string,
   descriptionLocalization: LocaleMap,
-  choices: {
+  choices?: {
     name: string,
     value: string,
     nameLocalizations: LocaleMap,

@@ -16,7 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { baseYoutubeDlStrategy } from "./baseYoutubeDlStrategy";
+import { Cache } from "./base";
+import { YoutubeDlInfo, baseYoutubeDlStrategy } from "./baseYoutubeDlStrategy";
 import { BinaryManager } from "../../../Component/binaryManager";
 
 const ytDlPBinaryManager = new BinaryManager({
@@ -26,13 +27,17 @@ const ytDlPBinaryManager = new BinaryManager({
   checkImmediately: false,
 });
 
-type ytDlP = "ytDlPatchedYoutubeDl";
-const ytDlP: ytDlP = "ytDlPatchedYoutubeDl";
+type ytDlPatchedYoutubeDl = "ytDlPatchedYoutubeDl";
+const ytDlPatchedYoutubeDl: ytDlPatchedYoutubeDl = "ytDlPatchedYoutubeDl";
 
-export class ytDlPatchedYoutubeDl extends baseYoutubeDlStrategy<ytDlP> {
+export class YtDlPatchedYoutubeDl extends baseYoutubeDlStrategy<ytDlPatchedYoutubeDl> {
   constructor(priority: number){
-    super(priority, ytDlP, ytDlPBinaryManager);
+    super(priority, ytDlPatchedYoutubeDl, ytDlPBinaryManager);
+  }
+
+  protected override cacheIsValid(cache?: Cache<any, any> | undefined): cache is Cache<ytDlPatchedYoutubeDl, YoutubeDlInfo> {
+    return cache?.type === YtDlPatchedYoutubeDl;
   }
 }
 
-export default ytDlPatchedYoutubeDl;
+export default YtDlPatchedYoutubeDl;

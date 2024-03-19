@@ -98,7 +98,7 @@ export class Normalizer extends Readable {
       if(!this.origin.destroyed){
         this.origin.destroy();
       }
-      this.origin = null;
+      this.origin = null!;
       try{
         if("_readableState" in this){
           // @ts-expect-error 2339
