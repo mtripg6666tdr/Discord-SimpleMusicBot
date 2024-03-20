@@ -33,7 +33,7 @@ const config = useConfig();
  */
 export class MusicBot extends MusicBotBase {
   // クライアントの初期化
-  protected readonly _client = null as discord.Client;
+  protected readonly _client: discord.Client;
   // eslint-disable-next-line @typescript-eslint/prefer-readonly
   private _isReadyFinished = false;
 
@@ -41,7 +41,7 @@ export class MusicBot extends MusicBotBase {
     return this._isReadyFinished;
   }
 
-  private readonly _telemetry: Telemetry = null;
+  private readonly _telemetry: Telemetry | null = null;
 
   get telemetry(){
     return this._telemetry;
@@ -136,10 +136,14 @@ export class MusicBot extends MusicBotBase {
    * @returns コマンドを実行する際にランナーに渡す引数
    */
   createCommandRunnerArgs(guildId: string, options: string[], optiont: string, locale: string): CommandArgs{
+    if(!this.guildData.has(guildId)){
+      throw new Error("The specified guild was not found.");
+    }
+
     return {
       args: options,
       bot: this,
-      server: this.guildData.get(guildId),
+      server: this.guildData.get(guildId)!,
       rawArgs: optiont,
       client: this._client,
       initData: this.initData.bind(this),

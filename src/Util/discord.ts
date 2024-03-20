@@ -26,7 +26,7 @@ const config = useConfig();
 export const users = {
   isDJ(member: Member, options: CommandArgs){
     return channels.sameVC(member, options)
-      && member.roles.some(roleId => config.djRoleNames.includes(member.guild.roles.get(roleId).name));
+      && member.roles.some(roleId => config.djRoleNames.includes(member.guild.roles.get(roleId)!.name));
   },
   isPrivileged(member: Member){
     return member.permissions.has("MANAGE_GUILD")
@@ -51,7 +51,7 @@ export const channels = {
   },
   getVoiceMember(options: CommandArgs){
     if(!options.server.player.isConnecting) return null;
-    return options.server.connectingVoiceChannel.voiceMembers || null;
+    return options.server.connectingVoiceChannel!.voiceMembers || null;
   },
   sameVC(member: Member, options: CommandArgs){
     return this.getVoiceMember(options)?.has(member.id) || false;

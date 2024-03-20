@@ -107,9 +107,9 @@ const audioExtensions = [
  * @param url 検査対象のURL
  * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
  */
-export function isAvailableRawAudioURL(url: string, { checkResponse }?: { checkResponse: false }): boolean;
-export function isAvailableRawAudioURL(url: string, { checkResponse }: { checkResponse: true }): Promise<boolean>;
-export function isAvailableRawAudioURL(url: string, { checkResponse = false } = {}){
+export function isAvailableRawAudioURL(url: string | null, { checkResponse }?: { checkResponse: false }): boolean;
+export function isAvailableRawAudioURL(url: string | null, { checkResponse }: { checkResponse: true }): Promise<boolean>;
+export function isAvailableRawAudioURL(url: string | null, { checkResponse = false } = {}){
   // check if the url variable is valid string object.
   if(!url || typeof url !== "string"){
     return false;

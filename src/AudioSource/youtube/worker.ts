@@ -42,7 +42,6 @@ const searchOptions = {
 parentPort.unref();
 
 function postMessage(message: workerMessage|WithId<workerMessage>){
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
   parentPort!.postMessage(message);
 }
 

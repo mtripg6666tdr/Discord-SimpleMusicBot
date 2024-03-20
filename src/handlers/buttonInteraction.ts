@@ -37,7 +37,7 @@ export async function handleButtonInteraction(
   }
 
   if(interaction.data.customID.startsWith("control_")){
-    let command: string = null;
+    let command: string = null!;
     switch(interaction.data.customID){
       case "control_rewind":
         command = "rewind";

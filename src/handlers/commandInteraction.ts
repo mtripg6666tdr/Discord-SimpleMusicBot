@@ -40,7 +40,7 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
     && interaction.channel.type !== discord.ChannelTypes.GUILD_VOICE
   ){
     await interaction.createMessage({
-      content: i18next.t("invalidChannel", { lng: interaction.locale }),
+      content: i18next.t("invalidChannel", { lng: interaction.locale })!,
     });
     return;
   }

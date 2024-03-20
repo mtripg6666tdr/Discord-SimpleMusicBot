@@ -116,7 +116,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   /**
    *  接続され、再生途中にあるか（たとえ一時停止されていても）
    */
-  get isPlaying(): boolean{
+  get isPlaying(): boolean {
     return this.isConnecting
       && !!this._player
       && (this._player.state.status === AudioPlayerStatus.Playing || this._player.state.status === AudioPlayerStatus.Paused || !!this._waitForLiveAbortController);
@@ -126,7 +126,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
    *  VCに接続中かどうか
    */
   get isConnecting(): boolean{
-    return this.server.connection && this.server.connection.state.status === VoiceConnectionStatus.Ready;
+    return !!this.server.connection && this.server.connection.state.status === VoiceConnectionStatus.Ready;
   }
 
   /**
@@ -561,7 +561,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.emit("disconnectAttempt");
 
     if(this.server.connection){
-      this.logger.info("Disconnected from " + this.server.connectingVoiceChannel.id);
+      this.logger.info("Disconnected from " + this.server.connectingVoiceChannel!.id);
       this.server.connection.disconnect();
       this.server.connection.destroy();
       this.emit("disconnect");

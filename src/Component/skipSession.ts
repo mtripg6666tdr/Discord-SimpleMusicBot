@@ -144,6 +144,10 @@ export class SkipSession extends ServerManagerBase<{}> {
   }
 
   private getVoiceMembers(){
+    if(!this.server.connectingVoiceChannel){
+      throw new Error("Voice connection has been already disposed.");
+    }
+
     return this.server.connectingVoiceChannel.voiceMembers;
   }
 

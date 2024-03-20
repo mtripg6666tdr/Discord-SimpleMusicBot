@@ -39,8 +39,7 @@ export async function onVoiceChannelJoin(
     // ミュート状態/抑制状態なら自分で解除を試みる
     if(member.voiceState?.suppress || member.voiceState?.mute){
       // VC参加 => 抑制状態ならそれの解除を試みる
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-      const voiceChannel = this._client.getChannel(newChannel.id) as discord.VoiceChannel | discord.StageChannel;
+      const voiceChannel = this._client.getChannel<discord.VoiceChannel | discord.StageChannel>(newChannel.id)!;
       if(!("guild" in voiceChannel)) return;
       voiceChannel.guild.editMember(this._client.user.id, {
         mute: false,
@@ -53,7 +52,7 @@ export async function onVoiceChannelJoin(
           .catch(er2 => {
             this.logger.warn(er2);
             this._client.rest.channels.createMessage(
-              this.guildData.get((newChannel as discord.VoiceChannel).guild.id).boundTextChannel,
+              this.guildData.get((newChannel as discord.VoiceChannel).guild.id)!.boundTextChannel,
               {
                 content: `:sob:${i18next.t("suppressed", { lng: server.locale })}`,
               }
@@ -77,7 +76,7 @@ export async function onVoiceChannelJoin(
           (
             (
               !server.connection
-              || (server.bgmConfig.mode === "prior" && server.connectingVoiceChannel.id !== server.bgmConfig.voiceChannelId))
+              || (server.bgmConfig.mode === "prior" && server.connectingVoiceChannel!.id !== server.bgmConfig.voiceChannelId))
             && !server.queue.isBGM
           )
           || server.player.finishTimeout

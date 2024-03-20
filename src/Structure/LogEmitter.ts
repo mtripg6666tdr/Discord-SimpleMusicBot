@@ -24,9 +24,9 @@ import { getLogger } from "../logger";
 
 export abstract class LogEmitter<Events extends EventDictionary> extends TypedEventEmitter<Events> {
   protected logger: LoggerObjectWithContext;
-  private guildId: string = null;
+  private guildId: string | null = null;
 
-  constructor(tag: string, id?: string){
+  constructor(tag: string, id?: string | null){
     super();
     this.logger = getLogger(tag, true);
     if(id){

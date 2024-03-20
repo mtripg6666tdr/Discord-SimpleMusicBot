@@ -170,6 +170,11 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
 
   decideItems(nums: number[]){
     this.status = "destroyed";
+
+    if(!this._responseMessage){
+      throw new Error("Search result has not been sent yet.");
+    }
+
     return {
       urls: nums.map(n => this.options[n - 1].url),
       responseMessage: this._responseMessage,
