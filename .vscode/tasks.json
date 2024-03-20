@@ -5,7 +5,7 @@
       "type": "shell",
       "group": "build",
       "command": [
-        "node builder.mjs bake && npx tsc --incremental -p tsconfig.build.json"
+        "node builder.mjs bake && npx tsc --incremental -p util/tsconfig/tsconfig.build.json"
       ],
       "label": "Transpile TypeScript"
     },
