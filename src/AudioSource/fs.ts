@@ -27,7 +27,7 @@ import { retrieveRemoteAudioInfo } from "../Util";
 
 export class FsStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
   constructor(){
-    super("fs");
+    super({ isCacheable: false });
   }
 
   async init(url: string, _: AudioSourceBasicJsonFormat | null, t: i18n["t"]){

@@ -94,7 +94,7 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
 
   if(preventSourceCache){
     logger.debug("Skipping source-caching due to private source");
-  }else if(basicInfo && !isNaN(basicInfo.lengthSeconds) && !basicInfo.unableToCache){
+  }else if(basicInfo && !isNaN(basicInfo.lengthSeconds) && basicInfo.isCachable){
     cacheManager.addSource(basicInfo, fromPersistentCache);
   }
 

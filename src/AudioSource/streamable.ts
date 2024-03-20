@@ -26,10 +26,6 @@ import { AudioSource } from "./audiosource";
 export class Streamable extends AudioSource<string, StreamableJsonFormat> {
   protected streamUrl = "";
 
-  constructor(){
-    super("streamable");
-  }
-
   async init(url: string, prefetched: StreamableJsonFormat | null){
     this.url = url;
     const id = StreamableApi.getVideoId(url);

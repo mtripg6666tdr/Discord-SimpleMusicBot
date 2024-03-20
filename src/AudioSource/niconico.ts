@@ -32,7 +32,7 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
   protected views = 0;
 
   constructor(){
-    super("niconico");
+    super({ isSeekable: false });
   }
 
   async init(url: string, prefetched: NiconicoJsonFormat, t: i18n["t"]){

@@ -66,10 +66,6 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     this._relatedVideos = value;
   }
 
-  constructor(){
-    super("youtube");
-  }
-
   get isFallbacked(){
     return typeof this.strategyId === "number" && this.strategyId !== 0 && this.strategyId !== 1;
   }

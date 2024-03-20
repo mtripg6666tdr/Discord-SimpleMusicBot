@@ -31,10 +31,6 @@ export class BestdoriS extends AudioSource<string, BestdoriJsonFormat> {
   protected arranger: string;
   private id: number;
 
-  constructor(){
-    super("bestdori");
-  }
-
   async init(url: string, prefetched: BestdoriJsonFormat, t: i18n["t"]){
     this.url = url;
     const id = BestdoriApi.instance.getAudioId(url);

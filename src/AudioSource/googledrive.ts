@@ -27,8 +27,7 @@ import { retrieveHttpStatusCode, retrieveRemoteAudioInfo } from "../Util";
 
 export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat> {
   constructor(){
-    super("googledrive");
-    this._unableToCache = true;
+    super({ isCacheable: false });
   }
 
   async init(url: string, prefetched: AudioSourceBasicJsonFormat | null, t: i18n["t"]){

@@ -21,8 +21,6 @@ import type { i18n } from "i18next";
 import type { EmbedField } from "oceanic.js";
 import type { Readable } from "stream";
 
-import * as niconicoS from "./niconico";
-import * as soundcloudS from "./soundcloud";
 import { YouTube } from "./youtube";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { getLogger } from "../logger";
@@ -98,12 +96,6 @@ export abstract class AudioSource<T extends ThumbnailType, U extends AudioSource
     this._description = value;
   }
 
-  // キャッシュできないかどうかを表すフラグ
-  protected _unableToCache: boolean = false;
-  get unableToCache(){
-    return this._unableToCache;
-  }
-
   // サムネイル
   private _thumbnail: T;
   get thumbnail(){
@@ -111,12 +103,6 @@ export abstract class AudioSource<T extends ThumbnailType, U extends AudioSource
   }
   protected set thumbnail(value: T){
     this._thumbnail = value;
-  }
-
-  // サービス識別子
-  private readonly _serviceIdentifer: AudioSourceTypeIdentifer;
-  protected get serviceIdentifer(): AudioSourceTypeIdentifer{
-    return this._serviceIdentifer;
   }
 
   // 非公開ソースかどうかを表すフラグ
@@ -128,12 +114,25 @@ export abstract class AudioSource<T extends ThumbnailType, U extends AudioSource
     this._isPrivateSource = value;
   }
 
+  // キャッシュできるかどうかを表すフラグ
+  protected _isCacheable: boolean;
+  get isCachable(){
+    return this._isCacheable;
+  }
+
+  private readonly _isSeekable: boolean;
+  get isSeekable(){
+    return this._isSeekable;
+  }
+
   /** オーディオソースの種類に対して生成されるロガーを表します */
   protected logger: LoggerObject;
 
-  constructor(serviceType: AudioSourceTypeIdentifer){
-    this._serviceIdentifer = serviceType;
+  constructor(options: { isSeekable?: boolean, isCacheable?: boolean } = {}){
+    options = Object.assign({ isSeekable: true, isCacheable: false }, options);
     this.logger = getLogger(this.constructor.name);
+    this._isSeekable = options.isSeekable!;
+    this._isCacheable = options.isCacheable!;
   }
 
   /** 現在再生中の曲を示すEmbedFieldを生成します。 */
@@ -156,11 +155,6 @@ export abstract class AudioSource<T extends ThumbnailType, U extends AudioSource
   /** オーディオソースがYouTubeであるかを返します。それ以外のソースに対してはinstanceofを使用してください。 */
   isYouTube(): this is YouTube {
     return this instanceof YouTube;
-  }
-
-  /** ソースがシークできるかどうかを表します */
-  isUnseekable(){
-    return this instanceof soundcloudS.SoundCloudS || this instanceof niconicoS.NicoNicoS;
   }
 
   /** プライベートなソースとして設定します */

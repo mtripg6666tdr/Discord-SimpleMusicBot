@@ -24,8 +24,7 @@ import { createFragmentalDownloadStream, downloadAsReadable, isAvailableRawAudio
 
 export class CustomStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
   constructor(){
-    super("custom");
-    this._unableToCache = true;
+    super({ isCacheable: false });
   }
 
   async init(url: string, prefetched: AudioSourceBasicJsonFormat | null, t: i18n["t"]){

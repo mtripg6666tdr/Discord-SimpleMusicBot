@@ -32,7 +32,7 @@ export class SoundCloudS extends AudioSource<string, SoundcloudJsonFormat> {
   protected author: string;
 
   constructor(){
-    super("soundcloud");
+    super({ isSeekable: false });
   }
 
   async init(url: string, prefetched: SoundcloudJsonFormat | null, t: i18n["t"]){

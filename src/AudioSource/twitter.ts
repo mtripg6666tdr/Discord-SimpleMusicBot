@@ -28,10 +28,6 @@ import { retrieveRemoteAudioInfo } from "../Util";
 export class Twitter extends AudioSource<string, TwitterJsonFormat> {
   private streamUrl = "";
 
-  constructor(){
-    super("twitter");
-  }
-
   async init(url: string, prefetched: TwitterJsonFormat | null, t: i18n["t"]){
     this.url = url;
     if(!Twitter.validateUrl(url)) throw new Error("Invalid Twitter url.");
