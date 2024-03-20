@@ -37,7 +37,7 @@ export default class Dc extends BaseCommand {
     context.server.updateBoundChannel(message);
     // そもそも再生状態じゃないよ...
     if(!context.server.player.isConnecting){
-      message.reply(t("notPlaying")!).catch(this.logger.error);
+      message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }
     // 停止しま～す

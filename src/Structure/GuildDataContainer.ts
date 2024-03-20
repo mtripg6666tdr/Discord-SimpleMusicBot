@@ -400,7 +400,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         });
         try{
           if(!targetVC.permissionsOf(this.bot.client.user.id).has("CONNECT")){
-            throw new Error(t("guildDataContainer.unableToJoinPermission")!);
+            throw new Error(t("guildDataContainer.unableToJoinPermission"));
           }
           await this.joinVoiceChannelOnly(targetVC.id);
           await connectingMessage.edit({
@@ -512,15 +512,15 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         const ch = this.bot.client.getChannel<TextChannel>(ids[ids.length - 2]);
 
         if(!ch || !("getMessage" in ch) || typeof ch.getMessage !== "function"){
-          throw new Error(t("guildDataContainer.notTextChannel")!);
+          throw new Error(t("guildDataContainer.notTextChannel"));
         }
 
         const msg = await ch.getMessage(ids[ids.length - 1]);
 
         if(ch.guild.id !== msg.channel.guild.id){
-          throw new Error(t("guildDataContainer.unableToPlayOtherServer")!);
+          throw new Error(t("guildDataContainer.unableToPlayOtherServer"));
         }else if(msg.attachments.size <= 0 || !Util.isAvailableRawAudioURL(msg.attachments.first()?.url || null)){
-          throw new Error(t("guildDataContainer.attachmentNotFound")!);
+          throw new Error(t("guildDataContainer.attachmentNotFound"));
         }
 
         const item = await this.queue.addQueue({
@@ -554,7 +554,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         addedBy: message.member,
         sourceType: "custom",
         first,
-        message: await message.reply(t("pleaseWait")!),
+        message: await message.reply(t("pleaseWait")),
         privateSource,
       });
 

@@ -52,7 +52,7 @@ export default class Frame extends BaseCommand {
 
     // そもそも再生状態ではない場合
     if(!server.player.isConnecting || !server.player.isPlaying){
-      await message.reply(t("notPlaying")!).catch(this.logger.error);
+      await message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }
 
@@ -74,7 +74,7 @@ export default class Frame extends BaseCommand {
 
     if(context.rawArgs !== "" && vinfo.isLiveStream){
       await message.channel.createMessage({
-        content: t("commands:frame.liveStreamWithTime")!,
+        content: t("commands:frame.liveStreamWithTime"),
       });
       return;
     }

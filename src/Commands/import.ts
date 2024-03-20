@@ -133,7 +133,7 @@ export default class Import extends BaseCommand {
               t("songProcessingInProgress", {
                 totalSongCount: t("totalSongCount", { count: qs.length }),
                 currentSongCount: t("currentSongCount", { count: i + 1 }),
-              })!
+              })
             );
           }
           if(cancellation.cancelled){

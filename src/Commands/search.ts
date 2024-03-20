@@ -98,7 +98,7 @@ export abstract class SearchBase<T> extends BaseCommand {
       }
       await searchPanel.consumeSearchResult(this.searchContent(context.rawArgs, context, t), this.consumer.bind(this), t);
     }else{
-      await message.reply(t("commands:search.noArgument")!).catch(this.logger.error);
+      await message.reply(t("commands:search.noArgument")).catch(this.logger.error);
     }
   }
 
@@ -154,7 +154,7 @@ export default class Search extends SearchBase<ytsr.Video[] | dYtsr.Video[]> {
       title: "title" in item ? item.title : `*${item.name}`,
       duration: item.duration || "0",
       thumbnail: ("bestThumbnail" in item ? item.bestThumbnail.url : item.thumbnail) || DefaultAudioThumbnailURL,
-      author: item.author?.name || t("unknown")!,
+      author: item.author?.name || t("unknown"),
       description: `${t("length")}: ${item.duration}, ${t("channelName")}: ${item.author?.name || t("unknown")}`,
     })).filter(n => n);
   }

@@ -40,7 +40,7 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
       this.title = await GoogleDrive.retriveFilename(url);
       this.url = url;
       if(await retrieveHttpStatusCode(this.url) !== 200){
-        throw new Error(t("urlNotFound")!);
+        throw new Error(t("urlNotFound"));
       }
       const info = await retrieveRemoteAudioInfo((await this.fetch()).url);
       this.lengthSeconds = info.lengthSeconds || 0;

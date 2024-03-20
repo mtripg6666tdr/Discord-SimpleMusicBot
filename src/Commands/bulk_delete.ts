@@ -109,7 +109,7 @@ export default class BulkDelete extends BaseCommand {
         await message.channel.deleteMessages(
           messages.map(msg => msg.id),
            
-          t("commands:bulk_delete.auditLog", { issuer: message.member.username, count })!
+          t("commands:bulk_delete.auditLog", { issuer: message.member.username, count })
         );
         await reply.edit({
           content: `:sparkles:${t("commands:bulk_delete.finish")}`,
@@ -120,7 +120,7 @@ export default class BulkDelete extends BaseCommand {
       collector.on("timeout", () => {
         reply.edit({
            
-          content: t("commands:bulk_delete.cancel")!,
+          content: t("commands:bulk_delete.cancel"),
           components: [],
         }).catch(this.logger.error);
       });
@@ -128,7 +128,7 @@ export default class BulkDelete extends BaseCommand {
     catch(er){
       this.logger.error(er);
       if(reply){
-        await reply.edit(t("failed")!).catch(this.logger.error);
+        await reply.edit(t("failed")).catch(this.logger.error);
       }
     }
   }

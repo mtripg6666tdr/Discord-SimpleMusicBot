@@ -56,7 +56,7 @@ export default class Invoke extends BaseCommand {
     // extract a requested normal command
     const commandInfo = CommandMessage.resolveCommandMessage(context.rawArgs, 0);
     if(commandInfo.command === "invoke"){
-      await message.reply(t("commands:invoke.recursiveInvoke")!).catch(this.logger.error);
+      await message.reply(t("commands:invoke.recursiveInvoke")).catch(this.logger.error);
       return;
     }
 
@@ -67,10 +67,10 @@ export default class Invoke extends BaseCommand {
       context.rawArgs = commandInfo.rawOptions;
       await ci.checkAndRun(message, context).catch(this.logger.error);
       if(!message["isMessage"] && !message["_interactionReplied"]){
-        await message.reply(t("commands:invoke.executed")!).catch(this.logger.error);
+        await message.reply(t("commands:invoke.executed")).catch(this.logger.error);
       }
     }else{
-      await message.reply(t("commands:invoke.commandNotFound")!).catch(this.logger.error);
+      await message.reply(t("commands:invoke.commandNotFound")).catch(this.logger.error);
     }
   }
 

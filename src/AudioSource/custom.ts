@@ -39,7 +39,7 @@ export class CustomStream extends AudioSource<string, AudioSourceBasicJsonFormat
       this.title = info.displayTitle || this.extractFilename() || t("audioSources.customStream");
       this.lengthSeconds = info.lengthSeconds || 0;
     }else{
-      throw new Error(t("audioSources.invalidStream")!);
+      throw new Error(t("audioSources.invalidStream"));
     }
 
     this.isPrivateSource = this.url.startsWith("https://cdn.discordapp.com/ephemeral-attachments/");

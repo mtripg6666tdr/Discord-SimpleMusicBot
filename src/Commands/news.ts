@@ -92,7 +92,7 @@ export default class News extends BaseCommand {
         });
 
       const responseMessage = await message.reply({
-        content: t("search.alreadyOpen")!,
+        content: t("search.alreadyOpen"),
         components: [
           new MessageActionRowBuilder()
             .addComponents(

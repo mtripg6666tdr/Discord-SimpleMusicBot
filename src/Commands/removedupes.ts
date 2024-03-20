@@ -97,7 +97,7 @@ export default class RmDuplicated extends BaseCommand {
         }`
       ).catch(this.logger.error);
     }else{
-      message.reply(t("commands:removedupes.noSongRemoved")!).catch(this.logger.error);
+      message.reply(t("commands:removedupes.noSongRemoved")).catch(this.logger.error);
     }
   }
 }

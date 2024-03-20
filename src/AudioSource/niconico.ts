@@ -48,7 +48,7 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
     }else{
       const info = await this.nico.getVideoInfo();
       if(info.isDeleted || info.isPrivate){
-        throw new Error(t("audioSources.videoNotPlayable")!);
+        throw new Error(t("audioSources.videoNotPlayable"));
       }
       this.title = info.title;
       this.description = htmlToText(info.description);

@@ -46,7 +46,7 @@ export default class Seek extends BaseCommand {
 
     // そもそも再生状態ではない場合
     if(!server.player.isPlaying || server.player.preparing){
-      await message.reply(t("notPlaying")!).catch(this.logger.error);
+      await message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }else if(server.player.currentAudioInfo!.lengthSeconds === 0 || server.player.currentAudioInfo!.isUnseekable()){
       await message.reply(`:warning:${t("commands:seek.unseekable")}`).catch(this.logger.error);

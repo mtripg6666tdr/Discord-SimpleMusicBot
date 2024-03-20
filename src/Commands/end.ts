@@ -36,11 +36,11 @@ export default class End extends BaseCommand {
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(!context.server.player.isPlaying){
-      message.reply(t("errorOccurred")!).catch(this.logger.error);
+      message.reply(t("errorOccurred")).catch(this.logger.error);
       return;
     }
     if(context.server.queue.length <= 1){
-      message.reply(t("commands:end.queueWasEmpty")!).catch(this.logger.error);
+      message.reply(t("commands:end.queueWasEmpty")).catch(this.logger.error);
       return;
     }
     context.server.queue.removeFrom2nd();

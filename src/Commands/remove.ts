@@ -43,11 +43,11 @@ export default class Rm extends BaseCommand {
 
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     if(context.args.length === 0){
-      message.reply(t("commands:remove.noArgument")!).catch(this.logger.error);
+      message.reply(t("commands:remove.noArgument")).catch(this.logger.error);
       return;
     }
     if(context.args.includes("0") && context.server.player.isPlaying){
-      message.reply(t("commands:remove.invalidArgument")!).catch(this.logger.error);
+      message.reply(t("commands:remove.invalidArgument")).catch(this.logger.error);
       return;
     }
 
@@ -148,7 +148,7 @@ export default class Rm extends BaseCommand {
         }`
       ).catch(this.logger.error);
     }else{
-      message.reply(t("commands:remove.unableToRemoveAll")!).catch(this.logger.error);
+      message.reply(t("commands:remove.unableToRemoveAll")).catch(this.logger.error);
     }
   }
 }

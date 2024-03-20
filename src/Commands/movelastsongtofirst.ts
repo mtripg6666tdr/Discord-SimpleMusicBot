@@ -36,7 +36,7 @@ export default class Mltf extends BaseCommand {
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(context.server.queue.length <= 2){
-      message.reply(t("commands:movelastsongtofirst.usableWhen3orMoreQueue")!).catch(this.logger.error);
+      message.reply(t("commands:movelastsongtofirst.usableWhen3orMoreQueue")).catch(this.logger.error);
       return;
     }
     const q = context.server.queue;

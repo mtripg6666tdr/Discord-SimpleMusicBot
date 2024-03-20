@@ -42,7 +42,7 @@ export default class Bgm extends BaseCommand {
 
     // check existing search panel
     if(context.server.searchPanel.has(message.member.id)){
-      message.reply(t("search.alreadyOpen")!).catch(this.logger.error);
+      message.reply(t("search.alreadyOpen")).catch(this.logger.error);
       return;
     }
 

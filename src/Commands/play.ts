@@ -65,7 +65,7 @@ export default class Play extends BaseCommand {
       && !(message["_message"] && message["_message"].referencedMessage)
       && !(message["_interaction"] && "type" in message["_interaction"].data && message["_interaction"].data.type === ApplicationCommandTypes.MESSAGE)
     ){
-      await message.reply(t("commands:play.noContent")!).catch(this.logger.error);
+      await message.reply(t("commands:play.noContent")).catch(this.logger.error);
       return;
     }
 
@@ -154,10 +154,10 @@ export default class Play extends BaseCommand {
     }else if(server.queue.length >= 1){
       // なにもないからキューから再生
       if(!server.player.isPlaying && !server.player.preparing){
-        await message.reply(t("commands:play.playing")!).catch(this.logger.error);
+        await message.reply(t("commands:play.playing")).catch(this.logger.error);
         await server.player.play({ bgm: false });
       }else{
-        await message.reply(t("commands:play.alreadyPlaying")!).catch(this.logger.error);
+        await message.reply(t("commands:play.alreadyPlaying")).catch(this.logger.error);
       }
     }else{
       await message.reply(`✘${t("commands:play.queueEmpty")}`).catch(this.logger.error);

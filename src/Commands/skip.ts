@@ -38,14 +38,14 @@ export default class Skip extends BaseCommand {
     const server = context.server;
     // そもそも再生状態じゃない
     if(server.player.preparing){
-      message.reply(t("commands:skip.preparing")!).catch(this.logger.error);
+      message.reply(t("commands:skip.preparing")).catch(this.logger.error);
       return;
     }else if(server.player.isWaiting){
       await server.player.stop().catch(this.logger.error);
-      message.reply(t("canceled")!).catch(this.logger.error);
+      message.reply(t("canceled")).catch(this.logger.error);
       return;
     }else if(!server.player.isPlaying){
-      message.reply(t("notPlaying")!).catch(this.logger.error);
+      message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }
 

@@ -327,7 +327,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         // まだないの場合（新しくUI用のメッセージを生成する）
         this.logger.info("AutoAddQueue will make a message that will be used to report statuses");
         uiMessage = await options.channel.createMessage({
-          content: i18next.t("loadingInfoPleaseWait", { lng: this.server.locale })!,
+          content: i18next.t("loadingInfoPleaseWait", { lng: this.server.locale }),
         });
       }
 
@@ -461,7 +461,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
             catch(er){
               this.logger.error(er);
               interaction.createFollowup({
-                content: i18next.t("errorOccurred")!,
+                content: i18next.t("errorOccurred"),
               }).catch(this.logger.error);
             }
           });

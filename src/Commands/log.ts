@@ -63,7 +63,7 @@ export default class SystemInfo extends BaseCommand {
     context.server.updateBoundChannel(message);
     // Run default logger
     context.bot.logGeneralInfo();
-    await message.reply(t("commands:log.executing")!);
+    await message.reply(t("commands:log.executing"));
 
     const embeds = [] as EmbedOptions[];
 
@@ -230,7 +230,7 @@ export default class SystemInfo extends BaseCommand {
       await message.channel.createMessage({ embeds }).catch(this.logger.error);
     }
     if(embeds.length === 0){
-      await message.channel.createMessage({ content: t("commands:log.incorrectArgument")! }).catch(this.logger.error);
+      await message.channel.createMessage({ content: t("commands:log.incorrectArgument") }).catch(this.logger.error);
     }
   }
 }

@@ -50,7 +50,7 @@ export default class Searchq extends BaseCommand {
     context.server.updateBoundChannel(message);
 
     if(context.server.queue.length === 0){
-      message.reply(t("commands:searchqueue.queueEmpty")!).catch(this.logger.error);
+      message.reply(t("commands:searchqueue.queueEmpty")).catch(this.logger.error);
       return;
     }
 
