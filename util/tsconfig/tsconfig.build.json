@@ -16,7 +16,7 @@
     "outDir": "dist/",
     "allowJs": false,
     "skipLibCheck": true,
-    "baseUrl": "../../"
+    "rootDir": "../../",
   },
   "include": [
     "src/**/*.ts"
