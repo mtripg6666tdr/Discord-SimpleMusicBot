@@ -15,9 +15,10 @@ COPY --link package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci
 COPY --link ./src ./src
-COPY --link ./tsconfig.bundle.json builder.mjs ./
+COPY --link ./builder.mjs ./
+COPY --link ./util/tsconfig/tsconfig.bundle.json ./util/tsconfig/
 RUN node builder.mjs bake && \
-    npx tsc -p tsconfig.bundle.json && \
+    npx tsc -p util/tsconfig/tsconfig.bundle.json && \
     node builder.mjs bundle && \
     mv ./dist/index.min.js ./dist/index.js && \
     mv ./dist/worker.min.js ./dist/worker.js
