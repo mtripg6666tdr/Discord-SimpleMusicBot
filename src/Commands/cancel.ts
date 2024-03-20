@@ -37,10 +37,8 @@ export default class Cancel extends BaseCommand {
     context.server.updateBoundChannel(message);
     const result = context.server.cancelAll();
     if(result){
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       message.reply(t("commands:cancel.canceling")!).catch(this.logger.error);
     }else{
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       message.reply(t("commands:cancel.noCancelable")!).catch(this.logger.error);
     }
   }

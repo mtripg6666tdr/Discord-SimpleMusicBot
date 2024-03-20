@@ -130,7 +130,6 @@ export default class Import extends BaseCommand {
           });
           if(qs.length <= 10 || i % 10 === 9){
             await statusMessage.edit(
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
               t("songProcessingInProgress", {
                 totalSongCount: t("totalSongCount", { count: qs.length }),
                 currentSongCount: t("currentSongCount", { count: i + 1 }),

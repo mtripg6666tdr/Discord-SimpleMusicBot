@@ -81,14 +81,12 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
         throw new Error("no format found!");
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       format.sort((fa, fb) => fb.bitrate! - fa.bitrate!);
 
       return {
         ...partialResult,
         stream: {
           type: "url" as const,
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
           url: format[0].url!,
           // @ts-expect-error
           streamType: format[0]["container"] === "webm" && format[0]["codec"] === "opus" ? "webm/opus" as const : null,
@@ -119,7 +117,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
     if(info.video_details.upcoming) throw new Error("This video is still in upcoming");
     return {
       url,
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+       
       title: info.video_details.title!,
       description: info.video_details.description || "",
       length: Number(info.video_details.durationInSec),

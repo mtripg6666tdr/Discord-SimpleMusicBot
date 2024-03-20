@@ -40,7 +40,6 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
       this.title = await GoogleDrive.retriveFilename(url);
       this.url = url;
       if(await retrieveHttpStatusCode(this.url) !== 200){
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         throw new Error(t("urlNotFound")!);
       }
       const info = await retrieveRemoteAudioInfo((await this.fetch()).url);

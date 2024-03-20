@@ -125,7 +125,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   connectingVoiceChannel: VoiceChannel | StageChannel | null;
 
   get locale(){
-    const guild = this.bot.client.guilds.get(this.getGuildId()!)!;
+    const guild = this.bot.client.guilds.get(this.getGuildId())!;
 
     // try to get the locale from the roles assigned to the bot, if present.
     const localeRegex = /\[locale:(?<locale>[a-z]{0,2}(-[A-Z]{0,2})?)\]$/;
@@ -337,7 +337,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     }
 
     // ニックネームの変更
-    const guild = this.bot.client.guilds.get(this.getGuildId()!)!;
+    const guild = this.bot.client.guilds.get(this.getGuildId())!;
     const botSelf = guild.clientMember;
     let nickname = botSelf.nick;
     // "⏹" これ

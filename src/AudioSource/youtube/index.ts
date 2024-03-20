@@ -183,7 +183,6 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
       };
     }else if(this.cache?.data.type === playDl){
       const info = this.cache.data.data as InfoData;
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const format = info.format.filter(f => f.mimeType?.startsWith("video")).sort((a, b) => b.bitrate! - a.bitrate!)[0];
       const url = format.url || info.LiveStreamData.hlsManifestUrl;
 
@@ -270,7 +269,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
           resolve();
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+         
         const waitTime = Math.max(new Date(startTime!).getTime() - Date.now(), 20 * 1000);
         this.logger.info(`Retrying after ${waitTime}ms`);
 

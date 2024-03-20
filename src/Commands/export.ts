@@ -37,7 +37,6 @@ export default class Export extends BaseCommand {
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
     if(context.server.queue.publicLength === 0){
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       message.reply(t("commands:export.queueEmpty")!).catch(this.logger.error);
       return;
     }

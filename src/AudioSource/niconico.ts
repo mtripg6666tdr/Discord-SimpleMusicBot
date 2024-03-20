@@ -48,7 +48,6 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
     }else{
       const info = await this.nico.getVideoInfo();
       if(info.isDeleted || info.isPrivate){
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         throw new Error(t("audioSources.videoNotPlayable")!);
       }
       this.title = info.title;

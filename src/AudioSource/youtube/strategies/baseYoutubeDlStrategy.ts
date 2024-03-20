@@ -83,7 +83,7 @@ export abstract class baseYoutubeDlStrategy<T extends string> extends Strategy<C
       const formats = info.formats.filter(f => f.format_note === "tiny" || f.video_ext === "none" && f.abr);
 
       if(formats.length === 0) throw new Error("no format found!");
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+
       const [format] = formats.sort((fa, fb) => fb.abr! - fa.abr!);
 
       if(forceUrl){

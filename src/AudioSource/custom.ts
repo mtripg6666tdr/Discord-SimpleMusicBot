@@ -39,7 +39,6 @@ export class CustomStream extends AudioSource<string, AudioSourceBasicJsonFormat
       this.title = info.displayTitle || this.extractFilename() || t("audioSources.customStream");
       this.lengthSeconds = info.lengthSeconds || 0;
     }else{
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       throw new Error(t("audioSources.invalidStream")!);
     }
 
