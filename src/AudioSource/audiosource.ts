@@ -21,8 +21,8 @@ import type { i18n } from "i18next";
 import type { EmbedField } from "oceanic.js";
 import type { Readable } from "stream";
 
-import { NicoNicoS } from "./niconico";
-import { SoundCloudS } from "./soundcloud";
+import * as niconicoS from "./niconico";
+import * as soundcloudS from "./soundcloud";
 import { YouTube } from "./youtube";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { getLogger } from "../logger";
@@ -160,7 +160,7 @@ export abstract class AudioSource<T extends ThumbnailType, U extends AudioSource
 
   /** ソースがシークできるかどうかを表します */
   isUnseekable(){
-    return this instanceof SoundCloudS || this instanceof NicoNicoS;
+    return this instanceof soundcloudS.SoundCloudS || this instanceof niconicoS.NicoNicoS;
   }
 
   /** プライベートなソースとして設定します */
