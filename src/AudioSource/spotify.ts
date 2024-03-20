@@ -22,12 +22,14 @@ import type { EmbedField } from "oceanic.js";
 import type { Track } from "spotify-url-info";
 import type ytsr from "ytsr";
 
+
 import candyget from "candyget";
 import spotifyUrlInfo from "spotify-url-info";
 
 import { AudioSource } from "./audiosource";
 import { searchYouTube } from "./youtube/spawner";
 import { attemptFetchForStrategies } from "./youtube/strategies";
+import { assertIsNotNull } from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
 
 const client = spotifyUrlInfo((url, opts) => candyget(url, "string", opts).then(res => ({ text: () => res.body })));
@@ -81,6 +83,8 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
       // store the result
       this.referenceUrl = target.url;
     }
+
+    assertIsNotNull(this.referenceUrl);
 
     // fetch the video
     const { result } = await attemptFetchForStrategies(this.referenceUrl, forceUrl);

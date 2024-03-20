@@ -213,7 +213,6 @@ export async function retrieveRemoteAudioInfo(url: string): Promise<RemoteAudioI
   if(durationMatcher.test(ffmpegOut)){
     const match = durationMatcher.exec(ffmpegOut)!;
     result.lengthSeconds = Math.ceil(
-       
       match.groups!.length
         .split(":")
         .map(n => Number(n))
@@ -223,13 +222,13 @@ export async function retrieveRemoteAudioInfo(url: string): Promise<RemoteAudioI
 
   if(titleMatcher.test(ffmpegOut)){
     const match = titleMatcher.exec(ffmpegOut)!;
-     
+
     result.title = match.groups!.title?.trim() || null;
   }
 
   if(artistMatcher.test(ffmpegOut)){
     const match = artistMatcher.exec(ffmpegOut)!;
-     
+
     result.artist = match.groups!.artist?.trim() || null;
   }
 
@@ -454,12 +453,6 @@ export function requireIfAny(id: string): unknown {
   }
 }
 
-/** This internal method should be used with assert(). It always returns true. */
-export function is<T>(obj: unknown): obj is T{
-  return true;
-}
+export function assertIs<T>(obj: unknown): asserts obj is T{}
 
-/** This internal method should be used with assert(). It always returns true. */
-export function isNotNull<T>(obj: T | null): obj is T {
-  return true;
-}
+export function assertIsNotNull<T>(obj: T | null): asserts obj is T {}

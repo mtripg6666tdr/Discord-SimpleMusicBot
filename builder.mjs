@@ -24,7 +24,7 @@ function createDefaultBuilder(path){
       external: ["node_modules/*"],
       write: false,
       define: {
-        "global.BUNDLED": "true"
+        "global.BUNDLED": "true",
       },
       sourcemap: "inline",
     });
