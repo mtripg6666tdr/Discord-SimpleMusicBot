@@ -5,7 +5,7 @@ dist
 docs
 node_modules
 test
-util
+util/exampleDbServer
 .env.sample
 .eslint*
 .gitattributes
