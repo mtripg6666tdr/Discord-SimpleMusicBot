@@ -31,30 +31,47 @@ export async function onVoiceChannelLeave(
   member: discord.Member,
   oldChannel: discord.VoiceChannel | discord.StageChannel | discord.Uncached,
 ){
-  if(!("guild" in oldChannel)) return;
+  if(!("guild" in oldChannel)){
+    return;
+  }
+
   const server = this.guildData.get(oldChannel.guild.id);
-  if(!server || !server.connection) return;
+
+  if(!server || !server.connection){
+    return;
+  }
 
   if(member.id === this._client.user.id){
     // サーバー側からのボットの切断
+
     this.logger.info(`forced to disconnect from VC (${server.connectingVoiceChannel?.id})`);
+
     await server.player.disconnect().catch(this.logger.error);
+
     await this._client.rest.channels.createMessage(
       server.boundTextChannel,
       {
         content: `:postbox: ${i18next.t("disconnected", { lng: server.locale })}`,
       }
     ).catch(this.logger.error);
-  }else if(
-    oldChannel.voiceMembers.has(this._client.user.id)
-    && oldChannel.voiceMembers.filter(user => !user.bot).length === 0
-  ){
+  }else if(oldChannel.voiceMembers.has(this._client.user.id) && oldChannel.voiceMembers.filter(user => !user.bot).length === 0){
+    // ボイスチャンネルに参加しているユーザーがボットだけになった時
+
     if(server.queue instanceof QueueManagerWithBgm && server.queue.isBGM){
       await server.player.disconnect().catch(this.logger.error);
-    }else if(server.player.isPlaying && !config.twentyFourSeven.includes(oldChannel.id) && !config.alwaysTwentyFourSeven){
-      // 誰も聞いてる人がいない
+    }else if(server.player.finishTimeout){
+      await server.player.disconnect().catch(this.logger.error);
+
+      await this._client.rest.channels.createMessage(
+        server.boundTextChannel,
+        {
+          content: `:postbox: ${i18next.t("disconnected", { lng: server.locale })}`,
+        }
+      ).catch(this.logger.error);
+    }else if(!config.twentyFourSeven.includes(oldChannel.id) && !config.alwaysTwentyFourSeven){
       if(
-        server.player.currentAudioInfo!.lengthSeconds > 60
+        server.player.isPlaying
+        && server.player.currentAudioInfo!.lengthSeconds > 60
         && server.player.currentAudioInfo!.lengthSeconds - server.player.currentTime / 1000 < 10
       ){
         // かつ、楽曲の長さが60秒以上
@@ -65,46 +82,46 @@ export async function onVoiceChannelLeave(
         if(!server.queue.onceLoopEnabled && !server.queue.loopEnabled){
           server.queue.next().catch(this.logger.error);
         }
+
         await this._client.rest.channels.createMessage(
           server.boundTextChannel,
           {
             content: `:postbox: ${i18next.t("disconnected", { lng: server.locale })}`,
           }
         ).catch(this.logger.error);
-      }else if(!server.player.isPaused){
-        // すでに一時停止されていないならば、一時停止する
-        server.player.pause(member);
-        await this._client.rest.channels.createMessage(
-          server.boundTextChannel,
-          {
-            content: `:pause_button:${i18next.t("autoPaused", { lng: server.locale })}`,
-          }
-        ).catch(this.logger.error);
-        const timer = setTimeout(() => {
-          server.player.off("playCalled", playHandler);
-          server.player.off("disconnect", playHandler);
-          if(server.player.isPaused){
-            this._client.rest.channels.createMessage(
+      }else{
+        // それ以外の場合は、タイムアウトを設定し、一定時間内に追加操作がなかった場合切断する
+        if(server.player.isPlaying && !server.player.isPaused){
+          // まだ一時停止されていないならば、一時停止する
+          server.player.pause(member);
+
+          if(server.boundTextChannel){
+            await this._client.rest.channels.createMessage(
               server.boundTextChannel,
               {
-                content: `:postbox: ${i18next.t("autoDisconnect", { lng: server.locale })}`,
+                content: `:pause_button:${i18next.t("autoPaused", { lng: server.locale })}`,
               }
             ).catch(this.logger.error);
-            server.player.disconnect().catch(this.logger.error);
           }
-        }, 10 * 60 * 1000).unref();
-        const playHandler = () => clearTimeout(timer);
-        server.player.once("playCalled", playHandler);
-        server.player.once("disconnect", playHandler);
-      }
-    }else if(server.player.finishTimeout){
-      await server.player.disconnect().catch(this.logger.error);
-      await this._client.rest.channels.createMessage(
-        server.boundTextChannel,
-        {
-          content: `:postbox: ${i18next.t("disconnected", { lng: server.locale })}`,
         }
-      ).catch(this.logger.error);
+
+        const timer = setTimeout(() => {
+          server.player.off("playCalled", clearIdleTimeout);
+          server.player.off("disconnect", clearIdleTimeout);
+
+          this._client.rest.channels.createMessage(
+            server.boundTextChannel,
+            {
+              content: `:postbox: ${i18next.t("autoDisconnect", { lng: server.locale })}`,
+            }
+          ).catch(this.logger.error);
+
+          server.player.disconnect().catch(this.logger.error);
+        }, 10 * 60 * 1000).unref();
+        const clearIdleTimeout = () => clearTimeout(timer);
+        server.player.once("playCalled", clearIdleTimeout);
+        server.player.once("disconnect", clearIdleTimeout);
+      }
     }
   }
 

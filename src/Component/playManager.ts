@@ -740,26 +740,33 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     }
 
     const timer = setTimeout(() => {
-      this.off("playCalled", playHandler);
-      this.off("disconnectAttempt", playHandler);
+      // unset event handler
+      this.off("playCalled", clearFinishTimeout);
+      this.off("disconnectAttempt", clearFinishTimeout);
+
       this._finishTimeout = false;
-      if(!this.isPlaying && this.server.boundTextChannel){
+
+      if(this.server.boundTextChannel){
         this.server.bot.client.rest.channels
           .createMessage(this.server.boundTextChannel, {
             content: `:wave:${i18next.t("components:play.queueEmptyAndExiting", { lng: this.server.locale })}`,
           })
-          .catch(this.logger.error)
-        ;
+          .catch(this.logger.error);
       }
+
       this.disconnect().catch(this.logger.error);
     }, 10 * 60 * 1000).unref();
+
     this._finishTimeout = true;
-    const playHandler = () => {
+
+    const clearFinishTimeout = () => {
       clearTimeout(timer);
       this._finishTimeout = false;
     };
-    this.once("playCalled", playHandler);
-    this.once("disconnectAttempt", playHandler);
+
+    // set event handler
+    this.once("playCalled", clearFinishTimeout);
+    this.once("disconnectAttempt", clearFinishTimeout);
   }
 
   protected async onStreamFailed(quiet: boolean = false){
