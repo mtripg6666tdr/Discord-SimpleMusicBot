@@ -28,7 +28,7 @@ export class RateLimitController {
       return false;
     }
     let cnt10sec = 0;
-    const currentStore = this.store.get(key).filter(dt => {
+    const currentStore = this.store.get(key)!.filter(dt => {
       const sub = Date.now() - dt;
       if(sub < 10 * 1000) cnt10sec++;
       return sub < 60 * 1000;

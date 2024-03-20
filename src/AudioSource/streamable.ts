@@ -16,21 +16,17 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { exportableCustom, UrlStreamInfo } from ".";
+import type { AudioSourceBasicJsonFormat, UrlStreamInfo } from ".";
 import type { i18n } from "i18next";
 
 import candyget from "candyget";
 
 import { AudioSource } from "./audiosource";
 
-export class Streamable extends AudioSource<string> {
+export class Streamable extends AudioSource<string, StreamableJsonFormat> {
   protected streamUrl = "";
 
-  constructor(){
-    super("streamable");
-  }
-
-  async init(url: string, prefetched?: exportableStreamable){
+  async init(url: string, prefetched: StreamableJsonFormat | null){
     this.url = url;
     const id = StreamableApi.getVideoId(url);
     if(!id) throw new Error("Invalid streamable url");
@@ -44,7 +40,11 @@ export class Streamable extends AudioSource<string> {
       this.lengthSeconds = Math.floor(streamInfo.files["mp4-mobile"].duration);
       this.thumbnail = "https:" + streamInfo.thumbnail_url;
       this.title = streamInfo.title;
-      this.streamUrl = streamInfo.files["mp4-mobile"].url;
+      const streamUrl = streamInfo.files["mp4-mobile"].url;
+      if(!streamUrl){
+        throw new Error("Invalid streamable url.");
+      }
+      this.streamUrl = streamUrl;
     }
     return this;
   }
@@ -73,7 +73,7 @@ export class Streamable extends AudioSource<string> {
     return "";
   }
 
-  exportData(): exportableStreamable{
+  exportData(): StreamableJsonFormat{
     return {
       url: this.url,
       length: this.lengthSeconds,
@@ -84,7 +84,7 @@ export class Streamable extends AudioSource<string> {
   }
 }
 
-export type exportableStreamable = exportableCustom & {
+export type StreamableJsonFormat = AudioSourceBasicJsonFormat & {
   thumbnail: string,
   streamUrl: string,
 };
@@ -98,18 +98,17 @@ export abstract class StreamableApi {
    * @param url 動画のURL
    * @returns 動画のID
    */
-  static getVideoId(url: string): string{
+  static getVideoId(url: string): string | null {
     const match = url.match(/^https?:\/\/streamable.com\/(?<Id>.+)$/);
     if(match){
-      return match.groups.Id;
+      return match.groups?.Id || null;
     }else{
       return null;
     }
   }
 
   static async getVideoDetails(id: string): Promise<StreamableAPIResult>{
-    const BASE_API = "https://api.streamable.com/videos/";
-    return candyget.json(BASE_API + id).then(({ body }) => body as StreamableAPIResult);
+    return candyget.json(`https://api.streamable.com/videos/${id}`).then(({ body }) => body as StreamableAPIResult);
   }
 }
 

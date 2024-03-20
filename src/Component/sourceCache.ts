@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { AudioSource, exportableCustom } from "../AudioSource";
+import type { AudioSource, AudioSourceBasicJsonFormat } from "../AudioSource";
 import type { MusicBotBase } from "../botBase";
 import type dYtsr from "@distube/ytsr";
 import type ytsr from "ytsr";
@@ -44,8 +44,8 @@ interface CacheEvents {
 const config = useConfig();
 
 export class SourceCache extends LogEmitter<CacheEvents> {
-  private readonly _sourceCache: Map<string, AudioSource<any>> = null;
-  private readonly _expireMap: Map<string, number> = null;
+  private readonly _sourceCache: Map<string, AudioSource<any, any>>;
+  private readonly _expireMap: Map<string, number>;
   private readonly cacheDirPath: string;
   private lastCleanup: number = 0;
 
@@ -88,7 +88,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     }
   }
 
-  addSource(content: AudioSource<any>, fromPersistentCache: boolean){
+  addSource(content: AudioSource<any, any>, fromPersistentCache: boolean){
     this._sourceCache.set(content.url, content);
     this.logger.info(`New memory cache added (total: ${this._sourceCache.size})`);
     if(this.enablePersistent && !fromPersistentCache){
@@ -118,7 +118,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     return result;
   }
 
-  getExportable<T extends exportableCustom>(url: string){
+  getExportable<T extends AudioSourceBasicJsonFormat>(url: string){
     return this.getPersistentCache(this.createCacheId(url, "exportable"))
       .then(data => {
         this.emit(data ? "persistentCacheHit" : "persistentCacheNotFound");
@@ -277,9 +277,9 @@ export class SourceCache extends LogEmitter<CacheEvents> {
         })
       )
         .then(ss => ss.map(d => "value" in d ? d.value : null).filter(d => d));
-      files.sort((a, b) => a.lastAccess - b.lastAccess);
+      files.sort((a, b) => a!.lastAccess - b!.lastAccess);
 
-      const currentTotalSize = files.reduce((prev, current) => prev + current.size, 0);
+      const currentTotalSize = files.reduce((prev, current) => prev + current!.size, 0);
       this.logger.info(`Current total cache size: ${getMBytes(currentTotalSize)}MB`);
 
       if(currentTotalSize > maxSize){
@@ -288,8 +288,8 @@ export class SourceCache extends LogEmitter<CacheEvents> {
         const removePaths: string[] = [];
         let current = 0;
         for(let i = 0; i < files.length; i++){
-          current += files[i].size;
-          removePaths.push(files[i].path);
+          current += files[i]!.size;
+          removePaths.push(files[i]!.path);
           if(current >= reduceSize){
             break;
           }

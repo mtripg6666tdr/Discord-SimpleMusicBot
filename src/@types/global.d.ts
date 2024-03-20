@@ -16,11 +16,16 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable eslint-comments/disable-enable-pair */
 /* eslint-disable no-var */
+/* eslint-disable @typescript-eslint/method-signature-style */
 import type { Worker } from "worker_threads";
 
 declare global {
   var workerThread: Worker;
   var BUNDLED: boolean | undefined;
+
+  interface JSON {
+    parse<T>(text: string, reviver?: (this: any, key: string, value: any) => any): T;
+  }
 }

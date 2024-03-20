@@ -48,11 +48,11 @@ export abstract class Backupper extends LogEmitter<{}> {
   /**
    * バックアップ済みの接続ステータス等を取得します
    */
-  abstract getStatusFromBackup(guildIds: string[]): Promise<Map<string, exportableStatuses>>;
+  abstract getStatusFromBackup(guildIds: string[]): Promise<Map<string, exportableStatuses> | null>;
   /**
    * バックアップ済みのキューのデータを取得します
    */
-  abstract getQueueDataFromBackup(guildIds: string[]): Promise<Map<string, YmxFormat>>;
+  abstract getQueueDataFromBackup(guildIds: string[]): Promise<Map<string, YmxFormat> | null>;
   /**
    * サーバーとの接続を破棄します
    */
@@ -112,7 +112,7 @@ export abstract class IntervalBackupper extends Backupper {
         if(!this.previousStatusCache.has(id)){
           return true;
         }else{
-          return !isDeepStrictEqual(this.data.get(id).exportStatus(), JSON.parse(this.previousStatusCache.get(id)));
+          return !isDeepStrictEqual(this.data.get(id)!.exportStatus(), JSON.parse(this.previousStatusCache.get(id)!));
         }
       });
   }

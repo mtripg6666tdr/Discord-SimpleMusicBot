@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import "./dotenv";
+import "dotenv/config";
 import "./logger";
 import "./polyfill";
 import type * as http from "http";
@@ -40,7 +40,7 @@ logger.info("Thank you for using Discord-SimpleMusicBot!");
 logger.info(`Node.js v${process.versions.node}`);
 
 const bot = new MusicBot(process.env.TOKEN, Boolean(config.maintenance));
-let server: http.Server = null;
+let server: http.Server | null = null;
 
 // Webサーバーのインスタンス化
 if(config.webserver){
@@ -53,13 +53,13 @@ if(!config.debug){
   // ハンドルされなかったエラーのハンドル
   process.on("uncaughtException", async (error)=>{
     logger.fatal(error);
-    if(bot.client && config.errorChannel){
+    if(bot.client){
       await reportError(error);
     }
   });
 }else{
   process.on("uncaughtException", async (error)=>{
-    if(bot.client && config.errorChannel){
+    if(bot.client){
       await reportError(error);
     }
     logger.fatal(error);
@@ -120,6 +120,8 @@ initLocalization(config.debug, config.defaultLanguage).then(() => {
 });
 
 async function reportError(err: any){
+  if(!config.errorChannel) return;
+
   try{
     await bot.client.rest.channels.createMessage(config.errorChannel, {
       content: stringifyObject(err),

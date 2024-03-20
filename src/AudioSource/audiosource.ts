@@ -16,13 +16,11 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Sources from ".";
-import type { exportableCustom } from "./custom";
+import type { YouTube } from "./youtube";
 import type { LoggerObject } from "../logger";
 import type { i18n } from "i18next";
 import type { EmbedField } from "oceanic.js";
 import type { Readable } from "stream";
-
 
 import { DefaultAudioThumbnailURL } from "../definition";
 import { getLogger } from "../logger";
@@ -43,7 +41,6 @@ export type AudioSourceTypeIdentifer =
   | "custom"
   | "fs"
   | "googledrive"
-  | "hibiki"
   | "niconico"
   | "soundcloud"
   | "spotify"
@@ -57,11 +54,15 @@ export type DynamicThumbnail = {
 
 type ThumbnailType = string | DynamicThumbnail;
 
+// declare alias and substitute later to prevent recursive import.
+// eslint-disable-next-line @typescript-eslint/init-declarations, prefer-const
+let YouTubeAlias: typeof YouTube;
+
 /**
  * 音楽ボットで解釈できるオーディオファイルのソースを表します。
  * @template T サムネイルの種類
  */
-export abstract class AudioSource<T extends ThumbnailType> {
+export abstract class AudioSource<T extends ThumbnailType, U extends AudioSourceBasicJsonFormat> {
   // リソースのURL
   // リソースに対して不変で、かつ一意である必要があります
   private _url: string;
@@ -99,12 +100,6 @@ export abstract class AudioSource<T extends ThumbnailType> {
     this._description = value;
   }
 
-  // キャッシュできないかどうかを表すフラグ
-  protected _unableToCache: boolean = false;
-  get unableToCache(){
-    return this._unableToCache;
-  }
-
   // サムネイル
   private _thumbnail: T;
   get thumbnail(){
@@ -112,12 +107,6 @@ export abstract class AudioSource<T extends ThumbnailType> {
   }
   protected set thumbnail(value: T){
     this._thumbnail = value;
-  }
-
-  // サービス識別子
-  private readonly _serviceIdentifer: AudioSourceTypeIdentifer;
-  protected get serviceIdentifer(): AudioSourceTypeIdentifer{
-    return this._serviceIdentifer;
   }
 
   // 非公開ソースかどうかを表すフラグ
@@ -129,24 +118,37 @@ export abstract class AudioSource<T extends ThumbnailType> {
     this._isPrivateSource = value;
   }
 
+  // キャッシュできるかどうかを表すフラグ
+  protected _isCacheable: boolean;
+  get isCachable(){
+    return this._isCacheable;
+  }
+
+  private readonly _isSeekable: boolean;
+  get isSeekable(){
+    return this._isSeekable;
+  }
+
   /** オーディオソースの種類に対して生成されるロガーを表します */
   protected logger: LoggerObject;
 
-  constructor(serviceType: AudioSourceTypeIdentifer){
-    this._serviceIdentifer = serviceType;
+  constructor(options: { isSeekable?: boolean, isCacheable?: boolean } = {}){
+    options = Object.assign({ isSeekable: true, isCacheable: false }, options);
     this.logger = getLogger(this.constructor.name);
+    this._isSeekable = options.isSeekable!;
+    this._isCacheable = options.isCacheable!;
   }
 
   /** 現在再生中の曲を示すEmbedFieldを生成します。 */
   abstract toField(verbose: boolean, t: i18n["t"]): EmbedField[];
   /** クラスを非同期で初期化します。 */
-  abstract init(url: string, prefetched: exportableCustom, t: i18n["t"]): Promise<AudioSource<T>>;
+  abstract init(url: string, prefetched: U | null, t: i18n["t"]): Promise<AudioSource<T, U>>;
   /** 再生するためのストリームをフェッチします。 */
   abstract fetch(url?: boolean, t?: i18n["t"]): Promise<StreamInfo>;
   /** 現在再生中の曲に関する追加データを生成します。 */
   abstract npAdditional(t: i18n["t"]): string;
   /** データをプレーンなオブジェクトにエクスポートします。 */
-  abstract exportData(): exportableCustom;
+  abstract exportData(): U;
 
   /**
    * 内部情報のキャッシュに対応しているソースに対して、キャッシュデータの削除を実行します。
@@ -154,29 +156,9 @@ export abstract class AudioSource<T extends ThumbnailType> {
    */
   purgeCache(){}
 
-  /** ソースがYouTubeのストリームであるかどうかを表します。 */
-  isYouTube(): this is Sources.YouTube{
-    return this.serviceIdentifer === "youtube";
-  }
-
-  /** ソースがSoundCloudのストリームであるかどうかを表します */
-  isSoundCloudS(): this is Sources.SoundCloudS{
-    return this.serviceIdentifer === "soundcloud";
-  }
-
-  /** ソースがニコニコ動画のストリームであるかどうかを表します。 */
-  isNicoNicoS(): this is Sources.NicoNicoS{
-    return this.serviceIdentifer === "niconico";
-  }
-
-  /** ソースがSpotifyのストリームであるかどうかを表します。 */
-  isSpotify(): this is Sources.Spotify{
-    return this.serviceIdentifer === "spotify";
-  }
-
-  /** ソースがシークできるかどうかを表します */
-  isUnseekable(){
-    return this.isSoundCloudS() || this.isNicoNicoS();
+  /** オーディオソースがYouTubeであるかを返します。それ以外のソースに対してはinstanceofを使用してください。 */
+  isYouTube(): this is YouTube {
+    return this instanceof YouTubeAlias;
   }
 
   /** プライベートなソースとして設定します */
@@ -185,15 +167,23 @@ export abstract class AudioSource<T extends ThumbnailType> {
   }
 }
 
-export type StreamInfo = ReadableStreamInfo|UrlStreamInfo;
+export type AudioSourceBasicJsonFormat = {
+  url: string,
+  length: number,
+  title: string,
+};
+
+export type StreamInfo = ReadableStreamInfo | UrlStreamInfo;
 export type ReadableStreamInfo = {
   type: "readable",
   stream: Readable,
-  streamType: StreamTypeIdentifer,
+  streamType: StreamTypeIdentifer | null,
 };
 export type UrlStreamInfo = {
   type: "url",
   url: string,
-  streamType: StreamTypeIdentifer,
+  streamType: StreamTypeIdentifer | null,
   userAgent?: string,
 };
+
+YouTubeAlias = require("./youtube").YouTube;

@@ -1,33 +1,31 @@
 {
+  "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
-    "module": "ESNext",
-    "target": "ES2021",
-    "lib": ["ES2021"],
-    "moduleResolution": "Bundler",
     "strict": false,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
     "noImplicitOverride": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
-    "outDir": "build/",
+    "outDir": "../../dist/",
     "allowJs": false,
     "skipLibCheck": true,
-    "strictBindCallApply": true
   },
   "include": [
-    "src/**/*.ts"
+    "../../src/**/*.ts"
   ],
   "exclude": [
-    "**/node_modules",
-    "test",
-    "./util",
-    "./docs",
-    "./dist",
-    "**/.*/"
+    "../../**/node_modules",
+    "../../test",
+    "../.././util",
+    "../../docs",
+    "../../dist",
+    "../../**/.*/"
   ]
 }

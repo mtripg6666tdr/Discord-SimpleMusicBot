@@ -44,7 +44,8 @@ export default class LeaveClean extends BaseCommand {
       message.reply(t("commands:leaveclean.queueEmpty")).catch(this.logger.error);
       return;
     }
-    const memberIds = context.server.connectingVoiceChannel.voiceMembers.map(member => member.id);
+
+    const memberIds = context.server.connectingVoiceChannel!.voiceMembers.map(member => member.id);
     const removed = context.server.queue.removeIf(q => !memberIds.includes(q.additionalInfo.addedBy.userId)).length;
     await message.reply(
       removed >= 1

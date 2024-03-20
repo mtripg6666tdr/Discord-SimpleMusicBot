@@ -34,7 +34,7 @@ export default class Radio extends BaseCommand {
       shouldDefer: true,
       argument: [
         {
-          type: "string",
+          type: "string" as const,
           name: "url",
           required: false,
         },
@@ -104,7 +104,7 @@ export default class Radio extends BaseCommand {
           && urlObject.pathname === "/playlist"
           && urlObject.searchParams.get("list")?.startsWith("RD")
         ){
-          return urlObject.searchParams.get("list").substring(2);
+          return urlObject.searchParams.get("list")!.substring(2);
         }
       }
       catch{

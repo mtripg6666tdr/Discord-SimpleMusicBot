@@ -1,7 +1,7 @@
 {
   "files.associations": {
     "config.json.sample": "jsonc",
-    "config.json": "jsonc",
+    "config*.json": "jsonc",
     ".env.sample": "env",
     "config-with-bgm.json": "jsonc",
     "docker-compose.yml.sample": "dockercompose"

@@ -6,6 +6,8 @@
     "noImplicitThis": true,
     "noImplicitReturns": true,
     "noImplicitOverride": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "sourceMap": true,
@@ -14,8 +16,7 @@
     "outDir": "dist/",
     "allowJs": false,
     "skipLibCheck": true,
-    "strictBindCallApply": true,
-    "resolveJsonModule": false,
+    "resolveJsonModule": true,
     "noEmit": true
   },
   "include": [

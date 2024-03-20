@@ -30,16 +30,30 @@ import { ConfigSchema } from "./type";
 
 const DEVELOPMENT_PHASE = false;
 
-type ConfigObject = Static<typeof ConfigSchema> & {
+type StaticConfigSchema = Static<typeof ConfigSchema>;
+
+type DefaultProvidedConfigPropertyNames =
+  | "disabledSources"
+  | "cacheLimit"
+  | "maxLogFiles"
+  | "proxy"
+  | "botWhiteList"
+  | "djRoleNames";
+
+type DefaultProvidedConfigProperties = {
+  [key in Exclude<DefaultProvidedConfigPropertyNames, "proxy">]: Exclude<StaticConfigSchema[key], null | undefined>
+} & { proxy: string | null };
+
+type ConfigObject = Omit<StaticConfigSchema, DefaultProvidedConfigPropertyNames> & {
   isBotAdmin: (userId: string) => boolean,
   isDisabledSource: (sourceIdentifer: AudioSourceTypeIdentifer) => boolean,
   isWhiteListedBot: (userId: string) => boolean,
   djRoleNames: string[],
-};
+} & DefaultProvidedConfigProperties;
 
 class ConfigLoader {
-  protected static _instance: ConfigLoader = null;
-  protected _config: ConfigObject = null;
+  protected static _instance: ConfigLoader | null = null;
+  protected _config: ConfigObject;
 
   protected constructor(){
     this.load();
@@ -62,7 +76,7 @@ class ConfigLoader {
 
     const config = CJSON.parse(
       fs.readFileSync(path.join(__dirname, global.BUNDLED ? "../config.json" : "../../config.json"), { encoding: "utf-8" }),
-      null,
+      undefined,
       true
     );
 
@@ -76,12 +90,21 @@ class ConfigLoader {
       throw er;
     }
 
-    if(DEVELOPMENT_PHASE && (typeof config !== "object" || !("debug" in config) || !config.debug)){
+    if(DEVELOPMENT_PHASE && (!config || typeof config !== "object" || !("debug" in config) || !config.debug)){
       console.error("This is still in a development phase, and running without the debug mode is currently disabled.");
       console.error("You should use the latest version instead of the current branch.");
       console.error("If you understand exactly what you are doing, please enable the debug mode.");
       process.exit(1);
     }
+
+    const defaultValues: DefaultProvidedConfigProperties = {
+      disabledSources: [],
+      cacheLimit: 500,
+      maxLogFiles: 100,
+      proxy: null,
+      botWhiteList: [],
+      djRoleNames: ["DJ"],
+    };
 
     this._config = Object.assign(
       // empty object
@@ -89,14 +112,7 @@ class ConfigLoader {
       // default options
       Value.Create(ConfigSchema),
       // optional options default value
-      {
-        disabledSources: [],
-        cacheLimit: 500,
-        maxLogFiles: 100,
-        proxy: null,
-        botWhiteList: [],
-        djRoleNames: ["DJ"],
-      },
+      defaultValues,
       // loaded config
       config,
     ) as unknown as ConfigObject;

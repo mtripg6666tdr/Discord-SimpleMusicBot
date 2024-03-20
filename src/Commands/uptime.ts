@@ -40,7 +40,7 @@ export default class Uptime extends BaseCommand {
 
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     const now = Date.now();
-    const insta = Util.time.calcTime(now - context.bot.instantiatedTime.getTime());
+    const insta = Util.time.calcTime(now - context.bot.instantiatedTime!.getTime());
     const ready = Util.time.calcTime(context.client.uptime);
     const embed = new MessageEmbedBuilder()
       .setColor(getColor("UPTIME"))

@@ -35,17 +35,16 @@ import { timeLoggedMethod } from "../logger";
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
 export class CommandManager extends LogEmitter<{}> {
-  private static _instance = null as CommandManager;
+  private static _instance: CommandManager | null = null;
 
   /**
    * コマンドマネージャーの唯一のインスタンスを返します
    */
   static get instance(){
-    if(this._instance) return this._instance;
-    else return this._instance = new CommandManager();
+    return this._instance ??= new CommandManager();
   }
 
-  private readonly _commands = null as BaseCommand[];
+  private readonly _commands: BaseCommand[];
   /**
    * コマンドを返します
    */
@@ -69,7 +68,7 @@ export class CommandManager extends LogEmitter<{}> {
     const sets = new Map<string, BaseCommand>();
     const setCommand = (name: string, command: BaseCommand) => {
       if(sets.has(name) && reportDupes && !command.interactionOnly){
-        this.logger.warn(`Detected command ${command.name} the duplicated key ${name} with ${sets.get(name).name}; overwriting`);
+        this.logger.warn(`Detected command ${command.name} the duplicated key ${name} with ${sets.get(name)!.name}; overwriting`);
       }
       sets.set(name, command);
     };
@@ -134,7 +133,7 @@ export class CommandManager extends LogEmitter<{}> {
       this.logger.info([...commandsToEdit, ...commandsToAdd].map(command => command.name));
       for(let i = 0; i < commandsToEdit.length; i++){
         const commandToRegister = commandsToEdit[i];
-        const id = registeredAppCommands.find(cmd => cmd.type === commandToRegister.type && cmd.name === commandToRegister.name).id;
+        const id = registeredAppCommands.find(cmd => cmd.type === commandToRegister.type && cmd.name === commandToRegister.name)!.id;
         await client.application.editGlobalCommand(id, commandToRegister);
         this.logger.info(`editing ${Math.floor((i + 1) / commandsToEdit.length * 1000) / 10}% completed`);
       }

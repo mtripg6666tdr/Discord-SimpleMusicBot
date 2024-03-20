@@ -133,12 +133,12 @@ async function getLyrics(keyword: string): Promise<songInfo>{
     ;
     lyric = convert(lyric);
     const match = doc.match(/<meta name="description" content="(?<artist>.+?)が歌う(?<title>.+)の歌詞ページ.+です。.+">/);
-    const artwork = doc.match(/<img src="(?<url>.+?)" alt=".+? 歌詞" \/>/).groups?.url;
+    const artwork = doc.match(/<img src="(?<url>.+?)" alt=".+? 歌詞" \/>/)?.groups?.url;
     return {
       lyric: decode(lyric),
-      artist: decode(match.groups.artist),
-      title: decode(match.groups.title),
-      artwork: artwork.startsWith("http") ? artwork : DefaultAudioThumbnailURL,
+      artist: decode(match?.groups?.artist),
+      title: decode(match?.groups?.title),
+      artwork: artwork?.startsWith("http") ? artwork : DefaultAudioThumbnailURL,
       url: url,
     };
   }

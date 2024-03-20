@@ -30,11 +30,15 @@ import { useConfig } from "../config";
 const config = useConfig();
 
 export async function onMessageCreate(this: MusicBot, message: discord.Message){
-  if(this.maintenance){
-    if(!config.isBotAdmin(message.author.id)) return;
+  if(this.maintenance && !config.isBotAdmin(message.author.id)){
+    return;
   }
-  // botのメッセやdm、およびnewsは無視
-  if(!this["_isReadyFinished"] || message.author.bot) return;
+
+
+  if(!this["_isReadyFinished"] || message.author.bot || !message.channel || !message.member || !message.inCachedGuildChannel()){
+    return;
+  }
+
   if(
     message.channel.type !== discord.ChannelTypes.GUILD_TEXT
     && message.channel.type !== discord.ChannelTypes.PRIVATE_THREAD
@@ -44,7 +48,12 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
   ){
     return;
   }
-  if(this._rateLimitController.isRateLimited(message.member.id)) return;
+
+
+  if(this._rateLimitController.isRateLimited(message.member.id)){
+    return;
+  }
+
   // データ初期化
   const server = this.initData(message.guildID, message.channel.id);
   // プレフィックスの更新
@@ -117,7 +126,7 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
     );
   }else if(server.searchPanel.has(message.member.id)){
     // searchコマンドのキャンセルを捕捉
-    const panel = server.searchPanel.get(message.member.id);
+    const panel = server.searchPanel.get(message.member.id)!;
     const content = normalizeText(message.content);
     if(
       message.content === "キャンセル"

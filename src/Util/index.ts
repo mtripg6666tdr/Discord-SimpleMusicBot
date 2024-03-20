@@ -107,9 +107,9 @@ const audioExtensions = [
  * @param url 検査対象のURL
  * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
  */
-export function isAvailableRawAudioURL(url: string, { checkResponse }?: { checkResponse: false }): boolean;
-export function isAvailableRawAudioURL(url: string, { checkResponse }: { checkResponse: true }): Promise<boolean>;
-export function isAvailableRawAudioURL(url: string, { checkResponse = false } = {}){
+export function isAvailableRawAudioURL(url: string | null, { checkResponse }?: { checkResponse: false }): boolean;
+export function isAvailableRawAudioURL(url: string | null, { checkResponse }: { checkResponse: true }): Promise<boolean>;
+export function isAvailableRawAudioURL(url: string | null, { checkResponse = false } = {}){
   // check if the url variable is valid string object.
   if(!url || typeof url !== "string"){
     return false;
@@ -125,9 +125,7 @@ export function isAvailableRawAudioURL(url: string, { checkResponse = false } = 
     return urlIsOk;
   }
 
-  return requestHead(url).then(({ headers }) =>
-    headers["content-type"].startsWith("audio/")
-  );
+  return requestHead(url).then(({ headers }) => headers["content-type"]?.startsWith("audio/"));
 }
 
 /**
@@ -213,9 +211,9 @@ export async function retrieveRemoteAudioInfo(url: string): Promise<RemoteAudioI
   }
 
   if(durationMatcher.test(ffmpegOut)){
-    const match = durationMatcher.exec(ffmpegOut);
+    const match = durationMatcher.exec(ffmpegOut)!;
     result.lengthSeconds = Math.ceil(
-      match.groups.length
+      match.groups!.length
         .split(":")
         .map(n => Number(n))
         .reduce((prev, current) => prev * 60 + current)
@@ -223,13 +221,15 @@ export async function retrieveRemoteAudioInfo(url: string): Promise<RemoteAudioI
   }
 
   if(titleMatcher.test(ffmpegOut)){
-    const match = titleMatcher.exec(ffmpegOut);
-    result.title = match.groups.title?.trim() || null;
+    const match = titleMatcher.exec(ffmpegOut)!;
+
+    result.title = match.groups!.title?.trim() || null;
   }
 
   if(artistMatcher.test(ffmpegOut)){
-    const match = artistMatcher.exec(ffmpegOut);
-    result.artist = match.groups.artist?.trim() || null;
+    const match = artistMatcher.exec(ffmpegOut)!;
+
+    result.artist = match.groups!.artist?.trim() || null;
   }
 
   // construct displayTitle
@@ -366,7 +366,7 @@ export function createDebounceFunctionsFactroy<Key>(func: (key: Key) => void, de
   const functionsStore = new Map<Key, () => void>();
   return (key: Key) => {
     if(functionsStore.has(key)){
-      return functionsStore.get(key);
+      return functionsStore.get(key)!;
     }else{
       const fn = debounce(debounceDelay, () => func(key));
       functionsStore.set(key, fn);
@@ -381,9 +381,12 @@ export function createFragmentalDownloadStream(
 ){
   const logger = getLogger("FragmentalDownloader", true);
   logger.addContext("id", Date.now());
+
   const stream = createPassThrough();
+
   setImmediate(() => {
     let current = -1;
+
     if(contentLength < chunkSize){
       const originStream = typeof streamGenerator === "string"
         ? downloadAsReadable(streamGenerator, {
@@ -392,15 +395,22 @@ export function createFragmentalDownloadStream(
           },
         })
         : streamGenerator(0);
+
       originStream
         .on("error", er => stream.destroy(er))
         .pipe(stream);
+
       logger.info("Stream was created as a single stream");
     }else{
       const pipeNextStream = () => {
         current++;
-        let end = chunkSize * (current + 1) - 1;
-        if(end >= contentLength) end = undefined;
+
+        let end: number | undefined = chunkSize * (current + 1) - 1;
+
+        if(end >= contentLength){
+          end = undefined;
+        }
+
         const nextStream = typeof streamGenerator === "string"
           ? downloadAsReadable(streamGenerator, {
             headers: {
@@ -410,16 +420,20 @@ export function createFragmentalDownloadStream(
           })
           : streamGenerator(chunkSize * current, end);
         logger.info(`Stream #${current + 1} was created`);
+
         nextStream
           .on("error", er => stream.destroy(er))
           .pipe(stream, { end: end === undefined });
+
         if(end !== undefined){
           nextStream.on("end", () => pipeNextStream());
         }else{
           logger.info(`Last stream (total: ${current + 1})`);
         }
       };
+
       pipeNextStream();
+
       logger.info(`Stream was created as partial stream. ${Math.ceil(contentLength / chunkSize)} streams will be created.`);
     }
   });
@@ -438,3 +452,7 @@ export function requireIfAny(id: string): unknown {
     return null;
   }
 }
+
+export function assertIs<T>(obj: unknown): asserts obj is T{}
+
+export function assertIsNotNull<T>(obj: T | null): asserts obj is T {}

@@ -28,6 +28,7 @@ import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oc
 import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
 import { useConfig } from "../config";
+import { DefaultAudioThumbnailURL } from "../definition";
 
 export abstract class SearchBase<T> extends BaseCommand {
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
@@ -56,6 +57,7 @@ export abstract class SearchBase<T> extends BaseCommand {
         .createCustomIds({
           cancelSearch: "button",
         });
+
       const responseMessage = await message.reply({
         content: `✘${t("search.alreadyOpen")}`,
         components: [
@@ -69,15 +71,20 @@ export abstract class SearchBase<T> extends BaseCommand {
             .toOceanic(),
         ],
       }).catch(this.logger.error);
+
       if(responseMessage){
         const panel = context.server.searchPanel.get(message.member.id);
+        if(!panel) return;
+
         collector.on("cancelSearch", interaction => {
           panel.destroy({ quiet: true }).catch(this.logger.error);
           interaction.createFollowup({
             content: `🚮${t("search.previousPanelRemoved")}:white_check_mark:`,
           }).catch(this.logger.error);
         });
+
         collector.setMessage(responseMessage);
+
         panel.once("destroy", () => collector.destroy());
       }
       return;
@@ -145,10 +152,10 @@ export default class Search extends SearchBase<ytsr.Video[] | dYtsr.Video[]> {
     return items.map(item => ({
       url: item.url,
       title: "title" in item ? item.title : `*${item.name}`,
-      duration: item.duration,
-      thumbnail: "bestThumbnail" in item ? item.bestThumbnail.url : item.thumbnail,
-      author: item.author.name,
-      description: `${t("length")}: ${item.duration}, ${t("channelName")}: ${item.author.name}`,
+      duration: item.duration || "0",
+      thumbnail: ("bestThumbnail" in item ? item.bestThumbnail.url : item.thumbnail) || DefaultAudioThumbnailURL,
+      author: item.author?.name || t("unknown"),
+      description: `${t("length")}: ${item.duration}, ${t("channelName")}: ${item.author?.name || t("unknown")}`,
     })).filter(n => n);
   }
 

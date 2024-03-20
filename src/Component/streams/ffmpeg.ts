@@ -100,7 +100,7 @@ export function transformThroughFFmpeg(
   ];
   logger.debug("Passing arguments: " + args.map(arg => arg.startsWith("http") ? "<URL>" : arg).join(" "));
   const ffmpeg = new FFmpeg({ args });
-  ffmpeg.process.stderr.on("data", chunk => logger.debug(chunk.toString()));
+  ffmpeg.process.stderr?.on("data", chunk => logger.debug(chunk.toString()));
   ffmpeg.process.once("exit", (code, signal) => {
     logger.debug(`FFmpeg process exited (code: ${code}, signal: ${signal})`);
     ffmpeg.emit("close");

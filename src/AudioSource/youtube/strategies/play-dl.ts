@@ -16,9 +16,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Cache } from "./base";
-import type { exportableYouTube } from "..";
-import type { UrlStreamInfo } from "../../audiosource";
+import type { Cache, StrategyFetchResult } from "./base";
+import type { YouTubeJsonFormat } from "..";
+import type { StreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { InfoData } from "play-dl";
 
 import { StreamType } from "@discordjs/voice";
@@ -37,8 +37,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
 
   async getInfo(url: string){
     this.logStrategyUsed();
-    let info = null as InfoData;
-    info = await video_info(url);
+    const info = await video_info(url);
     return {
       data: this.mapToExportable(url, info),
       cache: {
@@ -48,16 +47,21 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
     };
   }
 
-  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
+  async fetch(url: string, forceUrl: true, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<playDl, InfoData>, UrlStreamInfo>>;
+  async fetch(url: string, forceUrl?: boolean, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<playDl, InfoData>, StreamInfo>>;
+  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<playDl, InfoData>, StreamInfo>> {
     this.logStrategyUsed();
-    let info = null as InfoData;
-    const cacheAvailable = cache?.type === playDl && cache.data;
+
+    const cacheAvailable = this.cacheIsValid(cache) && cache.data;
     this.logger.info(cacheAvailable ? "using cache without obtaining" : "obtaining info");
-    info = cacheAvailable || await video_info(url);
+
+    const info = cacheAvailable || await video_info(url);
+
     const partialResult = {
       info: this.mapToExportable(url, info),
       relatedVideos: info.related_videos,
     };
+
     if(info.LiveStreamData.isLive){
       return {
         ...partialResult,
@@ -72,15 +76,20 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
         },
       };
     }else if(forceUrl){
-      const format = info.format.filter(f => f.mimeType.startsWith("audio"));
-      if(format.length === 0) throw new Error("no format found!");
-      format.sort((fa, fb) => fb.bitrate - fa.bitrate);
+      const format = info.format.filter(f => f.mimeType?.startsWith("audio"));
+      if(format.length === 0){
+        throw new Error("no format found!");
+      }
+
+      format.sort((fa, fb) => fb.bitrate! - fa.bitrate!);
+
       return {
         ...partialResult,
         stream: {
           type: "url" as const,
-          url: format[0].url,
-          streamType: (format[0] as any)["container"] === "webm" && (format[0] as any)["codec"] === "opus" ? "webm/opus" as const : undefined,
+          url: format[0].url!,
+          // @ts-expect-error
+          streamType: format[0]["container"] === "webm" && format[0]["codec"] === "opus" ? "webm/opus" as const : null,
         },
         cache: {
           type: playDl,
@@ -94,7 +103,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
         stream: {
           type: "readable" as const,
           stream: stream.stream,
-          streamType: stream.type === StreamType.WebmOpus ? "webm/opus" as const : undefined,
+          streamType: stream.type === StreamType.WebmOpus ? "webm/opus" as const : null,
         },
         cache: {
           type: playDl,
@@ -104,18 +113,23 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
     }
   }
 
-  protected mapToExportable(url: string, info: InfoData): exportableYouTube{
+  protected mapToExportable(url: string, info: InfoData): YouTubeJsonFormat{
     if(info.video_details.upcoming) throw new Error("This video is still in upcoming");
     return {
       url,
-      title: info.video_details.title,
-      description: info.video_details.description,
+       
+      title: info.video_details.title!,
+      description: info.video_details.description || "",
       length: Number(info.video_details.durationInSec),
       channel: info.video_details.channel?.name || "不明",
       channelUrl: info.video_details.channel?.url || "",
       thumbnail: info.video_details.thumbnails[0].url,
       isLive: info.video_details.live,
     };
+  }
+
+  protected override cacheIsValid(cache?: Cache<any, any>): cache is Cache<playDl, InfoData> {
+    return cache?.type === playDl;
   }
 }
 

@@ -71,7 +71,7 @@ export class QueueManagerWithBgm extends QueueManager {
     return this.isBGM ? this._bgmDefault[index] : super.get(index);
   }
 
-  override async addQueueOnly({
+  override async addQueueOnly<T extends AudioSource.AudioSourceBasicJsonFormat>({
     url,
     addedBy,
     method = "push",
@@ -80,19 +80,23 @@ export class QueueManagerWithBgm extends QueueManager {
     preventCache = false,
   }: {
     url: string,
-    addedBy: Member | AddedBy,
+    addedBy: Member | AddedBy | null,
     method?: "push" | "unshift",
     sourceType?: KnownAudioSourceIdentifer,
-    gotData?: AudioSource.exportableCustom,
+    gotData?: T | null,
     preventCache?: boolean,
   }): Promise<QueueContent & { index: number }> {
-    if(!url.startsWith("http://") && !url.startsWith("https://") && fs.existsSync(path.join(__dirname, global.BUNDLED ? "../" : "../../", url))){
+    if(
+      !url.startsWith("http://")
+      && !url.startsWith("https://")
+      && fs.existsSync(path.join(__dirname, global.BUNDLED ? "../" : "../../", url))
+    ){
       const result = {
         basicInfo: await new AudioSource.FsStream().init(url, null, i18next.getFixedT(this.server.locale)),
         additionalInfo: {
           addedBy: {
-            userId: this.getUserIdFromMember(addedBy) || "0",
-            displayName: addedBy.displayName || "不明",
+            userId: addedBy ? this.getUserIdFromMember(addedBy) : "0",
+            displayName: addedBy?.displayName || "unknown",
           },
         },
       } as QueueContent;

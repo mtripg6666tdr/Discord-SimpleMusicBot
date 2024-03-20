@@ -36,7 +36,7 @@ export async function handleSelectMenuInteraction(
   }
 
   // 検索パネル取得
-  const panel = this.guildData.get(interaction.channel.guild.id).searchPanel.get(interaction.member.id);
+  const panel = this.guildData.get(interaction.channel.guild.id)?.searchPanel.get(interaction.member.id);
 
   // なければ返却
   if(!panel) return;

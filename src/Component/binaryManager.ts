@@ -29,7 +29,7 @@ import pEvent from "p-event";
 import { LogEmitter } from "../Structure";
 import { createPassThrough, requireIfAny } from "../Util";
 
-const ffmpegStatic: string = requireIfAny("ffmpeg-static") as typeof import("ffmpeg-static").default;
+const ffmpegStatic: string | null = requireIfAny("ffmpeg-static") as typeof import("ffmpeg-static").default;
 
 type BinaryManagerOptions = {
   binaryName: string,
@@ -45,7 +45,7 @@ export class BinaryManager extends LogEmitter<{}> {
   protected readonly checkUpdateTimeout = this.options.checkUpdateTimeout || 1000 * 60 /* 1 min */ * 60 /* 1 hour */ * 3/* 3 hour */;
   protected baseUrl = path.join(__dirname, global.BUNDLED ? "../bin" : "../../bin");
   protected lastChecked: number = 0;
-  protected releaseInfo: GitHubRelease = null;
+  protected releaseInfo: GitHubRelease | null = null;
 
   get binaryPath(){
     return path.join(this.baseUrl, "./", this.options.localBinaryName + (process.platform === "win32" ? ".exe" : ""));
@@ -113,7 +113,7 @@ export class BinaryManager extends LogEmitter<{}> {
     if(!this.releaseInfo){
       await this.getReleaseInfo();
     }
-    const binaryUrl = this.releaseInfo.assets.find(asset => asset.name === `${this.options.binaryName}${process.platform === "win32" ? ".exe" : ""}`)?.browser_download_url;
+    const binaryUrl = this.releaseInfo!.assets.find(asset => asset.name === `${this.options.binaryName}${process.platform === "win32" ? ".exe" : ""}`)?.browser_download_url;
     if(!binaryUrl){
       throw new Error("No binary url detected");
     }else{
@@ -174,7 +174,7 @@ export class BinaryManager extends LogEmitter<{}> {
         process.stdout.on("end", onEnd);
         process.on("exit", onEnd);
         process.stdout.on("error", err => {
-          bufs = null;
+          bufs = null!;
           reject(err);
         });
         process.stderr.on("data", (chunk: Buffer) => this.logger.info(`[Child] ${chunk.toString()}`));

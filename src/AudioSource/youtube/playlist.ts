@@ -40,7 +40,7 @@ type GetPlaylistResult = {
     isLive: boolean,
     duration: number,
     durationText: string,
-    thumbnail: string,
+    thumbnail: string | null,
   }[],
 };
 
@@ -72,9 +72,9 @@ function resolveYtplToResult(result: ytpl.Result): GetPlaylistResult{
       title: item.title,
       author: item.author.name,
       isLive: item.isLive,
-      duration: item.durationSec,
-      durationText: item.duration,
-      thumbnail: item.thumbnails[0]?.url,
+      duration: item.durationSec || 0,
+      durationText: item.duration || "0",
+      thumbnail: item.thumbnails[0]?.url || null,
     })),
   };
 }
@@ -89,13 +89,13 @@ function resolveDYtplToResult(result: import("@distube/ytpl").result): GetPlayli
     items: result.items.map(item => ({
       url: item.url,
       title: item.title,
-      author: item.author.name,
+      author: item.author?.name || "unknown",
       // @ts-expect-error @distube/ytpl is missing 'isLive' typing
       isLive: item.isLive,
       duration: item.duration
-        .split(":")
-        .reduce((p, c) => p * 60 + Number(c), 0),
-      durationText: item.duration,
+        ?.split(":")
+        .reduce((p, c) => p * 60 + Number(c), 0) || 0,
+      durationText: item.duration || "0",
       thumbnail: item.thumbnail,
     })),
   };

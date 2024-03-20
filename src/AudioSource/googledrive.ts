@@ -16,8 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { UrlStreamInfo } from ".";
-import type { exportableCustom } from "./custom";
+import type { AudioSourceBasicJsonFormat, UrlStreamInfo } from ".";
 import type { i18n } from "i18next";
 
 import candyget from "candyget";
@@ -26,13 +25,12 @@ import * as htmlEntities from "html-entities";
 import { AudioSource } from "./audiosource";
 import { retrieveHttpStatusCode, retrieveRemoteAudioInfo } from "../Util";
 
-export class GoogleDrive extends AudioSource<string> {
+export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat> {
   constructor(){
-    super("googledrive");
-    this._unableToCache = true;
+    super({ isCacheable: false });
   }
 
-  async init(url: string, prefetched: exportableCustom, t: i18n["t"]){
+  async init(url: string, prefetched: AudioSourceBasicJsonFormat | null, t: i18n["t"]){
     if(prefetched){
       this.title = prefetched.title || t("audioSources.driveStream");
       this.url = url;
@@ -71,7 +69,7 @@ export class GoogleDrive extends AudioSource<string> {
     return "";
   }
 
-  exportData(): exportableCustom{
+  exportData(): AudioSourceBasicJsonFormat {
     return {
       url: this.url,
       length: this.lengthSeconds,
@@ -85,7 +83,7 @@ export class GoogleDrive extends AudioSource<string> {
 
   static getId(url: string){
     const match = url.match(/^https?:\/\/drive\.google\.com\/file\/d\/(?<id>[^/?]+)(\/.+)?$/);
-    return match ? match.groups.id : null;
+    return match?.groups?.id || null;
   }
 
   static async retriveFilename(url: string){

@@ -150,7 +150,7 @@ export default class SystemInfo extends BaseCommand {
     }
 
     if(config.isBotAdmin(message.member.id) && (context.args[0] === "server" && context.args[1] && context.client.guilds.has(context.args[1]))){
-      const target = context.client.guilds.get(context.args[1]);
+      const target = context.client.guilds.get(context.args[1])!;
       const data = context.bot.getData(context.args[1]);
       embeds.push(
         new MessageEmbedBuilder()
@@ -171,7 +171,7 @@ export default class SystemInfo extends BaseCommand {
             data?.player.currentAudioInfo?.isYouTube() && data?.player.currentAudioInfo.isLiveStream ? t("yes") : t("no"),
             true
           )
-          .setThumbnail(target.iconURL())
+          .setThumbnail(target.iconURL()!)
           .toOceanic()
       );
     }

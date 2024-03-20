@@ -35,12 +35,12 @@ export default class Play extends BaseCommand {
       category: "player",
       argument: [
         {
-          type: "string",
+          type: "string" as const,
           name: "keyword",
           required: false,
         },
         {
-          type: "file",
+          type: "file" as const,
           name: "audiofile",
           required: false,
         },
@@ -100,7 +100,7 @@ export default class Play extends BaseCommand {
         });
 
         try{
-          let videos: ytsr.Video[] | dYtsr.Video[] = null;
+          let videos: ytsr.Video[] | dYtsr.Video[] = null!;
 
           if(context.bot.cache.hasSearch(context.rawArgs)){
             videos = await context.bot.cache.getSearch(context.rawArgs);
@@ -146,7 +146,7 @@ export default class Play extends BaseCommand {
       }
     }else if(message["_interaction"] && "type" in message["_interaction"].data && message["_interaction"].data.type === ApplicationCommandTypes.MESSAGE){
       const messageReference = message["_interaction"].data.resolved.messages.first();
-      if(messageReference.inCachedGuildChannel()){
+      if(messageReference?.inCachedGuildChannel()){
         context.server
           .playFromMessage(message, messageReference, context, { first: !wasConnected }, t)
           .catch(this.logger.error);

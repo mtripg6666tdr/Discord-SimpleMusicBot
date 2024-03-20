@@ -16,15 +16,15 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Cache } from "./base";
-import type { exportableYouTube } from "..";
+import type { Cache, StrategyFetchResult } from "./base";
+import type { YouTubeJsonFormat } from "..";
 import type { BinaryManager } from "../../../Component/binaryManager";
-import type { ReadableStreamInfo, UrlStreamInfo } from "../../audiosource";
+import type { ReadableStreamInfo, StreamInfo, UrlStreamInfo } from "../../audiosource";
 
 import { Strategy } from "./base";
 import { createFragmentalDownloadStream } from "../../../Util";
 
-export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, YoutubeDlInfo>, YoutubeDlInfo> {
+export abstract class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, YoutubeDlInfo>, YoutubeDlInfo> {
   constructor(priority: number, protected id: T, protected binaryManager: BinaryManager){
     super(priority);
   }
@@ -37,8 +37,9 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
 
   async getInfo(url: string){
     this.logStrategyUsed();
-    let info = null as YoutubeDlInfo;
-    info = JSON.parse(await this.binaryManager.exec(["--skip-download", "--print-json", url])) as YoutubeDlInfo;
+
+    const info = JSON.parse<YoutubeDlInfo>(await this.binaryManager.exec(["--skip-download", "--print-json", url]));
+
     return {
       data: this.mapToExportable(url, info),
       cache: {
@@ -48,17 +49,24 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
     };
   }
 
-  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>){
+  async fetch(url: string, forceUrl: true, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<T, YoutubeDlInfo>, UrlStreamInfo>>;
+  async fetch(url: string, forceUrl?: boolean, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<T, YoutubeDlInfo>, StreamInfo>>;
+  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<T, YoutubeDlInfo>, StreamInfo>> {
     this.logStrategyUsed();
-    const availableCache = cache?.type === this.id && cache.data as YoutubeDlInfo;
+
+    const availableCache = this.cacheIsValid(cache) && cache.data;
     this.logger.info(availableCache ? "using cache without obtaining" : "obtaining info");
-    const info = availableCache || JSON.parse(await this.binaryManager.exec(["--skip-download", "--print-json", url])) as YoutubeDlInfo;
+
+    const info = availableCache || JSON.parse<YoutubeDlInfo>(await this.binaryManager.exec(["--skip-download", "--print-json", url]));
+
     const partialResult = {
       info: this.mapToExportable(url, info),
-      relatedVideos: null as exportableYouTube[],
+      relatedVideos: null,
     };
+
     if(info.is_live){
       const format = info.formats.filter(f => f.format_id === info.format_id);
+
       return {
         ...partialResult,
         stream: {
@@ -73,8 +81,11 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
       };
     }else{
       const formats = info.formats.filter(f => f.format_note === "tiny" || f.video_ext === "none" && f.abr);
+
       if(formats.length === 0) throw new Error("no format found!");
-      const [format] = formats.sort((fa, fb) => fb.abr - fa.abr);
+
+      const [format] = formats.sort((fa, fb) => fb.abr! - fa.abr!);
+
       if(forceUrl){
         return {
           ...partialResult,
@@ -119,7 +130,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
     }
   }
 
-  protected mapToExportable(url: string, info: YoutubeDlInfo): exportableYouTube{
+  protected mapToExportable(url: string, info: YoutubeDlInfo): YouTubeJsonFormat{
     return {
       url: url,
       title: info.title,
@@ -128,7 +139,7 @@ export class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, Y
       channel: info.channel,
       channelUrl: info.channel_url,
       thumbnail: info.thumbnail,
-      isLive: info.is_live,
+      isLive: !!info.is_live,
     };
   }
 }

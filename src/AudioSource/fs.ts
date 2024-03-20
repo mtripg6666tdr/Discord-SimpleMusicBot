@@ -16,8 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { exportableCustom } from ".";
-import type { ReadableStreamInfo } from "./audiosource";
+import type { AudioSourceBasicJsonFormat, ReadableStreamInfo } from "./audiosource";
 import type { i18n } from "i18next";
 
 import * as fs from "fs";
@@ -26,12 +25,12 @@ import * as path from "path";
 import { AudioSource } from "./audiosource";
 import { retrieveRemoteAudioInfo } from "../Util";
 
-export class FsStream extends AudioSource<string> {
+export class FsStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
   constructor(){
-    super("fs");
+    super({ isCacheable: false });
   }
 
-  async init(url: string, _: exportableCustom, t: i18n["t"]){
+  async init(url: string, _: AudioSourceBasicJsonFormat | null, t: i18n["t"]){
     this.url = url;
     const info = await retrieveRemoteAudioInfo(url);
     this.title = info.displayTitle || t("audioSources.customStream");
@@ -60,7 +59,7 @@ export class FsStream extends AudioSource<string> {
     return "";
   }
 
-  exportData(): exportableCustom{
+  exportData(): AudioSourceBasicJsonFormat {
     return {
       url: this.url,
       length: this.lengthSeconds,

@@ -82,9 +82,9 @@ export async function onReady(this: MusicBot){
         const id = guildQueueIds[i];
         if(guildStatusIds.includes(id)){
           try{
-            const server = this.initData(id, guildStatuses.get(id).boundChannelId);
-            await server.importQueue(guildQueues.get(id));
-            server.importStatus(guildStatuses.get(id));
+            const server = this.initData(id, guildStatuses.get(id)!.boundChannelId);
+            await server.importQueue(guildQueues.get(id)!);
+            server.importStatus(guildStatuses.get(id)!);
           }
           catch(e){
             this.logger.warn(e);

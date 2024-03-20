@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { AudioSource, exportableCustom } from "../AudioSource";
+import type { AudioSource, AudioSourceBasicJsonFormat } from "../AudioSource";
 
 /**
  * キューの内容を示します
@@ -25,7 +25,7 @@ export type QueueContent = {
   /**
    * 曲自体のメタ情報
    */
-  basicInfo: AudioSource<any>,
+  basicInfo: AudioSource<any, any>,
   /**
    * 曲の情報とは別の追加情報
    */
@@ -56,6 +56,6 @@ export type AdditionalInfo = {
 /**
  * エクスポート可能なキューのアイテムです
  */
-export type ExportableQueueContent = exportableCustom & {
+export type ExportableQueueContent = AudioSourceBasicJsonFormat & {
   addBy: AddedBy,
 };

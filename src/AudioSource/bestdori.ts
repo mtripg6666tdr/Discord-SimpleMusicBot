@@ -16,13 +16,14 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { exportableCustom, UrlStreamInfo } from ".";
+import type { AudioSourceBasicJsonFormat, UrlStreamInfo } from ".";
 
 import candyget from "candyget";
+import { i18n } from "i18next";
 
 import { AudioSource } from "./audiosource";
 
-export class BestdoriS extends AudioSource<string> {
+export class BestdoriS extends AudioSource<string, BestdoriJsonFormat> {
   protected artist = "";
   protected type: "anime"|"normal"|null = null;
   protected lyricist: string;
@@ -30,14 +31,11 @@ export class BestdoriS extends AudioSource<string> {
   protected arranger: string;
   private id: number;
 
-  constructor(){
-    super("bestdori");
-  }
-
-  async init(url: string, prefetched: exportableBestdori){
+  async init(url: string, prefetched: BestdoriJsonFormat, t: i18n["t"]){
     this.url = url;
-    this.id = BestdoriApi.instance.getAudioId(url);
-    if(!this.id) throw new Error("Invalid streamable url");
+    const id = BestdoriApi.instance.getAudioId(url);
+    if(!id) throw new Error("Invalid streamable url");
+    this.id = id;
     const data = (await BestdoriApi.instance.getSongInfo())[this.id];
     this.title = data.musicTitle[0];
     this.type = data.tag;
@@ -51,9 +49,9 @@ export class BestdoriS extends AudioSource<string> {
     }else{
       const detailed = await BestdoriApi.instance.getDetailedSongInfo(this.id);
       this.lengthSeconds = Math.floor(detailed.length);
-      this.lyricist = detailed.lyricist[0];
-      this.composer = detailed.composer[0];
-      this.arranger = detailed.arranger[0];
+      this.lyricist = detailed.lyricist[0] || t("unknown");
+      this.composer = detailed.composer[0] || t("unknown");
+      this.arranger = detailed.arranger[0] || t("unknown");
     }
 
     this.isPrivateSource = true;
@@ -70,7 +68,7 @@ export class BestdoriS extends AudioSource<string> {
     };
   }
 
-  toField(){
+  toField(_: boolean, t: i18n["t"]){
     const typeMap = {
       anime: "カバー",
       normal: "アニメ",
@@ -83,7 +81,7 @@ export class BestdoriS extends AudioSource<string> {
       },
       {
         name: "ジャンル",
-        value: typeMap[this.type],
+        value: typeMap[this.type as keyof typeof typeMap] || t("unknown"),
       },
       {
         name: "楽曲情報",
@@ -99,7 +97,7 @@ export class BestdoriS extends AudioSource<string> {
     return `アーティスト:\`${this.artist}\``;
   }
 
-  exportData(): exportableBestdori{
+  exportData(): BestdoriJsonFormat{
     return {
       url: this.url,
       length: this.lengthSeconds,
@@ -111,7 +109,7 @@ export class BestdoriS extends AudioSource<string> {
   }
 }
 
-export type exportableBestdori = exportableCustom & {
+export type BestdoriJsonFormat = AudioSourceBasicJsonFormat & {
   lyricist: string,
   composer: string,
   arranger: string,
@@ -126,9 +124,9 @@ type ApiCache<T> = {
  * Bestdori ( https://bestdori.com )のAPIラッパ
  */
 export class BestdoriApi {
-  private static _instance: BestdoriApi = null;
+  private static _instance: BestdoriApi | null = null;
 
-  static get instance(){
+  static get instance(): BestdoriApi{
     return this._instance ??= new BestdoriApi();
   }
 
@@ -136,8 +134,8 @@ export class BestdoriApi {
 
   private readonly BestdoriAllSongInfoEndPoint = "https://bestdori.com/api/songs/all.5.json";
   private readonly BestdoriAllBandInfoEndPoint = "https://bestdori.com/api/bands/all.1.json";
-  private allsonginfoCache: ApiCache<BestdoriAllSongInfo> = null;
-  private allbandinfoCache: ApiCache<BestdoriAllBandInfo> = null;
+  private allsonginfoCache: ApiCache<BestdoriAllSongInfo> = null!;
+  private allbandinfoCache: ApiCache<BestdoriAllBandInfo> = null!;
 
   private async setupData(){
     const lastDateTime = new Date(new Date().toLocaleString(undefined, { timeZone: "Asia/Tokyo" }));
@@ -179,10 +177,10 @@ export class BestdoriApi {
    * @param url BestdoriのURL
    * @returns BestdoriのID
    */
-  getAudioId(url: string): number{
+  getAudioId(url: string): number | null {
     const match = url.match(/^https?:\/\/bestdori\.com\/info\/songs\/(?<Id>\d+)(\/.*)?$/);
     if(match){
-      return Number(match.groups.Id);
+      return Number(match.groups?.Id);
     }else{
       return null;
     }

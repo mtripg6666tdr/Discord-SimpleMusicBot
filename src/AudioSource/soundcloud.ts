@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { exportableCustom, ReadableStreamInfo } from ".";
+import type { AudioSourceBasicJsonFormat, ReadableStreamInfo } from ".";
 import type { i18n } from "i18next";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 import type { Readable } from "stream";
@@ -28,14 +28,14 @@ import { createPassThrough } from "../Util";
 
 let soundCloudClient = new SoundCloud();
 
-export class SoundCloudS extends AudioSource<string> {
+export class SoundCloudS extends AudioSource<string, SoundcloudJsonFormat> {
   protected author: string;
 
   constructor(){
-    super("soundcloud");
+    super({ isSeekable: false });
   }
 
-  async init(url: string, prefetched?: exportableSoundCloud){
+  async init(url: string, prefetched: SoundcloudJsonFormat | null, t: i18n["t"]){
     this.url = url;
     if(prefetched){
       this.title = prefetched.title;
@@ -46,7 +46,7 @@ export class SoundCloudS extends AudioSource<string> {
     }else{
       const info = await soundCloudClient.tracks.getV2(url);
       this.title = info.title;
-      this.description = info.description;
+      this.description = info.description || t("unknown");
       this.lengthSeconds = Math.floor(info.duration / 1000);
       this.author = info.user.username;
       this.thumbnail = info.artwork_url;
@@ -89,7 +89,7 @@ export class SoundCloudS extends AudioSource<string> {
     return `${t("audioSources.artist")}: \`${this.author}\``;
   }
 
-  exportData(): exportableSoundCloud{
+  exportData(): SoundcloudJsonFormat{
     return {
       url: this.url,
       title: this.title,
@@ -113,7 +113,7 @@ export class SoundCloudS extends AudioSource<string> {
   }
 }
 
-export type exportableSoundCloud = exportableCustom & {
+export type SoundcloudJsonFormat = AudioSourceBasicJsonFormat & {
   description: string,
   author: string,
   thumbnail: string,

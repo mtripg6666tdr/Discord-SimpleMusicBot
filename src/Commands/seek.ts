@@ -48,7 +48,7 @@ export default class Seek extends BaseCommand {
     if(!server.player.isPlaying || server.player.preparing){
       await message.reply(t("notPlaying")).catch(this.logger.error);
       return;
-    }else if(server.player.currentAudioInfo.lengthSeconds === 0 || server.player.currentAudioInfo.isUnseekable()){
+    }else if(server.player.currentAudioInfo!.lengthSeconds === 0 || !server.player.currentAudioInfo!.isSeekable){
       await message.reply(`:warning:${t("commands:seek.unseekable")}`).catch(this.logger.error);
       return;
     }
@@ -63,7 +63,7 @@ export default class Seek extends BaseCommand {
       }
     }(context.rawArgs));
 
-    if(time > server.player.currentAudioInfo.lengthSeconds || isNaN(time)){
+    if(time > server.player.currentAudioInfo!.lengthSeconds || isNaN(time)){
       await message.reply(`:warning:${t("commands:seek.invalidTime")}`).catch(this.logger.error);
       return;
     }

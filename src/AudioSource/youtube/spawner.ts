@@ -25,11 +25,14 @@ import { Worker, isMainThread } from "worker_threads";
 
 import PQueue from "p-queue";
 
-import { type exportableYouTube, YouTube } from "..";
+import { type YouTubeJsonFormat, YouTube } from "..";
 import { getLogger } from "../../logger";
 
 const worker = isMainThread ? new Worker(path.join(__dirname, global.BUNDLED && __filename.includes("min") ? "./worker.min.js" : "./worker.js")).on("error", console.error) : null;
-global.workerThread = worker;
+
+if(worker){
+  global.workerThread = worker;
+}
 
 const logger = getLogger("Spawner");
 
@@ -38,7 +41,7 @@ export type spawnerJobMessage = spawnerGetInfoMessage | spawnerSearchMessage;
 export type spawnerGetInfoMessage = {
   type: "init",
   url: string,
-  prefetched: exportableYouTube,
+  prefetched: YouTubeJsonFormat,
   forceCache: boolean,
 };
 export type spawnerSearchMessage = {
@@ -70,11 +73,14 @@ const jobQueue = worker && new Map<string, jobQueueContent>();
 if(worker){
   worker.unref();
   worker.on("message", (message: WithId<workerMessage>) => {
-    if(jobQueue.has(message.id)){
-      const { callback, start } = jobQueue.get(message.id);
+    if(jobQueue!.has(message.id)){
+      const { callback, start } = jobQueue!.get(message.id)!;
+
       logger.debug(`Job(${message.id}) Finished (${Date.now() - start}ms)`);
+
       callback(message);
-      jobQueue.delete(message.id);
+
+      jobQueue!.delete(message.id);
     }else{
       logger.warn(`Invalid message received: ${message}`);
     }
@@ -90,15 +96,20 @@ const jobTriggerQueue = new PQueue({
 function doJob(message: spawnerGetInfoMessage): Promise<workerGetInfoSuccessMessage>;
 function doJob(message: spawnerSearchMessage): Promise<workerSearchSuccessMessage>;
 function doJob(message: spawnerJobMessage): Promise<workerSuccessMessage>{
+  if(!worker){
+    throw new Error("Cannot send send messages from worker thread to itself.");
+  }
+
   const uuid = crypto.randomUUID();
   logger.debug(`Job(${uuid}) Scheduled`);
+
   return jobTriggerQueue.add(() => new Promise((resolve, reject) => {
     worker.postMessage({
       ...message,
       id: uuid,
     });
     logger.debug(`Job(${uuid}) Started`);
-    jobQueue.set(uuid, {
+    jobQueue!.set(uuid, {
       start: Date.now(),
       callback: result => {
         if(result.type === "error"){
@@ -111,12 +122,12 @@ function doJob(message: spawnerJobMessage): Promise<workerSuccessMessage>{
   }));
 }
 
-export async function initYouTube(url: string, prefetched: exportableYouTube, forceCache?: boolean){
+export async function initYouTube(url: string, prefetched: YouTubeJsonFormat, forceCache?: boolean){
   const result = await doJob({
     type: "init",
     url,
     prefetched,
-    forceCache,
+    forceCache: !!forceCache,
   });
   return Object.assign(new YouTube(), result.data);
 }

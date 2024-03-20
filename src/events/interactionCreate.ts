@@ -37,6 +37,11 @@ export async function onInteractionCreate(this: MusicBot, interaction: discord.A
     this.logger.debug(`Unknown interaction received: ${(interaction as any).type}`);
     return;
   }
+
+  if(!interaction.member){
+    return;
+  }
+
   // メンテナンスモードでかつボット管理者以外なら終了
   if(this.maintenance && !config.isBotAdmin(interaction.member.id)){
     this.logger.debug("Interaction ignored due to mentenance mode");

@@ -81,7 +81,7 @@ export class PlayManagerWithBgm extends PlayManager {
   }
 
   protected override getNoticeNeeded(){
-    return this.server.boundTextChannel && !this.bgm;
+    return !!this.server.boundTextChannel && !this.bgm;
   }
 
   override disconnect(){
@@ -90,8 +90,8 @@ export class PlayManagerWithBgm extends PlayManager {
     return result;
   }
 
-  override async onStreamFinished(){
-    if(this._player.state.status === AudioPlayerStatus.Playing){
+  protected override async onStreamFinished(){
+    if(this._player?.state.status === AudioPlayerStatus.Playing){
       await entersState(this._player, AudioPlayerStatus.Idle, 20e3)
         .catch(() => {
           this.logger.warn("Stream has not ended in time and will force stream into destroying");

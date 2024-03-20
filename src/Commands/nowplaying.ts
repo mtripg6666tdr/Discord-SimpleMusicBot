@@ -33,7 +33,7 @@ export default class NowPlaying extends BaseCommand {
       unlist: false,
       category: "player",
       argument: [{
-        type: "bool",
+        type: "bool" as const,
         name: "detailed",
         required: false,
       }],
@@ -51,16 +51,16 @@ export default class NowPlaying extends BaseCommand {
     }
 
     // create progress bar
-    const _s = Math.floor(context.server.player.currentTime / 1000);
-    const _t = Number(context.server.player.currentAudioInfo.lengthSeconds * (
+    const currentTimeSeconds = Math.floor(context.server.player.currentTime / 1000);
+    const totalDurationSeconds = Number(context.server.player.currentAudioInfo!.lengthSeconds * (
       context.server.audioEffects.getEnabled("nightcore") ? 5 / 6 : 1
     ));
-    const [min, sec] = Util.time.calcMinSec(_s);
-    const [tmin, tsec] = Util.time.calcMinSec(_t);
-    const info = context.server.player.currentAudioInfo;
+    const [min, sec] = Util.time.calcMinSec(currentTimeSeconds);
+    const [tmin, tsec] = Util.time.calcMinSec(totalDurationSeconds);
+    const info = context.server.player.currentAudioInfo!;
     let progressBar = "";
-    if(_t > 0){
-      const progress = Math.floor(_s / _t * 20);
+    if(totalDurationSeconds > 0){
+      const progress = Math.floor(currentTimeSeconds / totalDurationSeconds * 20);
       progressBar += "=".repeat(progress > 0 ? progress - 1 : 0);
       progressBar += "●";
       progressBar += "=".repeat(20 - progress);
@@ -79,7 +79,7 @@ export default class NowPlaying extends BaseCommand {
         + `\r\n${progressBar}${
           info.isYouTube() && info.isLiveStream
             ? `(${t("liveStream")})`
-            : ` \`${min}:${sec}/${_t === 0 ? `(${t("unknown")})` : `${tmin}:${tsec}\``}`
+            : ` \`${min}:${sec}/${totalDurationSeconds === 0 ? `(${t("unknown")})` : `${tmin}:${tsec}\``}`
         }`
       )
       .setFields(

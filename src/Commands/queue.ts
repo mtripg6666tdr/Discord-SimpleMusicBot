@@ -33,7 +33,7 @@ export default class Queue extends BaseCommand {
       unlist: false,
       category: "playlist",
       argument: [{
-        type: "integer",
+        type: "integer" as const,
         name: "page",
         required: false,
       }],
@@ -107,7 +107,7 @@ export default class Queue extends BaseCommand {
             `${t("components:queue.equallyplayback")}:${context.server.equallyPlayback ? "⭕" : "❌"}`,
           ].join(" | "),
         })
-        .setThumbnail(message.guild.iconURL())
+        .setThumbnail(message.guild.iconURL()!)
         .setColor(getColor("QUEUE"))
         .toOceanic()
       ;

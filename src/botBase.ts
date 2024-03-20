@@ -57,13 +57,13 @@ interface BotBaseEvents {
 export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
   // クライアントの初期化
   protected readonly abstract _client: discord.Client;
-  protected readonly _instantiatedTime: Date = null;
-  protected readonly _versionInfo: string = null;
+  protected readonly _instantiatedTime: Date | null = null;
+  protected readonly _versionInfo: string;
   protected readonly _rateLimitController = new RateLimitController();
   protected readonly guildData: DataType = new Map();
   protected readonly _interactionCollectorManager: InteractionCollectorManager = new InteractionCollectorManager();
-  protected readonly _cacheManger: SourceCache = null;
-  protected _backupper: Backupper = null;
+  protected readonly _cacheManger: SourceCache;
+  protected _backupper: Backupper | null = null;
   private maintenanceTickCount = 0;
 
   /**

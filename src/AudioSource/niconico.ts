@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { exportableCustom, ReadableStreamInfo } from ".";
+import type { AudioSourceBasicJsonFormat, ReadableStreamInfo } from ".";
 import type { i18n } from "i18next";
 import type { Readable } from "stream";
 
@@ -26,16 +26,16 @@ import NiconicoDL, { isValidURL } from "niconico-dl.js";
 import { AudioSource } from "./audiosource";
 import { createPassThrough } from "../Util";
 
-export class NicoNicoS extends AudioSource<string> {
-  private nico = null as NiconicoDL;
+export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
+  private nico: NiconicoDL = null!;
   protected author = "";
   protected views = 0;
 
   constructor(){
-    super("niconico");
+    super({ isSeekable: false });
   }
 
-  async init(url: string, prefetched: exportableNicoNico, t: i18n["t"]){
+  async init(url: string, prefetched: NiconicoJsonFormat, t: i18n["t"]){
     this.url = url;
     this.nico = new NiconicoDL(url, /* quality */ "high");
     if(prefetched){
@@ -101,7 +101,7 @@ export class NicoNicoS extends AudioSource<string> {
     return `${t("audioSources.videoAuthor")}: ` + this.author;
   }
 
-  exportData(): exportableNicoNico{
+  exportData(): NiconicoJsonFormat{
     return {
       url: this.url,
       length: this.lengthSeconds,
@@ -118,7 +118,7 @@ export class NicoNicoS extends AudioSource<string> {
   }
 }
 
-export type exportableNicoNico = exportableCustom & {
+export type NiconicoJsonFormat = AudioSourceBasicJsonFormat & {
   description: string,
   author: string,
   thumbnail: string,

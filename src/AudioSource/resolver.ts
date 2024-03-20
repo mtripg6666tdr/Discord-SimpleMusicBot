@@ -28,7 +28,7 @@ import { getLogger } from "../logger";
 type AudioSourceBasicInfo = {
   type: KnownAudioSourceIdentifer,
   url: string,
-  knownData: AudioSource.exportableCustom,
+  knownData: AudioSource.AudioSourceBasicJsonFormat | null,
   forceCache: boolean,
 };
 
@@ -36,7 +36,7 @@ const { isDisabledSource } = useConfig();
 const logger = getLogger("Resolver");
 
 export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCache, preventSourceCache: boolean, t: i18n["t"]){
-  let basicInfo = null as AudioSource.AudioSource<any>;
+  let basicInfo: AudioSource.AudioSource<any, any> | null = null;
 
   const type = info.type;
   const url = info.url;
@@ -63,41 +63,38 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
 
   if(!isDisabledSource("youtube") && (type === "youtube" || type === "unknown" && AudioSource.YouTube.validateURL(url))){
     // youtube
-    basicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.exportableYouTube, cache);
+    basicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.YouTubeJsonFormat, cache);
   }else if(!isDisabledSource("custom") && (type === "custom" || type === "unknown" && isAvailableRawAudioURL(url))){
     // カスタムストリーム
     basicInfo = await new AudioSource.CustomStream().init(url, info.knownData, t);
   }else if(!isDisabledSource("soundcloud") && (type === "soundcloud" || AudioSource.SoundCloudS.validateUrl(url))){
     // soundcloud
-    basicInfo = await new AudioSource.SoundCloudS().init(url, gotData as AudioSource.exportableSoundCloud);
+    basicInfo = await new AudioSource.SoundCloudS().init(url, gotData as AudioSource.SoundcloudJsonFormat, t);
   }else if(!isDisabledSource("spotify") && (type === "spotify" || AudioSource.Spotify.validateTrackUrl(url)) && AudioSource.Spotify.available){
     // spotify
-    basicInfo = await new AudioSource.Spotify().init(url, gotData as AudioSource.exportableSpotify);
+    basicInfo = await new AudioSource.Spotify().init(url, gotData as AudioSource.SpotifyJsonFormat);
   }else if(type === "unknown"){
     // google drive
     if(!isDisabledSource("googledrive") && AudioSource.GoogleDrive.validateUrl(url)){
       basicInfo = await new AudioSource.GoogleDrive().init(url, info.knownData, t);
     }else if(!isDisabledSource("streamable") && AudioSource.StreamableApi.getVideoId(url)){
       // Streamable
-      basicInfo = await new AudioSource.Streamable().init(url, gotData as AudioSource.exportableStreamable);
+      basicInfo = await new AudioSource.Streamable().init(url, gotData as AudioSource.StreamableJsonFormat);
     }else if(process.env.BD_ENABLE && AudioSource.BestdoriApi.instance.getAudioId(url)){
       // Bestdori
-      basicInfo = await new AudioSource.BestdoriS().init(url, gotData as AudioSource.exportableBestdori);
-    }else if(process.env.HIBIKI_ENABLE && AudioSource.HibikiApi.validateURL(url)){
-      // Hibiki
-      basicInfo = await new AudioSource.Hibiki().init(url);
+      basicInfo = await new AudioSource.BestdoriS().init(url, gotData as AudioSource.BestdoriJsonFormat, t);
     }else if(!isDisabledSource("niconico") && AudioSource.NicoNicoS.validateUrl(url)){
       // NicoNico
-      basicInfo = await new AudioSource.NicoNicoS().init(url, gotData as AudioSource.exportableNicoNico, t);
+      basicInfo = await new AudioSource.NicoNicoS().init(url, gotData as AudioSource.NiconicoJsonFormat, t);
     }else if(!isDisabledSource("twitter") && AudioSource.Twitter.validateUrl(url)){
       // Twitter
-      basicInfo = await new AudioSource.Twitter().init(url, gotData as AudioSource.exportableTwitter, t);
+      basicInfo = await new AudioSource.Twitter().init(url, gotData as AudioSource.TwitterJsonFormat, t);
     }
   }
 
   if(preventSourceCache){
     logger.debug("Skipping source-caching due to private source");
-  }else if(basicInfo && !isNaN(basicInfo.lengthSeconds) && !basicInfo.unableToCache){
+  }else if(basicInfo && !isNaN(basicInfo.lengthSeconds) && basicInfo.isCachable){
     cacheManager.addSource(basicInfo, fromPersistentCache);
   }
 

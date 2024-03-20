@@ -35,12 +35,12 @@ type voteResult = "voted"|"cancelled"|"ignored";
 export class SkipSession extends ServerManagerBase<{}> {
   protected inited = false;
   protected readonly agreeUsers = new Set<string>();
-  protected reply: ResponseMessage = null;
-  protected currentSong: QueueContent = null;
+  protected reply: ResponseMessage = null!;
+  protected currentSong: QueueContent = null!;
   protected destroyed = false;
-  protected issuer: string = null;
+  protected issuer: string = null!;
   protected skipVoteCustomId: string;
-  protected collector: InteractionCollector = null;
+  protected collector: InteractionCollector = null!;
 
   constructor(protected parent: GuildDataContainer){
     super("SkipManager", parent);
@@ -65,7 +65,11 @@ export class SkipSession extends ServerManagerBase<{}> {
       .createCustomIds({
         "skip_vote": "button",
       });
-    collector.on("skip_vote", interaction => this.vote(interaction.member));
+    collector.on("skip_vote", interaction => {
+      if(interaction.member){
+        this.vote(interaction.member);
+      }
+    });
     this.collector = collector;
     this.skipVoteCustomId = customIdMap.skip_vote;
 
@@ -140,6 +144,10 @@ export class SkipSession extends ServerManagerBase<{}> {
   }
 
   private getVoiceMembers(){
+    if(!this.server.connectingVoiceChannel){
+      throw new Error("Voice connection has been already disposed.");
+    }
+
     return this.server.connectingVoiceChannel.voiceMembers;
   }
 

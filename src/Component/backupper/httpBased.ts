@@ -58,7 +58,9 @@ export class HttpBackupper extends IntervalBackupper {
       const statuses: { [guildId: string]: string } = {};
       const originalStatuses: { [guildId: string]: exportableStatuses } = {};
       statusModifiedGuildIds.forEach(id => {
-        const status = this.data.get(id).exportStatus();
+        const status = this.data.get(id)?.exportStatus();
+        if(!status) return;
+
         statuses[id] = [
           status.voiceChannelId,
           status.boundChannelId,
@@ -78,7 +80,7 @@ export class HttpBackupper extends IntervalBackupper {
         data: JSON.stringify(statuses),
       };
 
-      await candyget.post(process.env.DB_URL, "json", {
+      await candyget.post(process.env.DB_URL!, "json", {
         headers: {
           "Content-Type": MIME_JSON,
           "User-Agent": this.userAgent,
@@ -109,7 +111,11 @@ export class HttpBackupper extends IntervalBackupper {
       this.logger.info("Backing up modified queue...");
 
       const queues: { [guildId: string]: string } = {};
-      modifiedGuildIds.forEach(id => queues[id] = encodeURIComponent(JSON.stringify(this.data.get(id).exportQueue())));
+      modifiedGuildIds.forEach(id => {
+        const guild = this.data.get(id);
+        if(!guild) return;
+        queues[id] = encodeURIComponent(JSON.stringify(guild.exportQueue()));
+      });
 
       const payload = {
         token: process.env.DB_TOKEN,
@@ -118,7 +124,7 @@ export class HttpBackupper extends IntervalBackupper {
         type: "queue",
       };
 
-      const { body } = await candyget.post<postResult>(process.env.DB_URL, "json", {
+      const { body } = await candyget.post<postResult>(process.env.DB_URL!, "json", {
         headers: {
           "Content-Type": MIME_JSON,
           "User-Aegnt": this.userAgent,
@@ -143,7 +149,7 @@ export class HttpBackupper extends IntervalBackupper {
     if(HttpBackupper.backuppable){
       try{
         const { body: result } = await candyget.json<getResult>(
-          `${process.env.DB_URL}?token=${encodeURIComponent(process.env.DB_TOKEN)}&guildid=${guildids.join(",")}&type=j`,
+          `${process.env.DB_URL}?token=${encodeURIComponent(process.env.DB_TOKEN!)}&guildid=${guildids.join(",")}&type=j`,
           {
             headers: {
               "User-Agent": this.userAgent,
@@ -196,7 +202,7 @@ export class HttpBackupper extends IntervalBackupper {
     if(HttpBackupper.backuppable){
       try{
         const { body: result } = await candyget.json<getResult>(
-          `${process.env.DB_URL}?token=${encodeURIComponent(process.env.DB_TOKEN)}&guildid=${guildids.join(",")}&type=queue`,
+          `${process.env.DB_URL}?token=${encodeURIComponent(process.env.DB_TOKEN!)}&guildid=${guildids.join(",")}&type=queue`,
           {
             headers: {
               "User-Agent": this.userAgent,
@@ -209,7 +215,7 @@ export class HttpBackupper extends IntervalBackupper {
           const res = new Map<string, YmxFormat>();
           Object.keys(frozenQueues).forEach(key => {
             try{
-              const ymx = JSON.parse(decodeURIComponent(frozenQueues[key]));
+              const ymx = JSON.parse<YmxFormat>(decodeURIComponent(frozenQueues[key]));
               res.set(key, ymx);
             }
             catch{ /* empty */ }

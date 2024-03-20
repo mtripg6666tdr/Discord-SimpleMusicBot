@@ -16,19 +16,18 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { StreamInfo } from ".";
+import type { AudioSourceBasicJsonFormat, StreamInfo } from ".";
 import type { i18n } from "i18next";
 
 import { AudioSource } from "./audiosource";
 import { createFragmentalDownloadStream, downloadAsReadable, isAvailableRawAudioURL, requestHead, retrieveRemoteAudioInfo } from "../Util";
 
-export class CustomStream extends AudioSource<string> {
+export class CustomStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
   constructor(){
-    super("custom");
-    this._unableToCache = true;
+    super({ isCacheable: false });
   }
 
-  async init(url: string, prefetched: exportableCustom, t: i18n["t"]){
+  async init(url: string, prefetched: AudioSourceBasicJsonFormat | null, t: i18n["t"]){
     if(prefetched){
       this.title = prefetched.title || t("audioSources.customStream");
       this.url = url;
@@ -59,7 +58,7 @@ export class CustomStream extends AudioSource<string> {
     const headRes = await requestHead(this.url);
     const acceptRanges = headRes.headers["accept-ranges"];
     const contentLengthStr = headRes.headers["content-length"];
-    const stream = acceptRanges?.includes("bytes") && /^\d+$/.test(contentLengthStr)
+    const stream = acceptRanges?.includes("bytes") && contentLengthStr && /^\d+$/.test(contentLengthStr)
       ? createFragmentalDownloadStream(this.url, { contentLength: Number(contentLengthStr) })
       : downloadAsReadable(this.url);
 
@@ -87,7 +86,7 @@ export class CustomStream extends AudioSource<string> {
     return "";
   }
 
-  exportData(): exportableCustom{
+  exportData(): AudioSourceBasicJsonFormat{
     return {
       url: this.url,
       length: this.lengthSeconds,
@@ -101,8 +100,3 @@ export class CustomStream extends AudioSource<string> {
   }
 }
 
-export type exportableCustom = {
-  url: string,
-  length: number,
-  title: string,
-};

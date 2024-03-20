@@ -16,7 +16,6 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { AudioSource } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { AudioPlayer } from "@discordjs/voice";
 import type { Member, Message, TextChannel } from "oceanic.js";
@@ -32,6 +31,7 @@ import { FixedAudioResource } from "./audioResource";
 import { resolveStreamToPlayable } from "./streams";
 import { DSL } from "./streams/dsl";
 import { Normalizer } from "./streams/normalizer";
+import { type AudioSource } from "../AudioSource";
 import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
@@ -76,21 +76,21 @@ const config = useConfig();
 export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   protected readonly retryLimit = 3;
   protected _seek = 0;
-  protected _errorReportChannel: TextChannel = null;
+  protected _errorReportChannel: TextChannel | null = null;
   protected _volume = 100;
   protected _errorCount = 0;
   protected _errorUrl = "";
   protected _preparing = false;
-  protected _currentAudioInfo: AudioSource<any> = null;
-  protected _currentAudioStream: Readable = null;
+  protected _currentAudioInfo: AudioSource<any, any> | null = null;
+  protected _currentAudioStream: Readable | null = null;
   protected _cost = 0;
   protected _finishTimeout = false;
-  protected _player: AudioPlayer = null;
-  protected _resource: FixedAudioResource = null;
-  protected _waitForLiveAbortController: AbortController = null;
-  protected _dsLogger: DSL = null;
+  protected _player: AudioPlayer | null = null;
+  protected _resource: FixedAudioResource | null = null;
+  protected _waitForLiveAbortController: AbortController | null = null;
+  protected _dsLogger: DSL | null = null;
   protected _playing: boolean = false;
-  protected _lastMember: string = null;
+  protected _lastMember: string | null = null;
 
   get preparing(){
     return this._preparing;
@@ -100,7 +100,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this._preparing = val;
   }
 
-  get currentAudioInfo(): Readonly<AudioSource<any>>{
+  get currentAudioInfo(): Readonly<AudioSource<any, any>> | null {
     return this._currentAudioInfo;
   }
 
@@ -116,9 +116,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   /**
    *  接続され、再生途中にあるか（たとえ一時停止されていても）
    */
-  get isPlaying(): boolean{
+  get isPlaying(): boolean {
     return this.isConnecting
-      && this._player
+      && !!this._player
       && (this._player.state.status === AudioPlayerStatus.Playing || this._player.state.status === AudioPlayerStatus.Paused || !!this._waitForLiveAbortController);
   }
 
@@ -126,14 +126,14 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
    *  VCに接続中かどうか
    */
   get isConnecting(): boolean{
-    return this.server.connection && this.server.connection.state.status === VoiceConnectionStatus.Ready;
+    return !!this.server.connection && this.server.connection.state.status === VoiceConnectionStatus.Ready;
   }
 
   /**
    * 一時停止されているか
    */
   get isPaused(): boolean{
-    return this.isConnecting && this._player && this._player.state.status === AudioPlayerStatus.Paused;
+    return this.isConnecting && !!this._player && this._player.state.status === AudioPlayerStatus.Paused;
   }
 
   /**
@@ -141,10 +141,10 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
    * @remarks ミリ秒単位なので秒に直すには1000分の一する必要がある
    */
   get currentTime(): number{
-    if(!this.isPlaying || this._player.state.status === AudioPlayerStatus.Idle || this._player.state.status === AudioPlayerStatus.Buffering){
+    if(!this.isPlaying || this._player!.state.status === AudioPlayerStatus.Idle || this._player!.state.status === AudioPlayerStatus.Buffering){
       return 0;
     }
-    return this._seek * 1000 + this._player.state.playbackDuration;
+    return this._seek * 1000 + this._player!.state.playbackDuration;
   }
 
   get volume(){
@@ -194,14 +194,17 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.logger.info("#play called");
     this.emit("playPreparing", time);
     this.preparing = true;
-    let mes: Message = null;
+    let mes: Message | null = null;
     this._currentAudioInfo = this.server.queue.get(0).basicInfo;
 
     // 通知メッセージを送信する（可能なら）
     if(this.getNoticeNeeded() && !quietOnError){
-      const [min, sec] = Util.time.calcMinSec(this.currentAudioInfo.lengthSeconds);
-      const isLive = this.currentAudioInfo.isYouTube() && this.currentAudioInfo.isLiveStream;
-      if(this._currentAudioInfo.isYouTube() && this._currentAudioInfo.availableAfter){
+      const [min, sec] = Util.time.calcMinSec(this.currentAudioInfo!.lengthSeconds);
+      const isYT = this.currentAudioInfo!.isYouTube();
+      const isLive = isYT && this.currentAudioInfo.isLiveStream;
+
+      if(isYT && this.currentAudioInfo.availableAfter){
+        const waitTarget = this.currentAudioInfo;
         // まだ始まっていないライブを待機する
         mes = await this.server.bot.client.rest.channels.createMessage(
           this.server.boundTextChannel,
@@ -213,7 +216,6 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           }
         );
         this.preparing = false;
-        const waitTarget = this._currentAudioInfo;
         const abortController = this._waitForLiveAbortController = new AbortController();
         this.once("stop", () => {
           abortController.abort();
@@ -238,7 +240,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           {
             content: `:hourglass_flowing_sand:${
               i18next.t("components:play.preparing", {
-                title: `\`${this.currentAudioInfo.title}\` \`(${
+                title: `\`${this.currentAudioInfo!.title}\` \`(${
                   isLive ? i18next.t("liveStream", { lng: this.server.locale }) : `${min}:${sec}`
                 })\``,
                 lng: this.server.locale,
@@ -251,11 +253,11 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
 
     try{
       // シーク位置を確認
-      if(this.currentAudioInfo.lengthSeconds <= time) time = 0;
+      if(this.currentAudioInfo!.lengthSeconds <= time) time = 0;
       this._seek = time;
 
       // QueueContentからストリーム情報を取得
-      const rawStream = await this.currentAudioInfo.fetch(time > 0);
+      const rawStream = await this.currentAudioInfo!.fetch(time > 0);
 
       // 情報からストリームを作成
       // 万が一ストリームのfetch中に切断された場合には、リソース開放してplayを抜ける
@@ -286,6 +288,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       this._cost = cost;
       this._lastMember = null;
       this.prepareAudioPlayer();
+
       const normalizer = new Normalizer(stream, this.volume !== 100);
       normalizer.once("end", this.onStreamFinished.bind(this));
       const resource = this._resource = FixedAudioResource.fromAudioResource(
@@ -302,18 +305,18 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
                     : StreamType.Arbitrary,
           inlineVolume: this.volume !== 100,
         }),
-        this.currentAudioInfo.lengthSeconds - time
+        this.currentAudioInfo!.lengthSeconds - time
       );
       this._dsLogger?.appendReadable(normalizer);
 
       // start to play!
-      this._player.play(resource);
+      this._player!.play(resource);
 
       // setup volume
       this.setVolume(this.volume);
 
       // wait for player entering the playing state
-      const waitSuccess = await entersState(this._player, AudioPlayerStatus.Playing, 10e3)
+      const waitSuccess = await entersState(this._player!, AudioPlayerStatus.Playing, 10e3)
         .then(() => true)
         .catch(() => false);
       // when occurring one or more error(s) while waiting for player,
@@ -356,6 +359,10 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   }
 
   private createNowPlayingMessage(){
+    if(!this.currentAudioInfo){
+      throw new Error("Current audio info was null.");
+    }
+
     const _t = Number(this.currentAudioInfo.lengthSeconds);
     const [min, sec] = Util.time.calcMinSec(_t);
     const queueTimeFragments = Util.time.calcHourMinSec(
@@ -540,7 +547,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         if(wait){
           await entersState(this._player, AudioPlayerStatus.Idle, 10e3).catch(() => {
             this.logger.warn("Player didn't stop in time; force-stopping");
-            this._player.stop(true);
+            this._player?.stop(true);
           });
         }
       }
@@ -558,7 +565,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.emit("disconnectAttempt");
 
     if(this.server.connection){
-      this.logger.info("Disconnected from " + this.server.connectingVoiceChannel.id);
+      this.logger.info("Disconnected from " + this.server.connectingVoiceChannel!.id);
       this.server.connection.disconnect();
       this.server.connection.destroy();
       this.emit("disconnect");
@@ -604,7 +611,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   pause(lastMember?: Member): PlayManager{
     this.logger.info("Pause called");
     this.emit("pause");
-    this._player.pause();
+    this._player!.pause();
     this._lastMember = lastMember?.id || null;
     return this;
   }
@@ -617,7 +624,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.logger.info("Resume called");
     this.emit("resume");
     if(!member || member.id === this._lastMember){
-      this._player.unpause();
+      this._player!.unpause();
       this._lastMember = null;
     }
     return this;
@@ -663,7 +670,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this._errorUrl = "";
   }
 
-  async onStreamFinished(){
+  protected async onStreamFinished(){
     // 再生状態でないときに発生したエラーは基本的に無視する
     if(!this.currentAudioUrl || !this._playing){
       // ただし、ストリームの準備中に発生したエラーはエラーハンドリングして再試行に回す
@@ -677,7 +684,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.logger.info("onStreamFinished called");
 
     // まだ状態が再生中のままであるときには、再生停止中になるまで、最大20秒間待機する
-    if(this.server.connection && this._player.state.status === AudioPlayerStatus.Playing){
+    if(this.server.connection && this._player?.state.status === AudioPlayerStatus.Playing){
       await entersState(this._player, AudioPlayerStatus.Idle, 20e3)
         .catch(() => {
           this.logger.warn("Stream has not ended in time and will force stream into destroying");
@@ -755,19 +762,19 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.once("disconnectAttempt", playHandler);
   }
 
-  async onStreamFailed(quiet: boolean = false){
+  protected async onStreamFailed(quiet: boolean = false){
     this._playing = false;
     this.logger.info("onStreamFailed called");
     this.emit("playFailed");
     this._cost = 0;
     this.destroyStream();
 
-    if(this._errorUrl === this.currentAudioInfo?.url && !quiet){
+    if(this._errorUrl === this.currentAudioInfo!.url && !quiet){
       this._errorCount++;
     }else{
       this._errorCount = 1;
-      this._errorUrl = this.currentAudioInfo.url;
-      this.currentAudioInfo.purgeCache();
+      this._errorUrl = this.currentAudioInfo!.url;
+      this.currentAudioInfo!.purgeCache();
     }
 
     this.logger.warn(`Playback failed (${this._errorCount}times)`);

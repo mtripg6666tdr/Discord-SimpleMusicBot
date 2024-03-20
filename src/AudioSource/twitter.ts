@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { exportableCustom, UrlStreamInfo } from ".";
+import type { AudioSourceBasicJsonFormat, UrlStreamInfo } from ".";
 import type { i18n } from "i18next";
 
 import candyget from "candyget";
@@ -25,24 +25,24 @@ import * as htmlEntities from "html-entities";
 import { AudioSource } from "./audiosource";
 import { retrieveRemoteAudioInfo } from "../Util";
 
-export class Twitter extends AudioSource<string> {
+export class Twitter extends AudioSource<string, TwitterJsonFormat> {
   private streamUrl = "";
 
-  constructor(){
-    super("twitter");
-  }
-
-  async init(url: string, prefetched: exportableTwitter, t: i18n["t"]){
+  async init(url: string, prefetched: TwitterJsonFormat | null, t: i18n["t"]){
     this.url = url;
-    if(!Twitter.validateUrl(url)) throw new Error("Invalid streamable url");
+    if(!Twitter.validateUrl(url)) throw new Error("Invalid Twitter url.");
     if(prefetched){
       this.lengthSeconds = prefetched.length;
       this.title = prefetched.title;
       this.streamUrl = prefetched.streamUrl;
     }else{
       const streamInfo = await twitterDl(url.split("?")[0]);
+      if(!streamInfo.videoUrl){
+        throw new Error("Invalid Twitter url.");
+      }
+
       const audioInfo = await retrieveRemoteAudioInfo(streamInfo.videoUrl);
-      this.lengthSeconds = audioInfo.lengthSeconds;
+      this.lengthSeconds = audioInfo.lengthSeconds || 0;
 
       this.title = t("audioSources.tweet", { name: streamInfo.displayName, id: streamInfo.screenName });
       this.streamUrl = streamInfo.videoUrl;
@@ -78,7 +78,7 @@ export class Twitter extends AudioSource<string> {
     return "";
   }
 
-  exportData(): exportableTwitter{
+  exportData(): TwitterJsonFormat{
     return {
       url: this.url,
       length: this.lengthSeconds,
@@ -92,15 +92,15 @@ export class Twitter extends AudioSource<string> {
   }
 }
 
-export type exportableTwitter = exportableCustom & {
+export type TwitterJsonFormat = AudioSourceBasicJsonFormat & {
   streamUrl: string,
 };
 
 type Tweet = {
-  displayName: string,
-  screenName: string,
+  displayName: string | null,
+  screenName: string | null,
   content: string,
-  videoUrl: string,
+  videoUrl: string | null,
 };
 
 const mediaTypeRegExp = /<meta\s+property="twitter:card"\s+content="(?<type>.+?)"\/>/;
@@ -124,12 +124,12 @@ async function twitterDl(url: string): Promise<Tweet> {
     throw new Error("Provided URL includes no videos.");
   }
 
-  const screenName = twitterSiteRegExp.exec(result.body)?.groups?.id;
+  const screenName = twitterSiteRegExp.exec(result.body)?.groups?.id || null;
   const displayName = (twitterTitleRegExp.exec(result.body)?.groups?.title || "")
     .replace(new RegExp(`\\(@${screenName}\\)$`), "")
-    .trimEnd();
-  const content = htmlEntities.decode(ogDescriptionRegExp.exec(result.body)?.groups?.content);
-  const videoUrl = ogVideoRegExp.exec(result.body)?.groups?.url;
+    .trimEnd() || null;
+  const content = htmlEntities.decode(ogDescriptionRegExp.exec(result.body)?.groups?.content || "");
+  const videoUrl = ogVideoRegExp.exec(result.body)?.groups?.url || null;
 
   return {
     displayName,

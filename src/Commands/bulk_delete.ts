@@ -34,7 +34,7 @@ export default class BulkDelete extends BaseCommand {
       category: "utility",
       argument: [
         {
-          type: "integer",
+          type: "integer" as const,
           name: "count",
           required: true,
         },
@@ -60,17 +60,16 @@ export default class BulkDelete extends BaseCommand {
       const messages = [] as Message[];
       let i = 0;
       do{
-        const allMsgs: Message<AnyTextableGuildChannel>[] = await message.channel.getMessages(before ? {
-          limit: 100,
-          before,
-        } : {
-          limit: 100,
-        });
+        const allMsgs: Message<AnyTextableGuildChannel>[] = await message.channel.getMessages(
+          before
+            ? { limit: 100, before }
+            : { limit: 100 }
+        );
         if(allMsgs.length === 0) break;
         const msgs = allMsgs.filter(_msg => _msg.author.id === context.client.user.id && _msg.id !== reply.id);
         msgs.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
         messages.push(...msgs);
-        before = allMsgs.at(-1).id;
+        before = allMsgs.at(-1)!.id;
         i++;
         await reply.edit(
           `:mag:${t("commands:bulk_delete.loading")}(${
@@ -109,6 +108,7 @@ export default class BulkDelete extends BaseCommand {
         // bulk delete
         await message.channel.deleteMessages(
           messages.map(msg => msg.id),
+           
           t("commands:bulk_delete.auditLog", { issuer: message.member.username, count })
         );
         await reply.edit({
@@ -119,6 +119,7 @@ export default class BulkDelete extends BaseCommand {
       });
       collector.on("timeout", () => {
         reply.edit({
+           
           content: t("commands:bulk_delete.cancel"),
           components: [],
         }).catch(this.logger.error);

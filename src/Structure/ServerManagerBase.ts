@@ -25,7 +25,7 @@ import { LogEmitter } from ".";
  * すべてのマネージャークラスの基底クラスです
  */
 export abstract class ServerManagerBase<T extends EventDictionary> extends LogEmitter<T> {
-  protected server: GuildDataContainer = null;
+  protected server: GuildDataContainer;
   
   constructor(tag: string, parent: GuildDataContainer){
     super(tag, parent.getGuildId());

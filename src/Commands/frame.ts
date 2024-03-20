@@ -56,7 +56,7 @@ export default class Frame extends BaseCommand {
       return;
     }
 
-    const vinfo = server.player.currentAudioInfo;
+    const vinfo = server.player.currentAudioInfo!;
     if(!vinfo.isYouTube()){
       await message.reply(`:warning:${t("commands:frame.unsupported")}`).catch(this.logger.error);
       return;
@@ -132,7 +132,7 @@ function getFrame(url: string, time: number, ua: string){
     logger.debug(`Passing args: ${args.join(" ")}`);
     const bufs = [] as Buffer[];
     const ffmpeg = new FFmpeg({ args });
-    ffmpeg.process.stderr.on("data", logger.debug);
+    ffmpeg.process.stderr?.on("data", logger.debug);
     ffmpeg
       .on("error", (er) => {
         if(!ffmpeg.destroyed) ffmpeg.destroy(er);
