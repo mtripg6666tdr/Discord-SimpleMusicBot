@@ -30,6 +30,7 @@ export type exportableStatuses = {
   queueLoopEnabled: boolean,
   addRelatedSongs: boolean,
   equallyPlayback: boolean,
+  disableSkipSession: boolean,
   volume: number,
 };
 
