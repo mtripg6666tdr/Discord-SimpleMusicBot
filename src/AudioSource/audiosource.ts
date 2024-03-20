@@ -16,12 +16,12 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { YouTube } from "./youtube";
 import type { LoggerObject } from "../logger";
 import type { i18n } from "i18next";
 import type { EmbedField } from "oceanic.js";
 import type { Readable } from "stream";
 
-import { YouTube } from "./youtube";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { getLogger } from "../logger";
 
@@ -53,6 +53,10 @@ export type DynamicThumbnail = {
 };
 
 type ThumbnailType = string | DynamicThumbnail;
+
+// declare alias and substitute later to prevent recursive import.
+// eslint-disable-next-line @typescript-eslint/init-declarations, prefer-const
+let YouTubeAlias: typeof YouTube;
 
 /**
  * 音楽ボットで解釈できるオーディオファイルのソースを表します。
@@ -154,7 +158,7 @@ export abstract class AudioSource<T extends ThumbnailType, U extends AudioSource
 
   /** オーディオソースがYouTubeであるかを返します。それ以外のソースに対してはinstanceofを使用してください。 */
   isYouTube(): this is YouTube {
-    return this instanceof YouTube;
+    return this instanceof YouTubeAlias;
   }
 
   /** プライベートなソースとして設定します */
@@ -181,3 +185,5 @@ export type UrlStreamInfo = {
   streamType: StreamTypeIdentifer | null,
   userAgent?: string,
 };
+
+YouTubeAlias = require("./youtube").YouTube;
