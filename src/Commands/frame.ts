@@ -52,12 +52,11 @@ export default class Frame extends BaseCommand {
 
     // そもそも再生状態ではない場合
     if(!server.player.isConnecting || !server.player.isPlaying){
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       await message.reply(t("notPlaying")!).catch(this.logger.error);
       return;
     }
 
-    const vinfo = server.player.currentAudioInfo;
+    const vinfo = server.player.currentAudioInfo!;
     if(!vinfo.isYouTube()){
       await message.reply(`:warning:${t("commands:frame.unsupported")}`).catch(this.logger.error);
       return;
@@ -75,7 +74,6 @@ export default class Frame extends BaseCommand {
 
     if(context.rawArgs !== "" && vinfo.isLiveStream){
       await message.channel.createMessage({
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         content: t("commands:frame.liveStreamWithTime")!,
       });
       return;

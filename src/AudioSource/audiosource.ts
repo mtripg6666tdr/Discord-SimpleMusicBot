@@ -23,6 +23,7 @@ import type { Readable } from "stream";
 
 import { NicoNicoS } from "./niconico";
 import { SoundCloudS } from "./soundcloud";
+import { YouTube } from "./youtube";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { getLogger } from "../logger";
 
@@ -151,6 +152,11 @@ export abstract class AudioSource<T extends ThumbnailType, U extends AudioSource
    * それ以外のソースではこの関数は何もしません。
    */
   purgeCache(){}
+
+  /** オーディオソースがYouTubeであるかを返します。それ以外のソースに対してはinstanceofを使用してください。 */
+  isYouTube(): this is YouTube {
+    return this instanceof YouTube;
+  }
 
   /** ソースがシークできるかどうかを表します */
   isUnseekable(){

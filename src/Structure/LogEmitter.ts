@@ -43,6 +43,10 @@ export abstract class LogEmitter<Events extends EventDictionary> extends TypedEv
   }
 
   getGuildId(){
+    if(!this.guildId){
+      throw new Error("Cannot read guild id before guild id initialized.");
+    }
+
     return this.guildId;
   }
 }

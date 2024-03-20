@@ -31,7 +31,7 @@ import { FixedAudioResource } from "./audioResource";
 import { resolveStreamToPlayable } from "./streams";
 import { DSL } from "./streams/dsl";
 import { Normalizer } from "./streams/normalizer";
-import { YouTube, type AudioSource } from "../AudioSource";
+import { type AudioSource } from "../AudioSource";
 import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
@@ -200,7 +200,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     // 通知メッセージを送信する（可能なら）
     if(this.getNoticeNeeded() && !quietOnError){
       const [min, sec] = Util.time.calcMinSec(this.currentAudioInfo!.lengthSeconds);
-      const isYT = this.currentAudioInfo! instanceof YouTube;
+      const isYT = this.currentAudioInfo!.isYouTube();
       const isLive = isYT && this.currentAudioInfo.isLiveStream;
 
       if(isYT && this.currentAudioInfo.availableAfter){
@@ -359,22 +359,26 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   }
 
   private createNowPlayingMessage(){
-    const _t = Number(this.currentAudioInfo!.lengthSeconds);
+    if(!this.currentAudioInfo){
+      throw new Error("Current audio info was null.");
+    }
+
+    const _t = Number(this.currentAudioInfo.lengthSeconds);
     const [min, sec] = Util.time.calcMinSec(_t);
     const queueTimeFragments = Util.time.calcHourMinSec(
-      this.server.queue.lengthSecondsActual - (this.currentAudioInfo!.lengthSeconds >= 0 ? this.currentAudioInfo!.lengthSeconds : 0)
+      this.server.queue.lengthSecondsActual - (this.currentAudioInfo.lengthSeconds >= 0 ? this.currentAudioInfo.lengthSeconds : 0)
     );
     /* eslint-disable @typescript-eslint/indent */
     const embed = new MessageEmbedBuilder()
       .setTitle(`:cd:${i18next.t("components:nowplaying.nowplayingTitle", { lng: this.server.locale })}:musical_note:`)
       .setDescription(
         (
-          this.currentAudioInfo!.isPrivateSource
-            ? `${this.currentAudioInfo!.title} \``
-            : `[${this.currentAudioInfo!.title}](${this.currentAudioUrl}) \``
+          this.currentAudioInfo.isPrivateSource
+            ? `${this.currentAudioInfo.title} \``
+            : `[${this.currentAudioInfo.title}](${this.currentAudioUrl}) \``
         )
         + (
-          this.currentAudioInfo instanceof YouTube && this.currentAudioInfo.isLiveStream
+          this.currentAudioInfo.isYouTube() && this.currentAudioInfo.isLiveStream
             ? `(${i18next.t("liveStream", { lng: this.server.locale })})`
             : _t === 0 ? `(${i18next.t("unknown", { lng: this.server.locale })})` : min + ":" + sec
         )
@@ -413,14 +417,14 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         true
       );
 
-    if(typeof this.currentAudioInfo!.thumbnail === "string"){
-      embed.setThumbnail(this.currentAudioInfo!.thumbnail);
+    if(typeof this.currentAudioInfo.thumbnail === "string"){
+      embed.setThumbnail(this.currentAudioInfo.thumbnail);
     }else{
-      embed.setThumbnail("attachment://thumbnail." + this.currentAudioInfo!.thumbnail.ext);
+      embed.setThumbnail("attachment://thumbnail." + this.currentAudioInfo.thumbnail.ext);
     }
 
     /* eslint-enable @typescript-eslint/indent */
-    if(this.currentAudioInfo instanceof YouTube){
+    if(this.currentAudioInfo.isYouTube()){
       if(this.currentAudioInfo.isFallbacked){
         embed.addField(
           `:warning:${i18next.t("attention", { lng: this.server.locale })}`,
@@ -464,7 +468,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         .toOceanic(),
     ];
 
-    if(typeof this.currentAudioInfo!.thumbnail === "string"){
+    if(typeof this.currentAudioInfo.thumbnail === "string"){
       return {
         content: "",
         embeds: [embed.toOceanic()],
@@ -477,8 +481,8 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         components,
         files: [
           {
-            name: "thumbnail." + this.currentAudioInfo!.thumbnail.ext,
-            contents: this.currentAudioInfo!.thumbnail.data,
+            name: "thumbnail." + this.currentAudioInfo.thumbnail.ext,
+            contents: this.currentAudioInfo.thumbnail.data,
           },
         ],
       };

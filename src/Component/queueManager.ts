@@ -417,7 +417,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           }else if(info.basicInfo.strategyId === 1){
             embed.setTitle(`${embed.title}*`);
           }
-        }else if(info.basicInfo.isSpotify()){
+        }else if(info.basicInfo instanceof AudioSource.Spotify){
           embed.addField(
             `:warning:${i18next.t("attention", { lng: this.server.locale })}`,
             i18next.t("components:queue.spotifyNotice", { lng: this.server.locale })
