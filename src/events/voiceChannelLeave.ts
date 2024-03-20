@@ -59,9 +59,19 @@ export async function onVoiceChannelLeave(
 
     if(server.queue instanceof QueueManagerWithBgm && server.queue.isBGM){
       await server.player.disconnect().catch(this.logger.error);
-    }else if(server.player.isPlaying && !config.twentyFourSeven.includes(oldChannel.id) && !config.alwaysTwentyFourSeven){
+    }else if(server.player.finishTimeout){
+      await server.player.disconnect().catch(this.logger.error);
+
+      await this._client.rest.channels.createMessage(
+        server.boundTextChannel,
+        {
+          content: `:postbox: ${i18next.t("disconnected", { lng: server.locale })}`,
+        }
+      ).catch(this.logger.error);
+    }else if(!config.twentyFourSeven.includes(oldChannel.id) && !config.alwaysTwentyFourSeven){
       if(
-        server.player.currentAudioInfo!.lengthSeconds > 60
+        server.player.isPlaying
+        && server.player.currentAudioInfo!.lengthSeconds > 60
         && server.player.currentAudioInfo!.lengthSeconds - server.player.currentTime / 1000 < 10
       ){
         // かつ、楽曲の長さが60秒以上
@@ -72,6 +82,7 @@ export async function onVoiceChannelLeave(
         if(!server.queue.onceLoopEnabled && !server.queue.loopEnabled){
           server.queue.next().catch(this.logger.error);
         }
+
         await this._client.rest.channels.createMessage(
           server.boundTextChannel,
           {
@@ -80,42 +91,37 @@ export async function onVoiceChannelLeave(
         ).catch(this.logger.error);
       }else{
         // それ以外の場合は、タイムアウトを設定し、一定時間内に追加操作がなかった場合切断する
-        if(!server.player.isPaused){
-          // すでに一時停止されていないならば、一時停止する
+        if(server.player.isPlaying && !server.player.isPaused){
+          // まだ一時停止されていないならば、一時停止する
           server.player.pause(member);
-          await this._client.rest.channels.createMessage(
-            server.boundTextChannel,
-            {
-              content: `:pause_button:${i18next.t("autoPaused", { lng: server.locale })}`,
-            }
-          ).catch(this.logger.error);
+
+          if(server.boundTextChannel){
+            await this._client.rest.channels.createMessage(
+              server.boundTextChannel,
+              {
+                content: `:pause_button:${i18next.t("autoPaused", { lng: server.locale })}`,
+              }
+            ).catch(this.logger.error);
+          }
         }
 
         const timer = setTimeout(() => {
           server.player.off("playCalled", clearIdleTimeout);
           server.player.off("disconnect", clearIdleTimeout);
-          if(server.player.isPaused){
-            this._client.rest.channels.createMessage(
-              server.boundTextChannel,
-              {
-                content: `:postbox: ${i18next.t("autoDisconnect", { lng: server.locale })}`,
-              }
-            ).catch(this.logger.error);
-            server.player.disconnect().catch(this.logger.error);
-          }
+
+          this._client.rest.channels.createMessage(
+            server.boundTextChannel,
+            {
+              content: `:postbox: ${i18next.t("autoDisconnect", { lng: server.locale })}`,
+            }
+          ).catch(this.logger.error);
+
+          server.player.disconnect().catch(this.logger.error);
         }, 10 * 60 * 1000).unref();
         const clearIdleTimeout = () => clearTimeout(timer);
         server.player.once("playCalled", clearIdleTimeout);
         server.player.once("disconnect", clearIdleTimeout);
       }
-    }else if(server.player.finishTimeout){
-      await server.player.disconnect().catch(this.logger.error);
-      await this._client.rest.channels.createMessage(
-        server.boundTextChannel,
-        {
-          content: `:postbox: ${i18next.t("disconnected", { lng: server.locale })}`,
-        }
-      ).catch(this.logger.error);
     }
   }
 
