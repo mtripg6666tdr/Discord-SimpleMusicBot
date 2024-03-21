@@ -33,7 +33,7 @@ The documentation of the bot (Japanese).
 - [Documentation](https://web.usamyon.moe/Discord-SimpleMusicBot/)
 
 ## Contribution
-The bot is still in developing phase so very buggy.  
+The bot is still in development so you may encounter bugs.  
 Any contributions are welcome!  
 If you find any bugs, please confirm there's no duplicated issues at first and feel free to open a new issue.After that, open a pull request if you can.  
 Not only opening issues, we accept inquiries (Japanese or English) in the support server below.  
