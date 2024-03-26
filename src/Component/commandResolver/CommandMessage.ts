@@ -17,8 +17,12 @@
  */
 
 import { CommandMessage as LibCommandMessage } from "@mtripg6666tdr/oceanic-command-resolver";
+import { defaultConfig } from "@mtripg6666tdr/oceanic-command-resolver";
 
 import { normalizeText } from "../../Util";
+import { subCommandSeparator } from "../../definition";
+
+defaultConfig.subCommandSeparator = subCommandSeparator;
 
 export class CommandMessage extends LibCommandMessage {
   protected static override parseCommand(content: string, prefixLength: number){

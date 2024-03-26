@@ -53,6 +53,7 @@ import { getLogger } from "../logger";
 
 interface GuildDataContainerEvents {
   updateBoundChannel: [string];
+  updateSettings: [];
 }
 
 const config = useConfig();
@@ -115,10 +116,46 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
 
   /** メインボット */
   readonly bot: MusicBotBase;
+
+  protected _addRelated: boolean;
   /** 関連動画自動追加が有効 */
-  addRelated: boolean;
+  get addRelated(){
+    return this._addRelated;
+  }
+  set addRelated(value: boolean){
+    if(this._addRelated !== value){
+      this.emit("updateSettings");
+    }
+
+    this._addRelated = value;
+  }
+
+  protected _equallyPlayback: boolean;
   /** 均等再生が有効 */
-  equallyPlayback: boolean;
+  get equallyPlayback(){
+    return this._equallyPlayback;
+  }
+  set equallyPlayback(value: boolean){
+    if(this._equallyPlayback !== value){
+      this.emit("updateSettings");
+    }
+
+    this._equallyPlayback = value;
+  }
+
+  protected _disableSkipSession: boolean;
+  /** スキップ投票を無効にするか */
+  get disableSkipSession(){
+    return this._disableSkipSession;
+  }
+  set disableSkipSession(value: boolean){
+    if(this._disableSkipSession !== value){
+      this.emit("updateSettings");
+    }
+
+    this._disableSkipSession = value;
+  }
+
   /** VCへの接続 */
   connection: VoiceConnection | null;
   /** VC */
@@ -155,6 +192,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     this.addRelated = false;
     this.prefix = ">";
     this.equallyPlayback = false;
+    this.disableSkipSession = false;
     this.connection = null;
     this.initPlayManager();
     this.initQueueManager();
@@ -245,7 +283,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    * ステータスをエクスポートします
    * @returns ステータスのオブジェクト
    */
-  exportStatus(): exportableStatuses{
+  exportStatus(): exportableStatuses {
     // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
     return {
       voiceChannelId: this.player.isPlaying && !this.player.isPaused ? this.connectingVoiceChannel!.id : "0",
@@ -254,6 +292,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       queueLoopEnabled: this.queue.queueLoopEnabled,
       addRelatedSongs: this.addRelated,
       equallyPlayback: this.equallyPlayback,
+      disableSkipSession: this.disableSkipSession,
       volume: this.player.volume,
     };
   }
@@ -264,10 +303,11 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    */
   importStatus(statuses: exportableStatuses){
     //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
-    this.queue.loopEnabled = statuses.loopEnabled;
-    this.queue.queueLoopEnabled = statuses.queueLoopEnabled;
-    this.addRelated = statuses.addRelatedSongs;
-    this.equallyPlayback = statuses.equallyPlayback;
+    this.queue.loopEnabled = !!statuses.loopEnabled;
+    this.queue.queueLoopEnabled = !!statuses.queueLoopEnabled;
+    this.addRelated = !!statuses.addRelatedSongs;
+    this.equallyPlayback = !!statuses.equallyPlayback;
+    this.disableSkipSession = !!statuses.disableSkipSession;
     this.player.setVolume(statuses.volume);
     if(statuses.voiceChannelId !== "0"){
       this.joinVoiceChannelOnly(statuses.voiceChannelId)

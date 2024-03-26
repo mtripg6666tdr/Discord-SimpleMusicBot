@@ -129,7 +129,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
   /** スラッシュコマンドの名称として登録できる旧基準を満たしたコマンド名を取得します */
   get asciiName(){
-    return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
+    return this.alias.filter(c => c.match(/^[>\w-]{2,32}$/))[0];
   }
 
   protected readonly logger: LoggerObject;
@@ -313,7 +313,10 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
   /** アプリケーションコマンドとして登録できるオブジェクトを生成します */
   toApplicationCommandStructure(): CreateApplicationCommandOptions[] {
-    if(this.unlist) throw new Error("This command cannot be listed due to private command!");
+    if(this.unlist){
+      throw new Error("This command cannot be listed due to private command!");
+    }
+
     const result: CreateApplicationCommandOptions[] = [];
     const defaultMemberPermissions = this.defaultMemberPermission === "NONE"
       ? null

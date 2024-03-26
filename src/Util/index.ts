@@ -301,6 +301,7 @@ const normalizeTemplate = [
   { from: /ｙ/g, to: "y" } as const,
   { from: /ｚ/g, to: "z" } as const,
   { from: /＞/g, to: ">" } as const,
+  { from: /＜/g, to: "<" } as const,
 ] as const;
 
 /**

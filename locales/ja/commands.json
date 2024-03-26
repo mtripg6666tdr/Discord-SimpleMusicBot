@@ -489,6 +489,18 @@
     "success": "シークしました",
     "failed": "シークに失敗しました"
   },
+  "setting": {
+    "name": "設定",
+    "description": "ボットの設定を変更します"
+  },
+  "setting>skipvote": {
+    "name": "設定>スキップ投票",
+    "description": "スキップ投票の有効・無効を変更します"
+  },
+  "setting>nowplayingnotification": {
+    "name": "設定>現在再生中",
+    "description": "現在再生中パネルのプッシュ通知を有効・無効にします"
+  },
   "shuffle": {
     "name": "シャッフル",
     "description": "キューの内容をシャッフルします。",
