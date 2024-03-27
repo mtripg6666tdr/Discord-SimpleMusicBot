@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "@mtripg6666tdr/eslint-config": "^3.0.15",
-    "@swc/core": "^1.4.8",
+    "@swc/core": "^1.4.11",
     "@tsconfig/node16": "^16.1.2",
     "@types/html-to-text": "^9.0.4",
     "@types/mocha": "^10.0.6",
