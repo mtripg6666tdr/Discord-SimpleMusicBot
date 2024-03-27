@@ -49,7 +49,7 @@
     "ytsr": "^3.8.4"
   },
   "devDependencies": {
-    "@mtripg6666tdr/eslint-config": "^3.0.15",
+    "@mtripg6666tdr/eslint-config": "^3.0.16",
     "@swc/core": "^1.4.8",
     "@tsconfig/node16": "^16.1.2",
     "@types/html-to-text": "^9.0.4",
