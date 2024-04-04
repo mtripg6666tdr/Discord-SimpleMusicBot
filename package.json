@@ -42,7 +42,7 @@
     "spotify-url-info": "^3.2.13",
     "throttle-debounce": "^5.0.0",
     "tslib": "^2.6.2",
-    "undici": "^5.28.3",
+    "undici": "^5.28.4",
     "yt-mix-playlist": "^1.0.1",
     "ytdl-core": "^4.11.5",
     "ytpl": "^2.3.0",
