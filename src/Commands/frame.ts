@@ -45,10 +45,10 @@ export default class Frame extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
 
-    context.server.updateBoundChannel(message);
     const server = context.server;
 
     // そもそも再生状態ではない場合

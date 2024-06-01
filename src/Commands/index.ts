@@ -400,4 +400,15 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
     return result;
   }
+
+  static updateBoundChannel = function updateBoundChannel<This extends BaseCommand, Return>(
+    originalMethod: (this: This, ...args: Parameters<BaseCommand["run"]>) => Return,
+    _context: ClassMethodDecoratorContext<This, (this: This, ...args: Parameters<BaseCommand["run"]>) => Return>,
+  ){
+    return function replacementMethodUpdateBoundChannel(this: This, ...args: Parameters<BaseCommand["run"]>): Return {
+      args[1].server.updateBoundChannel(args[0]);
+
+      return originalMethod.apply(this, args);
+    };
+  };
 }

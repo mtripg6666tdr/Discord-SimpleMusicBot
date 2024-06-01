@@ -39,9 +39,10 @@ export default class Volume extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
+    
     if(context.rawArgs === ""){
       await message.reply(`:loud_sound:${t("commands:volume.currentVolume", { volume: context.server.player.volume })}`)
         .catch(this.logger.error)

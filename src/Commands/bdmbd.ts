@@ -32,8 +32,8 @@ export default class BgmBd extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   protected async run(message: CommandMessage, context: Readonly<CommandArgs>): Promise<void> {
-    context.server.updateBoundChannel(message);
     await context.server.joinVoiceChannel(message, { replyOnFail: true });
     const bgmPlaylistUrl = context.rawArgs.length === 0
       ? "aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTExmZmhjQXBzbzl4UFhLUG5YbEZ3czlxWUNkMDltTFA0"

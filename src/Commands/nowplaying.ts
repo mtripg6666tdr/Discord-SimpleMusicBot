@@ -40,10 +40,11 @@ export default class NowPlaying extends BaseCommand {
       shouldDefer: false,
     });
   }
-  
+
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
+
     // そもそも再生状態じゃないよ...
     if(!context.server.player.isPlaying){
       message.reply(t("notPlaying")).catch(this.logger.error);

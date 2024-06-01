@@ -30,9 +30,9 @@ import { getConfig } from "../config";
 import { DefaultAudioThumbnailURL } from "../definition";
 
 export abstract class SearchBase<T> extends BaseCommand {
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
 
     // URLが渡されたら、そのままキューに追加を試みる
     if(this.urlCheck(context.rawArgs)){

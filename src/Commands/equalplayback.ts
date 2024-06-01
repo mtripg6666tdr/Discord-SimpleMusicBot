@@ -35,10 +35,10 @@ export default class EquallyPlayback extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(command: CommandMessage, context: CommandArgs){
     const { t } = context;
 
-    context.server.updateBoundChannel(command);
     if(context.server.preferences.equallyPlayback){
       context.server.preferences.equallyPlayback = false;
       command.reply(`❌${t("commands:equalplayback.disabled")}`).catch(this.logger.error);

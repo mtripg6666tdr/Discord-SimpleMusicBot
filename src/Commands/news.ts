@@ -39,9 +39,10 @@ export default class News extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
+
     context.server.joinVoiceChannel(message, {}).catch(this.logger.error);
     // change news according to locale
     let url: string = null!;

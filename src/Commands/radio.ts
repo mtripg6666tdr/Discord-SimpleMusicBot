@@ -41,9 +41,9 @@ export default class Radio extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
 
     try{
       if(context.rawArgs !== "" && context.server.queue.mixPlaylistEnabled){

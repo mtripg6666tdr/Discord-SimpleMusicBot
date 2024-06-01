@@ -32,9 +32,10 @@ export default class Cancel extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
+
     const result = context.server.cancelAll();
     if(result){
       message.reply(t("commands:cancel.canceling")).catch(this.logger.error);

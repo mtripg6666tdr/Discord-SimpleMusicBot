@@ -198,7 +198,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    * 状況に応じてバインドチャンネルを更新します
    * @param message 更新元となるメッセージ
    */
-  updateBoundChannel(message: CommandMessage|string){
+  updateBoundChannel(message: CommandMessage | string){
     if(typeof message === "string"){
       this.boundTextChannel = message;
       return;

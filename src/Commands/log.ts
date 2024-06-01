@@ -58,9 +58,9 @@ export default class SystemInfo extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
     // Run default logger
     context.bot.logGeneralInfo();
     await message.reply(t("commands:log.executing"));

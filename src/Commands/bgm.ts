@@ -31,12 +31,10 @@ export default class Bgm extends BaseCommand {
       shouldDefer: true,
     });
   }
-  
+
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-
-    // update bound channel
-    context.server.updateBoundChannel(message);
 
     // attempt to join
     if(!await context.server.joinVoiceChannel(message, { replyOnFail: true })) return;

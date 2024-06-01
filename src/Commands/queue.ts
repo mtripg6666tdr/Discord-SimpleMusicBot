@@ -41,9 +41,9 @@ export default class Queue extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
     const queue = context.server.queue;
     if(queue.length === 0){
       await message.reply(`:face_with_raised_eyebrow:${t("commands:queue.queueEmpty")}`).catch(this.logger.error);

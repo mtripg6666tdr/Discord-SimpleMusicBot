@@ -32,9 +32,9 @@ export default class RmDuplicated extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
 
     // 削除するアイテムのリストを作成
     const q = context.server.queue;

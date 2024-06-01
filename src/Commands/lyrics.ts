@@ -49,9 +49,10 @@ export default class Lyrics extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
+
     const msg = await message.reply("🔍検索中...");
     try{
       const songInfo = await getLyrics(context.rawArgs);

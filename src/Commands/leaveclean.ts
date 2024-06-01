@@ -32,9 +32,9 @@ export default class LeaveClean extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
 
     if(!context.server.player.isConnecting){
       context.server.queue.removeAll();
