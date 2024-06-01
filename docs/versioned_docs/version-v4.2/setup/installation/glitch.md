@@ -41,7 +41,7 @@ Glitchのトップ画面から、右上にある`New project`をクリックし�
 ### 3. ボットが動作するようファイルを編集します
 ボットが動作するよう、いくつかのファイルを変更する必要があります。
 * 
-  ```diff title="tsconfig.json"
+  ```diff title="tsconfig.build.json"
         "importHelpers": true,
   -     "outDir": "dist/",
   +     "outDir": "out/",
@@ -54,7 +54,7 @@ Glitchのトップ画面から、右上にある`New project`をクリックし�
   -   "onlystart": "node util/exec dist",
   +   "onlystart": "node util/exec out",
   -   "build": "rimraf dist/ typings/ && tsc",
-  +   "build": "rimraf out/ typings/ && tsc",
+  +   "build": "rimraf out/ typings/ && tsc || exit 0",
       "lint": "eslint .",
   ```
 
