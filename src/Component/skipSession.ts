@@ -20,7 +20,7 @@ import type { InteractionCollector } from "./collectors/InteractionCollector";
 import type { CommandMessage } from "./commandResolver/CommandMessage";
 import type { ResponseMessage } from "./commandResolver/ResponseMessage";
 import type { GuildDataContainer } from "../Structure";
-import type { QueueContent } from "../Structure/QueueContent";
+import type { QueueContent } from "../types/QueueContent";
 import type { Member } from "oceanic.js";
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";

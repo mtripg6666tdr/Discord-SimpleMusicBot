@@ -53,8 +53,10 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
     return;
   }
 
+  // メッセージライクに解決してコマンドメッセージに
+  const commandMessage = CommandMessage.createFromInteraction(interaction);
   // コマンドを解決
-  const command = CommandManager.instance.resolve(interaction.data.name);
+  const command = CommandManager.instance.resolve(commandMessage.command);
   if(!command){
     await interaction.createMessage({
       content: `${i18next.t("commandNotFound", { lng: interaction.locale })}:sob:`,
@@ -67,8 +69,6 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
     return;
   }
 
-  // メッセージライクに解決してコマンドメッセージに
-  const commandMessage = CommandMessage.createFromInteraction(interaction);
   // プレフィックス更新
   server.updatePrefix(commandMessage);
   // コマンドを実行

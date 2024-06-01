@@ -109,7 +109,7 @@ export class PlayManagerWithBgm extends PlayManager {
         this.logger.info("Queue empty");
         await this.disconnect();
       }else{
-        await this.play({ quietOnError: true, bgm: true });
+        await this.play({ quiet: true, bgm: true });
       }
     }else{
       return super.onStreamFinished();

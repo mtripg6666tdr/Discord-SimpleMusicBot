@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -36,13 +35,14 @@ export default class Related extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
     context.server.updateBoundChannel(message);
-    if(context.server.addRelated){
-      context.server.addRelated = false;
+    if(context.server.preferences.addRelated){
+      context.server.preferences.addRelated = false;
       message.reply(`❌${t("commands:related.disabled")}`).catch(this.logger.error);
     }else{
-      context.server.addRelated = true;
+      context.server.preferences.addRelated = true;
       const embed = new MessageEmbedBuilder()
         .setTitle(`⭕${t("commands:related.enabled")}`)
         .setDescription(`${t("commands:related.featureDescription")}\r\n${t("commands:related.featureNote")}`)

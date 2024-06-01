@@ -25,14 +25,14 @@ import * as ytdl from "ytdl-core";
 
 import { Strategy } from "./base";
 import { YouTubeJsonFormat } from "..";
-import { useConfig } from "../../../config";
+import { getConfig } from "../../../config";
 import { SecondaryUserAgent } from "../../../definition";
 import { createChunkedYTStream, createRefreshableYTLiveStream } from "../stream";
 
 type ytdlCore = "ytdlCore";
 export const ytdlCore: ytdlCore = "ytdlCore";
 
-const config = useConfig();
+const config = getConfig();
 
 type ytdlCoreCache = Cache<ytdlCore, ytdl.videoInfo>;
 

@@ -17,11 +17,11 @@
  */
 
 import type { AudioSourceBasicJsonFormat, UrlStreamInfo } from ".";
-import type { i18n } from "i18next";
 
 import candyget from "candyget";
 
 import { AudioSource } from "./audiosource";
+import { getCommandExecutionContext } from "../Commands";
 
 export class Streamable extends AudioSource<string, StreamableJsonFormat> {
   protected streamUrl = "";
@@ -57,7 +57,9 @@ export class Streamable extends AudioSource<string, StreamableJsonFormat> {
     };
   }
 
-  toField(_: boolean, t: i18n["t"]){
+  toField(){
+    const { t } = getCommandExecutionContext();
+
     return [
       {
         name: ":link:URL",

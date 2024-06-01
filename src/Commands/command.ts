@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 import type { EmbedField } from "oceanic.js";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
@@ -26,11 +25,11 @@ import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/hel
 import { BaseCommand } from ".";
 import { CommandManager } from "../Component/commandManager";
 import { getColor } from "../Util/color";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 
-const config = useConfig();
+const config = getConfig();
 
-export const categoriesList = ["voice", "player", "playlist", "utility", "bot"] as const;
+export const categoriesList = ["voice", "player", "playlist", "utility", "bot", "settings"] as const;
 
 export default class Commands extends BaseCommand {
   constructor(){
@@ -38,7 +37,7 @@ export default class Commands extends BaseCommand {
       unlist: false,
       alias: ["command", "commands", "cmd"],
       category: "bot",
-      argument: [
+      args: [
         {
           type: "string",
           name: "command",
@@ -53,7 +52,9 @@ export default class Commands extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
+
     if(context.rawArgs === ""){
       // 引数がない場合は全コマンドの一覧を表示
       const embed = [] as MessageEmbedBuilder[];

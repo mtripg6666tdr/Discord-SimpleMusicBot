@@ -17,12 +17,11 @@
  */
 
 import type { CommandArgs } from ".";
-import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 import { CommandManager } from "../Component/commandManager";
 import { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 import { getLogs } from "../logger";
 
 export default class Invoke extends BaseCommand {
@@ -31,7 +30,7 @@ export default class Invoke extends BaseCommand {
       alias: ["invoke"],
       unlist: false,
       category: "utility",
-      argument: [{
+      args: [{
         name: "command",
         type: "string",
         required: true,
@@ -43,10 +42,12 @@ export default class Invoke extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
+
     // handle special commands
-    if(context.rawArgs.startsWith("sp;") && useConfig().isBotAdmin(message.member.id)){
-      this.evaluateSpecialCommands(context.rawArgs.substring(3), message, context, t)
+    if(context.rawArgs.startsWith("sp;") && getConfig().isBotAdmin(message.member.id)){
+      this.evaluateSpecialCommands(context.rawArgs.substring(3), message, context)
         .then(result => message.reply(result))
         .catch(this.logger.error)
       ;
@@ -74,7 +75,7 @@ export default class Invoke extends BaseCommand {
     }
   }
 
-  private async evaluateSpecialCommands(specialCommand: string, message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  private async evaluateSpecialCommands(specialCommand: string, message: CommandMessage, context: CommandArgs){
     switch(specialCommand){
       case "cleanupsc":
         await CommandManager.instance.sync(context.client, true);
@@ -102,8 +103,8 @@ export default class Invoke extends BaseCommand {
         }).catch(this.logger.error);
         break;
       default:
-        return t("commands:invoke.specialCommandNotFound");
+        return context.t("commands:invoke.specialCommandNotFound");
     }
-    return t("commands:invoke.executed");
+    return context.t("commands:invoke.executed");
   }
 }

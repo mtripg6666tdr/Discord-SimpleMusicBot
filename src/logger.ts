@@ -25,9 +25,9 @@ import { isMainThread } from "worker_threads";
 import log4js from "log4js";
 
 import { stringifyObject } from "./Util";
-import { useConfig } from "./config";
+import { getConfig } from "./config";
 
-const { debug, maxLogFiles } = useConfig();
+const { debug, maxLogFiles } = getConfig();
 
 
 const tokens = {

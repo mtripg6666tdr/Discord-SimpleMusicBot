@@ -25,12 +25,12 @@ import log4js from "log4js";
 
 import { stringifyObject } from "./Util";
 import { MusicBot } from "./bot";
-import { useConfig } from "./config";
+import { getConfig } from "./config";
 import { initLocalization } from "./i18n";
 import { createServer } from "./server";
 
 const logger = log4js.getLogger("Entry");
-const config = useConfig();
+const config = getConfig();
 
 logger.info("Discord-SimpleMusicBot by mtripg6666tdr");
 logger.info("This application was originally built by mtripg6666tdr and is licensed under GPLv3 or later.");

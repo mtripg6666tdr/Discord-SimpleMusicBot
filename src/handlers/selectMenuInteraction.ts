@@ -21,7 +21,6 @@ import type { MusicBot } from "../bot";
 import type * as discord from "oceanic.js";
 import type { ComponentTypes } from "oceanic.js";
 
-import i18next from "i18next";
 
 export async function handleSelectMenuInteraction(
   this: MusicBot,
@@ -46,7 +45,7 @@ export async function handleSelectMenuInteraction(
     if(interaction.data.values.getStrings().includes("cancel")){
       await panel.destroy();
     }else{
-      await server.playFromSearchPanelOptions(interaction.data.values.getStrings(), panel, i18next.getFixedT(interaction.locale));
+      await server.playFromSearchPanelOptions(interaction.data.values.getStrings(), panel);
     }
   }
 }

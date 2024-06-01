@@ -21,28 +21,37 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 
 import { BaseCommand } from ".";
 
-export default class Mltf extends BaseCommand {
+export default class SettingSkipvote extends BaseCommand {
   constructor(){
     super({
-      alias: ["movelastsongtofirst", "mlstf", "ml", "mltf", "mlf", "m1", "pt"],
+      alias: ["setting>skipvote"],
       unlist: false,
-      category: "playlist",
-      requiredPermissionsOr: ["admin", "onlyListener", "dj"],
+      category: "bot",
+      requiredPermissionsOr: ["admin", "dj", "onlyListener", "manageGuild"],
       shouldDefer: false,
+      examples: false,
+      usage: false,
+      args: [
+        {
+          type: "bool",
+          name: "enabled",
+          required: false,
+        },
+      ],
     });
   }
 
   async run(message: CommandMessage, context: CommandArgs){
-    const { t } = context;
-    context.server.updateBoundChannel(message);
-    if(context.server.queue.length <= 2){
-      message.reply(t("commands:movelastsongtofirst.usableWhen3orMoreQueue")).catch(this.logger.error);
-      return;
+    if(context.rawArgs){
+      const newDisabledStatus = context.server.preferences.disableSkipSession = !(context.args[0] === "enable" || context.args[0] === "true");
+
+      await message.reply(context.t("commands:setting>skipvote.changed", {
+        status: newDisabledStatus ? context.t("disabled") : context.t("enabled"),
+      }));
+    }else{
+      await message.reply(context.t("commands:setting>skipvote.currentState", {
+        status: context.server.preferences.disableSkipSession ? context.t("disabled") : context.t("enabled"),
+      }));
     }
-    const q = context.server.queue;
-    const to = context.server.player.isPlaying ? 1 : 0;
-    q.move(q.length - 1, to);
-    const info = q.get(to);
-    message.reply(`✅${t("commands:movelastsongtofirst.success", { title: info.basicInfo.title })}`).catch(this.logger.error);
   }
 }

@@ -19,7 +19,6 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { YmxFormat } from "../Structure";
-import type { i18n } from "i18next";
 import type { AnyTextableGuildChannel, Message } from "oceanic.js";
 
 import candyget from "candyget";
@@ -28,9 +27,9 @@ import { ApplicationCommandTypes } from "oceanic.js";
 import { BaseCommand } from ".";
 import { TaskCancellationManager } from "../Component/taskCancellationManager";
 import { YmxVersion } from "../Structure";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 
-const config = useConfig();
+const config = getConfig();
 
 export default class Import extends BaseCommand {
   constructor(){
@@ -38,7 +37,7 @@ export default class Import extends BaseCommand {
       alias: ["import"],
       unlist: false,
       category: "playlist",
-      argument: [{
+      args: [{
         type: "string",
         name: "url",
         required: true,
@@ -51,7 +50,9 @@ export default class Import extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
+
     context.server.updateBoundChannel(message);
 
     const statusMessage = await message.reply(`🔍${t("commands:import.loadingMessage")}...`);

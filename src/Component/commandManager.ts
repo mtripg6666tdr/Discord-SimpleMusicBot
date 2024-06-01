@@ -18,14 +18,17 @@
 
 import type { BaseCommand } from "../Commands";
 import type { CommandOptionsTypes } from "../Structure";
-import type { AnyApplicationCommand, ChatInputApplicationCommand, Client, CreateApplicationCommandOptions, MessageApplicationCommand } from "oceanic.js";
+import type { AnyApplicationCommand, ApplicationCommandOptions, ApplicationCommandOptionsSubCommand, ApplicationCommandOptionsWithValue, ChatInputApplicationCommand, Client, CreateApplicationCommandOptions, CreateChatInputApplicationCommandOptions, Locale, MessageApplicationCommand } from "oceanic.js";
 
 import util from "util";
 
+import i18next from "i18next";
 import { ApplicationCommandOptionTypes, ApplicationCommandTypes } from "oceanic.js";
 
 import { LogEmitter } from "../Structure";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
+import { subCommandSeparator } from "../definition";
+import { availableLanguages } from "../i18n";
 import { timeLoggedMethod } from "../logger";
 
 // const commandSeparator = "_";
@@ -45,11 +48,15 @@ export class CommandManager extends LogEmitter<{}> {
   }
 
   private readonly _commands: BaseCommand[];
-  /**
-   * コマンドを返します
-   */
+  /** コマンドを返します */
   get commands(): Readonly<BaseCommand[]>{
     return this._commands;
+  }
+
+  private _subCommandNames: Set<string>;
+  /** サブコマンドがあるコマンドの一覧を返します */
+  get subCommandNames(): Readonly<Set<string>>{
+    return this._subCommandNames;
   }
 
   private commandMap: Map<string, BaseCommand>;
@@ -60,23 +67,36 @@ export class CommandManager extends LogEmitter<{}> {
 
     this._commands = (require("../Commands/_index") as typeof import("../Commands/_index")).default.filter(n => !n.disabled);
 
-    this.initializeMap({ reportDupes: useConfig().debug });
+    this.initializeMap({ reportDupes: getConfig().debug });
+    this.initializeSubcommandNames();
+
     this.logger.info("Initialized");
   }
 
   private initializeMap({ reportDupes }: { reportDupes: boolean }){
     const sets = new Map<string, BaseCommand>();
+
     const setCommand = (name: string, command: BaseCommand) => {
       if(sets.has(name) && reportDupes && !command.interactionOnly){
         this.logger.warn(`Detected command ${command.name} the duplicated key ${name} with ${sets.get(name)!.name}; overwriting`);
       }
       sets.set(name, command);
     };
+
     this.commands.forEach(command => {
       setCommand(command.name, command);
       command.alias.forEach(name => setCommand(name, command));
     });
+
     this.commandMap = sets;
+  }
+
+  private initializeSubcommandNames(){
+    this._subCommandNames = new Set(
+      this.commands
+        .filter(command => command.asciiName.includes(">"))
+        .map(command => command.asciiName.split(">")[0])
+    );
   }
 
   /**
@@ -105,10 +125,12 @@ export class CommandManager extends LogEmitter<{}> {
     this.logger.info("Start syncing application commands");
 
     // format local commands into the api-compatible well-formatted ones
-    const apiCompatibleCommands: CreateApplicationCommandOptions[] = this.commands
-      .filter(command => !command.unlist)
-      .flatMap(command => command.toApplicationCommandStructure())
-      .map(command => this.apiToApplicationCommand(command as unknown as AnyApplicationCommand) as CreateApplicationCommandOptions);
+    const apiCompatibleCommands: CreateApplicationCommandOptions[] = this.groupSubcommands(
+      this.commands
+        .filter(command => !command.unlist)
+        .flatMap(command => command.toApplicationCommandStructure())
+        .map(command => this.apiToApplicationCommand(command as unknown as AnyApplicationCommand) as CreateApplicationCommandOptions)
+    );
 
     // Get registered commands
     const registeredAppCommands = await client.application.getGlobalCommands({ withLocalizations: true });
@@ -169,6 +191,7 @@ export class CommandManager extends LogEmitter<{}> {
         const actual = registeredAppCommands.find(
           command => command.type === ApplicationCommandTypes.CHAT_INPUT && command.name === expected.name
         ) as ChatInputApplicationCommand;
+
         if(!actual){
           return false;
         }else{
@@ -178,6 +201,7 @@ export class CommandManager extends LogEmitter<{}> {
         const actual = registeredAppCommands.find(
           command => command.type === ApplicationCommandTypes.MESSAGE && command.name === expected.name
         ) as MessageApplicationCommand;
+
         if(!actual){
           return false;
         }else{
@@ -251,38 +275,52 @@ export class CommandManager extends LogEmitter<{}> {
         defaultMemberPermissions,
       };
     }else if(apiCommand.options){
+      const optionMapper = (option: ApplicationCommandOptions) => {
+        if("choices" in option && option.choices){
+          return {
+            type: option.type,
+            name: option.name,
+            description: option.description,
+            descriptionLocalizations: option.descriptionLocalizations,
+            required: !!option.required,
+            choices: option.choices.map(choice => ({
+              name: choice.name,
+              value: choice.value,
+              // @ts-expect-error
+              nameLocalizations: choice.nameLocalizations || choice.name_localizations || null,
+              // @ts-expect-error
+              name_localizations: choice.nameLocalizations || choice.name_localizations || null,
+            })),
+          };
+        }else{
+          return {
+            type: option.type,
+            name: option.name,
+            description: option.description,
+            descriptionLocalizations: option.descriptionLocalizations,
+            required: !!option.required,
+            autocomplete: "autocomplete" in option && option.autocomplete || false,
+          };
+        }
+      };
+
       return {
         type: apiCommand.type,
         name: apiCommand.name,
         description: apiCommand.description,
-        descriptionLocalizations: apiCommand.descriptionLocalizations,
+        descriptionLocalizations: apiCommand.descriptionLocalizations || {},
         defaultMemberPermissions,
         options: apiCommand.options.map(option => {
-          if("choices" in option && option.choices){
+          if(option.type === ApplicationCommandOptionTypes.SUB_COMMAND){
             return {
-              type: option.type,
-              name: option.name,
               description: option.description,
-              descriptionLocalizations: option.descriptionLocalizations,
-              required: !!option.required,
-              choices: option.choices.map(choice => ({
-                name: choice.name,
-                value: choice.value,
-                // @ts-expect-error
-                nameLocalizations: choice.nameLocalizations || choice.name_localizations || null,
-                // @ts-expect-error
-                name_localizations: choice.nameLocalizations || choice.name_localizations || null,
-              })),
+              descriptionLocalizations: option.descriptionLocalizations || {},
+              name: option.name,
+              type: option.type,
+              options: option.options?.map(optionMapper),
             };
           }else{
-            return {
-              type: option.type,
-              name: option.name,
-              description: option.description,
-              descriptionLocalizations: option.descriptionLocalizations,
-              required: !!option.required,
-              autocomplete: "autocomplete" in option && option.autocomplete || false,
-            };
+            return optionMapper(option);
           }
         }),
       };
@@ -308,5 +346,66 @@ export class CommandManager extends LogEmitter<{}> {
       case "file":
         return ApplicationCommandOptionTypes.ATTACHMENT;
     }
+  }
+
+  /**サブコマンドをグループ化します。現時点では、ネストは一段階のみ対応しています。 */
+  protected groupSubcommands(commands: CreateApplicationCommandOptions[]): CreateApplicationCommandOptions[] {
+    const subcommandGroups = new Map<string, { from: CreateChatInputApplicationCommandOptions[], to: CreateChatInputApplicationCommandOptions | null }>();
+
+    const normalCommands = commands.filter(c => {
+      if(!c.name.includes(subCommandSeparator) || c.type !== ApplicationCommandTypes.CHAT_INPUT){
+        return true;
+      }
+
+      const baseName = c.name.split(subCommandSeparator)[0];
+
+      if(subcommandGroups.has(baseName)){
+        subcommandGroups.get(baseName)!.from.push(c);
+      }else{
+        subcommandGroups.set(baseName, { from: [c], to: null });
+      }
+
+      return false;
+    });
+
+    for(const key of subcommandGroups.keys()){
+      const group = subcommandGroups.get(key)!;
+
+      if(group.from.some(c => c.name === key)){
+        throw new Error("Top level command that has subcommands cannot be command itself.");
+      }
+
+      if(!group.to){
+        group.to = {
+          type: ApplicationCommandTypes.CHAT_INPUT,
+          name: key,
+          description: i18next.t(`commands:${key}.description` as any),
+          defaultMemberPermissions: group.from[0].defaultMemberPermissions,
+          descriptionLocalizations: {},
+          options: [],
+        };
+
+        availableLanguages().forEach(language => {
+          if(i18next.language === language) return;
+          const localized: string = i18next.t(`commands:${key}.description` as any, { lng: language }).substring(0, 100);
+          if(localized === group.to!.description) return;
+          group.to!.descriptionLocalizations![language as Locale] = localized.trim();
+        });
+      }
+
+      group.from.forEach(command => {
+        const subcommand: ApplicationCommandOptionsSubCommand = {
+          type: ApplicationCommandOptionTypes.SUB_COMMAND,
+          name: command.name.substring(key.length + 1),
+          description: command.description,
+          descriptionLocalizations: command.descriptionLocalizations || {},
+          options: command.options as ApplicationCommandOptionsWithValue[],
+        };
+
+        group.to!.options!.push(subcommand);
+      });
+    }
+
+    return [...normalCommands, ...[...subcommandGroups.values()].map(d => d.to!)];
   }
 }

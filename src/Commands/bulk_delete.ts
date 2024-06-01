@@ -19,7 +19,6 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { ResponseMessage } from "../Component/commandResolver/ResponseMessage";
-import type { i18n } from "i18next";
 import type { AnyTextableGuildChannel, Message } from "oceanic.js";
 
 import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
@@ -32,7 +31,7 @@ export default class BulkDelete extends BaseCommand {
       alias: ["bulk_delete", "bulk-delete", "bulkdelete"],
       unlist: false,
       category: "utility",
-      argument: [
+      args: [
         {
           type: "integer" as const,
           name: "count",
@@ -45,7 +44,9 @@ export default class BulkDelete extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
+
     const count = Number(context.args[0]);
     if(isNaN(count)){
       message.reply(`:warning:${t("commands:bulk_delete.invalidMessageCount")}`).catch(this.logger.error);

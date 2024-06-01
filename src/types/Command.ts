@@ -21,6 +21,8 @@ import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
 import type { Client, LocaleMap, PermissionName } from "oceanic.js";
 
+import { i18n } from "i18next";
+
 export type CommandPermission =
   | "admin"
   | "dj"
@@ -53,15 +55,14 @@ type CommandHelp = {
 };
 
 export type ListCommandWithArgsOptions = BaseListCommand & CommandHelp & {
-  argument: SlashCommandArgument[],
+  args: readonly SlashCommandArgument[],
 };
 
 export type ListCommandWithoutArgsOptions = BaseListCommand & Partial<CommandHelp>;
 
 export type ListCommandInitializeOptions =
   | ListCommandWithArgsOptions
-  | ListCommandWithoutArgsOptions
-;
+  | ListCommandWithoutArgsOptions;
 
 export type UnlistCommandOptions = BaseCommandInitializeOptions & {
   unlist: true,
@@ -74,7 +75,7 @@ export type UnlistCommandOptions = BaseCommandInitializeOptions & {
   requiredPermissionsOr?: CommandPermission[],
 };
 
-export type CommandOptionsTypes = "bool"|"integer"|"string"|"file";
+export type CommandOptionsTypes = "bool" | "integer" | "string" | "file";
 
 /**
  * スラッシュコマンドの引数として取れるものを定義するインターフェースです
@@ -135,4 +136,8 @@ export interface CommandArgs {
    * ユーザーのロケール
    */
   locale: string;
+  /**
+   * ロケールに適したt関数
+   */
+  t: i18n["t"];
 }

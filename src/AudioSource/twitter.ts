@@ -17,18 +17,20 @@
  */
 
 import type { AudioSourceBasicJsonFormat, UrlStreamInfo } from ".";
-import type { i18n } from "i18next";
 
 import candyget from "candyget";
 import * as htmlEntities from "html-entities";
 
 import { AudioSource } from "./audiosource";
+import { getCommandExecutionContext } from "../Commands";
 import { retrieveRemoteAudioInfo } from "../Util";
 
 export class Twitter extends AudioSource<string, TwitterJsonFormat> {
   private streamUrl = "";
 
-  async init(url: string, prefetched: TwitterJsonFormat | null, t: i18n["t"]){
+  async init(url: string, prefetched: TwitterJsonFormat | null){
+    const { t } = getCommandExecutionContext();
+
     this.url = url;
     if(!Twitter.validateUrl(url)) throw new Error("Invalid Twitter url.");
     if(prefetched){
@@ -59,7 +61,9 @@ export class Twitter extends AudioSource<string, TwitterJsonFormat> {
     };
   }
 
-  toField(_: boolean, t: i18n["t"]){
+  toField(){
+    const { t } = getCommandExecutionContext();
+
     return [
       {
         name: ":link:URL",

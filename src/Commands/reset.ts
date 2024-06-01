@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { Routes } from "oceanic.js";
 
@@ -33,7 +32,7 @@ export default class Reset extends BaseCommand {
       category: "utility",
       requiredPermissionsOr: ["manageGuild"],
       shouldDefer: false,
-      argument: [
+      args: [
         {
           type: "bool" as const,
           name: "preservequeue",
@@ -43,7 +42,8 @@ export default class Reset extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
     // VC接続中なら切断
     await context.server.player.disconnect().catch(this.logger.error);
 

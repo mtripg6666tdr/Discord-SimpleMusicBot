@@ -18,13 +18,12 @@
 
 import type { KnownAudioSourceIdentifer } from "./queueManager";
 import type { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
-import type { AddedBy, QueueContent } from "../Structure/QueueContent";
+import type { AddedBy, QueueContent } from "../types/QueueContent";
 import type { Member } from "oceanic.js";
 
 import * as fs from "fs";
 import * as path from "path";
 
-import i18next from "i18next";
 
 import { QueueManager } from "./queueManager";
 import * as AudioSource from "../AudioSource";
@@ -91,18 +90,24 @@ export class QueueManagerWithBgm extends QueueManager {
       && !url.startsWith("https://")
       && fs.existsSync(path.join(__dirname, global.BUNDLED ? "../" : "../../", url))
     ){
-      const result = {
-        basicInfo: await new AudioSource.FsStream().init(url, null, i18next.getFixedT(this.server.locale)),
+      const result: QueueContent = {
+        basicInfo: await new AudioSource.FsStream().init(url, null),
         additionalInfo: {
           addedBy: {
             userId: addedBy ? this.getUserIdFromMember(addedBy) : "0",
             displayName: addedBy?.displayName || "unknown",
           },
         },
-      } as QueueContent;
+      };
+
       this._default[method](result);
-      if(this.server.equallyPlayback) this.sortWithAddedBy();
+
+      if(this.server.preferences.equallyPlayback){
+        this.sortByAddedBy();
+      }
+
       const index = this._default.findIndex(q => q === result);
+
       return { ...result, index };
     }
     return super.addQueueOnly({ url, addedBy, method, sourceType, gotData, preventCache });
