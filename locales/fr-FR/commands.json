@@ -49,7 +49,8 @@
       "player": "Système de contrôle du lecteur de musique",
       "playlist": "Système d'exploitation de la liste de lecture",
       "utility": "Système utilitaire",
-      "bot": "Fonctionnement général du bot"
+      "bot": "Fonctionnement général du bot",
+      "settings": "設定"
     },
     "commandList": "Liste de commandes",
     "toLearnMoreMessage": "Comme `{{prefix}} command replay`, vous pouvez ajouter un nom de commande comme argument pour afficher les détails de cette commande.",
@@ -488,6 +489,38 @@
     "seeking": "En cherchant",
     "success": "recherché",
     "failed": "la recherche a échoué"
+  },
+  "setting": {
+    "name": "設定",
+    "description": "ボットの設定を変更します。"
+  },
+  "setting>skipvote": {
+    "name": "設定>スキップ投票",
+    "description": "スキップ投票の有効・無効の設定をします。何も指定しないと現在の設定を確認できます。",
+    "args": {
+      "enabled": {
+        "description": "スキップ投票を有効にするかどうか。"
+      }
+    },
+    "currentState": "スキップ投票は現在 **{{status}}** の設定になっています。",
+    "changed": "スキップ投票を **{{status}}** にしました。"
+  },
+  "setting>nowplaying": {
+    "name": "設定>現在再生中",
+    "description": "現在再生中パネルの表示モードの設定をします。何も指定しないと現在の設定を確認できます。",
+    "args": {
+      "level": {
+        "description": "表示モードを指定します。",
+        "choices": {
+          "normal": "通常",
+          "silent": "サイレント",
+          "disabled": "無効"
+        }
+      }
+    },
+    "invalidLevel": "指定されたモードが正しくありません。normal, silent, disabledのいずれかを指定してください。",
+    "changed": "現在再生中パネルの表示モードを **{{level}}** に設定しました。",
+    "currentState": "現在再生中パネルの表示モードは現在 **{{level}}** に設定されています。"
   },
   "shuffle": {
     "name": "mélanger",
