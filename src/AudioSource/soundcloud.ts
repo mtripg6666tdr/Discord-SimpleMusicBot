@@ -17,13 +17,13 @@
  */
 
 import type { AudioSourceBasicJsonFormat, ReadableStreamInfo } from ".";
-import type { i18n } from "i18next";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 import type { Readable } from "stream";
 
 import SoundCloud from "soundcloud.ts";
 
 import { AudioSource } from "./audiosource";
+import { getCommandExecutionContext } from "../Commands";
 import { createPassThrough } from "../Util";
 
 let soundCloudClient = new SoundCloud();
@@ -35,7 +35,9 @@ export class SoundCloudS extends AudioSource<string, SoundcloudJsonFormat> {
     super({ isSeekable: false });
   }
 
-  async init(url: string, prefetched: SoundcloudJsonFormat | null, t: i18n["t"]){
+  async init(url: string, prefetched: SoundcloudJsonFormat | null){
+    const { t } = getCommandExecutionContext();
+
     this.url = url;
     if(prefetched){
       this.title = prefetched.title;
@@ -70,7 +72,9 @@ export class SoundCloudS extends AudioSource<string, SoundcloudJsonFormat> {
     };
   }
 
-  toField(verbose: boolean, t: i18n["t"]){
+  toField(verbose: boolean){
+    const { t } = getCommandExecutionContext();
+
     return [
       {
         name: `:musical_note:${t("user")}`,
@@ -85,7 +89,9 @@ export class SoundCloudS extends AudioSource<string, SoundcloudJsonFormat> {
     ];
   }
 
-  npAdditional(t: i18n["t"]){
+  npAdditional(){
+    const { t } = getCommandExecutionContext();
+
     return `${t("audioSources.artist")}: \`${this.author}\``;
   }
 

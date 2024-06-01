@@ -23,6 +23,7 @@ import type { SelectOption } from "oceanic.js";
 
 import { MessageActionRowBuilder, MessageEmbedBuilder, MessageStringSelectMenuBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
+import { getCommandExecutionContext } from "../Commands";
 import { LogEmitter } from "../Structure";
 import { getColor } from "../Util/color";
 import { getConfig } from "../config";
@@ -75,7 +76,12 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
   }
 
   @timeLoggedMethod
-  async consumeSearchResult<T>(searchPromise: Promise<T|{ result: T, transformedQuery: string }>, consumer: (result: T, t: i18n["t"]) => SongInfo[], t: i18n["t"]){
+  async consumeSearchResult<T>(
+    searchPromise: Promise<T | { result: T, transformedQuery: string }>,
+    consumer: (result: T, t: i18n["t"]) => SongInfo[]
+  ){
+    const { t } = getCommandExecutionContext();
+
     if(this.status !== "init"){
       return false;
     }

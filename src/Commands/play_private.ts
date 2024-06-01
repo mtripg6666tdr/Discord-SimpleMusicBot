@@ -18,10 +18,8 @@
 
 import type { CommandArgs } from ".";
 import type { GuildDataContainer } from "../Structure";
-import type { i18n } from "i18next";
 import type { AnyTextableGuildChannel, ModalSubmitInteraction } from "oceanic.js";
 
-import i18next from "i18next";
 import { ComponentTypes, InteractionTypes, TextInputStyles } from "oceanic.js";
 
 import { BaseCommand } from ".";
@@ -40,7 +38,9 @@ export default class PlayPrivate extends BaseCommand {
     });
   }
 
-  protected override async run(message: CommandMessage, context: Readonly<CommandArgs>, t: i18n["t"]){
+  protected override async run(message: CommandMessage, context: Readonly<CommandArgs>){
+    const { t } = context;
+
     if(message["isMessage"] || !message["_interaction"]){
       await message.reply(`:x: ${t("commands:play_private.noInteraction")}`).catch(this.logger.error);
       return;
@@ -74,17 +74,14 @@ export default class PlayPrivate extends BaseCommand {
 
     if(value){
       const message = CommandMessage.createFromInteraction(interaction, "play_private", [value], value);
-      // ここの型注釈を外すとTSサーバーがとんでもなく重くなる
-      const fixedT: i18n["t"] = i18next.getFixedT(interaction.locale);
 
       const items = await server.playFromURL(
         message,
         value,
         { privateSource: true, first: false },
-        fixedT,
       );
 
-      if(items.length <= 0 || !await server.joinVoiceChannel(message, {}, fixedT)){
+      if(items.length <= 0 || !await server.joinVoiceChannel(message, {})){
         return;
       }
 

@@ -22,6 +22,8 @@ import type { LoggerObject } from "../logger";
 import type { ListCommandInitializeOptions, UnlistCommandOptions, ListCommandWithArgsOptions, CommandArgs, CommandPermission, LocalizedSlashCommandArgument } from "../types/Command";
 import type { AnyTextableGuildChannel, ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap, ModalSubmitInteraction, PermissionName } from "oceanic.js";
 
+import { AsyncLocalStorage } from "async_hooks";
+
 import i18next from "i18next";
 import { InteractionTypes, Permissions, TypedEmitter, ApplicationCommandTypes } from "oceanic.js";
 
@@ -36,12 +38,19 @@ interface CommandEvents {
   run: [Readonly<CommandArgs>];
 }
 
+export const commandExecutionContext = new AsyncLocalStorage<CommandArgs>();
+export function getCommandExecutionContext(): CommandArgs | Pick<CommandArgs, "t"> {
+  return commandExecutionContext.getStore() ?? {
+    t: i18next.t,
+  };
+}
+
 /**
  * すべてのコマンドハンドラーの基底クラスです
  */
 export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   /** ボットを実行します */
-  protected abstract run(message: CommandMessage, context: Readonly<CommandArgs>, t: (typeof i18next)["t"]): Promise<void>;
+  protected abstract run(message: CommandMessage, context: Readonly<CommandArgs>): Promise<void>;
 
   // eslint-disable-next-line unused-imports/no-unused-vars
   handleAutoComplete(argname: string, input: string | number, otherOptions: { name: string, value: string | number }[]): string[] {
@@ -308,7 +317,8 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     }
 
     this.emit("run", context);
-    await this.run(message, context, i18next.getFixedT(context.locale));
+
+    await commandExecutionContext.run(context, () => this.run(message, context));
   }
 
   /** アプリケーションコマンドとして登録できるオブジェクトを生成します */

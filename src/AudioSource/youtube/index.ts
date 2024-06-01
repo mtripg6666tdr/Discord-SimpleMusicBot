@@ -18,7 +18,6 @@
 
 import type { Cache } from "./strategies/base";
 import type { StreamInfo } from "..";
-import type { i18n } from "i18next";
 import type { EmbedField } from "oceanic.js";
 import type { InfoData } from "play-dl";
 
@@ -27,6 +26,7 @@ import * as ytdl from "ytdl-core";
 import { attemptGetInfoForStrategies, attemptFetchForStrategies } from "./strategies";
 import { playDl } from "./strategies/play-dl";
 import { ytdlCore } from "./strategies/ytdl-core";
+import { getCommandExecutionContext } from "../../Commands";
 import { SecondaryUserAgent } from "../../definition";
 import { timeLoggedMethod } from "../../logger";
 import { AudioSource } from "../audiosource";
@@ -79,7 +79,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
   }
 
   @timeLoggedMethod
-  async init(url: string, prefetched: YouTubeJsonFormat | null, _: i18n["t"] | null = null, forceCache?: boolean){
+  async init(url: string, prefetched: YouTubeJsonFormat | null, forceCache?: boolean){
     this.url = url = YouTube.normalizeUrl(url);
     if(prefetched){
       this.importData(prefetched);
@@ -195,7 +195,8 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     }
   }
 
-  toField(verbose: boolean, t: i18n["t"]){
+  toField(verbose: boolean){
+    const { t } = getCommandExecutionContext();
     const fields = [] as EmbedField[];
     fields.push({
       name: `:cinema:${t("channelName")}`,
@@ -211,7 +212,8 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     return fields;
   }
 
-  npAdditional(t: i18n["t"]){
+  npAdditional(){
+    const { t } = getCommandExecutionContext();
     return `${t("channelName")}:\`${this.channelName}\``;
   }
 
@@ -265,7 +267,6 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
           resolve();
         }
 
-         
         const waitTime = Math.max(new Date(startTime!).getTime() - Date.now(), 20 * 1000);
         this.logger.info(`Retrying after ${waitTime}ms`);
 
@@ -273,7 +274,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
           if(signal.aborted) return;
           tick();
           this.purgeCache();
-          await this.init(this.url, null, null, false);
+          await this.init(this.url, null, false);
           checkForLive();
         }, waitTime).unref();
       };

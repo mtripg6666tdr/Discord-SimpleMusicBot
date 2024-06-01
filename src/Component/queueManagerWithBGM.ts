@@ -24,7 +24,6 @@ import type { Member } from "oceanic.js";
 import * as fs from "fs";
 import * as path from "path";
 
-import i18next from "i18next";
 
 import { QueueManager } from "./queueManager";
 import * as AudioSource from "../AudioSource";
@@ -92,7 +91,7 @@ export class QueueManagerWithBgm extends QueueManager {
       && fs.existsSync(path.join(__dirname, global.BUNDLED ? "../" : "../../", url))
     ){
       const result: QueueContent = {
-        basicInfo: await new AudioSource.FsStream().init(url, null, i18next.getFixedT(this.server.locale)),
+        basicInfo: await new AudioSource.FsStream().init(url, null),
         additionalInfo: {
           addedBy: {
             userId: addedBy ? this.getUserIdFromMember(addedBy) : "0",

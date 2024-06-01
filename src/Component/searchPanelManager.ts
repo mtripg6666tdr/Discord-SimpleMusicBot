@@ -18,9 +18,9 @@
 
 import type { CommandMessage } from "./commandResolver/CommandMessage";
 import type { GuildDataContainer } from "../Structure";
-import type { i18n } from "i18next";
 
 import { SearchPanel } from "./searchPanel";
+import { getCommandExecutionContext } from "../Commands";
 import { ServerManagerBase } from "../Structure";
 
 interface SearchPanelManagerEvents {
@@ -40,7 +40,9 @@ export class SearchPanelManager extends ServerManagerBase<SearchPanelManagerEven
     return this._searchPanels.size;
   }
 
-  create(_commandMessage: CommandMessage, query: string, t: i18n["t"], isRawTitle: boolean = false){
+  create(_commandMessage: CommandMessage, query: string, isRawTitle: boolean = false){
+    const { t } = getCommandExecutionContext();
+
     if(this._searchPanels.size >= 3){
       _commandMessage.reply(`:cry:${t("components:search.maximumSearch")}`)
         .catch(this.logger.error);

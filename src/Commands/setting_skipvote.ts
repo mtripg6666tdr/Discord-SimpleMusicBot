@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
@@ -40,13 +39,17 @@ export default class SettingSkipvote extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
     if(context.rawArgs){
       const newDisabledStatus = context.server.preferences.disableSkipSession = !(context.args[0] === "enable" || context.args[0] === "true");
 
-      await message.reply(t("commands:setting>skipvote.changed", { status: newDisabledStatus ? t("disabled") : t("enabled") }));
+      await message.reply(context.t("commands:setting>skipvote.changed", {
+        status: newDisabledStatus ? context.t("disabled") : context.t("enabled"),
+      }));
     }else{
-      await message.reply(t("commands:setting>skipvote.currentState", { status: context.server.preferences.disableSkipSession ? t("disabled") : t("enabled") }));
+      await message.reply(context.t("commands:setting>skipvote.currentState", {
+        status: context.server.preferences.disableSkipSession ? context.t("disabled") : context.t("enabled"),
+      }));
     }
   }
 }

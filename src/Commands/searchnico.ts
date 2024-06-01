@@ -17,10 +17,10 @@
  */
 
 import type { SongInfo } from "../Component/searchPanel";
-import type { i18n } from "i18next";
 
 import candyget from "candyget";
 
+import { getCommandExecutionContext } from ".";
 import { SearchBase } from "./search";
 import { time } from "../Util";
 import { getConfig } from "../config";
@@ -53,7 +53,9 @@ export default class SearchN extends SearchBase<Datum[]> {
     return searchNicoNico(query);
   }
 
-  protected override consumer(result: Datum[], t: i18n["t"]): SongInfo[] {
+  protected override consumer(result: Datum[]): SongInfo[] {
+    const { t } = getCommandExecutionContext();
+
     return result.map(item => {
       const [min, sec] = time.calcMinSec(Math.floor(item.lengthSeconds));
       return {

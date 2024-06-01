@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 import { YmxVersion } from "../Structure";
@@ -34,7 +33,9 @@ export default class Export extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
+
     context.server.updateBoundChannel(message);
     if(context.server.queue.publicLength === 0){
       message.reply(t("commands:export.queueEmpty")).catch(this.logger.error);

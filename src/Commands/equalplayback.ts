@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -36,7 +35,9 @@ export default class EquallyPlayback extends BaseCommand {
     });
   }
 
-  async run(command: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(command: CommandMessage, context: CommandArgs){
+    const { t } = context;
+
     context.server.updateBoundChannel(command);
     if(context.server.preferences.equallyPlayback){
       context.server.preferences.equallyPlayback = false;

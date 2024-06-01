@@ -17,12 +17,12 @@
  */
 
 import type { SoundCloudTrackCollection } from "../AudioSource";
-import type { i18n } from "i18next";
 import type { SoundcloudTrackV2 } from "soundcloud.ts";
 
 import candyget from "candyget";
 import Soundcloud from "soundcloud.ts";
 
+import { getCommandExecutionContext } from ".";
 import { SearchBase } from "./search";
 import * as Util from "../Util";
 import { getConfig } from "../config";
@@ -88,7 +88,9 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
     };
   }
 
-  protected override consumer(result: SoundcloudTrackV2[], t: i18n["t"]){
+  protected override consumer(result: SoundcloudTrackV2[]){
+    const { t } = getCommandExecutionContext();
+
     return result.map(item => {
       const [min, sec] = Util.time.calcMinSec(Math.floor(item.duration / 1000));
       return {

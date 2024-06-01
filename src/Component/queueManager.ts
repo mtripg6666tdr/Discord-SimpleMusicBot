@@ -247,7 +247,6 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           },
           this.server.bot.cache,
           preventSourceCache,
-          i18next.getFixedT(this.server.locale)
         ),
         additionalInfo: {
           addedBy: {

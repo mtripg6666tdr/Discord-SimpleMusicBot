@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
@@ -33,12 +32,14 @@ export default class Bgm extends BaseCommand {
     });
   }
   
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
+
     // update bound channel
     context.server.updateBoundChannel(message);
 
     // attempt to join
-    if(!await context.server.joinVoiceChannel(message, { replyOnFail: true }, t)) return;
+    if(!await context.server.joinVoiceChannel(message, { replyOnFail: true })) return;
 
     // check existing search panel
     if(context.server.searchPanel.has(message.member.id)){
@@ -49,7 +50,6 @@ export default class Bgm extends BaseCommand {
     const searchPanel = context.server.searchPanel.create(
       message,
       t("commands:bgm.listOfPresetBGM"),
-      t,
       true
     );
     if(!searchPanel){
@@ -69,7 +69,6 @@ export default class Bgm extends BaseCommand {
         thumbnail: item.thumbnails[0].url,
         url: item.url,
       })),
-      t
     );
   }
 }

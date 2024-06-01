@@ -139,7 +139,7 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
     else if(content.match(/^([0-9]\s?)+$/)){
       // メッセージ送信者が検索者と一致するかを確認
       const nums = content.split(" ");
-      await server.playFromSearchPanelOptions(nums, panel, i18next.getFixedT(server.locale));
+      await server.playFromSearchPanelOptions(nums, panel);
     }
   }else if(
     message.content === "キャンセル"

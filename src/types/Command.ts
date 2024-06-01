@@ -21,6 +21,8 @@ import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
 import type { Client, LocaleMap, PermissionName } from "oceanic.js";
 
+import { i18n } from "i18next";
+
 export type CommandPermission =
   | "admin"
   | "dj"
@@ -135,4 +137,8 @@ export interface CommandArgs {
    * ユーザーのロケール
    */
   locale: string;
+  /**
+   * ロケールに適したt関数
+   */
+  t: i18n["t"];
 }

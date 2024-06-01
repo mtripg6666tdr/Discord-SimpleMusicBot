@@ -25,7 +25,6 @@ import type { JSONStatuses } from "../types/GuildStatuses";
 import type { QueueContent } from "../types/QueueContent";
 import type { YmxFormat } from "../types/YmxFormat";
 import type { VoiceConnection } from "@discordjs/voice";
-import type { i18n } from "i18next";
 import type { AnyTextableGuildChannel, Message, StageChannel, VoiceChannel } from "oceanic.js";
 import type { TextChannel } from "oceanic.js";
 import type { Playlist } from "spotify-url-info";
@@ -39,6 +38,7 @@ import { LogEmitter } from "./LogEmitter";
 import { Spotify } from "../AudioSource";
 import { SoundCloudS } from "../AudioSource";
 import { Playlist as ytpl } from "../AudioSource/youtube/playlist";
+import { getCommandExecutionContext } from "../Commands";
 import { AudioEffectManager } from "../Component/audioEffectManager";
 import { PlayManager } from "../Component/playManager";
 import { GuildPreferencesManager } from "../Component/preferencesManager";
@@ -380,10 +380,11 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    */
   async joinVoiceChannel(
     message: CommandMessage,
-    { reply = false, replyOnFail = false }: { reply?: boolean, replyOnFail?: boolean },
-    t: i18n["t"]
+    { reply = false, replyOnFail = false }: { reply?: boolean, replyOnFail?: boolean }
   ): Promise<boolean>{
     return lock(this.joinVoiceChannelLocker, async () => {
+      const { t } = getCommandExecutionContext();
+
       if(message.member.voiceState?.channelID){
         const targetVC = this.bot.client.getChannel<VoiceChannel | StageChannel>(message.member.voiceState.channelID)!;
 
@@ -467,9 +468,10 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       first?: boolean,
       cancellable?: boolean,
       privateSource?: boolean,
-    },
-    t: i18n["t"]
+    }
   ): Promise<QueueContent[]> {
+    const { t } = getCommandExecutionContext();
+
     if(Array.isArray(rawArg)){
       const [firstUrl, ...restUrls] = rawArg
         .flatMap(fragment => Util.normalizeText(fragment).split(" "))
@@ -480,7 +482,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         // eslint-disable-next-line prefer-spread
         results.push.apply(
           results,
-          await this.playFromURL(message, firstUrl, { first, cancellable: false }, t)
+          await this.playFromURL(message, firstUrl, { first, cancellable: false })
         );
 
         if(restUrls){
@@ -796,24 +798,24 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     message: Message<AnyTextableGuildChannel>,
     context: CommandArgs,
     morePrefs: { first?: boolean, cancellable?: boolean },
-    t: i18n["t"],
   ){
+    const { t } = getCommandExecutionContext();
     const prefixLength = context.server.prefix.length;
 
     if(message.content.startsWith("http://") || message.content.startsWith("https://")){
       // URLのみのメッセージか？
-      await context.server.playFromURL(commandMessage, message.content, morePrefs, t);
+      await context.server.playFromURL(commandMessage, message.content, morePrefs);
       return;
     }else if(
       message.content.substring(prefixLength).startsWith("http://")
         || message.content.substring(prefixLength).startsWith("https://")
     ){
       // プレフィックス+URLのメッセージか？
-      await context.server.playFromURL(commandMessage, message.content.substring(prefixLength), morePrefs, t);
+      await context.server.playFromURL(commandMessage, message.content.substring(prefixLength), morePrefs);
       return;
     }else if(message.attachments.size > 0){
       // 添付ファイル付きか？
-      await context.server.playFromURL(commandMessage, message.attachments.first()!.url, morePrefs, t);
+      await context.server.playFromURL(commandMessage, message.attachments.first()!.url, morePrefs);
       return;
     }else if(message.author.id === context.client.user.id || config.isWhiteListedBot(message.author.id)){
       // ボットのメッセージなら
@@ -829,7 +831,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         const url = embed.description?.match(/^\[.+\]\((?<url>https?.+)\)/)?.groups!.url;
 
         if(url){
-          await context.server.playFromURL(commandMessage, url, morePrefs, t);
+          await context.server.playFromURL(commandMessage, url, morePrefs);
           return;
         }
       }
@@ -844,7 +846,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    * @param nums インデックス番号の配列
    * @param message 
    */
-  async playFromSearchPanelOptions(nums: string[], panel: SearchPanel, t: i18n["t"]){
+  async playFromSearchPanelOptions(nums: string[], panel: SearchPanel){
     const includingNums = panel.filterOnlyIncludes(nums.map(n => Number(n)).filter(n => !isNaN(n)));
 
     const {
@@ -864,7 +866,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
 
     // 現在の状態を確認してVCに接続中なら接続試行
     if(panel.commandMessage.member.voiceState?.channelID){
-      await this.joinVoiceChannel(panel.commandMessage, {}, t);
+      await this.joinVoiceChannel(panel.commandMessage, {});
     }
 
     // 接続中なら再生を開始

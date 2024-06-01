@@ -18,6 +18,7 @@
 
 import type { CommandArgs } from "./Structure";
 
+import i18next from "i18next";
 import * as discord from "oceanic.js";
 
 import { Telemetry } from "./Component/telemetry";
@@ -149,6 +150,7 @@ export class MusicBot extends MusicBotBase {
       initData: this.initData.bind(this),
       includeMention: false,
       locale,
+      t: i18next.getFixedT(locale),
     };
   }
 }

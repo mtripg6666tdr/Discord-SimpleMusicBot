@@ -17,12 +17,12 @@
  */
 
 import type { AudioSourceBasicJsonFormat, ReadableStreamInfo } from "./audiosource";
-import type { i18n } from "i18next";
 
 import * as fs from "fs";
 import * as path from "path";
 
 import { AudioSource } from "./audiosource";
+import { getCommandExecutionContext } from "../Commands";
 import { retrieveRemoteAudioInfo } from "../Util";
 
 export class FsStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
@@ -30,7 +30,9 @@ export class FsStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
     super({ isCacheable: false });
   }
 
-  async init(url: string, _: AudioSourceBasicJsonFormat | null, t: i18n["t"]){
+  async init(url: string, _: AudioSourceBasicJsonFormat | null){
+    const { t } = getCommandExecutionContext();
+    
     this.url = url;
     const info = await retrieveRemoteAudioInfo(url);
     this.title = info.displayTitle || t("audioSources.customStream");
@@ -46,7 +48,9 @@ export class FsStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
     };
   }
 
-  toField(_: boolean, t: i18n["t"]){
+  toField(_: boolean){
+    const { t } = getCommandExecutionContext();
+
     return [
       {
         name: `:asterisk:${t("moreInfo")}`,

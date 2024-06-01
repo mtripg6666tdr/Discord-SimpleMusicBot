@@ -20,33 +20,33 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { SongInfo } from "../Component/searchPanel";
 import type * as dYtsr from "@distube/ytsr";
-import type { i18n } from "i18next";
 import type * as ytsr from "ytsr";
 
 import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
-import { BaseCommand } from ".";
+import { BaseCommand, getCommandExecutionContext } from ".";
 import { searchYouTube } from "../AudioSource";
 import { getConfig } from "../config";
 import { DefaultAudioThumbnailURL } from "../definition";
 
 export abstract class SearchBase<T> extends BaseCommand {
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
     context.server.updateBoundChannel(message);
 
     // URLが渡されたら、そのままキューに追加を試みる
     if(this.urlCheck(context.rawArgs)){
-      const joinResult = await context.server.joinVoiceChannel(message, { replyOnFail: true }, t);
+      const joinResult = await context.server.joinVoiceChannel(message, { replyOnFail: true });
       if(!joinResult){
         return;
       }
 
-      await context.server.playFromURL(message, context.args as string[], { first: !context.server.player.isConnecting }, t);
+      await context.server.playFromURL(message, context.args as string[], { first: !context.server.player.isConnecting });
       return;
     }
 
     // ボイスチャンネルへの参加の試みをしておく
-    context.server.joinVoiceChannel(message, {}, t).catch(this.logger.error);
+    context.server.joinVoiceChannel(message, {}).catch(this.logger.error);
 
     // 検索パネルがすでにあるなら
     if(context.server.searchPanel.has(message.member.id)){
@@ -92,11 +92,11 @@ export abstract class SearchBase<T> extends BaseCommand {
 
     // 検索を実行する
     if(context.rawArgs !== ""){
-      const searchPanel = context.server.searchPanel.create(message, context.rawArgs, t);
+      const searchPanel = context.server.searchPanel.create(message, context.rawArgs);
       if(!searchPanel){
         return;
       }
-      await searchPanel.consumeSearchResult(this.searchContent(context.rawArgs, context, t), this.consumer.bind(this), t);
+      await searchPanel.consumeSearchResult(this.searchContent(context.rawArgs, context), this.consumer.bind(this));
     }else{
       await message.reply(t("commands:search.noArgument")).catch(this.logger.error);
     }
@@ -106,10 +106,10 @@ export abstract class SearchBase<T> extends BaseCommand {
    * 検索を実行する関数  
    * 検索時にクエリーの変換を行う場合は、変換後のクエリをtransfomedQueryとして返す必要があります。
    */
-  protected abstract searchContent(query: string, context: CommandArgs, t: i18n["t"]): Promise<T|{ result: T, transformedQuery: string }>;
+  protected abstract searchContent(query: string, context: CommandArgs): Promise<T|{ result: T, transformedQuery: string }>;
 
   /** 検索結果を検索パネルで使用できるデータに変換する関数 */
-  protected abstract consumer(result: T, t: i18n["t"]): SongInfo[];
+  protected abstract consumer(result: T): SongInfo[];
 
   /** この検索が対象とするURLかを判断する関数 */
   // eslint-disable-next-line unused-imports/no-unused-vars
@@ -148,7 +148,9 @@ export default class Search extends SearchBase<ytsr.Video[] | dYtsr.Video[]> {
       });
   }
 
-  protected override consumer(items: ytsr.Video[] | dYtsr.Video[], t: i18n["t"]){
+  protected override consumer(items: ytsr.Video[] | dYtsr.Video[]){
+    const { t } = getCommandExecutionContext();
+
     return items.map(item => ({
       url: item.url,
       title: "title" in item ? item.title : `*${item.name}`,

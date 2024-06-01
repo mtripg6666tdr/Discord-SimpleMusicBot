@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 
@@ -33,12 +32,12 @@ export default class BgmBd extends BaseCommand {
     });
   }
 
-  protected async run(message: CommandMessage, context: Readonly<CommandArgs>, t: i18n["t"]): Promise<void> {
+  protected async run(message: CommandMessage, context: Readonly<CommandArgs>): Promise<void> {
     context.server.updateBoundChannel(message);
-    await context.server.joinVoiceChannel(message, { replyOnFail: true }, t);
+    await context.server.joinVoiceChannel(message, { replyOnFail: true });
     const bgmPlaylistUrl = context.rawArgs.length === 0
       ? "aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTExmZmhjQXBzbzl4UFhLUG5YbEZ3czlxWUNkMDltTFA0"
       : "aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTExmZmhjQXBzbzl4WnpYZ0RFdEdsQk5wNUtYZjNPY1Zx";
-    await context.server.playFromURL(message, Buffer.from(bgmPlaylistUrl, "base64").toString(), {}, t);
+    await context.server.playFromURL(message, Buffer.from(bgmPlaylistUrl, "base64").toString(), {});
   }
 }

@@ -19,7 +19,6 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { YmxFormat } from "../Structure";
-import type { i18n } from "i18next";
 import type { AnyTextableGuildChannel, Message } from "oceanic.js";
 
 import candyget from "candyget";
@@ -51,7 +50,9 @@ export default class Import extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
+
     context.server.updateBoundChannel(message);
 
     const statusMessage = await message.reply(`🔍${t("commands:import.loadingMessage")}...`);

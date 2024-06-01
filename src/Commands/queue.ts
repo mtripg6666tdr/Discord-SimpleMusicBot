@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -42,7 +41,8 @@ export default class Queue extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
     context.server.updateBoundChannel(message);
     const queue = context.server.queue;
     if(queue.length === 0){
@@ -84,7 +84,7 @@ export default class Queue extends BaseCommand {
                 : `${min}:${sec}`
             } \``,
             `${t("components:nowplaying.requestedBy")}: \`${q.additionalInfo.addedBy.displayName}\` `,
-            q.basicInfo.npAdditional(t),
+            q.basicInfo.npAdditional(),
           ].join("\r\n"),
         });
       }
