@@ -19,7 +19,7 @@
 // @ts-check
 const fs = require("fs");
 const path = require("path");
-const config = require("../dist/config").useConfig();
+const config = require("../dist/config").getConfig();
 
 let overview = `# コマンド一覧
 この節では、ボットで使用できるコマンドのほとんどが解説されています。
@@ -57,7 +57,7 @@ require("../dist/i18n").initLocalization(false, config.defaultLanguage).then(() 
 
   for(let i = 0; i < commands.length; i++){
     const cmd = commands[i];
-    const filename = `${cmd.asciiName}.md`;
+    const filename = `${cmd.asciiName.replaceAll(">", "_")}.md`;
     if(existingFiles.has(filename)){
       existingFiles.delete(filename);
     }
@@ -67,7 +67,7 @@ sidebar_label: ${cmd.name}
 # \`${cmd.name}\`コマンド
 ${cmd.description}
 
-スラッシュコマンドでは、\`/${cmd.asciiName}\`を使用してください。
+スラッシュコマンドでは、\`/${cmd.asciiName.replaceAll(">", " ")}\`を使用してください。
 
 ## 別名
 \`${cmd.name}\`以外にも以下の別名を使用できます。
