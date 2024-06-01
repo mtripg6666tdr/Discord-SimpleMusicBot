@@ -49,7 +49,8 @@
       "player": "音楽プレイヤー制御系",
       "playlist": "プレイリスト操作系",
       "utility": "ユーティリティ系",
-      "bot": "ボット操作全般"
+      "bot": "ボット操作全般",
+      "settings": "設定"
     },
     "commandList": "コマンド一覧",
     "toLearnMoreMessage": "`{{prefix}}コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
@@ -488,6 +489,38 @@
     "seeking": "シークしています",
     "success": "シークしました",
     "failed": "シークに失敗しました"
+  },
+  "setting": {
+    "name": "設定",
+    "description": "ボットの設定を変更します。"
+  },
+  "setting>skipvote": {
+    "name": "設定>スキップ投票",
+    "description": "スキップ投票の有効・無効の設定をします。何も指定しないと現在の設定を確認できます。",
+    "args": {
+      "enabled": {
+        "description": "スキップ投票を有効にするかどうか。"
+      }
+    },
+    "currentState": "スキップ投票は現在 **{{status}}** の設定になっています。",
+    "changed": "スキップ投票を **{{status}}** にしました。"
+  },
+  "setting>nowplaying": {
+    "name": "設定>現在再生中",
+    "description": "現在再生中パネルの表示モードの設定をします。何も指定しないと現在の設定を確認できます。",
+    "args": {
+      "level": {
+        "description": "表示モードを指定します。",
+        "choices": {
+          "normal": "通常",
+          "silent": "サイレント",
+          "disabled": "無効"
+        }
+      }
+    },
+    "invalidLevel": "指定されたモードが正しくありません。normal, silent, disabledのいずれかを指定してください。",
+    "changed": "現在再生中パネルの表示モードを **{{level}}** に設定しました。",
+    "currentState": "現在再生中パネルの表示モードは現在 **{{level}}** に設定されています。"
   },
   "shuffle": {
     "name": "シャッフル",
