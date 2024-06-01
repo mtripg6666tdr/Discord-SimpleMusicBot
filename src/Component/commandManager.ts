@@ -48,11 +48,15 @@ export class CommandManager extends LogEmitter<{}> {
   }
 
   private readonly _commands: BaseCommand[];
-  /**
-   * コマンドを返します
-   */
+  /** コマンドを返します */
   get commands(): Readonly<BaseCommand[]>{
     return this._commands;
+  }
+
+  private _subCommandNames: Set<string>;
+  /** サブコマンドがあるコマンドの一覧を返します */
+  get subCommandNames(): Readonly<Set<string>>{
+    return this._subCommandNames;
   }
 
   private commandMap: Map<string, BaseCommand>;
@@ -64,6 +68,8 @@ export class CommandManager extends LogEmitter<{}> {
     this._commands = (require("../Commands/_index") as typeof import("../Commands/_index")).default.filter(n => !n.disabled);
 
     this.initializeMap({ reportDupes: useConfig().debug });
+    this.initializeSubcommandNames();
+
     this.logger.info("Initialized");
   }
 
@@ -83,6 +89,14 @@ export class CommandManager extends LogEmitter<{}> {
     });
 
     this.commandMap = sets;
+  }
+
+  private initializeSubcommandNames(){
+    this._subCommandNames = new Set(
+      this.commands
+        .filter(command => command.asciiName.includes(">"))
+        .map(command => command.asciiName.split(">")[0])
+    );
   }
 
   /**
