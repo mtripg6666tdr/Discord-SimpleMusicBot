@@ -94,5 +94,7 @@
     "attachmentNotFound": "添付ファイルが見つかりません",
     "invalidUrl": "有効なURLを指定してください。キーワードで再生する場合は`検索`コマンドを使用してください。"
   },
-  "system": "システム"
+  "system": "システム",
+  "enabled": "有効",
+  "disabled": "無効"
 }
