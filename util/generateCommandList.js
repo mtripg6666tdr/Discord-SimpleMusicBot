@@ -83,7 +83,7 @@ ${cmd.getLocalizedPermissionDescription(config.defaultLanguage)}
 ※管理者権限や、サーバーの管理権限、チャンネルの管理権限、および管理者権限を持つユーザーはこの権限を満たしていなくてもいつでもこのコマンドを実行できます。
 \r\n`, {encoding: "utf-8"});
 
-    overview += `|[${cmd.name}](./${cmd.asciiName}.md)|${cmd.description.replace(/\n/g, "")}|\r\n`
+    overview += `|[${cmd.name}](./${cmd.asciiName.replaceAll(">", "_")}.md)|${cmd.description.replace(/\n/g, "")}|\r\n`
   }
 
   overview += "\r\n\r\n</div>";
