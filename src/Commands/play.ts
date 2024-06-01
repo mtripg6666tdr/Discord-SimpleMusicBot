@@ -50,9 +50,10 @@ export default class Play extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
+
     const server = context.server;
     const firstAttachment = Array.isArray(message.attachments) ? message.attachments[0] : message.attachments.first();
 
