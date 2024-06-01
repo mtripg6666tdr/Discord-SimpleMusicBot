@@ -94,5 +94,7 @@
     "attachmentNotFound": "Pièce jointe introuvable",
     "invalidUrl": "Veuillez spécifier une URL valide. Utilisez la commande `search` pour jouer par mot-clé."
   },
-  "system": "système"
+  "system": "système",
+  "enabled": "有効",
+  "disabled": "無効"
 }
