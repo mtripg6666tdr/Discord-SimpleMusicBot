@@ -22,7 +22,7 @@ import type { JSONStatuses } from "../../types/GuildStatuses";
 
 import { IntervalBackupper } from ".";
 import { timeLoggedMethod } from "../../logger";
-import { ReplitClient } from "../ReplitDatabaseClient";
+import { ReplitClient } from "../replitDatabaseClient";
 
 export class ReplitBackupper extends IntervalBackupper {
   protected readonly db: ReplitClient = null!;
