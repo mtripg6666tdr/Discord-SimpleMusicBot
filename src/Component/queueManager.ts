@@ -36,7 +36,7 @@ import { getCommandExecutionContext } from "../Commands";
 import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
-import { bindThis } from "../Util/decorators";
+import { bindThis, emitEventOnMutation } from "../Util/decorators";
 import { getConfig } from "../config";
 import { timeLoggedMethod } from "../logger";
 
@@ -46,7 +46,7 @@ interface QueueManagerEvents {
   change: [];
   changeWithoutCurrent: [];
   add: [content:QueueContent];
-  settingsChanged: [];
+  settingsChanged: [boolean, boolean];
   mixPlaylistEnabledChanged: [enabled: boolean];
 }
 
@@ -68,44 +68,23 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     return this._default;
   }
 
-  protected _loopEnabled: boolean = false;
   /**
-   * トラックループが有効か?
+   * トラックループが有効かどうか
    */
-  get loopEnabled(): boolean{
-    return this._loopEnabled;
-  }
+  @emitEventOnMutation("settingsChanged")
+  accessor loopEnabled: boolean;
 
-  set loopEnabled(value: boolean){
-    this._loopEnabled = value;
-    this.emit("settingsChanged");
-  }
-
-  protected _queueLoopEnabled: boolean = false;
   /**
-   * キューループが有効か?
+   * キューループが有効かどうか
    */
-  get queueLoopEnabled(): boolean{
-    return this._queueLoopEnabled;
-  }
+  @emitEventOnMutation("settingsChanged")
+  accessor queueLoopEnabled: boolean;
 
-  set queueLoopEnabled(value: boolean){
-    this._queueLoopEnabled = value;
-    this.emit("settingsChanged");
-  }
-
-  protected _onceLoopEnabled: boolean = false;
   /**
-   * ワンスループが有効か?
+   * ワンスループが有効かどうか
    */
-  get onceLoopEnabled(): boolean{
-    return this._onceLoopEnabled;
-  }
-
-  set onceLoopEnabled(value: boolean){
-    this._onceLoopEnabled = value;
-    this.emit("settingsChanged");
-  }
+  @emitEventOnMutation("settingsChanged")
+  accessor onceLoopEnabled: boolean;
 
   /**
    * キューの長さ（トラック数）
