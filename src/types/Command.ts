@@ -55,15 +55,14 @@ type CommandHelp = {
 };
 
 export type ListCommandWithArgsOptions = BaseListCommand & CommandHelp & {
-  args: SlashCommandArgument[],
+  args: readonly SlashCommandArgument[],
 };
 
 export type ListCommandWithoutArgsOptions = BaseListCommand & Partial<CommandHelp>;
 
 export type ListCommandInitializeOptions =
   | ListCommandWithArgsOptions
-  | ListCommandWithoutArgsOptions
-;
+  | ListCommandWithoutArgsOptions;
 
 export type UnlistCommandOptions = BaseCommandInitializeOptions & {
   unlist: true,

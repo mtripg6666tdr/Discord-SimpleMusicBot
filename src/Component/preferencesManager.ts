@@ -36,6 +36,7 @@ export class GuildPreferencesManager extends ServerManagerBase<GuildPreferencesE
     this.addRelated = false;
     this.equallyPlayback = false;
     this.disableSkipSession = false;
+    this.nowPlayingNotificationLevel = NowPlayingNotificationLevel.Normal;
   }
 
   exportPreferences(): JSONGuildPreferences {

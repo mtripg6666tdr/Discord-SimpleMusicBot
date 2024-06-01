@@ -27,11 +27,13 @@ export default class SettingSkipvote extends BaseCommand {
       alias: ["setting>skipvote"],
       unlist: false,
       category: "bot",
-      requiredPermissionsOr: [],
+      requiredPermissionsOr: ["admin", "dj", "onlyListener", "manageGuild"],
       shouldDefer: false,
+      examples: false,
+      usage: false,
       args: [
         {
-          type: "bool" as const,
+          type: "bool",
           name: "enabled",
           required: false,
         },

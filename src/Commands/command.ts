@@ -29,7 +29,7 @@ import { getConfig } from "../config";
 
 const config = getConfig();
 
-export const categoriesList = ["voice", "player", "playlist", "utility", "bot"] as const;
+export const categoriesList = ["voice", "player", "playlist", "utility", "bot", "settings"] as const;
 
 export default class Commands extends BaseCommand {
   constructor(){
