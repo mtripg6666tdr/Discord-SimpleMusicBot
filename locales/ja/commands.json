@@ -492,7 +492,7 @@
   },
   "setting": {
     "name": "設定",
-    "description": "ボットの設定を変更します"
+    "description": "ボットの設定を変更します。"
   },
   "setting>skipvote": {
     "name": "設定>スキップ投票",

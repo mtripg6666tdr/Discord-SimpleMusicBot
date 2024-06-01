@@ -94,5 +94,7 @@
     "attachmentNotFound": "No attachment found",
     "invalidUrl": "Give a valid URL. If you want to play by keyword, use `search` command instead."
   },
-  "system": "System"
+  "system": "System",
+  "enabled": "enabled",
+  "disabled": "disabled"
 }
