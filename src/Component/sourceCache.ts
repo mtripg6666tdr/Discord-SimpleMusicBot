@@ -164,6 +164,8 @@ export class SourceCache extends LogEmitter<CacheEvents> {
           .map(file => fs.promises.stat(path.join(this.cacheDirPath, file.name)))
       ))
       .then(sizes =>
+        // Disabling eslint rule because the fs.Stats type is used just for type checking
+        // eslint-disable-next-line deprecation/deprecation
         (sizes.filter(d => d.status === "fulfilled") as PromiseFulfilledResult<fs.Stats>[])
           .reduce((prev, current) => prev + current.value.size, 0)
       );
