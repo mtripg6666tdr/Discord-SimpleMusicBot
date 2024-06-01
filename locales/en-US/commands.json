@@ -49,7 +49,8 @@
       "player": "Music Player Related",
       "playlist": "Playlist Related",
       "utility": "Utilities",
-      "bot": "Bot Operation"
+      "bot": "Bot Operation",
+      "settings": "Settings"
     },
     "commandList": "Command List",
     "toLearnMoreMessage": "Like `{{prefix}}command play`, you can add a command name as an argument to display the details of that command.",
@@ -489,6 +490,38 @@
     "success": "Seeked",
     "failed": "Seek failed"
   },
+  "setting": {
+    "name": "setting",
+    "description": "Changes the bot's settings."
+  },
+  "setting>skipvote": {
+    "name": "setting>skipvote",
+    "description": "Configures if skip-vote is enabled or not. Shows current setting with no option provided.",
+    "args": {
+      "enabled": {
+        "description": "If you want to enable skip-vote feature, specify true. Otherwise, false."
+      }
+    },
+    "currentState": "The skip-vote feature is currently **{{status}}**.",
+    "changed": "The skip-vote feature is now **{{status}}**."
+  },
+  "setting>nowplaying": {
+    "name": "setting>nowplaying",
+    "description": "Configures the display mode of now-playing embeds. Shows the current setting with no option provided.",
+    "args": {
+      "level": {
+        "description": "Specify a display mode of the now-playing embeds.",
+        "choices": {
+          "normal": "Normal",
+          "silent": "Silent",
+          "disabled": "Disabled"
+        }
+      }
+    },
+    "invalidLevel": "The display-mode you specified was incorrect. Please specify one of three, \"normal\", \"silent\", or \"disabled\".",
+    "changed": "The display-mode was set to **{{level}}**.",
+    "currentState": "The current display mode was set to **{{level}}**."
+  },
   "shuffle": {
     "name": "shuffle",
     "description": "Shuffles the queue.",
@@ -528,7 +561,7 @@
   },
   "volume": {
     "name": "volume",
-    "description": "Changes the volume. Set between 1 and 200. (The default value is 100.) When you provide no argument, shows the current volume. If it becomes unstable, set the volume to 100.",
+    "description": "Changes the volume. When no argument provided, shows the current volume. The valid range of the volume is 1~200 (and 100 is the default). If it becomes unstable, set the volume to 100.",
     "examples": "volume [number]",
     "usage": "volume 120",
     "args": {
