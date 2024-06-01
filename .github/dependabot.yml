@@ -16,18 +16,29 @@ updates:
     allow:
       - dependency-type: "direct"
     ignore:
-      - dependency-name: "sodium-native"
+      - dependency-name: "sodium-native" # oceanic.js requirements
         update-types:
           - "version-update:semver-major"
-      - dependency-name: "p-queue"
+      - dependency-name: "p-queue" # uses ES-modules
         update-types:
           - "version-update:semver-major"
-      - dependency-name: "p-event"
+      - dependency-name: "p-event" # uses ES-modules
         update-types:
           - "version-update:semver-major"
-      - dependency-name: "undici"
+      - dependency-name: "undici" # dropping support Node.js v16
         update-types:
           - "version-update:semver-major"
+      - dependency-name: "genius-lyrics" # uses undici for Node.js v18+
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"
+      - dependency-name: "soundcloud.ts" # uses undici for Node.js v18+
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"
+
     groups:
       oceanic:
         patterns:
