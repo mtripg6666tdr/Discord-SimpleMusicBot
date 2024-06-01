@@ -23,10 +23,10 @@ import candyget from "candyget";
 
 import { SearchBase } from "./search";
 import { time } from "../Util";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 
 
-const config = useConfig();
+const config = getConfig();
 
 export default class SearchN extends SearchBase<Datum[]> {
   constructor() {

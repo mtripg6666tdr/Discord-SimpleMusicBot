@@ -24,10 +24,10 @@ import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oc
 
 import { BaseCommand } from ".";
 import { Playlist } from "../AudioSource/youtube/playlist";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 import { DefaultAudioThumbnailURL } from "../definition";
 
-const config = useConfig();
+const config = getConfig();
 
 export default class News extends BaseCommand {
   constructor(){

@@ -23,10 +23,10 @@ import * as discord from "oceanic.js";
 import { Telemetry } from "./Component/telemetry";
 import { requireIfAny } from "./Util";
 import { MusicBotBase } from "./botBase";
-import { useConfig } from "./config";
+import { getConfig } from "./config";
 import * as eventHandlers from "./events";
 
-const config = useConfig();
+const config = getConfig();
 
 /**
  * 音楽ボットの本体

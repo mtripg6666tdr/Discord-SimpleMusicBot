@@ -25,9 +25,9 @@ import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/hel
 import { BaseCommand } from ".";
 import { Spotify } from "../AudioSource";
 import { getColor } from "../Util/color";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 
-const config = useConfig();
+const config = getConfig();
 
 export default class Help extends BaseCommand {
   constructor(){

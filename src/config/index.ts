@@ -130,7 +130,7 @@ class ConfigLoader {
   }
 }
 
-export function useConfig(){
+export function getConfig(){
   return ConfigLoader.instance.config;
 }
 

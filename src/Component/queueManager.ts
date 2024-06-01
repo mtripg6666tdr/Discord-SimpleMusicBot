@@ -36,7 +36,7 @@ import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
 import { bindThis } from "../Util/decorators";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 import { timeLoggedMethod } from "../logger";
 
 export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"spotify"|"unknown";
@@ -49,7 +49,7 @@ interface QueueManagerEvents {
   mixPlaylistEnabledChanged: [enabled: boolean];
 }
 
-const config = useConfig();
+const config = getConfig();
 
 /**
  * サーバーごとのキューを管理するマネージャー。

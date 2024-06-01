@@ -47,7 +47,7 @@ import { SearchPanelManager } from "../Component/searchPanelManager";
 import { SkipSession } from "../Component/skipSession";
 import { TaskCancellationManager } from "../Component/taskCancellationManager";
 import * as Util from "../Util";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 import { discordLanguages } from "../i18n";
 import { getLogger } from "../logger";
 import { YmxVersion } from "../types/YmxFormat";
@@ -56,7 +56,7 @@ interface GuildDataContainerEvents {
   updateBoundChannel: [string];
 }
 
-const config = useConfig();
+const config = getConfig();
 
 /**
  * サーバーごとデータを保存するコンテナ

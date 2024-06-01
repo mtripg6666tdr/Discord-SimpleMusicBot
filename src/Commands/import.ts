@@ -28,9 +28,9 @@ import { ApplicationCommandTypes } from "oceanic.js";
 import { BaseCommand } from ".";
 import { TaskCancellationManager } from "../Component/taskCancellationManager";
 import { YmxVersion } from "../Structure";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 
-const config = useConfig();
+const config = getConfig();
 
 export default class Import extends BaseCommand {
   constructor(){

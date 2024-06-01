@@ -26,9 +26,9 @@ import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/hel
 import { BaseCommand } from ".";
 import { CommandManager } from "../Component/commandManager";
 import { getColor } from "../Util/color";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 
-const config = useConfig();
+const config = getConfig();
 
 export const categoriesList = ["voice", "player", "playlist", "utility", "bot"] as const;
 

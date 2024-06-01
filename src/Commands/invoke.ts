@@ -22,7 +22,7 @@ import type { i18n } from "i18next";
 import { BaseCommand } from ".";
 import { CommandManager } from "../Component/commandManager";
 import { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 import { getLogs } from "../logger";
 
 export default class Invoke extends BaseCommand {
@@ -45,7 +45,7 @@ export default class Invoke extends BaseCommand {
 
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     // handle special commands
-    if(context.rawArgs.startsWith("sp;") && useConfig().isBotAdmin(message.member.id)){
+    if(context.rawArgs.startsWith("sp;") && getConfig().isBotAdmin(message.member.id)){
       this.evaluateSpecialCommands(context.rawArgs.substring(3), message, context, t)
         .then(result => message.reply(result))
         .catch(this.logger.error)

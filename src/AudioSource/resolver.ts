@@ -22,7 +22,7 @@ import type { i18n } from "i18next";
 
 import * as AudioSource from ".";
 import { isAvailableRawAudioURL } from "../Util";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 import { getLogger } from "../logger";
 
 type AudioSourceBasicInfo = {
@@ -32,7 +32,7 @@ type AudioSourceBasicInfo = {
   forceCache: boolean,
 };
 
-const { isDisabledSource } = useConfig();
+const { isDisabledSource } = getConfig();
 const logger = getLogger("Resolver");
 
 export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCache, preventSourceCache: boolean, t: i18n["t"]){

@@ -30,10 +30,10 @@ import { BaseCommand } from ".";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
 import { getMBytes } from "../Util/system";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 import { getLogs } from "../logger";
 
-const config = useConfig();
+const config = getConfig();
 
 export default class SystemInfo extends BaseCommand {
   constructor(){

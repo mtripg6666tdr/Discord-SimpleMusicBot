@@ -25,7 +25,7 @@ import { MessageActionRowBuilder, MessageEmbedBuilder, MessageStringSelectMenuBu
 
 import { LogEmitter } from "../Structure";
 import { getColor } from "../Util/color";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 import { timeLoggedMethod } from "../logger";
 
 type status = "init"|"consumed"|"destroyed";
@@ -35,7 +35,7 @@ interface SearchPanelEvents {
   open: [reply: ResponseMessage];
 }
 
-const config = useConfig();
+const config = getConfig();
 
 export class SearchPanel extends LogEmitter<SearchPanelEvents> {
   protected _status: status = "init";

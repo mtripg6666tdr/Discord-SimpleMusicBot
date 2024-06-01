@@ -35,7 +35,7 @@ import { type AudioSource } from "../AudioSource";
 import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 import { timeLoggedMethod } from "../logger";
 
 interface PlayManagerEvents {
@@ -67,7 +67,7 @@ export type PlayManagerPlayOptions = Record<string & {}, string | boolean | numb
   quietOnError?: boolean,
 };
 
-const config = useConfig();
+const config = getConfig();
 
 /**
  * サーバーごとの再生を管理するマネージャー。

@@ -27,7 +27,7 @@ import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oc
 
 import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 import { DefaultAudioThumbnailURL } from "../definition";
 
 export abstract class SearchBase<T> extends BaseCommand {
@@ -118,7 +118,7 @@ export abstract class SearchBase<T> extends BaseCommand {
   }
 }
 
-const config = useConfig();
+const config = getConfig();
 
 export default class Search extends SearchBase<ytsr.Video[] | dYtsr.Video[]> {
   constructor(){

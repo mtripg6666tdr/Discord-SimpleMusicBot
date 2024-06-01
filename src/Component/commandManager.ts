@@ -26,7 +26,7 @@ import i18next from "i18next";
 import { ApplicationCommandOptionTypes, ApplicationCommandTypes } from "oceanic.js";
 
 import { LogEmitter } from "../Structure";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 import { subCommandSeparator } from "../definition";
 import { availableLanguages } from "../i18n";
 import { timeLoggedMethod } from "../logger";
@@ -67,7 +67,7 @@ export class CommandManager extends LogEmitter<{}> {
 
     this._commands = (require("../Commands/_index") as typeof import("../Commands/_index")).default.filter(n => !n.disabled);
 
-    this.initializeMap({ reportDupes: useConfig().debug });
+    this.initializeMap({ reportDupes: getConfig().debug });
     this.initializeSubcommandNames();
 
     this.logger.info("Initialized");
