@@ -31,7 +31,7 @@ import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 
 import { LogEmitter } from "../Structure";
 import { getMBytes } from "../Util/system";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 import { timeLoggedMethod } from "../logger";
 
 interface CacheEvents {
@@ -41,7 +41,7 @@ interface CacheEvents {
   persistentCacheNotFound: [];
 }
 
-const config = useConfig();
+const config = getConfig();
 
 export class SourceCache extends LogEmitter<CacheEvents> {
   private readonly _sourceCache: Map<string, AudioSource<any, any>>;

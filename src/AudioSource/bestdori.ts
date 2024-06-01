@@ -19,9 +19,9 @@
 import type { AudioSourceBasicJsonFormat, UrlStreamInfo } from ".";
 
 import candyget from "candyget";
-import { i18n } from "i18next";
 
 import { AudioSource } from "./audiosource";
+import { getCommandExecutionContext } from "../Commands";
 
 export class BestdoriS extends AudioSource<string, BestdoriJsonFormat> {
   protected artist = "";
@@ -31,7 +31,9 @@ export class BestdoriS extends AudioSource<string, BestdoriJsonFormat> {
   protected arranger: string;
   private id: number;
 
-  async init(url: string, prefetched: BestdoriJsonFormat, t: i18n["t"]){
+  async init(url: string, prefetched: BestdoriJsonFormat){
+    const { t } = getCommandExecutionContext();
+
     this.url = url;
     const id = BestdoriApi.instance.getAudioId(url);
     if(!id) throw new Error("Invalid streamable url");
@@ -68,11 +70,14 @@ export class BestdoriS extends AudioSource<string, BestdoriJsonFormat> {
     };
   }
 
-  toField(_: boolean, t: i18n["t"]){
+  toField(_: boolean){
+    const { t } = getCommandExecutionContext();
+
     const typeMap = {
       anime: "カバー",
       normal: "アニメ",
     };
+
     return [
       {
         name: "バンド名",

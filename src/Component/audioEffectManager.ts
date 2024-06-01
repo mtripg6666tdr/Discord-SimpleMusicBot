@@ -17,10 +17,10 @@
  */
 
 import type { GuildDataContainer } from "../Structure";
-import type { i18n } from "i18next";
 
 import { MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
+import { getCommandExecutionContext } from "../Commands";
 import { ServerManagerBase } from "../Structure";
 import { getColor } from "../Util/color";
 
@@ -68,7 +68,7 @@ const audioEffects = {
     arg: "asetrate=48000*1.2,aresample=48000,bass=g=5",
     shouldDisableVbr: false,
   },
-} satisfies Record<AudioEffectNames, AudioEffect>;
+} as const satisfies Record<AudioEffectNames, AudioEffect>;
 
 export type ExportedAudioEffect = {
   args: string[],
@@ -108,7 +108,9 @@ export class AudioEffectManager extends ServerManagerBase<EffectManagerEvents> {
     return { args, shouldDisableVbr };
   }
 
-  createEmbed(avatarUrl: string, t: i18n["t"]){
+  createEmbed(avatarUrl: string){
+    const { t } = getCommandExecutionContext();
+
     const embed = new MessageEmbedBuilder()
       .setTitle(`:cd:${t("commands:effect.effectControllPanel.title")}:microphone:`)
       .setDescription(t("commands:effect.effectControllPanel.description"))

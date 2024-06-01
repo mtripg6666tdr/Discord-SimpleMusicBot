@@ -58,7 +58,7 @@ describe("Config", function() {
   });
 
   describe("#CheckValues", function(){
-    const config = require(configLoaderPath).useConfig();
+    const config = require(configLoaderPath).getConfig();
     /** @type {[string, string|boolean|{}][]} */
     const tests = [
       ["adminId", "123456"],

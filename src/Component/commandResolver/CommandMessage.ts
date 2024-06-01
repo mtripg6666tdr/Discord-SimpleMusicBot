@@ -17,10 +17,17 @@
  */
 
 import { CommandMessage as LibCommandMessage } from "@mtripg6666tdr/oceanic-command-resolver";
+import { defaultConfig } from "@mtripg6666tdr/oceanic-command-resolver";
+import { AnyTextableGuildChannel, Message } from "oceanic.js";
 
 import { normalizeText } from "../../Util";
+import { subCommandSeparator } from "../../definition";
+import { CommandManager } from "../commandManager";
+
+defaultConfig.subCommandSeparator = subCommandSeparator;
 
 export class CommandMessage extends LibCommandMessage {
+  // 超省略形を解釈するために、基底クラスをオーバーライドします
   protected static override parseCommand(content: string, prefixLength: number){
     const resolved = super.parseCommand(content, prefixLength, normalizeText);
     // 超省略形を捕捉
@@ -32,9 +39,19 @@ export class CommandMessage extends LibCommandMessage {
     return resolved;
   }
 
-  static override resolveCommandMessage(content: string, prefixLength: number = 1){
-    const resolved = CommandMessage.parseCommand(content, prefixLength);
-    resolved.command = resolved.command.toLowerCase();
-    return resolved;
+  // サブコマンドを解決するために、基底クラスをオーバーライドします
+  static override createFromMessage(message: Message<AnyTextableGuildChannel>, prefixLength?: number | undefined) {
+    const resolved = this.parseCommand(message.content, prefixLength || 1);
+
+    if(CommandManager.instance.subCommandNames.has(resolved.command)){
+      const subCommand = resolved.options.shift();
+
+      if(subCommand){
+        resolved.command = `${resolved.command}${subCommandSeparator}${subCommand}`;
+        resolved.rawOptions = resolved.options.join(" ");
+      }
+    }
+
+    return CommandMessage.createFromMessageWithParsed(message, resolved.command, resolved.options, resolved.rawOptions);
   }
 }

@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 import { discordUtil } from "../Util";
@@ -34,7 +33,8 @@ export default class Skip extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
     const server = context.server;
     // そもそも再生状態じゃない
     if(server.player.preparing){
@@ -59,6 +59,7 @@ export default class Skip extends BaseCommand {
         && !discordUtil.users.isDJ(message.member, context)
         && !discordUtil.users.isPrivileged(message.member)
         && members && members.size > 3
+        && !context.server.preferences.disableSkipSession
       ){
         // 投票パネルを作成する
         if(!server.skipSession){

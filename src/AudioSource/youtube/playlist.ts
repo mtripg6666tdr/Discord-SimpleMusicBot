@@ -19,10 +19,10 @@
 import ytpl from "ytpl";
 
 import { requireIfAny } from "../../Util";
-import { useConfig } from "../../config";
+import { getConfig } from "../../config";
 const dYtpl = requireIfAny("ytpl") as typeof import("@distube/ytpl");
 
-const config = useConfig();
+const config = getConfig();
 const playlistSearchOptions = {
   gl: config.country,
   hl: config.defaultLanguage,

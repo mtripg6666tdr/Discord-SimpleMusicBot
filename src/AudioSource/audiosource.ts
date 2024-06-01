@@ -18,7 +18,6 @@
 
 import type { YouTube } from "./youtube";
 import type { LoggerObject } from "../logger";
-import type { i18n } from "i18next";
 import type { EmbedField } from "oceanic.js";
 import type { Readable } from "stream";
 
@@ -140,13 +139,13 @@ export abstract class AudioSource<T extends ThumbnailType, U extends AudioSource
   }
 
   /** 現在再生中の曲を示すEmbedFieldを生成します。 */
-  abstract toField(verbose: boolean, t: i18n["t"]): EmbedField[];
+  abstract toField(verbose: boolean): EmbedField[];
   /** クラスを非同期で初期化します。 */
-  abstract init(url: string, prefetched: U | null, t: i18n["t"]): Promise<AudioSource<T, U>>;
+  abstract init(url: string, prefetched: U | null): Promise<AudioSource<T, U>>;
   /** 再生するためのストリームをフェッチします。 */
-  abstract fetch(url?: boolean, t?: i18n["t"]): Promise<StreamInfo>;
+  abstract fetch(url?: boolean): Promise<StreamInfo>;
   /** 現在再生中の曲に関する追加データを生成します。 */
-  abstract npAdditional(t: i18n["t"]): string;
+  abstract npAdditional(): string;
   /** データをプレーンなオブジェクトにエクスポートします。 */
   abstract exportData(): U;
 

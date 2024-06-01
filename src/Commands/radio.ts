@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import ytdl from "ytdl-core";
 
@@ -32,7 +31,7 @@ export default class Radio extends BaseCommand {
       category: "playlist",
       requiredPermissionsOr: ["admin", "sameVc", "noConnection"],
       shouldDefer: true,
-      argument: [
+      args: [
         {
           type: "string" as const,
           name: "url",
@@ -42,7 +41,8 @@ export default class Radio extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
     context.server.updateBoundChannel(message);
 
     try{
@@ -57,7 +57,7 @@ export default class Radio extends BaseCommand {
       // if url specified, enable the feature
       if(context.rawArgs !== "" || (!context.server.queue.mixPlaylistEnabled && context.server.player.isPlaying)){
         // first, attempt to join to the vc
-        const joinResult = await context.server.joinVoiceChannel(message, { reply: false, replyOnFail: true }, t);
+        const joinResult = await context.server.joinVoiceChannel(message, { reply: false, replyOnFail: true });
         if(!joinResult){
           return;
         }

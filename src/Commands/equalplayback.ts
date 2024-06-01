@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -36,20 +35,22 @@ export default class EquallyPlayback extends BaseCommand {
     });
   }
 
-  async run(context: CommandMessage, options: CommandArgs, t: i18n["t"]){
-    options.server.updateBoundChannel(context);
-    if(options.server.equallyPlayback){
-      options.server.equallyPlayback = false;
-      context.reply(`❌${t("commands:equalplayback.disabled")}`).catch(this.logger.error);
+  async run(command: CommandMessage, context: CommandArgs){
+    const { t } = context;
+
+    context.server.updateBoundChannel(command);
+    if(context.server.preferences.equallyPlayback){
+      context.server.preferences.equallyPlayback = false;
+      command.reply(`❌${t("commands:equalplayback.disabled")}`).catch(this.logger.error);
     }else{
-      options.server.equallyPlayback = true;
+      context.server.preferences.equallyPlayback = true;
       const embed = new MessageEmbedBuilder()
         .setTitle(`⭕${t("commands:equalplayback.enabled")}`)
         .setDescription(t("commands:equalplayback.featureDescription"))
         .setColor(getColor("EQUALLY"))
         .toOceanic()
       ;
-      context.reply({ embeds: [embed] }).catch(this.logger.error);
+      command.reply({ embeds: [embed] }).catch(this.logger.error);
     }
   }
 }

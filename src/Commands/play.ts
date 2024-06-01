@@ -19,7 +19,6 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type * as dYtsr from "@distube/ytsr";
-import type { i18n } from "i18next";
 import type * as ytsr from "ytsr";
 
 import { ApplicationCommandTypes } from "oceanic.js";
@@ -33,7 +32,7 @@ export default class Play extends BaseCommand {
       alias: ["play", "p", "resume", "re"],
       unlist: false,
       category: "player",
-      argument: [
+      args: [
         {
           type: "string" as const,
           name: "keyword",
@@ -51,7 +50,8 @@ export default class Play extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
     context.server.updateBoundChannel(message);
     const server = context.server;
     const firstAttachment = Array.isArray(message.attachments) ? message.attachments[0] : message.attachments.first();
@@ -71,7 +71,7 @@ export default class Play extends BaseCommand {
 
     const wasConnected = server.player.isConnecting;
     //VCに入れない
-    if(!await context.server.joinVoiceChannel(message, { replyOnFail: true }, t)){
+    if(!await context.server.joinVoiceChannel(message, { replyOnFail: true })){
       return;
     }
 
@@ -92,7 +92,7 @@ export default class Play extends BaseCommand {
       // 引数ついてたらそれ優先して再生する
       if(context.rawArgs.startsWith("http://") || context.rawArgs.startsWith("https://")){
         // ついていた引数がURLなら
-        await context.server.playFromURL(message, context.args as string[], { first: !wasConnected }, t);
+        await context.server.playFromURL(message, context.args as string[], { first: !wasConnected });
       }else{
         // URLでないならキーワードとして検索
         const msg = await message.channel.createMessage({
@@ -118,7 +118,7 @@ export default class Play extends BaseCommand {
             return;
           }
           await Promise.allSettled([
-            context.server.playFromURL(message, videos[0].url, { first: !wasConnected, cancellable: context.server.queue.length >= 1 }, t),
+            context.server.playFromURL(message, videos[0].url, { first: !wasConnected, cancellable: context.server.queue.length >= 1 }),
             msg.delete(),
           ]);
         }
@@ -134,21 +134,20 @@ export default class Play extends BaseCommand {
         message,
         firstAttachment.url,
         { first: !wasConnected },
-        t
       );
     }else if(message["_message"]?.referencedMessage){
       // 返信先のメッセージを確認
       const messageReference = message["_message"].referencedMessage;
       if(messageReference.inCachedGuildChannel()){
         context.server
-          .playFromMessage(message, messageReference, context, { first: !wasConnected }, t)
+          .playFromMessage(message, messageReference, context, { first: !wasConnected })
           .catch(this.logger.error);
       }
     }else if(message["_interaction"] && "type" in message["_interaction"].data && message["_interaction"].data.type === ApplicationCommandTypes.MESSAGE){
       const messageReference = message["_interaction"].data.resolved.messages.first();
       if(messageReference?.inCachedGuildChannel()){
         context.server
-          .playFromMessage(message, messageReference, context, { first: !wasConnected }, t)
+          .playFromMessage(message, messageReference, context, { first: !wasConnected })
           .catch(this.logger.error);
       }
     }else if(server.queue.length >= 1){

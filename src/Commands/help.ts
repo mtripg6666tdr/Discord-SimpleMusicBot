@@ -18,16 +18,15 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
 import { BaseCommand } from ".";
 import { Spotify } from "../AudioSource";
 import { getColor } from "../Util/color";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 
-const config = useConfig();
+const config = getConfig();
 
 export default class Help extends BaseCommand {
   constructor(){
@@ -40,7 +39,9 @@ export default class Help extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
+
     const developerId = "593758391395155978";
     const cachedUser = context.client.users.get(developerId);
     const developer: string | null = cachedUser

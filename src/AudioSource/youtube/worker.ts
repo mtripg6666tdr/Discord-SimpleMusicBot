@@ -24,7 +24,7 @@ import ytsr from "ytsr";
 
 import { YouTube } from ".";
 import { requireIfAny, stringifyObject } from "../../Util";
-import { useConfig } from "../../config";
+import { getConfig } from "../../config";
 
 if(!parentPort){
   throw new Error("This file should be run in worker thread.");
@@ -32,7 +32,7 @@ if(!parentPort){
 
 const dYtsr = requireIfAny("@distube/ytsr") as typeof import("@distube/ytsr");
 
-const config = useConfig();
+const config = getConfig();
 const searchOptions = {
   limit: 12,
   gl: config.country,
@@ -52,7 +52,7 @@ function onMessage(message: WithId<spawnerJobMessage>){
   if(message.type === "init"){
     const { id, url, prefetched, forceCache } = message;
     const youtube = new YouTube();
-    youtube.init(url, prefetched, null, forceCache)
+    youtube.init(url, prefetched, forceCache)
       .then(() => {
         const data = Object.assign({}, youtube);
         // @ts-expect-error

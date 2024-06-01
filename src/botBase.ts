@@ -35,7 +35,7 @@ import { GuildDataContainer } from "./Structure";
 import { LogEmitter } from "./Structure";
 import { GuildDataContainerWithBgm } from "./Structure/GuildDataContainerWithBgm";
 import * as Util from "./Util";
-import { useConfig } from "./config";
+import { getConfig } from "./config";
 
 export type DataType = Map<string, GuildDataContainer>;
 
@@ -175,7 +175,7 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
     }
     this.logger.info(`Version: ${this._versionInfo}`);
     this.initializeBackupper();
-    const config = useConfig();
+    const config = getConfig();
     this._cacheManger = new SourceCache(this, config.cacheLevel === "persistent");
   }
 
@@ -231,7 +231,7 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
   protected initData(guildid: string, boundChannelId: string){
     const prev = this.guildData.get(guildid);
     if(!prev){
-      const config = useConfig();
+      const config = getConfig();
       const server = config.bgm[guildid]
         ? new GuildDataContainerWithBgm(guildid, boundChannelId, this, config.bgm[guildid])
         : new GuildDataContainer(guildid, boundChannelId, this);

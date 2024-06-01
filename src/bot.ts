@@ -18,15 +18,16 @@
 
 import type { CommandArgs } from "./Structure";
 
+import i18next from "i18next";
 import * as discord from "oceanic.js";
 
 import { Telemetry } from "./Component/telemetry";
 import { requireIfAny } from "./Util";
 import { MusicBotBase } from "./botBase";
-import { useConfig } from "./config";
+import { getConfig } from "./config";
 import * as eventHandlers from "./events";
 
-const config = useConfig();
+const config = getConfig();
 
 /**
  * 音楽ボットの本体
@@ -149,6 +150,7 @@ export class MusicBot extends MusicBotBase {
       initData: this.initData.bind(this),
       includeMention: false,
       locale,
+      t: i18next.getFixedT(locale),
     };
   }
 }

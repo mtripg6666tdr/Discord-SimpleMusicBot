@@ -23,7 +23,7 @@ import type { ytDlPStrategy } from "./yt-dlp";
 import type { ytdlCoreStrategy } from "./ytdl-core";
 import type { YtDlPatchedYoutubeDl } from "./ytdl-patched_youtube-dl";
 
-import { useConfig } from "../../../config";
+import { getConfig } from "../../../config";
 import { getLogger } from "../../../logger";
 
 type strategies =
@@ -35,7 +35,7 @@ type strategies =
 ;
 
 const logger = getLogger("Strategies");
-const config = useConfig();
+const config = getConfig();
 
 export const strategies: strategies[] = [
   () => require("./ytdl-core"),

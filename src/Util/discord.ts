@@ -19,9 +19,9 @@
 import type { CommandArgs } from "../Commands";
 import type { AnyTextableGuildChannel, Member, PermissionName } from "oceanic.js";
 
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 
-const config = useConfig();
+const config = getConfig();
 
 export const users = {
   isDJ(member: Member, options: CommandArgs){

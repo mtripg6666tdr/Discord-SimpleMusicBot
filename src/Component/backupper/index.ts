@@ -22,16 +22,7 @@ import type { DataType, MusicBotBase } from "../../botBase";
 import { isDeepStrictEqual } from "util";
 
 import { LogEmitter } from "../../Structure";
-
-export type exportableStatuses = {
-  voiceChannelId: string,
-  boundChannelId: string,
-  loopEnabled: boolean,
-  queueLoopEnabled: boolean,
-  addRelatedSongs: boolean,
-  equallyPlayback: boolean,
-  volume: number,
-};
+import { JSONStatuses } from "../../types/GuildStatuses";
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export abstract class Backupper extends LogEmitter<{}> {
@@ -48,7 +39,7 @@ export abstract class Backupper extends LogEmitter<{}> {
   /**
    * バックアップ済みの接続ステータス等を取得します
    */
-  abstract getStatusFromBackup(guildIds: string[]): Promise<Map<string, exportableStatuses> | null>;
+  abstract getStatusFromBackup(guildIds: string[]): Promise<Map<string, JSONStatuses> | null>;
   /**
    * バックアップ済みのキューのデータを取得します
    */
@@ -90,7 +81,7 @@ export abstract class IntervalBackupper extends Backupper {
     await this.backupQueue();
   }
 
-  protected updateStatusCache(guildId: string, status: exportableStatuses){
+  protected updateStatusCache(guildId: string, status: JSONStatuses){
     this.previousStatusCache.set(guildId, JSON.stringify(status));
   }
 

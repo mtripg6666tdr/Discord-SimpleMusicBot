@@ -192,7 +192,7 @@ jobs:
       - test
       - docs
     steps:
-      - uses: im-open/workflow-conclusion@v2.2.2
+      - uses: im-open/workflow-conclusion@v2.2.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 

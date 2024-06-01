@@ -22,9 +22,9 @@ import i18next from "i18next";
 import * as discord from "oceanic.js";
 
 import { CommandManager } from "../Component/commandManager";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 
-const config = useConfig();
+const config = getConfig();
 
 export async function onReady(this: MusicBot){
   const client = this._client;

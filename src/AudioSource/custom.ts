@@ -17,9 +17,9 @@
  */
 
 import type { AudioSourceBasicJsonFormat, StreamInfo } from ".";
-import type { i18n } from "i18next";
 
 import { AudioSource } from "./audiosource";
+import { getCommandExecutionContext } from "../Commands";
 import { createFragmentalDownloadStream, downloadAsReadable, isAvailableRawAudioURL, requestHead, retrieveRemoteAudioInfo } from "../Util";
 
 export class CustomStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
@@ -27,7 +27,9 @@ export class CustomStream extends AudioSource<string, AudioSourceBasicJsonFormat
     super({ isCacheable: false });
   }
 
-  async init(url: string, prefetched: AudioSourceBasicJsonFormat | null, t: i18n["t"]){
+  async init(url: string, prefetched: AudioSourceBasicJsonFormat | null){
+    const { t } = getCommandExecutionContext();
+
     if(prefetched){
       this.title = prefetched.title || t("audioSources.customStream");
       this.url = url;
@@ -69,7 +71,9 @@ export class CustomStream extends AudioSource<string, AudioSourceBasicJsonFormat
     };
   }
 
-  toField(_: boolean, t: i18n["t"]){
+  toField(_: boolean){
+    const { t } = getCommandExecutionContext();
+
     return [
       {
         name: ":link:URL",

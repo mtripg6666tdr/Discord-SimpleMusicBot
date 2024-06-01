@@ -26,7 +26,7 @@ import { TypeCompiler } from "@sinclair/typebox/compiler";
 import { Value } from "@sinclair/typebox/value";
 import CJSON from "comment-json";
 
-import { ConfigSchema } from "./type";
+import { ConfigSchema } from "./schema";
 
 const DEVELOPMENT_PHASE = false;
 
@@ -130,8 +130,8 @@ class ConfigLoader {
   }
 }
 
-export function useConfig(){
+export function getConfig(){
   return ConfigLoader.instance.config;
 }
 
-export { GuildBGMContainerType } from "./type";
+export { GuildBGMContainerType } from "./schema";

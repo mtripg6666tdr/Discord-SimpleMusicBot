@@ -86,7 +86,7 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
       this.queue.resetBgmTracks();
     }
     return this.joinVoiceChannelOnly(this.bgmConfig.voiceChannelId)
-      .then(() => this.player.play({ quietOnError: true, bgm: true }))
+      .then(() => this.player.play({ quiet: true, bgm: true }))
       .catch(this.logger.error);
   }
 }

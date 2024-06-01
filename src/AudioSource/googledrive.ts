@@ -17,12 +17,12 @@
  */
 
 import type { AudioSourceBasicJsonFormat, UrlStreamInfo } from ".";
-import type { i18n } from "i18next";
 
 import candyget from "candyget";
 import * as htmlEntities from "html-entities";
 
 import { AudioSource } from "./audiosource";
+import { getCommandExecutionContext } from "../Commands";
 import { retrieveHttpStatusCode, retrieveRemoteAudioInfo } from "../Util";
 
 export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat> {
@@ -30,7 +30,9 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
     super({ isCacheable: false });
   }
 
-  async init(url: string, prefetched: AudioSourceBasicJsonFormat | null, t: i18n["t"]){
+  async init(url: string, prefetched: AudioSourceBasicJsonFormat | null){
+    const { t } = getCommandExecutionContext();
+
     if(prefetched){
       this.title = prefetched.title || t("audioSources.driveStream");
       this.url = url;
@@ -56,7 +58,9 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
     };
   }
 
-  toField(_: boolean, t: i18n["t"]){
+  toField(_: boolean){
+    const { t } = getCommandExecutionContext();
+
     return [
       {
         name: `:asterisk:${t("moreInfo")}`,

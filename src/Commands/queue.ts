@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -32,7 +31,7 @@ export default class Queue extends BaseCommand {
       alias: ["キューを表示", "再生待ち", "queue", "q"],
       unlist: false,
       category: "playlist",
-      argument: [{
+      args: [{
         type: "integer" as const,
         name: "page",
         required: false,
@@ -42,7 +41,8 @@ export default class Queue extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
     context.server.updateBoundChannel(message);
     const queue = context.server.queue;
     if(queue.length === 0){
@@ -84,7 +84,7 @@ export default class Queue extends BaseCommand {
                 : `${min}:${sec}`
             } \``,
             `${t("components:nowplaying.requestedBy")}: \`${q.additionalInfo.addedBy.displayName}\` `,
-            q.basicInfo.npAdditional(t),
+            q.basicInfo.npAdditional(),
           ].join("\r\n"),
         });
       }
@@ -103,8 +103,8 @@ export default class Queue extends BaseCommand {
             `${t("commands:queue.total")}: ${thour}:${tmin}:${tsec}`,
             `${t("components:queue.trackloop")}:${queue.loopEnabled ? "⭕" : "❌"}`,
             `${t("components:queue.queueloop")}:${queue.queueLoopEnabled ? "⭕" : "❌"}`,
-            `${t("components:queue.autoplayRelated")}:${context.server.addRelated ? "⭕" : "❌"}`,
-            `${t("components:queue.equallyplayback")}:${context.server.equallyPlayback ? "⭕" : "❌"}`,
+            `${t("components:queue.autoplayRelated")}:${context.server.preferences.addRelated ? "⭕" : "❌"}`,
+            `${t("components:queue.equallyplayback")}:${context.server.preferences.equallyPlayback ? "⭕" : "❌"}`,
           ].join(" | "),
         })
         .setThumbnail(message.guild.iconURL()!)

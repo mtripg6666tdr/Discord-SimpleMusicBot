@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { BaseCommand } from ".";
 import { discordUtil } from "../Util";
@@ -29,7 +28,7 @@ export default class Rm extends BaseCommand {
       alias: ["消去", "remove", "rm", "del", "delete"],
       unlist: false,
       category: "playlist",
-      argument: [{
+      args: [{
         type: "string",
         name: "index",
         required: true,
@@ -41,7 +40,8 @@ export default class Rm extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
     if(context.args.length === 0){
       message.reply(t("commands:remove.noArgument")).catch(this.logger.error);
       return;

@@ -18,10 +18,8 @@
 
 import type { Locale } from "oceanic.js";
 
-
 import fs from "fs";
 import path from "path";
-
 
 import i18next from "i18next";
 import Backend from "i18next-fs-backend";
@@ -32,37 +30,38 @@ const arrayOfAll = <T>() => <U extends T[]>(
 ) => array;
 
 export const discordLanguages: readonly string[] = arrayOfAll<Locale>()([
-  "bg",
-  "cs",
+  "id",
   "da",
   "de",
-  "el",
   "en-GB",
   "en-US",
   "es-ES",
-  "fi",
+  "es-419",
   "fr",
-  "hi",
   "hr",
-  "hu",
-  "id",
   "it",
-  "ja",
-  "ko",
   "lt",
+  "hu",
   "nl",
   "no",
   "pl",
   "pt-BR",
   "ro",
-  "ru",
+  "fi",
   "sv-SE",
-  "th",
-  "tr",
-  "uk",
   "vi",
+  "tr",
+  "cs",
+  "el",
+  "bg",
+  "ru",
+  "uk",
+  "hi",
+  "th",
   "zh-CN",
+  "ja",
   "zh-TW",
+  "ko",
 ]);
 
 const localesRoot = path.join(__dirname, "../locales/");

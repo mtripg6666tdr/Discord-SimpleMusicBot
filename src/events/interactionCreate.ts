@@ -21,10 +21,10 @@ import type { MusicBot } from "../bot";
 import * as discord from "oceanic.js";
 import { InteractionTypes } from "oceanic.js";
 
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 import * as handlers from "../handlers";
 
-const config = useConfig();
+const config = getConfig();
 
 export async function onInteractionCreate(this: MusicBot, interaction: discord.AnyInteractionGateway){
   // コマンドインタラクションおよびコンポーネントインタラクション以外は処理せず終了

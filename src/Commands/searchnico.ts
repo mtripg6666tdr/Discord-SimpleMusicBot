@@ -17,16 +17,16 @@
  */
 
 import type { SongInfo } from "../Component/searchPanel";
-import type { i18n } from "i18next";
 
 import candyget from "candyget";
 
+import { getCommandExecutionContext } from ".";
 import { SearchBase } from "./search";
 import { time } from "../Util";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 
 
-const config = useConfig();
+const config = getConfig();
 
 export default class SearchN extends SearchBase<Datum[]> {
   constructor() {
@@ -34,7 +34,7 @@ export default class SearchN extends SearchBase<Datum[]> {
       alias: ["ニコニコを検索", "ニコ動を検索", "searchnico", "searchniconico", "searchn"],
       unlist: false,
       category: "playlist",
-      argument: [
+      args: [
         {
           type: "string",
           name: "keyword",
@@ -53,7 +53,9 @@ export default class SearchN extends SearchBase<Datum[]> {
     return searchNicoNico(query);
   }
 
-  protected override consumer(result: Datum[], t: i18n["t"]): SongInfo[] {
+  protected override consumer(result: Datum[]): SongInfo[] {
+    const { t } = getCommandExecutionContext();
+
     return result.map(item => {
       const [min, sec] = time.calcMinSec(Math.floor(item.lengthSeconds));
       return {

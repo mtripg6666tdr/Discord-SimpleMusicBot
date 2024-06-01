@@ -22,9 +22,9 @@ import type * as discord from "oceanic.js";
 import i18next from "i18next";
 
 import { QueueManagerWithBgm } from "../Component/queueManagerWithBGM";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 
-const config = useConfig();
+const config = getConfig();
 
 export async function onVoiceChannelLeave(
   this: MusicBot,

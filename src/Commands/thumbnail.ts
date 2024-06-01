@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -32,7 +31,7 @@ export default class Thumbnail extends BaseCommand {
       alias: ["サムネ", "thumbnail", "thumb", "t"],
       unlist: false,
       category: "player",
-      argument: [{
+      args: [{
         type: "integer",
         name: "index",
         required: false,
@@ -44,7 +43,8 @@ export default class Thumbnail extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
     context.server.updateBoundChannel(message);
 
     const embed = new MessageEmbedBuilder();

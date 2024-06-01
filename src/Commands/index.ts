@@ -18,9 +18,11 @@
 
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { GuildDataContainer } from "../Structure";
-import type { ListCommandInitializeOptions, UnlistCommandOptions, ListCommandWithArgsOptions, CommandArgs, CommandPermission, LocalizedSlashCommandArgument } from "../Structure/Command";
 import type { LoggerObject } from "../logger";
+import type { ListCommandInitializeOptions, UnlistCommandOptions, ListCommandWithArgsOptions, CommandArgs, CommandPermission, LocalizedSlashCommandArgument } from "../types/Command";
 import type { AnyTextableGuildChannel, ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap, ModalSubmitInteraction, PermissionName } from "oceanic.js";
+
+import { AsyncLocalStorage } from "async_hooks";
 
 import i18next from "i18next";
 import { InteractionTypes, Permissions, TypedEmitter, ApplicationCommandTypes } from "oceanic.js";
@@ -30,10 +32,17 @@ import { discordUtil } from "../Util";
 import { availableLanguages } from "../i18n";
 import { getLogger } from "../logger";
 
-export { CommandArgs } from "../Structure/Command";
+export { CommandArgs } from "../types/Command";
 
 interface CommandEvents {
   run: [Readonly<CommandArgs>];
+}
+
+export const commandExecutionContext = new AsyncLocalStorage<CommandArgs>();
+export function getCommandExecutionContext(): CommandArgs | Pick<CommandArgs, "t"> {
+  return commandExecutionContext.getStore() ?? {
+    t: i18next.t,
+  };
 }
 
 /**
@@ -41,7 +50,7 @@ interface CommandEvents {
  */
 export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   /** ボットを実行します */
-  protected abstract run(message: CommandMessage, context: Readonly<CommandArgs>, t: (typeof i18next)["t"]): Promise<void>;
+  protected abstract run(message: CommandMessage, context: Readonly<CommandArgs>): Promise<void>;
 
   // eslint-disable-next-line unused-imports/no-unused-vars
   handleAutoComplete(argname: string, input: string | number, otherOptions: { name: string, value: string | number }[]): string[] {
@@ -129,12 +138,12 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
   /** スラッシュコマンドの名称として登録できる旧基準を満たしたコマンド名を取得します */
   get asciiName(){
-    return this.alias.filter(c => c.match(/^[\w-]{2,32}$/))[0];
+    return this.alias.filter(c => c.match(/^[>\w-]{2,32}$/))[0];
   }
 
   protected readonly logger: LoggerObject;
 
-  constructor(opts: ListCommandInitializeOptions|UnlistCommandOptions){
+  constructor(opts: ListCommandInitializeOptions | UnlistCommandOptions){
     super();
     this._messageCommand = "messageCommand" in opts && opts.messageCommand || false;
     this._interactionOnly = "interactionOnly" in opts && opts.interactionOnly || false;
@@ -156,7 +165,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         examples,
         usage,
         category,
-        argument,
+        args,
         requiredPermissionsOr,
         defaultMemberPermission,
       } = opts as ListCommandWithArgsOptions;
@@ -188,7 +197,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
       this._category = category;
 
-      this._argument = argument ? argument.map(arg => {
+      this._argument = args ? args.map(arg => {
         const result: LocalizedSlashCommandArgument = {
           type: arg.type,
           name: arg.name,
@@ -308,12 +317,16 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     }
 
     this.emit("run", context);
-    await this.run(message, context, i18next.getFixedT(context.locale));
+
+    await commandExecutionContext.run(context, () => this.run(message, context));
   }
 
   /** アプリケーションコマンドとして登録できるオブジェクトを生成します */
   toApplicationCommandStructure(): CreateApplicationCommandOptions[] {
-    if(this.unlist) throw new Error("This command cannot be listed due to private command!");
+    if(this.unlist){
+      throw new Error("This command cannot be listed due to private command!");
+    }
+
     const result: CreateApplicationCommandOptions[] = [];
     const defaultMemberPermissions = this.defaultMemberPermission === "NONE"
       ? null

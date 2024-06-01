@@ -17,13 +17,13 @@
  */
 
 import type { AudioSourceBasicJsonFormat, ReadableStreamInfo } from ".";
-import type { i18n } from "i18next";
 import type { Readable } from "stream";
 
 import { convert as htmlToText } from "html-to-text";
 import NiconicoDL, { isValidURL } from "niconico-dl.js";
 
 import { AudioSource } from "./audiosource";
+import { getCommandExecutionContext } from "../Commands";
 import { createPassThrough } from "../Util";
 
 export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
@@ -35,7 +35,9 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
     super({ isSeekable: false });
   }
 
-  async init(url: string, prefetched: NiconicoJsonFormat, t: i18n["t"]){
+  async init(url: string, prefetched: NiconicoJsonFormat){
+    const { t } = getCommandExecutionContext();
+
     this.url = url;
     this.nico = new NiconicoDL(url, /* quality */ "high");
     if(prefetched){
@@ -75,7 +77,9 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
     };
   }
 
-  toField(verbose: boolean, t: i18n["t"]){
+  toField(verbose: boolean){
+    const { t } = getCommandExecutionContext();
+
     return [
       {
         name: `:cinema:${t("audioSources.videoAuthor")}`,
@@ -97,7 +101,9 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
     ];
   }
 
-  npAdditional(t: i18n["t"]){
+  npAdditional(){
+    const { t } = getCommandExecutionContext();
+
     return `${t("audioSources.videoAuthor")}: ` + this.author;
   }
 

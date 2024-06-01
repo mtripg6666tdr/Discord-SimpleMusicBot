@@ -21,7 +21,7 @@ import type { ResponseMessage } from "./commandResolver/ResponseMessage";
 import type { TaskCancellationManager } from "./taskCancellationManager";
 import type { AudioSourceBasicJsonFormat } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
-import type { AddedBy, QueueContent } from "../Structure/QueueContent";
+import type { AddedBy, QueueContent } from "../types/QueueContent";
 import type { AnyTextableGuildChannel, EditMessageOptions, Message, MessageActionRow } from "oceanic.js";
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
@@ -32,11 +32,12 @@ import ytmpl from "yt-mix-playlist";
 import ytdl from "ytdl-core";
 
 import * as AudioSource from "../AudioSource";
+import { getCommandExecutionContext } from "../Commands";
 import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
 import { bindThis } from "../Util/decorators";
-import { useConfig } from "../config";
+import { getConfig } from "../config";
 import { timeLoggedMethod } from "../logger";
 
 export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"spotify"|"unknown";
@@ -49,7 +50,7 @@ interface QueueManagerEvents {
   mixPlaylistEnabledChanged: [enabled: boolean];
 }
 
-const config = useConfig();
+const config = getConfig();
 
 /**
  * サーバーごとのキューを管理するマネージャー。
@@ -158,7 +159,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
 
   constructor(parent: GuildDataContainer){
     super("QueueManager", parent);
-    this.logger.info("QueueManager instantiated");
+    this.logger.info("QueueManager initialized.");
   }
 
   /**
@@ -247,7 +248,6 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           },
           this.server.bot.cache,
           preventSourceCache,
-          i18next.getFixedT(this.server.locale)
         ),
         additionalInfo: {
           addedBy: {
@@ -258,7 +258,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       } as QueueContent;
       if(result.basicInfo){
         this._default[method](result);
-        if(this.server.equallyPlayback) this.sortWithAddedBy();
+        if(this.server.preferences.equallyPlayback) this.sortByAddedBy();
         this.emit(method === "push" ? "changeWithoutCurrent" : "change");
         this.emit("add", result);
         const index = this._default.findIndex(q => q === result);
@@ -299,6 +299,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
   ): Promise<QueueContent | null> {
     this.logger.info("AutoAddQueue Called");
     let uiMessage: Message<AnyTextableGuildChannel> | ResponseMessage | null = null;
+    const { t } = getCommandExecutionContext();
 
     try{
       // UI表示するためのメッセージを特定する作業
@@ -310,8 +311,8 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           content: "",
           embeds: [
             new MessageEmbedBuilder()
-              .setTitle(i18next.t("pleaseWait", { lng: this.server.locale }))
-              .setDescription(`${i18next.t("loadingInfo", { lng: this.server.locale })}...`)
+              .setTitle(t("pleaseWait"))
+              .setDescription(`${t("loadingInfo")}...`)
               .toOceanic(),
           ],
           allowedMentions: {
@@ -327,7 +328,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         // まだないの場合（新しくUI用のメッセージを生成する）
         this.logger.info("AutoAddQueue will make a message that will be used to report statuses");
         uiMessage = await options.channel.createMessage({
-          content: i18next.t("loadingInfoPleaseWait", { lng: this.server.locale }),
+          content: t("loadingInfoPleaseWait"),
         });
       }
 
@@ -335,8 +336,8 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       if(this.server.queue.length > 999){
         // キュー上限
         this.logger.warn("AutoAddQueue failed due to too long queue");
-        // eslint-disable-next-line @typescript-eslint/no-throw-literal
-        throw i18next.t("components:queue.tooManyQueueItems", { lng: this.server.locale });
+
+        throw new Error(t("components:queue.tooManyQueueItems"));
       }
 
       // キューへの追加を実行
@@ -370,40 +371,40 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         // 埋め込みの作成
         const embed = new MessageEmbedBuilder()
           .setColor(getColor("SONG_ADDED"))
-          .setTitle(`✅${i18next.t("components:queue.songAdded", { lng: this.server.locale })}`)
+          .setTitle(`✅${t("components:queue.songAdded")}`)
           .setDescription(info.basicInfo.isPrivateSource ? info.basicInfo.title : `[${info.basicInfo.title}](${info.basicInfo.url})`)
           .addField(
-            i18next.t("length", { lng: this.server.locale }),
+            t("length"),
             info.basicInfo.isYouTube() && info.basicInfo.isLiveStream
-              ? i18next.t("liveStream", { lng: this.server.locale })
+              ? t("liveStream")
               : _t !== 0
                 ? min + ":" + sec
-                : i18next.t("unknown", { lng: this.server.locale }),
+                : t("unknown"),
             true
           )
           .addField(
-            i18next.t("components:nowplaying.requestedBy", { lng: this.server.locale }),
-            options.addedBy?.displayName || i18next.t("unknown", { lng: this.server.locale }),
+            t("components:nowplaying.requestedBy"),
+            options.addedBy?.displayName || t("unknown"),
             true
           )
           .addField(
-            i18next.t("components:queue.positionInQueue", { lng: this.server.locale }),
+            t("components:queue.positionInQueue"),
             index === "0"
               ? `${
-                i18next.t("components:nowplaying.nowplayingItemName", { lng: this.server.locale })
+                t("components:nowplaying.nowplayingItemName")
               }/${
-                i18next.t("components:nowplaying.waitForPlayingItemName", { lng: this.server.locale })
+                t("components:nowplaying.waitForPlayingItemName")
               }`
               : index,
             true
           )
           .addField(
-            i18next.t("components:queue.etaToPlay", { lng: this.server.locale }),
+            t("components:queue.etaToPlay"),
             index === "0"
               ? "-"
               : timeFragments[2].includes("-")
-                ? i18next.t("unknown", { lng: this.server.locale })
-                : Util.time.HourMinSecToString(timeFragments, i18next.getFixedT(this.server.locale)),
+                ? t("unknown")
+                : Util.time.HourMinSecToString(timeFragments, t),
             true
           )
         ;
@@ -411,16 +412,16 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         if(info.basicInfo.isYouTube()){
           if(info.basicInfo.isFallbacked){
             embed.addField(
-              `:warning:${i18next.t("attention", { lng: this.server.locale })}`,
-              i18next.t("components:queue.fallbackNotice", { lng: this.server.locale })
+              `:warning:${t("attention")}`,
+              t("components:queue.fallbackNotice")
             );
           }else if(info.basicInfo.strategyId === 1){
             embed.setTitle(`${embed.title}*`);
           }
         }else if(info.basicInfo instanceof AudioSource.Spotify){
           embed.addField(
-            `:warning:${i18next.t("attention", { lng: this.server.locale })}`,
-            i18next.t("components:queue.spotifyNotice", { lng: this.server.locale })
+            `:warning:${t("attention")}`,
+            t("components:queue.spotifyNotice")
           );
         }
 
@@ -444,7 +445,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
               .addComponents(
                 new MessageButtonBuilder()
                   .setCustomId(collectorCreateResult.customIdMap.cancelLast)
-                  .setLabel(i18next.t("cancel", { lng: this.server.locale }))
+                  .setLabel(t("cancel"))
                   .setStyle("DANGER")
               )
               .toOceanic()
@@ -455,13 +456,13 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
               const item = this.get(this.length - 1);
               this.removeAt(this.length - 1);
               interaction.createFollowup({
-                content: `🚮${i18next.t("components:queue.cancelAdded", { title: item.basicInfo.title, lng: this.server.locale })}`,
+                content: `🚮${t("components:queue.cancelAdded", { title: item.basicInfo.title })}`,
               }).catch(this.logger.error);
             }
             catch(er){
               this.logger.error(er);
               interaction.createFollowup({
-                content: i18next.t("errorOccurred"),
+                content: t("errorOccurred"),
               }).catch(this.logger.error);
             }
           });
@@ -507,7 +508,9 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       this.logger.error("AutoAddQueue failed", e);
       if(uiMessage){
         uiMessage.edit({
-          content: `:weary:${i18next.t("components:queue.failedToAdd", { lng: this.server.locale })}${typeof e === "object" && "message" in e ? `(${e.message})` : ""}`,
+          content: `:weary:${t("components:queue.failedToAdd")}${
+            typeof e === "object" && "message" in e ? `(${e.message})` : ""
+          }`,
           embeds: [],
         })
           .catch(this.logger.error)
@@ -593,7 +596,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
 
     if(this.queueLoopEnabled){
       this._default.push(this.default[0]);
-    }else if(this.server.addRelated && this.server.player.currentAudioInfo instanceof AudioSource.YouTube){
+    }else if(this.server.preferences.addRelated && this.server.player.currentAudioInfo instanceof AudioSource.YouTube){
       const relatedVideos = this.server.player.currentAudioInfo.relatedVideos;
       if(relatedVideos.length >= 1){
         const video = relatedVideos[0];
@@ -734,8 +737,8 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       this._default.sort(() => Math.random() - 0.5);
       this.emit("change");
     }
-    if(this.server.equallyPlayback){
-      this.sortWithAddedBy(addedByOrder);
+    if(this.server.preferences.equallyPlayback){
+      this.sortByAddedBy(addedByOrder);
     }
   }
 
@@ -784,7 +787,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
   /**
    * 追加者によってできるだけ交互になるようにソートします
    */
-  sortWithAddedBy(addedByUsers?: string[]){
+  sortByAddedBy(addedByUsers?: string[]){
     // 追加者の一覧とマップを作成
     const generateUserOrder = !addedByUsers;
     addedByUsers = addedByUsers || [];

@@ -16,6 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-export const DefaultAudioThumbnailURL = "https://cdn.discordapp.com/attachments/757824315294220329/846737267951271946/Audio_icon-icons.com_71845.png";
+export const DefaultAudioThumbnailURL = "https://static-objects.usamyon.moe/icons/audio-icon.png";
 export const DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36";
 export const SecondaryUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36";
+export const subCommandSeparator = ">";

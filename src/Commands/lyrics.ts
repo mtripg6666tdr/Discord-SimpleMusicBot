@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 import candyget from "candyget";
@@ -36,7 +35,7 @@ export default class Lyrics extends BaseCommand {
       alias: ["lyrics", "l", "lyric"],
       unlist: false,
       category: "utility",
-      argument: [
+      args: [
         {
           type: "string",
           name: "keyword",
@@ -50,11 +49,12 @@ export default class Lyrics extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, options: CommandArgs, t: i18n["t"]){
-    options.server.updateBoundChannel(message);
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
+    context.server.updateBoundChannel(message);
     const msg = await message.reply("🔍検索中...");
     try{
-      const songInfo = await getLyrics(options.rawArgs);
+      const songInfo = await getLyrics(context.rawArgs);
       const embeds = [] as MessageEmbedBuilder[];
       if(!songInfo.lyric) throw new Error("取得した歌詞が空でした");
       const chunkLength = Math.ceil(songInfo.lyric.length / 4000);

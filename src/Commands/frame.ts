@@ -18,7 +18,6 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type { i18n } from "i18next";
 
 import { FFmpeg } from "prism-media";
 import * as ytdl from "ytdl-core";
@@ -34,7 +33,7 @@ export default class Frame extends BaseCommand {
       alias: ["frame", "キャプチャ", "capture"],
       unlist: false,
       category: "player",
-      argument: [{
+      args: [{
         type: "string",
         name: "time",
         required: false,
@@ -46,7 +45,9 @@ export default class Frame extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
+  async run(message: CommandMessage, context: CommandArgs){
+    const { t } = context;
+
     context.server.updateBoundChannel(message);
     const server = context.server;
 

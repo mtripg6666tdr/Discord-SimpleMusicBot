@@ -18,6 +18,6 @@
 
 export * from "./LogEmitter";
 export * from "./ServerManagerBase";
-export * from "./Command";
+export * from "../types/Command";
 export * from "./GuildDataContainer";
-export * from "./YmxFormat";
+export * from "../types/YmxFormat";
