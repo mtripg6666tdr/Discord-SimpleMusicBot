@@ -13,7 +13,7 @@ sidebar_position: 2
 追加するには、サーバーの管理権が必要です。自分のサーバーではない場合は、ボットの権限の付与を簡単にするためにも、サーバーの管理者の方に招待してもらうのがよいでしょう。
 招待リンクにアクセスし、サーバーに追加します。
 
-<img src="https://cdn.discordapp.com/attachments/928878872659894292/1079666392636346418/image.png" alt="ボットの招待画面" width="50%" />
+<img src="https://static-objects.usamyon.moe/dsmb/docs-assets/tutorial_step_1.png" alt="ボットの招待画面" width="50%" />
 
 `サーバーにを選択`から、追加先のサーバーを選択し、[はい]をクリック/タップします。
 
@@ -23,7 +23,7 @@ sidebar_position: 2
 
 :::
 
-<img src="https://cdn.discordapp.com/attachments/928878872659894292/1079667206553600000/image.png" alt="ボットの権限画面" width="50%" />
+<img src="https://static-objects.usamyon.moe/dsmb/docs-assets/tutorial_step_1_2.png" alt="ボットの権限画面" width="50%" />
 
 「以下の権限を与えることを確認してください。」と表示されたら、なにもせずに[はい]を選択して、表示された操作を済ませます。
 
@@ -43,7 +43,7 @@ Discordのサーバーで、メンバーの一覧に、追加したボットが�
 ボイスチャンネルがない場合は新しく作成するか、権限がない場合は管理者の方に作成してもらいましょう。  
 音楽を流したいボイスチャンネルが用意できたら、そこに参加します。そして、テキストチャットで`/join`と打ちます。
 
-<img src="https://cdn.discordapp.com/attachments/928878872659894292/1079672465820766268/image.png" width="50%" />
+<img src="https://static-objects.usamyon.moe/dsmb/docs-assets/tutorial_step_2.png" width="50%" />
 
 このようになればOKです。
 
@@ -52,11 +52,11 @@ Discordのサーバーで、メンバーの一覧に、追加したボットが�
 テキストチャットで、`/play`と入力して、そのあとに聴きたい曲名や歌手名などを入力します。  
 そして、そのまま送信します。
 
-![](https://cdn.discordapp.com/attachments/928878872659894292/1079674218750431242/image.png)
+![](https://static-objects.usamyon.moe/dsmb/docs-assets/tutorial_step_2_2.png)
 
 すると再生が開始されます。
 
-<img src="https://cdn.discordapp.com/attachments/928878872659894292/1079674421473722368/image.png" width="70%" />
+<img src="https://static-objects.usamyon.moe/dsmb/docs-assets/tutorial_step_2_3.png" width="70%" />
 
 再生できましたか？  
 このように、ボットの操作は基本的にテキストチャットで、コマンドを打って行います！
@@ -70,18 +70,18 @@ Discordのサーバーで、メンバーの一覧に、追加したボットが�
 キーワードから一発で再生することもできますが、キーワードから検索して、その中から再生したいものを選んで再生することができます。
 検索するには、テキストチャットで、`/search`と入力して送信します。
 
-![](https://cdn.discordapp.com/attachments/928878872659894292/1079675550760710164/image.png)
+![](https://static-objects.usamyon.moe/dsmb/docs-assets/tutorial_step_2_4.png)
 
 すると、検索結果が表示されます。
 
-<img src="https://cdn.discordapp.com/attachments/928878872659894292/1079675806449676289/image.png" width="50%" />
+<img src="https://static-objects.usamyon.moe/dsmb/docs-assets/tutorial_step_2_5.png" width="50%" />
 
 検索候補から、再生したいものを選び、下の選択欄から選択しましょう。
 
 <p>
-  <img src="https://cdn.discordapp.com/attachments/928878872659894292/1079676208763117629/image.png" width="40%" />
+  <img src="https://static-objects.usamyon.moe/dsmb/docs-assets/tutorial_step_2_6.png" width="40%" />
   <span>&nbsp;</span>
-  <img src="https://cdn.discordapp.com/attachments/928878872659894292/1079676257391890432/image.png" width="40%" />
+  <img src="https://static-objects.usamyon.moe/dsmb/docs-assets/tutorial_step_2_7.png" width="40%" />
 </p>
 
 右側の画像のように、複数選択することもできます。
@@ -92,11 +92,11 @@ Discordのサーバーで、メンバーの一覧に、追加したボットが�
 そういう時には便利機能であるサムネイルコマンドを使用しましょう！
 たとえば、`4.`の候補のサムネイルを見たければ、`/thumbnail`と入力して、番号をそのあとに入力します。
 
-![](https://cdn.discordapp.com/attachments/928878872659894292/1079677453645131806/image.png)
+![](https://static-objects.usamyon.moe/dsmb/docs-assets/tutorial_step_2_8.png)
 
 すると、次のようにサムネイルが表示されます。
 
-<img src="https://cdn.discordapp.com/attachments/928878872659894292/1079678873563836517/temp.png" width="60%" />  
+<img src="https://static-objects.usamyon.moe/dsmb/docs-assets/tutorial_step_2_9.png" width="60%" />  
 
 ## 3. よく使うコマンド一覧
 ボットを使う上で便利なコマンドをまとめておきます。これらは利用できるコマンドの一部ですので、完全な一覧はこのセクションのコマンド一覧をご覧になるか、`/command`コマンドを参照してください。
