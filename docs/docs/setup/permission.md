@@ -24,7 +24,7 @@ OAuth認証でボットをサーバーに追加する際に、`permissions=74659
 
 :::info
 Discord Developer Portalで、ボットに対してMessage Content Intentを有効にしないと、メッセージベースのコマンドや、その他の一部機能を使用することはできません。
-![Message Content Intent](https://cdn.discordapp.com/attachments/1024683345625497601/1025018178146926733/unknown.png)
+![Message Content Intent](https://static-objects.usamyon.moe/dsmb/docs-assets/setup_message_content_intent.png)
 
 無効にしたまま使用する場合は、[`config.json`で`noMessageContent`を`true`に設定](installation/configuration.md#nomessagecontent-boolean)してください。 
 :::

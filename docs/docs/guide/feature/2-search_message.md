@@ -4,7 +4,7 @@
 :::info
 ここで紹介されている機能は、Message Content Intentが有効になっている場合にのみ使用できます。([→使用する権限](../../setup/permission.md))  
 :::
-![検索パネル](https://cdn.discordapp.com/attachments/928878872659894292/1041368824273969272/image.png)  
+![検索パネル](https://static-objects.usamyon.moe/dsmb/docs-assets/guide_search_panel.png)  
 検索パネルでは、下のドロップダウンを使用して要素を追加することもできますが、メッセージとして、数字を直接打ち込むことでキューに追加することもできます。
 
 ## 使用例
