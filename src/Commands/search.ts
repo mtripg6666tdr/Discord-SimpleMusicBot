@@ -126,7 +126,7 @@ export default class Search extends SearchBase<ytsr.Video[] | dYtsr.Video[]> {
       alias: ["search", "se"],
       unlist: false,
       category: "playlist",
-      argument: [{
+      args: [{
         type: "string",
         name: "keyword",
         required: true,

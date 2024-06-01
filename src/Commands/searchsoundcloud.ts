@@ -38,7 +38,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
       alias: ["soundcloudを検索", "searchsoundcloud", "searchs", "ses", "ss", "sc", "soundcloud"],
       unlist: false,
       category: "playlist",
-      argument: [{
+      args: [{
         type: "string",
         name: "keyword",
         required: true,

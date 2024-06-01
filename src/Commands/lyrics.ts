@@ -36,7 +36,7 @@ export default class Lyrics extends BaseCommand {
       alias: ["lyrics", "l", "lyric"],
       unlist: false,
       category: "utility",
-      argument: [
+      args: [
         {
           type: "string",
           name: "keyword",

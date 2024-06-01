@@ -32,7 +32,7 @@ export default class BulkDelete extends BaseCommand {
       alias: ["bulk_delete", "bulk-delete", "bulkdelete"],
       unlist: false,
       category: "utility",
-      argument: [
+      args: [
         {
           type: "integer" as const,
           name: "count",

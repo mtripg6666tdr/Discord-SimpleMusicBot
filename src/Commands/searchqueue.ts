@@ -34,7 +34,7 @@ export default class Searchq extends BaseCommand {
       alias: ["searchqueue", "searchq", "seq", "sq"],
       unlist: false,
       category: "playlist",
-      argument: [{
+      args: [{
         type: "string",
         name: "keyword",
         required: true,

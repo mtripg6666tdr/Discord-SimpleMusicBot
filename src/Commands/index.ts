@@ -134,7 +134,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
   protected readonly logger: LoggerObject;
 
-  constructor(opts: ListCommandInitializeOptions|UnlistCommandOptions){
+  constructor(opts: ListCommandInitializeOptions | UnlistCommandOptions){
     super();
     this._messageCommand = "messageCommand" in opts && opts.messageCommand || false;
     this._interactionOnly = "interactionOnly" in opts && opts.interactionOnly || false;
@@ -156,7 +156,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         examples,
         usage,
         category,
-        argument,
+        args,
         requiredPermissionsOr,
         defaultMemberPermission,
       } = opts as ListCommandWithArgsOptions;
@@ -188,7 +188,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
       this._category = category;
 
-      this._argument = argument ? argument.map(arg => {
+      this._argument = args ? args.map(arg => {
         const result: LocalizedSlashCommandArgument = {
           type: arg.type,
           name: arg.name,

@@ -32,7 +32,7 @@ export default class Thumbnail extends BaseCommand {
       alias: ["サムネ", "thumbnail", "thumb", "t"],
       unlist: false,
       category: "player",
-      argument: [{
+      args: [{
         type: "integer",
         name: "index",
         required: false,

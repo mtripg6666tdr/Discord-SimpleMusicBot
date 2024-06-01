@@ -38,7 +38,7 @@ export default class Import extends BaseCommand {
       alias: ["import"],
       unlist: false,
       category: "playlist",
-      argument: [{
+      args: [{
         type: "string",
         name: "url",
         required: true,

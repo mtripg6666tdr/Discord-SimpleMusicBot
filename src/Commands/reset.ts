@@ -33,7 +33,7 @@ export default class Reset extends BaseCommand {
       category: "utility",
       requiredPermissionsOr: ["manageGuild"],
       shouldDefer: false,
-      argument: [
+      args: [
         {
           type: "bool" as const,
           name: "preservequeue",

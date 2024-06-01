@@ -32,7 +32,7 @@ export default class Radio extends BaseCommand {
       category: "playlist",
       requiredPermissionsOr: ["admin", "sameVc", "noConnection"],
       shouldDefer: true,
-      argument: [
+      args: [
         {
           type: "string" as const,
           name: "url",

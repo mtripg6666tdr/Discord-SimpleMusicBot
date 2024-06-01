@@ -38,7 +38,7 @@ export default class Commands extends BaseCommand {
       unlist: false,
       alias: ["command", "commands", "cmd"],
       category: "bot",
-      argument: [
+      args: [
         {
           type: "string",
           name: "command",

@@ -28,7 +28,7 @@ export default class Volume extends BaseCommand {
       alias: ["volume", "vol"],
       unlist: false,
       category: "voice",
-      argument: [{
+      args: [{
         type: "integer",
         name: "volume",
         required: false,

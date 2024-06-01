@@ -32,7 +32,7 @@ export default class Queue extends BaseCommand {
       alias: ["キューを表示", "再生待ち", "queue", "q"],
       unlist: false,
       category: "playlist",
-      argument: [{
+      args: [{
         type: "integer" as const,
         name: "page",
         required: false,

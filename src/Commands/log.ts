@@ -41,7 +41,7 @@ export default class SystemInfo extends BaseCommand {
       alias: ["ログ", "log", "systeminfo", "sysinfo"],
       unlist: false,
       category: "utility",
-      argument: [{
+      args: [{
         type: "string",
         name: "content",
         required: false,

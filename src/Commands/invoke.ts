@@ -31,7 +31,7 @@ export default class Invoke extends BaseCommand {
       alias: ["invoke"],
       unlist: false,
       category: "utility",
-      argument: [{
+      args: [{
         name: "command",
         type: "string",
         required: true,

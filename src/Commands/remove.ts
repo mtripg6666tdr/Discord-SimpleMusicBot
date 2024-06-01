@@ -29,7 +29,7 @@ export default class Rm extends BaseCommand {
       alias: ["消去", "remove", "rm", "del", "delete"],
       unlist: false,
       category: "playlist",
-      argument: [{
+      args: [{
         type: "string",
         name: "index",
         required: true,

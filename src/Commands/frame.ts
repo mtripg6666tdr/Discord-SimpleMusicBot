@@ -34,7 +34,7 @@ export default class Frame extends BaseCommand {
       alias: ["frame", "キャプチャ", "capture"],
       unlist: false,
       category: "player",
-      argument: [{
+      args: [{
         type: "string",
         name: "time",
         required: false,

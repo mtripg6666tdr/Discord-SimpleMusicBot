@@ -53,7 +53,7 @@ type CommandHelp = {
 };
 
 export type ListCommandWithArgsOptions = BaseListCommand & CommandHelp & {
-  argument: SlashCommandArgument[],
+  args: SlashCommandArgument[],
 };
 
 export type ListCommandWithoutArgsOptions = BaseListCommand & Partial<CommandHelp>;
@@ -74,7 +74,7 @@ export type UnlistCommandOptions = BaseCommandInitializeOptions & {
   requiredPermissionsOr?: CommandPermission[],
 };
 
-export type CommandOptionsTypes = "bool"| "integer" | "string" | "file";
+export type CommandOptionsTypes = "bool" | "integer" | "string" | "file";
 
 /**
  * スラッシュコマンドの引数として取れるものを定義するインターフェースです

@@ -33,7 +33,7 @@ export default class Play extends BaseCommand {
       alias: ["play", "p", "resume", "re"],
       unlist: false,
       category: "player",
-      argument: [
+      args: [
         {
           type: "string" as const,
           name: "keyword",

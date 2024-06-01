@@ -28,7 +28,7 @@ export default class Seek extends BaseCommand {
       alias: ["seek"],
       unlist: false,
       category: "player",
-      argument: [{
+      args: [{
         type: "string",
         name: "keyword",
         required: true,

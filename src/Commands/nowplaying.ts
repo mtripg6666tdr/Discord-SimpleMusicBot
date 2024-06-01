@@ -32,7 +32,7 @@ export default class NowPlaying extends BaseCommand {
       alias: ["今の曲", "nowplaying", "np"],
       unlist: false,
       category: "player",
-      argument: [{
+      args: [{
         type: "bool" as const,
         name: "detailed",
         required: false,

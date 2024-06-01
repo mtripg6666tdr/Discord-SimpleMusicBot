@@ -28,7 +28,7 @@ export default class Mv extends BaseCommand {
       alias: ["move", "mv"],
       unlist: false,
       category: "playlist",
-      argument: [
+      args: [
         {
           type: "integer",
           name: "from",

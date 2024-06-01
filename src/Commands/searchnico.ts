@@ -34,7 +34,7 @@ export default class SearchN extends SearchBase<Datum[]> {
       alias: ["ニコニコを検索", "ニコ動を検索", "searchnico", "searchniconico", "searchn"],
       unlist: false,
       category: "playlist",
-      argument: [
+      args: [
         {
           type: "string",
           name: "keyword",
