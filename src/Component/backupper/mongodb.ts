@@ -91,7 +91,7 @@ export class MongoBackupper extends Backupper {
         container.queue.eitherOn(["change", "changeWithoutCurrent"], backupQueueFuncFactory(container.getGuildId()));
         container.queue.on("settingsChanged", backupStatusFuncFactory(container.getGuildId()));
         container.player.on("all", backupStatusFuncFactory(container.getGuildId()));
-        container.on("updateSettings", backupStatusFuncFactory(container.getGuildId()));
+        container.preferences.on("updateSettings", backupStatusFuncFactory(container.getGuildId()));
         container.player.on("reportPlaybackDuration", this.addPlayerAnalyticsEvent.bind(this, container.getGuildId()));
       };
 

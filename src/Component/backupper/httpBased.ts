@@ -70,6 +70,7 @@ export class HttpBackupper extends IntervalBackupper {
           status.equallyPlayback ? "1" : "0",
           status.volume,
           status.disableSkipSession,
+          status.nowPlayingNotificationLevel,
         ].join(":");
         originalStatuses[id] = status;
       });
@@ -171,6 +172,7 @@ export class HttpBackupper extends IntervalBackupper {
               equallyPlayback,
               volume,
               disableSkipSession,
+              nowPlayingNotificationLevel,
             ] = frozenGuildStatuses[key].split(":");
             const numVolume = Number(volume) || 100;
             const b = (v: string) => v === "1";
@@ -183,6 +185,7 @@ export class HttpBackupper extends IntervalBackupper {
               equallyPlayback: b(equallyPlayback),
               volume: numVolume >= 1 && numVolume <= 200 ? numVolume : 100,
               disableSkipSession: b(disableSkipSession),
+              nowPlayingNotificationLevel: Number(nowPlayingNotificationLevel) || 0,
             });
           });
           return map;

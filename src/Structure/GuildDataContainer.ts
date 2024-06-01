@@ -35,11 +35,11 @@ import { LockObj, lock } from "@mtripg6666tdr/async-lock";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 import Soundcloud from "soundcloud.ts";
 
-import { GuildPreferencesManager } from "./GuildPreferencesManager";
 import { LogEmitter } from "./LogEmitter";
 import { Spotify } from "../AudioSource";
 import { SoundCloudS } from "../AudioSource";
 import { Playlist as ytpl } from "../AudioSource/youtube/playlist";
+import { GuildPreferencesManager } from "../Component/GuildPreferencesManager";
 import { AudioEffectManager } from "../Component/audioEffectManager";
 import { PlayManager } from "../Component/playManager";
 import { QueueManager } from "../Component/queueManager";
@@ -54,7 +54,6 @@ import { YmxVersion } from "../types/YmxFormat";
 
 interface GuildDataContainerEvents {
   updateBoundChannel: [string];
-  updateSettings: [];
 }
 
 const config = useConfig();

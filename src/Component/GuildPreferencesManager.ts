@@ -16,9 +16,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { GuildDataContainer } from "./GuildDataContainer";
-import { ServerManagerBase } from "./ServerManagerBase";
-import { JSONGuildPreferences } from "../types/GuildPreferences";
+import { GuildDataContainer } from "../Structure/GuildDataContainer";
+import { ServerManagerBase } from "../Structure/ServerManagerBase";
+import { JSONGuildPreferences, NowPlayingNotificationLevel } from "../types/GuildPreferences";
 
 interface GuildPreferencesEvents {
   updateSettings: [];
@@ -43,13 +43,15 @@ export class GuildPreferencesManager extends ServerManagerBase<GuildPreferencesE
       addRelatedSongs: this.addRelated,
       equallyPlayback: this.equallyPlayback,
       disableSkipSession: this.disableSkipSession,
+      nowPlayingNotificationLevel: this.nowPlayingNotificationLevel,
     };
   }
 
   importPreferences(preferences: JSONGuildPreferences){
-    this.addRelated = !!preferences.addRelatedSongs;
-    this.equallyPlayback = !!preferences.equallyPlayback;
-    this.disableSkipSession = !!preferences.disableSkipSession;
+    this.addRelated = preferences.addRelatedSongs;
+    this.equallyPlayback = preferences.equallyPlayback;
+    this.disableSkipSession = preferences.disableSkipSession;
+    this.nowPlayingNotificationLevel = preferences.nowPlayingNotificationLevel;
   }
 
 
@@ -92,5 +94,18 @@ export class GuildPreferencesManager extends ServerManagerBase<GuildPreferencesE
     }
 
     this._disableSkipSession = value;
+  }
+
+
+  protected _nowPlayingNotificationLevel: NowPlayingNotificationLevel;
+  get nowPlayingNotificationLevel(){
+    return this._nowPlayingNotificationLevel;
+  }
+  set nowPlayingNotificationLevel(value: NowPlayingNotificationLevel){
+    if(this._nowPlayingNotificationLevel !== value){
+      this.emit("updateSettings");
+    }
+
+    this._nowPlayingNotificationLevel = value;
   }
 }

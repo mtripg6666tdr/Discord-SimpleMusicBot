@@ -20,4 +20,11 @@ export interface JSONGuildPreferences {
   addRelatedSongs: boolean;
   equallyPlayback: boolean;
   disableSkipSession: boolean;
+  nowPlayingNotificationLevel: NowPlayingNotificationLevel;
+}
+
+export enum NowPlayingNotificationLevel {
+  Normal = 0,
+  Silent = 1,
+  Disable = 2
 }
