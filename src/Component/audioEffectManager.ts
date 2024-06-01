@@ -68,7 +68,7 @@ const audioEffects = {
     arg: "asetrate=48000*1.2,aresample=48000,bass=g=5",
     shouldDisableVbr: false,
   },
-} satisfies Record<AudioEffectNames, AudioEffect>;
+} as const satisfies Record<AudioEffectNames, AudioEffect>;
 
 export type ExportedAudioEffect = {
   args: string[],

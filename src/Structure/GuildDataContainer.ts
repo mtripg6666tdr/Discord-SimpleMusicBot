@@ -16,14 +16,14 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CommandArgs } from "./Command";
-import type { QueueContent } from "./QueueContent";
-import type { YmxFormat } from "./YmxFormat";
 import type { AudioSourceBasicJsonFormat, SpotifyJsonFormat } from "../AudioSource";
-import type { exportableStatuses } from "../Component/backupper";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { SearchPanel } from "../Component/searchPanel";
 import type { MusicBotBase } from "../botBase";
+import type { CommandArgs } from "../types/Command";
+import type { JSONStatuses } from "../types/GuildStatuses";
+import type { QueueContent } from "../types/QueueContent";
+import type { YmxFormat } from "../types/YmxFormat";
 import type { VoiceConnection } from "@discordjs/voice";
 import type { i18n } from "i18next";
 import type { AnyTextableGuildChannel, Message, StageChannel, VoiceChannel } from "oceanic.js";
@@ -35,8 +35,8 @@ import { LockObj, lock } from "@mtripg6666tdr/async-lock";
 import { MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 import Soundcloud from "soundcloud.ts";
 
+import { GuildPreferencesManager } from "./GuildPreferencesManager";
 import { LogEmitter } from "./LogEmitter";
-import { YmxVersion } from "./YmxFormat";
 import { Spotify } from "../AudioSource";
 import { SoundCloudS } from "../AudioSource";
 import { Playlist as ytpl } from "../AudioSource/youtube/playlist";
@@ -50,6 +50,7 @@ import * as Util from "../Util";
 import { useConfig } from "../config";
 import { discordLanguages } from "../i18n";
 import { getLogger } from "../logger";
+import { YmxVersion } from "../types/YmxFormat";
 
 interface GuildDataContainerEvents {
   updateBoundChannel: [string];
@@ -70,12 +71,14 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   /** プレフィックス */
   prefix: string;
 
+
   // キューマネージャー
   protected _queue: QueueManager;
   /** キューマネジャ */
   get queue(){
     return this._queue;
   }
+
 
   // プレーマネージャー
   protected _player: PlayManager;
@@ -84,6 +87,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     return this._player;
   }
 
+
   // 検索パネルマネージャー
   protected _searchPanel: SearchPanelManager;
   /** 検索パネルマネジャ */
@@ -91,17 +95,25 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     return this._searchPanel;
   }
 
+
   protected _audioEffects: AudioEffectManager;
   /** オーディオエフェクトマネジャ */
   get audioEffects(){
     return this._audioEffects;
   }
 
-  // スキップセッション
+
   protected _skipSession: SkipSession | null = null;
   /** スキップセッション */
   get skipSession(){
     return this._skipSession;
+  }
+
+
+  protected _preferences: GuildPreferencesManager;
+  /** 設定 */
+  get preferences(){
+    return this._preferences;
   }
 
   private _boundTextChannel: string;
@@ -116,45 +128,6 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
 
   /** メインボット */
   readonly bot: MusicBotBase;
-
-  protected _addRelated: boolean;
-  /** 関連動画自動追加が有効 */
-  get addRelated(){
-    return this._addRelated;
-  }
-  set addRelated(value: boolean){
-    if(this._addRelated !== value){
-      this.emit("updateSettings");
-    }
-
-    this._addRelated = value;
-  }
-
-  protected _equallyPlayback: boolean;
-  /** 均等再生が有効 */
-  get equallyPlayback(){
-    return this._equallyPlayback;
-  }
-  set equallyPlayback(value: boolean){
-    if(this._equallyPlayback !== value){
-      this.emit("updateSettings");
-    }
-
-    this._equallyPlayback = value;
-  }
-
-  protected _disableSkipSession: boolean;
-  /** スキップ投票を無効にするか */
-  get disableSkipSession(){
-    return this._disableSkipSession;
-  }
-  set disableSkipSession(value: boolean){
-    if(this._disableSkipSession !== value){
-      this.emit("updateSettings");
-    }
-
-    this._disableSkipSession = value;
-  }
 
   /** VCへの接続 */
   connection: VoiceConnection | null;
@@ -189,15 +162,13 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       throw new Error("Invalid bound textchannel id was given");
     }
     this.bot = bot;
-    this.addRelated = false;
     this.prefix = ">";
-    this.equallyPlayback = false;
-    this.disableSkipSession = false;
     this.connection = null;
     this.initPlayManager();
     this.initQueueManager();
     this.initSearchPanelManager();
-    this.initAudioEffectManager();
+    this.initAudioEffects();
+    this.initPreferences();
   }
 
   // 子クラスでオーバーライドされる可能性があるので必要
@@ -216,8 +187,12 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   }
 
   // 同上
-  protected initAudioEffectManager(){
+  protected initAudioEffects(){
     this._audioEffects = new AudioEffectManager(this);
+  }
+
+  protected initPreferences(){
+    this._preferences = new GuildPreferencesManager(this);
   }
 
   /**
@@ -283,17 +258,15 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    * ステータスをエクスポートします
    * @returns ステータスのオブジェクト
    */
-  exportStatus(): exportableStatuses {
+  exportStatus(): JSONStatuses {
     // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
     return {
       voiceChannelId: this.player.isPlaying && !this.player.isPaused ? this.connectingVoiceChannel!.id : "0",
       boundChannelId: this.boundTextChannel,
       loopEnabled: this.queue.loopEnabled,
       queueLoopEnabled: this.queue.queueLoopEnabled,
-      addRelatedSongs: this.addRelated,
-      equallyPlayback: this.equallyPlayback,
-      disableSkipSession: this.disableSkipSession,
       volume: this.player.volume,
+      ...this.preferences.exportPreferences(),
     };
   }
 
@@ -301,13 +274,11 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    * ステータスをオブジェクトからインポートします。
    * @param param0 読み取り元のオブジェクト
    */
-  importStatus(statuses: exportableStatuses){
+  importStatus(statuses: JSONStatuses): void {
     //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
     this.queue.loopEnabled = !!statuses.loopEnabled;
     this.queue.queueLoopEnabled = !!statuses.queueLoopEnabled;
-    this.addRelated = !!statuses.addRelatedSongs;
-    this.equallyPlayback = !!statuses.equallyPlayback;
-    this.disableSkipSession = !!statuses.disableSkipSession;
+    this.preferences.importPreferences(statuses);
     this.player.setVolume(statuses.volume);
     if(statuses.voiceChannelId !== "0"){
       this.joinVoiceChannelOnly(statuses.voiceChannelId)

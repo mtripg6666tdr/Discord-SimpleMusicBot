@@ -103,8 +103,8 @@ export default class Queue extends BaseCommand {
             `${t("commands:queue.total")}: ${thour}:${tmin}:${tsec}`,
             `${t("components:queue.trackloop")}:${queue.loopEnabled ? "⭕" : "❌"}`,
             `${t("components:queue.queueloop")}:${queue.queueLoopEnabled ? "⭕" : "❌"}`,
-            `${t("components:queue.autoplayRelated")}:${context.server.addRelated ? "⭕" : "❌"}`,
-            `${t("components:queue.equallyplayback")}:${context.server.equallyPlayback ? "⭕" : "❌"}`,
+            `${t("components:queue.autoplayRelated")}:${context.server.preferences.addRelated ? "⭕" : "❌"}`,
+            `${t("components:queue.equallyplayback")}:${context.server.preferences.equallyPlayback ? "⭕" : "❌"}`,
           ].join(" | "),
         })
         .setThumbnail(message.guild.iconURL()!)

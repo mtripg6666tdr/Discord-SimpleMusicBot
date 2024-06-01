@@ -16,10 +16,10 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { exportableStatuses } from ".";
 import type { BaseCommand, CommandArgs } from "../../Commands";
 import type { GuildDataContainer, YmxFormat } from "../../Structure";
 import type { DataType, MusicBotBase } from "../../botBase";
+import type { JSONStatuses } from "../../types/GuildStatuses";
 import type * as mongo from "mongodb";
 
 import { Backupper } from ".";
@@ -46,7 +46,7 @@ export class MongoBackupper extends Backupper {
   private dbConnectionReady = false;
   private dbError: Error | null = null;
   collections: {
-    status: mongo.Collection<Collectionate<exportableStatuses>>,
+    status: mongo.Collection<Collectionate<JSONStatuses>>,
     queue: mongo.Collection<Collectionate<YmxFormat>>,
     analytics: mongo.Collection<Analytics>,
   } = null!;
@@ -69,7 +69,7 @@ export class MongoBackupper extends Backupper {
         this.logger.info("Database connection ready");
         const db = this.client.db(process.env.DB_TOKEN || "discord_music_bot_backup");
         this.collections = {
-          status: db.collection<Collectionate<exportableStatuses>>("Status"),
+          status: db.collection<Collectionate<JSONStatuses>>("Status"),
           queue: db.collection<Collectionate<YmxFormat>>("Queue"),
           analytics: db.collection<Analytics>("Analytics"),
         };
@@ -211,7 +211,7 @@ export class MongoBackupper extends Backupper {
           guildId: id,
         })),
       });
-      const result = new Map<string, exportableStatuses>();
+      const result = new Map<string, JSONStatuses>();
       for await(const doc of dbResult){
         result.set(doc.guildId, doc);
       }

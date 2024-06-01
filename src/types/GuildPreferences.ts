@@ -16,8 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from "./LogEmitter";
-export * from "./ServerManagerBase";
-export * from "../types/Command";
-export * from "./GuildDataContainer";
-export * from "../types/YmxFormat";
+export interface JSONGuildPreferences {
+  addRelatedSongs: boolean;
+  equallyPlayback: boolean;
+  disableSkipSession: boolean;
+}

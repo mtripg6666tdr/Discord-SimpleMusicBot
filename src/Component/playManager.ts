@@ -163,7 +163,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   // コンストラクタ
   constructor(parent: GuildDataContainer){
     super("PlayManager", parent);
-    this.logger.info("PlayManager instantiated");
+    this.logger.info("PlayManager instantiated.");
   }
 
   setVolume(val: number){

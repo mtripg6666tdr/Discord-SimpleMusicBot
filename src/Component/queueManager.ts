@@ -21,7 +21,7 @@ import type { ResponseMessage } from "./commandResolver/ResponseMessage";
 import type { TaskCancellationManager } from "./taskCancellationManager";
 import type { AudioSourceBasicJsonFormat } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
-import type { AddedBy, QueueContent } from "../Structure/QueueContent";
+import type { AddedBy, QueueContent } from "../types/QueueContent";
 import type { AnyTextableGuildChannel, EditMessageOptions, Message, MessageActionRow } from "oceanic.js";
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
@@ -158,7 +158,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
 
   constructor(parent: GuildDataContainer){
     super("QueueManager", parent);
-    this.logger.info("QueueManager instantiated");
+    this.logger.info("QueueManager initialized.");
   }
 
   /**
@@ -258,7 +258,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       } as QueueContent;
       if(result.basicInfo){
         this._default[method](result);
-        if(this.server.equallyPlayback) this.sortWithAddedBy();
+        if(this.server.preferences.equallyPlayback) this.sortByAddedBy();
         this.emit(method === "push" ? "changeWithoutCurrent" : "change");
         this.emit("add", result);
         const index = this._default.findIndex(q => q === result);
@@ -593,7 +593,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
 
     if(this.queueLoopEnabled){
       this._default.push(this.default[0]);
-    }else if(this.server.addRelated && this.server.player.currentAudioInfo instanceof AudioSource.YouTube){
+    }else if(this.server.preferences.addRelated && this.server.player.currentAudioInfo instanceof AudioSource.YouTube){
       const relatedVideos = this.server.player.currentAudioInfo.relatedVideos;
       if(relatedVideos.length >= 1){
         const video = relatedVideos[0];
@@ -734,8 +734,8 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       this._default.sort(() => Math.random() - 0.5);
       this.emit("change");
     }
-    if(this.server.equallyPlayback){
-      this.sortWithAddedBy(addedByOrder);
+    if(this.server.preferences.equallyPlayback){
+      this.sortByAddedBy(addedByOrder);
     }
   }
 
@@ -784,7 +784,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
   /**
    * 追加者によってできるだけ交互になるようにソートします
    */
-  sortWithAddedBy(addedByUsers?: string[]){
+  sortByAddedBy(addedByUsers?: string[]){
     // 追加者の一覧とマップを作成
     const generateUserOrder = !addedByUsers;
     addedByUsers = addedByUsers || [];

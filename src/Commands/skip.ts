@@ -59,7 +59,7 @@ export default class Skip extends BaseCommand {
         && !discordUtil.users.isDJ(message.member, context)
         && !discordUtil.users.isPrivileged(message.member)
         && members && members.size > 3
-        && !context.server.disableSkipSession
+        && !context.server.preferences.disableSkipSession
       ){
         // 投票パネルを作成する
         if(!server.skipSession){

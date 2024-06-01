@@ -18,8 +18,8 @@
 
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { GuildDataContainer } from "../Structure";
-import type { ListCommandInitializeOptions, UnlistCommandOptions, ListCommandWithArgsOptions, CommandArgs, CommandPermission, LocalizedSlashCommandArgument } from "../Structure/Command";
 import type { LoggerObject } from "../logger";
+import type { ListCommandInitializeOptions, UnlistCommandOptions, ListCommandWithArgsOptions, CommandArgs, CommandPermission, LocalizedSlashCommandArgument } from "../types/Command";
 import type { AnyTextableGuildChannel, ApplicationCommandOptionsBoolean, ApplicationCommandOptionsChoice, ApplicationCommandOptionsInteger, ApplicationCommandOptionsString, CreateApplicationCommandOptions, LocaleMap, ModalSubmitInteraction, PermissionName } from "oceanic.js";
 
 import i18next from "i18next";
@@ -30,7 +30,7 @@ import { discordUtil } from "../Util";
 import { availableLanguages } from "../i18n";
 import { getLogger } from "../logger";
 
-export { CommandArgs } from "../Structure/Command";
+export { CommandArgs } from "../types/Command";
 
 interface CommandEvents {
   run: [Readonly<CommandArgs>];

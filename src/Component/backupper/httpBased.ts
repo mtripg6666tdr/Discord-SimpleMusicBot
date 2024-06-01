@@ -16,9 +16,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { exportableStatuses } from ".";
 import type { YmxFormat } from "../../Structure";
 import type { DataType, MusicBotBase } from "../../botBase";
+import type { JSONStatuses } from "../../types/GuildStatuses";
 
 import candyget from "candyget";
 
@@ -56,7 +56,7 @@ export class HttpBackupper extends IntervalBackupper {
       this.logger.info("Backing up modified status...");
 
       const statuses: { [guildId: string]: string } = {};
-      const originalStatuses: { [guildId: string]: exportableStatuses } = {};
+      const originalStatuses: { [guildId: string]: JSONStatuses } = {};
       statusModifiedGuildIds.forEach(id => {
         const status = this.data.get(id)?.exportStatus();
         if(!status) return;
@@ -160,7 +160,7 @@ export class HttpBackupper extends IntervalBackupper {
         );
         if(result.status === 200){
           const frozenGuildStatuses = result.data;
-          const map = new Map<string, exportableStatuses>();
+          const map = new Map<string, JSONStatuses>();
           Object.keys(frozenGuildStatuses).forEach(key => {
             const [
               voiceChannelId,

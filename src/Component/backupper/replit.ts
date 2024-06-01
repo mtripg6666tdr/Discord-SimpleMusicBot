@@ -16,9 +16,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { exportableStatuses } from ".";
 import type { YmxFormat } from "../../Structure";
 import type { DataType, MusicBotBase } from "../../botBase";
+import type { JSONStatuses } from "../../types/GuildStatuses";
 
 import candyget from "candyget";
 import PQueue from "p-queue";
@@ -113,11 +113,11 @@ export class ReplitBackupper extends IntervalBackupper {
 
   @timeLoggedMethod
   override async getStatusFromBackup(guildIds: string[]) {
-    const result = new Map<string, exportableStatuses>();
+    const result = new Map<string, JSONStatuses>();
     try{
       await Promise.allSettled(
         guildIds.map(async id => {
-          const status = await this.db.get<exportableStatuses>(this.getDbKey("status", id));
+          const status = await this.db.get<JSONStatuses>(this.getDbKey("status", id));
           if(status){
             result.set(id, status);
             this.updateStatusCache(id, status);

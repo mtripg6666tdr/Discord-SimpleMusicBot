@@ -16,8 +16,12 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from "./LogEmitter";
-export * from "./ServerManagerBase";
-export * from "../types/Command";
-export * from "./GuildDataContainer";
-export * from "../types/YmxFormat";
+import { JSONGuildPreferences } from "./GuildPreferences";
+
+export type JSONStatuses = {
+  voiceChannelId: string,
+  boundChannelId: string,
+  loopEnabled: boolean,
+  queueLoopEnabled: boolean,
+  volume: number,
+} & JSONGuildPreferences;

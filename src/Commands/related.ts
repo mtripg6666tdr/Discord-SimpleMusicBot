@@ -38,11 +38,11 @@ export default class Related extends BaseCommand {
 
   async run(message: CommandMessage, context: CommandArgs, t: i18n["t"]){
     context.server.updateBoundChannel(message);
-    if(context.server.addRelated){
-      context.server.addRelated = false;
+    if(context.server.preferences.addRelated){
+      context.server.preferences.addRelated = false;
       message.reply(`❌${t("commands:related.disabled")}`).catch(this.logger.error);
     }else{
-      context.server.addRelated = true;
+      context.server.preferences.addRelated = true;
       const embed = new MessageEmbedBuilder()
         .setTitle(`⭕${t("commands:related.enabled")}`)
         .setDescription(`${t("commands:related.featureDescription")}\r\n${t("commands:related.featureNote")}`)
