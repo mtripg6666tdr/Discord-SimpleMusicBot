@@ -27,8 +27,8 @@ import { attemptGetInfoForStrategies, attemptFetchForStrategies } from "./strate
 import { playDl } from "./strategies/play-dl";
 import { ytdlCore } from "./strategies/ytdl-core";
 import { getCommandExecutionContext } from "../../Commands";
+import { measureTime } from "../../Util/decorators";
 import { SecondaryUserAgent } from "../../definition";
-import { timeLoggedMethod } from "../../logger";
 import { AudioSource } from "../audiosource";
 
 export * from "./spawner";
@@ -78,7 +78,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     return this.upcomingTimestamp;
   }
 
-  @timeLoggedMethod
+  @measureTime
   async init(url: string, prefetched: YouTubeJsonFormat | null, forceCache?: boolean){
     this.url = url = YouTube.normalizeUrl(url);
     if(prefetched){
@@ -130,7 +130,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     this.importData(result.data);
   }
 
-  @timeLoggedMethod
+  @measureTime
   async fetch(forceUrl?: boolean): Promise<StreamInfo>{
     if(this.cacheIsStale){
       this.purgeCache();

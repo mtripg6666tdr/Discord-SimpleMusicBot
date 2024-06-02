@@ -23,7 +23,7 @@ import type { JSONStatuses } from "../../types/GuildStatuses";
 import candyget from "candyget";
 
 import { IntervalBackupper } from ".";
-import { timeLoggedMethod } from "../../logger";
+import { measureTime } from "../../Util/decorators";
 
 const MIME_JSON = "application/json";
 
@@ -43,7 +43,7 @@ export class HttpBackupper extends IntervalBackupper {
   /**
    * 接続ステータス等をバックアップします
    */
-  @timeLoggedMethod
+  @measureTime
   protected override async backupStatus(){
     try{
       const statusModifiedGuildIds = this.getStatusModifiedGuildIds();
@@ -100,7 +100,7 @@ export class HttpBackupper extends IntervalBackupper {
   /**
    * キューをバックアップします
    */
-  @timeLoggedMethod
+  @measureTime
   protected override async backupQueue(){
     try{
       const modifiedGuildIds = this.getQueueModifiedGuildIds();
@@ -146,7 +146,7 @@ export class HttpBackupper extends IntervalBackupper {
     }
   }
 
-  @timeLoggedMethod
+  @measureTime
   override async getStatusFromBackup(guildids: string[]){
     if(HttpBackupper.backuppable){
       try{
@@ -203,7 +203,7 @@ export class HttpBackupper extends IntervalBackupper {
     }
   }
 
-  @timeLoggedMethod
+  @measureTime
   override async getQueueDataFromBackup(guildids: string[]){
     if(HttpBackupper.backuppable){
       try{

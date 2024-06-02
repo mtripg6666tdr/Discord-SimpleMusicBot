@@ -37,8 +37,8 @@ import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
 import { bindThis, emitEventOnMutation } from "../Util/decorators";
+import { measureTime } from "../Util/decorators";
 import { getConfig } from "../config";
-import { timeLoggedMethod } from "../logger";
 
 export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"spotify"|"unknown";
 
@@ -197,7 +197,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
 
   private readonly addQueueLocker = new LockObj();
 
-  @timeLoggedMethod
+  @measureTime
   async addQueueOnly<T extends AudioSourceBasicJsonFormat = AudioSourceBasicJsonFormat>({
     url,
     addedBy,
@@ -252,7 +252,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
    * ユーザーへのインタラクションやキュー追加までを一括して行います
    * @returns 成功した場合はtrue、それ以外の場合はfalse
    */
-  @timeLoggedMethod
+  @measureTime
   async addQueue(options: {
     url: string,
     addedBy: Member|AddedBy|null|undefined,
@@ -513,7 +513,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
    * @param exportableConsumer トラックをexportableCustomに処理する関数
    * @returns 追加に成功した楽曲数
    */
-  @timeLoggedMethod
+  @measureTime
   async processPlaylist<T>(
     msg: ResponseMessage,
     cancellation: TaskCancellationManager,

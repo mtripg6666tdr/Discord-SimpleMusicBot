@@ -35,8 +35,8 @@ import { type AudioSource } from "../AudioSource";
 import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
+import { measureTime } from "../Util/decorators";
 import { getConfig } from "../config";
-import { timeLoggedMethod } from "../logger";
 import { NowPlayingNotificationLevel } from "../types/GuildPreferences";
 
 interface PlayManagerEvents {
@@ -179,7 +179,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   /**
    *  再生します
    */
-  @timeLoggedMethod
+  @measureTime
   async play(options: PlayManagerPlayOptions = {}): Promise<PlayManager>{
     let time = options.time || 0;
     const quiet = options.quiet || false;

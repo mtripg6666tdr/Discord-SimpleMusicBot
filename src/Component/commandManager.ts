@@ -26,10 +26,10 @@ import i18next from "i18next";
 import { ApplicationCommandOptionTypes, ApplicationCommandTypes } from "oceanic.js";
 
 import { LogEmitter } from "../Structure";
+import { measureTime } from "../Util/decorators";
 import { getConfig } from "../config";
 import { subCommandSeparator } from "../definition";
 import { availableLanguages } from "../i18n";
-import { timeLoggedMethod } from "../logger";
 
 // const commandSeparator = "_";
 
@@ -115,7 +115,7 @@ export class CommandManager extends LogEmitter<{}> {
     return result;
   }
 
-  @timeLoggedMethod
+  @measureTime
   async sync(client: Readonly<Client>, removeOutdated: boolean = false){
     if(process.env.DISABLE_SYNC_SC && !removeOutdated){
       this.logger.info("Skip syncing commands");
