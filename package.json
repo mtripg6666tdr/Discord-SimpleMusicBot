@@ -18,7 +18,7 @@
     "generatecommandlist": "node util/generateCommandList"
   },
   "dependencies": {
-    "@discordjs/voice": "^0.16.1",
+    "@discordjs/voice": "^0.17.0",
     "@mtripg6666tdr/async-lock": "^1.1.0",
     "@mtripg6666tdr/oceanic-command-resolver": "~1.4.1",
     "@sinclair/typebox": "^0.32.31",
