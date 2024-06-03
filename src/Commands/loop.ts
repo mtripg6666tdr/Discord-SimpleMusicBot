@@ -32,9 +32,10 @@ export default class Loop extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
+
     if(context.server.queue.loopEnabled){
       context.server.queue.loopEnabled = false;
       message.reply(`:repeat_one:${t("commands:loop.disabled")}:x:`).catch(this.logger.error);

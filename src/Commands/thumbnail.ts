@@ -43,9 +43,9 @@ export default class Thumbnail extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
 
     const embed = new MessageEmbedBuilder();
     embed.setColor(getColor("THUMB"));

@@ -32,10 +32,10 @@ export default class End extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
 
-    context.server.updateBoundChannel(message);
     if(!context.server.player.isPlaying){
       message.reply(t("errorOccurred")).catch(this.logger.error);
       return;

@@ -26,8 +26,8 @@ import { MessageActionRowBuilder, MessageEmbedBuilder, MessageStringSelectMenuBu
 import { getCommandExecutionContext } from "../Commands";
 import { LogEmitter } from "../Structure";
 import { getColor } from "../Util/color";
+import { measureTime } from "../Util/decorators";
 import { getConfig } from "../config";
-import { timeLoggedMethod } from "../logger";
 
 type status = "init"|"consumed"|"destroyed";
 
@@ -75,7 +75,7 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     }
   }
 
-  @timeLoggedMethod
+  @measureTime
   async consumeSearchResult<T>(
     searchPromise: Promise<T | { result: T, transformedQuery: string }>,
     consumer: (result: T, t: i18n["t"]) => SongInfo[]

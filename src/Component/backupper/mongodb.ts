@@ -24,7 +24,7 @@ import type * as mongo from "mongodb";
 
 import { Backupper } from ".";
 import { createDebounceFunctionsFactroy, requireIfAny, waitForEnteringState } from "../../Util";
-import { timeLoggedMethod } from "../../logger";
+import { measureTime } from "../../Util/decorators";
 import { CommandManager } from "../commandManager";
 
 const MongoClient = (requireIfAny("mongodb") as typeof import("mongodb"))?.MongoClient;
@@ -118,7 +118,7 @@ export class MongoBackupper extends Backupper {
     }
   }
 
-  @timeLoggedMethod
+  @measureTime
   async backupStatus(guildId: string){
     if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
     try{
@@ -140,7 +140,7 @@ export class MongoBackupper extends Backupper {
     }
   }
 
-  @timeLoggedMethod
+  @measureTime
   async backupQueue(guildId: string){
     if(!MongoBackupper.backuppable || !this.dbConnectionReady) return;
     try{
@@ -198,7 +198,7 @@ export class MongoBackupper extends Backupper {
     }
   }
 
-  @timeLoggedMethod
+  @measureTime
   override async getStatusFromBackup(guildIds: string[]){
     if(!this.dbConnectionReady && !this.dbError) await waitForEnteringState(() => this.dbConnectionReady || !!this.dbError, Infinity);
     if(this.dbError){
@@ -224,7 +224,7 @@ export class MongoBackupper extends Backupper {
     }
   }
 
-  @timeLoggedMethod
+  @measureTime
   override async getQueueDataFromBackup(guildids: string[]){
     if(!this.dbConnectionReady && !this.dbError) await waitForEnteringState(() => this.dbConnectionReady || !!this.dbError, Infinity);
     if(this.dbError){

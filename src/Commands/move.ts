@@ -46,9 +46,9 @@ export default class Mv extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
 
     if(context.args.length !== 2){
       message.reply(`✘${t("commands:move.invalidArgumentCount")}`).catch(this.logger.error);

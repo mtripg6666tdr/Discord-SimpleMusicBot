@@ -16,6 +16,40 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import TypedEventEmitter from "../Structure/TypedEmitter";
+import { getLogger } from "../logger";
+
+const timerLogger = getLogger("Timer");
+export function measureTime<This, Args extends any[], Return>(
+  originalMethod: (this: This, ...args: Args) => Return,
+  context: ClassMethodDecoratorContext<This, (this: This, ...args: Args) => Return>
+){
+  return function replacementMethod(this: This, ...args: Args): Return {
+    const start = Date.now();
+    let end = false;
+    const endLog = () => {
+      if(end) return;
+      end = true;
+      timerLogger.trace(`${this?.constructor.name || ""}#${String(context.name)} elapsed ${Date.now() - start}ms`);
+    };
+    let result: any = null;
+    try{
+      result = originalMethod.call(this, ...args);
+      if(result instanceof Promise){
+        return result.finally(endLog) as any;
+      }else{
+        endLog();
+      }
+      return result;
+    }
+    finally{
+      if(typeof result !== "object" || !(result instanceof Promise)){
+        endLog();
+      }
+    }
+  };
+}
+
 export function bindThis(_originalMethod: any, context: ClassMethodDecoratorContext) {
   const methodName = context.name;
   if(context.private){
@@ -24,4 +58,36 @@ export function bindThis(_originalMethod: any, context: ClassMethodDecoratorCont
   context.addInitializer(function() {
     (this as any)[methodName] = (this as any)[methodName].bind(this);
   });
+}
+
+export function emitEventOnMutation<EventKey extends string>(eventName: EventKey){
+  return function emitEventOnMutationDecorator<
+    This extends TypedEventEmitter<Events>,
+    Events extends { [key in EventKey]: [ValueType, ValueType] },
+    ValueType
+  >(
+    originalValue: {
+      get: (this: This) => ValueType,
+      set: (this: This, value: ValueType) => void,
+    },
+    _context: ClassAccessorDecoratorContext<This, ValueType>,
+  ): {
+      get?: (this: This) => ValueType,
+      set?: (this: This, value: ValueType) => void,
+      init?: (this: This, initialValue: ValueType) => ValueType,
+    }{
+    return {
+      get: originalValue.get,
+      set: function set(value: ValueType) {
+        const oldValue = originalValue.get.call(this);
+
+        if(oldValue !== value){
+          // @ts-expect-error
+          this.emit(eventName, value, oldValue);
+        }
+
+        return originalValue.set.call(this, value);
+      },
+    };
+  };
 }

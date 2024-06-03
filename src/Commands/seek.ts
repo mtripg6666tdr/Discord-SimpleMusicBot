@@ -39,10 +39,9 @@ export default class Seek extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
-    const { t } = context;
-    context.server.updateBoundChannel(message);
-    const server = context.server;
+    const { t, server } = context;
 
     // そもそも再生状態ではない場合
     if(!server.player.isPlaying || server.player.preparing){

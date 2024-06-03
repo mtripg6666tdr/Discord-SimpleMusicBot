@@ -18,6 +18,7 @@
 
 import { GuildDataContainer } from "../Structure/GuildDataContainer";
 import { ServerManagerBase } from "../Structure/ServerManagerBase";
+import { emitEventOnMutation } from "../Util/decorators";
 import { JSONGuildPreferences, NowPlayingNotificationLevel } from "../types/GuildPreferences";
 
 interface GuildPreferencesEvents {
@@ -56,57 +57,19 @@ export class GuildPreferencesManager extends ServerManagerBase<GuildPreferencesE
   }
 
 
-  protected _addRelated: boolean;
   /** 関連動画自動追加が有効 */
-  get addRelated(){
-    return this._addRelated;
-  }
-  set addRelated(value: boolean){
-    if(this._addRelated !== value){
-      this.emit("updateSettings");
-    }
+  @emitEventOnMutation("updateSettings")
+  accessor addRelated: boolean;
 
-    this._addRelated = value;
-  }
-
-
-  protected _equallyPlayback: boolean;
   /** 均等再生が有効 */
-  get equallyPlayback(){
-    return this._equallyPlayback;
-  }
-  set equallyPlayback(value: boolean){
-    if(this._equallyPlayback !== value){
-      this.emit("updateSettings");
-    }
+  @emitEventOnMutation("updateSettings")
+  accessor equallyPlayback: boolean;
 
-    this._equallyPlayback = value;
-  }
-
-
-  protected _disableSkipSession: boolean;
   /** スキップ投票を無効にするか */
-  get disableSkipSession(){
-    return this._disableSkipSession;
-  }
-  set disableSkipSession(value: boolean){
-    if(this._disableSkipSession !== value){
-      this.emit("updateSettings");
-    }
+  @emitEventOnMutation("updateSettings")
+  accessor disableSkipSession: boolean;
 
-    this._disableSkipSession = value;
-  }
-
-
-  protected _nowPlayingNotificationLevel: NowPlayingNotificationLevel;
-  get nowPlayingNotificationLevel(){
-    return this._nowPlayingNotificationLevel;
-  }
-  set nowPlayingNotificationLevel(value: NowPlayingNotificationLevel){
-    if(this._nowPlayingNotificationLevel !== value){
-      this.emit("updateSettings");
-    }
-
-    this._nowPlayingNotificationLevel = value;
-  }
+  /** 現在再生中パネルの表示レベル */
+  @emitEventOnMutation("updateSettings")
+  accessor nowPlayingNotificationLevel: NowPlayingNotificationLevel;
 }

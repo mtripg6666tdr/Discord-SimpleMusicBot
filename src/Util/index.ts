@@ -42,7 +42,9 @@ export * as time from "./time";
  * @returns 文字列。JSON、またはその他の文字列、および空の文字列の場合があります
  */
 export function stringifyObject(obj: any): string{
-  if(typeof obj === "string"){
+  if(!obj){
+    return "null";
+  }else if(typeof obj === "string"){
     return obj;
   }else if(obj instanceof Error){
     return `${obj.name}: ${obj.message}\n${obj.stack || "no stacks"}`;

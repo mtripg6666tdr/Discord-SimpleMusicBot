@@ -36,10 +36,10 @@ export default class Effect extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
 
-    context.server.updateBoundChannel(message);
     try{
       const { collector, customIdMap } = context.server.bot.collectors.create()
         .setAuthorIdFilter(message.member.id)

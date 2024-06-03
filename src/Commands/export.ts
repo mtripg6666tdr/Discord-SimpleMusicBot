@@ -33,10 +33,10 @@ export default class Export extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
 
-    context.server.updateBoundChannel(message);
     if(context.server.queue.publicLength === 0){
       message.reply(t("commands:export.queueEmpty")).catch(this.logger.error);
       return;

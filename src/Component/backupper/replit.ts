@@ -21,7 +21,7 @@ import type { DataType, MusicBotBase } from "../../botBase";
 import type { JSONStatuses } from "../../types/GuildStatuses";
 
 import { IntervalBackupper } from ".";
-import { timeLoggedMethod } from "../../logger";
+import { measureTime } from "../../Util/decorators";
 import { ReplitClient } from "../replitDatabaseClient";
 
 export class ReplitBackupper extends IntervalBackupper {
@@ -44,7 +44,7 @@ export class ReplitBackupper extends IntervalBackupper {
     });
   }
 
-  @timeLoggedMethod
+  @measureTime
   protected override async backupStatus(){
     if(!this.db) return;
 
@@ -68,7 +68,7 @@ export class ReplitBackupper extends IntervalBackupper {
     }
   }
 
-  @timeLoggedMethod
+  @measureTime
   protected override async backupQueue(){
     if(!this.db) return;
     const modifiedGuildIds = this.getQueueModifiedGuildIds();
@@ -88,7 +88,7 @@ export class ReplitBackupper extends IntervalBackupper {
     }
   }
 
-  @timeLoggedMethod
+  @measureTime
   override async getQueueDataFromBackup(guildIds: string[]) {
     const result = new Map<string, YmxFormat>();
     try{
@@ -109,7 +109,7 @@ export class ReplitBackupper extends IntervalBackupper {
     }
   }
 
-  @timeLoggedMethod
+  @measureTime
   override async getStatusFromBackup(guildIds: string[]) {
     const result = new Map<string, JSONStatuses>();
     try{

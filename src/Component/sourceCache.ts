@@ -30,9 +30,9 @@ import zlib from "zlib";
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 
 import { LogEmitter } from "../Structure";
+import { measureTime } from "../Util/decorators";
 import { getMBytes } from "../Util/system";
 import { getConfig } from "../config";
-import { timeLoggedMethod } from "../logger";
 
 interface CacheEvents {
   memoryCacheHit: [];
@@ -60,7 +60,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     bot.on("tick", this.onTick.bind(this));
   }
 
-  @timeLoggedMethod
+  @measureTime
   private onTick(count: number){
     if(count % 5 === 0 || config.debug){
       const now = Date.now();

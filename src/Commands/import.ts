@@ -50,10 +50,9 @@ export default class Import extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-
-    context.server.updateBoundChannel(message);
 
     const statusMessage = await message.reply(`🔍${t("commands:import.loadingMessage")}...`);
     let targetMessage: Message<AnyTextableGuildChannel> | null = null;

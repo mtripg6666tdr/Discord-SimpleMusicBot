@@ -35,9 +35,10 @@ export default class Related extends BaseCommand {
     });
   }
 
+  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
-    context.server.updateBoundChannel(message);
+
     if(context.server.preferences.addRelated){
       context.server.preferences.addRelated = false;
       message.reply(`❌${t("commands:related.disabled")}`).catch(this.logger.error);
