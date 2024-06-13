@@ -21,7 +21,7 @@
     "@discordjs/voice": "^0.16.1",
     "@mtripg6666tdr/async-lock": "^1.1.0",
     "@mtripg6666tdr/oceanic-command-resolver": "~1.4.1",
-    "@sinclair/typebox": "^0.32.31",
+    "@sinclair/typebox": "^0.32.32",
     "candyget": "^0.5.6",
     "comment-json": "^4.2.3",
     "dotenv": "^16.4.5",
