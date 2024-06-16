@@ -67,7 +67,7 @@
   "optionalDependencies": {
     "@discordjs/opus": "^0.9.0",
     "@distube/ytpl": "^1.2.1",
-    "@distube/ytsr": "^2.0.0",
+    "@distube/ytsr": "^2.0.4",
     "erlpack": "^0.1.4",
     "ffmpeg-static": "^5.2.0",
     "libsodium-wrappers": "^0.7.13",
