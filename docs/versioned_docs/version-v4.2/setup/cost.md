@@ -24,7 +24,7 @@ sidebar_position: 8
 ## コストの計算
 ボットで取得された楽曲のデータは、以下のように処理されます。
 
-<img src="https://cdn.discordapp.com/attachments/928878872659894292/1073517548513021982/play-cost-graph.jpg" width="600" />
+<img src="https://static-objects.usamyon.moe/dsmb/docs-assets/play_cost_graph.jpg" width="600" />
 
 コストは各経路内の`Cost`の値の合計となります。  
 

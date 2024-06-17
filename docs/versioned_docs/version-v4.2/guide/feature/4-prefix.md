@@ -16,8 +16,8 @@
 ## サーバーでのプレフィックスを変更する
 サーバーでのプレフィックスを変更するには、ボットのニックネームをDiscordで変更してください。  
 例えば、プレフィックスを`!`に変更したい場合、ボットのニックネームを`[!]音楽ボット`などとします。  
-![ニックネーム変更例](https://cdn.discordapp.com/attachments/928878872659894292/1073523143681003520/image.png)
+![ニックネーム変更例](https://static-objects.usamyon.moe/dsmb/docs-assets/guide_prefix_nickname.png)
 
 ## 現在のプレフィックスを調べる
 現在のボットのプレフィックスの設定を確認するには、ボットをメンションしてください。
-![ボットのプレフィックスを調べる](https://cdn.discordapp.com/attachments/928878872659894292/1073523826807287898/image.png)
+![ボットのプレフィックスを調べる](https://static-objects.usamyon.moe/dsmb/docs-assets/guide_prefix_2.png)
