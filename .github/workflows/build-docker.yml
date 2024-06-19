@@ -64,7 +64,7 @@ jobs:
             type=raw,value=dev,enable=${{ github.event_name == 'workflow_dispatch' }}
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           platforms: ${{ env.DOCKER_PLATFORMS }}
           push: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch' }}
