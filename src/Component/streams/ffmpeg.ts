@@ -53,6 +53,9 @@ export function transformThroughFFmpeg(
     ...FFmpegDefaultNetworkArgs,
     "-user_agent", readable.userAgent || DefaultUserAgent,
   ] : [];
+  const ffmpegCookieArgs = readable.type === "url" && readable.cookie ? [
+    "-cookies", readable.cookie,
+  ] : [];
   const ffmpegSeekArgs = seek > 0 ? [
     "-ss", seek.toString(),
   ] : [];
@@ -92,6 +95,7 @@ export function transformThroughFFmpeg(
     "-analyzeduration", "0",
     ...ffmpegNetworkArgs,
     ...ffmpegSeekArgs,
+    ...ffmpegCookieArgs,
     "-i", readable.type === "readable" ? "-" : readable.url,
     ...effects.args,
     "-vn",
