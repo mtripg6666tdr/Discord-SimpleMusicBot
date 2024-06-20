@@ -70,7 +70,7 @@ export default class SearchN extends SearchBase<Datum[]> {
   }
 }
 
-const API_ENDPOINT = "https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search";
+const API_ENDPOINT = "https://snapshot.search.nicovideo.jp/api/v2/snapshot/video/contents/search";
 
 async function searchNicoNico(keyword: string){
   const url = `${API_ENDPOINT}?q=${encodeURIComponent(keyword)}&targets=title,description,tags&fields=contentId,title,lengthSeconds,thumbnailUrl,viewCounter&_sort=-viewCounter`;
