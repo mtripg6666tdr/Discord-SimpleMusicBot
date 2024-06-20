@@ -183,6 +183,7 @@ export type UrlStreamInfo = {
   url: string,
   streamType: StreamTypeIdentifer | null,
   userAgent?: string,
+  cookie?: string,
 };
 
 YouTubeAlias = require("./youtube").YouTube;
