@@ -84,13 +84,19 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     if(prefetched){
       this.importData(prefetched);
     }else{
-      await this.refreshInfo(forceCache);
+      await this.refreshInfo({ forceCache });
     }
 
     return this;
   }
 
-  private async refreshInfo(forceCache?: boolean){
+  async refreshInfo(options: { forceCache?: boolean, onlyIfNoCache?: boolean } = {}){
+    const { forceCache, onlyIfNoCache } = Object.assign({ forceCache: false, onlyIfNoCache: false }, options);
+
+    if(onlyIfNoCache && this.cache){
+      return;
+    }
+
     const { result, resolved } = await attemptGetInfoForStrategies(this.url);
 
     // check if fallbacked
@@ -162,7 +168,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
 
   async fetchVideo(){
     if(this.cacheIsStale){
-      await this.refreshInfo(true);
+      await this.refreshInfo({ forceCache: true });
     }
 
     if(this.cache?.data.type === ytdlCore){

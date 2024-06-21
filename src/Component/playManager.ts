@@ -195,7 +195,11 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.logger.info("#play called");
     this.emit("playPreparing", time);
     this.preparing = true;
-    let mes: Message | null = null;
+
+    let messageIsSending = false;
+    let messageSendingTimeout: NodeJS.Timeout | null = null;
+    let messageSendingScheduledAt: number | null = null;
+    let message: Message | null = null;
     this._currentAudioInfo = this.server.queue.get(0).basicInfo;
 
     const [min, sec] = Util.time.calcMinSec(this.currentAudioInfo!.lengthSeconds);
@@ -205,7 +209,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     if(isYT && this.currentAudioInfo.availableAfter){
       const waitTarget = this.currentAudioInfo;
       // まだ始まっていないライブを待機する
-      mes = this.getNoticeNeeded() && !quiet && await this.server.bot.client.rest.channels.createMessage(
+      message = this.getNoticeNeeded() && !quiet && await this.server.bot.client.rest.channels.createMessage(
         this.server.boundTextChannel,
         {
           content: `:stopwatch:${i18next.t("components:play.waitingForLiveStream", {
@@ -226,10 +230,10 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       });
       if(abortController.signal.aborted){
         this._waitForLiveAbortController = null;
-        const content = `:white_check_mark:${i18next.t("components:play.waitingForLiveCanceled", { lng: this.server.locale })}`;
+        const content = `:white_check_mark: ${i18next.t("components:play.waitingForLiveCanceled", { lng: this.server.locale })}`;
 
-        if(mes){
-          mes.edit({ content }).catch(this.logger.error);
+        if(message){
+          message.edit({ content }).catch(this.logger.error);
         }else{
           this.server.bot.client.rest.channels.createMessage(
             this.server.boundTextChannel,
@@ -243,22 +247,31 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       this.preparing = true;
     }else if(this.getNoticeNeeded() && !quiet && this.server.preferences.nowPlayingNotificationLevel !== NowPlayingNotificationLevel.Disable){
       // 通知メッセージを送信する（可能なら）
-      mes = await this.server.bot.client.rest.channels.createMessage(
-        this.server.boundTextChannel,
-        {
-          content: `:hourglass_flowing_sand:${
-            i18next.t("components:play.preparing", {
-              title: `\`${this.currentAudioInfo!.title}\` \`(${
-                isLive ? i18next.t("liveStream", { lng: this.server.locale }) : `${min}:${sec}`
-              })\``,
-              lng: this.server.locale,
-            })
-          }...`,
-          flags: this.server.preferences.nowPlayingNotificationLevel === NowPlayingNotificationLevel.Silent
-            ? MessageFlags.SUPPRESS_NOTIFICATIONS
-            : 0,
-        }
-      );
+      // このとき、即時には送信せずに、3秒間の猶予を儲ける
+      messageSendingTimeout = setTimeout(async () => {
+        messageIsSending = true;
+        message = await this.server.bot.client.rest.channels.createMessage(
+          this.server.boundTextChannel,
+          {
+            content: `:hourglass_flowing_sand:${
+              i18next.t("components:play.preparing", {
+                title: `\`${this.currentAudioInfo!.title}\` \`(${
+                  isLive ? i18next.t("liveStream", { lng: this.server.locale }) : `${min}:${sec}`
+                })\``,
+                lng: this.server.locale,
+              })
+            }...`,
+            flags: this.server.preferences.nowPlayingNotificationLevel === NowPlayingNotificationLevel.Silent
+              ? MessageFlags.SUPPRESS_NOTIFICATIONS
+              : 0,
+          }
+        ).catch(er => {
+          this.logger.error(er);
+          return null;
+        });
+        messageIsSending = false;
+      }, 3e3).unref();
+      messageSendingScheduledAt = Date.now();
     }
 
     try{
@@ -294,7 +307,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       }
 
       // 各種準備
-      this._errorReportChannel = mes?.channel as TextChannel;
+      this._errorReportChannel = message?.channel as TextChannel;
       this._cost = cost;
       this._lastMember = null;
       this.prepareAudioPlayer();
@@ -329,6 +342,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       const waitingSucceeded = await entersState(this._player!, AudioPlayerStatus.Playing, 10e3)
         .then(() => true)
         .catch(() => false);
+
       // when occurring one or more error(s) while waiting for player,
       // the error(s) should be also emitted from AudioPlayer and handled by PlayManager#handleError
       // so simply ignore the error(s) here.
@@ -342,21 +356,58 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
 
       this.logger.info("Playback started successfully");
 
-      if(mes && !quiet){
+      // 現在再生中パネルを送信していい環境な場合に以下のブロックを実行する
+      if(messageSendingTimeout){
         // 再生開始メッセージ
         const messageContent = this.createNowPlayingMessage();
 
-        mes.edit(messageContent).catch(this.logger.error);
+        clearTimeout(messageSendingTimeout);
 
-        this.eitherOnce(["playCompleted", "handledError", "stop"], () => {
-          mes.edit({
-            components: [],
-          }).catch(this.logger.error);
-        });
+        // 送信されかけているなら送信完了まで待つ
+        if(!message && messageIsSending){
+          await Util.waitForEnteringState(() => !messageIsSending, 10e3, { rejectOnTimeout: false });
+        }
+
+        this.logger.debug(`Preparing elapsed time: ${Date.now() - messageSendingScheduledAt!}ms`);
+
+        if(message){
+          // すでに送信されているメッセージがある場合それを利用する
+          message.edit(messageContent).catch(this.logger.error);
+        }else{
+          // メッセージが送信されていないなら新規で作成する。
+          message = await this.server.bot.client.rest.channels.createMessage(
+            this.server.boundTextChannel,
+            messageContent,
+          ).catch(er => {
+            this.logger.error(er);
+            return null;
+          });
+        }
+
+        // エラー等でmessageがnullになっている場合は何もしない
+        if(message){
+          const _localMessage = message;
+
+          this.eitherOnce(["playCompleted", "handledError", "stop"], () => {
+            _localMessage.edit({
+              components: [],
+            }).catch(this.logger.error);
+          });
+        }
       }
 
+      // ラジオが有効になっている場合、次の曲を準備する
       if(this.server.queue.mixPlaylistEnabled){
         await this.server.queue.prepareNextMixItem();
+      }
+
+      // 条件に合致した場合、次の曲をプリフェッチする
+      if(this.server.queue.length >= 2 && this.currentAudioInfo!.lengthSeconds <= 7200 /* 2 * 60 * 60 */){
+        const nextSong = this.server.queue.get(1);
+        if(nextSong.basicInfo.isYouTube()){
+          this.logger.info("Prefetching next song beforehand.");
+          await nextSong.basicInfo.refreshInfo({ forceCache: true, onlyIfNoCache: true }).catch(this.logger.error);
+        }
       }
     }
     catch(e){
@@ -380,7 +431,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     );
     /* eslint-disable @typescript-eslint/indent */
     const embed = new MessageEmbedBuilder()
-      .setTitle(`:cd:${i18next.t("components:nowplaying.nowplayingTitle", { lng: this.server.locale })}:musical_note:`)
+      .setTitle(`:cd: ${i18next.t("components:nowplaying.nowplayingTitle", { lng: this.server.locale })} :musical_note:`)
       .setDescription(
         (
           this.currentAudioInfo.isPrivateSource
@@ -437,7 +488,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     if(this.currentAudioInfo.isYouTube()){
       if(this.currentAudioInfo.isFallbacked){
         embed.addField(
-          `:warning:${i18next.t("attention", { lng: this.server.locale })}`,
+          `:warning: ${i18next.t("attention", { lng: this.server.locale })}`,
           i18next.t("components:queue.fallbackNotice", { lng: this.server.locale })
         );
       }else if(this.currentAudioInfo.strategyId === 1){
@@ -599,17 +650,13 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
 
   destroyStream(){
     if(this._currentAudioStream){
-      setImmediate(() => {
-        if(this._currentAudioStream){
-          if(!this._currentAudioStream.destroyed){
-            this._currentAudioStream.destroy();
-          }
-          this._currentAudioStream = null;
-          if(this._resource){
-            this._resource = null;
-          }
-        }
-      });
+      if(!this._currentAudioStream.destroyed){
+        this._currentAudioStream.destroy();
+      }
+      this._currentAudioStream = null;
+      if(this._resource){
+        this._resource = null;
+      }
       this._dsLogger?.destroy();
     }
   }
