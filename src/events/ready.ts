@@ -30,11 +30,11 @@ export async function onReady(this: MusicBot){
   const client = this._client;
   this.logger.info("Socket connection is ready now");
 
-  delete this.client.rest.handler.ratelimits["/interactions/:id/:token/callback"];
-
   if(this["_isReadyFinished"]){
     return;
   }
+
+  this["_mentionText"] = `<@${client.user.id}>`;
 
   this.logger.info("Starting environment checking and preparation now");
 
@@ -82,7 +82,7 @@ export async function onReady(this: MusicBot){
         const id = guildQueueIds[i];
         if(guildStatusIds.includes(id)){
           try{
-            const server = this.initData(id, guildStatuses.get(id)!.boundChannelId);
+            const server = this.upsertData(id, guildStatuses.get(id)!.boundChannelId);
             await server.importQueue(guildQueues.get(id)!);
             server.importStatus(guildStatuses.get(id)!);
           }
@@ -95,7 +95,7 @@ export async function onReady(this: MusicBot){
     }
   }else{
     this.logger.warn(
-      "Cannot perform recovery of queues and statuses. Check .env file to perform this."
+      "Unable to recover queues and statuses."
     );
   }
 

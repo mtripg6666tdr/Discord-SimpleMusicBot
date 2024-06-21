@@ -49,16 +49,19 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
     return;
   }
 
-
-  if(this._rateLimitController.isRateLimited(message.member.id)){
+  if(this._rateLimitController.isLimited(message.member.id)){
     return;
   }
 
   // データ初期化
-  const server = this.initData(message.guildID, message.channel.id);
+  const server = this.upsertData(message.guildID, message.channel.id);
   // プレフィックスの更新
   server.updatePrefix(message as discord.Message<discord.TextChannel>);
-  if(message.content === `<@${this._client.user.id}>`){
+  if(message.content === this.mentionText){
+    if(this._rateLimitController.pushEvent(message.member.id)){
+      return;
+    }
+
     // メンションならば
     await message.channel.createMessage({
       content: `${i18next.t("mentionHelp", { lng: server.locale })}\r\n`
@@ -71,9 +74,14 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
       .catch(this.logger.error);
     return;
   }
+
   const prefix = server.prefix;
   const messageContent = normalizeText(message.content);
   if(messageContent.startsWith(prefix) && messageContent.length > prefix.length){
+    if(this._rateLimitController.pushEvent(message.member.id)){
+      return;
+    }
+
     // コマンドメッセージを作成
     const commandMessage = CommandMessage.createFromMessage(message as discord.Message<discord.TextChannel>, prefix.length);
     // コマンドを解決

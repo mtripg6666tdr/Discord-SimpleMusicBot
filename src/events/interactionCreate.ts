@@ -52,13 +52,13 @@ export async function onInteractionCreate(this: MusicBot, interaction: discord.A
     return;
   }
   // レートリミットしてるなら終了
-  if(this.rateLimitController.isRateLimited(interaction.member.id)){
+  if(this.rateLimitController.pushEvent(interaction.member.id)){
     return;
   }
 
   // データ初期化
   const channel = interaction.channel as discord.TextChannel;
-  const server = this.initData(channel.guild.id, channel.id);
+  const server = this.upsertData(channel.guild.id, channel.id);
 
   // コマンドインタラクション
   switch(interaction.type){

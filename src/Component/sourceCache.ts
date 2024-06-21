@@ -164,8 +164,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
           .map(file => fs.promises.stat(path.join(this.cacheDirPath, file.name)))
       ))
       .then(sizes =>
-        (sizes.filter(d => d.status === "fulfilled") as PromiseFulfilledResult<fs.Stats>[])
-          .reduce((prev, current) => prev + current.value.size, 0)
+        sizes.filter(d => d.status === "fulfilled").reduce((prev, current) => prev + current.value.size, 0)
       );
   }
 
