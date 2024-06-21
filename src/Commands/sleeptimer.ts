@@ -62,6 +62,12 @@ export default class SleepTimer extends BaseCommand {
     }
 
     const time = colonSplittedTimeToSeconds(context.rawArgs);
+
+    if(isNaN(time)){
+      await message.reply(t("commands:sleeptimer.invalidTime")).catch(this.logger.error);
+      return;
+    }
+
     server.player.setSleepTimer(time);
     await message.reply(t("commands:sleeptimer.done", {
       time: context.rawArgs,
