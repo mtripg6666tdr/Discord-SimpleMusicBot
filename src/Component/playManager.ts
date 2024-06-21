@@ -92,6 +92,8 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   protected _dsLogger: DSL | null = null;
   protected _playing: boolean = false;
   protected _lastMember: string | null = null;
+  protected _sleeptimerCurrentSong: boolean = false;
+  protected _sleeptimerTimeout: NodeJS.Timeout | null = null;
 
   get preparing(){
     return this._preparing;
@@ -105,7 +107,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     return this._currentAudioInfo;
   }
 
-  get currentAudioUrl(): string{
+  get currentAudioUrl(): string {
     if(this.currentAudioInfo) return this.currentAudioInfo.url;
     else return "";
   }
@@ -589,6 +591,8 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.server.connection = null;
     this.server.connectingVoiceChannel = null;
     this._player = null;
+    this._sleeptimerCurrentSong = false;
+    this.clearSleepTimerTimeout();
 
     if(typeof global.gc === "function"){
       global.gc();
@@ -713,25 +717,36 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this._cost = 0;
     this.destroyStream();
 
+    // スリープタイマーの処理
+    if(this._sleeptimerCurrentSong){
+      if(!this.server.queue.loopEnabled && !this.server.queue.queueLoopEnabled){
+        await this.server.queue.next();
+      }
+
+      await this.sendSleepMessage();
+      await this.disconnect().catch(this.logger.error);
+
+      return;
+    }
+
     if(this.server.queue.loopEnabled){
       // 曲ループオンならばもう一度再生
       await this.play();
-      return;
     }else if(this.server.queue.onceLoopEnabled){
       // ワンスループが有効ならもう一度同じものを再生
       this.server.queue.onceLoopEnabled = false;
       await this.play();
-      return;
     }else{
       // キュー整理
       await this.server.queue.next();
-    }
-    // キューがなくなったら接続終了
-    if(this.server.queue.isEmpty){
-      await this.onQueueEmpty();
-    // なくなってないなら再生開始！
-    }else{
-      await this.play();
+
+      // キューがなくなったら接続終了
+      if(this.server.queue.isEmpty){
+        await this.onQueueEmpty();
+      }else{
+        // なくなってないなら再生開始！
+        await this.play();
+      }
     }
   }
 
@@ -803,6 +818,49 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       await this.server.queue.next();
     }
     await this.play({ quiet: quiet });
+  }
+
+  setSleepTimer(currentSong: boolean): void;
+  setSleepTimer(timeSeconds: number): void;
+  setSleepTimer(arg: boolean | number): void {
+    if(typeof arg === "boolean"){
+      this._sleeptimerCurrentSong = arg;
+      this.clearSleepTimerTimeout();
+      return;
+    }
+
+    this._sleeptimerCurrentSong = false;
+    const timeSeconds = arg;
+
+    if(timeSeconds < 0){
+      throw new Error("timeSeconds must be positive number");
+    }else if(timeSeconds === 0){
+      this.clearSleepTimerTimeout();
+      return;
+    }
+
+    if(this._sleeptimerTimeout){
+      clearTimeout(this._sleeptimerTimeout);
+    }
+
+    this._sleeptimerTimeout = setTimeout(async () => {
+      await this.sendSleepMessage();
+
+      await this.disconnect().catch(this.logger.error);
+    }, timeSeconds * 1000).unref();
+  }
+
+  protected clearSleepTimerTimeout(){
+    if(this._sleeptimerTimeout){
+      clearTimeout(this._sleeptimerTimeout);
+      this._sleeptimerTimeout = null;
+    }
+  }
+
+  protected async sendSleepMessage(){
+    await this.server.bot.client.rest.channels.createMessage(this.server.boundTextChannel, {
+      content: `:zzz: ${i18next.t("commands:sleeptimer.slept")}`,
+    }).catch(this.logger.error);
   }
 
   override emit<U extends keyof PlayManagerEvents>(event: U, ...args: PlayManagerEvents[U]): boolean {

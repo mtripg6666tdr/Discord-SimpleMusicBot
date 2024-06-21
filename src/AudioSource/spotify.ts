@@ -38,6 +38,10 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
   protected artist = "";
   protected referenceUrl: string | null = null;
 
+  constructor(){
+    super({ isCacheable: false });
+  }
+
   override async init(url: string, prefetched: SpotifyJsonFormat): Promise<Spotify>{
     if(!Spotify.validateTrackUrl(url)) throw new Error("Invalid url");
     if(prefetched){

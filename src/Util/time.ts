@@ -72,3 +72,18 @@ export function calcTime(date: number): number[]{
   const hour = (ato - min) / 60;
   return [hour, min, sec, millisec];
 }
+
+//         50 => 50s
+//       5:00 => 5m 0s
+//    1:23:45 => 1h 23m 45s
+// 1: 5:20:12 => 1d 5h 20m 12s
+const colonSplittedTimeRegex = /^(\d+:){0,3}\d+$/;
+export function colonSplittedTimeToSeconds(colonSplittedTime: string){
+  if(!colonSplittedTimeRegex.test(colonSplittedTime)){
+    return NaN;
+  }
+
+  const times = colonSplittedTime.split(":").map(Number);
+  const day = times.length === 4 ? times.shift()! : 0;
+  return day * 86400 + times.reduce((prev, current) => prev * 60 + current);
+}

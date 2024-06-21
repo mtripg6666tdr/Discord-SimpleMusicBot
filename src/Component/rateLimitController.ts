@@ -66,6 +66,18 @@ export class RateLimitController {
   private judgeRateLimiting(key: string): RateLimitJudgementResult {
     let cnt10sec = 0;
     const now = Date.now();
+
+    if(!this.store.has(key)){
+      const store = [now];
+      this.store.set(key, store);
+
+      return {
+        isLimited: false,
+        timeSinceLastEvent: null,
+        store: store,
+      };
+    }
+
     const currentStore = this.store.get(key)!.filter(dt => {
       const sub = now - dt;
       if(sub < 10 * 1000) cnt10sec++;
