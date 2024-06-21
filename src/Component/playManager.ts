@@ -847,7 +847,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       await this.sendSleepMessage();
 
       await this.disconnect().catch(this.logger.error);
-    }, timeSeconds * 1000);
+    }, timeSeconds * 1000).unref();
   }
 
   protected clearSleepTimerTimeout(){
