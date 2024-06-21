@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
+ * Copyright 2021-2023 mtripg6666tdr
  * 
  * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
@@ -16,21 +16,19 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CommandArgs } from ".";
-import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-
-import { BaseCommand } from ".";
+import { BaseCommand, CommandArgs } from ".";
+import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import { colonSplittedTimeToSeconds } from "../Util/time";
 
-export default class Seek extends BaseCommand {
+export default class SleepTimer extends BaseCommand {
   constructor(){
     super({
-      alias: ["seek"],
+      alias: ["sleeptimer", "sleep", "timer"],
       unlist: false,
       category: "player",
       args: [{
         type: "string",
-        name: "keyword",
+        name: "time",
         required: true,
       }],
       requiredPermissionsOr: ["admin", "dj", "onlyListener"],
@@ -40,38 +38,33 @@ export default class Seek extends BaseCommand {
     });
   }
 
-  @BaseCommand.updateBoundChannel
   async run(message: CommandMessage, context: CommandArgs){
     const { t, server } = context;
 
-    // そもそも再生状態ではない場合
-    if(!server.player.isPlaying || server.player.preparing){
+    // そもそも接続中ではない場合
+    if(!server.player.isConnecting){
       await message.reply(t("notPlaying")).catch(this.logger.error);
       return;
-    }else if(server.player.currentAudioInfo!.lengthSeconds === 0 || !server.player.currentAudioInfo!.isSeekable){
-      await message.reply(`:warning:${t("commands:seek.unseekable")}`).catch(this.logger.error);
+    }
+
+    if(context.rawArgs === ""){
+      server.player.setSleepTimer(false);
+      await message.reply(t("commands:sleeptimer.canceled")).catch(this.logger.error);
       return;
     }
 
-    // 引数から時間を算出
+    const toCurrentSong = context.rawArgs === "$";
+
+    if(toCurrentSong){
+      server.player.setSleepTimer(true);
+      await message.reply(t("commands:sleeptimer.doneCurrentSong")).catch(this.logger.error);
+      return;
+    }
+
     const time = colonSplittedTimeToSeconds(context.rawArgs);
-
-    if(time > server.player.currentAudioInfo!.lengthSeconds || isNaN(time)){
-      await message.reply(`:warning:${t("commands:seek.invalidTime")}`).catch(this.logger.error);
-      return;
-    }
-
-    try{
-      const response = await message.reply(`:rocket:${t("commands:seek.seeking")}...`);
-      await server.player.stop({ wait: true });
-      await server.player.play({ time });
-      await response.edit(`:white_check_mark:${t("commands:seek.success")}`).catch(this.logger.error);
-    }
-    catch(e){
-      this.logger.error(e);
-      await message.channel.createMessage({
-        content: `:astonished:${t("commands:seek.failed")}`,
-      }).catch(this.logger.error);
-    }
+    server.player.setSleepTimer(time);
+    await message.reply(t("commands:sleeptimer.done", {
+      time: context.rawArgs,
+    })).catch(this.logger.error);
   }
 }

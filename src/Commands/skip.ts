@@ -34,8 +34,8 @@ export default class Skip extends BaseCommand {
   }
 
   async run(message: CommandMessage, context: CommandArgs){
-    const { t } = context;
-    const server = context.server;
+    const { t, server } = context;
+
     // そもそも再生状態じゃない
     if(server.player.preparing){
       message.reply(t("commands:skip.preparing")).catch(this.logger.error);

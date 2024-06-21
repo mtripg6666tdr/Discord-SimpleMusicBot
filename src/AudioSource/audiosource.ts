@@ -132,7 +132,7 @@ export abstract class AudioSource<T extends ThumbnailType, U extends AudioSource
   protected logger: LoggerObject;
 
   constructor(options: { isSeekable?: boolean, isCacheable?: boolean } = {}){
-    options = Object.assign({ isSeekable: true, isCacheable: false }, options);
+    options = Object.assign({ isSeekable: true, isCacheable: true }, options);
     this.logger = getLogger(this.constructor.name);
     this._isSeekable = options.isSeekable!;
     this._isCacheable = options.isCacheable!;
