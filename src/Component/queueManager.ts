@@ -354,7 +354,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         // 埋め込みの作成
         const embed = new MessageEmbedBuilder()
           .setColor(getColor("SONG_ADDED"))
-          .setTitle(`✅${t("components:queue.songAdded")}`)
+          .setTitle(`:white_check_mark: ${t("components:queue.songAdded")}`)
           .setDescription(info.basicInfo.isPrivateSource ? info.basicInfo.title : `[${info.basicInfo.title}](${info.basicInfo.url})`)
           .addField(
             t("length"),
@@ -395,7 +395,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         if(info.basicInfo.isYouTube()){
           if(info.basicInfo.isFallbacked){
             embed.addField(
-              `:warning:${t("attention")}`,
+              `:warning: ${t("attention")}`,
               t("components:queue.fallbackNotice")
             );
           }else if(info.basicInfo.strategyId === 1){
@@ -491,7 +491,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       this.logger.error("AutoAddQueue failed", e);
       if(uiMessage){
         uiMessage.edit({
-          content: `:weary:${t("components:queue.failedToAdd")}${
+          content: `:weary: ${t("components:queue.failedToAdd")}${
             typeof e === "object" && "message" in e ? `(${e.message})` : ""
           }`,
           embeds: [],

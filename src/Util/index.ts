@@ -326,7 +326,7 @@ export function normalizeText(rawText: string){
  */
 export function waitForEnteringState(predicate: () => boolean, timeout: number = 10 * 1000, options?: {
   /**
-   * タイムアウトした際にエラーとするかどうかを表します。
+   * タイムアウトした際にエラーとするかどうかを表します。デフォルトではエラーとなります。
    */
   rejectOnTimeout?: boolean,
   /**
