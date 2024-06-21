@@ -536,6 +536,17 @@
     "success": "ignoré `{{title}}`",
     "failed": "n'a pas réussi à sauter"
   },
+  "sleeptimer": {
+    "name": "スリープタイマー",
+    "description": "指定された時間が経過した後に、音楽の再生を自動的に終了します。",
+    "examples": "スリープタイマー 5:00",
+    "usage": "スリープタイマー <時間(分:秒の形式で)または$で現在再生中の楽曲の終了時>",
+    "done": "スリープタイマーを **{{time}}** に設定しました。",
+    "doneCurrentSong": "スリープタイマーを、この曲が終わるタイミングに設定しました。",
+    "canceled": "スリープタイマーをキャンセルしました。",
+    "invalidTime": "指定された時間が正しくありません。「時間:分:秒」の形式か、この曲で終了する場合は$と指定してください。",
+    "slept": "スリープタイマーの時間になったため、終了します。"
+  },
   "thumbnail": {
     "name": "vignette",
     "description": "Affiche la vignette en cours de lecture. Si le panneau de recherche est ouvert et qu'un numéro dans le panneau de recherche est spécifié, la vignette de cette chanson s'affichera.",
