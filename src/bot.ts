@@ -48,6 +48,14 @@ export class MusicBot extends MusicBotBase {
     return this._telemetry;
   }
 
+  // ready.ts で値を代入しているため
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly
+  private _mentionText: `<@${string}>` = "" as `<@${string}>`;
+
+  get mentionText(){
+    return this._mentionText;
+  }
+
   constructor(token: string, maintenance: boolean = false){
     super(maintenance);
 
@@ -147,7 +155,7 @@ export class MusicBot extends MusicBotBase {
       server: this.guildData.get(guildId)!,
       rawArgs: optiont,
       client: this._client,
-      initData: this.initData.bind(this),
+      initData: this.upsertData.bind(this),
       includeMention: false,
       locale,
       t: i18next.getFixedT(locale),
