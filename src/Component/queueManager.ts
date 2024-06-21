@@ -237,7 +237,11 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       } as QueueContent;
       if(result.basicInfo){
         this._default[method](result);
-        if(this.server.preferences.equallyPlayback) this.sortByAddedBy();
+
+        if(this.server.preferences.equallyPlayback){
+          this.sortByAddedBy();
+        }
+
         this.emit(method === "push" ? "changeWithoutCurrent" : "change");
         this.emit("add", result);
         const index = this._default.findIndex(q => q === result);
@@ -670,6 +674,11 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     }
     this.logger.info(`RemoveAt Called (offset:${offset})`);
     this._default.splice(offset, 1);
+
+    if(this.server.preferences.equallyPlayback){
+      this.sortByAddedBy();
+    }
+
     this.emit(offset === 0 ? "change" : "changeWithoutCurrent");
   }
 
@@ -760,6 +769,11 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       //要素削除
       this._default.splice(from + 1, 1);
     }
+
+    if(this.server.preferences.equallyPlayback){
+      this.sortByAddedBy();
+    }
+
     this.emit(from === 0 || to === 0 ? "change" : "changeWithoutCurrent");
   }
 
