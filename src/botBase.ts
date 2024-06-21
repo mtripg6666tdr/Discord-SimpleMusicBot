@@ -228,7 +228,7 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
   /**
    * 必要に応じてサーバーデータを初期化します
    */
-  protected initData(guildid: string, boundChannelId: string){
+  protected upsertData(guildid: string, boundChannelId: string){
     const prev = this.guildData.get(guildid);
     if(!prev){
       const config = getConfig();

@@ -17,32 +17,66 @@
  */
 
 import { getLogger } from "../logger";
+import { RateLimitJudgementResult } from "../types/rateLimitController";
 
 export class RateLimitController {
   protected readonly store = new Map<string, number[]>();
   protected logger = getLogger("RateLimitController");
 
-  isRateLimited(key: string){
+  /**
+   * キーに現在時刻での新しいイベントをレートリミットコントローラーに追加し、レートリミット状態に当たるかどうかを確認します。
+   * @param key 新しいイベントの追加先のキー
+   * @returns キーにイベントを追加後、レートリミット状態になっていれば true、そうでなければ false
+   */
+  pushEvent(key: string){
     if(!this.store.has(key)){
       this.store.set(key, [Date.now()]);
       return false;
     }
-    let cnt10sec = 0;
-    const currentStore = this.store.get(key)!.filter(dt => {
-      const sub = Date.now() - dt;
-      if(sub < 10 * 1000) cnt10sec++;
-      return sub < 60 * 1000;
-    });
-    this.store.set(key, currentStore);
-    if(currentStore.length > 15 || cnt10sec > 5){
-      if(Date.now() - currentStore[currentStore.length - 1] < 2 * 1000){
-        currentStore.push(Date.now());
+
+    const { isLimited, timeSinceLastEvent, store } = this.judgeRateLimiting(key);
+
+    if(isLimited){
+      if(timeSinceLastEvent < 2 * 1000){
+        store.push(Date.now());
       }
       this.logger.info(`Key ${key} hit the ratelimit.`);
       return true;
     }else{
-      currentStore.push(Date.now());
+      store.push(Date.now());
       return false;
     }
+  }
+
+  isLimited(key: string){
+    if(!this.store){
+      return false;
+    }
+
+    const { isLimited } = this.judgeRateLimiting(key);
+
+    if(isLimited){
+      this.logger.info(`Key ${key} hit the ratelimit.`);
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  private judgeRateLimiting(key: string): RateLimitJudgementResult {
+    let cnt10sec = 0;
+    const now = Date.now();
+    const currentStore = this.store.get(key)!.filter(dt => {
+      const sub = now - dt;
+      if(sub < 10 * 1000) cnt10sec++;
+      return sub < 60 * 1000;
+    });
+    this.store.set(key, currentStore);
+
+    return {
+      isLimited: currentStore.length > 15 || cnt10sec > 5,
+      timeSinceLastEvent: currentStore.length > 0 ? now - currentStore.at(-1)! : null,
+      store: currentStore,
+    } as RateLimitJudgementResult;
   }
 }
