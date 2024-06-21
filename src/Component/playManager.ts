@@ -377,7 +377,12 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           // メッセージが送信されていないなら新規で作成する。
           message = await this.server.bot.client.rest.channels.createMessage(
             this.server.boundTextChannel,
-            messageContent,
+            {
+              ...messageContent,
+              flags: this.server.preferences.nowPlayingNotificationLevel === NowPlayingNotificationLevel.Silent
+                ? MessageFlags.SUPPRESS_NOTIFICATIONS
+                : 0,
+            },
           ).catch(er => {
             this.logger.error(er);
             return null;
