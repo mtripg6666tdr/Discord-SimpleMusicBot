@@ -537,15 +537,15 @@
     "failed": "Skip failed"
   },
   "sleeptimer": {
-    "name": "スリープタイマー",
-    "description": "指定された時間が経過した後に、音楽の再生を自動的に終了します。",
-    "examples": "スリープタイマー 5:00",
-    "usage": "スリープタイマー <時間(分:秒の形式で)または$で現在再生中の楽曲の終了時>",
-    "done": "スリープタイマーを **{{time}}** に設定しました。",
-    "doneCurrentSong": "スリープタイマーを、この曲が終わるタイミングに設定しました。",
-    "canceled": "スリープタイマーをキャンセルしました。",
-    "invalidTime": "指定された時間が正しくありません。「時間:分:秒」の形式か、この曲で終了する場合は$と指定してください。",
-    "slept": "スリープタイマーの時間になったため、終了します。"
+    "name": "sleeptimer",
+    "description": "Exits from the voice channel when the specific time elapsed.",
+    "examples": "sleeptimer 5:00",
+    "usage": "sleeptimer <time(formatted like \"mm:ss\") or $ (the end of the current playing song)>",
+    "done": "Successfully set the sleep timer in **{{time}}**.",
+    "doneCurrentSong": "Successfully set the sleep timer at the end of the current song.",
+    "canceled": "Canceled the sleep timer.",
+    "invalidTime": "Invalid time specified. Type in the \"hh:mm:ss\" format to set the sleep timer in the manual time, or just \"$\" to set at the end of the current song.",
+    "slept": "Disconnecting from the voice channel since it is a time the sleep timer set."
   },
   "thumbnail": {
     "name": "thumbnail",
