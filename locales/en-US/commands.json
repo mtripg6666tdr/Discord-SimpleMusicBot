@@ -28,6 +28,30 @@
       }
     }
   },
+  "bulk_play": {
+    "name": "bulk_play",
+    "usage": "bulk_play <URL or keyword> <URL or keyword> ...",
+    "examples": "bulk_play \"songA\" \"songB\" \"songC\"",
+    "description": "Bulk-adds and play multiple songs.",
+    "args": {
+      "keyword1": {
+        "description": "Keyword or URL of the song you want to play."
+      },
+      "keyword2": {
+        "description": "Keyword or URL of the song you want to play."
+      },
+      "keyword3": {
+        "description": "Keyword or URL of the song you want to play."
+      },
+      "keyword4": {
+        "description": "Keyword or URL of the song you want to play."
+      },
+      "keyword5": {
+        "description": "Keyword or URL of the song you want to play."
+      }
+    },
+    "partialSuccess": "Some part of songs you requested couldn't be found."
+  },
   "cancel": {
     "name": "cancel",
     "description": "Aborts all operations that can be canceled.",
@@ -535,6 +559,17 @@
     "votePanelAlreadyOpen": "There's already another skip vote opened.",
     "success": "Skipped `{{title}}`",
     "failed": "Skip failed"
+  },
+  "sleeptimer": {
+    "name": "sleeptimer",
+    "description": "Exits from the voice channel when the specific time elapsed.",
+    "examples": "sleeptimer 5:00",
+    "usage": "sleeptimer <time(formatted like \"mm:ss\") or $ (the end of the current playing song)>",
+    "done": "Successfully set the sleep timer in **{{time}}**.",
+    "doneCurrentSong": "Successfully set the sleep timer at the end of the current song.",
+    "canceled": "Canceled the sleep timer.",
+    "invalidTime": "Invalid time specified. Type in the \"hh:mm:ss\" format to set the sleep timer in the manual time, or just \"$\" to set at the end of the current song.",
+    "slept": "Disconnecting from the voice channel since it is a time the sleep timer set."
   },
   "thumbnail": {
     "name": "thumbnail",

@@ -28,6 +28,30 @@
       }
     }
   },
+  "bulk_play": {
+    "name": "バルク再生",
+    "usage": "バルク再生 <URLまたはキーワード> <URLまたはキーワード> ...",
+    "examples": "バルク再生 曲A 曲B 曲C",
+    "description": "いくつかの曲を一括でキューに追加します。",
+    "args": {
+      "keyword1": {
+        "description": "追加する曲のキーワードまたはURL。"
+      },
+      "keyword2": {
+        "description": "追加する曲のキーワードまたはURL。"
+      },
+      "keyword3": {
+        "description": "追加する曲のキーワードまたはURL。"
+      },
+      "keyword4": {
+        "description": "追加する曲のキーワードまたはURL。"
+      },
+      "keyword5": {
+        "description": "追加する曲のキーワードまたはURL。"
+      }
+    },
+    "partialSuccess": "一部の曲が見つかりませんでした。"
+  },
   "cancel": {
     "name": "Annuler",
     "description": "Abandonne toutes les opérations annulables en cours.",
@@ -535,6 +559,17 @@
     "votePanelAlreadyOpen": "Il y a un panneau de vote déjà ouvert.",
     "success": "ignoré `{{title}}`",
     "failed": "n'a pas réussi à sauter"
+  },
+  "sleeptimer": {
+    "name": "スリープタイマー",
+    "description": "指定された時間が経過した後に、音楽の再生を自動的に終了します。",
+    "examples": "スリープタイマー 5:00",
+    "usage": "スリープタイマー <時間(分:秒の形式で)または$で現在再生中の楽曲の終了時>",
+    "done": "スリープタイマーを **{{time}}** に設定しました。",
+    "doneCurrentSong": "スリープタイマーを、この曲が終わるタイミングに設定しました。",
+    "canceled": "スリープタイマーをキャンセルしました。",
+    "invalidTime": "指定された時間が正しくありません。「時間:分:秒」の形式か、この曲で終了する場合は$と指定してください。",
+    "slept": "スリープタイマーの時間になったため、終了します。"
   },
   "thumbnail": {
     "name": "vignette",
