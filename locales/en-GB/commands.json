@@ -28,6 +28,30 @@
       }
     }
   },
+  "bulk_play": {
+    "name": "バルク再生",
+    "usage": "バルク再生 <URLまたはキーワード> <URLまたはキーワード> ...",
+    "examples": "バルク再生 曲A 曲B 曲C",
+    "description": "いくつかの曲を一括でキューに追加します。",
+    "args": {
+      "keyword1": {
+        "description": "追加する曲のキーワードまたはURL。"
+      },
+      "keyword2": {
+        "description": "追加する曲のキーワードまたはURL。"
+      },
+      "keyword3": {
+        "description": "追加する曲のキーワードまたはURL。"
+      },
+      "keyword4": {
+        "description": "追加する曲のキーワードまたはURL。"
+      },
+      "keyword5": {
+        "description": "追加する曲のキーワードまたはURL。"
+      }
+    },
+    "partialSuccess": "一部の曲が見つかりませんでした。"
+  },
   "cancel": {
     "name": "cancel",
     "description": "Aborts all operations that can be canceled.",
