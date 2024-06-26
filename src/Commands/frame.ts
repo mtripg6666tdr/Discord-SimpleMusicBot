@@ -86,7 +86,7 @@ export default class Frame extends BaseCommand {
     }
 
     try{
-      const [hour, min, sec] = Util.time.calcHourMinSec(Math.floor(time * 100) / 100);
+      const [hour, min, sec] = Util.time.calcHourMinSec(time);
       const response = await message.reply(`:camera_with_flash:${t("commands:frame.capturing")}...`);
       const { url, ua } = await vinfo.fetchVideo();
       const frame = await getFrame(url, time, ua);
