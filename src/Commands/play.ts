@@ -34,16 +34,18 @@ export default class Play extends BaseCommand {
       category: "player",
       args: [
         {
-          type: "string" as const,
+          type: "string",
           name: "keyword",
           required: false,
         },
         {
-          type: "file" as const,
+          type: "file",
           name: "audiofile",
           required: false,
         },
       ],
+      usage: false,
+      examples: false,
       requiredPermissionsOr: [],
       shouldDefer: true,
       messageCommand: true,
@@ -93,7 +95,7 @@ export default class Play extends BaseCommand {
       // 引数ついてたらそれ優先して再生する
       if(context.rawArgs.startsWith("http://") || context.rawArgs.startsWith("https://")){
         // ついていた引数がURLなら
-        await context.server.playFromURL(message, context.args as string[], { first: !wasConnected });
+        await context.server.playFromUrl(message, context.args as string[], { first: !wasConnected });
       }else{
         // URLでないならキーワードとして検索
         const msg = await message.channel.createMessage({
@@ -113,25 +115,26 @@ export default class Play extends BaseCommand {
 
           if(videos.length === 0){
             await Promise.allSettled([
-              message.reply(`:face_with_monocle:${t("commands:play.noMusicFound")}`),
+              message.reply(`:face_with_monocle: ${t("commands:play.noMusicFound")}`),
               msg.delete(),
             ]);
             return;
           }
+
           await Promise.allSettled([
-            context.server.playFromURL(message, videos[0].url, { first: !wasConnected, cancellable: context.server.queue.length >= 1 }),
-            msg.delete(),
+            context.server.playFromUrl(message, videos[0].url, { first: !wasConnected, cancellable: context.server.queue.length >= 1 }),
+            msg.delete().catch(this.logger.error),
           ]);
         }
         catch(e){
           this.logger.error(e);
-          message.reply(`✗${t("internalErrorOccurred")}`).catch(this.logger.error);
+          message.reply(`✗ ${t("internalErrorOccurred")}`).catch(this.logger.error);
           msg.delete().catch(this.logger.error);
         }
       }
     }else if(firstAttachment){
       // 添付ファイルを確認
-      await context.server.playFromURL(
+      await context.server.playFromUrl(
         message,
         firstAttachment.url,
         { first: !wasConnected },
@@ -160,7 +163,7 @@ export default class Play extends BaseCommand {
         await message.reply(t("commands:play.alreadyPlaying")).catch(this.logger.error);
       }
     }else{
-      await message.reply(`✘${t("commands:play.queueEmpty")}`).catch(this.logger.error);
+      await message.reply(`✘ ${t("commands:play.queueEmpty")}`).catch(this.logger.error);
     }
   }
 }

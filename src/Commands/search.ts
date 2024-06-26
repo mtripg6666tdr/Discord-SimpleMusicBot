@@ -41,7 +41,7 @@ export abstract class SearchBase<T> extends BaseCommand {
         return;
       }
 
-      await context.server.playFromURL(message, context.args as string[], { first: !context.server.player.isConnecting });
+      await context.server.playFromUrl(message, context.args as string[], { first: !context.server.player.isConnecting });
       return;
     }
 

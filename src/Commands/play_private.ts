@@ -75,7 +75,7 @@ export default class PlayPrivate extends BaseCommand {
     if(value){
       const message = CommandMessage.createFromInteraction(interaction, "play_private", [value], value);
 
-      const items = await server.playFromURL(
+      const items = await server.playFromUrl(
         message,
         value,
         { privateSource: true, first: false },
