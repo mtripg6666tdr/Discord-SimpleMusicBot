@@ -28,6 +28,30 @@
       }
     }
   },
+  "bulk_play": {
+    "name": "bulk_play",
+    "usage": "bulk_play <URL or keyword> <URL or keyword> ...",
+    "examples": "bulk_play \"songA\" \"songB\" \"songC\"",
+    "description": "Bulk-adds and play multiple songs.",
+    "args": {
+      "keyword1": {
+        "description": "Keyword or URL of the song you want to play."
+      },
+      "keyword2": {
+        "description": "Keyword or URL of the song you want to play."
+      },
+      "keyword3": {
+        "description": "Keyword or URL of the song you want to play."
+      },
+      "keyword4": {
+        "description": "Keyword or URL of the song you want to play."
+      },
+      "keyword5": {
+        "description": "Keyword or URL of the song you want to play."
+      }
+    },
+    "partialSuccess": "Some part of songs you requested couldn't be found."
+  },
   "cancel": {
     "name": "cancel",
     "description": "Aborts all operations that can be canceled.",
