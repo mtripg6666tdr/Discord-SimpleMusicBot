@@ -51,4 +51,5 @@ Node.js v16以上の環境で動作することを想定していますが、で
 * 随時Pull Requestも受け付けております。開発にご協力いただける方は、ぜひともよろしくお願いします。
 
 [**マイルストーン**](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/milestone/15?closed=1)
+
 ---
