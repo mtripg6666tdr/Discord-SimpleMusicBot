@@ -27,7 +27,7 @@ export default class SettingNowPlayingNotification extends BaseCommand {
     super({
       alias: ["setting>nowplaying"],
       unlist: false,
-      category: "bot",
+      category: "settings",
       requiredPermissionsOr: ["admin", "dj", "onlyListener", "manageGuild"],
       shouldDefer: false,
       examples: false,
