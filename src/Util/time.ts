@@ -42,7 +42,7 @@ export function calcHourMinSec(totalSec: number): [string, string, string]{
   const min = (totalSec - sec) / 60 % 60;
   const hr = ((totalSec - sec) / 60 - min) / 60;
   return [
-    hr.toString(),
+    hr.toFixed(2).toString(),
     min.toString().padStart(2, "0"),
     sec.toString().padStart(2, "0"),
   ];
