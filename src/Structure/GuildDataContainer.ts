@@ -767,7 +767,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           url: rawArg,
           addedBy: message.member,
           first,
-          message: await message.reply(`${t("pleaseWait")}...`),
+          message,
           cancellable,
           privateSource,
         });
