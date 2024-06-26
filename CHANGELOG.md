@@ -36,9 +36,10 @@
 * throttle-debounce 5.0.0 => 5.0.2
 * tslib 2.6.2 => 2.6.3
 ### Optional
-* そのほか、数々の脆弱性の問題に対処
 * @distube/ytsr 2.0.0 => 2.0.4
 * mongodb 6.3.0 => 6.7.0
+
+* そのほか、数々の脆弱性の問題に対処
 ## その他の変更
 * 新しいビルド方式を試験的に導入 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2220)
   * 新しいビルド方式により、大量のファイルを数個のファイルに減らすことにより、メモリ消費が劇的に減少しました。
