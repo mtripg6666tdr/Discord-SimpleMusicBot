@@ -38,6 +38,6 @@ export default class BgmBd extends BaseCommand {
     const bgmPlaylistUrl = context.rawArgs.length === 0
       ? "aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTExmZmhjQXBzbzl4UFhLUG5YbEZ3czlxWUNkMDltTFA0"
       : "aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTExmZmhjQXBzbzl4WnpYZ0RFdEdsQk5wNUtYZjNPY1Zx";
-    await context.server.playFromURL(message, Buffer.from(bgmPlaylistUrl, "base64").toString(), {});
+    await context.server.playFromUrl(message, Buffer.from(bgmPlaylistUrl, "base64").toString(), {});
   }
 }

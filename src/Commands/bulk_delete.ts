@@ -52,9 +52,7 @@ export default class BulkDelete extends BaseCommand {
       message.reply(`:warning:${t("commands:bulk_delete.invalidMessageCount")}`).catch(this.logger.error);
       return;
     }
-    const reply = await message.reply(
-      t("commands:bulk_delete.loading") + "..."
-    ).catch(this.logger.error) as ResponseMessage;
+    const reply = await message.reply(`${t("commands:bulk_delete.loading")}...`).catch(this.logger.error) as ResponseMessage;
     try{
       // collect messages
       let before = "";
@@ -109,7 +107,6 @@ export default class BulkDelete extends BaseCommand {
         // bulk delete
         await message.channel.deleteMessages(
           messages.map(msg => msg.id),
-           
           t("commands:bulk_delete.auditLog", { issuer: message.member.username, count })
         );
         await reply.edit({
@@ -120,7 +117,6 @@ export default class BulkDelete extends BaseCommand {
       });
       collector.on("timeout", () => {
         reply.edit({
-           
           content: t("commands:bulk_delete.cancel"),
           components: [],
         }).catch(this.logger.error);
