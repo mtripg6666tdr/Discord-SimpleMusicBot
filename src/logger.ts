@@ -71,10 +71,15 @@ const memoryAppender = {
       const logContent = `${level}:[${
         tokens.category(logEvent)
       }] ${logEvent.data.map(data => typeof data === "string" ? data : stringifyObject(data))}`;
-      memoryStore.push(logContent);
+
+      if(!logContent.includes("(SECRET)")){
+        memoryStore.push(logContent);
+      }
+
       if(memoryStore.length > MEMORYSTORE_MAXSIZE){
         memoryStore.shift();
       }
+
       if(process.env.CONSOLE_ENABLE){
         console[level === "F" || level === "E" ? "error" : level === "W" ? "warn" : "log"](logContent);
       }

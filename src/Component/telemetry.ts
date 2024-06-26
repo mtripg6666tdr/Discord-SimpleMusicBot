@@ -43,7 +43,7 @@ export class Telemetry extends LogEmitter<Record<never, never>> {
 
     this.logger.info("Discord-SimpleMusicBot now collects completely anonymous telemetry data about usage.");
     this.logger.info("This is completely optional and you can opt-out it.");
-    this.logger.info("See https://sr.usamyon.moe/dsmb-telemetry for more info.");
+    this.logger.info("See https://sr.usamyon.moe/dsmb-telemetry for details.");
 
     this.bot.once("ready", this.onReady.bind(this));
   }
@@ -100,7 +100,7 @@ export class Telemetry extends LogEmitter<Record<never, never>> {
       .digest()
       .toString("hex");
 
-    this.logger.debug(`Telemetry hash is "${hash}"`);
+    this.logger.debug(`(SECRET) Telemetry hash is "${hash}"`);
 
     return hash;
   }

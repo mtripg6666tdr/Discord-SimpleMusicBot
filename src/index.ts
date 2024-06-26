@@ -33,9 +33,9 @@ const logger = log4js.getLogger("Entry");
 const config = getConfig();
 
 logger.info("Discord-SimpleMusicBot by mtripg6666tdr");
-logger.info("This application was originally built by mtripg6666tdr and is licensed under GPLv3 or later.");
+logger.info("This application was originally written by mtripg6666tdr and is licensed under GPLv3 or later.");
 logger.info("There is no warranty for the work, both of the original and its forks.");
-logger.info("However if you found any bugs in the original please feel free to report them by creating an issue on GitHub.");
+logger.info("However if you find a bug in the original application, please feel free to report it by creating an issue on GitHub.");
 logger.info("Thank you for using Discord-SimpleMusicBot!");
 logger.info(`Node.js v${process.versions.node}`);
 

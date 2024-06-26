@@ -63,14 +63,14 @@ export class CommandManager extends LogEmitter<{}> {
 
   private constructor(){
     super("CommandsManager");
-    this.logger.info("Initializing");
+    this.logger.trace("Initializing");
 
     this._commands = (require("../Commands/_index") as typeof import("../Commands/_index")).default.filter(n => !n.disabled);
 
     this.initializeMap({ reportDupes: getConfig().debug });
     this.initializeSubcommandNames();
 
-    this.logger.info("Initialized");
+    this.logger.trace("Initialized");
   }
 
   private initializeMap({ reportDupes }: { reportDupes: boolean }){
