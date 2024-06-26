@@ -36,7 +36,7 @@ export async function onReady(this: MusicBot){
 
   this["_mentionText"] = `<@${client.user.id}>`;
 
-  this.logger.info("Starting environment checking and preparation now");
+  this.logger.info("Starting environment checking and preparation.");
 
   // Set activity as booting
   if(!this.maintenance){
