@@ -25,8 +25,20 @@
   * もし、Replit Deploymentsを有償でご利用されている方で、ドキュメントを執筆していただける方がいらっしゃれば、ぜひドキュメントの再度の執筆をお願いしたく思っております。ご迷惑をおかけいたしますが、何卒ご了承くださいませ。
 * ドキュメントの継続的な更新 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2195, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2366, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2369, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2394)
 ## 依存関係のアップデート
+* @mtripg6666tdr/oceanic-command-resolver 1.3.0 => 1.4.2
+* @sinclair/typebox 0.31.28 => 0.32.34
+* dotenv 16.3.1 => 16.4.5
+* html-entities 2.4.0 => 2.5.2
+* https-proxy-agent 7.0.2 => 7.0.4
+* i18next 22.5.1 => 23.11.5
+* oceanic.js 1.8.1 => 1.11.0
+* spotify-url-info 3.2.10 => 3.2.15
+* throttle-debounce 5.0.0 => 5.0.2
+* tslib 2.6.2 => 2.6.3
 ### Optional
 * そのほか、数々の脆弱性の問題に対処
+* @distube/ytsr 2.0.0 => 2.0.4
+* mongodb 6.3.0 => 6.7.0
 ## その他の変更
 * 新しいビルド方式を試験的に導入 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2220)
   * 新しいビルド方式により、大量のファイルを数個のファイルに減らすことにより、メモリ消費が劇的に減少しました。
