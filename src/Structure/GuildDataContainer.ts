@@ -461,7 +461,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     message: CommandMessage,
     rawArg: string | string[],
     {
-      first = true,
+      first = false,
       cancellable = false,
       privateSource = false,
     }: {
