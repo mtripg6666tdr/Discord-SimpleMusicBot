@@ -13,7 +13,7 @@ function resolveRelativePath(spec){
 
 /** @param {string} path */
 function createDefaultBuilder(path){
-  return async function(){
+  return async function({ generateMetafile }){
     const res = await build({
       entryPoints: [path],
       minify: false,
@@ -27,6 +27,7 @@ function createDefaultBuilder(path){
         "global.BUNDLED": "true",
       },
       sourcemap: "inline",
+      metafile: generateMetafile,
     });
 
     const bundled = res.outputFiles[0].text;
@@ -36,25 +37,31 @@ function createDefaultBuilder(path){
       mangle: true,
     });
 
-    return { bundled, minified };
+    return { bundled, minified, metafile: res.metafile };
   };
 }
 
-async function bundleAssets({ leaveBuildArtifact }){
+async function bundleAssets({ leaveBuildArtifact, generateMetafile, useOutDir }){
   const [mainCompilation, workerCompilation] = await Promise.all([
-    createDefaultBuilder("build/index.js")(),
-    createDefaultBuilder("build/AudioSource/youtube/worker.js")(),
+    createDefaultBuilder("build/index.js")({ generateMetafile }),
+    createDefaultBuilder("build/AudioSource/youtube/worker.js")({ generateMetafile }),
   ]);
 
-  if(!fs.existsSync(resolveRelativePath("./dist"))){
-    await fs.promises.mkdir(resolveRelativePath("./dist"));
+  const outDirBase = useOutDir ? "./out" : "./dist";
+  const outPath = (path) => `${outDirBase}/${path}`;
+
+  if(!fs.existsSync(resolveRelativePath(outDirBase))){
+    await fs.promises.mkdir(resolveRelativePath(outDirBase), { recursive: true });
   }
+
   await Promise.all([
-    fs.promises.writeFile(resolveRelativePath("./dist/index.js"), mainCompilation.bundled),
-    fs.promises.writeFile(resolveRelativePath("./dist/index.min.js"), mainCompilation.minified),
-    fs.promises.writeFile(resolveRelativePath("./dist/worker.js"), workerCompilation.bundled),
-    fs.promises.writeFile(resolveRelativePath("./dist/worker.min.js"), workerCompilation.minified),
-  ]);
+    fs.promises.writeFile(resolveRelativePath(outPath("index.js")), mainCompilation.bundled),
+    fs.promises.writeFile(resolveRelativePath(outPath("index.min.js")), mainCompilation.minified),
+    mainCompilation.metafile && fs.promises.writeFile(resolveRelativePath(outPath("index.meta.json")), JSON.stringify(mainCompilation.metafile, null)),
+    fs.promises.writeFile(resolveRelativePath(outPath("worker.js")), workerCompilation.bundled),
+    fs.promises.writeFile(resolveRelativePath(outPath("worker.min.js")), workerCompilation.minified),
+    workerCompilation.metafile && fs.promises.writeFile(resolveRelativePath(outPath("worker.meta.json")), JSON.stringify(workerCompilation.metafile)),
+  ].filter(Boolean));
 
   if(!leaveBuildArtifact){
     await rimraf(resolveRelativePath("./build"));
@@ -88,7 +95,11 @@ switch(process.argv[2]){
     bakeDynamicImports();
     break;
   case "bundle":
-    void bundleAssets({ leaveBuildArtifact: process.argv[3] === "--leave-build-artifact" });
+    void bundleAssets({
+      leaveBuildArtifact: process.argv.includes("--leave-build-artifact"),
+      generateMetafile: process.argv.includes("--generate-metafile"),
+      useOutDir: process.argv.includes("--use-out-dir"),
+    });
     break;
   default:
     console.error("Invalid verb.");

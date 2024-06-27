@@ -35,28 +35,48 @@ Glitchのトップ画面から、右上にある`New project`をクリックし�
   git remote add origin https://github.com/mtripg6666tdr/Discord-SimpleMusicBot.git
   git fetch
   git reset --hard <最新のバージョン>
+  refresh
   ```
   `最新のバージョン`(例：`v4.2.0`)は適宜現時点での最新のバージョンに読みかえてください。
+
+:::info
+最新のバージョンは、[リリースページ](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/releases)で確認してください。
+:::
 
 ### 3. ボットが動作するようファイルを編集します
 ボットが動作するよう、いくつかのファイルを変更する必要があります。
 
 * 
-  ```diff title="tsconfig.json"
+  ```diff title="util/tsconfig/tsconfig.build.json"
+        "forceConsistentCasingInFileNames": true,
         "importHelpers": true,
+        // highlight-start
   -     "outDir": "dist/",
   +     "outDir": "out/",
+        // highlight-end
         "allowJs": false,
+        "skipLibCheck": true,
   ```
 
 * 
   ```diff title="package.json"
+    "scripts": {
+      "test": "mocha",
       "start": "npm run build && npm run onlystart",
+      // highlight-start
   -   "onlystart": "node util/exec dist",
   +   "onlystart": "node util/exec out",
-  -   "build": "rimraf dist/ typings/ && tsc",
-  +   "build": "rimraf out/ typings/ && tsc || exit 0",
-      "lint": "eslint .",
+      // highlight-end
+      "build": "node builder.mjs bake && tsc -p util/tsconfig/tsconfig.build.json",
+      // highlight-start
+  -   "build:bundled": "node builder.mjs bake && tsc -p util/tsconfig/tsconfig.bundle.json && node builder.mjs bundle",
+  +   "build:bundled": "node builder.mjs bake && tsc -p util/tsconfig/tsconfig.bundle.json && node builder.mjs bundle --use-out-dir",
+      // highlight-end
+      "prelint": "node builder.mjs bake",
+      "lint": "tsc && eslint .",
+      "cleanup": "rimraf dist/ typings/ build/ out/ src/Commands/_index.ts",
+      "generatecommandlist": "node util/generateCommandList"
+    },
   ```
 
 ### 4. ボットの各種設定をします
@@ -71,3 +91,20 @@ Glitchのトップ画面から、右上にある`New project`をクリックし�
 
 ### 5. 完了
   しばらくすると、ボットが起動します。ボットの状況については画面下の`LOGS`をクリックしてログを参照してください。
+
+## ボットの更新
+ボットを最新のバージョンに更新するには、以下のコマンドをまず実行してください。
+```sh
+git fetch
+
+# <最新のバージョン>は、適宜最新のバージョンに読み替えてください。
+# 例えば、最新バージョンがv4.3.0だった場合、
+# git reset --hard v4.3.0
+# となります
+git reset --hard <最新のバージョン>
+
+refresh
+```
+コマンドを実行したら、Glitchのエディターから、上で説明した通りにファイルの変更を行ってください。  
+
+この操作ののち、しばらくするとボットが起動します。
