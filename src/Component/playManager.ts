@@ -25,7 +25,7 @@ import { NoSubscriberBehavior } from "@discordjs/voice";
 import { AudioPlayerStatus, createAudioResource, createAudioPlayer, entersState, StreamType, VoiceConnectionStatus } from "@discordjs/voice";
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 import i18next from "i18next";
-import { MessageFlags, type Member, type Message, type TextChannel } from "oceanic.js";
+import { MessageFlags, TextChannel, type Member, type Message } from "oceanic.js";
 
 import { FixedAudioResource } from "./audioResource";
 import { resolveStreamToPlayable } from "./streams";
@@ -309,7 +309,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       }
 
       // 各種準備
-      this._errorReportChannel = message?.channel as TextChannel;
+      this._errorReportChannel = message?.channel as TextChannel || this.server.bot.client.rest.channels.get<TextChannel>(this.server.boundTextChannel);
       this._cost = cost;
       this._lastMember = null;
       this.prepareAudioPlayer();
