@@ -32,8 +32,10 @@ sidebar_position: 1
   bot:
     image: ghcr.io/mtripg6666tdr/discord-music-bot:latest
     # ...
+    # highlight-start
     environment:
       - KEY=VALUE
+    # highlight-end
 # ...
 ```
 

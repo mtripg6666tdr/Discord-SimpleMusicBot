@@ -37,7 +37,7 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to={detectUrl || "/docs/setup/welcome"}>
-            🎵ドキュメントに進む▶️
+            🎵&nbsp;ドキュメントに進む&nbsp;▶️
           </Link>
         </div>
       </div>
