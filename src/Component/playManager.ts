@@ -272,7 +272,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           return null;
         });
         messageIsSending = false;
-      }, 2e3).unref();
+      }, 2.5e3).unref();
       messageSendingScheduledAt = Date.now();
     }
 
