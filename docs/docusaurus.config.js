@@ -119,6 +119,10 @@ const config = {
               {
                 label: 'ボット利用者向け機能ガイド',
                 to: '/docs/guide/overview'
+              },
+              {
+                label: 'リリースノート',
+                href: 'https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/releases'
               }
             ],
           },
@@ -132,11 +136,15 @@ const config = {
             ],
           },
           {
-            title: '開発',
+            title: '開発/翻訳',
             items: [
               {
                 label: 'GitHub',
                 href: 'https://github.com/mtripg6666tdr/Discord-SimpleMusicBot',
+              },
+              {
+                label: 'Crowdin',
+                href: 'https://crowdin.com/project/discord-simplemusicbot'
               },
             ],
           },
