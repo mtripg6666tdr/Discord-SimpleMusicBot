@@ -81,13 +81,13 @@ export default class Frame extends BaseCommand {
     }
 
     if(!vinfo.isLiveStream && (isNaN(time) || time > vinfo.lengthSeconds)){
-      await message.reply(`:warning:${t("commands:frame.invalidTime")}`).catch(this.logger.error);
+      await message.reply(`:warning: ${t("commands:frame.invalidTime")}`).catch(this.logger.error);
       return;
     }
 
     try{
-      const [hour, min, sec] = Util.time.calcHourMinSec(time);
-      const response = await message.reply(`:camera_with_flash:${t("commands:frame.capturing")}...`);
+      const [hour, min, sec] = Util.time.calcHourMinSec(time, { fixedLength: 2 });
+      const response = await message.reply(`:camera_with_flash: ${t("commands:frame.capturing")}...`);
       const { url, ua } = await vinfo.fetchVideo();
       const frame = await getFrame(url, time, ua);
       await response.channel.createMessage({
@@ -100,7 +100,7 @@ export default class Frame extends BaseCommand {
         ],
       });
       await response.edit({
-        content: `:white_check_mark:${
+        content: `:white_check_mark: ${
           t("commands:frame.finish")
         }${vinfo.isLiveStream
           ? ""

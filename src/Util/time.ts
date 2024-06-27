@@ -23,12 +23,12 @@ import type { i18n } from "i18next";
  * @param totalSec 合計時間(秒)
  * @returns [ゼロ補完された分,ゼロ補完された秒]
  */
-export function calcMinSec(totalSec: number){
+export function calcMinSec(totalSec: number, { fixedLength = 0 }: { fixedLength?: number } = {}): [string, string] {
   const sec = totalSec % 60;
   const min = (totalSec - sec) / 60;
   return [
     min.toString().padStart(2, "0"),
-    sec.toString().padStart(2, "0"),
+    sec.toFixed(fixedLength).padStart(fixedLength === 0 ? 2 : fixedLength + 3, "0"),
   ];
 }
 
@@ -37,14 +37,14 @@ export function calcMinSec(totalSec: number){
  * @param totalSec 合計時間(秒)
  * @returns [時間, ゼロ補完された分, ゼロ補完された秒]
  */
-export function calcHourMinSec(totalSec: number): [string, string, string]{
+export function calcHourMinSec(totalSec: number, { fixedLength = 0 }: { fixedLength?: number } = {}): [string, string, string]{
   const sec = totalSec % 60;
   const min = (totalSec - sec) / 60 % 60;
   const hr = ((totalSec - sec) / 60 - min) / 60;
   return [
-    hr.toFixed(2).toString(),
+    hr.toString(),
     min.toString().padStart(2, "0"),
-    sec.toString().padStart(2, "0"),
+    sec.toFixed(fixedLength).padStart(fixedLength === 0 ? 2 : fixedLength + 3, "0"),
   ];
 }
 
