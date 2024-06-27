@@ -1,6 +1,6 @@
 {
   "name": "discord-music-bot",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "description": "Simple Music Bot for Discord without any database",
   "private": true,
   "engines": {
@@ -14,7 +14,7 @@
     "build:bundled": "node builder.mjs bake && tsc -p util/tsconfig/tsconfig.bundle.json && node builder.mjs bundle",
     "prelint": "node builder.mjs bake",
     "lint": "tsc && eslint .",
-    "cleanup": "rimraf dist/ typings/ build/",
+    "cleanup": "rimraf dist/ typings/ build/ out/ src/Commands/_index.ts",
     "generatecommandlist": "node util/generateCommandList"
   },
   "dependencies": {

@@ -14,8 +14,9 @@
   --ifm-color-primary-lighter: #d54e2c;
   --ifm-color-primary-lightest: #db6648;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
-  --ifm-font-family-base: 'IBM Plex Sans JP',system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-  --ifm-font-weight-semibold: 600;
+  --ifm-font-family-base: 'IBM Plex Sans JP', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  --ifm-font-weight-semibold: 500;
+  --ifm-heading-font-weight: 600;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */

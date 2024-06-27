@@ -5,6 +5,7 @@
 .vs/
 node_modules
 dist
+out
 typings
 *.env
 *.exe
