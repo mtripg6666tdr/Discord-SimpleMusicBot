@@ -37,12 +37,13 @@ export class DSL extends LogEmitter<{}> {
   protected logStreams: Readable[] = [];
   protected logFileName: string | null = null;
   protected logFileStream: fs.WriteStream | null = null;
+  protected destroyed = false;
 
   constructor(protected options: DSLOptions){
     super("DSL");
     this.logger.warn("CSV based detailed log enabled.");
     if(options.enableFileLog){
-      this.logFileName = path.join(__dirname, `${global.BUNDLED ? "../" : "../../"}../logs/stream-${Date.now()}.csv`);
+      this.logFileName = path.join(__dirname, `${global.BUNDLED ? ".." : "../../.."}/logs/stream-${Date.now()}.csv`);
       this.logFileStream = fs.createWriteStream(this.logFileName);
       this.logFileStream.once("close", () => this.logger.info("CSV file closed"));
       this.logger.warn(`CSV filename will be ${this.logFileName}`);
@@ -71,7 +72,7 @@ export class DSL extends LogEmitter<{}> {
           this.logStreams.splice(inx, 1);
           this.logger.info(this.logStreams);
           if(this.logStreams.length === 0 && this.logFileStream && !this.logFileStream.destroyed){
-            this.logFileStream.destroy();
+            this.destroy();
             this.logger.info("CSV log saved successfully");
           }
         }
@@ -95,10 +96,15 @@ export class DSL extends LogEmitter<{}> {
   }
 
   destroy(){
-    this.logger.info("Destroyed");
+    if(this.destroyed) return;
+    this.destroyed = true;
+    this.logger.info("Destroying");
     this.csvLog = null;
-    this.logFileStream?.destroy();
-    this.logFileStream = null;
+    if(this.logFileStream){
+      const strm = this.logFileStream;
+      this.logFileStream = null;
+      strm.end();
+    }
   }
 
   protected getNow(){
