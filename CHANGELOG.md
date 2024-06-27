@@ -18,12 +18,12 @@
 * ニコニコ動画の再生に関する問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2407, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2408)
 * ボットにコマンドを送信していなくても通常のチャットでレートリミットがかかってしまう問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2412)
 * 楽曲を削除したり、移動すると、均等再生を設定していても適切にソートされない問題を修正 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2415)
-* 「フレーム」コマンドを実行時に表示される奇妙な小数点以下の数値を修正 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2430)
+* 「フレーム」コマンドを実行時に表示される奇妙な小数点以下の数値を修正 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2430, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2441)
 ## ドキュメント
 * Replit で使用する方法のページをドキュメントサイトから削除 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2167)
   * Replitでのホストは、来年以降Replit Deploymentsを利用する必要があり、Replit Deploymentsは完全有料なため、ドキュメントの保守が不可能になったためです。
   * もし、Replit Deploymentsを有償でご利用されている方で、ドキュメントを執筆していただける方がいらっしゃれば、ぜひドキュメントの再度の執筆をお願いしたく思っております。ご迷惑をおかけいたしますが、何卒ご了承くださいませ。
-* ドキュメントの継続的な更新 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2195, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2366, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2369, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2394)
+* ドキュメントの継続的な更新 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2195, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2366, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2369, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2394, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2433)
 ## 依存関係のアップデート
 * @mtripg6666tdr/oceanic-command-resolver 1.3.0 => 1.4.2
 * @sinclair/typebox 0.31.28 => 0.32.34
