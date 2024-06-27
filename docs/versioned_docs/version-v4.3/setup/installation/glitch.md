@@ -40,6 +40,7 @@ Glitchのトップ画面から、右上にある`New project`をクリックし�
 
 ### 3. ボットが動作するようファイルを編集します
 ボットが動作するよう、いくつかのファイルを変更する必要があります。
+
 * 
   ```diff title="tsconfig.json"
         "importHelpers": true,

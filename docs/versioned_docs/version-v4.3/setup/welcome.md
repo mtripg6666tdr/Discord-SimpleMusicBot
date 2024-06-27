@@ -4,7 +4,7 @@ sidebar_position: 1
 ---
 
 # Discord-SimpleMusicBot
-Discord-SimpleMusicBotのドキュメントへようこそ
+Discord-SimpleMusicBotのドキュメントへようこそ。
 
 こちらのドキュメントでボットの初回設定および起動の手順を確認することができます。
 
