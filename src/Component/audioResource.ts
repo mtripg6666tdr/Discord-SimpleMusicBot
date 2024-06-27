@@ -21,11 +21,15 @@
 
 import type { VolumeTransformer } from "prism-media";
 
-import { EventEmitter } from "stream";
-
 import * as voice from "@discordjs/voice";
 
+import TypedEventEmitter from "../Structure/TypedEmitter";
 import { getLogger } from "../logger";
+
+interface AudioResourceEventKeys {
+  end: [];
+  error: [Error];
+}
 
 class NullMetaAudioResource extends voice.AudioResource<null> {}
 
@@ -41,7 +45,7 @@ export interface FixedAudioResource extends NullMetaAudioResource {
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class FixedAudioResource extends NullMetaAudioResource {
   public error = false;
-  public readonly events: AudioResourceEvent;
+  public readonly events: TypedEventEmitter<AudioResourceEventKeys>;
   private readLength = 0;
   private estimatedLengthSeconds = 0;
   private readonly logger = getLogger("FixedAudioResource");
@@ -56,7 +60,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
   constructor(...args: ConstructorParameters<typeof NullMetaAudioResource>){
     super(...args);
     this.logger.info("instantiated");
-    this.events = new AudioResourceEvent({
+    this.events = new TypedEventEmitter({
       captureRejections: false,
     });
     this.playStream
@@ -67,19 +71,26 @@ export class FixedAudioResource extends NullMetaAudioResource {
       .on("end", () => {
         this.events.emit("end");
         this.logger.info(`Pushed total ${this.readLength} bytes${this.estimatedLengthSeconds !== 0 ? ` (average ${Math.round(this.readLength / this.estimatedLengthSeconds * 8 / 100) / 10} kbps)` : ""}`);
-      })
-    ;
+      });
   }
 
   private get isStreamReadable(){
-    return !(this.playStream.readableEnded || this.playStream.destroyed || this.error || this.timedout);
+    const res = this.playStream.readable || !(this.playStream.readableEnded || this.playStream.destroyed || this.error || this.timedout);
+    if(!res){
+      this.logger.trace(`Stream seems to finished / readable=${this.playStream.readable}, readableEnded=${this.playStream.readableEnded}, destroyed=${this.playStream.destroyed}, error=${this.error}, timedout=${this.timedout}`);
+    }
+    return res;
   }
 
   public override get readable(){
     if(this.silenceRemaining === 0) return false;
     const real = this.isStreamReadable;
     if(!real){
-      if(this.silenceRemaining === -1) this.silenceRemaining = this.silencePaddingFrames;
+      if(this.silenceRemaining === -1){
+        this.logger.trace("Silence padding is enabled.");
+        this.silenceRemaining = this.silencePaddingFrames;
+      }
+
       return this.silenceRemaining !== 0;
     }
     return real;
@@ -91,9 +102,11 @@ export class FixedAudioResource extends NullMetaAudioResource {
 
   public override read(): Buffer | null{
     if(this.silenceRemaining === 0){
+      this.logger.trace("Silence padding frame consumed.");
       return null;
     }else if(this.silenceRemaining > 0){
       this.silenceRemaining--;
+      this.logger.trace(`Silence padding frame consumed. Remaining: ${this.silenceRemaining}`);
       return SILENCE_FRAME;
     }
 
@@ -122,7 +135,11 @@ export class FixedAudioResource extends NullMetaAudioResource {
     if(packet){
       this.playbackDuration += 20;
       this.readLength += packet.length || 0;
+    }else if(this.playStream.readable){
+      this.logger.trace("Stream is readable but no packet received. Sending silence frame.");
+      return SILENCE_FRAME;
     }
+
     return packet;
   }
 
@@ -131,46 +148,5 @@ export class FixedAudioResource extends NullMetaAudioResource {
     _this.estimatedLengthSeconds = estimatedLengthSeconds;
     _this._volume = resource.volume || null;
     return _this;
-  }
-}
-
-interface EventKeys {
-  end: [];
-  error: [Error];
-}
-
-class AudioResourceEvent extends EventEmitter {
-  override on<T extends keyof EventKeys>(event: T, callback: (...args: EventKeys[T]) => any): this{
-    super.on(event, callback);
-    return this;
-  }
-
-  override off<T extends keyof EventKeys>(event: T, callback: (...args: EventKeys[T]) => any){
-    super.off(event, callback);
-    return this;
-  }
-
-  override once<T extends keyof EventKeys>(event: T, callback: (...args: EventKeys[T]) => any){
-    super.once(event, callback);
-    return this;
-  }
-
-  override addListener<T extends keyof EventKeys>(event: T, callback: (...args: EventKeys[T]) => any){
-    super.addListener(event, callback);
-    return this;
-  }
-
-  override removeListener<T extends keyof EventKeys>(event: T, callback: (...args: EventKeys[T]) => any){
-    super.removeListener(event, callback);
-    return this;
-  }
-
-  override removeAllListeners<T extends keyof EventKeys>(event: T){
-    super.removeAllListeners(event);
-    return this;
-  }
-
-  override emit<T extends keyof EventKeys>(event: T, ...args: EventKeys[T]){
-    return super.emit(event, args);
   }
 }
