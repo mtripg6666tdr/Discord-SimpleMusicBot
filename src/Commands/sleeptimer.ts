@@ -29,7 +29,7 @@ export default class SleepTimer extends BaseCommand {
       args: [{
         type: "string",
         name: "time",
-        required: true,
+        required: false,
       }],
       requiredPermissionsOr: ["admin", "dj", "onlyListener"],
       shouldDefer: false,

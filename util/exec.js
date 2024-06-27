@@ -4,13 +4,14 @@ const path = require("path");
 
 let nodePath = "node";
 
-if(fs.existsSync("./node_modules/.bin/node.cmd")){
-  nodePath = "node_modules\\.bin\\node.cmd";
+if(fs.existsSync("./node_modules/node/bin/node.exe")){
+  nodePath = "node_modules\\node\\bin\\node.exe";
 }else if(fs.existsSync("./node_modules/.bin/node")){
   nodePath = "node_modules/.bin/node";
 }
 
 const result = spawnSync(nodePath, ["--version"]);
+
 const version = result.stdout.toString().trim();
 console.log("Node.js " + version + " detected");
 const nodeOptions = [];
@@ -31,4 +32,15 @@ const main = spawn(
     env: process.env,
   }
 );
+
 main.on("exit", (code) => process.exit(code));
+
+let stopping = false;
+const onExit = () => {
+  if(stopping) return;
+  stopping = true;
+
+  main.kill("SIGINT");
+};
+process.on("SIGINT", onExit);
+process.on("SIGTERM", onExit);

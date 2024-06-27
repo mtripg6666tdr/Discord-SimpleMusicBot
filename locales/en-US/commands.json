@@ -565,6 +565,11 @@
     "description": "Exits from the voice channel when the specific time elapsed.",
     "examples": "sleeptimer 5:00",
     "usage": "sleeptimer <time(formatted like \"mm:ss\") or $ (the end of the current playing song)>",
+    "args": {
+      "time": {
+        "description": "Time you want to set a sleep timer. Type in \"mm:ss\" format, or $ to set the timer at the end of the current song."
+      }
+    },
     "done": "Successfully set the sleep timer in **{{time}}**.",
     "doneCurrentSong": "Successfully set the sleep timer at the end of the current song.",
     "canceled": "Canceled the sleep timer.",
