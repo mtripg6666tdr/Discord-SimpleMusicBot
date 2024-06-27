@@ -18,14 +18,14 @@
 
 import type { GuildDataContainer } from "../Structure";
 import type { AudioPlayer } from "@discordjs/voice";
+import type { TextChannel, Member, Message } from "oceanic.js";
 import type { Readable } from "stream";
-
 
 import { NoSubscriberBehavior } from "@discordjs/voice";
 import { AudioPlayerStatus, createAudioResource, createAudioPlayer, entersState, StreamType, VoiceConnectionStatus } from "@discordjs/voice";
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 import i18next from "i18next";
-import { MessageFlags, TextChannel, type Member, type Message } from "oceanic.js";
+import { MessageFlags } from "oceanic.js";
 
 import { FixedAudioResource } from "./audioResource";
 import { resolveStreamToPlayable } from "./streams";
@@ -38,6 +38,7 @@ import { getColor } from "../Util/color";
 import { measureTime } from "../Util/decorators";
 import { getConfig } from "../config";
 import { NowPlayingNotificationLevel } from "../types/GuildPreferences";
+
 
 interface PlayManagerEvents {
   volumeChanged: [volume:string];
