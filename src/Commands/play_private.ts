@@ -78,7 +78,7 @@ export default class PlayPrivate extends BaseCommand {
       const items = await server.playFromUrl(
         message,
         value,
-        { privateSource: true, first: false },
+        { privateSource: true },
       );
 
       if(items.length <= 0 || !await server.joinVoiceChannel(message, {})){
