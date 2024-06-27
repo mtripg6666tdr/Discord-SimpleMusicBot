@@ -18,12 +18,22 @@
 
 import { getLogger } from "./logger";
 
-if(typeof global.fetch === "undefined"){
-  const logger = getLogger("Polyfill");
+const logger = getLogger("Polyfill");
 
+if(typeof global.fetch === "undefined"){
   logger.warn("Native fetch function is not defined.");
   logger.warn("Installing a fetch polyfill.");
   logger.warn("We strongly recommend you upgrading Node.js to v18 or higher.");
 
   global.fetch = require("undici").fetch;
+}
+
+if(typeof global.structuredClone === "undefined"){
+  logger.warn("Native structuredClone function is not defined.");
+  logger.warn("Installing a structuredClone polyfill.");
+  logger.warn("We strongly recommend you upgrading Node.js to v18 or higher.");
+
+  global.structuredClone = function structuredClone<T>(value: T){
+    return JSON.parse(JSON.stringify(value));
+  };
 }
