@@ -19,6 +19,7 @@
 * ボットにコマンドを送信していなくても通常のチャットでレートリミットがかかってしまう問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2412)
 * 楽曲を削除したり、移動すると、均等再生を設定していても適切にソートされない問題を修正 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2415)
 * 「フレーム」コマンドを実行時に表示される奇妙な小数点以下の数値を修正 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2430, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2441)
+* 特定の条件下で、曲を追加した際に意図した場所と違う位置に曲が追加される問題を修正 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2442)
 ## ドキュメント
 * Replit で使用する方法のページをドキュメントサイトから削除 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2167)
   * Replitでのホストは、来年以降Replit Deploymentsを利用する必要があり、Replit Deploymentsは完全有料なため、ドキュメントの保守が不可能になったためです。
