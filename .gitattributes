@@ -2,6 +2,7 @@
 config.json.sample           linguist-language=jsonc
 config*.json                 linguist-language=jsonc
 docker-compose.yml.sample    linguist-language=yml
+compose.yml.sample           linguist-language=yml
 docs/versioned_docs/*        linguist-generated
 docs/versioned_sidebars/*    linguist-generated
 *                            text=auto

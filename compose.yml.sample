@@ -1,4 +1,3 @@
-version: '3'
 services:
   bot:
     image: ghcr.io/mtripg6666tdr/discord-music-bot:latest

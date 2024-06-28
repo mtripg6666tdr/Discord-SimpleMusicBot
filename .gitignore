@@ -1,26 +1,46 @@
+# Node.js Modules
+node_modules
+
+# Visual Studio Code
 .vscode/*
 !.vscode/launch.json
 !.vscode/settings.json
 !.vscode/tasks.json
+
+# Visual Studio
 .vs/
-node_modules
+
+# Build artifacts
 dist
 out
 typings
+build
+src/Commands/_index.ts
+
+# Configuration files
 *.env
-*.exe
+config.json
+docker-compose.yml
+compose.yml
+
+# Executables
 youtube-dl
+*.exe
 node
 !util/**/node
+
+# Files for development purposes only
 *.template.*
 *.temp.*
 *.tmp*
+
+# Temporary files (e.g. logs)
 *.log
-addon
-config.json
 logs/*
 !**/.gitkeep
+
+# Legacy folder
+addon
+
+# Cache
 cache
-docker-compose.yml
-build
-src/Commands/_index.ts

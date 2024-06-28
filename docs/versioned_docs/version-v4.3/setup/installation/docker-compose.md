@@ -20,7 +20,7 @@ sidebar_position: 1
 
 ## 設定の手順
 ### 1. `docker-compose.yml`を用意します。
-[ここ](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/docker-compose.yml.sample)から、
+[ここ](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/compose.yml.sample)から、
 `docker-compose.yml.sample`を入手し、適当なフォルダに`docker-compose.yml`として配置し、必要であれば適宜編集を加えます。  
 
 ### 2. ボットの設定
