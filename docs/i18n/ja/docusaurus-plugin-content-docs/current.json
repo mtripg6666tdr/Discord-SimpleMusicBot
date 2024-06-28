@@ -11,12 +11,16 @@
     "message": "バックアップ",
     "description": "The label for category バックアップ in sidebar docsSidebar"
   },
-  "sidebar.commandsSidebar.category.コマンド一覧": {
-    "message": "コマンド一覧",
-    "description": "The label for category コマンド一覧 in sidebar commandsSidebar"
-  },
   "sidebar.docsSidebar.category.ボットの各種機能": {
     "message": "ボットの各種機能",
     "description": "The label for category ボットの各種機能 in sidebar docsSidebar"
+  },
+  "sidebar.guideSidebar.category.各種機能ガイド": {
+    "message": "各種機能ガイド",
+    "description": "The label for category 各種機能ガイド in sidebar guideSidebar"
+  },
+  "sidebar.guideSidebar.category.コマンド一覧": {
+    "message": "コマンド一覧",
+    "description": "The label for category コマンド一覧 in sidebar guideSidebar"
   }
 }

@@ -14,5 +14,13 @@
   "item.label.機能ガイド": {
     "message": "機能ガイド",
     "description": "Navbar item with label 機能ガイド"
+  },
+  "logo.alt": {
+    "message": "Logo",
+    "description": "The alt text of navbar logo"
+  },
+  "item.label.使い方/ガイド": {
+    "message": "使い方/ガイド",
+    "description": "Navbar item with label 使い方/ガイド"
   }
 }
