@@ -55,7 +55,7 @@ export default class Lyrics extends BaseCommand {
 
     const msg = await message.reply("🔍検索中...");
     try{
-      const songInfo = await getLyrics(context.rawArgs);
+      const songInfo = await getLyrics.call(this, context.rawArgs);
       const embeds = [] as MessageEmbedBuilder[];
       if(!songInfo.lyric) throw new Error("取得した歌詞が空でした");
       const chunkLength = Math.ceil(songInfo.lyric.length / 4000);
@@ -91,7 +91,7 @@ export default class Lyrics extends BaseCommand {
   }
 }
 
-async function getLyrics(keyword: string): Promise<songInfo>{
+async function getLyrics(this: BaseCommand, keyword: string): Promise<songInfo>{
   try{
     const client = new Genius.Client();
     const song = (await client.songs.search(keyword))[0];
@@ -106,6 +106,8 @@ async function getLyrics(keyword: string): Promise<songInfo>{
   catch(e){
     // Fallback to utaten
     if(!process.env.CSE_KEY) throw e;
+    this.logger.warn(e);
+
     const { body } = await candyget.json(
       `${
         Buffer.from("aHR0cHM6Ly9jdXN0b21zZWFyY2guZ29vZ2xlYXBpcy5jb20vY3VzdG9tc2VhcmNoL3YxP2N4PTg5ZWJjY2FjZGMzMjQ2MWYy", "base64").toString()
@@ -116,6 +118,7 @@ async function getLyrics(keyword: string): Promise<songInfo>{
     if(!items || items.length === 0){
       throw new Error("No lyric was found");
     }
+
     const url = items[0].link;
     let { body: lyric } = await candyget.string(url, {
       headers: {
@@ -133,12 +136,15 @@ async function getLyrics(keyword: string): Promise<songInfo>{
       .replace(/[\r\n]{2}/g, "<br>")
     ;
     lyric = convert(lyric);
-    const match = doc.match(/<meta name="description" content="(?<artist>.+?)が歌う(?<title>.+)の歌詞ページ.+です。.+">/);
+
+    const structuredData = JSON.parse<any>(doc.match(/<script\stype="application\/ld\+json">(\r?\n?)\s*(?<json>.+)<\/script>/)!.groups!.json);
     const artwork = doc.match(/<img src="(?<url>.+?)" alt=".+? 歌詞" \/>/)?.groups?.url;
+
+
     return {
       lyric: decode(lyric),
-      artist: decode(match?.groups?.artist),
-      title: decode(match?.groups?.title),
+      artist: structuredData.recordedAs.byArtist.name,
+      title: structuredData.name,
       artwork: artwork?.startsWith("http") ? artwork : DefaultAudioThumbnailURL,
       url: url,
     };
