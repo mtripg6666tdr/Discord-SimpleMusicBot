@@ -34,13 +34,3 @@ const main = spawn(
 );
 
 main.on("exit", (code) => process.exit(code));
-
-let stopping = false;
-const onExit = () => {
-  if(stopping) return;
-  stopping = true;
-
-  main.kill("SIGINT");
-};
-process.on("SIGINT", onExit);
-process.on("SIGTERM", onExit);
