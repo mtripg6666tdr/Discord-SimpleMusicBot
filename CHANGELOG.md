@@ -66,3 +66,20 @@ Node.js v16以上の環境で動作することを想定していますが、で
 [**マイルストーン**](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/milestone/15?closed=1)
 
 ---
+
+# v4.3.1
+## バグ修正
+* ボットが正常に終了しない問題を修正 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2447)
+* エラー発生時のボットの挙動を修正 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2448)
+## 依存関係のアップデート
+### Optional
+* mongodb 6.7.0 => 6.8.0
+
+### その他の特記事項
+#### Node.jsのバージョンについて
+Node.js v16以上の環境で動作することを想定していますが、できれば最新のLTS版を推奨しています。  
+古いバージョンの場合、一部機能が制限されることがあります。詳しくは[こちら](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support#nodejs%E3%81%AE%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E3%81%AB%E3%82%88%E3%82%8B%E6%A9%9F%E8%83%BD%E3%81%AE%E9%81%95%E3%81%84)をご覧ください。
+#### Dockerについて
+* Dockerのイメージは、リリース後30～40分程度で公開されます。
+
+---
