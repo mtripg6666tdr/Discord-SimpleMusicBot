@@ -16,6 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { AudioSource } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { AudioPlayer } from "@discordjs/voice";
 import type { TextChannel, Member, Message } from "oceanic.js";
@@ -31,7 +32,6 @@ import { FixedAudioResource } from "./audioResource";
 import { resolveStreamToPlayable } from "./streams";
 import { DSL } from "./streams/dsl";
 import { Normalizer } from "./streams/normalizer";
-import { type AudioSource } from "../AudioSource";
 import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
 import { getColor } from "../Util/color";
@@ -310,7 +310,9 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       }
 
       // 各種準備
-      this._errorReportChannel = message?.channel as TextChannel || this.server.bot.client.rest.channels.get<TextChannel>(this.server.boundTextChannel);
+      this._errorReportChannel = (message?.channel as TextChannel | undefined)
+        || this.server.bot.client.getChannel<TextChannel>(this.server.boundTextChannel)
+        || await this.server.bot.client.rest.channels.get<TextChannel>(this.server.boundTextChannel);
       this._cost = cost;
       this._lastMember = null;
       this.prepareAudioPlayer();
