@@ -71,6 +71,8 @@ Node.js v16以上の環境で動作することを想定していますが、で
 ## バグ修正
 * ボットが正常に終了しない問題を修正 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2447)
 * エラー発生時のボットの挙動を修正 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2448)
+## ドキュメント
+* ドキュメントの継続的な更新 (https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2450)
 ## 依存関係のアップデート
 ### Optional
 * mongodb 6.7.0 => 6.8.0
