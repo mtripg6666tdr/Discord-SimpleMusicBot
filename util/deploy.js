@@ -9,7 +9,7 @@ async function main(){
   // e.g., "v4.1.6"
   const latestVersion = latestReleaseRes.body.name;
 
-  const hookRes = await candyget.post(process.env.HOOK_URL, "empty", {
+  const hookRes = await candyget.post(process.env.HOOK_URL, "string", {
     headers: {
       "CF-Access-Client-Id": process.env.HOOK_CLIENT_ID,
       "CF-Access-Client-Secret": process.env.HOOK_CLIENT_SECRET,
@@ -20,7 +20,7 @@ async function main(){
   });
 
   if(hookRes.statusCode !== 202){
-    throw new Error("Failed to hook updating to the version.");
+    throw new Error(`Failed to hook updating to the version. Status: ${hookRes.statusCode}, Body: ${hookRes.body}`);
   }
 }
 

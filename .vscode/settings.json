@@ -4,7 +4,8 @@
     "config*.json": "jsonc",
     ".env.sample": "env",
     "config-with-bgm.json": "jsonc",
-    "docker-compose.yml.sample": "dockercompose"
+    "docker-compose.yml.sample": "dockercompose",
+    "compose.yml.sample": "dockercompose"
   },
   "files.insertFinalNewline": true,
   "typescript.tsdk": "node_modules\\typescript\\lib",
