@@ -56,11 +56,15 @@ export class Telemetry extends LogEmitter<Record<never, never>> {
     this._paused = false;
   }
 
+  registerError(err: unknown){
+    this.errors.push(stringifyObject(err));
+  }
+
   private onReady(){
     this.send().catch(this.logger.warn);
     this.bot.on("tick", this.onTick.bind(this));
     process.on("uncaughtException", err => {
-      this.errors.push(stringifyObject(err));
+      this.registerError(err);
     });
   }
 

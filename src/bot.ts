@@ -101,14 +101,15 @@ export class MusicBot extends MusicBotBase {
 
   private async onError(er: Error){
     this.logger.error(er);
-    if(er.message?.startsWith("Invalid token")){
-      this.logger.fatal(
-        "Invalid token detected. Please ensure that you set the correct token. You can also re-generate new token for your bot."
-      );
-      process.exit(1);
+    if(er.message?.startsWith("Invalid token") || (er.cause as Error | undefined)?.message?.includes("401: Unauthorized")){
+      throw new Error("Invalid token detected. Please ensure that you set the correct token. You can also re-generate a new token for your bot.");
     }else{
-      this.logger.info("Attempt reconnecting after waiting for a while...");
-      this._client.disconnect(true);
+      if(this.client.shards.some(shard => shard.status === "disconnected")){
+        this.logger.info("Attempt reconnecting after waiting for a while...");
+        this._client.disconnect(true);
+      }
+
+      this.telemetry?.registerError(er);
     }
   }
 
@@ -124,7 +125,7 @@ export class MusicBot extends MusicBotBase {
    * Botを開始します。
    */
   run(){
-    this._client.connect().catch(e => this.logger.error(e));
+    this._client.connect().catch(this.onError.bind(this));
   }
 
   async stop(){
