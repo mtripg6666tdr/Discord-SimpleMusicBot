@@ -20,7 +20,7 @@ import type { KnownAudioSourceIdentifer } from "../Component/queueManager";
 import type { SourceCache } from "../Component/sourceCache";
 
 import * as AudioSource from ".";
-import { isAvailableRawAudioURL } from "../Util";
+import { getResourceTypeFromUrl } from "../Util";
 import { getConfig } from "../config";
 import { getLogger } from "../logger";
 
@@ -63,7 +63,7 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
   if(!isDisabledSource("youtube") && (type === "youtube" || type === "unknown" && AudioSource.YouTube.validateURL(url))){
     // youtube
     basicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.YouTubeJsonFormat, cache);
-  }else if(!isDisabledSource("custom") && (type === "custom" || type === "unknown" && isAvailableRawAudioURL(url))){
+  }else if(!isDisabledSource("custom") && (type === "custom" || type === "unknown" && getResourceTypeFromUrl(url) !== "none")){
     // カスタムストリーム
     basicInfo = await new AudioSource.CustomStream().init(url, info.knownData);
   }else if(!isDisabledSource("soundcloud") && (type === "soundcloud" || AudioSource.SoundCloudS.validateUrl(url))){

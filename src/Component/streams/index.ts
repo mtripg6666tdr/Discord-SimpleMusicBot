@@ -62,7 +62,10 @@ export async function resolveStreamToPlayable(
   /** シークが有効になっているか  */
   const seekEnabled = seek > 0;
   /** Node.js側でダウンロードすべきかどうか */
-  const shouldDownload = originalStreamInfo.streamType !== "m3u8" && !seekEnabled;
+  const shouldDownload = originalStreamInfo.type === "url"
+    && originalStreamInfo.streamType !== "m3u8"
+    && !originalStreamInfo.canBeWithVideo
+    && !seekEnabled;
   /** shouldDownloadがtrueの場合は常にReadableStreamInfo。それ以外の場合は、UrlStreamInfoの可能性もあります */
   const streamInfo = shouldDownload ? convertStreamInfoToReadableStreamInfo(originalStreamInfo) : originalStreamInfo;
 
@@ -177,15 +180,22 @@ export function destroyStream(stream: Readable, error?: Error){
   }
 }
 
-function convertStreamInfoToReadableStreamInfo(streamInfo: UrlStreamInfo|ReadableStreamInfo): ReadableStreamInfo{
+function convertStreamInfoToReadableStreamInfo(streamInfo: UrlStreamInfo | ReadableStreamInfo): ReadableStreamInfo{
   if(streamInfo.type === "readable"){
     return streamInfo;
   }
+
+  logger.debug("Converting to Readable.");
+
   return {
     type: "readable",
     stream: downloadAsReadable(streamInfo.url, streamInfo.userAgent ? {
       headers: {
         "User-Agent": streamInfo.userAgent,
+        "cookie": streamInfo.cookie
+          ?.split("\n")
+          .map(c => c.trim().split(";")[0])
+          .join(";"),
       },
     } : {}),
     streamType: streamInfo.streamType,

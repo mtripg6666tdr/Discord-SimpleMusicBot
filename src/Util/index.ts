@@ -97,37 +97,65 @@ const audioExtensions = [
   ".mp3",
   ".wav",
   ".wma",
-  ".mov",
-  ".mp4",
   ".ogg",
   ".m4a",
   ".webm",
   ".flac",
 ] as const;
+const videoExtensions = [
+  ".mov",
+  ".mp4",
+  ".webm",
+];
+type ResourceType = "none" | "audio" | "video";
 /**
- * ローオーディオファイルのURLであるかどうかをURLの末尾の拡張子から判断します
+ * ローオーディオファイルのURLであるかどうかをURLの末尾の拡張子から判断します。
  * @param url 検査対象のURL
  * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
  */
-export function isAvailableRawAudioURL(url: string | null, { checkResponse }?: { checkResponse: false }): boolean;
-export function isAvailableRawAudioURL(url: string | null, { checkResponse }: { checkResponse: true }): Promise<boolean>;
-export function isAvailableRawAudioURL(url: string | null, { checkResponse = false } = {}){
+export function getResourceTypeFromUrl(url: string | null): ResourceType;
+/**
+ * ローオーディオファイルのURLであるかどうかをURLの末尾の拡張子から判断します。
+ * @param url 検査対象のURL
+ * @param param1 追加の設定。checkResponseがtrueの場合は、リクエストを送信してレスポンスのContent-Typeを確認します。
+ * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
+ */
+export function getResourceTypeFromUrl(url: string | null, { checkResponse }: { checkResponse: false }): ResourceType;
+/**
+ * ローオーディオファイルのURLであるかどうかをURLの末尾の拡張子から判断します。
+ * @param url 検査対象のURL
+ * @param param1 追加の設定。checkResponseがtrueの場合は、リクエストを送信してレスポンスのContent-Typeを確認します。
+ * @returns ローオーディオファイルのURLであるならばtrue、それ以外の場合にはfalse
+ */
+export function getResourceTypeFromUrl(url: string | null, { checkResponse }: { checkResponse: true }): Promise<ResourceType>;
+export function getResourceTypeFromUrl(url: string | null, { checkResponse = false } = {}): ResourceType | Promise<ResourceType> {
   // check if the url variable is valid string object.
   if(!url || typeof url !== "string"){
-    return false;
+    return "none";
   }
 
   const urlObject = new URL(url);
 
   // check if the url has a valid protocol and if its pathname ends with a valid extension.
-  const urlIsOk = (urlObject.protocol === "https:" || urlObject.protocol === "http:")
-    && audioExtensions.some(ext => urlObject.pathname.endsWith(ext));
+  const urlIsHttp = urlObject.protocol === "http:" || urlObject.protocol === "https:";
 
-  if(!checkResponse || !urlIsOk){
-    return urlIsOk;
+  if(!urlIsHttp){
+    return "none";
   }
 
-  return requestHead(url).then(({ headers }) => headers["content-type"]?.startsWith("audio/"));
+  const typeInferredFromUrl: ResourceType = videoExtensions.some(ext => urlObject.pathname.endsWith(ext))
+    ? "video"
+    : audioExtensions.some(ext => urlObject.pathname.endsWith(ext))
+      ? "audio"
+      : "none";
+
+  if(!checkResponse || typeInferredFromUrl === "none"){
+    return typeInferredFromUrl;
+  }
+
+  return requestHead(url).then(({ headers }) =>
+    headers["content-type"]?.startsWith(`${typeInferredFromUrl}/`) ? typeInferredFromUrl : "none"
+  );
 }
 
 /**
@@ -193,10 +221,10 @@ const artistMatcher = /^\s+artist\s+:(?<artist>.+)$/m;
  */
 export async function retrieveRemoteAudioInfo(url: string): Promise<RemoteAudioInfo> {
   // FFmpegに食わせて標準出力を取得する
-  const ffmpegOut = await retrieveFFmpegStdoutFromUrl(url, () => require("ffmpeg-static"))
+  const ffmpegOut = await retrieveFFmpegStderrFromUrl(url, () => require("ffmpeg-static"))
     .catch(er => {
       getLogger("Util").info(`Failed: ${stringifyObject(er)}`);
-      return retrieveFFmpegStdoutFromUrl(url, () => "ffmpeg");
+      return retrieveFFmpegStderrFromUrl(url, () => "ffmpeg");
     });
 
   const result: RemoteAudioInfo = {
@@ -244,7 +272,7 @@ export async function retrieveRemoteAudioInfo(url: string): Promise<RemoteAudioI
   return result;
 }
 
-function retrieveFFmpegStdoutFromUrl(url: string, ffmpegPathGenerator: () => string){
+function retrieveFFmpegStderrFromUrl(url: string, ffmpegPathGenerator: () => string){
   return new Promise<string>((resolve, reject) => {
     const ffmpegPath = ffmpegPathGenerator();
     let data = "";

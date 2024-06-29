@@ -527,7 +527,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
 
         if(ch.guild.id !== msg.channel.guild.id){
           throw new Error(t("guildDataContainer.unableToPlayOtherServer"));
-        }else if(msg.attachments.size <= 0 || !Util.isAvailableRawAudioURL(msg.attachments.first()?.url || null)){
+        }else if(msg.attachments.size <= 0 || Util.getResourceTypeFromUrl(msg.attachments.first()?.url || null) === "none"){
           throw new Error(t("guildDataContainer.attachmentNotFound"));
         }
 
@@ -556,7 +556,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
 
 
     // オーディオファイルへの直リンク？
-    else if(!config.isDisabledSource("custom") && Util.isAvailableRawAudioURL(rawArg)){
+    else if(!config.isDisabledSource("custom") && Util.getResourceTypeFromUrl(rawArg) !== "none"){
       const item = await this.queue.addQueue({
         url: rawArg,
         addedBy: message.member,
