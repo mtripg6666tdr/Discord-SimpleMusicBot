@@ -16,11 +16,11 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { AudioSourceBasicJsonFormat, StreamInfo } from ".";
+import type { AudioSourceBasicJsonFormat, UrlStreamInfo } from ".";
 
 import { AudioSource } from "./audiosource";
 import { getCommandExecutionContext } from "../Commands";
-import { createFragmentalDownloadStream, downloadAsReadable, isAvailableRawAudioURL, requestHead, retrieveRemoteAudioInfo } from "../Util";
+import { getResourceTypeFromUrl, retrieveRemoteAudioInfo } from "../Util";
 
 export class CustomStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
   constructor(){
@@ -34,7 +34,7 @@ export class CustomStream extends AudioSource<string, AudioSourceBasicJsonFormat
       this.title = prefetched.title || t("audioSources.customStream");
       this.url = url;
       this.lengthSeconds = prefetched.length;
-    }else if(isAvailableRawAudioURL(url)){
+    }else if(getResourceTypeFromUrl(url) !== "none"){
       this.url = url;
       const info = await retrieveRemoteAudioInfo(url);
       this.title = info.displayTitle || this.extractFilename() || t("audioSources.customStream");
@@ -48,26 +48,12 @@ export class CustomStream extends AudioSource<string, AudioSourceBasicJsonFormat
     return this;
   }
 
-  async fetch(url?: boolean): Promise<StreamInfo>{
-    if(url){
-      return {
-        type: "url",
-        url: this.url,
-        streamType: "unknown",
-      };
-    }
-
-    const headRes = await requestHead(this.url);
-    const acceptRanges = headRes.headers["accept-ranges"];
-    const contentLengthStr = headRes.headers["content-length"];
-    const stream = acceptRanges?.includes("bytes") && contentLengthStr && /^\d+$/.test(contentLengthStr)
-      ? createFragmentalDownloadStream(this.url, { contentLength: Number(contentLengthStr) })
-      : downloadAsReadable(this.url);
-
+  async fetch(): Promise<UrlStreamInfo>{
     return {
-      type: "readable",
-      stream,
+      type: "url",
+      url: this.url,
       streamType: "unknown",
+      canBeWithVideo: getResourceTypeFromUrl(this.url) === "video",
     };
   }
 

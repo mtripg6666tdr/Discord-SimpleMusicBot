@@ -23,9 +23,12 @@ import * as htmlEntities from "html-entities";
 
 import { AudioSource } from "./audiosource";
 import { getCommandExecutionContext } from "../Commands";
-import { retrieveHttpStatusCode, retrieveRemoteAudioInfo } from "../Util";
+import { requestHead, retrieveHttpStatusCode, retrieveRemoteAudioInfo } from "../Util";
+import { DefaultUserAgent } from "../definition";
 
 export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat> {
+  protected resourceUrlCache: UrlStreamInfo | null = null;
+
   constructor(){
     super({ isCacheable: false });
   }
@@ -50,11 +53,71 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
   }
 
   async fetch(): Promise<UrlStreamInfo>{
+    if(this.resourceUrlCache){
+      return this.resourceUrlCache;
+    }
+
     const id = GoogleDrive.getId(this.url);
-    return {
+    let resourceUrl = `https://drive.usercontent.google.com/uc?id=${id}&export=download`;
+
+    this.logger.debug("Fetching resource URL.");
+    const { statusCode, headers, body } = await candyget(resourceUrl, "stream", {
+      headers: {
+        "User-Agent": DefaultUserAgent,
+      },
+    });
+    const contentType = headers["content-type"];
+    let canBeWithVideo = !!contentType?.startsWith("video/");
+
+    if(statusCode >= 400 || !contentType){
+      body.destroy();
+      throw new Error("The requested resource is not available right now.");
+    }
+
+    const isDoc = contentType.startsWith("text/html");
+
+    if(isDoc){
+      this.logger.debug("Resource URL is a document. Reading resource URL from document.");
+      const document = await new Promise<string>((resolve, reject) => {
+        const buf: Buffer[] = [];
+        body
+          .on("data", chunk => buf.push(chunk))
+          .on("error", reject)
+          .on("end", () => {
+            resolve(Buffer.concat(buf).toString());
+          });
+      });
+      const { url: actionUrl } = document.match(/action="(?<url>.+?)"/)?.groups || {};
+      const resourceUrlObj = new URL(actionUrl);
+      for(const match of document.matchAll(/<input type="hidden" name="(?<name>.+?)" value="(?<value>.+?)">/g)){
+        const { name, value } = match.groups!;
+        resourceUrlObj.searchParams.set(name, value);
+      }
+
+      resourceUrl = resourceUrlObj.toString();
+
+      this.logger.debug("Fetching resource URL to check if it is playable");
+      const { statusCode: resourceStatusCode, headers: resourceHeaders } = await requestHead(resourceUrl);
+      const resourceContentType = resourceHeaders["content-type"];
+
+      if(
+        resourceStatusCode >= 400
+        || !resourceContentType
+        || (!resourceContentType.startsWith("audio/") && !resourceContentType.startsWith("video/"))
+      ){
+        throw new Error("The requested resource is not available right now.");
+      }
+
+      canBeWithVideo = !!resourceContentType.startsWith("video/");
+    }
+
+    body.destroy();
+
+    return this.resourceUrlCache = {
       type: "url",
       streamType: "unknown",
-      url: `https://drive.google.com/uc?id=${id}`,
+      url: resourceUrl,
+      canBeWithVideo,
     };
   }
 
@@ -79,6 +142,10 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
       length: this.lengthSeconds,
       title: this.title,
     };
+  }
+
+  override purgeCache(): void {
+    this.resourceUrlCache = null;
   }
 
   static validateUrl(url: string){
