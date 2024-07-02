@@ -62,7 +62,7 @@
     "eslint-plugin-license-header": "^0.6.1",
     "mocha": "^10.5.2",
     "rimraf": "^5.0.7",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.3"
   },
   "optionalDependencies": {
     "@discordjs/opus": "^0.9.0",
