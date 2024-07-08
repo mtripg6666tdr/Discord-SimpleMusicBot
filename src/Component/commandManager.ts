@@ -105,7 +105,7 @@ export class CommandManager extends LogEmitter<{}> {
    * @returns 解決されたコマンド
    */
   resolve(command: string){
-    const result = this.commandMap.get(command);
+    const result = this.commandMap.get(command.toLowerCase());
     if(result){
       this.logger.info(`Command "${command}" was resolved successfully`);
     }else{
