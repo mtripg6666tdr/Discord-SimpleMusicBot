@@ -41,8 +41,13 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
     const { t } = getCommandExecutionContext();
 
     this.url = url;
-    if(prefetched){
+    if(NiconicoTempDL.isTempWatchUrl(url)){
+      this.nicoTemp = new NiconicoTempDL(url);
+    }else{
       this.nico = new NiconicoDL(url, /* quality */ "high");
+    }
+
+    if(prefetched){
       this.title = prefetched.title;
       this.description = htmlToText(prefetched.description);
       this.lengthSeconds = prefetched.length;
@@ -50,8 +55,7 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
       this.thumbnail = prefetched.thumbnail;
       this.views = prefetched.views;
     }else if(NiconicoTempDL.isTempWatchUrl(url)){
-      this.nicoTemp = new NiconicoTempDL(url);
-      const info = await this.nicoTemp.getInfo();
+      const info = await this.nicoTemp!.getInfo();
       this.title = info.data.video.title;
       this.description = htmlToText(info.data.video.description);
       this.lengthSeconds = info.data.video.duration;
