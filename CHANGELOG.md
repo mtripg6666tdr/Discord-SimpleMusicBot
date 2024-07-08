@@ -94,3 +94,22 @@ Node.js v16以上の環境で動作することを想定していますが、で
 * Dockerのイメージは、リリース後10～20分程度で公開されます。
 
 ---
+
+# v4.3.3
+## バグ修正
+* 一部のソースで、音楽ソースの内容を正しく判断できず再生に失敗する問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2455)
+* 均等再生機能を使用するとクラッシュする場合がある問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2470)
+* 大文字にするとコマンドが使えない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2472)
+* エラー発生時に、特定の条件下で長文のエラーメッセージが表示される問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2473)
+* v4.3.0で導入された遅延メッセージ関連の機能をリファクタリングし、数々のバグを改善(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2474)
+* 非公開の音楽ソースのURL等が漏洩する可能性のある問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2475)
+* キュー追加位置の算出に問題があったため修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2477)
+## 依存関係のアップデート
+* comment-json 4.2.3 => 4.2.4
+* https-proxy-agent 7.0.4 => 7.0.5
+* spotify-url-info 3.2.15 => 3.2.16
+## その他の特記事項
+* Node.jsは、最新のLTSのバージョンをご利用いただくことを強く推奨しています。v16以上であれば動作はしますが、一部機能が制限されることがあります。詳しくは[こちら](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support#nodejs%E3%81%AE%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E3%81%AB%E3%82%88%E3%82%8B%E6%A9%9F%E8%83%BD%E3%81%AE%E9%81%95%E3%81%84)をご覧ください。
+* Dockerのイメージは、リリース後10～20分程度で公開されます。
+
+---
