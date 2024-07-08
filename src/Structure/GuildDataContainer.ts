@@ -535,6 +535,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           url: msg.attachments.first()!.url,
           addedBy: message.member,
           first,
+          cancellable,
           message: smsg,
           privateSource,
         });
@@ -561,6 +562,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         url: rawArg,
         addedBy: message.member,
         sourceType: "custom",
+        cancellable,
         first,
         message: await message.reply(t("pleaseWait")),
         privateSource,

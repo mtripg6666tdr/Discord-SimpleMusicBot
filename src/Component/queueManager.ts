@@ -367,13 +367,13 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       // UIを表示する
       if(uiMessageTimeout || uiMessage){
         // 曲の時間取得＆計算
-        const _t = Number(info.basicInfo.lengthSeconds);
-        const [min, sec] = Util.time.calcMinSec(_t);
+        const trackLengthSeconds = Number(info.basicInfo.lengthSeconds);
+        const [min, sec] = Util.time.calcMinSec(trackLengthSeconds);
         // キュー内のオフセット取得
         const index = info.index.toString();
         // ETAの計算
         const timeFragments = Util.time.calcHourMinSec(
-          this.getLengthSecondsTo(info.index) - _t - Math.floor(this.server.player.currentTime / 1000)
+          this.getLengthSecondsTo(info.index) - trackLengthSeconds - Math.floor(this.server.player.currentTime / 1000)
         );
         // 埋め込みの作成
         const embed = new MessageEmbedBuilder()
@@ -384,7 +384,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
             t("length"),
             info.basicInfo.isYouTube() && info.basicInfo.isLiveStream
               ? t("liveStream")
-              : _t !== 0
+              : trackLengthSeconds !== 0
                 ? min + ":" + sec
                 : t("unknown"),
             true
@@ -460,8 +460,8 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
 
           collectorCreateResult.collector.once("cancelLast", interaction => {
             try{
-              const item = this.get(this.length - 1);
-              this.removeAt(this.length - 1);
+              const item = this.get(info.index);
+              this.removeAt(info.index);
               interaction.createFollowup({
                 content: `🚮${t("components:queue.cancelAdded", { title: item.basicInfo.title })}`,
               }).catch(this.logger.error);

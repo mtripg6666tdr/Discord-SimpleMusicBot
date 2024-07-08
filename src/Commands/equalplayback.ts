@@ -51,6 +51,7 @@ export default class EquallyPlayback extends BaseCommand {
         .toOceanic()
       ;
       command.reply({ embeds: [embed] }).catch(this.logger.error);
+      context.server.queue.sortByAddedBy();
     }
   }
 }
