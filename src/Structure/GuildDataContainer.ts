@@ -564,7 +564,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         sourceType: "custom",
         cancellable,
         first,
-        message: await message.reply(t("pleaseWait")),
+        message,
         privateSource,
       });
 
@@ -835,7 +835,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       }
     }
 
-    await commandMessage.reply(`:face_with_raised_eyebrow:${t("commands:play.noContent")}`)
+    await commandMessage.reply(`:face_with_raised_eyebrow: ${t("commands:play.noContent")}`)
       .catch(this.logger.error);
   }
 

@@ -21,7 +21,7 @@ import type { TaskCancellationManager } from "./taskCancellationManager";
 import type { AudioSourceBasicJsonFormat } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { AddedBy, QueueContent } from "../types/QueueContent";
-import type { AnyTextableGuildChannel, EditMessageOptions, Message, MessageActionRow } from "oceanic.js";
+import type { AnyTextableGuildChannel, EditMessageOptions, MessageActionRow } from "oceanic.js";
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 import { CommandMessage as LibCommandMessage } from "@mtripg6666tdr/oceanic-command-resolver";
@@ -32,6 +32,7 @@ import ytmpl from "yt-mix-playlist";
 import ytdl from "ytdl-core";
 
 import { ResponseMessage } from "./commandResolver/ResponseMessage";
+import { DeferredMessage } from "./deferredMessage";
 import * as AudioSource from "../AudioSource";
 import { getCommandExecutionContext } from "../Commands";
 import { ServerManagerBase } from "../Structure";
@@ -285,9 +286,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
 
     const { t } = getCommandExecutionContext();
 
-    let uiMessage: Message<AnyTextableGuildChannel> | LibCommandMessage | ResponseMessage | null = null;
-    let uiMessageTimeout: NodeJS.Timeout | null = null;
-    let uiMessageSending = false;
+    let uiMessage: DeferredMessage | ResponseMessage | null = null;
 
     try{
       // UI表示するためのメッセージを特定する作業
@@ -311,32 +310,21 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       }else if(options.message){
         // すでに処理中メッセージがある場合
         this.logger.info("AutoAddQueue will report statuses to the specified message");
-        const optionsMessage = uiMessage = options.message;
-        if(optionsMessage instanceof LibCommandMessage){
-          uiMessageTimeout = setTimeout(async () => {
-            uiMessageSending = true;
-            uiMessage = await optionsMessage.reply({
-              content: t("loadingInfoPleaseWait"),
-            }).catch(er => {
-              this.logger.error(er);
-              return null;
-            });
-            uiMessageSending = false;
-          }, 2e3).unref();
-        }
+
+        uiMessage = options.message instanceof LibCommandMessage
+          ? DeferredMessage.create(options.message, 2e3, {
+            content: t("loadingInfoPleaseWait"),
+          })
+            .on("error", this.logger.error)
+            .on("debug", this.logger.debug)
+          : options.message;
       }else if(options.channel){
         // まだないの場合（新しくUI用のメッセージを生成する）
         this.logger.info("AutoAddQueue will make a message that will be used to report statuses");
-        uiMessageTimeout = setTimeout(async () => {
-          uiMessageSending = true;
-          uiMessage = await options.channel.createMessage({
-            content: t("loadingInfoPleaseWait"),
-          }).catch(er => {
-            this.logger.error(er);
-            return null;
-          });
-          uiMessageSending = false;
-        }, 2e3).unref();
+
+        uiMessage = DeferredMessage.create(options.channel, 2e3, {
+          content: t("loadingInfoPleaseWait"),
+        }).on("error", this.logger.error);
       }
 
       // キューの長さ確認
@@ -365,7 +353,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       this.logger.info("AutoAddQueue worked successfully");
 
       // UIを表示する
-      if(uiMessageTimeout || uiMessage){
+      if(uiMessage){
         // 曲の時間取得＆計算
         const trackLengthSeconds = Number(info.basicInfo.lengthSeconds);
         const [min, sec] = Util.time.calcMinSec(trackLengthSeconds);
@@ -506,21 +494,11 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           };
         }
 
-        if(uiMessageTimeout){
-          clearTimeout(uiMessageTimeout);
+        const lastReply = await uiMessage.edit(messageContent).catch(this.logger.error);
+
+        if(lastReply){
+          collector?.setMessage(lastReply);
         }
-
-        if(uiMessageSending){
-          await Util.waitForEnteringState(() => !uiMessageSending, 10e3, { rejectOnTimeout: false });
-        }
-
-        const lastReply: Message<AnyTextableGuildChannel> | ResponseMessage = uiMessage
-          ? uiMessage instanceof LibCommandMessage
-            ? await uiMessage.reply(messageContent)
-            : await uiMessage.edit(messageContent)
-          : await options.channel!.createMessage(messageContent);
-
-        collector?.setMessage(lastReply);
       }
       return info;
     }
@@ -535,11 +513,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           embeds: [],
         };
 
-        if(uiMessage instanceof LibCommandMessage){
-          uiMessage.reply(errorMessageContent).catch(this.logger.error);
-        }else{
-          uiMessage.edit(errorMessageContent).catch(this.logger.error);
-        }
+        uiMessage.edit(errorMessageContent).catch(this.logger.error);
       }
       return null;
     }

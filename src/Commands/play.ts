@@ -82,7 +82,7 @@ export default class Play extends BaseCommand {
     if(context.rawArgs === "" && server.player.isPaused){
       server.player.resume();
       await message.reply({
-        content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:arrow_forward:${t("commands:play.resuming")}`,
+        content: `${context.includeMention ? `<@${message.member.id}> ` : ""} :arrow_forward:${t("commands:play.resuming")}`,
         allowedMentions: {
           users: false,
         },
