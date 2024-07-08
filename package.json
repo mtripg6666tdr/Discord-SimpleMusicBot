@@ -61,7 +61,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-license-header": "^0.6.1",
     "mocha": "^10.6.0",
-    "rimraf": "^5.0.7",
+    "rimraf": "^5.0.8",
     "typescript": "^5.5.3"
   },
   "optionalDependencies": {
