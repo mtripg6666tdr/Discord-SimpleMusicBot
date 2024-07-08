@@ -70,7 +70,7 @@ export default class NowPlaying extends BaseCommand {
     // create embed
     const embed = new MessageEmbedBuilder()
       .setColor(getColor("NP"))
-      .setTitle(`${t("commands:nowplaying.nowPlayingSong")}:musical_note:`)
+      .setTitle(`${t("commands:nowplaying.nowPlayingSong")} :musical_note:`)
       .setDescription(
         (
           info.isPrivateSource
@@ -82,9 +82,13 @@ export default class NowPlaying extends BaseCommand {
             ? `(${t("liveStream")})`
             : ` \`${min}:${sec}/${totalDurationSeconds === 0 ? `(${t("unknown")})` : `${tmin}:${tsec}\``}`
         }`
-      )
-      .setFields(...info.toField(["long", "l", "verbose", "l", "true"].some(arg => context.args[0] === arg)))
-      .addField(":link:URL", info.url);
+      );
+
+    if(!info.isPrivateSource){
+      embed
+        .setFields(...info.toField(["long", "l", "verbose", "l", "true"].some(arg => context.args[0] === arg)))
+        .addField(":link:URL", info.url);
+    }
 
     if(typeof info.thumbnail === "string"){
       embed.setThumbnail(info.thumbnail);
