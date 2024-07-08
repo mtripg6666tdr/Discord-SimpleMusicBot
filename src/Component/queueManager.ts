@@ -821,28 +821,35 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
    * 追加者によってできるだけ交互になるようにソートします
    */
   sortByAddedBy(addedByUsers?: string[]){
+    const firstItem = this._default[0];
+
+    if(!firstItem) return;
+
     // 追加者の一覧とマップを作成
     const generateUserOrder = !addedByUsers;
     addedByUsers = addedByUsers || [];
-    const queueByAdded = {} as { [key: string]: QueueContent[] };
+    const queueByAdded = new Map<string, QueueContent[]>();
     for(let i = 0; i < this._default.length; i++){
-      if(!addedByUsers.includes(this._default[i].additionalInfo.addedBy.userId)){
-        if(generateUserOrder){
-          addedByUsers.push(this._default[i].additionalInfo.addedBy.userId);
-        }
-        queueByAdded[this._default[i].additionalInfo.addedBy.userId] = [this._default[i]];
+      const item = this._default[i];
+      if(generateUserOrder && !addedByUsers.includes(item.additionalInfo.addedBy.userId)){
+        addedByUsers.push(item.additionalInfo.addedBy.userId);
+      }
+
+      if(queueByAdded.has(item.additionalInfo.addedBy.userId)){
+        queueByAdded.get(item.additionalInfo.addedBy.userId)!.push(item);
       }else{
-        queueByAdded[this._default[i].additionalInfo.addedBy.userId].push(this._default[i]);
+        queueByAdded.set(item.additionalInfo.addedBy.userId, [item]);
       }
     }
+
     // ソートをもとにキューを再構築
     const sorted = [] as QueueContent[];
-    const maxLengthByUser = Math.max(...addedByUsers.map(user => queueByAdded[user].length));
+    const maxLengthByUser = Math.max(...addedByUsers.map(userId => queueByAdded.get(userId)?.length || 0));
     for(let i = 0; i < maxLengthByUser; i++){
-      sorted.push(...addedByUsers.map(user => queueByAdded[user][i]).filter(q => !!q));
+      sorted.push(...addedByUsers.map(userId => queueByAdded.get(userId)?.[i]).filter(q => !!q));
     }
     this._default = sorted;
-    this.emit("changeWithoutCurrent");
+    this.emit(this._default[0] === firstItem ? "changeWithoutCurrent" : "change");
   }
 
   getRawQueueItems(){
