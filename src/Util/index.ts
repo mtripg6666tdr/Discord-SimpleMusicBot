@@ -61,6 +61,20 @@ export function stringifyObject(obj: any): string{
 }
 
 /**
+ * 与えられた文字列に、ファイルパスが含まれている場合、それを隠します。
+ * @param original 元の文字列
+ * @returns フィルター後の文字列
+ */
+export function filterContent(original: string){
+  const cwd = process.cwd();
+  return original
+    .replaceAll(cwd, "***")
+    .replace(/https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+/g, "http:***")
+    .replace(/\\/g, "/")
+    .replace(/\*/g, "\\*");
+}
+
+/**
  * 空のPassThroughを生成します
  * @returns PassThrough
  */

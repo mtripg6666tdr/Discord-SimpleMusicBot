@@ -24,7 +24,7 @@ import os from "os";
 import candyget from "candyget";
 
 import { LogEmitter } from "../Structure";
-import { stringifyObject } from "../Util";
+import { filterContent, stringifyObject } from "../Util";
 
 const t12HOURS = 12 * 60;
 const endpoint = Buffer.from("aHR0cHM6Ly9kc21iLW1ldHJpY3MudXNhbXlvbi5tb2U=", "base64").toString();
@@ -57,7 +57,7 @@ export class Telemetry extends LogEmitter<Record<never, never>> {
   }
 
   registerError(err: unknown){
-    this.errors.push(stringifyObject(err));
+    this.errors.push(filterContent(stringifyObject(err)));
   }
 
   private onReady(){
