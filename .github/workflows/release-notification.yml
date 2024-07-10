@@ -25,7 +25,7 @@ jobs:
           echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
       - name: Check npm cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
@@ -34,11 +34,14 @@ jobs:
             npm-20.x-
             npm-
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup deps & scripts
+        run: |
+          npm init -y
+          npm install oceanic.js@~1.11.0 candyget@~0.5.4
+          curl -Lo notification.js https://github.com/${{ github.repository }}/raw/${{ github.ref_name }}/util/notification.js
 
       - name: Run notification
-        run: node util/notification
+        run: node notification
         env:
           TOKEN: ${{ secrets.Y_TOKEN }}
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
