@@ -20,24 +20,24 @@ import { Cache } from "./base";
 import { YoutubeDlInfo, baseYoutubeDlStrategy } from "./baseYoutubeDlStrategy";
 import { BinaryManager } from "../../../Component/binaryManager";
 
-const ytDlPBinaryManager = new BinaryManager({
+const ytDlNightlyBinaryManager = new BinaryManager({
   binaryName: "youtube-dl",
-  localBinaryName: "ydp_youtube-dl",
-  binaryRepo: "ytdl-patched/youtube-dl",
+  localBinaryName: "ydn_youtube-dl",
+  binaryRepo: "ytdl-org/ytdl-nightly",
   checkImmediately: false,
 });
 
-type ytDlPatchedYoutubeDl = "ytDlPatchedYoutubeDl";
-const ytDlPatchedYoutubeDl: ytDlPatchedYoutubeDl = "ytDlPatchedYoutubeDl";
+type nightlyYoutubeDl = "ytDlNightlyYoutubeDl";
+const nightlyYoutubeDl: nightlyYoutubeDl = "ytDlNightlyYoutubeDl";
 
-export class YtDlPatchedYoutubeDl extends baseYoutubeDlStrategy<ytDlPatchedYoutubeDl> {
+export class NightlyYoutubeDl extends baseYoutubeDlStrategy<nightlyYoutubeDl> {
   constructor(priority: number){
-    super(priority, ytDlPatchedYoutubeDl, ytDlPBinaryManager);
+    super(priority, nightlyYoutubeDl, ytDlNightlyBinaryManager);
   }
 
-  protected override cacheIsValid(cache?: Cache<any, any> | undefined): cache is Cache<ytDlPatchedYoutubeDl, YoutubeDlInfo> {
-    return cache?.type === YtDlPatchedYoutubeDl;
+  protected override cacheIsValid(cache?: Cache<any, any> | undefined): cache is Cache<nightlyYoutubeDl, YoutubeDlInfo> {
+    return cache?.type === NightlyYoutubeDl;
   }
 }
 
-export default YtDlPatchedYoutubeDl;
+export default NightlyYoutubeDl;
