@@ -340,7 +340,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       this.setVolume(this.volume);
 
       // wait for player entering the playing state
-      const waitingSucceeded = await entersState(this._player!, AudioPlayerStatus.Playing, 20e3)
+      const waitingSucceeded = await entersState(this._player!, AudioPlayerStatus.Playing, 30e3)
         .then(() => true)
         .catch(() => false);
 

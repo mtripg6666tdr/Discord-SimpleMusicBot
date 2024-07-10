@@ -17,11 +17,11 @@
  */
 
 import type { Strategy, Cache } from "./base";
+import type { NightlyYoutubeDl } from "./nightly_youtube-dl";
 import type { playDlStrategy } from "./play-dl";
 import type { youtubeDlStrategy } from "./youtube-dl";
 import type { ytDlPStrategy } from "./yt-dlp";
 import type { ytdlCoreStrategy } from "./ytdl-core";
-import type { YtDlPatchedYoutubeDl } from "./ytdl-patched_youtube-dl";
 
 import { getConfig } from "../../../config";
 import { getLogger } from "../../../logger";
@@ -31,21 +31,26 @@ type strategies =
   | playDlStrategy
   | youtubeDlStrategy
   | ytDlPStrategy
-  | YtDlPatchedYoutubeDl
+  | NightlyYoutubeDl
 ;
 
 const logger = getLogger("Strategies");
 const config = getConfig();
 
 export const strategies: strategies[] = [
-  () => require("./ytdl-core"),
-  () => require("./play-dl"),
-  () => require("./youtube-dl"),
-  () => require("./yt-dlp"),
-  () => require("./ytdl-patched_youtube-dl"),
-].map((_import, i) => {
+  { enable: false, importer: () => require("./ytdl-core") },
+  { enable: false, importer: () => require("./play-dl") },
+  { enable: true, importer: () => require("./youtube-dl") },
+  { enable: false, importer: () => require("./yt-dlp") },
+  { enable: true, importer: () => require("./nightly_youtube-dl") },
+].map(({ enable, importer }, i) => {
+  if(!enable){
+    logger.warn(`strategy#${i} is currently disabled.`);
+    return null;
+  }
+
   try{
-    const { default: Module } = _import();
+    const { default: Module } = importer();
     return new Module(i);
   }
   catch(e){
