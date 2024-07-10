@@ -19,7 +19,7 @@
     "songAdded": "Şarkı Eklendi",
     "positionInQueue": "Kuyruktaki Konumu",
     "etaToPlay": "Oynatmak için kalan süre",
-    "fallbackNotice": "現在、通常の方法で情報を取得できなかったため、代わりの方法を使用しました。これが異常だと思われる場合はサポートまでお問い合わせください。\n処理に時間がかかる、突然終了するなど、正常な動作をしない場合があります。この場合の動作はサポート対象外です。問題が発生した場合、`リセット`コマンドを使用すると、サーバーのデータをすべて初期化することができます。",
+    "fallbackNotice": "現在、通常の方法で情報を取得できなかったため、代わりの方法を使用しました。これが異常だと思われる場合はサポートまでお問い合わせください。\n処理に時間がかかる、突然終了するなど、正常な動作をしない場合があります。万一問題が発生した場合、`リセット`コマンドを使用すると、サーバーのデータをすべて初期化することができます。",
     "spotifyNotice": "Spotify'daki şarkılar doğru şekilde OYNATILAMAYABİLİR.",
     "cancelAdded": "`{{title}}` eklenmesi iptal edildi",
     "failedToAdd": "Sıraya eklenemedi.",
