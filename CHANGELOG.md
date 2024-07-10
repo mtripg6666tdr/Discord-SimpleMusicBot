@@ -116,7 +116,7 @@ Node.js v16以上の環境で動作することを想定していますが、で
 
 # v4.3.4
 ## バグ修正
-* 一部のソースの再生が機能しなくなったのを暫定的に修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2479)
+* 一部のソースの再生が機能しなくなったのを暫定的に修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2479, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2482)
   * 今回の修正は暫定的な修正のため、以下の問題があります。
     * フレーム機能など一部の機能が機能しません。
     * 再生までに通常より長く時間がかかります。
