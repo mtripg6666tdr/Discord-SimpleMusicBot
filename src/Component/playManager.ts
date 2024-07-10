@@ -352,6 +352,10 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       // the error(s) should be also emitted from AudioPlayer and handled by PlayManager#handleError
       // so simply ignore the error(s) here.
       if(!waitingSucceeded){
+        if(message instanceof DeferredMessage){
+          message.cancelSchedule();
+        }
+
         return this;
       }
 
