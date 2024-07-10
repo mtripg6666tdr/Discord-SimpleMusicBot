@@ -1,2 +1,2 @@
 - [ドキュメント](https://web.usamyon.moe/Discord-SimpleMusicBot/)
-- [Discordサーバー](https://myon.page.link/8QZw)
+- [Discordサーバー](https://sr.usamyon.moe/8QZw)
