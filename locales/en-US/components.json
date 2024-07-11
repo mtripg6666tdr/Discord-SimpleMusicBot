@@ -19,7 +19,7 @@
     "songAdded": "Song Added",
     "positionInQueue": "Position in Queue",
     "etaToPlay": "Estimated Time until Playing",
-    "fallbackNotice": "This song couldn't be played in the normal method, so used an alternative method. If this behavior is obviously an error, please contact our support.\nIt may NOT be played correctly, like it takes more time than usual or it ends suddenly. We don't support such cases. When you have any troubles, you can use command `reset` to reset all data in the server.",
+    "fallbackNotice": "This song couldn't be played in the normal method, so used an alternative method. If this behavior is obviously an error, please contact our support.\nIt may NOT be played normally, like it takes more time than usual or it ends suddenly. When you have any troubles, you can use command `reset` to reset all data in the server.",
     "spotifyNotice": "Songs on Spotify may NOT be played correctly.",
     "cancelAdded": "Canceled adding `{{title}}`",
     "failedToAdd": "Failed to add to queue.",
