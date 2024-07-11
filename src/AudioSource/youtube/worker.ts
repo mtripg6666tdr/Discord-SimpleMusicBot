@@ -18,6 +18,8 @@
 
 import type { WithId, spawnerJobMessage, workerMessage } from "./spawner";
 
+import "../../polyfill";
+
 import { parentPort } from "worker_threads";
 
 import ytsr from "ytsr";

@@ -34,16 +34,22 @@ type strategies =
   | NightlyYoutubeDl
 ;
 
+interface StrategyImporter {
+  enable: boolean;
+  importer: () => any;
+}
+
 const logger = getLogger("Strategies");
 const config = getConfig();
 
-export const strategies: strategies[] = [
+export const strategies: strategies[] = ([
   { enable: false, importer: () => require("./ytdl-core") },
   { enable: false, importer: () => require("./play-dl") },
+  { enable: true, importer: () => require("./distube_ytdl-core") },
   { enable: false, importer: () => require("./youtube-dl") },
   { enable: true, importer: () => require("./yt-dlp") },
   { enable: true, importer: () => require("./nightly_youtube-dl") },
-].map(({ enable, importer }, i) => {
+] satisfies StrategyImporter[]).map(({ enable, importer }, i) => {
   if(!enable){
     logger.warn(`strategy#${i} is currently disabled.`);
     return null;
@@ -95,11 +101,8 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(.
         logger.warn(`fetch in strategy#${i} failed`, e);
       }
     }
-    logger.warn(
-      i + 1 === strategies.length
-        ? "All strategies failed"
-        : "Fallbacking to the next strategy"
-    );
+
+    logger.warn("Fallbacking to the next strategy");
   }
   throw new Error("All strategies failed");
 }

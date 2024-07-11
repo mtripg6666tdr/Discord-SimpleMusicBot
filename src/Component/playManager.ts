@@ -431,7 +431,13 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     );
     /* eslint-disable @typescript-eslint/indent */
     const embed = new MessageEmbedBuilder()
-      .setTitle(`:cd: ${i18next.t("components:nowplaying.nowplayingTitle", { lng: this.server.locale })} :musical_note:`)
+      .setTitle(
+        `:cd: ${
+          i18next.t("components:nowplaying.nowplayingTitle", { lng: this.server.locale })
+        }${
+          this.currentAudioInfo.isYouTube() ? this.currentAudioInfo.getStrategyIndicator() : ""
+        } :musical_note:`
+      )
       .setDescription(
         (
           this.currentAudioInfo.isPrivateSource
@@ -485,14 +491,13 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     }
 
     /* eslint-enable @typescript-eslint/indent */
+
     if(this.currentAudioInfo.isYouTube()){
       if(this.currentAudioInfo.isFallbacked){
         embed.addField(
           `:warning: ${i18next.t("attention", { lng: this.server.locale })}`,
           i18next.t("components:queue.fallbackNotice", { lng: this.server.locale })
         );
-      }else if(this.currentAudioInfo.strategyId === 1){
-        embed.setTitle(`${embed.title}*`);
       }
     }
 

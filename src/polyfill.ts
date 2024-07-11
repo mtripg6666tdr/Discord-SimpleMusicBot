@@ -37,3 +37,8 @@ if(typeof global.structuredClone === "undefined"){
     return JSON.parse(JSON.stringify(value));
   };
 }
+
+if(typeof global.ReadableStream === "undefined"){
+  logger.warn("Native ReadableStream class is not defined.");
+  global.ReadableStream = require("stream/web").ReadableStream;
+}

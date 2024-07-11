@@ -17,6 +17,7 @@
  */
 
 import type { Cache } from "./strategies/base";
+import type { distubeYtdlCore } from "./strategies/distube_ytdl-core";
 import type { StreamInfo } from "..";
 import type { EmbedField } from "oceanic.js";
 import type { InfoData } from "play-dl";
@@ -67,7 +68,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
   }
 
   get isFallbacked(){
-    return typeof this.strategyId === "number" && this.strategyId !== 0 && this.strategyId !== 1;
+    return typeof this.strategyId === "number" && this.strategyId !== 0 && this.strategyId !== 1 && this.strategyId !== 2;
   }
 
   get cacheIsStale(){
@@ -171,7 +172,9 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
       await this.refreshInfo({ forceCache: true });
     }
 
-    if(this.cache?.data.type === ytdlCore){
+    const distubeYtdlCore: distubeYtdlCore = "distubeYtdlCore";
+
+    if(this.cache?.data.type === ytdlCore || this.cache?.data.type === distubeYtdlCore){
       const info = this.cache.data.data as ytdl.videoInfo;
       const isLive = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
       const format = ytdl.chooseFormat(info.formats, {
@@ -199,6 +202,10 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     }else{
       throw new Error("No available data found.");
     }
+  }
+
+  getStrategyIndicator(){
+    return "*".repeat(this.strategyId);
   }
 
   toField(verbose: boolean){
