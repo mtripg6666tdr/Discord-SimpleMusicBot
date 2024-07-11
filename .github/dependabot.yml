@@ -39,6 +39,9 @@ updates:
           - "version-update:semver-major"
           - "version-update:semver-minor"
           - "version-update:semver-patch"
+      - dependency-name: "rimraf" # dropping support Node.js v16, v18
+        update-types:
+          - "version-update:semver-major"
 
     groups:
       oceanic:
