@@ -51,8 +51,8 @@ Glitchのトップ画面から、右上にある`New project`をクリックし�
         "forceConsistentCasingInFileNames": true,
         "importHelpers": true,
         // highlight-start
-  -     "outDir": "dist/",
-  +     "outDir": "out/",
+  -     "outDir": "../../dist/",
+  +     "outDir": "../../out/",
         // highlight-end
         "allowJs": false,
         "skipLibCheck": true,
@@ -66,9 +66,8 @@ Glitchのトップ画面から、右上にある`New project`をクリックし�
       // highlight-start
   -   "onlystart": "node util/exec dist",
   +   "onlystart": "node util/exec out",
-      // highlight-end
-      "build": "node builder.mjs bake && tsc -p util/tsconfig/tsconfig.build.json",
-      // highlight-start
+  -   "build": "node builder.mjs bake && tsc -p util/tsconfig/tsconfig.build.json",
+  +   "build": "node builder.mjs bake && tsc -p util/tsconfig/tsconfig.build.json || exit 0",
   -   "build:bundled": "node builder.mjs bake && tsc -p util/tsconfig/tsconfig.bundle.json && node builder.mjs bundle",
   +   "build:bundled": "node builder.mjs bake && tsc -p util/tsconfig/tsconfig.bundle.json && node builder.mjs bundle --use-out-dir",
       // highlight-end
