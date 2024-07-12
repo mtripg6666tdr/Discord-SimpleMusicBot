@@ -51,8 +51,8 @@ Glitchのトップ画面から、右上にある`New project`をクリックし�
         "forceConsistentCasingInFileNames": true,
         "importHelpers": true,
         // highlight-start
-  -     "outDir": "dist/",
-  +     "outDir": "out/",
+  -     "outDir": "../../dist/",
+  +     "outDir": "../../out/",
         // highlight-end
         "allowJs": false,
         "skipLibCheck": true,
