@@ -48,6 +48,7 @@ import { SkipSession } from "../Component/skipSession";
 import { TaskCancellationManager } from "../Component/taskCancellationManager";
 import * as Util from "../Util";
 import { getConfig } from "../config";
+import { DefaultAudioThumbnailURL } from "../definition";
 import { discordLanguages } from "../i18n";
 import { getLogger } from "../logger";
 import { YmxVersion } from "../types/YmxFormat";
@@ -627,7 +628,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
                 t("components:queue.songsAdded", { count: items.length })
               }`
             )
-            .setThumbnail(result.url)
+            .setThumbnail(result.thumbnailUrl || DefaultAudioThumbnailURL)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({
             content: "",
