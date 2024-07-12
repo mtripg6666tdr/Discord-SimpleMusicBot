@@ -273,6 +273,11 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       messageSendingScheduledAt = Date.now();
     }
 
+    // try...catchブロックに入る前に、エラーレポートチャンネルを決定しておく
+    this._errorReportChannel = (message?.channel as TextChannel | undefined)
+        || this.server.bot.client.getChannel<TextChannel>(this.server.boundTextChannel)
+        || await this.server.bot.client.rest.channels.get<TextChannel>(this.server.boundTextChannel);
+
     try{
       // シーク位置を確認
       if(this.currentAudioInfo!.lengthSeconds <= time) time = 0;
@@ -306,9 +311,6 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       }
 
       // 各種準備
-      this._errorReportChannel = (message?.channel as TextChannel | undefined)
-        || this.server.bot.client.getChannel<TextChannel>(this.server.boundTextChannel)
-        || await this.server.bot.client.rest.channels.get<TextChannel>(this.server.boundTextChannel);
       this._cost = cost;
       this._lastMember = null;
       this.prepareAudioPlayer();
