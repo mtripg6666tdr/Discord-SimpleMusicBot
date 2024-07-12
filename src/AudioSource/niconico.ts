@@ -205,7 +205,7 @@ class NiconicoTempDL {
         "X-Request-With": "https://www.nicovideo.jp",
       },
       body: {
-        outputs: info.data.media.domand.videos.map(({ id }) => [id, audioDomandId]),
+        outputs: info.data.media.domand.videos.filter(({ isAvailable }) => isAvailable).map(({ id }) => [id, audioDomandId]),
       },
     });
 
