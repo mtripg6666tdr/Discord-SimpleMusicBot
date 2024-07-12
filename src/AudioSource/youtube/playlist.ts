@@ -20,7 +20,7 @@ import ytpl from "ytpl";
 
 import { requireIfAny } from "../../Util";
 import { getConfig } from "../../config";
-const dYtpl = requireIfAny("ytpl") as typeof import("@distube/ytpl");
+const dYtpl = requireIfAny("@distube/ytpl") as typeof import("@distube/ytpl");
 
 const config = getConfig();
 const playlistSearchOptions = {
@@ -32,6 +32,7 @@ type GetPlaylistResult = {
   title: string,
   itemCount: number,
   visibility: "public" | "unlisted",
+  thumbnailUrl: string | null,
   url: string,
   items: {
     url: string,
@@ -47,7 +48,11 @@ type GetPlaylistResult = {
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function Playlist(id: string, options: ytpl.Options & Record<string & {}, any> = {}): Promise<GetPlaylistResult> {
   if(dYtpl){
-    return dYtpl(id, { ...playlistSearchOptions, ...options }).then(resolveDYtplToResult);
+    return dYtpl(id, { ...playlistSearchOptions, ...options })
+      .then(resolveDYtplToResult)
+      .catch(() => {
+        return ytpl(id, { ...playlistSearchOptions, ...options }).then(resolveYtplToResult);
+      });
   }
 
   return ytpl(id, { ...playlistSearchOptions, ...options }).then(resolveYtplToResult);
@@ -67,6 +72,7 @@ function resolveYtplToResult(result: ytpl.Result): GetPlaylistResult{
     itemCount: result.estimatedItemCount,
     visibility: result.visibility === "everyone" ? "public" : result.visibility,
     url: result.url,
+    thumbnailUrl: result.bestThumbnail.url,
     items: result.items.map(item => ({
       url: item.url,
       title: item.title,
@@ -80,12 +86,23 @@ function resolveYtplToResult(result: ytpl.Result): GetPlaylistResult{
 }
 
 function resolveDYtplToResult(result: import("@distube/ytpl").result): GetPlaylistResult {
+  let thumbnailUrl: string | null = null;
+
+  if("thumbnail" in result){
+    const thumbnail = result.thumbnail as any;
+
+    if(typeof thumbnail?.url === "string"){
+      thumbnailUrl = thumbnail.url;
+    }
+  }
+
   return {
     title: result.title,
     // @ts-expect-error @distube/ytpl is missing 'estimatedItemCount' typing
     itemCount: result.total_items || result.estimatedItemCount,
     visibility: result.visibility === "everyone" ? "public" : "unlisted",
     url: result.url,
+    thumbnailUrl,
     items: result.items.map(item => ({
       url: item.url,
       title: item.title,
