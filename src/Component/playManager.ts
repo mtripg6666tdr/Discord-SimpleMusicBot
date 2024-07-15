@@ -853,13 +853,13 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.emit("playFailed");
     this._cost = 0;
     this.destroyStream();
+    this.currentAudioInfo!.purgeCache();
 
     if(this._errorUrl === this.currentAudioInfo!.url && !quiet){
       this._errorCount++;
     }else{
       this._errorCount = 1;
       this._errorUrl = this.currentAudioInfo!.url;
-      this.currentAudioInfo!.purgeCache();
     }
 
     this.logger.warn(`Playback failed (${this._errorCount}times)`);
