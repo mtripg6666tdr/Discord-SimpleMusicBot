@@ -116,7 +116,7 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
     }else{
       const readable: Readable = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow
         ? createRefreshableYTLiveStream(info, url, { format, lang: config.defaultLanguage })
-        : createChunkedDistubeYTStream(info, format, { lang: config.defaultLanguage }, 1 * 1024 * 1024);
+        : createChunkedDistubeYTStream(info, format, { lang: config.defaultLanguage }, 512 * 1024);
 
       return {
         ...partialResult,
