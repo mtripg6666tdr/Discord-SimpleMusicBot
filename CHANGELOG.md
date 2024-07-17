@@ -143,3 +143,22 @@ Node.js v16以上の環境で動作することを想定していますが、で
 * Dockerのイメージは、リリース後10～20分程度で公開されます。
 
 ---
+
+# v4.3.6
+本修正に取り組む予定ではありますが、現時点で都合により数週間ほど着手できないことがわかっているので、現時点までに実装したバグ修正をリリースします。（そのため今回のリリースも応急パッチの扱いとなります。）
+## バグ修正
+* 一定の条件下で、プレイリスト追加時のサムネイルが表示されない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2495)
+* 一定の条件下で、エラー発生時にその旨のメッセージが送信されないことがある問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2498)
+* エラー発生時に、キャッシュを確実にクリアするよう修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2503)
+* ラジオ機能使用時に、ラジオ機能によって追加された曲と思われる場合のみ、キューに曲が追加されるよう修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2504)
+  * 完全な判定ではないため、一定の条件下で、ラジオ機能によって追加された曲でなくても曲が追加されることがあります~~が、誤差ということでご理解ください~~。
+* 一部のソースの再生が機能しなくなったのを暫定的に修正後、一部の環境で再生が安定しない問題を緩和(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2507)
+## ドキュメント
+* ドキュメントの継続的な更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2496)
+## 依存関係のアップデート
+* i18next 23.11.5 => 23.12.1
+## その他の特記事項
+* Node.jsは、最新のLTSのバージョンをご利用いただくことを強く推奨しています。v16以上であれば動作はしますが、一部機能が制限されることがあります。詳しくは[こちら](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support#nodejs%E3%81%AE%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E3%81%AB%E3%82%88%E3%82%8B%E6%A9%9F%E8%83%BD%E3%81%AE%E9%81%95%E3%81%84)をご覧ください。
+* Dockerのイメージは、リリース後10～20分程度で公開されます。
+
+---
