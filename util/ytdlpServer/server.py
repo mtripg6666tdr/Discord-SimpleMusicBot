@@ -20,7 +20,6 @@ from aioconsole import get_standard_streams
 from yt_dlp import YoutubeDL
 import json
 import asyncio
-import sys
 
 async def get_info(ytdl, payload):
   try:
@@ -28,8 +27,7 @@ async def get_info(ytdl, payload):
     info = ytdl.extract_info(url, download=False)
     return {"oid": payload["oid"], "status": "ok", "info": info}
   except Exception as e:
-    trace_back = sys.exc_info()[2]
-    return {"oid": payload["oid"], "status": "error", "message": e.with_traceback(trace_back)}
+    return {"oid": payload["oid"], "status": "error", "message": str(e)}
 
 async def process_line(ytdl, write_line, line):
     try:
@@ -50,7 +48,12 @@ async def main():
     def write_line(data):
       writer.write(data + "\n")
 
-    with YoutubeDL({ "quiet": True }) as ytdl:
+    ytdl_options = {
+      "quiet": True,
+      "color": "never",
+    }
+
+    with YoutubeDL(ytdl_options) as ytdl:
       while True:
           line = await reader.readline()
           asyncio.create_task(process_line(ytdl, write_line, line))
