@@ -5,6 +5,7 @@ docker-compose.yml.sample    linguist-language=yml
 compose.yml.sample           linguist-language=yml
 docs/versioned_docs/*        linguist-generated
 docs/versioned_sidebars/*    linguist-generated
+lib/*                        linguist-vendored
 *                            text=auto
 *.yml                        text eol=lf
 *.ts                         text eol=crlf

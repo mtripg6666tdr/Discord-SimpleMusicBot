@@ -26,30 +26,37 @@ import type { ytdlCoreStrategy } from "./ytdl-core";
 import { getConfig } from "../../../config";
 import { getLogger } from "../../../logger";
 
-type strategies =
-  | ytdlCoreStrategy
-  | playDlStrategy
-  | youtubeDlStrategy
-  | ytDlPStrategy
-  | NightlyYoutubeDl
-;
 
 interface StrategyImporter {
   enable: boolean;
   importer: () => any;
+  isFallback: boolean;
+}
+
+interface Strategies {
+  module:
+    | ytdlCoreStrategy
+    | playDlStrategy
+    | youtubeDlStrategy
+    | ytDlPStrategy
+    | NightlyYoutubeDl;
+  isFallback: boolean;
 }
 
 const logger = getLogger("Strategies");
 const config = getConfig();
 
-export const strategies: strategies[] = ([
-  { enable: false, importer: () => require("./ytdl-core") },
-  { enable: false, importer: () => require("./play-dl") },
-  { enable: true, importer: () => require("./distube_ytdl-core") },
-  { enable: false, importer: () => require("./youtube-dl") },
-  { enable: true, importer: () => require("./yt-dlp") },
-  { enable: true, importer: () => require("./nightly_youtube-dl") },
-] satisfies StrategyImporter[]).map(({ enable, importer }, i) => {
+const strategyImporters: StrategyImporter[] = [
+  { enable: false, isFallback: false, importer: () => require("./ytdl-core") },
+  { enable: false, isFallback: false, importer: () => require("./play-dl") },
+  { enable: false, isFallback: false, importer: () => require("./distube_ytdl-core") },
+  { enable: true, isFallback: false, importer: () => require("./play-dl-test") },
+  { enable: false, isFallback: true, importer: () => require("./youtube-dl") },
+  { enable: true, isFallback: true, importer: () => require("./yt-dlp") },
+  { enable: true, isFallback: true, importer: () => require("./nightly_youtube-dl") },
+];
+
+export const strategies: (Strategies | null)[] = strategyImporters.map(({ enable, importer, isFallback }, i) => {
   if(!enable){
     logger.warn(`strategy#${i} is currently disabled.`);
     return null;
@@ -57,7 +64,10 @@ export const strategies: strategies[] = ([
 
   try{
     const { default: Module } = importer();
-    return new Module(i);
+    return {
+      module: new Module(i),
+      isFallback,
+    };
   }
   catch(e){
     logger.warn(`failed to load strategy#${i}`);
@@ -72,14 +82,16 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(.
   let checkedStrategy = -1;
   if(parameters[2]){
     const cacheType = parameters[2].type;
-    checkedStrategy = strategies.findIndex(s => s && s.cacheType === cacheType);
+    checkedStrategy = strategies.findIndex(s => s && s.module.cacheType === cacheType);
     if(checkedStrategy >= 0){
       try{
-        const result = await strategies[checkedStrategy].fetch(...parameters);
+        const strategy = strategies[checkedStrategy]!;
+        const result = await strategy.module.fetch(...parameters);
         return {
           result,
           resolved: checkedStrategy,
           cache: result.cache,
+          isFallbacked: strategy.isFallback,
         };
       }
       catch(e){
@@ -90,11 +102,13 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(.
   for(let i = 0; i < strategies.length; i++){
     if(i !== checkedStrategy && strategies[i]){
       try{
-        const result = await strategies[i].fetch(...parameters);
+        const strategy = strategies[i]!;
+        const result = await strategy.module.fetch(...parameters);
         return {
           result,
           resolved: i,
           cache: result.cache,
+          isFallbacked: strategy.isFallback,
         };
       }
       catch(e){
@@ -111,10 +125,12 @@ export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>
   for(let i = 0; i < strategies.length; i++){
     try{
       if(strategies[i]){
-        const result = await strategies[i].getInfo(...parameters);
+        const strategy = strategies[i]!;
+        const result = await strategy.module.getInfo(...parameters);
         return {
           result,
           resolved: i,
+          isFallbacked: strategy.isFallback,
         };
       }
     }

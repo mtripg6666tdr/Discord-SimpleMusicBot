@@ -18,21 +18,21 @@
 
 import type { Cache, StrategyFetchResult } from "./base";
 import type { YouTubeJsonFormat } from "..";
+import type { InfoData } from "../../../../lib/play-dl";
 import type { StreamInfo, UrlStreamInfo } from "../../audiosource";
-import type { InfoData } from "play-dl";
 
 import { StreamType } from "@discordjs/voice";
-import { stream_from_info } from "play-dl";
-import { video_info } from "play-dl";
 
 import { Strategy } from "./base";
 
-type playDl = "playDl";
-export const playDl: playDl = "playDl";
+const { stream_from_info, video_info } = require(global.BUNDLED ? "../lib/play-dl" : "../../../../lib/play-dl") as typeof import("../../../../lib/play-dl");
 
-export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> {
+type playDlTest = "playDlTest";
+export const playDlTest: playDlTest = "playDlTest";
+
+export class playDlTestStrategy extends Strategy<Cache<playDlTest, InfoData>, InfoData> {
   get cacheType(){
-    return playDl;
+    return playDlTest;
   }
 
   async getInfo(url: string){
@@ -41,15 +41,15 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
     return {
       data: this.mapToExportable(url, info),
       cache: {
-        type: playDl,
+        type: playDlTest,
         data: info,
       },
     };
   }
 
-  async fetch(url: string, forceUrl: true, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<playDl, InfoData>, UrlStreamInfo>>;
-  async fetch(url: string, forceUrl?: boolean, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<playDl, InfoData>, StreamInfo>>;
-  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<playDl, InfoData>, StreamInfo>> {
+  async fetch(url: string, forceUrl: true, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<playDlTest, InfoData>, UrlStreamInfo>>;
+  async fetch(url: string, forceUrl?: boolean, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<playDlTest, InfoData>, StreamInfo>>;
+  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<playDlTest, InfoData>, StreamInfo>> {
     this.logStrategyUsed();
 
     const cacheAvailable = this.cacheIsValid(cache) && cache.data;
@@ -71,7 +71,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
           streamType: "m3u8",
         } as UrlStreamInfo,
         cache: {
-          type: playDl,
+          type: playDlTest,
           data: info,
         },
       };
@@ -92,7 +92,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
           streamType: format[0]["container"] === "webm" && format[0]["codec"] === "opus" ? "webm/opus" as const : null,
         },
         cache: {
-          type: playDl,
+          type: playDlTest,
           data: info,
         },
       };
@@ -106,7 +106,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
           streamType: stream.type === StreamType.WebmOpus ? "webm/opus" as const : null,
         },
         cache: {
-          type: playDl,
+          type: playDlTest,
           data: info,
         },
       };
@@ -127,9 +127,9 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
     };
   }
 
-  protected override cacheIsValid(cache?: Cache<any, any>): cache is Cache<playDl, InfoData> {
-    return cache?.type === playDl;
+  protected override cacheIsValid(cache?: Cache<any, any>): cache is Cache<playDlTest, InfoData> {
+    return cache?.type === playDlTest;
   }
 }
 
-export default playDlStrategy;
+export default playDlTestStrategy;
