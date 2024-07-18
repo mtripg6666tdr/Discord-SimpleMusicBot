@@ -49,21 +49,26 @@ if(config.webserver){
   logger.info("Skipping to start server");
 }
 
-if(!config.debug){
+if(config.debug){
+  process.on("uncaughtException", async (error)=>{
+    if(bot.client){
+      await reportError(error);
+    }
+    logger.fatal(error);
+
+    const err = await new Promise<Error | undefined>(resolve => log4js.shutdown(resolve));
+
+    console.error("An error occurred while shutting down the logger:", err);
+
+    process.exit(1);
+  });
+}else{
   // ハンドルされなかったエラーのハンドル
   process.on("uncaughtException", async (error)=>{
     logger.fatal(error);
     if(bot.client){
       await reportError(error);
     }
-  });
-}else{
-  process.on("uncaughtException", async (error)=>{
-    if(bot.client){
-      await reportError(error);
-    }
-    logger.fatal(error);
-    process.exit(1);
   });
 }
 
@@ -96,7 +101,7 @@ const onTerminated = async function(code: string){
 
   logger.info("Shutting down completed");
 
-  log4js.shutdown((er) => {
+  log4js.shutdown(er => {
     if(er){
       console.error(er);
     }
