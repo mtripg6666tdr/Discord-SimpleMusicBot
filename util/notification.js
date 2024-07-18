@@ -1,4 +1,4 @@
-#!/bin/env node
+#!/usr/bin/env node
 // @ts-check
 require("dotenv").config();
 const oceanic = require("oceanic.js");
