@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import fs from "fs";
 import { build } from "esbuild";
 import { minify } from "@swc/core";
