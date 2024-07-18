@@ -43,3 +43,5 @@ jobs:
         env:
           TOKEN: ${{ secrets.Y_TOKEN }}
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+          ROLE_ID: ${{ secrets.HOOK_ROLE_ID }}
+          REPO_NAME: ${{ github.repository }}
