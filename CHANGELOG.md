@@ -152,7 +152,8 @@ Node.js v16以上の環境で動作することを想定していますが、で
 * エラー発生時に、キャッシュを確実にクリアするよう修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2503)
 * ラジオ機能使用時に、ラジオ機能によって追加された曲と思われる場合のみ、キューに曲が追加されるよう修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2504)
   * 完全な判定ではないため、一定の条件下で、ラジオ機能によって追加された曲でなくても曲が追加されることがあります~~が、誤差ということでご理解ください~~。
-* 一部のソースの再生が機能しなくなったのを暫定的に修正後、一部の環境で再生が安定しない問題を緩和(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2507)
+* 一部のソースの再生が機能しなくなったのを暫定的に修正後、一部の環境で再生が安定しない問題を緩和(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2507, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2511)
+* `ログ`コマンドで、依存関係のパッケージのバージョンが正しく表示されない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2509)
 ## ドキュメント
 * ドキュメントの継続的な更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2496)
 ## 依存関係のアップデート
