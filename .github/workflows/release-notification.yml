@@ -35,7 +35,7 @@ jobs:
       - name: Setup deps & scripts
         run: |
           npm init -y
-          npm install oceanic.js@~1.11.0 candyget@~0.5.4
+          npm install oceanic.js@~1.11.0 candyget@~0.5.4 dotenv@^16.4.5
           curl -Lo notification.js https://github.com/${{ github.repository }}/raw/${{ github.ref_name }}/util/notification.js
 
       - name: Run notification
