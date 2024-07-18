@@ -58,5 +58,5 @@ async def main():
           line = await reader.readline()
           asyncio.create_task(process_line(ytdl, write_line, line))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())
