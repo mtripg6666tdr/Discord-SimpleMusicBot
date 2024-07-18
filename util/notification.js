@@ -32,7 +32,7 @@ async function main(){
   }
 
   if(!draft){
-    // Send a message automatically if it is not a draft and there are sufficient data retrived.
+    // Send a message automatically if it is not a draft and there are sufficient data retrieved.
     const client = new oceanic.Client({ auth: `Bot ${TOKEN}` });
 
     const { id } = await client.rest.channels.createMessage(CHANNEL_ID, {
