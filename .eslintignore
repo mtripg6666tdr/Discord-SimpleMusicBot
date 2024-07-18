@@ -5,6 +5,7 @@ util/exampleDbServer/*
 util/exampleDbServer/node/dist
 !src/Util
 test/*
+lib/*
 dist/*
 docs
 *.temp.*

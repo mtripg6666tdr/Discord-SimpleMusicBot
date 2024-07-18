@@ -52,7 +52,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
   }
 
   protected _isLiveStream: boolean;
-  get isLiveStream(){
+  get isLiveStream(): boolean {
     return this._isLiveStream;
   }
   protected set isLiveStream(value: boolean){
@@ -67,8 +67,9 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     this._relatedVideos = value;
   }
 
-  get isFallbacked(){
-    return typeof this.strategyId === "number" && this.strategyId !== 0 && this.strategyId !== 1 && this.strategyId !== 2;
+  _isFallbacked: boolean;
+  get isFallbacked(): boolean{
+    return this._isFallbacked;
   }
 
   get cacheIsStale(){
@@ -98,10 +99,11 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
       return;
     }
 
-    const { result, resolved } = await attemptGetInfoForStrategies(this.url);
+    const { result, resolved, isFallbacked } = await attemptGetInfoForStrategies(this.url);
 
     // check if fallbacked
     this.strategyId = resolved;
+    this._isFallbacked = isFallbacked;
 
     // check if the video is upcoming
     if(result.cache?.data){
@@ -143,8 +145,9 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
       this.purgeCache();
     }
 
-    const { result, resolved } = await attemptFetchForStrategies(this.url, forceUrl, this.cache?.data);
+    const { result, resolved, isFallbacked } = await attemptFetchForStrategies(this.url, forceUrl, this.cache?.data);
     this.strategyId = resolved;
+    this._isFallbacked = isFallbacked;
 
     // store related videos
     if(result.relatedVideos){
