@@ -4,7 +4,7 @@
   "description": "Simple Music Bot for Discord without any database",
   "private": true,
   "engines": {
-    "node": ">=16.16.0"
+    "node": ">=16.5.0"
   },
   "scripts": {
     "test": "mocha",
