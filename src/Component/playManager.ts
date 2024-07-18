@@ -395,7 +395,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       }
 
       // ラジオが有効になっている場合、次の曲を準備する
-      if(this.server.queue.mixPlaylistEnabled && !this.server.queue.get(0).additionalInfo.addedBy){
+      if(this.server.queue.mixPlaylistEnabled && this.server.queue.get(0).additionalInfo.addedBy.userId === "2"){
         await this.server.queue.prepareNextMixItem();
       }
 

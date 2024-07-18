@@ -94,7 +94,7 @@ export class QueueManagerWithBgm extends QueueManager {
         basicInfo: await new AudioSource.FsStream().init(url, null),
         additionalInfo: {
           addedBy: {
-            userId: addedBy ? this.getUserIdFromMember(addedBy) : "0",
+            userId: addedBy && this.getUserIdFromMember(addedBy) || "0",
             displayName: addedBy?.displayName || "unknown",
           },
         },

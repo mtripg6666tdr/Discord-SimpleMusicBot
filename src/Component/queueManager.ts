@@ -29,7 +29,6 @@ import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } fr
 import i18next from "i18next";
 import { Member } from "oceanic.js";
 import ytmpl from "yt-mix-playlist";
-import ytdl from "ytdl-core";
 
 import { ResponseMessage } from "./commandResolver/ResponseMessage";
 import { DeferredMessage } from "./deferredMessage";
@@ -210,7 +209,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     preventSourceCache = false,
   }: {
     url: string,
-    addedBy?: Member | AddedBy | null,
+    addedBy?: Member | Partial<AddedBy> | null,
     method?: "push" | "unshift",
     sourceType?: KnownAudioSourceIdentifer,
     gotData?: T | null,
@@ -621,23 +620,30 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     this.emit("change");
   }
 
-  async enableMixPlaylist(url: string, request: Member, skipAddingBase: boolean = false){
-    this._mixPlaylist = await ytmpl(ytdl.getURLVideoID(url), {
+  async enableMixPlaylist(videoId: string, request: Member, skipAddingBase: boolean = false){
+    this._mixPlaylist = await ytmpl(videoId, {
       gl: config.country,
       hl: config.defaultLanguage,
     });
+
+    if(!this.mixPlaylistEnabled){
+      return false;
+    }
+
     if(!skipAddingBase){
       await this.addQueueOnly({
-        url: url,
+        url: `https://www.youtube.com/watch?v=${videoId}`,
         addedBy: request,
         method: "push",
         sourceType: "youtube",
       });
-    }else{
-      await this.prepareNextMixItem();
     }
+
+    await this.prepareNextMixItem();
     await this.prepareNextMixItem();
     this.server.player.once("disconnect", this.disableMixPlaylist);
+
+    return true;
   }
 
   async prepareNextMixItem(): Promise<void> {
@@ -655,7 +661,9 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
 
       await this.addQueueOnly({
         url: item.url,
-        addedBy: null,
+        addedBy: {
+          userId: "2",
+        },
         method: "push",
         sourceType: "youtube",
         gotData: {
@@ -836,7 +844,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     this._default.push(...items);
   }
 
-  protected getUserIdFromMember(member: Member | AddedBy){
+  protected getUserIdFromMember(member: Member | Partial<AddedBy>){
     return member instanceof Member ? member.id : member.userId;
   }
 }

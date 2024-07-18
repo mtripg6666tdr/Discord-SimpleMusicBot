@@ -24,9 +24,9 @@ import type { StreamInfo, UrlStreamInfo } from "../../audiosource";
 import { StreamType } from "@discordjs/voice";
 
 import { Strategy } from "./base";
-import { requireIfAny } from "../../../Util";
 
-const { stream_from_info, video_info } = requireIfAny(global.BUNDLED ? "../lib/play-dl" : "../../../../lib/play-dl") as typeof import("../../../../lib/play-dl");
+const localRequire = require;
+const { stream_from_info, video_info } = localRequire(global.BUNDLED ? "../lib/play-dl" : "../../../../lib/play-dl") as typeof import("../../../../lib/play-dl");
 
 type playDlTest = "playDlTest";
 export const playDlTest: playDlTest = "playDlTest";
