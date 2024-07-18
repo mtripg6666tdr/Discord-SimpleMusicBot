@@ -24,8 +24,8 @@ import sys
 
 async def get_info(ytdl, payload):
   try:
-    vid = payload["vid"]
-    info = ytdl.extract_info("https://www.youtube.com/watch?v=" + vid, download=False)
+    url = payload["url"]
+    info = ytdl.extract_info(url, download=False)
     return {"oid": payload["oid"], "status": "ok", "info": info}
   except Exception as e:
     trace_back = sys.exc_info()[2]
