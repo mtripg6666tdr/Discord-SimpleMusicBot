@@ -68,9 +68,13 @@ export default class SystemInfo extends BaseCommand {
       let packageRootPath = require.resolve(mod);
       const fsModSuffix = mod.replace(/\//g, path.sep);
 
-      do{
+      for(let i = 0; i < 5; i++){
         packageRootPath = path.join(packageRootPath, "..");
-      } while(!packageRootPath.endsWith(fsModSuffix));
+
+        if(packageRootPath.endsWith(fsModSuffix)){
+          break;
+        }
+      }
 
       return require(path.join(packageRootPath, "package.json")).version;
     }
