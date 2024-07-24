@@ -5,32 +5,32 @@
 
 <img alt="bot usage example" src="https://user-images.githubusercontent.com/56076195/218059644-2ebdf405-b9f8-4561-a3cc-2bcecf09f145.png" width="550" />
 
-A music bot for Discord, made in Japan.  
-This bot supports playing songs from YouTube. No need to copy and paste URLs, but you can find music by keywords.  
+Discord向けの、シンプルな音楽ボット。YouTubeなどからの再生に対応。 選曲はキーワードで可能なので、URLを控える必要はありません。  
 Enjoy your favorite songs with your friends, by using this OSS bot.  
 You can try to use the bot in the support server below.
 
-## Features
-- 🎵Plays songs as the highest quality as the bot can
-- ⌨️Supports both slash-commands and conventional message-based-commands
-- 🔗 Plays songs from URLs
-  - YouTube video's URL
+## 特長
+- 🎵 できる限り高音質で再生
+- 🔎 URLやキーワードから検索して再生
+  - YouTubeの動画のキーワード・リンク
   - YouTube's playlist URL
-  - SoundCloud's music page URL
+  - SoundCloudの楽曲のキーワードやリンク
   - NicoNico video's watch page URL
-  - [and so on...](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/guide/feature/overview)
-- 🔎 Searches videos from keyword and play them (from YouTube and SoundCloud)
+  - [再生できるソースの一覧はこちら](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/guide/feature/overview)
+- ⌨️ スラッシュコマンドおよび従来のメッセージベースのコマンドに両対応
+  - メッセージベースのコマンドに使用するプレフィックスも変更可能
+  - スラッシュコマンドのみに対応させることも可能
+- ⏯️ ボタンで直感的にプレーヤーを操作可能
 - 🔁Track loop and queue loop
-- ❕The prefix is changeable
-  - Prefix is changeable by modifying the bot's nickname.
-  - If you are an owner of the bot, you can change the default prefix of the bot.
-  - Multiple letters' prefix is supported.
-- ▶️Autoplay songs, by pre-defined configuration
+- ▶️ 事前設定による音楽の自動再生
+- 😸 データベースなど他のプログラムは必要なし
+  - リソースが少なくても実行可能
+  - 比較的手順の少ない、簡単なセットアップを実現
 - 👍 [Support](#サポート)(Japanese and English Available).
 
-## Guide
+## ドキュメント・ガイド
 The documentation of the bot (Japanese).
-- [Documentation](https://web.usamyon.moe/Discord-SimpleMusicBot/)
+- [ドキュメントサイト](https://web.usamyon.moe/Discord-SimpleMusicBot/)
 
 ## Contribution
 The bot is still in development so you may encounter bugs.  
