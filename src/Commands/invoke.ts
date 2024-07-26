@@ -19,6 +19,8 @@
 import type { CommandArgs } from ".";
 
 import { BaseCommand } from ".";
+import { updateStrategyConfiguration as updateStrategyConfigInWorker } from "../AudioSource/youtube/spawner";
+import { updateStrategyConfiguration } from "../AudioSource/youtube/strategies";
 import { CommandManager } from "../Component/commandManager";
 import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import { getConfig } from "../config";
@@ -47,7 +49,7 @@ export default class Invoke extends BaseCommand {
 
     // handle special commands
     if(context.rawArgs.startsWith("sp;") && getConfig().isBotAdmin(message.member.id)){
-      this.evaluateSpecialCommands(context.rawArgs.substring(3), message, context)
+      this.evaluateSpecialCommands(context.args[0].substring(3), message, context)
         .then(result => message.reply(result))
         .catch(this.logger.error)
       ;
@@ -101,6 +103,12 @@ export default class Invoke extends BaseCommand {
             },
           ],
         }).catch(this.logger.error);
+        break;
+      case "updatestrcfg": {
+        const config = context.args[1];
+        updateStrategyConfigInWorker(config);
+        updateStrategyConfiguration(config);
+      }
         break;
       default:
         return context.t("commands:invoke.specialCommandNotFound");

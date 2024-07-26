@@ -498,6 +498,14 @@ export function requireIfAny(id: string): unknown {
   }
 }
 
+export function safeTraverseByPath(obj: any, ...path: (string | ((current: any) => any))[]): any | null {
+  if(!obj){
+    return null;
+  }
+
+  return path.reduce((prev, current) => typeof current === "function" ? current(prev) : prev?.[current], obj);
+}
+
 export function assertIs<T>(obj: unknown): asserts obj is T{}
 
 export function assertIsNotNull<T>(obj: T | null): asserts obj is T {}

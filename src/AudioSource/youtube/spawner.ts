@@ -27,6 +27,7 @@ import { Worker, isMainThread } from "worker_threads";
 import PQueue from "p-queue";
 
 import { YouTube } from "..";
+import { stringifyObject } from "../../Util";
 import { getLogger } from "../../logger";
 
 const worker = isMainThread ? new Worker(path.join(__dirname, global.BUNDLED && __filename.includes("min") ? "./worker.min.js" : "./worker.js")).on("error", console.error) : null;
@@ -38,7 +39,12 @@ if(worker){
 const logger = getLogger("Spawner");
 
 export type WithId<T> = T & { id: string };
-export type SpawnerJobMessage = SpawnerGetInfoMessage | SpawnerSearchMessage | SpawnerPurgeCacheMessage;
+
+export type SpawnerJobMessage =
+  | SpawnerGetInfoMessage
+  | SpawnerSearchMessage
+  | SpawnerPurgeCacheMessage
+  | SpawnerUpdateConfigMessage;
 export type SpawnerGetInfoMessage = {
   type: "init",
   url: string,
@@ -51,6 +57,10 @@ export type SpawnerSearchMessage = {
 };
 export type SpawnerPurgeCacheMessage = {
   type: "purgeCache",
+};
+export type SpawnerUpdateConfigMessage = {
+  type: "updateConfig",
+  config: string,
 };
 export type WorkerMessage = WorkerSuccessMessage | WorkerErrorMessage;
 export type WorkerSuccessMessage = WorkerGetInfoSuccessMessage | WorkerSearchSuccessMessage;
@@ -86,7 +96,7 @@ if(worker){
 
       jobQueue!.delete(message.id);
     }else{
-      logger.warn(`Invalid message received: ${message}`);
+      logger.warn(`Invalid message received: ${stringifyObject(message)}`);
     }
   });
 }
@@ -146,4 +156,8 @@ export async function searchYouTube(keyword: string){
 
 export function purgeCache(){
   worker?.postMessage({ type: "purgeCache", id: "0" } satisfies WithId<SpawnerPurgeCacheMessage>);
+}
+
+export function updateStrategyConfiguration(config: string){
+  worker?.postMessage({ type: "updateConfig", config, id: "0" } satisfies WithId<SpawnerUpdateConfigMessage>);
 }

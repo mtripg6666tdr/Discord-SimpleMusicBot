@@ -24,6 +24,7 @@ import * as ytdl from "@distube/ytdl-core";
 
 import { Strategy } from "./base";
 import { YouTubeJsonFormat } from "..";
+import { safeTraverseByPath } from "../../../Util";
 import { getConfig } from "../../../config";
 import { SecondaryUserAgent } from "../../../definition";
 import { createChunkedDistubeYTStream, createRefreshableYTLiveStream } from "../stream";
@@ -34,6 +35,8 @@ export const distubeYtdlCore: distubeYtdlCore = "distubeYtdlCore";
 const config = getConfig();
 
 type distubeYtdlCoreCache = Cache<distubeYtdlCore, ytdl.videoInfo>;
+
+const poTokenExperiments = ["51217476", "51217102"];
 
 export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl.videoInfo> {
   protected agent = config.proxy ? ytdl.createProxyAgent({ uri: config.proxy }) : undefined;
@@ -49,6 +52,15 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
       lang: "ja",
       agent: this.agent,
     });
+
+    const experiments = this.extractExperiments(info);
+
+    this.logger.trace("Experiments", experiments?.join(", "));
+
+    if(poTokenExperiments.some(expId => experiments.includes(expId))){
+      throw new Error("Detected broken formats by the poToken experiment.");
+    }
+
     return {
       data: this.mapToExportable(url, info),
       cache: {
@@ -151,6 +163,27 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
 
   protected override cacheIsValid(cache?: Cache<any, any> | undefined): cache is Cache<distubeYtdlCore, ytdl.videoInfo> {
     return cache?.type === distubeYtdlCore;
+  }
+
+  extractExperiments(info: ytdl.videoInfo): string[] {
+    // ref: https://github.com/yt-dlp/yt-dlp/pull/10456/files
+    const experiments = safeTraverseByPath(
+      info,
+      "response",
+      "responseContext",
+      "serviceTrackingParams",
+      v => v.find((d: any) => d.service === "GFEEDBACK"),
+      "params",
+      v => v.find((d: any) => d.key === "e"),
+      "value",
+      v => v.split(","),
+    );
+
+    if(experiments){
+      return experiments;
+    }else{
+      return [];
+    }
   }
 }
 
