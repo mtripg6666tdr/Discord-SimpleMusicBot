@@ -47,8 +47,9 @@ export default class Thumbnail extends BaseCommand {
   async run(message: CommandMessage, context: CommandArgs){
     const { t } = context;
 
-    const embed = new MessageEmbedBuilder();
-    embed.setColor(getColor("THUMB"));
+    const embed = new MessageEmbedBuilder()
+      .setColor(getColor("THUMB"));
+
     const userSearchPanel = context.server.searchPanel.get(message.member.id);
     const rawArgNumber = Number(context.rawArgs);
     if(context.rawArgs && userSearchPanel && 0 < rawArgNumber && rawArgNumber <= userSearchPanel.options.length){
@@ -57,15 +58,15 @@ export default class Thumbnail extends BaseCommand {
       embed
         .setImage(opt.thumbnail)
         .setTitle(opt.title)
-        .setDescription("URL: " + opt.url)
-      ;
+        .setDescription(`URL: ${opt.url}`);
     }else if(!context.rawArgs && context.server.player.isPlaying && context.server.queue.length >= 1){
       // 現在再生中楽曲のサムネイル
-      const info = context.server.queue.get(0).basicInfo;
-      embed
-        .setTitle(info.title)
-        .setDescription("URL: " + info.url)
-      ;
+      const { basicInfo: info } = context.server.queue.get(0);
+      embed.setTitle(info.title);
+
+      if(!info.isPrivateSource){
+        embed.setDescription(`URL: ${info.url}`);
+      }
 
       if(typeof info.thumbnail === "string"){
         embed.setImage(info.thumbnail);
@@ -73,12 +74,12 @@ export default class Thumbnail extends BaseCommand {
           embeds: [embed.toOceanic()],
         }).catch(this.logger.error);
       }else{
-        embed.setImage("attachment://thumbnail." + info.thumbnail.ext);
+        embed.setImage(`attachment://thumbnail.${info.thumbnail.ext}`);
         await message.reply({
           embeds: [embed.toOceanic()],
           files: [
             {
-              name: "thumbnail." + info.thumbnail.ext,
+              name: `thumbnail.${info.thumbnail.ext}`,
               contents: info.thumbnail.data,
             },
           ],
