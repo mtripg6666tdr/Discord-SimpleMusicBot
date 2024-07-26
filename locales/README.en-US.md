@@ -5,32 +5,32 @@
 
 <img alt="bot usage example" src="https://user-images.githubusercontent.com/56076195/218059644-2ebdf405-b9f8-4561-a3cc-2bcecf09f145.png" width="550" />
 
-Discord向けの、シンプルな音楽ボット。YouTubeなどからの再生に対応。 選曲はキーワードで可能なので、URLを控える必要はありません。  
+A simple music bot for Discord.This bot supports playing songs from YouTube. No need to copy and paste URLs, but you can find music by keywords.  
 Enjoy your favorite songs with your friends, by using this OSS bot.  
 You can try to use the bot in the support server below.
 
-## 特長
-- 🎵 できる限り高音質で再生
+## Features
+- 🎵 Plays songs as the highest quality as the bot can
 - 🔎 URLやキーワードから検索して再生
   - YouTubeの動画のキーワード・リンク
   - YouTube's playlist URL
   - SoundCloudの楽曲のキーワードやリンク
   - NicoNico video's watch page URL
-  - [再生できるソースの一覧はこちら](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/guide/feature/overview)
-- ⌨️ スラッシュコマンドおよび従来のメッセージベースのコマンドに両対応
-  - メッセージベースのコマンドに使用するプレフィックスも変更可能
-  - スラッシュコマンドのみに対応させることも可能
-- ⏯️ ボタンで直感的にプレーヤーを操作可能
+  - [Click here for the complete list the bot can play](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/guide/feature/overview)
+- ⌨️ Supports both slash-commands and conventional message-based-commands
+  - Customizable prefix that is used when using message-based commands
+  - You can disable the message-based commands feature.
+- Control a playback with ⏯️ button intuitively.
 - 🔁Track loop and queue loop
-- ▶️ 事前設定による音楽の自動再生
-- 😸 データベースなど他のプログラムは必要なし
-  - リソースが少なくても実行可能
-  - 比較的手順の少ない、簡単なセットアップを実現
+- ▶️ Autoplay songs, by pre-defined configuration
+- 😸 No database, no other external programs.
+  - Executable even when only small amount of resources left in your computer.
+  - Easy setup with comparatively fewer steps
 - 👍 [Support](#サポート)(Japanese and English Available).
 
-## ドキュメント・ガイド
+## Documentation / Guide
 The documentation of the bot (Japanese).
-- [ドキュメントサイト](https://web.usamyon.moe/Discord-SimpleMusicBot/)
+- [Documentation site](https://web.usamyon.moe/Discord-SimpleMusicBot/)
 
 ## Contribution
 The bot is still in development so you may encounter bugs.  
