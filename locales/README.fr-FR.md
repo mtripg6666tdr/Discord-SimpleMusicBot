@@ -5,32 +5,32 @@
 
 <img alt="exemple d'utilisation de bot" src="https://user-images.githubusercontent.com/56076195/218059644-2ebdf405-b9f8-4561-a3cc-2bcecf09f145.png" width="550" />
 
-Un bot musical simple fabriqué au Japon pour Discord.  
-La lecture à partir de YouTube, etc. est prise en charge. La sélection de chansons peut être spécifiée par mot-clé, il n'est donc pas nécessaire de s'abstenir d'URL.  
+Discord向けの、シンプルな音楽ボット。YouTubeなどからの再生に対応。 選曲はキーワードで可能なので、URLを控える必要はありません。  
 Avec ce bot OSS, profitons tous de la musique sur le canal vocal dès maintenant.  
 Vous pouvez essayer le bot à partir du serveur d'assistance répertorié ci-dessous.
 
-## fonction
-- 🎵Jouez avec la meilleure qualité possible
-- ⌨️ Prend en charge les commandes slash et les commandes traditionnelles basées sur des messages
-- 🔗 Jouer à partir de l'URL
-  - Lien vidéo YouTube
+## 特長
+- 🎵 できる限り高音質で再生
+- 🔎 URLやキーワードから検索して再生
+  - YouTubeの動画のキーワード・リンク
   - lien de la liste de lecture youtube
-  - Lien vers la page de la chanson SoundCloud
+  - SoundCloudの楽曲のキーワードやリンク
   - Lien vers la page de lecture de Nico Nico Douga
-  - [etc...](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/guide/feature/overview)
-- 🔎 Rechercher et lire par mot-clé (YouTube et SoundCloud)
+  - [再生できるソースの一覧はこちら](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/guide/feature/overview)
+- ⌨️ スラッシュコマンドおよび従来のメッセージベースのコマンドに両対応
+  - メッセージベースのコマンドに使用するプレフィックスも変更可能
+  - スラッシュコマンドのみに対応させることも可能
+- ⏯️ ボタンで直感的にプレーヤーを操作可能
 - 🔁 Boucle par piste et à travers les repères
-- ❕ Changement de préfixe
-  - Le préfixe est modifiable en modifiant le surnom du bot.
-  - Si vous êtes propriétaire du bot, vous pouvez modifier le préfixe par défaut du bot.
-  - Le préfixe de plusieurs lettres est pris en charge.
-- ▶️ Musique à lecture automatique préconfigurée
+- ▶️ 事前設定による音楽の自動再生
+- 😸 データベースなど他のプログラムは必要なし
+  - リソースが少なくても実行可能
+  - 比較的手順の少ない、簡単なセットアップを実現
 - 👍 Botに関する[サポート](#サポート)(下記)
 
-## guide
+## ドキュメント・ガイド
 Vous pouvez voir comment configurer le bot, les commandes, etc. ici.
-- [document](https://web.usamyon.moe/Discord-SimpleMusicBot/)
+- [ドキュメントサイト](https://web.usamyon.moe/Discord-SimpleMusicBot/)
 
 ## À propos de la cotisation
 Il y a beaucoup de bugs car il est en cours de développement.  

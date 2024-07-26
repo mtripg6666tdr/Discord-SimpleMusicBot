@@ -5,32 +5,32 @@
 
 <img alt="bot usage example" src="https://user-images.githubusercontent.com/56076195/218059644-2ebdf405-b9f8-4561-a3cc-2bcecf09f145.png" width="550" />
 
-A music bot for Discord, made in Japan.  
-This bot supports playing songs from YouTube. No need to copy and paste URLs, but you can find music by keywords.  
+A simple music bot for Discord.This bot supports playing songs from YouTube. No need to copy and paste URLs, but you can find music by keywords.  
 Enjoy your favorite songs with your friends, by using this OSS bot.  
 You can try to use the bot in the support server below.
 
 ## Features
-- 🎵Plays songs as the highest quality as the bot can
-- ⌨️Supports both slash-commands and conventional message-based-commands
-- 🔗 Plays songs from URLs
-  - YouTube video's URL
+- 🎵 Plays songs as the highest quality as the bot can
+- 🔎 URLやキーワードから検索して再生
+  - YouTubeの動画のキーワード・リンク
   - YouTube's playlist URL
-  - SoundCloud's music page URL
+  - SoundCloudの楽曲のキーワードやリンク
   - NicoNico video's watch page URL
-  - [and so on...](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/guide/feature/overview)
-- 🔎 Searches videos from keyword and play them (from YouTube and SoundCloud)
+  - [Click here for the complete list the bot can play](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/guide/feature/overview)
+- ⌨️ Supports both slash-commands and conventional message-based-commands
+  - Customizable prefix that is used when using message-based commands
+  - You can disable the message-based commands feature.
+- Control a playback with ⏯️ button intuitively.
 - 🔁Track loop and queue loop
-- ❕The prefix is changeable
-  - Prefix is changeable by modifying the bot's nickname.
-  - If you are an owner of the bot, you can change the default prefix of the bot.
-  - Multiple letters' prefix is supported.
-- ▶️Autoplay songs, by pre-defined configuration
+- ▶️ Autoplay songs, by pre-defined configuration
+- 😸 No database, no other external programs.
+  - Executable even when only small amount of resources left in your computer.
+  - Easy setup with comparatively fewer steps
 - 👍 [Support](#サポート)(Japanese and English Available).
 
-## Guide
+## Documentation / Guide
 The documentation of the bot (Japanese).
-- [Documentation](https://web.usamyon.moe/Discord-SimpleMusicBot/)
+- [Documentation site](https://web.usamyon.moe/Discord-SimpleMusicBot/)
 
 ## Contribution
 The bot is still in development so you may encounter bugs.  
