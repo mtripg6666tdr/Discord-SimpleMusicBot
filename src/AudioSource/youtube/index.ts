@@ -208,7 +208,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
   }
 
   getStrategyIndicator(){
-    return "*".repeat(this.strategyId);
+    return "\\*".repeat(this.strategyId);
   }
 
   toField(verbose: boolean){
