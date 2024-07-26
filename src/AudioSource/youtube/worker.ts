@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { WithId, SpawnerGetInfoMessage, SpawnerJobMessage, SpawnerSearchMessage, WorkerMessage, SpawnerPurgeCacheMessage } from "./spawner";
+import type { WithId, SpawnerGetInfoMessage, SpawnerJobMessage, SpawnerSearchMessage, WorkerMessage, SpawnerPurgeCacheMessage, SpawnerUpdateConfigMessage } from "./spawner";
 
 import "../../polyfill";
 
@@ -27,6 +27,7 @@ import ytdl from "ytdl-core";
 import ytsr from "ytsr";
 
 import { YouTube } from ".";
+import { updateStrategyConfiguration } from "./strategies";
 import { requireIfAny, stringifyObject } from "../../Util";
 import { getConfig } from "../../config";
 
@@ -133,6 +134,10 @@ function purgeCache(_: WithId<SpawnerPurgeCacheMessage>){
   extractCacheOtherThanCookie(dYtdl).forEach(cache => cache.clear());
 }
 
+function updateConfig({ config: newConfig }: WithId<SpawnerUpdateConfigMessage>){
+  updateStrategyConfiguration(newConfig);
+}
+
 function onMessage(message: WithId<SpawnerJobMessage>){
   if(!message){
     return;
@@ -147,6 +152,9 @@ function onMessage(message: WithId<SpawnerJobMessage>){
       break;
     case "purgeCache":
       purgeCache(message);
+      break;
+    case "updateConfig":
+      updateConfig(message);
       break;
   }
 }

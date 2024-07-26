@@ -54,29 +54,35 @@ const strategyImporters: StrategyImporter[] = [
   { enable: false, isFallback: true, importer: () => require("./youtube-dl") },
   { enable: true, isFallback: true, importer: () => require("./yt-dlp") },
   { enable: true, isFallback: true, importer: () => require("./nightly_youtube-dl") },
-];
+] as const;
 
-export const strategies: (Strategies | null)[] = strategyImporters.map(({ enable, importer, isFallback }, i) => {
-  if(!enable){
-    logger.warn(`strategy#${i} is currently disabled.`);
-    return null;
-  }
+export let strategies: (Strategies | null)[] = [];
 
-  try{
-    const { default: Module } = importer();
-    return {
-      module: new Module(i),
-      isFallback,
-    };
-  }
-  catch(e){
-    logger.warn(`failed to load strategy#${i}`);
-    if(config.debug){
-      logger.debug(e);
+function initStrategies(configEnabled: boolean[] | null = null){
+  strategies = strategyImporters.map(({ enable, importer, isFallback }, i) => {
+    if(Array.isArray(configEnabled) ? !configEnabled[i] : !enable){
+      logger.warn(`strategy#${i} is currently disabled.`);
+      return null;
     }
-    return null;
-  }
-});
+
+    try{
+      const { default: Module } = importer();
+      return {
+        module: new Module(i),
+        isFallback,
+      };
+    }
+    catch(e){
+      logger.warn(`failed to load strategy#${i}`);
+      if(config.debug){
+        logger.debug(e);
+      }
+      return null;
+    }
+  });
+}
+
+initStrategies();
 
 export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(...parameters: Parameters<Strategy<T, U>["fetch"]>){
   let checkedStrategy = -1;
@@ -144,4 +150,15 @@ export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>
     }
   }
   throw new Error("All strategies failed");
+}
+
+export function updateStrategyConfiguration(strategyConfig: string){
+  if(!strategyConfig){
+    initStrategies();
+  }
+
+  const strategyExternalConfig = strategyConfig.padEnd(strategyImporters.length, "0")
+    .split("")
+    .map(v => v === "1");
+  initStrategies(strategyExternalConfig);
 }
