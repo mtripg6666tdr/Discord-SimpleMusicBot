@@ -72,3 +72,13 @@ if(polyfillCount > 0){
   logger.warn(`Installed ${polyfillCount} polyfill(s), which means Node.js may be stale.`);
   logger.warn("We strongly recommend you upgrading Node.js to v18 at least or higher.");
 }
+
+logger.debug("Patching @distube/ytdl-core to handle upcoming videos correctly.");
+const dYtdlUtils = require("@distube/ytdl-core/lib/utils");
+const originalPlayError = dYtdlUtils.playError;
+dYtdlUtils.playError = function playError(...args: any[]){
+  if(args[0]?.playabilityStatus?.status === "LIVE_STREAM_OFFLINE"){
+    args[0].playabilityStatus.status += "_REPLACED";
+  }
+  return originalPlayError.apply(this, args);
+};
