@@ -37,7 +37,7 @@ export default class End extends BaseCommand {
     const { t } = context;
 
     if(!context.server.player.isPlaying){
-      message.reply(t("errorOccurred")).catch(this.logger.error);
+      message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }
     if(context.server.queue.length <= 1){
