@@ -498,12 +498,46 @@ export function requireIfAny(id: string): unknown {
   }
 }
 
-export function safeTraverseByPath(obj: any, ...path: (string | ((current: any) => any))[]): any | null {
-  if(!obj){
-    return null;
-  }
+interface UnsafeTraverseState<T> {
+  value: T;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  getProperty: <U = any>(name: keyof T | (string & {})) => UnsafeTraverseState<U | undefined>;
+  select: <U = any>(selector: (current: T) => U | undefined | null) => UnsafeTraverseState<U | undefined>;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  execute: <U extends keyof T | (string & {})>(func: U) => T extends undefined
+    ? () => UnsafeTraverseState<undefined>
+    : T extends { [key in U]: (...args: any[]) => any }
+      ? (...args: Parameters<T[U]>) => UnsafeTraverseState<ReturnType<T[U]>>
+      : (..._: any[]) => UnsafeTraverseState<undefined>;
+  action: (action: (value: T) => void) => UnsafeTraverseState<T>;
+}
 
-  return path.reduce((prev, current) => typeof current === "function" ? current(prev) : prev?.[current], obj);
+export function unsafeTraverseFrom<S>(obj: S){
+  const createState: <T = any> (value: T) => UnsafeTraverseState<T> = <T = any> (value: T) => ({
+    value,
+    getProperty: <U = any>(name: string) => value
+      ? createState<U | undefined>(value[name as keyof typeof value] as U | null | undefined || undefined)
+      : undefinedState,
+    select: <U = any>(selector: (current: T) => U | undefined | null) => value
+      ? createState<U | undefined>(selector(value) || undefined)
+      : undefinedState,
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    execute: <U extends keyof T | (string & {})>(func: U) => (!value
+      ? () => undefinedState
+      // @ts-expect-error
+      : typeof value[func] === "function"
+        // @ts-expect-error
+        ? (...args: Parameters<T[U]>) => createState<ReturnType<T[U]>>(value[func](...args))
+        : (..._: any[]) => undefinedState) as any,
+    action: (action: (value: T) => void) => {
+      action(value);
+      return createState(value);
+    },
+  });
+
+  const undefinedState = createState(undefined);
+
+  return createState<S>(obj);
 }
 
 export function assertIs<T>(obj: unknown): asserts obj is T{}

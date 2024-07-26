@@ -24,7 +24,7 @@ import * as ytdl from "@distube/ytdl-core";
 
 import { Strategy } from "./base";
 import { YouTubeJsonFormat } from "..";
-import { safeTraverseByPath } from "../../../Util";
+import { unsafeTraverseFrom } from "../../../Util";
 import { getConfig } from "../../../config";
 import { SecondaryUserAgent } from "../../../definition";
 import { createChunkedDistubeYTStream, createRefreshableYTLiveStream } from "../stream";
@@ -53,12 +53,10 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
       agent: this.agent,
     });
 
-    const experiments = this.extractExperiments(info);
+    const nop = this.validateInfoExperiments(info);
 
-    this.logger.trace("Experiments", experiments?.join(", "));
-
-    if(poTokenExperiments.some(expId => experiments.includes(expId))){
-      throw new Error("Detected broken formats by the poToken experiment.");
+    if(!nop){
+      throw new Error("Detected broken formats.");
     }
 
     return {
@@ -75,14 +73,28 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
   async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>): Promise<StrategyFetchResult<distubeYtdlCoreCache, StreamInfo>> {
     this.logStrategyUsed();
 
-    const availableCache = this.cacheIsValid(cache) && cache.data;
+    const availableCache = this.cacheIsValid(cache) && this.validateCacheExperiments(cache) && cache.data;
 
     this.logger.info(availableCache ? "using cache without obtaining" : "obtaining info");
 
-    const info = availableCache || await ytdl.getInfo(url, {
-      lang: config.defaultLanguage,
-    });
+    let info: ytdl.videoInfo = null!;
 
+    for(let i = 0; i < 3; i++){
+      info = availableCache || await ytdl.getInfo(url, {
+        lang: config.defaultLanguage,
+      });
+
+      if(this.validateInfoExperiments(info)) break;
+
+      unsafeTraverseFrom(ytdl)
+        .getProperty("cache")
+        .select(obj => Object.values<Map<string, any>>(obj))
+        .execute("forEach")(s => s.clear());
+    }
+
+    if(!this.validateInfoExperiments(info)){
+      throw new Error("Detected broken formats.");
+    }
 
     const format = ytdl.chooseFormat(info.formats, info.videoDetails.liveBroadcastDetails?.isLiveNow ? {
       filter: undefined,
@@ -167,23 +179,30 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
 
   extractExperiments(info: ytdl.videoInfo): string[] {
     // ref: https://github.com/yt-dlp/yt-dlp/pull/10456/files
-    const experiments = safeTraverseByPath(
-      info,
-      "response",
-      "responseContext",
-      "serviceTrackingParams",
-      v => v.find((d: any) => d.service === "GFEEDBACK"),
-      "params",
-      v => v.find((d: any) => d.key === "e"),
-      "value",
-      v => v.split(","),
-    );
+    const experiments = unsafeTraverseFrom(info)
+      .getProperty("response")
+      .getProperty("responseContext")
+      .getProperty("serviceTrackingParams")
+      .select(v => v.find((d: any) => d.service === "GFEEDBACK"))
+      .getProperty("params")
+      .select(v => v.find((d: any) => d.key === "e"))
+      .getProperty("value")
+      .select<string[]>(v => v.split(","))
+      .value;
 
-    if(experiments){
-      return experiments;
-    }else{
-      return [];
-    }
+    return experiments || [];
+  }
+
+  validateInfoExperiments(info: ytdl.videoInfo){
+    const experiments = this.extractExperiments(info);
+
+    this.logger.trace("Experiments", experiments.join(", "));
+
+    return !poTokenExperiments.some(expId => experiments.includes(expId));
+  }
+
+  validateCacheExperiments(cache: Cache<distubeYtdlCore, ytdl.videoInfo>){
+    return this.validateInfoExperiments(cache.data);
   }
 }
 
