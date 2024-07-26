@@ -154,10 +154,6 @@ export async function searchYouTube(keyword: string){
   return result.data;
 }
 
-export function purgeCache(){
-  worker?.postMessage({ type: "purgeCache", id: "0" } satisfies WithId<SpawnerPurgeCacheMessage>);
-}
-
 export function updateStrategyConfiguration(config: string){
   worker?.postMessage({ type: "updateConfig", config, id: "0" } satisfies WithId<SpawnerUpdateConfigMessage>);
 }

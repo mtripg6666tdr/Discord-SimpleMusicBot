@@ -16,14 +16,12 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { WithId, SpawnerGetInfoMessage, SpawnerJobMessage, SpawnerSearchMessage, WorkerMessage, SpawnerPurgeCacheMessage, SpawnerUpdateConfigMessage } from "./spawner";
+import type { WithId, SpawnerGetInfoMessage, SpawnerJobMessage, SpawnerSearchMessage, WorkerMessage, SpawnerUpdateConfigMessage } from "./spawner";
 
 import "../../polyfill";
 
 import { parentPort } from "worker_threads";
 
-import dYtdl from "@distube/ytdl-core";
-import ytdl from "ytdl-core";
 import ytsr from "ytsr";
 
 import { YouTube } from ".";
@@ -117,23 +115,6 @@ function search({ id, keyword }: WithId<SpawnerSearchMessage>){
     });
 }
 
-function purgeCache(_: WithId<SpawnerPurgeCacheMessage>){
-  const extractCacheOtherThanCookie = (module: typeof ytdl | typeof dYtdl | null) => {
-    if(!module){
-      return [];
-    }
-
-    // @ts-expect-error
-    const cache: { [key: string]: Map<string, unknown> } = module.cache;
-    return Object.entries(cache)
-      .filter(([key]) => key !== "cookie")
-      .map(([, value]) => value);
-  };
-
-  extractCacheOtherThanCookie(ytdl).forEach(cache => cache.clear());
-  extractCacheOtherThanCookie(dYtdl).forEach(cache => cache.clear());
-}
-
 function updateConfig({ config: newConfig }: WithId<SpawnerUpdateConfigMessage>){
   updateStrategyConfiguration(newConfig);
 }
@@ -149,9 +130,6 @@ function onMessage(message: WithId<SpawnerJobMessage>){
       break;
     case "search":
       search(message);
-      break;
-    case "purgeCache":
-      purgeCache(message);
       break;
     case "updateConfig":
       updateConfig(message);
