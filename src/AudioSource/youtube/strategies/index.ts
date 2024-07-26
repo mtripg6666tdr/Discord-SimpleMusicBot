@@ -155,6 +155,7 @@ export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>
 export function updateStrategyConfiguration(strategyConfig: string){
   if(!strategyConfig){
     initStrategies();
+    return;
   }
 
   const strategyExternalConfig = strategyConfig.padEnd(strategyImporters.length, "0")
