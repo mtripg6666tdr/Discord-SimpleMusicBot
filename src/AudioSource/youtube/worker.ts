@@ -75,6 +75,7 @@ function getInfo({ id, url, prefetched, forceCache }: WithId<SpawnerGetInfoMessa
 function search({ id, keyword }: WithId<SpawnerSearchMessage>){
   if(dYtsr){
     dYtsr(keyword, searchOptions)
+    // @ts-ignore
       .then(result => {
         postMessage({
           type: "searchOk",
@@ -82,11 +83,13 @@ function search({ id, keyword }: WithId<SpawnerSearchMessage>){
           id,
         });
       })
+      // @ts-ignore
       .catch((err) => {
         console.error(err);
 
         return ytsr(keyword, searchOptions);
       })
+      // @ts-ignore
       .catch(err => {
         postMessage({
           type: "error",
