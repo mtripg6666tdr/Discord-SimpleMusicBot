@@ -27,6 +27,7 @@ import * as ytdl from "ytdl-core";
 import { attemptGetInfoForStrategies, attemptFetchForStrategies } from "./strategies";
 import { playDl } from "./strategies/play-dl";
 import { ytdlCore } from "./strategies/ytdl-core";
+import { purgeCache as purgeCacheInWorker } from "..";
 import { getCommandExecutionContext } from "../../Commands";
 import { measureTime } from "../../Util/decorators";
 import { SecondaryUserAgent } from "../../definition";
@@ -258,6 +259,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
 
   override purgeCache(){
     this.cache = null;
+    purgeCacheInWorker();
   }
 
   waitForLive(signal: AbortSignal, tick: () => void){
