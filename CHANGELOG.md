@@ -172,3 +172,23 @@ Node.js v16以上の環境で動作することを想定していますが、で
 * Dockerのイメージは、リリース後10～20分程度で公開されます。
 
 ---
+
+# v4.3.8
+## バグ修正
+* 一部のソースの再生が機能しなくなったのを暫定的に修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2534)
+  * 引き続き必要に応じて修正パッチをリリースしていきます。
+* `この曲で終了`コマンドの表示を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2535)
+## ドキュメント
+* ドキュメント上でサポートされている Node.js のバージョンを更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2518)
+  * 正確にいつからかはわからないですが、v16.16以前のバージョンでも動作するようになっています。
+  * 現在、ボットの動作に必要な最低限の Node.js のバージョンは v16.4 です。
+* ドキュメントの継続的な更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2526, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2527)
+## 依存関係のアップデート
+* oceanic.js 1.10.0 => 1.11.1
+* i18next 23.12.1 => 23.12.2
+* @sinclair/typebox 0.32.34 => 0.32.35
+## その他の特記事項
+* Node.jsは、最新のLTSのバージョンをご利用いただくことを強く推奨しています。v16以上であれば動作はしますが、一部機能が制限されることがあります。詳しくは[こちら](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support#nodejs%E3%81%AE%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E3%81%AB%E3%82%88%E3%82%8B%E6%A9%9F%E8%83%BD%E3%81%AE%E9%81%95%E3%81%84)をご覧ください。
+* Dockerのイメージは、リリース後10～20分程度で公開されます。
+
+---
