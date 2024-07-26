@@ -175,9 +175,10 @@ Node.js v16以上の環境で動作することを想定していますが、で
 
 # v4.3.8
 ## バグ修正
-* 一部のソースの再生が機能しなくなったのを暫定的に修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2534)
+* 一部のソースの再生が機能しなくなったのを暫定的に修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2534, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2537)
   * 引き続き必要に応じて修正パッチをリリースしていきます。
 * `この曲で終了`コマンドの表示を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2535)
+* ラジオ機能で再生失敗が複数回起きた時などにキューが無限に長くなる問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2538)
 ## ドキュメント
 * ドキュメント上でサポートされている Node.js のバージョンを更新(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2518)
   * 正確にいつからかはわからないですが、v16.16以前のバージョンでも動作するようになっています。
