@@ -96,6 +96,8 @@ function search({ id, keyword }: WithId<SpawnerSearchMessage>){
           id,
         });
       });
+
+    return;
   }
 
   ytsr(keyword, searchOptions)

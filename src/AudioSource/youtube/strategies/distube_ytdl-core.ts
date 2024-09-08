@@ -27,7 +27,7 @@ import { YouTubeJsonFormat } from "..";
 import { unsafeTraverseFrom } from "../../../Util";
 import { getConfig } from "../../../config";
 import { SecondaryUserAgent } from "../../../definition";
-import { createChunkedDistubeYTStream, createRefreshableYTLiveStream } from "../stream";
+import { createRefreshableYTLiveStream } from "../stream";
 
 export type distubeYtdlCore = "distubeYtdlCore";
 export const distubeYtdlCore: distubeYtdlCore = "distubeYtdlCore";
@@ -132,15 +132,12 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
             ? "webm/opus"
             : "unknown",
         } as UrlStreamInfo,
-        cache: {
-          type: distubeYtdlCore,
-          data: info,
-        },
+        cache: null!,
       };
     }else{
       const readable: Readable = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow
         ? createRefreshableYTLiveStream(info, url, { format, lang: config.defaultLanguage })
-        : createChunkedDistubeYTStream(info, format, { lang: config.defaultLanguage }, 512 * 1024);
+        : ytdl.downloadFromInfo(info, { format });
 
       return {
         ...partialResult,
@@ -152,10 +149,7 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
               ? "webm/opus"
               : "unknown",
         } as ReadableStreamInfo,
-        cache: {
-          type: distubeYtdlCore,
-          data: info,
-        },
+        cache: null!,
       };
     }
   }
