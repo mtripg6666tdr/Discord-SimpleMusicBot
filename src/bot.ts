@@ -72,7 +72,7 @@ export class MusicBot extends MusicBotBase {
           "GUILD_VOICE_STATES",
           "MESSAGE_CONTENT",
         ],
-        compress: !!(requireIfAny("zlib-sync") || requireIfAny("pako")),
+        compress: requireIfAny("zlib-sync") || requireIfAny("pako") ? "zlib-stream" : false,
       },
     });
 
