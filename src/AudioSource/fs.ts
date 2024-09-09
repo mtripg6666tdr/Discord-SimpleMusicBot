@@ -26,11 +26,11 @@ import { getCommandExecutionContext } from "../Commands";
 import { retrieveRemoteAudioInfo } from "../Util";
 
 export class FsStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
-  constructor(){
+  constructor() {
     super({ isCacheable: false });
   }
 
-  async init(url: string, _: AudioSourceBasicJsonFormat | null){
+  async init(url: string, _: AudioSourceBasicJsonFormat | null) {
     const { t } = getCommandExecutionContext();
     
     this.url = url;
@@ -40,7 +40,7 @@ export class FsStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
     return this;
   }
 
-  async fetch(): Promise<ReadableStreamInfo>{
+  async fetch(): Promise<ReadableStreamInfo> {
     return {
       type: "readable",
       stream: fs.createReadStream(path.join(__dirname, global.BUNDLED ? "../" : "../../", this.url)),
@@ -48,7 +48,7 @@ export class FsStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
     };
   }
 
-  toField(_: boolean){
+  toField(_: boolean) {
     const { t } = getCommandExecutionContext();
 
     return [
@@ -59,7 +59,7 @@ export class FsStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
     ];
   }
 
-  npAdditional(){
+  npAdditional() {
     return "";
   }
 

@@ -32,7 +32,7 @@ import { getLogger } from "../../logger";
 
 const worker = isMainThread ? new Worker(path.join(__dirname, global.BUNDLED && __filename.includes("min") ? "./worker.min.js" : "./worker.js")).on("error", console.error) : null;
 
-if(worker){
+if (worker) {
   global.workerThread = worker;
 }
 
@@ -84,10 +84,10 @@ type jobQueueContent = {
 };
 const jobQueue = worker && new Map<string, jobQueueContent>();
 
-if(worker){
+if (worker) {
   worker.unref();
   worker.on("message", (message: WithId<WorkerMessage>) => {
-    if(jobQueue!.has(message.id)){
+    if (jobQueue!.has(message.id)) {
       const { callback, start } = jobQueue!.get(message.id)!;
 
       logger.debug(`Job(${message.id}) Finished (${Date.now() - start}ms)`);
@@ -95,7 +95,7 @@ if(worker){
       callback(message);
 
       jobQueue!.delete(message.id);
-    }else{
+    } else {
       logger.warn(`Invalid message received: ${stringifyObject(message)}`);
     }
   });
@@ -109,8 +109,8 @@ const jobTriggerQueue = new PQueue({
 
 function doJob(message: SpawnerGetInfoMessage): Promise<WorkerGetInfoSuccessMessage>;
 function doJob(message: SpawnerSearchMessage): Promise<WorkerSearchSuccessMessage>;
-function doJob(message: SpawnerJobMessage): Promise<WorkerSuccessMessage>{
-  if(!worker){
+function doJob(message: SpawnerJobMessage): Promise<WorkerSuccessMessage> {
+  if (!worker) {
     throw new Error("Cannot send send messages from worker thread to itself.");
   }
 
@@ -126,9 +126,9 @@ function doJob(message: SpawnerJobMessage): Promise<WorkerSuccessMessage>{
     jobQueue!.set(uuid, {
       start: Date.now(),
       callback: result => {
-        if(result.type === "error"){
+        if (result.type === "error") {
           reject(result.data);
-        }else{
+        } else {
           resolve(result as WorkerSuccessMessage);
         }
       },
@@ -136,7 +136,7 @@ function doJob(message: SpawnerJobMessage): Promise<WorkerSuccessMessage>{
   }));
 }
 
-export async function initYouTube(url: string, prefetched: YouTubeJsonFormat, forceCache?: boolean){
+export async function initYouTube(url: string, prefetched: YouTubeJsonFormat, forceCache?: boolean) {
   const result = await doJob({
     type: "init",
     url,
@@ -146,7 +146,7 @@ export async function initYouTube(url: string, prefetched: YouTubeJsonFormat, fo
   return Object.assign(new YouTube(), result.data);
 }
 
-export async function searchYouTube(keyword: string){
+export async function searchYouTube(keyword: string) {
   const result = await doJob({
     type: "search",
     keyword,
@@ -154,6 +154,6 @@ export async function searchYouTube(keyword: string){
   return result.data;
 }
 
-export function updateStrategyConfiguration(config: string){
+export function updateStrategyConfiguration(config: string) {
   worker?.postMessage({ type: "updateConfig", config, id: "0" } satisfies WithId<SpawnerUpdateConfigMessage>);
 }

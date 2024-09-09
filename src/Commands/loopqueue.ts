@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class QueueLoop extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["loopqueue", "queueloop"],
       unlist: false,
@@ -33,13 +33,13 @@ export default class QueueLoop extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    if(context.server.queue.queueLoopEnabled){
+    if (context.server.queue.queueLoopEnabled) {
       context.server.queue.queueLoopEnabled = false;
       message.reply(`:repeat:${t("commands:loopqueue.disabled")}:x:`).catch(this.logger.error);
-    }else{
+    } else {
       context.server.queue.queueLoopEnabled = true;
       message.reply(`:repeat:${t("commands:loopqueue.enabled")}:o:`).catch(this.logger.error);
     }

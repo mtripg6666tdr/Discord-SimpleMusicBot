@@ -39,15 +39,15 @@ export class DSL extends LogEmitter<{}> {
   protected logFileStream: fs.WriteStream | null = null;
   protected destroyed = false;
 
-  constructor(protected options: DSLOptions){
+  constructor(protected options: DSLOptions) {
     super("DSL");
     this.logger.warn("CSV based detailed log enabled.");
-    if(options.enableFileLog){
+    if (options.enableFileLog) {
       this.logFileName = path.join(__dirname, `${global.BUNDLED ? ".." : "../../.."}/logs/stream-${Date.now()}.csv`);
       this.logFileStream = fs.createWriteStream(this.logFileName);
       this.logFileStream.once("close", () => this.logger.info("CSV file closed"));
       this.logger.warn(`CSV filename will be ${this.logFileName}`);
-    }else if(options.enableMemoryLog){
+    } else if (options.enableMemoryLog) {
       this.csvLog = [];
     }
     this.appendCsvLog("type,datetime,id,total,current");
@@ -57,9 +57,9 @@ export class DSL extends LogEmitter<{}> {
     return this.csvLog;
   }
 
-  appendReadable(...streams: Readable[]){
+  appendReadable(...streams: Readable[]) {
     streams.forEach(readable => {
-      if(!readable) return;
+      if (!readable) return;
       const i = this.logStreams.push(readable);
       this.logger.info(`ID:${i}=${readable.constructor.name} (highWaterMark:${readable.readableHighWaterMark})`);
       let total = 0;
@@ -68,10 +68,10 @@ export class DSL extends LogEmitter<{}> {
         readable.off("end", onClose);
         this.appendCsvLog(`total,${this.getNow()},${i},${total}`);
         const inx = this.logStreams.findIndex(s => s === readable);
-        if(inx >= 0){
+        if (inx >= 0) {
           this.logStreams.splice(inx, 1);
           this.logger.info(this.logStreams);
-          if(this.logStreams.length === 0 && this.logFileStream && !this.logFileStream.destroyed){
+          if (this.logStreams.length === 0 && this.logFileStream && !this.logFileStream.destroyed) {
             this.destroy();
             this.logger.info("CSV log saved successfully");
           }
@@ -87,27 +87,27 @@ export class DSL extends LogEmitter<{}> {
     });
   }
 
-  appendCsvLog(line: string){
-    if(this.csvLog){
+  appendCsvLog(line: string) {
+    if (this.csvLog) {
       this.csvLog.push(line);
-    }else if(this.logFileStream){
+    } else if (this.logFileStream) {
       this.logFileStream.write(line + "\r\n");
     }
   }
 
-  destroy(){
-    if(this.destroyed) return;
+  destroy() {
+    if (this.destroyed) return;
     this.destroyed = true;
     this.logger.info("Destroying");
     this.csvLog = null;
-    if(this.logFileStream){
+    if (this.logFileStream) {
       const strm = this.logFileStream;
       this.logFileStream = null;
       strm.end();
     }
   }
 
-  protected getNow(){
+  protected getNow() {
     const now = new Date();
     return `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`;
   }

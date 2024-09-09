@@ -23,10 +23,10 @@ export class ReplitClient {
   protected baseUrl: string;
   protected queue: PQueue;
 
-  constructor(baseUrl: string){
+  constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
 
-    if(!this.baseUrl){
+    if (!this.baseUrl) {
       throw new Error("No URL found");
     }
 
@@ -41,21 +41,21 @@ export class ReplitClient {
 
   get(key: string, options: { raw: true }): Promise<string>;
   get<T = any>(key: string, options?: { raw: false }): Promise<T>;
-  get(key: string, options?: { raw: boolean }){
+  get(key: string, options?: { raw: boolean }) {
     return this.queue.add(async () => {
       const shouldRaw = options?.raw || false;
       const { body } = await candyget(`${this.baseUrl}/${key}`, "string");
-      if(!body){
+      if (!body) {
         return null;
-      }else if(shouldRaw){
+      } else if (shouldRaw) {
         return body;
-      }else{
+      } else {
         return JSON.parse(body);
       }
     });
   }
 
-  set(key: string, value: any){
+  set(key: string, value: any) {
     return this.queue.add(async () => {
       const textData = JSON.stringify(value);
 
@@ -65,15 +65,15 @@ export class ReplitClient {
         },
       }, `${encodeURIComponent(key)}=${encodeURIComponent(textData)}`);
 
-      if(statusCode >= 200 && statusCode <= 299){
+      if (statusCode >= 200 && statusCode <= 299) {
         return this;
-      }else{
+      } else {
         throw new Error(`Status code: ${statusCode}`);
       }
     });
   }
 
-  delete(key: string){
+  delete(key: string) {
     return this.queue.add(async () => {
       await candyget.delete(`${this.baseUrl}/${key}`, "empty");
       return this;

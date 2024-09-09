@@ -29,29 +29,29 @@ interface InteractionCollectorManagerEvents {
 export class InteractionCollectorManager extends LogEmitter<InteractionCollectorManagerEvents> {
   protected collectors = new Map<string, InteractionCollector<any>>();
 
-  get customIdLength(){
+  get customIdLength() {
     return this.collectors.size;
   }
 
-  get collectorLength(){
+  get collectorLength() {
     return new Set(this.collectors.values()).size;
   }
 
-  constructor(){
+  constructor() {
     super("InteractionCollectorManager");
   }
 
-  create(){
+  create() {
     const collector = new InteractionCollector(this);
     return this.setCollectorEvents(collector);
   }
 
-  createPagenation(){
+  createPagenation() {
     const collector = new Pagenation(this);
     return this.setCollectorEvents(collector);
   }
 
-  protected setCollectorEvents<T extends InteractionCollector>(collector: T): T{
+  protected setCollectorEvents<T extends InteractionCollector>(collector: T): T {
     this.logger.debug(`(${collector.collectorId}) collector created`);
     collector
       .on("customIdsCreate", customIds => {
@@ -76,11 +76,11 @@ export class InteractionCollectorManager extends LogEmitter<InteractionCollector
    * @param interaction インタラクション
    * @returns 対応するコレクターが存在し、処理が渡った場合はtrue、それ以外の場合はfalse
    */
-  async onInteractionCreate(interaction: ComponentInteraction<any, AnyTextableGuildChannel>){
+  async onInteractionCreate(interaction: ComponentInteraction<any, AnyTextableGuildChannel>) {
     const collector = this.collectors.get(interaction.data.customID);
-    if(!collector){
+    if (!collector) {
       return false;
-    }else{
+    } else {
       this.logger.debug(`passed an interaction successfully: ${interaction.data.customID} => ${collector.collectorId}`);
       await interaction.deferUpdate();
       collector.handleInteraction(interaction);

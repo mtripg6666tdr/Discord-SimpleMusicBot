@@ -28,7 +28,7 @@ import * as Util from "../Util";
 import { getLogger } from "../logger";
 
 export default class Frame extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["frame", "キャプチャ", "capture"],
       unlist: false,
@@ -46,46 +46,46 @@ export default class Frame extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     const server = context.server;
 
     // そもそも再生状態ではない場合
-    if(!server.player.isConnecting || !server.player.isPlaying){
+    if (!server.player.isConnecting || !server.player.isPlaying) {
       await message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }
 
     const vinfo = server.player.currentAudioInfo!;
-    if(!vinfo.isYouTube()){
+    if (!vinfo.isYouTube()) {
       await message.reply(`:warning:${t("commands:frame.unsupported")}`).catch(this.logger.error);
       return;
-    }else if(vinfo.isFallbacked){
+    } else if (vinfo.isFallbacked) {
       await message.reply(`:warning:${t("commands:frame.fallbacking")}`).catch(this.logger.error);
       return;
     }
 
-    const time = (function(rawTime){
-      if(rawTime === "" || vinfo.isLiveStream) return server.player.currentTime / 1000;
-      else if(rawTime.match(/^(\d+:)*\d+(\.\d+)?$/)) return rawTime.split(":").map(n => Number(n))
+    const time = (function(rawTime) {
+      if (rawTime === "" || vinfo.isLiveStream) return server.player.currentTime / 1000;
+      else if (rawTime.match(/^(\d+:)*\d+(\.\d+)?$/)) return rawTime.split(":").map(n => Number(n))
         .reduce((prev, current) => prev * 60 + current);
       else return NaN;
     }(context.rawArgs));
 
-    if(context.rawArgs !== "" && vinfo.isLiveStream){
+    if (context.rawArgs !== "" && vinfo.isLiveStream) {
       await message.channel.createMessage({
         content: t("commands:frame.liveStreamWithTime"),
       });
       return;
     }
 
-    if(!vinfo.isLiveStream && (isNaN(time) || time > vinfo.lengthSeconds)){
+    if (!vinfo.isLiveStream && (isNaN(time) || time > vinfo.lengthSeconds)) {
       await message.reply(`:warning: ${t("commands:frame.invalidTime")}`).catch(this.logger.error);
       return;
     }
 
-    try{
+    try {
       const [hour, min, sec] = Util.time.calcHourMinSec(time, { fixedLength: 2 });
       const response = await message.reply(`:camera_with_flash: ${t("commands:frame.capturing")}...`);
       const { url, ua } = await vinfo.fetchVideo();
@@ -108,7 +108,7 @@ export default class Frame extends BaseCommand {
         }`,
       });
     }
-    catch(e){
+    catch (e) {
       this.logger.error(e);
       await message.channel.createMessage({
         content: `:sob:${t("commands:frame.failed")}`,
@@ -117,7 +117,7 @@ export default class Frame extends BaseCommand {
   }
 }
 
-function getFrame(url: string, time: number, ua: string){
+function getFrame(url: string, time: number, ua: string) {
   const logger = getLogger("FFmpeg");
   return new Promise<Buffer>((resolve, reject) => {
     const args = [
@@ -136,7 +136,7 @@ function getFrame(url: string, time: number, ua: string){
     ffmpeg.process.stderr?.on("data", logger.debug);
     ffmpeg
       .on("error", (er) => {
-        if(!ffmpeg.destroyed) ffmpeg.destroy(er);
+        if (!ffmpeg.destroyed) ffmpeg.destroy(er);
         reject(er);
       })
       .on("data", (chunks) => {
@@ -144,7 +144,7 @@ function getFrame(url: string, time: number, ua: string){
       })
       .on("end", () => {
         resolve(Buffer.concat(bufs));
-        if(!ffmpeg.destroyed) ffmpeg.destroy();
+        if (!ffmpeg.destroyed) ffmpeg.destroy();
       })
     ;
   });

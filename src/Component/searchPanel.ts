@@ -40,37 +40,37 @@ const config = getConfig();
 
 export class SearchPanel extends LogEmitter<SearchPanelEvents> {
   protected _status: status = "init";
-  protected get status(){
+  protected get status() {
     return this._status;
   }
-  protected set status(val: status){
+  protected set status(val: status) {
     this._status = val;
-    if(val === "destroyed") this.emit("destroy");
+    if (val === "destroyed") this.emit("destroy");
   }
 
   protected _options: SongInfo[] | null = null;
   get options(): Readonly<SongInfo[]> {
-    if(!this._options){
+    if (!this._options) {
       throw new Error("Search has not been done yet.");
     }
     return this._options;
   }
 
-  get commandMessage(){
+  get commandMessage() {
     return this._commandMessage;
   }
 
   protected _responseMessage: ResponseMessage | null = null;
 
-  get responseMesasge(){
+  get responseMesasge() {
     return this._responseMessage;
   }
 
   protected t: i18n["t"];
 
-  constructor(protected readonly _commandMessage: CommandMessage, protected query: string, protected readonly isRawTitle: boolean = false){
+  constructor(protected readonly _commandMessage: CommandMessage, protected query: string, protected readonly isRawTitle: boolean = false) {
     super("SearchPanel");
-    if(!_commandMessage){
+    if (!_commandMessage) {
       throw new Error("Invalid arguments passed");
     }
   }
@@ -79,20 +79,20 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
   async consumeSearchResult<T>(
     searchPromise: Promise<T | { result: T, transformedQuery: string }>,
     consumer: (result: T, t: i18n["t"]) => SongInfo[]
-  ){
+  ) {
     const { t } = getCommandExecutionContext();
 
-    if(this.status !== "init"){
+    if (this.status !== "init") {
       return false;
     }
     this.status = "consumed";
     this.t = t;
 
     let reply: ResponseMessage | null = null;
-    try{
+    try {
       let waitedPromiseResult: T | { result: T, transformedQuery: string } = null!;
       [reply, waitedPromiseResult] = await Promise.all([this._commandMessage.reply(`🔍${t("search.searching")}...`), searchPromise]);
-      if("transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string })){
+      if ("transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string })) {
         this.query = (waitedPromiseResult as { result: T, transformedQuery: string }).transformedQuery;
       }
       const songResult = this._options = consumer(
@@ -101,7 +101,7 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
           : waitedPromiseResult as T,
         t
       ).slice(0, 20);
-      if(songResult.length <= 0){
+      if (songResult.length <= 0) {
         await reply.edit(`:pensive:${t("search.notFound")}`);
         return false;
       }
@@ -157,12 +157,12 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
       this.emit("open", this._responseMessage);
       return true;
     }
-    catch(e){
+    catch (e) {
       this.logger.error(e);
-      if(reply){
+      if (reply) {
         reply.edit(`✘${t("internalErrorOccurred")}`)
           .catch(this.logger.error);
-      }else{
+      } else {
         this._commandMessage.reply(`✘${t("internalErrorOccurred")}`)
           .catch(this.logger.error);
       }
@@ -170,14 +170,14 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     }
   }
 
-  filterOnlyIncludes(nums: number[]){
+  filterOnlyIncludes(nums: number[]) {
     return nums.filter(n => 0 < n && n <= this.options.length);
   }
 
-  decideItems(nums: number[]){
+  decideItems(nums: number[]) {
     this.status = "destroyed";
 
-    if(!this._responseMessage){
+    if (!this._responseMessage) {
       throw new Error("Search result has not been sent yet.");
     }
 
@@ -187,10 +187,10 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     };
   }
 
-  async destroy(option?: { quiet: boolean }){
+  async destroy(option?: { quiet: boolean }) {
     const quiet = option?.quiet || false;
-    if(this.status !== "consumed") return;
-    if(!quiet){
+    if (this.status !== "consumed") return;
+    if (!quiet) {
       await this._responseMessage?.channel.createMessage({
         content: `✅${this.t("canceling")}`,
       }).catch(this.logger.error);

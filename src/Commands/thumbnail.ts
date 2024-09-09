@@ -26,7 +26,7 @@ import { BaseCommand } from ".";
 import { getColor } from "../Util/color";
 
 export default class Thumbnail extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["サムネ", "thumbnail", "thumb", "t"],
       unlist: false,
@@ -44,7 +44,7 @@ export default class Thumbnail extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     const embed = new MessageEmbedBuilder()
@@ -52,28 +52,28 @@ export default class Thumbnail extends BaseCommand {
 
     const userSearchPanel = context.server.searchPanel.get(message.member.id);
     const rawArgNumber = Number(context.rawArgs);
-    if(context.rawArgs && userSearchPanel && 0 < rawArgNumber && rawArgNumber <= userSearchPanel.options.length){
+    if (context.rawArgs && userSearchPanel && 0 < rawArgNumber && rawArgNumber <= userSearchPanel.options.length) {
       // 検索パネルからのサムネイル
       const opt = userSearchPanel.options[rawArgNumber - 1];
       embed
         .setImage(opt.thumbnail)
         .setTitle(opt.title)
         .setDescription(`URL: ${opt.url}`);
-    }else if(!context.rawArgs && context.server.player.isPlaying && context.server.queue.length >= 1){
+    } else if (!context.rawArgs && context.server.player.isPlaying && context.server.queue.length >= 1) {
       // 現在再生中楽曲のサムネイル
       const { basicInfo: info } = context.server.queue.get(0);
       embed.setTitle(info.title);
 
-      if(!info.isPrivateSource){
+      if (!info.isPrivateSource) {
         embed.setDescription(`URL: ${info.url}`);
       }
 
-      if(typeof info.thumbnail === "string"){
+      if (typeof info.thumbnail === "string") {
         embed.setImage(info.thumbnail);
         await message.reply({
           embeds: [embed.toOceanic()],
         }).catch(this.logger.error);
-      }else{
+      } else {
         embed.setImage(`attachment://thumbnail.${info.thumbnail.ext}`);
         await message.reply({
           embeds: [embed.toOceanic()],
@@ -85,7 +85,7 @@ export default class Thumbnail extends BaseCommand {
           ],
         }).catch(this.logger.error);
       }
-    }else{
+    } else {
       message.reply(`✘${t("commands:thumbnail.noSearchPanelFound")}`).catch(this.logger.error);
       return;
     }

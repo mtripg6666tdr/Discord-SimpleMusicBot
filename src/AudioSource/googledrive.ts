@@ -29,21 +29,21 @@ import { DefaultUserAgent } from "../definition";
 export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat> {
   protected resourceUrlCache: UrlStreamInfo | null = null;
 
-  constructor(){
+  constructor() {
     super({ isCacheable: false });
   }
 
-  async init(url: string, prefetched: AudioSourceBasicJsonFormat | null){
+  async init(url: string, prefetched: AudioSourceBasicJsonFormat | null) {
     const { t } = getCommandExecutionContext();
 
-    if(prefetched){
+    if (prefetched) {
       this.title = prefetched.title || t("audioSources.driveStream");
       this.url = url;
       this.lengthSeconds = prefetched.length;
-    }else{
+    } else {
       this.title = await GoogleDrive.retriveFilename(url);
       this.url = url;
-      if(await retrieveHttpStatusCode(this.url) !== 200){
+      if (await retrieveHttpStatusCode(this.url) !== 200) {
         throw new Error(t("urlNotFound"));
       }
       const info = await retrieveRemoteAudioInfo((await this.fetch()).url);
@@ -52,8 +52,8 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
     return this;
   }
 
-  async fetch(): Promise<UrlStreamInfo>{
-    if(this.resourceUrlCache){
+  async fetch(): Promise<UrlStreamInfo> {
+    if (this.resourceUrlCache) {
       return this.resourceUrlCache;
     }
 
@@ -69,14 +69,14 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
     const contentType = headers["content-type"];
     let canBeWithVideo = !!contentType?.startsWith("video/");
 
-    if(statusCode >= 400 || !contentType){
+    if (statusCode >= 400 || !contentType) {
       body.destroy();
       throw new Error("The requested resource is not available right now.");
     }
 
     const isDoc = contentType.startsWith("text/html");
 
-    if(isDoc){
+    if (isDoc) {
       this.logger.debug("Resource URL is a document. Reading resource URL from document.");
       const document = await new Promise<string>((resolve, reject) => {
         const buf: Buffer[] = [];
@@ -89,7 +89,7 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
       });
       const { url: actionUrl } = document.match(/action="(?<url>.+?)"/)?.groups || {};
       const resourceUrlObj = new URL(actionUrl);
-      for(const match of document.matchAll(/<input type="hidden" name="(?<name>.+?)" value="(?<value>.+?)">/g)){
+      for (const match of document.matchAll(/<input type="hidden" name="(?<name>.+?)" value="(?<value>.+?)">/g)) {
         const { name, value } = match.groups!;
         resourceUrlObj.searchParams.set(name, value);
       }
@@ -100,11 +100,11 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
       const { statusCode: resourceStatusCode, headers: resourceHeaders } = await requestHead(resourceUrl);
       const resourceContentType = resourceHeaders["content-type"];
 
-      if(
+      if (
         resourceStatusCode >= 400
         || !resourceContentType
         || (!resourceContentType.startsWith("audio/") && !resourceContentType.startsWith("video/"))
-      ){
+      ) {
         throw new Error("The requested resource is not available right now.");
       }
 
@@ -121,7 +121,7 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
     };
   }
 
-  toField(_: boolean){
+  toField(_: boolean) {
     const { t } = getCommandExecutionContext();
 
     return [
@@ -132,7 +132,7 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
     ];
   }
 
-  npAdditional(){
+  npAdditional() {
     return "";
   }
 
@@ -148,24 +148,24 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
     this.resourceUrlCache = null;
   }
 
-  static validateUrl(url: string){
+  static validateUrl(url: string) {
     return Boolean(url.match(/^https?:\/\/drive\.google\.com\/file\/d\/([^/?]+)(\/.+)?$/));
   }
 
-  static getId(url: string){
+  static getId(url: string) {
     const match = url.match(/^https?:\/\/drive\.google\.com\/file\/d\/(?<id>[^/?]+)(\/.+)?$/);
     return match?.groups?.id || null;
   }
 
-  static async retriveFilename(url: string){
+  static async retriveFilename(url: string) {
     const source = await candyget.get(url, "string", { maxRedirects: 0 });
-    if(source.statusCode !== 200){
+    if (source.statusCode !== 200) {
       throw new Error("The requested file is not available right now.");
     }
 
     const name = source.body.match(/<meta property="og:title" content="(?<name>.+?)">/)?.groups?.name;
 
-    if(!name){
+    if (!name) {
       throw new Error("Something went wrong while fetching the file data.");
     }
 

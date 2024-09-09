@@ -55,48 +55,48 @@ class ConfigLoader {
   protected static _instance: ConfigLoader | null = null;
   protected _config: ConfigObject;
 
-  protected constructor(){
+  protected constructor() {
     this.load();
   }
 
-  static get instance(){
-    if(this._instance){
+  static get instance() {
+    if (this._instance) {
       return this._instance;
-    }else{
+    } else {
       return this._instance = new this();
     }
   }
 
-  get config(){
+  get config() {
     return this._config;
   }
 
-  protected load(){
+  protected load() {
     const checker = TypeCompiler.Compile(ConfigSchema);
 
     let config: ReturnType<typeof CJSON.parse> = null;
 
-    try{
+    try {
       config = CJSON.parse(
         fs.readFileSync(path.join(__dirname, global.BUNDLED ? "../config.json" : "../../config.json"), { encoding: "utf-8" }),
         undefined,
         true
       );
     }
-    catch(er){
+    catch (er) {
       throw new Error("Failed to parse `config.json`.", {
         cause: er,
       });
     }
 
     const errs = [...checker.Errors(config)];
-    if(errs.length > 0){
+    if (errs.length > 0) {
       throw new Error("Invalid `config.json`.", {
         cause: errs,
       });
     }
 
-    if(DEVELOPMENT_PHASE && (!config || typeof config !== "object" || !("debug" in config) || !config.debug)){
+    if (DEVELOPMENT_PHASE && (!config || typeof config !== "object" || !("debug" in config) || !config.debug)) {
       console.error("This is still in a development phase, and running without the debug mode is currently disabled.");
       console.error("You should use the latest version instead of the current branch.");
       console.error("If you understand exactly what you are doing, please enable the debug mode.");
@@ -123,7 +123,7 @@ class ConfigLoader {
       config,
     ) as unknown as ConfigObject;
     this._config.isBotAdmin = (userId: string) => {
-      if(!this._config.adminId){
+      if (!this._config.adminId) {
         return userId === "593758391395155978";
       }
       return typeof this._config.adminId === "string" ? this._config.adminId === userId : this._config.adminId.includes(userId);
@@ -136,7 +136,7 @@ class ConfigLoader {
   }
 }
 
-export function getConfig(){
+export function getConfig() {
   return ConfigLoader.instance.config;
 }
 

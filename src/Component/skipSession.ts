@@ -42,12 +42,12 @@ export class SkipSession extends ServerManagerBase<{}> {
   protected skipVoteCustomId: string;
   protected collector: InteractionCollector = null!;
 
-  constructor(protected parent: GuildDataContainer){
+  constructor(protected parent: GuildDataContainer) {
     super("SkipManager", parent);
   }
 
-  async init(message: CommandMessage){
-    if(this.inited || this.destroyed){
+  async init(message: CommandMessage) {
+    if (this.inited || this.destroyed) {
       throw new Error("This manager has already initialized or destroyed");
     }
     this.inited = true;
@@ -66,7 +66,7 @@ export class SkipSession extends ServerManagerBase<{}> {
         "skip_vote": "button",
       });
     collector.on("skip_vote", interaction => {
-      if(interaction.member){
+      if (interaction.member) {
         this.vote(interaction.member);
       }
     });
@@ -80,26 +80,26 @@ export class SkipSession extends ServerManagerBase<{}> {
     return this;
   }
 
-  private organize(){
-    if(!this.inited || this.destroyed) return;
+  private organize() {
+    if (!this.inited || this.destroyed) return;
     this.agreeUsers.forEach(userId => {
-      if(!this.server.connection || !this.getVoiceMembers().has(userId)){
+      if (!this.server.connection || !this.getVoiceMembers().has(userId)) {
         this.agreeUsers.delete(userId);
       }
     });
   }
 
-  protected vote(user: Member): voteResult{
-    if(!this.inited || this.destroyed) return "ignored";
+  protected vote(user: Member): voteResult {
+    if (!this.inited || this.destroyed) return "ignored";
     this.organize();
-    if(!user.voiceState?.channelID || !this.getVoiceMembers().has(user.id)){
+    if (!user.voiceState?.channelID || !this.getVoiceMembers().has(user.id)) {
       return "ignored";
     }
-    if(this.agreeUsers.has(user.id)){
+    if (this.agreeUsers.has(user.id)) {
       this.agreeUsers.delete(user.id);
       this.checkThreshold().catch(this.logger.error);
       return "cancelled";
-    }else{
+    } else {
       this.agreeUsers.add(user.id);
       this.checkThreshold().catch(this.logger.error);
       return "voted";
@@ -107,15 +107,15 @@ export class SkipSession extends ServerManagerBase<{}> {
   }
 
   readonly checkThresholdLocker = new LockObj();
-  async checkThreshold(){
+  async checkThreshold() {
     return lock(this.checkThresholdLocker, async () => {
-      if(!this.inited || this.destroyed){
+      if (!this.inited || this.destroyed) {
         return;
       }
       const members = this.getVoiceMembers();
       this.organize();
-      if(this.agreeUsers.size * 2 >= members.size - members.filter(member => member.bot).length){
-        try{
+      if (this.agreeUsers.size * 2 >= members.size - members.filter(member => member.bot).length) {
+        try {
           const response = this.reply = await this.reply.edit({
             content: `:ok: ${i18next.t("components:skip.skipping", { lng: this.parent.locale })}`,
             embeds: [],
@@ -129,29 +129,29 @@ export class SkipSession extends ServerManagerBase<{}> {
 
           await this.server.player.play();
         }
-        catch(e){
+        catch (e) {
           this.logger.error(e);
           this.reply.edit(`:astonished:${i18next.t("components:skip.failed", { lng: this.parent.locale })}`)
             .catch(this.logger.error);
         }
-      }else{
+      } else {
         const content = this.createMessageContent();
-        if(content.embeds[0].description !== this.reply.embeds[0].description){
+        if (content.embeds[0].description !== this.reply.embeds[0].description) {
           this.reply = await this.reply.edit(content);
         }
       }
     });
   }
 
-  private getVoiceMembers(){
-    if(!this.server.connectingVoiceChannel){
+  private getVoiceMembers() {
+    if (!this.server.connectingVoiceChannel) {
       throw new Error("Voice connection has been already disposed.");
     }
 
     return this.server.connectingVoiceChannel.voiceMembers;
   }
 
-  private createMessageContent(){
+  private createMessageContent() {
     const voiceSize = this.getVoiceMembers().size - 1;
     return {
       embeds: [
@@ -182,8 +182,8 @@ export class SkipSession extends ServerManagerBase<{}> {
     };
   }
 
-  destroy(){
-    if(!this.destroyed){
+  destroy() {
+    if (!this.destroyed) {
       this.destroyed = true;
       this.collector.destroy();
     }

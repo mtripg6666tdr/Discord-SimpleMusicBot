@@ -29,11 +29,11 @@ export abstract class Backupper extends LogEmitter<{}> {
   /**
    * 初期化時に与えられたアクセサを使って、サーバーのデータを返します。
    */
-  protected get data(){
+  protected get data() {
     return this.getData();
   }
 
-  constructor(protected readonly bot: MusicBotBase, protected readonly getData:(() => DataType)){
+  constructor(protected readonly bot: MusicBotBase, protected readonly getData:(() => DataType)) {
     super("Backup");
   }
   /**
@@ -54,7 +54,7 @@ export abstract class IntervalBackupper extends Backupper {
   private readonly queueModifiedGuild = new Set<string>();
   private readonly previousStatusCache = new Map<string, string>();
 
-  constructor(bot: MusicBotBase, getData: () => DataType, name: string){
+  constructor(bot: MusicBotBase, getData: () => DataType, name: string) {
     super(bot, getData);
 
     this.logger.info(`Initializing ${name} Database backup server adapter...`);
@@ -76,33 +76,33 @@ export abstract class IntervalBackupper extends Backupper {
     });
   }
 
-  private async backup(){
+  private async backup() {
     await this.backupStatus();
     await this.backupQueue();
   }
 
-  protected updateStatusCache(guildId: string, status: JSONStatuses){
+  protected updateStatusCache(guildId: string, status: JSONStatuses) {
     this.previousStatusCache.set(guildId, JSON.stringify(status));
   }
 
-  protected getQueueModifiedGuildIds(){
+  protected getQueueModifiedGuildIds() {
     return [...this.queueModifiedGuild.keys()];
   }
 
-  protected unmarkQueueModifiedGuild(guildId: string){
+  protected unmarkQueueModifiedGuild(guildId: string) {
     this.queueModifiedGuild.delete(guildId);
   }
 
-  protected unmarkAllQueueModifiedGuild(){
+  protected unmarkAllQueueModifiedGuild() {
     this.queueModifiedGuild.clear();
   }
 
-  protected getStatusModifiedGuildIds(){
+  protected getStatusModifiedGuildIds() {
     return [...this.data.keys()]
       .filter(id => {
-        if(!this.previousStatusCache.has(id)){
+        if (!this.previousStatusCache.has(id)) {
           return true;
-        }else{
+        } else {
           return !isDeepStrictEqual(this.data.get(id)!.exportStatus(), JSON.parse(this.previousStatusCache.get(id)!));
         }
       });

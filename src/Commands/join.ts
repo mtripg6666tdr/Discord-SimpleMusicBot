@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class Join extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["join", "参加", "connect"],
       unlist: false,
@@ -33,12 +33,12 @@ export default class Join extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    if(message.member.voiceState?.channel?.voiceMembers.has(context.client.user.id) && context.server.connection){
+    if (message.member.voiceState?.channel?.voiceMembers.has(context.client.user.id) && context.server.connection) {
       message.reply(`✘${t("commands:join.alreadyConnected")}`).catch(this.logger.error);
-    }else{
+    } else {
       await context.server.joinVoiceChannel(message, { reply: true });
     }
   }

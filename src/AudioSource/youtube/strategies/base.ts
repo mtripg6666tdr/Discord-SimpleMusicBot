@@ -41,7 +41,7 @@ export abstract class Strategy<T extends Cache<any, U>, U> {
   abstract get cacheType(): string;
   protected logger: LoggerObject;
 
-  constructor(protected priority: number){
+  constructor(protected priority: number) {
     this.logger = getLogger(this.constructor.name);
   }
 
@@ -54,7 +54,7 @@ export abstract class Strategy<T extends Cache<any, U>, U> {
   abstract fetch(url: string, forceCache?: boolean, cache?: Cache<any, any>): Promise<StrategyFetchResult<T, StreamInfo>>;
 
   /** 戦略が使用されたことを示すログを出力します */
-  protected logStrategyUsed(){
+  protected logStrategyUsed() {
     this.logger.info("using strategy #" + this.priority);
   }
 

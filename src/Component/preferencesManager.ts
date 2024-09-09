@@ -26,14 +26,14 @@ interface GuildPreferencesEvents {
 }
 
 export class GuildPreferencesManager extends ServerManagerBase<GuildPreferencesEvents> {
-  constructor(parent: GuildDataContainer){
+  constructor(parent: GuildDataContainer) {
     super("GuildPreferencesManager", parent);
     this.logger.info("GuildPreferencesManager initialized.");
 
     this.init();
   }
 
-  protected init(){
+  protected init() {
     this.addRelated = false;
     this.equallyPlayback = false;
     this.disableSkipSession = false;
@@ -49,7 +49,7 @@ export class GuildPreferencesManager extends ServerManagerBase<GuildPreferencesE
     };
   }
 
-  importPreferences(preferences: JSONGuildPreferences){
+  importPreferences(preferences: JSONGuildPreferences) {
     this.addRelated = preferences.addRelatedSongs;
     this.equallyPlayback = preferences.equallyPlayback;
     this.disableSkipSession = preferences.disableSkipSession;

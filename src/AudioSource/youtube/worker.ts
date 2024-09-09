@@ -31,7 +31,7 @@ import { getConfig } from "../../config";
 
 const dYtsr = requireIfAny("@distube/ytsr") as typeof import("@distube/ytsr");
 
-if(!parentPort){
+if (!parentPort) {
   throw new Error("This file should be run in worker thread.");
 }
 
@@ -45,11 +45,11 @@ const searchOptions = {
 parentPort.unref();
 parentPort.on("message", onMessage);
 
-function postMessage(message: WorkerMessage | WithId<WorkerMessage>){
+function postMessage(message: WorkerMessage | WithId<WorkerMessage>) {
   parentPort!.postMessage(message);
 }
 
-function getInfo({ id, url, prefetched, forceCache }: WithId<SpawnerGetInfoMessage>){
+function getInfo({ id, url, prefetched, forceCache }: WithId<SpawnerGetInfoMessage>) {
   const youtube = new YouTube();
   youtube.init(url, prefetched, forceCache)
     .then(() => {
@@ -71,8 +71,8 @@ function getInfo({ id, url, prefetched, forceCache }: WithId<SpawnerGetInfoMessa
     });
 }
 
-function search({ id, keyword }: WithId<SpawnerSearchMessage>){
-  if(dYtsr){
+function search({ id, keyword }: WithId<SpawnerSearchMessage>) {
+  if (dYtsr) {
     dYtsr(keyword, searchOptions)
     // @ts-ignore
       .then(result => {
@@ -117,16 +117,16 @@ function search({ id, keyword }: WithId<SpawnerSearchMessage>){
     });
 }
 
-function updateConfig({ config: newConfig }: WithId<SpawnerUpdateConfigMessage>){
+function updateConfig({ config: newConfig }: WithId<SpawnerUpdateConfigMessage>) {
   updateStrategyConfiguration(newConfig);
 }
 
-function onMessage(message: WithId<SpawnerJobMessage>){
-  if(!message){
+function onMessage(message: WithId<SpawnerJobMessage>) {
+  if (!message) {
     return;
   }
 
-  switch(message.type){
+  switch (message.type) {
     case "init":
       getInfo(message);
       break;

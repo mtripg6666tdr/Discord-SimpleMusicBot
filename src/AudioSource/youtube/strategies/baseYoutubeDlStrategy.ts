@@ -25,17 +25,17 @@ import { Strategy } from "./base";
 import { createFragmentalDownloadStream } from "../../../Util";
 
 export abstract class baseYoutubeDlStrategy<T extends string> extends Strategy<Cache<T, YoutubeDlInfo>, YoutubeDlInfo> {
-  constructor(priority: number, protected id: T, protected binaryManager: BinaryManager){
+  constructor(priority: number, protected id: T, protected binaryManager: BinaryManager) {
     super(priority);
   }
 
-  get cacheType(){
+  get cacheType() {
     return this.id;
   }
 
   last: number = 0;
 
-  async getInfo(url: string){
+  async getInfo(url: string) {
     this.logStrategyUsed();
 
     const info = JSON.parse<YoutubeDlInfo>(await this.binaryManager.exec(["--skip-download", "--print-json", url]));
@@ -64,7 +64,7 @@ export abstract class baseYoutubeDlStrategy<T extends string> extends Strategy<C
       relatedVideos: null,
     };
 
-    if(info.is_live){
+    if (info.is_live) {
       const format = info.formats.filter(f => f.format_id === info.format_id);
 
       return {
@@ -79,14 +79,14 @@ export abstract class baseYoutubeDlStrategy<T extends string> extends Strategy<C
           data: info,
         },
       };
-    }else{
+    } else {
       const formats = info.formats.filter(f => f.format_note === "tiny" || f.video_ext === "none" && f.abr);
 
-      if(formats.length === 0) throw new Error("no format found!");
+      if (formats.length === 0) throw new Error("no format found!");
 
       const [format] = formats.sort((fa, fb) => fb.abr! - fa.abr!);
 
-      if(forceUrl){
+      if (forceUrl) {
         return {
           ...partialResult,
           stream: {
@@ -130,7 +130,7 @@ export abstract class baseYoutubeDlStrategy<T extends string> extends Strategy<C
     }
   }
 
-  protected mapToExportable(url: string, info: YoutubeDlInfo): YouTubeJsonFormat{
+  protected mapToExportable(url: string, info: YoutubeDlInfo): YouTubeJsonFormat {
     return {
       url: url,
       title: info.title,

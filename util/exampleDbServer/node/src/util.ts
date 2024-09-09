@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-export function parseQuery(url: string): { [key: string]: string }{
+export function parseQuery(url: string): { [key: string]: string } {
   return Object.assign({}, ...url.split("&").map(q => q.split("="))
     .map(qs => ({ [decodeURIComponent(qs[0])]: decodeURIComponent(qs[1]) })));
 }

@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class RmDuplicated extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["removedupes", "rmdupes", "rmduplicated", "removeduplicates", "drm"],
       unlist: false,
@@ -33,7 +33,7 @@ export default class RmDuplicated extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     // 削除するアイテムのリストを作成
@@ -41,9 +41,9 @@ export default class RmDuplicated extends BaseCommand {
     const indexes: number[] = [];
     const itemUrl: string[] = [];
     q.forEach((item, i) => {
-      if(itemUrl.includes(item.basicInfo.url)){
+      if (itemUrl.includes(item.basicInfo.url)) {
         indexes.push(i);
-      }else{
+      } else {
         itemUrl.push(item.basicInfo.url);
       }
     });
@@ -59,16 +59,16 @@ export default class RmDuplicated extends BaseCommand {
     const actualDeleted = [] as number[];
     const failed = [] as number[];
     let firstItemTitle = null;
-    for(let i = 0; i < dels.length; i++){
+    for (let i = 0; i < dels.length; i++) {
       const item = q.get(dels[i]);
       q.removeAt(dels[i]);
       actualDeleted.push(dels[i]);
-      if(actualDeleted.length === 1){
+      if (actualDeleted.length === 1) {
         firstItemTitle = item.basicInfo.title;
       }
     }
 
-    if(actualDeleted.length > 0){
+    if (actualDeleted.length > 0) {
       const title = actualDeleted.length === 1 ? firstItemTitle : null;
       const resultStr = actualDeleted.sort((a, b) => a - b).join(",");
       const failedStr = failed.sort((a, b) => a - b).join(",");
@@ -96,7 +96,7 @@ export default class RmDuplicated extends BaseCommand {
               : ""
         }`
       ).catch(this.logger.error);
-    }else{
+    } else {
       message.reply(t("commands:removedupes.noSongRemoved")).catch(this.logger.error);
     }
   }

@@ -24,11 +24,11 @@ import { getConfig } from "../config";
 const config = getConfig();
 
 export const users = {
-  isDJ(member: Member, options: CommandArgs){
+  isDJ(member: Member, options: CommandArgs) {
     return channels.sameVC(member, options)
       && member.roles.some(roleId => config.djRoleNames.includes(member.guild.roles.get(roleId)!.name));
   },
-  isPrivileged(member: Member){
+  isPrivileged(member: Member) {
     return member.permissions.has("MANAGE_GUILD")
       || member.permissions.has("MANAGE_CHANNELS")
       || member.permissions.has("ADMINISTRATOR");
@@ -45,24 +45,24 @@ const requirePermissions = [
 ] as Readonly<PermissionName[]>;
 
 export const channels = {
-  checkSendable(channel: AnyTextableGuildChannel, userId: string){
+  checkSendable(channel: AnyTextableGuildChannel, userId: string) {
     const permissions = channel.permissionsOf(userId);
     return requirePermissions.every(permission => permissions.has(permission));
   },
-  getVoiceMember(options: CommandArgs){
-    if(!options.server.player.isConnecting) return null;
+  getVoiceMember(options: CommandArgs) {
+    if (!options.server.player.isConnecting) return null;
     return options.server.connectingVoiceChannel!.voiceMembers || null;
   },
-  sameVC(member: Member, options: CommandArgs){
+  sameVC(member: Member, options: CommandArgs) {
     return this.getVoiceMember(options)?.has(member.id) || false;
   },
-  voiceMemberCount(options: CommandArgs){
+  voiceMemberCount(options: CommandArgs) {
     return this.getVoiceMember(options)?.size || 0;
   },
-  isOnlyListener(member: Member, options: CommandArgs){
+  isOnlyListener(member: Member, options: CommandArgs) {
     const vcMember = this.getVoiceMember(options);
-    if(!vcMember) return false;
-    if(vcMember.filter(m => !m.bot).length > 1) return false;
+    if (!vcMember) return false;
+    if (vcMember.filter(m => !m.bot).length > 1) return false;
     return vcMember.has(member.id);
   },
 } as const;

@@ -43,25 +43,25 @@ export class CommandManager extends LogEmitter<{}> {
   /**
    * コマンドマネージャーの唯一のインスタンスを返します
    */
-  static get instance(){
+  static get instance() {
     return this._instance ??= new CommandManager();
   }
 
   private readonly _commands: BaseCommand[];
   /** コマンドを返します */
-  get commands(): Readonly<BaseCommand[]>{
+  get commands(): Readonly<BaseCommand[]> {
     return this._commands;
   }
 
   private _subCommandNames: Set<string>;
   /** サブコマンドがあるコマンドの一覧を返します */
-  get subCommandNames(): Readonly<Set<string>>{
+  get subCommandNames(): Readonly<Set<string>> {
     return this._subCommandNames;
   }
 
   private commandMap: Map<string, BaseCommand>;
 
-  private constructor(){
+  private constructor() {
     super("CommandsManager");
     this.logger.trace("Initializing");
 
@@ -73,11 +73,11 @@ export class CommandManager extends LogEmitter<{}> {
     this.logger.trace("Initialized");
   }
 
-  private initializeMap({ reportDupes }: { reportDupes: boolean }){
+  private initializeMap({ reportDupes }: { reportDupes: boolean }) {
     const sets = new Map<string, BaseCommand>();
 
     const setCommand = (name: string, command: BaseCommand) => {
-      if(sets.has(name) && reportDupes && !command.interactionOnly){
+      if (sets.has(name) && reportDupes && !command.interactionOnly) {
         this.logger.warn(`Detected command ${command.name} the duplicated key ${name} with ${sets.get(name)!.name}; overwriting`);
       }
       sets.set(name, command);
@@ -91,7 +91,7 @@ export class CommandManager extends LogEmitter<{}> {
     this.commandMap = sets;
   }
 
-  private initializeSubcommandNames(){
+  private initializeSubcommandNames() {
     this._subCommandNames = new Set(
       this.commands
         .filter(command => command.asciiName.includes(">"))
@@ -104,11 +104,11 @@ export class CommandManager extends LogEmitter<{}> {
    * @param command コマンド名
    * @returns 解決されたコマンド
    */
-  resolve(command: string){
+  resolve(command: string) {
     const result = this.commandMap.get(command.toLowerCase());
-    if(result){
+    if (result) {
       this.logger.info(`Command "${command}" was resolved successfully`);
-    }else{
+    } else {
       this.logger.info("Command not found");
     }
 
@@ -116,8 +116,8 @@ export class CommandManager extends LogEmitter<{}> {
   }
 
   @measureTime
-  async sync(client: Readonly<Client>, removeOutdated: boolean = false){
-    if(process.env.DISABLE_SYNC_SC && !removeOutdated){
+  async sync(client: Readonly<Client>, removeOutdated: boolean = false) {
+    if (process.env.DISABLE_SYNC_SC && !removeOutdated) {
       this.logger.info("Skip syncing commands");
       return;
     }
@@ -142,7 +142,7 @@ export class CommandManager extends LogEmitter<{}> {
     const commandsToRemove = await this.filterCommandsToBeRemoved(apiCompatibleCommands, registeredAppCommands);
 
     // if the app has the known commands or has no command and there are too many diffs, bulk-registering them
-    if(commandsToEdit.length + commandsToAdd.length > 3 && (registeredAppCommands.length === 0 || commandsToRemove.length === 0)){
+    if (commandsToEdit.length + commandsToAdd.length > 3 && (registeredAppCommands.length === 0 || commandsToRemove.length === 0)) {
       this.logger.info("Bulk-registering application-commands");
       await client.application.bulkEditGlobalCommands(apiCompatibleCommands);
       this.logger.info("Successfully registered");
@@ -150,33 +150,33 @@ export class CommandManager extends LogEmitter<{}> {
     }
 
     // if there are any commands that should be added or updated
-    if(commandsToEdit.length > 0 || commandsToAdd.length > 0){
+    if (commandsToEdit.length > 0 || commandsToAdd.length > 0) {
       this.logger.info(`Detected ${commandsToEdit.length + commandsToAdd.length} commands that should be updated; updating`);
       this.logger.info([...commandsToEdit, ...commandsToAdd].map(command => command.name));
-      for(let i = 0; i < commandsToEdit.length; i++){
+      for (let i = 0; i < commandsToEdit.length; i++) {
         const commandToRegister = commandsToEdit[i];
         const id = registeredAppCommands.find(cmd => cmd.type === commandToRegister.type && cmd.name === commandToRegister.name)!.id;
         await client.application.editGlobalCommand(id, commandToRegister);
         this.logger.info(`editing ${Math.floor((i + 1) / commandsToEdit.length * 1000) / 10}% completed`);
       }
-      for(let i = 0; i < commandsToAdd.length; i++){
+      for (let i = 0; i < commandsToAdd.length; i++) {
         const commandToRegister = commandsToAdd[i];
         await client.application.createGlobalCommand(commandToRegister);
         this.logger.info(`adding ${Math.floor((i + 1) / commandsToAdd.length * 1000) / 10}% completed`);
       }
       this.logger.info("Updating succeeded.");
-    }else{
+    } else {
       this.logger.info("Detected no command that should be updated");
     }
 
     // remove outdated commands (which are not recognized as the bot's command)
-    if(removeOutdated){
-      if(commandsToRemove.length > 0){
+    if (removeOutdated) {
+      if (commandsToRemove.length > 0) {
         this.logger.info(`Detected ${commandsToRemove.length} commands that should be removed; removing...`);
         this.logger.info(commandsToRemove.map(command => command.name));
         await client.application.bulkEditGlobalCommands(apiCompatibleCommands);
         this.logger.info("Removal succeeded.");
-      }else{
+      } else {
         this.logger.info("Detected no command that should be removed");
       }
     }
@@ -185,29 +185,29 @@ export class CommandManager extends LogEmitter<{}> {
   private async filterCommandsToBeEdited(
     apiCompatibleCommands: CreateApplicationCommandOptions[],
     registeredAppCommands: AnyApplicationCommand[],
-  ){
+  ) {
     return apiCompatibleCommands.filter(expected => {
-      if(expected.type === ApplicationCommandTypes.CHAT_INPUT){
+      if (expected.type === ApplicationCommandTypes.CHAT_INPUT) {
         const actual = registeredAppCommands.find(
           command => command.type === ApplicationCommandTypes.CHAT_INPUT && command.name === expected.name
         ) as ChatInputApplicationCommand;
 
-        if(!actual){
+        if (!actual) {
           return false;
-        }else{
+        } else {
           return !this.isSameCommand(actual, expected);
         }
-      }else if(expected.type === ApplicationCommandTypes.MESSAGE){
+      } else if (expected.type === ApplicationCommandTypes.MESSAGE) {
         const actual = registeredAppCommands.find(
           command => command.type === ApplicationCommandTypes.MESSAGE && command.name === expected.name
         ) as MessageApplicationCommand;
 
-        if(!actual){
+        if (!actual) {
           return false;
-        }else{
+        } else {
           return !this.isSameCommand(actual, expected);
         }
-      }else{
+      } else {
         return false;
       }
     });
@@ -216,17 +216,17 @@ export class CommandManager extends LogEmitter<{}> {
   private async filterCommandsToBeAdded(
     apiCompatibleCommands: CreateApplicationCommandOptions[],
     registeredAppCommands: AnyApplicationCommand[],
-  ){
+  ) {
     return apiCompatibleCommands.filter(expected => {
-      if(expected.type === ApplicationCommandTypes.CHAT_INPUT){
+      if (expected.type === ApplicationCommandTypes.CHAT_INPUT) {
         return !registeredAppCommands.some(
           reg => reg.type === ApplicationCommandTypes.CHAT_INPUT && reg.name === expected.name
         );
-      }else if(expected.type === ApplicationCommandTypes.MESSAGE){
+      } else if (expected.type === ApplicationCommandTypes.MESSAGE) {
         return !registeredAppCommands.some(
           reg => reg.type === ApplicationCommandTypes.MESSAGE && reg.name === expected.name
         );
-      }else{
+      } else {
         return false;
       }
     });
@@ -235,26 +235,26 @@ export class CommandManager extends LogEmitter<{}> {
   private async filterCommandsToBeRemoved(
     apiCompatibleCommands: CreateApplicationCommandOptions[],
     registeredAppCommands: AnyApplicationCommand[],
-  ){
+  ) {
     return registeredAppCommands.filter(registered => {
       const index = apiCompatibleCommands.findIndex(command =>registered.type === command.type && registered.name === command.name);
       return index < 0;
     });
   }
 
-  async removeAllApplicationCommand(client: Readonly<Client>){
+  async removeAllApplicationCommand(client: Readonly<Client>) {
     this.logger.info("Removing all application commands");
     await client.application.bulkEditGlobalCommands([]);
     this.logger.info("Successfully removed all application commands");
   }
 
-  async removeAllGuildCommand(client: Readonly<Client>, guildId: string){
+  async removeAllGuildCommand(client: Readonly<Client>, guildId: string) {
     this.logger.info("Removing all guild commands of " + guildId);
     await client.application.bulkEditGuildCommands(guildId, []);
     this.logger.info("Successfully removed all guild commands");
   }
 
-  isSameCommand(actual: ChatInputApplicationCommand | MessageApplicationCommand, expected: CreateApplicationCommandOptions): boolean{
+  isSameCommand(actual: ChatInputApplicationCommand | MessageApplicationCommand, expected: CreateApplicationCommandOptions): boolean {
     return util.isDeepStrictEqual(
       this.apiToApplicationCommand(actual),
       expected
@@ -267,16 +267,16 @@ export class CommandManager extends LogEmitter<{}> {
         ? apiCommand.defaultMemberPermissions.allow.toString()
         : apiCommand.defaultMemberPermissions as unknown as string;
 
-    if(apiCommand.type === ApplicationCommandTypes.MESSAGE){
+    if (apiCommand.type === ApplicationCommandTypes.MESSAGE) {
       return {
         type: apiCommand.type,
         name: apiCommand.name,
         nameLocalizations: apiCommand.nameLocalizations,
         defaultMemberPermissions,
       };
-    }else if(apiCommand.options){
+    } else if (apiCommand.options) {
       const optionMapper = (option: ApplicationCommandOptions) => {
-        if("choices" in option && option.choices){
+        if ("choices" in option && option.choices) {
           return {
             type: option.type,
             name: option.name,
@@ -292,7 +292,7 @@ export class CommandManager extends LogEmitter<{}> {
               name_localizations: choice.nameLocalizations || choice.name_localizations || null,
             })),
           };
-        }else{
+        } else {
           return {
             type: option.type,
             name: option.name,
@@ -311,7 +311,7 @@ export class CommandManager extends LogEmitter<{}> {
         descriptionLocalizations: apiCommand.descriptionLocalizations || {},
         defaultMemberPermissions,
         options: apiCommand.options.map(option => {
-          if(option.type === ApplicationCommandOptionTypes.SUB_COMMAND){
+          if (option.type === ApplicationCommandOptionTypes.SUB_COMMAND) {
             return {
               description: option.description,
               descriptionLocalizations: option.descriptionLocalizations || {},
@@ -319,12 +319,12 @@ export class CommandManager extends LogEmitter<{}> {
               type: option.type,
               options: option.options?.map(optionMapper),
             };
-          }else{
+          } else {
             return optionMapper(option);
           }
         }),
       };
-    }else{
+    } else {
       return {
         type: apiCommand.type,
         name: apiCommand.name,
@@ -335,8 +335,8 @@ export class CommandManager extends LogEmitter<{}> {
     }
   }
 
-  static mapCommandOptionTypeToInteger(type: CommandOptionsTypes){
-    switch(type){
+  static mapCommandOptionTypeToInteger(type: CommandOptionsTypes) {
+    switch (type) {
       case "bool":
         return ApplicationCommandOptionTypes.BOOLEAN;
       case "integer":
@@ -353,29 +353,29 @@ export class CommandManager extends LogEmitter<{}> {
     const subcommandGroups = new Map<string, { from: CreateChatInputApplicationCommandOptions[], to: CreateChatInputApplicationCommandOptions | null }>();
 
     const normalCommands = commands.filter(c => {
-      if(!c.name.includes(subCommandSeparator) || c.type !== ApplicationCommandTypes.CHAT_INPUT){
+      if (!c.name.includes(subCommandSeparator) || c.type !== ApplicationCommandTypes.CHAT_INPUT) {
         return true;
       }
 
       const baseName = c.name.split(subCommandSeparator)[0];
 
-      if(subcommandGroups.has(baseName)){
+      if (subcommandGroups.has(baseName)) {
         subcommandGroups.get(baseName)!.from.push(c);
-      }else{
+      } else {
         subcommandGroups.set(baseName, { from: [c], to: null });
       }
 
       return false;
     });
 
-    for(const key of subcommandGroups.keys()){
+    for (const key of subcommandGroups.keys()) {
       const group = subcommandGroups.get(key)!;
 
-      if(group.from.some(c => c.name === key)){
+      if (group.from.some(c => c.name === key)) {
         throw new Error("Top level command that has subcommands cannot be command itself.");
       }
 
-      if(!group.to){
+      if (!group.to) {
         group.to = {
           type: ApplicationCommandTypes.CHAT_INPUT,
           name: key,
@@ -386,9 +386,9 @@ export class CommandManager extends LogEmitter<{}> {
         };
 
         availableLanguages().forEach(language => {
-          if(i18next.language === language) return;
+          if (i18next.language === language) return;
           const localized: string = i18next.t(`commands:${key}.description` as any, { lng: language }).substring(0, 100);
-          if(localized === group.to!.description) return;
+          if (localized === group.to!.description) return;
           group.to!.descriptionLocalizations![language as Locale] = localized.trim();
         });
       }

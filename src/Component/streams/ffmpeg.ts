@@ -46,7 +46,7 @@ export function transformThroughFFmpeg(
     seek: number,
     output: "webm" | "ogg" | "pcm",
   }
-){
+) {
   const logger = getLogger("FFmpeg", true);
   const id = Date.now();
   logger.addContext("id", id);
@@ -64,20 +64,20 @@ export function transformThroughFFmpeg(
   const outputArgs: string[] = [];
   const bitrateArgs: string[] = [];
 
-  if(
+  if (
     effects.args.length === 0
     && ((output === "webm" && readable.streamType === "webm/opus") || (output === "ogg" && readable.streamType === "ogg/opus"))
-  ){
+  ) {
     outputArgs.push(
       "-f", output === "ogg" ? "opus" : "webm",
       "-acodec", "copy",
     );
-  }else if(output === "ogg" || output === "webm"){
+  } else if (output === "ogg" || output === "webm") {
     outputArgs.push(
       "-f", output === "ogg" ? "opus" : "webm",
       "-acodec", "libopus",
     );
-  }else{
+  } else {
     outputArgs.push(
       "-f", "s16le",
       "-ar", "48000",
@@ -85,7 +85,7 @@ export function transformThroughFFmpeg(
     );
   }
 
-  if(!effects.shouldDisableVbr){
+  if (!effects.shouldDisableVbr) {
     bitrateArgs.push(
       "-vbr", "on",
     );
@@ -111,7 +111,7 @@ export function transformThroughFFmpeg(
     logger.debug(`FFmpeg process exited (code: ${code}, signal: ${signal})`);
     ffmpeg.emit("close");
   });
-  if(readable.type === "readable"){
+  if (readable.type === "readable") {
     readable.stream
       .on("error", e => destroyStream(ffmpeg, e))
       .pipe(ffmpeg)

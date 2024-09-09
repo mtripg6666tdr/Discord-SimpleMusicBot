@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class Mltf extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["movelastsongtofirst", "mlstf", "ml", "mltf", "mlf", "m1", "pt"],
       unlist: false,
@@ -33,10 +33,10 @@ export default class Mltf extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    if(context.server.queue.length <= 2){
+    if (context.server.queue.length <= 2) {
       message.reply(t("commands:movelastsongtofirst.usableWhen3orMoreQueue")).catch(this.logger.error);
       return;
     }

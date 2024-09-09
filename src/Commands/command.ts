@@ -32,7 +32,7 @@ const config = getConfig();
 export const categoriesList = ["voice", "player", "playlist", "utility", "bot", "settings"] as const;
 
 export default class Commands extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       unlist: false,
       alias: ["command", "commands", "cmd"],
@@ -52,10 +52,10 @@ export default class Commands extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    if(context.rawArgs === ""){
+    if (context.rawArgs === "") {
       // 引数がない場合は全コマンドの一覧を表示
       const embed = [] as MessageEmbedBuilder[];
       const getCategoryText = (label: typeof categoriesList[number])=>{
@@ -65,16 +65,16 @@ export default class Commands extends BaseCommand {
       const commands = {} as { [category: string]: BaseCommand[] };
 
       // Generate command list
-      for(let i = 0; i < rawcommands.length; i++){
-        if(commands[rawcommands[i].category]){
+      for (let i = 0; i < rawcommands.length; i++) {
+        if (commands[rawcommands[i].category]) {
           commands[rawcommands[i].category].push(rawcommands[i]);
-        }else{
+        } else {
           commands[rawcommands[i].category] = [rawcommands[i]];
         }
       }
 
       // Generate embed
-      for(let i = 0; i < categoriesList.length; i++){
+      for (let i = 0; i < categoriesList.length; i++) {
         embed.push(
           new MessageEmbedBuilder()
             .setTitle(getCategoryText(categoriesList[i]))
@@ -87,7 +87,7 @@ export default class Commands extends BaseCommand {
             )
         );
       }
-      for(let i = 0; i < embed.length; i++){
+      for (let i = 0; i < embed.length; i++) {
         embed[i]
           .setTitle(`${t("commands:command.commandList")}(${embed[i].title})`)
           .setDescription(
@@ -109,9 +109,9 @@ export default class Commands extends BaseCommand {
         .createPagenation()
         .setPages(embed, embed.length)
         .send(message);
-    }else{
+    } else {
       const ci = CommandManager.instance.resolve(context.rawArgs);
-      if(ci && !ci.unlist){
+      if (ci && !ci.unlist) {
         const prefix = context.server ? context.server.prefix : ">";
         const availableAlias = ci.alias.filter(a => a !== ci.name);
         const embed = new MessageEmbedBuilder()
@@ -126,28 +126,28 @@ export default class Commands extends BaseCommand {
           )
           .addField(t("permissionsToRun"), ci.getLocalizedPermissionDescription(context.locale))
         ;
-        if(ci.usage){
+        if (ci.usage) {
           embed.addField(
             t("commands:command.usageLabel"),
             `\`${prefix}${t(`commands:${ci.asciiName}.usage` as any, { lng: context.locale })}\` \r\n`
             + t("commands:command.argumentDescription")
           );
         }
-        if(ci.examples){
+        if (ci.examples) {
           embed.addField(
             t("commands:command.exampleLabel"),
             `\`${prefix}${t(`commands:${ci.asciiName}.examples` as any, { lng: context.locale })}\``
           );
         }
         await message.reply({ embeds: [embed.toOceanic()] });
-      }else{
+      } else {
         await message.reply(`:face_with_raised_eyebrow:${t("commands:command.commandNotFound")}`);
       }
     }
   }
 
   override handleAutoComplete(_: string, input: string): string[] {
-    if(input === ""){
+    if (input === "") {
       return [
         "play",
         "search",
@@ -156,7 +156,7 @@ export default class Commands extends BaseCommand {
         "pause",
         "disconnect",
       ];
-    }else{
+    } else {
       return [...new Set(
         CommandManager.instance.commands
           .filter(command => !command.unlist)

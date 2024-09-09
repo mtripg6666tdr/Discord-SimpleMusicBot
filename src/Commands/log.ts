@@ -35,7 +35,7 @@ import { getLogs } from "../logger";
 const config = getConfig();
 
 export default class SystemInfo extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["ログ", "log", "systeminfo", "sysinfo"],
       unlist: false,
@@ -58,32 +58,32 @@ export default class SystemInfo extends BaseCommand {
     });
   }
 
-  getPackageVersion(mod: string): string{
-    try{
+  getPackageVersion(mod: string): string {
+    try {
       return require(`${mod}/package.json`).version;
     }
-    catch{/* empty */}
+    catch {/* empty */}
 
-    try{
+    try {
       let packageRootPath = require.resolve(mod);
       const fsModSuffix = mod.replace(/\//g, path.sep);
 
-      for(let i = 0; i < 5; i++){
+      for (let i = 0; i < 5; i++) {
         packageRootPath = path.join(packageRootPath, "..");
 
-        if(packageRootPath.endsWith(fsModSuffix)){
+        if (packageRootPath.endsWith(fsModSuffix)) {
           break;
         }
       }
 
       return require(path.join(packageRootPath, "package.json")).version;
     }
-    catch{/* empty */}
+    catch {/* empty */}
 
     return "unknown";
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
     // Run default logger
     context.bot.logGeneralInfo();
@@ -91,7 +91,7 @@ export default class SystemInfo extends BaseCommand {
 
     const embeds = [] as EmbedOptions[];
 
-    if(context.args.includes("basic") || context.args.length === 0){
+    if (context.args.includes("basic") || context.args.length === 0) {
       const cacheState = context.bot.cache.getMemoryCacheState();
       embeds.push(
         new MessageEmbedBuilder()
@@ -132,11 +132,11 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(config.isBotAdmin(message.member.id) && (context.args.includes("log") || context.args.length === 0)){
+    if (config.isBotAdmin(message.member.id) && (context.args.includes("log") || context.args.length === 0)) {
       let logs: string[] = [...getLogs()];
       logs.reverse();
-      for(let i = 0; i < logs.length; i++){
-        if(logs.join("\r\n").length < 3950) break;
+      for (let i = 0; i < logs.length; i++) {
+        if (logs.join("\r\n").length < 3950) break;
         logs = logs.slice(0, -1);
       }
       logs.reverse();
@@ -150,7 +150,7 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(config.isBotAdmin(message.member.id) && context.args.includes("servers") || context.args.length === 0){
+    if (config.isBotAdmin(message.member.id) && context.args.includes("servers") || context.args.length === 0) {
       embeds.push(
         new MessageEmbedBuilder()
           .setColor(getColor("UPTIME"))
@@ -168,7 +168,7 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(config.isBotAdmin(message.member.id) && (context.args[0] === "server" && context.args[1] && context.client.guilds.has(context.args[1]))){
+    if (config.isBotAdmin(message.member.id) && (context.args[0] === "server" && context.args[1] && context.client.guilds.has(context.args[1]))) {
       const target = context.client.guilds.get(context.args[1])!;
       const data = context.bot.getData(context.args[1]);
       embeds.push(
@@ -195,12 +195,12 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(context.args.includes("cpu") || context.args.length === 0){
+    if (context.args.includes("cpu") || context.args.length === 0) {
       // Process CPU Info
       const cpuInfoEmbed = new MessageEmbedBuilder();
       cpuInfoEmbed.setColor(getColor("UPTIME")).setTitle("CPU Info");
       const cpus = os.cpus();
-      for(let i = 0; i < cpus.length; i++){
+      for (let i = 0; i < cpus.length; i++) {
         const all = cpus[i].times.user + cpus[i].times.sys + cpus[i].times.nice + cpus[i].times.irq + cpus[i].times.idle;
         cpuInfoEmbed.addField(
           "CPU" + (i + 1),
@@ -219,7 +219,7 @@ export default class SystemInfo extends BaseCommand {
       embeds.push(cpuInfoEmbed.toOceanic());
     }
 
-    if(context.args.includes("mem") || context.args.length === 0){
+    if (context.args.includes("mem") || context.args.length === 0) {
       // Process Mem Info
       const memory = Util.system.getMemoryInfo();
       const nMem = process.memoryUsage();
@@ -249,10 +249,10 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if(embeds.length > 0){
+    if (embeds.length > 0) {
       await message.channel.createMessage({ embeds }).catch(this.logger.error);
     }
-    if(embeds.length === 0){
+    if (embeds.length === 0) {
       await message.channel.createMessage({ content: t("commands:log.incorrectArgument") }).catch(this.logger.error);
     }
   }

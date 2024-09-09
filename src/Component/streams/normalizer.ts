@@ -28,7 +28,7 @@ export class Normalizer extends Readable {
   protected logger = getLogger("Normalizer");
   protected _destroyed = false;
 
-  constructor(protected origin: Readable, protected inlineVolume: boolean, options: ReadableOptions = {}){
+  constructor(protected origin: Readable, protected inlineVolume: boolean, options: ReadableOptions = {}) {
     super(Object.assign({
       highWaterMark: 64 * 4 * 1024 * (inlineVolume ? 5 : 1),
     }, options));
@@ -37,16 +37,16 @@ export class Normalizer extends Readable {
 
     const now = Date.now();
     setImmediate(() => {
-      if(this.origin){
+      if (this.origin) {
         this.on("data", () => {
-          if(this.readableLength < this.resumeHighWaterMark){
+          if (this.readableLength < this.resumeHighWaterMark) {
             this.resumeOrigin();
-          }else{
+          } else {
             this.pauseOrigin();
           }
         });
         this.origin.on("data", chunk => {
-          if(!this.push(chunk)){
+          if (!this.push(chunk)) {
             this.pauseOrigin();
           }
         });
@@ -64,50 +64,50 @@ export class Normalizer extends Readable {
     this.logger.info("initialized");
   }
 
-  override _read(){
-    if(this.readableLength < this.readableHighWaterMark){
+  override _read() {
+    if (this.readableLength < this.readableHighWaterMark) {
       this.resumeOrigin();
     }
   }
 
-  pauseOrigin(){
-    if(this.origin && !this.origin.destroyed && !this.origin.isPaused()){
+  pauseOrigin() {
+    if (this.origin && !this.origin.destroyed && !this.origin.isPaused()) {
       this.logger.debug(`Origin paused (${this.readableLength}/${this.readableHighWaterMark})`);
       this.origin.pause();
     }
   }
 
-  resumeOrigin(){
-    if(this.origin && !this.origin.destroyed && this.origin.isPaused()){
+  resumeOrigin() {
+    if (this.origin && !this.origin.destroyed && this.origin.isPaused()) {
       this.logger.debug(`Origin resumed (${this.readableLength}/${this.readableHighWaterMark})`);
       this.origin.resume();
     }
   }
 
   @bindThis
-  protected _onDestroy(){
-    if(this._destroyed){
+  protected _onDestroy() {
+    if (this._destroyed) {
       return;
     }
     this._destroyed = true;
     this.logger.debug("Destroy hook called");
     this.off("close", this._onDestroy);
     this.off("end", this._onDestroy);
-    if(this.origin){
+    if (this.origin) {
       this.logger.info("Attempting to destroy origin");
-      if(!this.origin.destroyed){
+      if (!this.origin.destroyed) {
         this.origin.destroy();
       }
       this.origin = null!;
-      try{
-        if("_readableState" in this){
+      try {
+        if ("_readableState" in this) {
           // @ts-expect-error 2339
           this._readableState.buffer.clear();
           // @ts-expect-error 2339
           this._readableState.length = 0;
         }
       }
-      catch{/* empty */}
+      catch {/* empty */}
     }
   }
 }

@@ -27,7 +27,7 @@ import { getConfig } from "../config";
 import { getLogs } from "../logger";
 
 export default class Invoke extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["invoke"],
       unlist: false,
@@ -44,11 +44,11 @@ export default class Invoke extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     // handle special commands
-    if(context.rawArgs.startsWith("sp;") && getConfig().isBotAdmin(message.member.id)){
+    if (context.rawArgs.startsWith("sp;") && getConfig().isBotAdmin(message.member.id)) {
       this.evaluateSpecialCommands(context.args[0].substring(3), message, context)
         .then(result => message.reply(result))
         .catch(this.logger.error)
@@ -58,27 +58,27 @@ export default class Invoke extends BaseCommand {
 
     // extract a requested normal command
     const commandInfo = CommandMessage.resolveCommandMessage(context.rawArgs, 0);
-    if(commandInfo.command === "invoke"){
+    if (commandInfo.command === "invoke") {
       await message.reply(t("commands:invoke.recursiveInvoke")).catch(this.logger.error);
       return;
     }
 
     // run the command
     const ci = CommandManager.instance.resolve(commandInfo.command);
-    if(ci){
+    if (ci) {
       context.args = commandInfo.options;
       context.rawArgs = commandInfo.rawOptions;
       await ci.checkAndRun(message, context).catch(this.logger.error);
-      if(!message["isMessage"] && !message["_interactionReplied"]){
+      if (!message["isMessage"] && !message["_interactionReplied"]) {
         await message.reply(t("commands:invoke.executed")).catch(this.logger.error);
       }
-    }else{
+    } else {
       await message.reply(t("commands:invoke.commandNotFound")).catch(this.logger.error);
     }
   }
 
-  private async evaluateSpecialCommands(specialCommand: string, message: CommandMessage, context: CommandArgs){
-    switch(specialCommand){
+  private async evaluateSpecialCommands(specialCommand: string, message: CommandMessage, context: CommandArgs) {
+    switch (specialCommand) {
       case "cleanupsc":
         await CommandManager.instance.sync(context.client, true);
         break;

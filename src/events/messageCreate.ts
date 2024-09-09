@@ -29,27 +29,27 @@ import { getConfig } from "../config";
 
 const config = getConfig();
 
-export async function onMessageCreate(this: MusicBot, message: discord.Message){
-  if(this.maintenance && !config.isBotAdmin(message.author.id)){
+export async function onMessageCreate(this: MusicBot, message: discord.Message) {
+  if (this.maintenance && !config.isBotAdmin(message.author.id)) {
     return;
   }
 
 
-  if(!this["_isReadyFinished"] || message.author.bot || !message.channel || !message.member || !message.inCachedGuildChannel()){
+  if (!this["_isReadyFinished"] || message.author.bot || !message.channel || !message.member || !message.inCachedGuildChannel()) {
     return;
   }
 
-  if(
+  if (
     message.channel.type !== discord.ChannelTypes.GUILD_TEXT
     && message.channel.type !== discord.ChannelTypes.PRIVATE_THREAD
     && message.channel.type !== discord.ChannelTypes.PUBLIC_THREAD
     && message.channel.type !== discord.ChannelTypes.GUILD_STAGE_VOICE
     && message.channel.type !== discord.ChannelTypes.GUILD_VOICE
-  ){
+  ) {
     return;
   }
 
-  if(this._rateLimitController.isLimited(message.member.id)){
+  if (this._rateLimitController.isLimited(message.member.id)) {
     return;
   }
 
@@ -57,8 +57,8 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
   const server = this.upsertData(message.guildID, message.channel.id);
   // プレフィックスの更新
   server.updatePrefix(message as discord.Message<discord.TextChannel>);
-  if(message.content === this.mentionText){
-    if(this._rateLimitController.pushEvent(message.member.id)){
+  if (message.content === this.mentionText) {
+    if (this._rateLimitController.pushEvent(message.member.id)) {
       return;
     }
 
@@ -77,8 +77,8 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
 
   const prefix = server.prefix;
   const messageContent = normalizeText(message.content);
-  if(messageContent.startsWith(prefix) && messageContent.length > prefix.length){
-    if(this._rateLimitController.pushEvent(message.member.id)){
+  if (messageContent.startsWith(prefix) && messageContent.length > prefix.length) {
+    if (this._rateLimitController.pushEvent(message.member.id)) {
       return;
     }
 
@@ -86,8 +86,8 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
     const commandMessage = CommandMessage.createFromMessage(message as discord.Message<discord.TextChannel>, prefix.length);
     // コマンドを解決
     const command = CommandManager.instance.resolve(commandMessage.command);
-    if(!command) return;
-    if(
+    if (!command) return;
+    if (
       // BGM構成が存在するサーバー
       server instanceof GuildDataContainerWithBgm
       && (
@@ -102,13 +102,13 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
       )
       // かつBGM構成で制限があるときに実行できないコマンドならば
       && command.category !== "utility" && command.category !== "bot" && command.name !== "ボリューム"
-    ){
+    ) {
       // 無視して返却
       return;
     }
     // 送信可能か確認
-    if(!discordUtil.channels.checkSendable(message.channel, this._client.user.id)){
-      try{
+    if (!discordUtil.channels.checkSendable(message.channel, this._client.user.id)) {
+      try {
         await message.channel.createMessage({
           messageReference: {
             messageID: message.id,
@@ -119,7 +119,7 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
           },
         });
       }
-      catch{ /* empty */ }
+      catch { /* empty */ }
       return;
     }
     // コマンドの処理
@@ -132,30 +132,30 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message){
         server.locale,
       )
     );
-  }else if(server.searchPanel.has(message.member.id)){
+  } else if (server.searchPanel.has(message.member.id)) {
     // searchコマンドのキャンセルを捕捉
     const panel = server.searchPanel.get(message.member.id)!;
     const content = normalizeText(message.content);
-    if(
+    if (
       message.content === "キャンセル"
       || message.content === "cancel"
       || message.content === i18next.t("cancel", { lng: server.locale })
-    ){
+    ) {
       await panel.destroy();
     }
     // searchコマンドの選択を捕捉
-    else if(content.match(/^([0-9]\s?)+$/)){
+    else if (content.match(/^([0-9]\s?)+$/)) {
       // メッセージ送信者が検索者と一致するかを確認
       const nums = content.split(" ");
       await server.playFromSearchPanelOptions(nums, panel);
     }
-  }else if(
+  } else if (
     message.content === "キャンセル"
     || message.content === "cancel"
     || message.content === i18next.t("cancel", { lng: server.locale })
-  ){
+  ) {
     const result = server.cancelAll();
-    if(!result) return;
+    if (!result) return;
     await message.channel.createMessage({
       messageReference: {
         messageID: message.id,

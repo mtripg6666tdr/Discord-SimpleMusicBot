@@ -23,7 +23,7 @@ import { BaseCommand } from ".";
 import { discordUtil } from "../Util";
 
 export default class Rm extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["消去", "remove", "rm", "del", "delete"],
       unlist: false,
@@ -40,13 +40,13 @@ export default class Rm extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
-    if(context.args.length === 0){
+    if (context.args.length === 0) {
       message.reply(t("commands:remove.noArgument")).catch(this.logger.error);
       return;
     }
-    if(context.args.includes("0") && context.server.player.isPlaying){
+    if (context.args.includes("0") && context.server.player.isPlaying) {
       message.reply(t("commands:remove.invalidArgument")).catch(this.logger.error);
       return;
     }
@@ -60,29 +60,29 @@ export default class Rm extends BaseCommand {
     // 5-、-12、3-6など。
     context.args.forEach(o => {
       let match = o.match(/^(?<from>[0-9]+)-(?<to>[0-9]+)$/);
-      if(match){
+      if (match) {
         const from = Number(match.groups!.from);
         const to = Number(match.groups!.to);
-        if(!isNaN(from) && !isNaN(to) && from <= to){
-          for(let i = from; i <= to; i++){
+        if (!isNaN(from) && !isNaN(to) && from <= to) {
+          for (let i = from; i <= to; i++) {
             addition.push(i);
           }
         }
-      }else{
+      } else {
         match = o.match(/^(?<from>[0-9]+)-$/);
-        if(match){
+        if (match) {
           const from = Number(match.groups!.from);
-          if(!isNaN(from)){
-            for(let i = from; i < q.length; i++){
+          if (!isNaN(from)) {
+            for (let i = from; i < q.length; i++) {
               addition.push(i);
             }
           }
-        }else{
+        } else {
           match = o.match(/^-(?<to>[0-9]+)$/);
-          if(match){
+          if (match) {
             const to = Number(match.groups!.to);
-            if(!isNaN(to)){
-              for(let i = context.server.player.isPlaying ? 1 : 0; i <= to; i++){
+            if (!isNaN(to)) {
+              for (let i = context.server.player.isPlaying ? 1 : 0; i <= to; i++) {
                 addition.push(i);
               }
             }
@@ -108,28 +108,28 @@ export default class Rm extends BaseCommand {
     const actualDeleted = [] as number[];
     const failed = [] as number[];
     let firstItemTitle = null;
-    for(let i = 0; i < dels.length; i++){
+    for (let i = 0; i < dels.length; i++) {
       const item = q.get(dels[i]);
-      if(
+      if (
         discordUtil.users.isDJ(message.member, context)
         || item.additionalInfo.addedBy.userId === message.member.id
         || !discordUtil.channels.getVoiceMember(context)?.has(item.additionalInfo.addedBy.userId)
         || discordUtil.channels.isOnlyListener(message.member, context)
         || discordUtil.users.isPrivileged(message.member)
-      ){
+      ) {
         // 権限等を確認して削除できるものなら削除
         q.removeAt(dels[i]);
         actualDeleted.push(dels[i]);
-        if(actualDeleted.length === 1){
+        if (actualDeleted.length === 1) {
           firstItemTitle = item.basicInfo.title;
         }
-      }else{
+      } else {
         // 削除失敗したインデックスを保存
         failed.push(dels[i]);
       }
     }
 
-    if(actualDeleted.length > 0){
+    if (actualDeleted.length > 0) {
       // 実際削除できたものがあったのなら
       const title = actualDeleted.length === 1 ? firstItemTitle : null;
       const resultStr = actualDeleted.sort((a, b) => a - b).join(",");
@@ -147,7 +147,7 @@ export default class Rm extends BaseCommand {
               : ""
         }`
       ).catch(this.logger.error);
-    }else{
+    } else {
       message.reply(t("commands:remove.unableToRemoveAll")).catch(this.logger.error);
     }
   }

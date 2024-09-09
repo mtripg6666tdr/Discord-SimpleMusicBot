@@ -30,20 +30,20 @@ interface SearchPanelManagerEvents {
 }
 
 export class SearchPanelManager extends ServerManagerBase<SearchPanelManagerEvents> {
-  constructor(parent: GuildDataContainer){
+  constructor(parent: GuildDataContainer) {
     super("SearchPanelManager", parent);
   }
 
   protected _searchPanels = new Map<string, SearchPanel>();
 
-  get size(){
+  get size() {
     return this._searchPanels.size;
   }
 
-  create(_commandMessage: CommandMessage, query: string, isRawTitle: boolean = false){
+  create(_commandMessage: CommandMessage, query: string, isRawTitle: boolean = false) {
     const { t } = getCommandExecutionContext();
 
-    if(this._searchPanels.size >= 3){
+    if (this._searchPanels.size >= 3) {
       _commandMessage.reply(`:cry:${t("components:search.maximumSearch")}`)
         .catch(this.logger.error);
       return null;
@@ -54,15 +54,15 @@ export class SearchPanelManager extends ServerManagerBase<SearchPanelManagerEven
     return panel;
   }
 
-  get(userId: string){
+  get(userId: string) {
     return this._searchPanels.get(userId);
   }
 
-  has(userId: string){
+  has(userId: string) {
     return this._searchPanels.has(userId);
   }
 
-  protected bindSearchPanel(panel: SearchPanel){
+  protected bindSearchPanel(panel: SearchPanel) {
     this._searchPanels.set(panel.commandMessage.member.id, panel);
     const destroyPanel = panel.destroy.bind(panel);
     const timeout = setTimeout(destroyPanel, 10 * 60 * 1000).unref();

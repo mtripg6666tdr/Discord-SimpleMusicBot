@@ -25,7 +25,7 @@ import { BaseCommand } from ".";
 import { getColor } from "../Util/color";
 
 export default class Related extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["関連曲", "おすすめ", "オススメ", "related", "relatedsong", "r", "recommend"],
       unlist: false,
@@ -36,13 +36,13 @@ export default class Related extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    if(context.server.preferences.addRelated){
+    if (context.server.preferences.addRelated) {
       context.server.preferences.addRelated = false;
       message.reply(`❌${t("commands:related.disabled")}`).catch(this.logger.error);
-    }else{
+    } else {
       context.server.preferences.addRelated = true;
       const embed = new MessageEmbedBuilder()
         .setTitle(`⭕${t("commands:related.enabled")}`)

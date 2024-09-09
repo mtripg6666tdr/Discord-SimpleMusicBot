@@ -34,39 +34,39 @@ export class QueueManagerWithBgm extends QueueManager {
   protected _bgmInitial: QueueContent[] = [];
 
   protected _isBGM: boolean = false;
-  get isBGM(){
+  get isBGM() {
     return this._isBGM;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
-  constructor(parent: GuildDataContainerWithBgm){
+  constructor(parent: GuildDataContainerWithBgm) {
     super(parent);
   }
 
-  moveCurrentTracksToBGM(){
+  moveCurrentTracksToBGM() {
     this._bgmDefault = [...this._default];
     this._bgmInitial = [...this._default];
     this._default = [];
     this.logger.info(`Moved ${this._bgmDefault.length} tracks to bgm queue, and the default queue is now empty`);
   }
 
-  resetBgmTracks(){
+  resetBgmTracks() {
     this._bgmDefault = [...this._bgmInitial];
   }
 
-  setToPlayBgm(val: boolean = true){
+  setToPlayBgm(val: boolean = true) {
     this._isBGM = val;
   }
 
-  get bgmLength(){
+  get bgmLength() {
     return this._bgmDefault.length;
   }
 
-  get isBgmEmpty(){
+  get isBgmEmpty() {
     return this._bgmDefault.length === 0;
   }
 
-  override get(index: number){
+  override get(index: number) {
     return this.isBGM ? this._bgmDefault[index] : super.get(index);
   }
 
@@ -85,11 +85,11 @@ export class QueueManagerWithBgm extends QueueManager {
     gotData?: T | null,
     preventCache?: boolean,
   }): Promise<QueueContent & { index: number }> {
-    if(
+    if (
       !url.startsWith("http://")
       && !url.startsWith("https://")
       && fs.existsSync(path.join(__dirname, global.BUNDLED ? "../" : "../../", url))
-    ){
+    ) {
       const result: QueueContent = {
         basicInfo: await new AudioSource.FsStream().init(url, null),
         additionalInfo: {
@@ -102,7 +102,7 @@ export class QueueManagerWithBgm extends QueueManager {
 
       this._default[method](result);
 
-      if(this.server.preferences.equallyPlayback){
+      if (this.server.preferences.equallyPlayback) {
         this.sortByAddedBy();
       }
 
@@ -113,14 +113,14 @@ export class QueueManagerWithBgm extends QueueManager {
     return super.addQueueOnly({ url, addedBy, method, sourceType, gotData, preventCache });
   }
 
-  override async next(){
-    if(this.isBGM){
+  override async next() {
+    if (this.isBGM) {
       this.server.player.resetError();
-      if(this.server.bgmConfig.enableQueueLoop){
+      if (this.server.bgmConfig.enableQueueLoop) {
         this._bgmDefault.push(this._bgmDefault[0]);
       }
       this._bgmDefault.shift();
-    }else{
+    } else {
       return super.next();
     }
   }

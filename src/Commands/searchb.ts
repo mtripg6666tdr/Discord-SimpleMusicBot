@@ -25,7 +25,7 @@ export default class Searchb extends SearchBase<string[]> {
   private songInfoCache: BestdoriAllSongInfo = null!;
   private bandInfoCache: BestdoriAllBandInfo = null!;
 
-  constructor(){
+  constructor() {
     super({
       name: "searchb",
       alias: ["seb", "sb"],
@@ -35,19 +35,19 @@ export default class Searchb extends SearchBase<string[]> {
     });
   }
 
-  protected async searchContent(query: string){
+  protected async searchContent(query: string) {
     this.songInfoCache = await BestdoriApi.instance.getSongInfo();
     this.bandInfoCache = await BestdoriApi.instance.getBandInfo();
     const keys = Object.keys(this.songInfoCache);
     const q = query.toLowerCase();
     return keys.filter(k => {
       const info = this.songInfoCache[Number(k)];
-      if(!info.musicTitle[0]) return false;
+      if (!info.musicTitle[0]) return false;
       return (info.musicTitle[0] + this.bandInfoCache[info.bandId].bandName[0]).toLowerCase().includes(q);
     });
   }
 
-  protected consumer(items: string[]){
+  protected consumer(items: string[]) {
     return items.map(item => ({
       title: this.songInfoCache[Number(item)].musicTitle[0],
       url: BestdoriApi.instance.getAudioPage(Number(item)),

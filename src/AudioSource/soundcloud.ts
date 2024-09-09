@@ -31,21 +31,21 @@ let soundCloudClient = new SoundCloud();
 export class SoundCloudS extends AudioSource<string, SoundcloudJsonFormat> {
   protected author: string;
 
-  constructor(){
+  constructor() {
     super({ isSeekable: false });
   }
 
-  async init(url: string, prefetched: SoundcloudJsonFormat | null){
+  async init(url: string, prefetched: SoundcloudJsonFormat | null) {
     const { t } = getCommandExecutionContext();
 
     this.url = url;
-    if(prefetched){
+    if (prefetched) {
       this.title = prefetched.title;
       this.description = prefetched.description;
       this.lengthSeconds = prefetched.length;
       this.author = prefetched.author;
       this.thumbnail = prefetched.thumbnail;
-    }else{
+    } else {
       const info = await soundCloudClient.tracks.getV2(url);
       this.title = info.title;
       this.description = info.description || t("unknown");
@@ -56,7 +56,7 @@ export class SoundCloudS extends AudioSource<string, SoundcloudJsonFormat> {
     return this;
   }
 
-  async fetch(): Promise<ReadableStreamInfo>{
+  async fetch(): Promise<ReadableStreamInfo> {
     const source = await soundCloudClient.util.streamTrack(this.url) as Readable;
     const stream = createPassThrough();
     source
@@ -72,7 +72,7 @@ export class SoundCloudS extends AudioSource<string, SoundcloudJsonFormat> {
     };
   }
 
-  toField(verbose: boolean){
+  toField(verbose: boolean) {
     const { t } = getCommandExecutionContext();
 
     return [
@@ -89,13 +89,13 @@ export class SoundCloudS extends AudioSource<string, SoundcloudJsonFormat> {
     ];
   }
 
-  npAdditional(){
+  npAdditional() {
     const { t } = getCommandExecutionContext();
 
     return `${t("audioSources.artist")}: \`${this.author}\``;
   }
 
-  exportData(): SoundcloudJsonFormat{
+  exportData(): SoundcloudJsonFormat {
     return {
       url: this.url,
       title: this.title,
@@ -106,15 +106,15 @@ export class SoundCloudS extends AudioSource<string, SoundcloudJsonFormat> {
     };
   }
 
-  override purgeCache(){
+  override purgeCache() {
     soundCloudClient = new SoundCloud();
   }
 
-  static validateUrl(url: string){
+  static validateUrl(url: string) {
     return Boolean(url.match(/https?:\/\/soundcloud.com\/.+\/.+/));
   }
 
-  static validatePlaylistUrl(url: string){
+  static validatePlaylistUrl(url: string) {
     return Boolean(url.match(/https?:\/\/soundcloud.com\/[^/?]+\/sets\/[^/?]+/));
   }
 }

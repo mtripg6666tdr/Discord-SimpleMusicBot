@@ -30,13 +30,13 @@ const MIME_JSON = "application/json";
 export class HttpBackupper extends IntervalBackupper {
   protected userAgent: string;
 
-  constructor(bot: MusicBotBase, getData: () => DataType){
+  constructor(bot: MusicBotBase, getData: () => DataType) {
     super(bot, getData, "HttpBased");
 
     this.userAgent = `mtripg6666tdr/Discord-SimpleMusicBot#${this.bot.version || "unknown"} http based backup server adapter`;
   }
 
-  static get backuppable(){
+  static get backuppable() {
     return !!(process.env.DB_TOKEN && process.env.DB_URL);
   }
 
@@ -44,11 +44,11 @@ export class HttpBackupper extends IntervalBackupper {
    * 接続ステータス等をバックアップします
    */
   @measureTime
-  protected override async backupStatus(){
-    try{
+  protected override async backupStatus() {
+    try {
       const statusModifiedGuildIds = this.getStatusModifiedGuildIds();
 
-      if(statusModifiedGuildIds.length <= 0){
+      if (statusModifiedGuildIds.length <= 0) {
         this.logger.debug("No modified status found, skipping");
         return;
       }
@@ -59,7 +59,7 @@ export class HttpBackupper extends IntervalBackupper {
       const originalStatuses: { [guildId: string]: JSONStatuses } = {};
       statusModifiedGuildIds.forEach(id => {
         const status = this.data.get(id)?.exportStatus();
-        if(!status) return;
+        if (!status) return;
 
         statuses[id] = [
           status.voiceChannelId,
@@ -92,7 +92,7 @@ export class HttpBackupper extends IntervalBackupper {
 
       statusModifiedGuildIds.forEach(id => this.updateStatusCache(id, originalStatuses[id]));
     }
-    catch(e){
+    catch (e) {
       this.logger.warn(e);
     }
   }
@@ -101,11 +101,11 @@ export class HttpBackupper extends IntervalBackupper {
    * キューをバックアップします
    */
   @measureTime
-  protected override async backupQueue(){
-    try{
+  protected override async backupQueue() {
+    try {
       const modifiedGuildIds = this.getQueueModifiedGuildIds();
 
-      if(modifiedGuildIds.length <= 0){
+      if (modifiedGuildIds.length <= 0) {
         this.logger.debug("No modified queue found, skipping");
         return;
       }
@@ -115,7 +115,7 @@ export class HttpBackupper extends IntervalBackupper {
       const queues: { [guildId: string]: string } = {};
       modifiedGuildIds.forEach(id => {
         const guild = this.data.get(id);
-        if(!guild) return;
+        if (!guild) return;
         queues[id] = encodeURIComponent(JSON.stringify(guild.exportQueue()));
       });
 
@@ -134,22 +134,22 @@ export class HttpBackupper extends IntervalBackupper {
         validator: this.postResultValidator.bind(this),
       }, payload);
 
-      if(body.status === 200){
+      if (body.status === 200) {
         this.unmarkAllQueueModifiedGuild();
-      }else{
+      } else {
         throw new Error(`Status code: ${body.status}`);
       }
     }
-    catch(e){
+    catch (e) {
       this.logger.error(e);
       this.logger.info("Something went wrong while backing up queue");
     }
   }
 
   @measureTime
-  override async getStatusFromBackup(guildids: string[]){
-    if(HttpBackupper.backuppable){
-      try{
+  override async getStatusFromBackup(guildids: string[]) {
+    if (HttpBackupper.backuppable) {
+      try {
         const { body: result } = await candyget.json<getResult>(
           `${process.env.DB_URL}?token=${encodeURIComponent(process.env.DB_TOKEN!)}&guildid=${guildids.join(",")}&type=j`,
           {
@@ -159,7 +159,7 @@ export class HttpBackupper extends IntervalBackupper {
             validator: this.getResultValidator.bind(this),
           }
         );
-        if(result.status === 200){
+        if (result.status === 200) {
           const frozenGuildStatuses = result.data;
           const map = new Map<string, JSONStatuses>();
           Object.keys(frozenGuildStatuses).forEach(key => {
@@ -189,24 +189,24 @@ export class HttpBackupper extends IntervalBackupper {
             });
           });
           return map;
-        }else{
+        } else {
           return null;
         }
       }
-      catch(er){
+      catch (er) {
         this.logger.error(er);
         this.logger.warn("Status restoring failed!");
         return null;
       }
-    }else{
+    } else {
       return null;
     }
   }
 
   @measureTime
-  override async getQueueDataFromBackup(guildids: string[]){
-    if(HttpBackupper.backuppable){
-      try{
+  override async getQueueDataFromBackup(guildids: string[]) {
+    if (HttpBackupper.backuppable) {
+      try {
         const { body: result } = await candyget.json<getResult>(
           `${process.env.DB_URL}?token=${encodeURIComponent(process.env.DB_TOKEN!)}&guildid=${guildids.join(",")}&type=queue`,
           {
@@ -216,27 +216,27 @@ export class HttpBackupper extends IntervalBackupper {
             validator: this.getResultValidator.bind(this),
           }
         );
-        if(result.status === 200){
+        if (result.status === 200) {
           const frozenQueues = result.data as { [guildid: string]: string };
           const res = new Map<string, YmxFormat>();
           Object.keys(frozenQueues).forEach(key => {
-            try{
+            try {
               const ymx = JSON.parse<YmxFormat>(decodeURIComponent(frozenQueues[key]));
               res.set(key, ymx);
             }
-            catch{ /* empty */ }
+            catch { /* empty */ }
           });
           return res;
-        }else{
+        } else {
           return null;
         }
       }
-      catch(er){
+      catch (er) {
         this.logger.error(er);
         this.logger.warn("Queue restoring failed!");
         return null;
       }
-    }else{
+    } else {
       return null;
     }
   }
@@ -249,7 +249,7 @@ export class HttpBackupper extends IntervalBackupper {
     return this.postResultValidator(data) && "data" in data && typeof data.data === "object";
   }
 
-  override destroy(){
+  override destroy() {
     /* empty */
   }
 }

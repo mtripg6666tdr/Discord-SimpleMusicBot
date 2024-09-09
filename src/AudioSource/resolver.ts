@@ -34,7 +34,7 @@ type AudioSourceBasicInfo = {
 const { isDisabledSource } = getConfig();
 const logger = getLogger("Resolver");
 
-export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCache, preventSourceCache: boolean){
+export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCache, preventSourceCache: boolean) {
   let basicInfo: AudioSource.AudioSource<any, any> | null = null;
 
   const type = info.type;
@@ -43,57 +43,57 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
   let gotData = info.knownData;
   let fromPersistentCache = !!gotData;
 
-  if(cacheManager.hasSource(url)){
+  if (cacheManager.hasSource(url)) {
     logger.debug("cache found");
     return cacheManager.getSource(url);
-  }else if(!gotData && cacheManager.hasExportable(url)){
+  } else if (!gotData && cacheManager.hasExportable(url)) {
     gotData = await cacheManager.getExportable(url);
-    if(gotData){
+    if (gotData) {
       logger.debug("exportable cache found");
       fromPersistentCache = true;
     }
   }
 
-  if(gotData){
+  if (gotData) {
     logger.debug("initializing source with cache");
-  }else{
+  } else {
     logger.debug("initializing source from scratch");
   }
 
-  if(!isDisabledSource("youtube") && (type === "youtube" || type === "unknown" && AudioSource.YouTube.validateURL(url))){
+  if (!isDisabledSource("youtube") && (type === "youtube" || type === "unknown" && AudioSource.YouTube.validateURL(url))) {
     // youtube
     basicInfo = await AudioSource.initYouTube(url, gotData as AudioSource.YouTubeJsonFormat, cache);
-  }else if(!isDisabledSource("custom") && (type === "custom" || type === "unknown" && getResourceTypeFromUrl(url) !== "none")){
+  } else if (!isDisabledSource("custom") && (type === "custom" || type === "unknown" && getResourceTypeFromUrl(url) !== "none")) {
     // カスタムストリーム
     basicInfo = await new AudioSource.CustomStream().init(url, info.knownData);
-  }else if(!isDisabledSource("soundcloud") && (type === "soundcloud" || AudioSource.SoundCloudS.validateUrl(url))){
+  } else if (!isDisabledSource("soundcloud") && (type === "soundcloud" || AudioSource.SoundCloudS.validateUrl(url))) {
     // soundcloud
     basicInfo = await new AudioSource.SoundCloudS().init(url, gotData as AudioSource.SoundcloudJsonFormat);
-  }else if(!isDisabledSource("spotify") && (type === "spotify" || AudioSource.Spotify.validateTrackUrl(url)) && AudioSource.Spotify.available){
+  } else if (!isDisabledSource("spotify") && (type === "spotify" || AudioSource.Spotify.validateTrackUrl(url)) && AudioSource.Spotify.available) {
     // spotify
     basicInfo = await new AudioSource.Spotify().init(url, gotData as AudioSource.SpotifyJsonFormat);
-  }else if(type === "unknown"){
+  } else if (type === "unknown") {
     // google drive
-    if(!isDisabledSource("googledrive") && AudioSource.GoogleDrive.validateUrl(url)){
+    if (!isDisabledSource("googledrive") && AudioSource.GoogleDrive.validateUrl(url)) {
       basicInfo = await new AudioSource.GoogleDrive().init(url, info.knownData);
-    }else if(!isDisabledSource("streamable") && AudioSource.StreamableApi.getVideoId(url)){
+    } else if (!isDisabledSource("streamable") && AudioSource.StreamableApi.getVideoId(url)) {
       // Streamable
       basicInfo = await new AudioSource.Streamable().init(url, gotData as AudioSource.StreamableJsonFormat);
-    }else if(process.env.BD_ENABLE && AudioSource.BestdoriApi.instance.getAudioId(url)){
+    } else if (process.env.BD_ENABLE && AudioSource.BestdoriApi.instance.getAudioId(url)) {
       // Bestdori
       basicInfo = await new AudioSource.BestdoriS().init(url, gotData as AudioSource.BestdoriJsonFormat);
-    }else if(!isDisabledSource("niconico") && AudioSource.NicoNicoS.validateUrl(url)){
+    } else if (!isDisabledSource("niconico") && AudioSource.NicoNicoS.validateUrl(url)) {
       // NicoNico
       basicInfo = await new AudioSource.NicoNicoS().init(url, gotData as AudioSource.NiconicoJsonFormat);
-    }else if(!isDisabledSource("twitter") && AudioSource.Twitter.validateUrl(url)){
+    } else if (!isDisabledSource("twitter") && AudioSource.Twitter.validateUrl(url)) {
       // Twitter
       basicInfo = await new AudioSource.Twitter().init(url, gotData as AudioSource.TwitterJsonFormat);
     }
   }
 
-  if(preventSourceCache){
+  if (preventSourceCache) {
     logger.debug("Skipping source-caching due to private source");
-  }else if(basicInfo && !isNaN(basicInfo.lengthSeconds) && basicInfo.isCachable){
+  } else if (basicInfo && !isNaN(basicInfo.lengthSeconds) && basicInfo.isCachable) {
     cacheManager.addSource(basicInfo, fromPersistentCache);
   }
 

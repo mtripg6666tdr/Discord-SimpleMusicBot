@@ -31,13 +31,13 @@ import { DefaultAudioThumbnailURL } from "../definition";
 
 export abstract class SearchBase<T> extends BaseCommand {
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     // URLが渡されたら、そのままキューに追加を試みる
-    if(this.urlCheck(context.rawArgs)){
+    if (this.urlCheck(context.rawArgs)) {
       const joinResult = await context.server.joinVoiceChannel(message, { replyOnFail: true });
-      if(!joinResult){
+      if (!joinResult) {
         return;
       }
 
@@ -49,7 +49,7 @@ export abstract class SearchBase<T> extends BaseCommand {
     context.server.joinVoiceChannel(message, {}).catch(this.logger.error);
 
     // 検索パネルがすでにあるなら
-    if(context.server.searchPanel.has(message.member.id)){
+    if (context.server.searchPanel.has(message.member.id)) {
       const { collector, customIdMap } = context.bot.collectors
         .create()
         .setAuthorIdFilter(message.member.id)
@@ -72,9 +72,9 @@ export abstract class SearchBase<T> extends BaseCommand {
         ],
       }).catch(this.logger.error);
 
-      if(responseMessage){
+      if (responseMessage) {
         const panel = context.server.searchPanel.get(message.member.id);
-        if(!panel) return;
+        if (!panel) return;
 
         collector.on("cancelSearch", interaction => {
           panel.destroy({ quiet: true }).catch(this.logger.error);
@@ -91,13 +91,13 @@ export abstract class SearchBase<T> extends BaseCommand {
     }
 
     // 検索を実行する
-    if(context.rawArgs !== ""){
+    if (context.rawArgs !== "") {
       const searchPanel = context.server.searchPanel.create(message, context.rawArgs);
-      if(!searchPanel){
+      if (!searchPanel) {
         return;
       }
       await searchPanel.consumeSearchResult(this.searchContent(context.rawArgs, context), this.consumer.bind(this));
-    }else{
+    } else {
       await message.reply(t("commands:search.noArgument")).catch(this.logger.error);
     }
   }
@@ -113,7 +113,7 @@ export abstract class SearchBase<T> extends BaseCommand {
 
   /** この検索が対象とするURLかを判断する関数 */
   // eslint-disable-next-line unused-imports/no-unused-vars
-  protected urlCheck(query: string){
+  protected urlCheck(query: string) {
     return false;
   }
 }
@@ -121,7 +121,7 @@ export abstract class SearchBase<T> extends BaseCommand {
 const config = getConfig();
 
 export default class Search extends SearchBase<ytsr.Video[] | dYtsr.Video[]> {
-  constructor(){
+  constructor() {
     super({
       alias: ["search", "se"],
       unlist: false,
@@ -139,7 +139,7 @@ export default class Search extends SearchBase<ytsr.Video[] | dYtsr.Video[]> {
     });
   }
 
-  protected override async searchContent(query: string, context: CommandArgs){
+  protected override async searchContent(query: string, context: CommandArgs) {
     return searchYouTube(query)
       .then(result => {
         const videos = (result.items as (ytsr.Item | dYtsr.Video)[]).filter(item => item.type === "video") as ytsr.Video[] | dYtsr.Video[];
@@ -148,7 +148,7 @@ export default class Search extends SearchBase<ytsr.Video[] | dYtsr.Video[]> {
       });
   }
 
-  protected override consumer(items: ytsr.Video[] | dYtsr.Video[]){
+  protected override consumer(items: ytsr.Video[] | dYtsr.Video[]) {
     const { t } = getCommandExecutionContext();
 
     return items.map(item => ({
@@ -161,7 +161,7 @@ export default class Search extends SearchBase<ytsr.Video[] | dYtsr.Video[]> {
     })).filter(n => n);
   }
 
-  protected override urlCheck(query: string){
+  protected override urlCheck(query: string) {
     return query.startsWith("http://") || query.startsWith("https://");
   }
 }

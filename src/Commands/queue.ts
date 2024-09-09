@@ -26,7 +26,7 @@ import * as Util from "../Util";
 import { getColor } from "../Util/color";
 
 export default class Queue extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["キューを表示", "再生待ち", "queue", "q"],
       unlist: false,
@@ -42,18 +42,18 @@ export default class Queue extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
     const queue = context.server.queue;
-    if(queue.length === 0){
+    if (queue.length === 0) {
       await message.reply(`:face_with_raised_eyebrow:${t("commands:queue.queueEmpty")}`).catch(this.logger.error);
       return;
     }
     // 合計所要時間の計算
     const totalLength = queue.lengthSecondsActual;
     let _page = context.rawArgs === "" ? 0 : Number(context.rawArgs);
-    if(isNaN(_page)) _page = 1;
-    if(queue.length > 0 && _page > Math.ceil(queue.length / 10)){
+    if (isNaN(_page)) _page = 1;
+    if (queue.length > 0 && _page > Math.ceil(queue.length / 10)) {
       await message.reply(`:warning:${t("commands:queue.pageOutOfRange")}`).catch(this.logger.error);
       return;
     }
@@ -63,8 +63,8 @@ export default class Queue extends BaseCommand {
     // ページのキューを割り出す
     const getQueueEmbed = (page: number) => {
       const fields: { name: string, value: string }[] = [];
-      for(let i = 10 * page; i < 10 * (page + 1); i++){
-        if(queue.length <= i){
+      for (let i = 10 * page; i < 10 * (page + 1); i++) {
+        if (queue.length <= i) {
           break;
         }
         const q = queue.get(i);
@@ -114,13 +114,13 @@ export default class Queue extends BaseCommand {
     };
 
     // 送信
-    if(totalpage > 1){
+    if (totalpage > 1) {
       const pagenation = await context.bot.collectors
         .createPagenation()
         .setPages(getQueueEmbed, totalpage)
         .send(message);
       context.server.queue.eitherOnce(["change", "changeWithoutCurrent"], pagenation.destroy.bind(pagenation));
-    }else{
+    } else {
       await message.reply({ content: "", embeds: [getQueueEmbed(_page)] }).catch(this.logger.error);
     }
   }

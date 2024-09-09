@@ -33,7 +33,7 @@ const config = getConfig();
 export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
   private readonly soundcloud = new Soundcloud();
 
-  constructor(){
+  constructor() {
     super({
       alias: ["soundcloudを検索", "searchsoundcloud", "searchs", "ses", "ss", "sc", "soundcloud"],
       unlist: false,
@@ -51,10 +51,10 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
     });
   }
 
-  protected override async searchContent(query: string){
+  protected override async searchContent(query: string) {
     let result: SoundcloudTrackV2[] = [];
     let transformedQuery = query;
-    if(query.match(/^https:\/\/soundcloud.com\/[^/]+$/)){
+    if (query.match(/^https:\/\/soundcloud.com\/[^/]+$/)) {
       // ユーザーの楽曲検索
       const user = await this.soundcloud.users.getV2(query);
       const clientId = await this.soundcloud.api.getClientId();
@@ -66,7 +66,7 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
       // 再帰的にユーザーの投稿した楽曲を取得する
       result.push(...rawResult.collection);
       nextUrl = `${rawResult.next_href}&client_id=${clientId}`;
-      while(nextUrl && result.length < 10){
+      while (nextUrl && result.length < 10) {
         rawResult = await candyget.json(nextUrl, {
           headers: {
             "User-Agent": DefaultUserAgent,
@@ -77,18 +77,18 @@ export default class Searchs extends SearchBase<SoundcloudTrackV2[]> {
           ? `${rawResult.next_href}&client_id=${clientId}`
           : rawResult.next_href;
       }
-    }else{
+    } else {
       // 楽曲検索
       result = (await this.soundcloud.tracks.searchV2({ q: query })).collection;
     }
-    if(result.length > 12) result = result.splice(0, 11);
+    if (result.length > 12) result = result.splice(0, 11);
     return {
       result,
       transformedQuery,
     };
   }
 
-  protected override consumer(result: SoundcloudTrackV2[]){
+  protected override consumer(result: SoundcloudTrackV2[]) {
     const { t } = getCommandExecutionContext();
 
     return result.map(item => {

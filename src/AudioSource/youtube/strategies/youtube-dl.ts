@@ -31,7 +31,7 @@ type youtubeDl = "youtubeDl";
 const youtubeDl: youtubeDl = "youtubeDl";
 
 export class youtubeDlStrategy extends baseYoutubeDlStrategy<youtubeDl> {
-  constructor(priority: number){
+  constructor(priority: number) {
     super(priority, youtubeDl, youtubeDlBinaryManager);
   }
 

@@ -27,20 +27,20 @@ export async function onVoiceChannelJoin(
   this: MusicBot,
   member: discord.Member,
   newChannel: discord.VoiceChannel | discord.StageChannel | discord.Uncached
-){
-  if(!("guild" in newChannel)) return;
+) {
+  if (!("guild" in newChannel)) return;
   const server = this.guildData.get(member.guild.id);
-  if(!server){
+  if (!server) {
     return;
   }
 
-  if(member.id === this._client.user.id){
+  if (member.id === this._client.user.id) {
     // ボットが参加した際
     // ミュート状態/抑制状態なら自分で解除を試みる
-    if(member.voiceState?.suppress || member.voiceState?.mute){
+    if (member.voiceState?.suppress || member.voiceState?.mute) {
       // VC参加 => 抑制状態ならそれの解除を試みる
       const voiceChannel = this._client.getChannel<discord.VoiceChannel | discord.StageChannel>(newChannel.id)!;
-      if(!("guild" in voiceChannel)) return;
+      if (!("guild" in voiceChannel)) return;
       voiceChannel.guild.editMember(this._client.user.id, {
         mute: false,
       }).catch(er => {
@@ -68,7 +68,7 @@ export async function onVoiceChannelJoin(
 
   server.skipSession?.checkThreshold().catch(this.logger.error);
 
-  if(
+  if (
     server instanceof GuildDataContainerWithBgm
       && (
         newChannel.id === server.bgmConfig.voiceChannelId
@@ -82,10 +82,10 @@ export async function onVoiceChannelJoin(
           || server.player.finishTimeout
         )
       )
-  ){
+  ) {
     // BGMを再生する条件が整っている
     server.playBgmTracks().catch(this.logger.error);
-  }else if(server.player.isPaused){
+  } else if (server.player.isPaused) {
     // 自動で一時停止している場合には再開
     server.player.resume(member);
   }

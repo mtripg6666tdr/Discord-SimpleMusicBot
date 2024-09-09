@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class Pause extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["一旦停止", "停止", "pause", "stop"],
       unlist: false,
@@ -33,15 +33,15 @@ export default class Pause extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     // そもそも再生状態じゃないよ...
-    if(!context.server.player.isPlaying){
+    if (!context.server.player.isPlaying) {
       await message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }
-    if(context.server.player.isPaused){
+    if (context.server.player.isPaused) {
       await message.reply(
         `:pause_button: ${t("commands:pause.alreadyPaused")}\r\n`
         + t("commands:pause.usePlayToResume")).catch(this.logger.error);

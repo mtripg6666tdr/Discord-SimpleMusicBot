@@ -23,7 +23,7 @@ import { BaseCommand } from ".";
 import { colonSplittedTimeToSeconds } from "../Util/time";
 
 export default class Seek extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["seek"],
       unlist: false,
@@ -41,14 +41,14 @@ export default class Seek extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t, server } = context;
 
     // そもそも再生状態ではない場合
-    if(!server.player.isPlaying || server.player.preparing){
+    if (!server.player.isPlaying || server.player.preparing) {
       await message.reply(t("notPlaying")).catch(this.logger.error);
       return;
-    }else if(server.player.currentAudioInfo!.lengthSeconds === 0 || !server.player.currentAudioInfo!.isSeekable){
+    } else if (server.player.currentAudioInfo!.lengthSeconds === 0 || !server.player.currentAudioInfo!.isSeekable) {
       await message.reply(`:warning:${t("commands:seek.unseekable")}`).catch(this.logger.error);
       return;
     }
@@ -56,18 +56,18 @@ export default class Seek extends BaseCommand {
     // 引数から時間を算出
     const time = colonSplittedTimeToSeconds(context.rawArgs);
 
-    if(time > server.player.currentAudioInfo!.lengthSeconds || isNaN(time)){
+    if (time > server.player.currentAudioInfo!.lengthSeconds || isNaN(time)) {
       await message.reply(`:warning:${t("commands:seek.invalidTime")}`).catch(this.logger.error);
       return;
     }
 
-    try{
+    try {
       const response = await message.reply(`:rocket:${t("commands:seek.seeking")}...`);
       await server.player.stop({ wait: true });
       await server.player.play({ time });
       await response.edit(`:white_check_mark:${t("commands:seek.success")}`).catch(this.logger.error);
     }
-    catch(e){
+    catch (e) {
       this.logger.error(e);
       await message.channel.createMessage({
         content: `:astonished:${t("commands:seek.failed")}`,

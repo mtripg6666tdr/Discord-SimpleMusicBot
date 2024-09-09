@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class BgmBd extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       name: "BGMBD",
       alias: ["bgmbd"],

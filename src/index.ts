@@ -43,17 +43,17 @@ const bot = new MusicBot(process.env.TOKEN, Boolean(config.maintenance));
 let server: http.Server | null = null;
 
 // Webサーバーのインスタンス化
-if(config.webserver){
+if (config.webserver) {
   server = createServer(bot.client, Number(process.env.PORT) || 8081);
-}else{
+} else {
   logger.info("Skipping to start server");
 }
 
-if(config.debug){
+if (config.debug) {
   Error.stackTraceLimit = 50;
 
   process.on("uncaughtException", async (error)=>{
-    if(bot.client){
+    if (bot.client) {
       await reportError(error);
     }
     logger.fatal(error);
@@ -64,19 +64,19 @@ if(config.debug){
 
     process.exit(1);
   });
-}else{
+} else {
   // ハンドルされなかったエラーのハンドル
   process.on("uncaughtException", async (error)=>{
     logger.fatal(error);
-    if(bot.client){
+    if (bot.client) {
       await reportError(error);
     }
   });
 }
 
 let terminating = false;
-const onTerminated = async function(code: string){
-  if(terminating) return;
+const onTerminated = async function(code: string) {
+  if (terminating) return;
 
   terminating = true;
 
@@ -84,19 +84,19 @@ const onTerminated = async function(code: string){
 
   await bot.stop();
 
-  if(server && server.listening){
+  if (server && server.listening) {
     logger.info("Shutting down the server...");
     await new Promise(resolve => server.close(resolve));
   }
 
   // 強制終了を報告
-  if(bot.client && config.errorChannel){
+  if (bot.client && config.errorChannel) {
     bot.client.rest.channels.createMessage(config.errorChannel, {
       content: "Process terminated",
     }).catch(() => {});
   }
 
-  if(global.workerThread){
+  if (global.workerThread) {
     logger.info("Shutting down worker...");
     await global.workerThread.terminate();
   }
@@ -104,7 +104,7 @@ const onTerminated = async function(code: string){
   logger.info("Shutting down completed");
 
   log4js.shutdown(er => {
-    if(er){
+    if (er) {
       console.error(er);
     }
   });
@@ -126,15 +126,15 @@ initLocalization(config.debug, config.defaultLanguage).then(() => {
   bot.run();
 });
 
-async function reportError(err: any){
-  if(!config.errorChannel) return;
+async function reportError(err: any) {
+  if (!config.errorChannel) return;
 
-  try{
+  try {
     await bot.client.rest.channels.createMessage(config.errorChannel, {
       content: stringifyObject(err),
     }).catch(() => {});
   }
-  catch(e){
+  catch (e) {
     logger.error(e);
   }
 }
