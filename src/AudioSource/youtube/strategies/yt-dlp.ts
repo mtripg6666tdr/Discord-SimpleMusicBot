@@ -21,7 +21,22 @@ import { YoutubeDlInfo, baseYoutubeDlStrategy } from "./baseYoutubeDlStrategy";
 import { BinaryManager } from "../../../Component/binaryManager";
 
 const ytDlPBinaryManager = new BinaryManager({
-  binaryName: "yt-dlp",
+  binaryName: (asset, defaultSelector) => {
+    const { arch, platform } = process;
+
+    if (platform === "linux") {
+      switch (arch) {
+        case "arm":
+          return asset.name === "yt-dlp_linux_armv7l";
+        case "arm64":
+          return asset.name === "yt-dlp_linux_aarch64";
+        case "x64":
+          return asset.name === "yt-dlp_linux";
+      }
+    }
+
+    return defaultSelector("yt-dlp");
+  },
   localBinaryName: "yt-dlp",
   binaryRepo: "yt-dlp/yt-dlp",
   checkImmediately: false,
