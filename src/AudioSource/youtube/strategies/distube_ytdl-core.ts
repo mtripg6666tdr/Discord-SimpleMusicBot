@@ -21,13 +21,13 @@ import type { ReadableStreamInfo, StreamInfo, UrlStreamInfo } from "../../audios
 import type { Readable } from "stream";
 
 import * as ytdl from "@distube/ytdl-core";
+import { safeTraverse } from "safe-traverse";
 
 import { Strategy } from "./base";
 import { YouTubeJsonFormat } from "..";
-import { unsafeTraverseFrom } from "../../../Util";
 import { getConfig } from "../../../config";
 import { SecondaryUserAgent } from "../../../definition";
-import { createRefreshableYTLiveStream } from "../stream";
+import { createChunkedDistubeYTStream, createRefreshableYTLiveStream } from "../stream";
 
 export type distubeYtdlCore = "distubeYtdlCore";
 export const distubeYtdlCore: distubeYtdlCore = "distubeYtdlCore";
@@ -86,10 +86,10 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
 
       if(this.validateInfoExperiments(info)) break;
 
-      unsafeTraverseFrom(ytdl)
-        .getProperty("cache")
-        .select(obj => Object.values<Map<string, any>>(obj))
-        .execute("forEach")(s => s.clear());
+      safeTraverse(ytdl)
+        .get("cache")
+        .values()
+        .call("clear", (s: Map<string, any>) => s.clear());
     }
 
     if(!this.validateInfoExperiments(info)){
@@ -137,7 +137,7 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
     }else{
       const readable: Readable = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow
         ? createRefreshableYTLiveStream(info, url, { format, lang: config.defaultLanguage })
-        : ytdl.downloadFromInfo(info, { format });
+        : createChunkedDistubeYTStream(info, format, { lang: config.defaultLanguage });
 
       return {
         ...partialResult,
@@ -173,16 +173,16 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
 
   extractExperiments(info: ytdl.videoInfo): string[] {
     // ref: https://github.com/yt-dlp/yt-dlp/pull/10456/files
-    const experiments = unsafeTraverseFrom(info)
-      .getProperty("response")
-      .getProperty("responseContext")
-      .getProperty("serviceTrackingParams")
-      .select(v => v.find((d: any) => d.service === "GFEEDBACK"))
-      .getProperty("params")
-      .select(v => v.find((d: any) => d.key === "e"))
-      .getProperty("value")
-      .select<string[]>(v => v.split(","))
-      .value;
+
+    const experiments = safeTraverse(info)
+      .expect(_ => _.response.responseContext.serviceTrackingParams)
+      .validate(_ => !!_.find)
+      .select(_ => _.find((d: any) => d.service === "GFEEDBACK"))
+      .get<any>("params")
+      .validate(_ => !!_.find)
+      .select(_ => _.find((d: any) => d.key === "e"))
+      .safeExpect(_ => _.value.split(","))
+      .get() as string[];
 
     return experiments || [];
   }

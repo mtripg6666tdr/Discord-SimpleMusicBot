@@ -17,19 +17,16 @@
  */
 
 import type { AudioSourceBasicJsonFormat, StreamInfo } from ".";
-import type { Readable } from "stream";
 
 import candyget from "candyget";
 import { convert as htmlToText } from "html-to-text";
-import NiconicoDL, { isValidURL } from "niconico-dl.js";
+import parse from "node-html-parser";
 
 import { AudioSource } from "./audiosource";
 import { getCommandExecutionContext } from "../Commands";
-import { createPassThrough } from "../Util";
 
 export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
-  private nico: NiconicoDL | null = null;
-  private nicoTemp: NiconicoTempDL | null = null;
+  private nicoTemp: NiconicoDL | null = null;
   protected author = "";
   protected views = 0;
 
@@ -38,14 +35,9 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
   }
 
   async init(url: string, prefetched: NiconicoJsonFormat){
-    const { t } = getCommandExecutionContext();
-
     this.url = url;
-    if(NiconicoTempDL.isTempWatchUrl(url)){
-      this.nicoTemp = new NiconicoTempDL(url);
-    }else{
-      this.nico = new NiconicoDL(url, /* quality */ "high");
-    }
+
+    this.nicoTemp = new NiconicoDL(url);
 
     if(prefetched){
       this.title = prefetched.title;
@@ -54,55 +46,30 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
       this.author = prefetched.author;
       this.thumbnail = prefetched.thumbnail;
       this.views = prefetched.views;
-    }else if(NiconicoTempDL.isTempWatchUrl(url)){
-      const info = await this.nicoTemp!.getInfo();
-      this.title = info.data.video.title;
-      this.description = htmlToText(info.data.video.description);
-      this.lengthSeconds = info.data.video.duration;
-      this.author = info.data.ownerNickname;
-      this.thumbnail = info.data.video.thumbnail.url;
-      this.views = info.data.video.count.view;
     }else{
-      this.nico = new NiconicoDL(url, /* quality */ "high");
-      const info = await this.nico.getVideoInfo();
-      if(info.isDeleted || info.isPrivate){
-        throw new Error(t("audioSources.videoNotPlayable"));
-      }
-      this.title = info.title;
-      this.description = htmlToText(info.description);
-      this.lengthSeconds = info.duration;
-      this.author = info.owner.nickname;
-      this.thumbnail = info.thumbnail.url;
-      this.views = info.count.view;
+      const info = await this.nicoTemp.getInfo();
+      this.title = info.data.response.video.title;
+      this.description = htmlToText(info.data.response.video.description);
+      this.lengthSeconds = info.data.response.video.duration;
+      this.author = info.data.response.owner.nickname;
+      this.thumbnail = info.data.response.video.thumbnail.url;
+      this.views = info.data.response.video.count.view;
     }
     return this;
   }
 
   async fetch(): Promise<StreamInfo>{
-    if(this.nico){
-      const stream = createPassThrough();
-      const source = await this.nico.download() as Readable;
-      source
-        .on("error", e => !stream.destroyed ? stream.destroy(e) : stream.emit("error", e))
-        .pipe(stream)
-        .on("close", () => !source.destroyed && source.destroy?.());
-
-      return {
-        type: "readable",
-        streamType: "unknown",
-        stream,
-      };
-    }else if(this.nicoTemp){
-      const { url, cookie } = await this.nicoTemp.fetch();
-      return {
-        type: "url",
-        streamType: "m3u8",
-        url,
-        cookie,
-      };
+    if(!this.nicoTemp){
+      throw new Error("The audio source is not initialized.");
     }
 
-    throw new Error("Noop");
+    const { url, cookie } = await this.nicoTemp.fetch();
+    return {
+      type: "url",
+      streamType: "m3u8",
+      url,
+      cookie,
+    };
   }
 
   toField(verbose: boolean){
@@ -110,17 +77,17 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
 
     return [
       {
-        name: `:cinema:${t("audioSources.videoAuthor")}`,
+        name: `:cinema: ${t("audioSources.videoAuthor")}`,
         value: this.author,
         inline: false,
       },
       {
-        name: `:eyes:${t("audioSources.playCountLabel")}`,
+        name: `:eyes: ${t("audioSources.playCountLabel")}`,
         value: t("audioSources.playCount", { count: this.views }),
         inline: false,
       },
       {
-        name: `:asterisk:${t("summary")}`,
+        name: `:asterisk: ${t("summary")}`,
         value: this.description.length > (verbose ? 1000 : 350)
           ? this.description.substring(0, verbose ? 1000 : 300) + "..."
           : this.description,
@@ -148,7 +115,7 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
   }
 
   static validateUrl(url: string){
-    return isValidURL(url) || NiconicoTempDL.isTempWatchUrl(url);
+    return NiconicoDL.isWatchUrl(url);
   }
 }
 
@@ -160,38 +127,46 @@ export type NiconicoJsonFormat = AudioSourceBasicJsonFormat & {
 };
 
 
-const niconicoTempWatchUrlRegex = /https:\/\/www\.nicovideo\.jp\/watch_tmp\/(?<id>sm\d+)/;
+const niconicoTempWatchUrlRegex = /https:\/\/www\.nicovideo\.jp\/watch\/(?<id>sm\d+)/;
 
-class NiconicoTempDL {
+class NiconicoDL {
   private readonly _videoId: string;
-  private _info: NiconicoTempMeta | null = null;
+
+  private _info: NiconicoMeta | null = null;
 
   constructor(url: string){
-    if(!NiconicoTempDL.isTempWatchUrl(url)){
+    if(!NiconicoDL.isWatchUrl(url)){
       throw new Error("The requested url is invalid.");
     }
 
     this._videoId = niconicoTempWatchUrlRegex.exec(url)!.groups!["id"]!;
   }
 
-  static isTempWatchUrl(url: string){
+  static isWatchUrl(url: string){
     return niconicoTempWatchUrlRegex.test(url);
   }
 
-  async getInfo(): Promise<NiconicoTempMeta> {
-    const { statusCode, body } = await candyget.json(`https://www.nicovideo.jp/api/watch/tmp/${this._videoId}?_frontendId=6&_frontendVersion=0.0.0`);
+  async getInfo(): Promise<NiconicoMeta> {
+    const { statusCode, body } = await candyget.string(`https://www.nicovideo.jp/watch/${this._videoId}`);
     if(statusCode < 200 || 300 <= statusCode){
       throw new Error("Failed to fetch audio information.");
     }
 
-    return this._info = body as NiconicoTempMeta;
+    const root = parse(body);
+    const content = root.querySelector("meta[name=server-response]")?.getAttribute("content");
+
+    if(!content){
+      throw new Error("Failed to fetch audio information.");
+    }
+
+    return this._info = JSON.parse<NiconicoMeta>(content);
   }
 
   async fetch(): Promise<{ url: string, cookie: string }> {
     const info = this._info || await this.getInfo();
 
-    const hlsInfoUrl = `https://nvapi.nicovideo.jp/v1/tmp/watch/${this._videoId}/access-rights/hls?actionTrackId=${info.data.client.watchTrackId}&_frontendId=6&_frontendVersion=0.0.0`;
-    const audioDomandId = [...info.data.media.domand.audios].sort((a, b) => b.bitRate - a.bitRate)[0]?.id;
+    const hlsInfoUrl = `https://nvapi.nicovideo.jp/v1/watch/${this._videoId}/access-rights/hls?actionTrackId=${info.data.response.client.watchTrackId}`;
+    const audioDomandId = [...info.data.response.media.domand.audios].sort((a, b) => b.bitRate - a.bitRate)[0]?.id;
 
     if(!audioDomandId){
       throw new Error("Failed to detect audio stream.");
@@ -201,11 +176,14 @@ class NiconicoTempDL {
       headers: {
         origin: "https://www.nicovideo.jp",
         referer: "https://www.nicovideo.jp/",
-        "X-Access-Right-Key": info.data.media.domand.accessRightKey,
-        "X-Request-With": "https://www.nicovideo.jp",
+        "X-Access-Right-Key": info.data.response.media.domand.accessRightKey,
+        "X-Request-With": "nicovideo",
+        "X-Frontend-Id": "6",
+        "X-Frontend-Version": "0",
+        "X-Niconico-Language": "ja-jp",
       },
       body: {
-        outputs: info.data.media.domand.videos.filter(({ isAvailable }) => isAvailable).map(({ id }) => [id, audioDomandId]),
+        outputs: info.data.response.media.domand.videos.filter(({ isAvailable }) => isAvailable).map(({ id }) => [id, audioDomandId]),
       },
     });
 
@@ -227,54 +205,60 @@ type WithStatusResult<T> = {
   data: T,
 };
 
-type NiconicoTempMeta = WithStatusResult<{
-  client: {
-    nicosid: string,
-    watchId: string,
-    watchTrackId: string,
-  },
-  ownerNickname: string,
-  video: {
-    description: string,
-    duration: number,
-    id: string,
-    thumbnail: {
-      ogp: string,
-      player: string,
-      url: string,
+type NiconicoMeta = WithStatusResult<{
+  response: {
+    client: {
+      nicosid: string,
+      watchId: string,
+      watchTrackId: string,
     },
-    title: string,
-    count: {
-      comment: number,
-      like: number,
-      mylist: number,
-      view: number,
+    video: {
+      description: string,
+      duration: number,
+      id: string,
+      thumbnail: {
+        ogp: string,
+        player: string,
+        url: string,
+      },
+      title: string,
+      count: {
+        comment: number,
+        like: number,
+        mylist: number,
+        view: number,
+      },
     },
-  },
-  media: {
-    domand: {
-      accessRightKey: string,
-      videos: {
-        bitRate: number,
-        height: number,
-        id: string,
-        isAvailable: boolean,
-        label: string,
-        qualityLevel: number,
-        recommendedHighestAudioQualityLevel: number,
-        width: number,
-      }[],
-      isStoryboardAvailable: boolean,
-      audios: {
-        bitRate: number,
-        id: string,
-        integratedLoudness: number,
-        isAvailable: boolean,
-        loudnessCollection: unknown,
-        qualityLevel: number,
-        samplingRate: number,
-        truePeak: number,
-      }[],
+    media: {
+      domand: {
+        accessRightKey: string,
+        videos: {
+          bitRate: number,
+          height: number,
+          id: string,
+          isAvailable: boolean,
+          label: string,
+          qualityLevel: number,
+          recommendedHighestAudioQualityLevel: number,
+          width: number,
+        }[],
+        isStoryboardAvailable: boolean,
+        audios: {
+          bitRate: number,
+          id: string,
+          integratedLoudness: number,
+          isAvailable: boolean,
+          loudnessCollection: unknown,
+          qualityLevel: number,
+          samplingRate: number,
+          truePeak: number,
+        }[],
+      },
+    },
+    owner: {
+      iconUrl: string,
+      id: number,
+      nickname: string,
     },
   },
 }>;

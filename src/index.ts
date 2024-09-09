@@ -50,6 +50,8 @@ if(config.webserver){
 }
 
 if(config.debug){
+  Error.stackTraceLimit = 50;
+
   process.on("uncaughtException", async (error)=>{
     if(bot.client){
       await reportError(error);
