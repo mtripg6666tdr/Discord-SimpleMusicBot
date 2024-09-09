@@ -41,18 +41,36 @@ export function createChunkedYTStream(info: ytdl.videoInfo, format: ytdl.videoFo
   );
 }
 
-export function createChunkedDistubeYTStream(info: distubeYtdl.videoInfo, format: distubeYtdl.videoFormat, options: distubeYtdl.downloadOptions, chunkSize: number = 512 * 1024){
-  return createFragmentalDownloadStream(
-    (start, end) => distubeYtdl.downloadFromInfo(info, {
-      format,
-      ...options,
-      range: { start, end },
-    }),
+export function createChunkedDistubeYTStream(
+  info: distubeYtdl.videoInfo,
+  format: distubeYtdl.videoFormat,
+  options: distubeYtdl.downloadOptions,
+  chunkSize: number = 8 * 1024 * 1024, // 8MB
+){
+  const refreshInfo = async () => {
+    info = await distubeYtdl.getInfo(info.videoDetails.video_url);
+
+    const newFormat = info.formats.find(f => f.itag === format.itag);
+    if(!newFormat){
+      stream.destroy(new Error("Failed to refresh the format"));
+      return;
+    }
+
+    format = newFormat;
+  };
+
+  const stream = createFragmentalDownloadStream(
+    async (start, end) => {
+      await refreshInfo();
+      return distubeYtdl.downloadFromInfo(info, { format, ...options, range: { start, end }, dlChunkSize: 0 });
+    },
     {
       chunkSize,
       contentLength: Number(format.contentLength),
     }
   );
+
+  return stream;
 }
 
 export function createRefreshableYTLiveStream(info: ytdl.videoInfo | distubeYtdl.videoInfo, url: string, options: ytdl.downloadOptions | distubeYtdl.downloadOptions, distube: boolean = false){

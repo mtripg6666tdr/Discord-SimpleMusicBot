@@ -421,7 +421,7 @@ export function createDebounceFunctionsFactroy<Key>(func: (key: Key) => void, de
 }
 
 export function createFragmentalDownloadStream(
-  streamGenerator: string | ((start: number, end?: number) => Readable),
+  streamGenerator: string | ((start: number, end?: number) => Readable) | ((start: number, end?: number) => PromiseLike<Readable>),
   { chunkSize = 512 * 1024, contentLength, userAgent = SecondaryUserAgent }: { chunkSize?: number, contentLength: number, userAgent?: string },
 ){
   const logger = getLogger("FragmentalDownloader", true);
@@ -429,7 +429,7 @@ export function createFragmentalDownloadStream(
 
   const stream = createPassThrough();
 
-  setImmediate(() => {
+  setImmediate(async () => {
     let current = -1;
 
     if(contentLength < chunkSize){
@@ -439,7 +439,7 @@ export function createFragmentalDownloadStream(
             "User-Agent": userAgent,
           },
         })
-        : streamGenerator(0);
+        : await streamGenerator(0);
 
       originStream
         .on("error", er => stream.destroy(er))
@@ -447,7 +447,7 @@ export function createFragmentalDownloadStream(
 
       logger.info("Stream was created as a single stream");
     }else{
-      const pipeNextStream = () => {
+      const pipeNextStream = async () => {
         current++;
 
         let end: number | undefined = chunkSize * (current + 1) - 1;
@@ -463,10 +463,11 @@ export function createFragmentalDownloadStream(
               "Range": `bytes=${chunkSize * current}-${end ? end : ""}`,
             },
           })
-          : streamGenerator(chunkSize * current, end);
+          : await streamGenerator(chunkSize * current, end);
         logger.info(`Stream #${current + 1} was created`);
 
         nextStream
+          .on("request", logger.trace)
           .on("error", er => stream.destroy(er))
           .pipe(stream, { end: end === undefined });
 
@@ -477,7 +478,7 @@ export function createFragmentalDownloadStream(
         }
       };
 
-      pipeNextStream();
+      pipeNextStream().catch(logger.warn);
 
       logger.info(`Stream was created as partial stream. ${Math.ceil(contentLength / chunkSize)} streams will be created.`);
     }
@@ -496,48 +497,6 @@ export function requireIfAny(id: string): unknown {
 
     return null;
   }
-}
-
-interface UnsafeTraverseState<T> {
-  value: T;
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  getProperty: <U = any>(name: keyof T | (string & {})) => UnsafeTraverseState<U | undefined>;
-  select: <U = any>(selector: (current: T) => U | undefined | null) => UnsafeTraverseState<U | undefined>;
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  execute: <U extends keyof T | (string & {})>(func: U) => T extends undefined
-    ? () => UnsafeTraverseState<undefined>
-    : T extends { [key in U]: (...args: any[]) => any }
-      ? (...args: Parameters<T[U]>) => UnsafeTraverseState<ReturnType<T[U]>>
-      : (..._: any[]) => UnsafeTraverseState<undefined>;
-  action: (action: (value: T) => void) => UnsafeTraverseState<T>;
-}
-
-export function unsafeTraverseFrom<S>(obj: S){
-  const createState: <T = any> (value: T) => UnsafeTraverseState<T> = <T = any> (value: T) => ({
-    value,
-    getProperty: <U = any>(name: string) => value
-      ? createState<U | undefined>(value[name as keyof typeof value] as U | null | undefined || undefined)
-      : undefinedState,
-    select: <U = any>(selector: (current: T) => U | undefined | null) => value
-      ? createState<U | undefined>(selector(value) || undefined)
-      : undefinedState,
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    execute: <U extends keyof T | (string & {})>(func: U) => (!value
-      ? () => undefinedState
-      // @ts-expect-error
-      : typeof value[func] === "function"
-        // @ts-expect-error
-        ? (...args: Parameters<T[U]>) => createState<ReturnType<T[U]>>(value[func](...args))
-        : (..._: any[]) => undefinedState) as any,
-    action: (action: (value: T) => void) => {
-      action(value);
-      return createState(value);
-    },
-  });
-
-  const undefinedState = createState(undefined);
-
-  return createState<S>(obj);
 }
 
 export function assertIs<T>(obj: unknown): asserts obj is T{}

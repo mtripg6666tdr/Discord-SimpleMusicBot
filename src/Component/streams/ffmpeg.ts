@@ -33,8 +33,6 @@ export const FFmpegDefaultNetworkArgs = [
   "-reconnect_delay_max", "30",
 ] as const;
 
-const logger = getLogger("FFmpeg");
-
 export function transformThroughFFmpeg(
   readable: StreamInfo,
   {
@@ -46,9 +44,13 @@ export function transformThroughFFmpeg(
     bitrate: number,
     effects: ExportedAudioEffect,
     seek: number,
-    output: "webm"|"ogg"|"pcm",
+    output: "webm" | "ogg" | "pcm",
   }
 ){
+  const logger = getLogger("FFmpeg", true);
+  const id = Date.now();
+  logger.addContext("id", id);
+
   const ffmpegNetworkArgs = readable.type === "url" ? [
     ...FFmpegDefaultNetworkArgs,
     "-user_agent", readable.userAgent || DefaultUserAgent,
