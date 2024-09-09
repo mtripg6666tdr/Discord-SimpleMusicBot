@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class SettingSkipvote extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["setting>skipvote"],
       unlist: false,
@@ -41,14 +41,14 @@ export default class SettingSkipvote extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
-    if(context.rawArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
+    if (context.rawArgs) {
       const newDisabledStatus = context.server.preferences.disableSkipSession = !(context.args[0] === "enable" || context.args[0] === "true");
 
       await message.reply(context.t("commands:setting>skipvote.changed", {
         status: newDisabledStatus ? context.t("disabled") : context.t("enabled"),
       }));
-    }else{
+    } else {
       await message.reply(context.t("commands:setting>skipvote.currentState", {
         status: context.server.preferences.disableSkipSession ? context.t("disabled") : context.t("enabled"),
       }));

@@ -27,7 +27,7 @@ import { BaseCommand } from ".";
 import { getColor } from "../Util/color";
 
 export default class Uptime extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["ping", "latency"],
       unlist: false,
@@ -37,7 +37,7 @@ export default class Uptime extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
     const now = Date.now();
     const embed = new MessageEmbedBuilder()

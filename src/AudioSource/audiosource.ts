@@ -65,7 +65,7 @@ export abstract class AudioSource<T extends ThumbnailType, U extends AudioSource
   // リソースのURL
   // リソースに対して不変で、かつ一意である必要があります
   private _url: string;
-  get url(){
+  get url() {
     return this._url;
   }
   protected set url(value: string) {
@@ -74,64 +74,64 @@ export abstract class AudioSource<T extends ThumbnailType, U extends AudioSource
 
   // 曲のタイトル
   private _title: string;
-  get title(){
+  get title() {
     return this._title;
   }
-  protected set title(value: string){
+  protected set title(value: string) {
     this._title = value;
   }
 
   // 曲の長さ
   private _lengthSeconds: number = 0;
-  get lengthSeconds(): number{
+  get lengthSeconds(): number {
     return this._lengthSeconds;
   }
-  protected set lengthSeconds(value: number){
+  protected set lengthSeconds(value: number) {
     this._lengthSeconds = value;
   }
 
   // 曲の説明
   private _description: string;
-  get description(){
+  get description() {
     return this._description;
   }
-  protected set description(value: string){
+  protected set description(value: string) {
     this._description = value;
   }
 
   // サムネイル
   private _thumbnail: T;
-  get thumbnail(){
+  get thumbnail() {
     return this._thumbnail || DefaultAudioThumbnailURL as T;
   }
-  protected set thumbnail(value: T){
+  protected set thumbnail(value: T) {
     this._thumbnail = value;
   }
 
   // 非公開ソースかどうかを表すフラグ
   private _isPrivateSource: boolean = false;
-  get isPrivateSource(){
+  get isPrivateSource() {
     return this._isPrivateSource;
   }
-  protected set isPrivateSource(value: boolean){
+  protected set isPrivateSource(value: boolean) {
     this._isPrivateSource = value;
   }
 
   // キャッシュできるかどうかを表すフラグ
   protected _isCacheable: boolean;
-  get isCachable(){
+  get isCachable() {
     return this._isCacheable;
   }
 
   private readonly _isSeekable: boolean;
-  get isSeekable(){
+  get isSeekable() {
     return this._isSeekable;
   }
 
   /** オーディオソースの種類に対して生成されるロガーを表します */
   protected logger: LoggerObject;
 
-  constructor(options: { isSeekable?: boolean, isCacheable?: boolean } = {}){
+  constructor(options: { isSeekable?: boolean, isCacheable?: boolean } = {}) {
     options = Object.assign({ isSeekable: true, isCacheable: true }, options);
     this.logger = getLogger(this.constructor.name);
     this._isSeekable = options.isSeekable!;
@@ -153,7 +153,7 @@ export abstract class AudioSource<T extends ThumbnailType, U extends AudioSource
    * 内部情報のキャッシュに対応しているソースに対して、キャッシュデータの削除を実行します。
    * それ以外のソースではこの関数は何もしません。
    */
-  purgeCache(){}
+  purgeCache() {}
 
   /** オーディオソースがYouTubeであるかを返します。それ以外のソースに対してはinstanceofを使用してください。 */
   isYouTube(): this is YouTube {
@@ -161,7 +161,7 @@ export abstract class AudioSource<T extends ThumbnailType, U extends AudioSource
   }
 
   /** プライベートなソースとして設定します */
-  markAsPrivateSource(){
+  markAsPrivateSource() {
     this.isPrivateSource = true;
   }
 }

@@ -28,17 +28,17 @@ export async function handleButtonInteraction(
   this: MusicBot,
   server: GuildDataContainer,
   interaction: discord.ComponentInteraction<ComponentTypes.BUTTON, discord.AnyTextableGuildChannel>,
-){
+) {
   this.logger.info("received button interaction");
 
   // コレクターで処理できるか？
-  if(await this.collectors.onInteractionCreate(interaction)){
+  if (await this.collectors.onInteractionCreate(interaction)) {
     return;
   }
 
-  if(interaction.data.customID.startsWith("control_")){
+  if (interaction.data.customID.startsWith("control_")) {
     let command: string = null!;
-    switch(interaction.data.customID){
+    switch (interaction.data.customID) {
       case "control_rewind":
         command = "rewind";
         break;

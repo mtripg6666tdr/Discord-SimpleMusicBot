@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class Rewind extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["rewind", "gotop", "replay"],
       unlist: false,
@@ -32,12 +32,12 @@ export default class Rewind extends BaseCommand {
     });
   }
   
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
     context.server.updateBoundChannel(message);
-    if(!context.server.player.isPlaying){
+    if (!context.server.player.isPlaying) {
       message.reply(t("notPlaying")).catch(this.logger.error);
-    }else{
+    } else {
       await message.reply({
         content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:rewind:${t("commands:rewind.success")}:+1:`,
         allowedMentions: {

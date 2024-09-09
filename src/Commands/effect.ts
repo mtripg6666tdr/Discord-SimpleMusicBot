@@ -26,7 +26,7 @@ import { BaseCommand } from ".";
 import { audioEffectNames, type AudioEffectNames } from "../Component/audioEffectManager";
 
 export default class Effect extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["effect", "音声エフェクト", "音声効果", "効果"],
       unlist: false,
@@ -37,10 +37,10 @@ export default class Effect extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    try{
+    try {
       const { collector, customIdMap } = context.server.bot.collectors.create()
         .setAuthorIdFilter(message.member.id)
         .setMaxInteraction(Infinity)
@@ -63,7 +63,7 @@ export default class Effect extends BaseCommand {
             .setLabel(t("commands:effect.effectControllPanel.reload")),
           ...context.server.audioEffects.createMessageButtons(customIdMap),
         ];
-        for(let i = 0; i < Math.ceil(components.length / 5); i++){
+        for (let i = 0; i < Math.ceil(components.length / 5); i++) {
           rows.push(
             new MessageActionRowBuilder()
               .addComponents(...components.slice(i * 5, (i + 1) * 5))
@@ -87,14 +87,14 @@ export default class Effect extends BaseCommand {
       collector.on("reload", () => updateEffectEmbed());
       collector.on("timeout", () => updateEffectEmbed(true));
 
-      for(const effectName of audioEffectNames){
+      for (const effectName of audioEffectNames) {
         collector.on(effectName, () => {
           context.server.audioEffects.toggle(effectName);
           updateEffectEmbed();
         });
       }
     }
-    catch(e){
+    catch (e) {
       this.logger.error(e);
       message.reply(`:cry:${t("errorOccurred")}`).catch(this.logger.error);
     }

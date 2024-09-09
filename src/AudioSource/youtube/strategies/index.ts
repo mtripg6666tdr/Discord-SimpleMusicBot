@@ -58,23 +58,23 @@ const strategyImporters: StrategyImporter[] = [
 
 export let strategies: (Strategies | null)[] = [];
 
-function initStrategies(configEnabled: boolean[] | null = null){
+function initStrategies(configEnabled: boolean[] | null = null) {
   strategies = strategyImporters.map(({ enable, importer, isFallback }, i) => {
-    if(Array.isArray(configEnabled) ? !configEnabled[i] : !enable){
+    if (Array.isArray(configEnabled) ? !configEnabled[i] : !enable) {
       logger.warn(`strategy#${i} is currently disabled.`);
       return null;
     }
 
-    try{
+    try {
       const { default: Module } = importer();
       return {
         module: new Module(i),
         isFallback,
       };
     }
-    catch(e){
+    catch (e) {
       logger.warn(`failed to load strategy#${i}`);
-      if(config.debug){
+      if (config.debug) {
         logger.debug(e);
       }
       return null;
@@ -84,13 +84,13 @@ function initStrategies(configEnabled: boolean[] | null = null){
 
 initStrategies();
 
-export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(...parameters: Parameters<Strategy<T, U>["fetch"]>){
+export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(...parameters: Parameters<Strategy<T, U>["fetch"]>) {
   let checkedStrategy = -1;
-  if(parameters[2]){
+  if (parameters[2]) {
     const cacheType = parameters[2].type;
     checkedStrategy = strategies.findIndex(s => s && s.module.cacheType === cacheType);
-    if(checkedStrategy >= 0){
-      try{
+    if (checkedStrategy >= 0) {
+      try {
         const strategy = strategies[checkedStrategy]!;
         const result = await strategy.module.fetch(...parameters);
         return {
@@ -100,14 +100,14 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(.
           isFallbacked: strategy.isFallback,
         };
       }
-      catch(e){
+      catch (e) {
         logger.warn(`fetch in strategy#${checkedStrategy} failed`, e);
       }
     }
   }
-  for(let i = 0; i < strategies.length; i++){
-    if(i !== checkedStrategy && strategies[i]){
-      try{
+  for (let i = 0; i < strategies.length; i++) {
+    if (i !== checkedStrategy && strategies[i]) {
+      try {
         const strategy = strategies[i]!;
         const result = await strategy.module.fetch(...parameters);
         return {
@@ -117,7 +117,7 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(.
           isFallbacked: strategy.isFallback,
         };
       }
-      catch(e){
+      catch (e) {
         logger.warn(`fetch in strategy#${i} failed`, e);
       }
     }
@@ -127,10 +127,10 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(.
   throw new Error("All strategies failed");
 }
 
-export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>(...parameters: Parameters<Strategy<T, U>["getInfo"]>){
-  for(let i = 0; i < strategies.length; i++){
-    try{
-      if(strategies[i]){
+export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>(...parameters: Parameters<Strategy<T, U>["getInfo"]>) {
+  for (let i = 0; i < strategies.length; i++) {
+    try {
+      if (strategies[i]) {
         const strategy = strategies[i]!;
         const result = await strategy.module.getInfo(...parameters);
         return {
@@ -140,7 +140,7 @@ export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>
         };
       }
     }
-    catch(e){
+    catch (e) {
       logger.warn(`getInfo in strategy#${i} failed`, e);
       logger.warn(
         i + 1 === strategies.length
@@ -152,8 +152,8 @@ export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>
   throw new Error("All strategies failed");
 }
 
-export function updateStrategyConfiguration(strategyConfig: string){
-  if(!strategyConfig){
+export function updateStrategyConfiguration(strategyConfig: string) {
+  if (!strategyConfig) {
     initStrategies();
     return;
   }

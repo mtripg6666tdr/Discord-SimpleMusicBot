@@ -49,25 +49,25 @@ export class SourceCache extends LogEmitter<CacheEvents> {
   private readonly cacheDirPath: string;
   private lastCleanup: number = 0;
 
-  constructor(protected bot: MusicBotBase, protected enablePersistent: boolean){
+  constructor(protected bot: MusicBotBase, protected enablePersistent: boolean) {
     super("Cache");
     this._sourceCache = new Map();
     this._expireMap = new Map();
     this.cacheDirPath = path.join(__dirname, global.BUNDLED ? "../cache/" : "../../cache/");
-    if(!fs.existsSync(this.cacheDirPath)){
+    if (!fs.existsSync(this.cacheDirPath)) {
       fs.mkdirSync(this.cacheDirPath);
     }
     bot.on("tick", this.onTick.bind(this));
   }
 
   @measureTime
-  private onTick(count: number){
-    if(count % 5 === 0 || config.debug){
+  private onTick(count: number) {
+    if (count % 5 === 0 || config.debug) {
       const now = Date.now();
       let purgeCount = 0;
       const shouldPurgeCount = this._sourceCache.size - 300;
       [...this._expireMap.entries()].sort((a, b) => a[1] - b[1]).forEach(([url, expiresAt]) => {
-        if(now > expiresAt || purgeCount < shouldPurgeCount){
+        if (now > expiresAt || purgeCount < shouldPurgeCount) {
           this._sourceCache.delete(url);
           this._expireMap.delete(url);
           purgeCount++;
@@ -88,37 +88,37 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     }
   }
 
-  addSource(content: AudioSource<any, any>, fromPersistentCache: boolean){
+  addSource(content: AudioSource<any, any>, fromPersistentCache: boolean) {
     this._sourceCache.set(content.url, content);
     this.logger.info(`New memory cache added (total: ${this._sourceCache.size})`);
-    if(this.enablePersistent && !fromPersistentCache){
+    if (this.enablePersistent && !fromPersistentCache) {
       this.addPersistentCache(this.createCacheId(content.url, "exportable"), content.exportData()).catch(this.logger.error);
     }
   }
 
-  hasSource(url: string){
-    if(url.includes("?si=")) url = url.split("?")[0];
+  hasSource(url: string) {
+    if (url.includes("?si=")) url = url.split("?")[0];
     const result = this._sourceCache.has(url);
     this.logger.debug(`Requested memory cache ${result ? "" : "not "}found`);
     this.emit(result ? "memoryCacheHit" : "memoryCacheNotFound");
     return result;
   }
 
-  getSource(url: string){
+  getSource(url: string) {
     return this._sourceCache.get(url);
   }
 
-  hasExportable(url: string){
+  hasExportable(url: string) {
     const id = this.createCacheId(url, "exportable");
     const result = this.existPersistentCache(id);
     this.logger.info(`Requested persistent cache ${result ? "" : "not "}found (id: ${id})`);
-    if(!result){
+    if (!result) {
       this.emit("persistentCacheNotFound");
     }
     return result;
   }
 
-  getExportable<T extends AudioSourceBasicJsonFormat>(url: string){
+  getExportable<T extends AudioSourceBasicJsonFormat>(url: string) {
     return this.getPersistentCache(this.createCacheId(url, "exportable"))
       .then(data => {
         this.emit(data ? "persistentCacheHit" : "persistentCacheNotFound");
@@ -127,36 +127,36 @@ export class SourceCache extends LogEmitter<CacheEvents> {
       .catch(() => null) as Promise<T>;
   }
 
-  addSearch(keyword: string, result: ytsr.Video[] | dYtsr.Video[]){
-    if(this.enablePersistent){
+  addSearch(keyword: string, result: ytsr.Video[] | dYtsr.Video[]) {
+    if (this.enablePersistent) {
       this.addPersistentCache(this.createCacheId(keyword.toLowerCase(), "search"), result).catch(this.logger.error);
     }
   }
 
-  hasSearch(keyword: string){
+  hasSearch(keyword: string) {
     const id = this.createCacheId(keyword, "search");
     const result = this.existPersistentCache(id);
     this.logger.info(`Requested persistent cache ${result ? "" : "not "}found (id: ${id})`);
     return result;
   }
 
-  getSearch(keyword: string){
+  getSearch(keyword: string) {
     return this.getPersistentCache(this.createCacheId(keyword, "search")) as Promise<ytsr.Video[]>;
   }
 
-  getMemoryCacheState(){
+  getMemoryCacheState() {
     return {
       totalCount: this._sourceCache.size,
       purgeScheduled: this._expireMap.size,
     };
   }
 
-  purgeMemoryCache(){
+  purgeMemoryCache() {
     this._sourceCache.clear();
     this._expireMap.clear();
   }
 
-  getPersistentCacheSize(){
+  getPersistentCacheSize() {
     return fs.promises.readdir(this.cacheDirPath, { withFileTypes: true })
       .then(files => Promise.allSettled(
         files
@@ -168,7 +168,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
       );
   }
 
-  purgePersistentCache(){
+  purgePersistentCache() {
     return fs.promises.readdir(this.cacheDirPath, { withFileTypes: true })
       .then(files => Promise.allSettled(
         files
@@ -177,8 +177,8 @@ export class SourceCache extends LogEmitter<CacheEvents> {
       ));
   }
 
-  private createCacheId(key: string, type: "exportable" | "search"){
-    if(key.includes("?si=")) key = key.split("?")[0];
+  private createCacheId(key: string, type: "exportable" | "search") {
+    if (key.includes("?si=")) key = key.split("?")[0];
     const id = this.generateHash(`${type}+${key}`);
     this.logger.debug(`type: ${type}, id: ${id}`);
     return id;
@@ -186,7 +186,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
 
   private readonly persistentCacheLocker = new LockObj();
 
-  async addPersistentCache(cacheId: string, data: any){
+  async addPersistentCache(cacheId: string, data: any) {
     return lock(this.persistentCacheLocker, () => new Promise<void>((resolve, reject) => {
       pipeline(
         Readable.from(Buffer.from(JSON.stringify(data))),
@@ -197,9 +197,9 @@ export class SourceCache extends LogEmitter<CacheEvents> {
         }),
         fs.createWriteStream(this.getCachePath(cacheId)),
         er => {
-          if(er){
+          if (er) {
             reject(er);
-          }else{
+          } else {
             this.logger.info(`persistent cache (id: ${cacheId}) stored`);
             resolve(this.cleanupCache());
           }
@@ -220,12 +220,12 @@ export class SourceCache extends LogEmitter<CacheEvents> {
   //   return gzip;
   // }
 
-  existPersistentCache(cacheId: string){
+  existPersistentCache(cacheId: string) {
     return fs.existsSync(this.getCachePath(cacheId));
   }
 
-  async getPersistentCache(cacheId: string){
-    if(!this.existPersistentCache(cacheId)) return null;
+  async getPersistentCache(cacheId: string) {
+    if (!this.existPersistentCache(cacheId)) return null;
     return lock(this.persistentCacheLocker, () => new Promise<any>((resolve, reject) => {
       const bufs: Buffer[] = [];
       fs.createReadStream(this.getCachePath(cacheId))
@@ -244,19 +244,19 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     }));
   }
 
-  private getCachePath(cacheId: string){
+  private getCachePath(cacheId: string) {
     return `${this.cacheDirPath}${cacheId}.bin2`;
   }
 
-  private generateHash(content: string){
+  private generateHash(content: string) {
     return crypto.createHash("md5")
       .update(Buffer.from(content))
       .digest("hex");
   }
 
-  private async cleanupCache(){
-    if(config.cacheLimit > 0){
-      if(Date.now() - this.lastCleanup < 3 * 60 * 60 * 1000) return;
+  private async cleanupCache() {
+    if (config.cacheLimit > 0) {
+      if (Date.now() - this.lastCleanup < 3 * 60 * 60 * 1000) return;
       this.logger.info("Start cleaning up cache files");
       this.lastCleanup = Date.now();
 
@@ -281,15 +281,15 @@ export class SourceCache extends LogEmitter<CacheEvents> {
       const currentTotalSize = files.reduce((prev, current) => prev + current!.size, 0);
       this.logger.info(`Current total cache size: ${getMBytes(currentTotalSize)}MB`);
 
-      if(currentTotalSize > maxSize){
+      if (currentTotalSize > maxSize) {
         this.logger.info("Searching stale caches...");
         const reduceSize = currentTotalSize - maxSize;
         const removePaths: string[] = [];
         let current = 0;
-        for(let i = 0; i < files.length; i++){
+        for (let i = 0; i < files.length; i++) {
           current += files[i]!.size;
           removePaths.push(files[i]!.path);
-          if(current >= reduceSize){
+          if (current >= reduceSize) {
             break;
           }
         }
@@ -298,7 +298,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
 
         await Promise.allSettled(removePaths.map(logPath => fs.promises.unlink(logPath)));
         this.logger.info("Cleaning up completed.");
-      }else{
+      } else {
         this.logger.info("Skip deleting");
       }
     }

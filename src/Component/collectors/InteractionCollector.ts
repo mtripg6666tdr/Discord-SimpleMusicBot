@@ -43,28 +43,28 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
   protected resetTimeoutOnInteraction = false;
   protected message: Message<AnyTextableGuildChannel> | ResponseMessage | null = null;
 
-  getCustomIds(){
+  getCustomIds() {
     return [...this.customIdMap.keys()];
   }
 
-  get collectorId(){
+  get collectorId() {
     return this._collectorId;
   }
 
-  constructor(protected parent: InteractionCollectorManager){
+  constructor(protected parent: InteractionCollectorManager) {
     const collectorId = crypto.randomUUID();
     super("InteractionCollector", collectorId);
     this._collectorId = collectorId;
   }
 
-  setMaxInteraction(count: number){
+  setMaxInteraction(count: number) {
     this.maxReceiveCount = count;
     this.logger.debug(`max interaction count: ${count}`);
     return this;
   }
 
-  setTimeout(timeout: number){
-    if(this.timer){
+  setTimeout(timeout: number) {
+    if (this.timer) {
       clearTimeout(this.timer);
     }
     this.logger.debug(`timeout: ${timeout}`);
@@ -76,13 +76,13 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
     return this;
   }
 
-  setAuthorIdFilter(userId: string | null = null){
+  setAuthorIdFilter(userId: string | null = null) {
     this.userId = userId;
     this.logger.debug(`author filter: ${this.userId}`);
     return this;
   }
 
-  setResetTimeoutOnInteraction(reset: boolean){
+  setResetTimeoutOnInteraction(reset: boolean) {
     this.resetTimeoutOnInteraction = reset;
     return this;
   }
@@ -99,7 +99,7 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
   } {
     const existingComponentIds = [...this.customIdMap.values()];
     const componentIds = Object.keys(componentTypes) as (keyof U)[];
-    if(componentIds.some(id => existingComponentIds.includes(id as string))){
+    if (componentIds.some(id => existingComponentIds.includes(id as string))) {
       throw new Error("Duplicated key");
     }
     const customIds = Array.from({ length: componentIds.length }, () => `collector-${crypto.randomUUID()}`);
@@ -116,44 +116,44 @@ export class InteractionCollector<T extends InteractionCollectorEvents = Interac
     };
   }
 
-  handleInteraction(interaction: ComponentInteraction<any, AnyTextableGuildChannel>){
+  handleInteraction(interaction: ComponentInteraction<any, AnyTextableGuildChannel>) {
     const componentId = this.customIdMap.get(interaction.data.customID);
-    if(!componentId){
+    if (!componentId) {
       this.logger.warn(`unknown custom id: ${interaction.data.customID}`);
       return;
-    }else if(this.userId && interaction.member.id !== this.userId){
+    } else if (this.userId && interaction.member.id !== this.userId) {
       this.logger.warn(`forbidden interaction; ignoring: ${interaction.data.customID}`);
       return;
     }
     this.logger.debug(`id mapped ${interaction.data.customID} => ${componentId}`);
-    if(this.resetTimeoutOnInteraction && this.timeout){
+    if (this.resetTimeoutOnInteraction && this.timeout) {
       this.setTimeout(this.timeout);
     }
     this.emit(componentId as any, interaction);
     this.receivedCount++;
-    if(this.receivedCount >= this.maxReceiveCount){
+    if (this.receivedCount >= this.maxReceiveCount) {
       this.destroy();
     }
   }
 
-  setMessage(message: Message<AnyTextableGuildChannel> | ResponseMessage){
+  setMessage(message: Message<AnyTextableGuildChannel> | ResponseMessage) {
     this.message = message;
     return message;
   }
 
-  destroy(){
-    if(!this.destroyed){
+  destroy() {
+    if (!this.destroyed) {
       this.destroyed = true;
       this.emit("destroy");
       this.logger.debug("destroyed");
     }
-    if(this.message){
+    if (this.message) {
       this.message.edit({
         components: [],
       }).catch(this.logger.error);
       this.message = null;
     }
-    if(this.timer){
+    if (this.timer) {
       clearTimeout(this.timer);
       this.timer = null;
     }

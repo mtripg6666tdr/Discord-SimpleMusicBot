@@ -28,37 +28,37 @@ export class RateLimitController {
    * @param key 新しいイベントの追加先のキー
    * @returns キーにイベントを追加後、レートリミット状態になっていれば true、そうでなければ false
    */
-  pushEvent(key: string){
-    if(!this.store.has(key)){
+  pushEvent(key: string) {
+    if (!this.store.has(key)) {
       this.store.set(key, [Date.now()]);
       return false;
     }
 
     const { isLimited, timeSinceLastEvent, store } = this.judgeRateLimiting(key);
 
-    if(isLimited){
-      if(timeSinceLastEvent < 2 * 1000){
+    if (isLimited) {
+      if (timeSinceLastEvent < 2 * 1000) {
         store.push(Date.now());
       }
       this.logger.info(`Key ${key} hit the ratelimit.`);
       return true;
-    }else{
+    } else {
       store.push(Date.now());
       return false;
     }
   }
 
-  isLimited(key: string){
-    if(!this.store){
+  isLimited(key: string) {
+    if (!this.store) {
       return false;
     }
 
     const { isLimited } = this.judgeRateLimiting(key);
 
-    if(isLimited){
+    if (isLimited) {
       this.logger.info(`Key ${key} hit the ratelimit.`);
       return true;
-    }else{
+    } else {
       return false;
     }
   }
@@ -67,7 +67,7 @@ export class RateLimitController {
     let cnt10sec = 0;
     const now = Date.now();
 
-    if(!this.store.has(key)){
+    if (!this.store.has(key)) {
       const store = [now];
       this.store.set(key, store);
 
@@ -80,7 +80,7 @@ export class RateLimitController {
 
     const currentStore = this.store.get(key)!.filter(dt => {
       const sub = now - dt;
-      if(sub < 10 * 1000) cnt10sec++;
+      if (sub < 10 * 1000) cnt10sec++;
       return sub < 60 * 1000;
     });
     this.store.set(key, currentStore);

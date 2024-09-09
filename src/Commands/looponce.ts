@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class OnceLoop extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["looponce", "onceloop"],
       unlist: false,
@@ -33,10 +33,10 @@ export default class OnceLoop extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    if(context.server.queue.onceLoopEnabled){
+    if (context.server.queue.onceLoopEnabled) {
       context.server.queue.onceLoopEnabled = false;
       message.reply({
         content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:${t("commands:looponce.disabled")}:x:`,
@@ -44,7 +44,7 @@ export default class OnceLoop extends BaseCommand {
           users: false,
         },
       }).catch(this.logger.error);
-    }else{
+    } else {
       context.server.queue.onceLoopEnabled = true;
       message.reply({
         content: `${context.includeMention ? `<@${message.member.id}> ` : ""}:repeat_one:${t("commands:looponce.enabled")}:o:`,

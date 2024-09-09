@@ -47,7 +47,7 @@ type GetPlaylistResult = {
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function Playlist(id: string, options: ytpl.Options & Record<string & {}, any> = {}): Promise<GetPlaylistResult> {
-  if(dYtpl){
+  if (dYtpl) {
     return dYtpl(id, { ...playlistSearchOptions, ...options })
       .then(resolveDYtplToResult)
       .catch(() => {
@@ -58,15 +58,15 @@ export function Playlist(id: string, options: ytpl.Options & Record<string & {},
   return ytpl(id, { ...playlistSearchOptions, ...options }).then(resolveYtplToResult);
 }
 
-Playlist.validateID = function validateID(url: string){
+Playlist.validateID = function validateID(url: string) {
   return ytpl.validateID(url);
 };
 
-Playlist.getPlaylistID = function getPlaylistID(url: string){
+Playlist.getPlaylistID = function getPlaylistID(url: string) {
   return ytpl.getPlaylistID(url);
 };
 
-function resolveYtplToResult(result: ytpl.Result): GetPlaylistResult{
+function resolveYtplToResult(result: ytpl.Result): GetPlaylistResult {
   return {
     title: result.title,
     itemCount: result.estimatedItemCount,
@@ -88,10 +88,10 @@ function resolveYtplToResult(result: ytpl.Result): GetPlaylistResult{
 function resolveDYtplToResult(result: import("@distube/ytpl").result): GetPlaylistResult {
   let thumbnailUrl: string | null = null;
 
-  if("thumbnail" in result){
+  if ("thumbnail" in result) {
     const thumbnail = result.thumbnail as any;
 
-    if(typeof thumbnail?.url === "string"){
+    if (typeof thumbnail?.url === "string") {
       thumbnailUrl = thumbnail.url;
     }
   }

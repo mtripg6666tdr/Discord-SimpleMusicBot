@@ -26,11 +26,11 @@ export async function handleSelectMenuInteraction(
   this: MusicBot,
   server: GuildDataContainer,
   interaction: discord.ComponentInteraction<ComponentTypes.STRING_SELECT>
-){
-  if(!interaction.inCachedGuildChannel()) return;
+) {
+  if (!interaction.inCachedGuildChannel()) return;
   this.logger.info("received selectmenu interaction");
 
-  if(await this.collectors.onInteractionCreate(interaction)){
+  if (await this.collectors.onInteractionCreate(interaction)) {
     return;
   }
 
@@ -38,13 +38,13 @@ export async function handleSelectMenuInteraction(
   const panel = this.guildData.get(interaction.channel.guild.id)?.searchPanel.get(interaction.member.id);
 
   // なければ返却
-  if(!panel) return;
+  if (!panel) return;
   await interaction.deferUpdate();
 
-  if(interaction.data.customID === "search"){
-    if(interaction.data.values.getStrings().includes("cancel")){
+  if (interaction.data.customID === "search") {
+    if (interaction.data.values.getStrings().includes("cancel")) {
       await panel.destroy();
-    }else{
+    } else {
       await server.playFromSearchPanelOptions(interaction.data.values.getStrings(), panel);
     }
   }

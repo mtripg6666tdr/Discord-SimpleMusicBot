@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class Rmall extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["removeall", "rmall", "allrm", "allremove", "clear"],
       unlist: false,
@@ -33,7 +33,7 @@ export default class Rmall extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     await context.server.player.disconnect().catch(this.logger.error);

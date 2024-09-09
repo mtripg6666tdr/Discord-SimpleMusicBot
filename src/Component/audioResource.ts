@@ -53,11 +53,11 @@ export class FixedAudioResource extends NullMetaAudioResource {
   private timedout = false;
   protected _volume: VolumeTransformer | null = null;
 
-  get volumeTransformer(){
+  get volumeTransformer() {
     return this._volume;
   }
 
-  constructor(...args: ConstructorParameters<typeof NullMetaAudioResource>){
+  constructor(...args: ConstructorParameters<typeof NullMetaAudioResource>) {
     super(...args);
     this.logger.info("instantiated");
     this.events = new TypedEventEmitter({
@@ -75,19 +75,19 @@ export class FixedAudioResource extends NullMetaAudioResource {
       });
   }
 
-  private get isStreamReadable(){
+  private get isStreamReadable() {
     const res = this.playStream.readable || !(this.playStream.readableEnded || this.playStream.destroyed || this.error || this.timedout);
-    if(!res){
+    if (!res) {
       this.logger.trace(`Stream seems to finished / readable=${this.playStream.readable}, readableEnded=${this.playStream.readableEnded}, destroyed=${this.playStream.destroyed}, error=${this.error}, timedout=${this.timedout}`);
     }
     return res;
   }
 
-  public override get readable(){
-    if(this.silenceRemaining === 0) return false;
+  public override get readable() {
+    if (this.silenceRemaining === 0) return false;
     const real = this.isStreamReadable;
-    if(!real){
-      if(this.silenceRemaining === -1){
+    if (!real) {
+      if (this.silenceRemaining === -1) {
         this.logger.trace("Silence padding is enabled.");
         this.silenceRemaining = this.silencePaddingFrames;
       }
@@ -97,46 +97,46 @@ export class FixedAudioResource extends NullMetaAudioResource {
     return real;
   }
 
-  public override get ended(){
+  public override get ended() {
     return !this.isStreamReadable && this.silenceRemaining === 0;
   }
 
-  public override read(): Buffer | null{
-    if(this.silenceRemaining === 0){
+  public override read(): Buffer | null {
+    if (this.silenceRemaining === 0) {
       this.logger.trace("Silence padding frame consumed.");
       return null;
-    }else if(this.silenceRemaining > 0){
+    } else if (this.silenceRemaining > 0) {
       this.silenceRemaining--;
       this.logger.trace(`Silence padding frame consumed. Remaining: ${this.silenceRemaining}`);
       return SILENCE_FRAME;
     }
 
-    if(this.playStream.readable){
-      if(this.dataUnreadableAt !== -1){
+    if (this.playStream.readable) {
+      if (this.dataUnreadableAt !== -1) {
         this.logger.trace("Stream is now readable");
         this.dataUnreadableAt = -1;
       }
-    }else if(this.dataUnreadableAt === -1){
+    } else if (this.dataUnreadableAt === -1) {
       this.logger.trace("Stream becomes unreadable");
       this.dataUnreadableAt = Date.now();
       return SILENCE_FRAME;
-    }else if(this.dataUnreadableAt - Date.now() >= TIMEOUT){
+    } else if (this.dataUnreadableAt - Date.now() >= TIMEOUT) {
       this.logger.trace("Stream timed out");
       this.timedout = true;
-    }else{
+    } else {
       this.logger.trace("Stream is not readable; sending silence frame");
       return SILENCE_FRAME;
     }
 
-    if(this.timedout){
+    if (this.timedout) {
       return null;
     }
 
     const packet: Buffer | null = this.playStream.read();
-    if(packet){
+    if (packet) {
       this.playbackDuration += 20;
       this.readLength += packet.length || 0;
-    }else if(this.playStream.readable){
+    } else if (this.playStream.readable) {
       this.logger.trace("Stream is readable but no packet received. Sending silence frame.");
       return SILENCE_FRAME;
     }
@@ -144,7 +144,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
     return packet;
   }
 
-  static fromAudioResource(resource: voice.AudioResource, estimatedLengthSeconds: number){
+  static fromAudioResource(resource: voice.AudioResource, estimatedLengthSeconds: number) {
     const _this = new this(resource.edges, [resource.playStream], null, resource.silencePaddingFrames);
     _this.estimatedLengthSeconds = estimatedLengthSeconds;
     _this._volume = resource.volume || null;

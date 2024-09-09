@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class End extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["end"],
       unlist: false,
@@ -33,14 +33,14 @@ export default class End extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    if(!context.server.player.isPlaying){
+    if (!context.server.player.isPlaying) {
       message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }
-    if(context.server.queue.length <= 1){
+    if (context.server.queue.length <= 1) {
       message.reply(t("commands:end.queueWasEmpty")).catch(this.logger.error);
       return;
     }

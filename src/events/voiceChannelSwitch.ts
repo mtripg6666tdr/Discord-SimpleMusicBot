@@ -26,16 +26,16 @@ export async function onVoiceChannelSwitch(
   member: discord.Member,
   newChannel: discord.VoiceChannel | discord.StageChannel | discord.Uncached,
   oldChannel: discord.VoiceChannel | discord.StageChannel | discord.Uncached
-){
-  if(!("guild" in newChannel)) return;
+) {
+  if (!("guild" in newChannel)) return;
 
   onVoiceChannelJoin.call(this, member, newChannel).catch(this.logger.error);
 
-  if(member.id === this.client.user.id){
-    if(this.guildData.has(member.guild.id)){
+  if (member.id === this.client.user.id) {
+    if (this.guildData.has(member.guild.id)) {
       this.getData(member.guild.id)!.connectingVoiceChannel = member.voiceState!.channel!;
     }
-  }else{
+  } else {
     onVoiceChannelLeave.call(this, member, oldChannel).catch(this.logger.error);
   }
 }

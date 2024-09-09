@@ -23,7 +23,7 @@ import { BaseCommand } from ".";
 import { YmxVersion } from "../Structure";
 
 export default class Export extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["export"],
       unlist: false,
@@ -34,10 +34,10 @@ export default class Export extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    if(context.server.queue.publicLength === 0){
+    if (context.server.queue.publicLength === 0) {
       message.reply(t("commands:export.queueEmpty")).catch(this.logger.error);
       return;
     }

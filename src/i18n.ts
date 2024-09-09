@@ -69,14 +69,14 @@ const lngsInLocalesDirectory = fs.readdirSync(localesRoot, { withFileTypes: true
   .filter(d => d.isDirectory())
   .flatMap(d => d.name);
 const supportedDiscordLocales = discordLanguages.filter(lang => {
-  if(lang.includes("-")){
+  if (lang.includes("-")) {
     return lngsInLocalesDirectory.includes(lang);
-  }else{
+  } else {
     return lngsInLocalesDirectory.some(directoryLang => directoryLang.split("-")[0] === lang);
   }
 });
 
-export function initLocalization(debug: boolean, lang: string){
+export function initLocalization(debug: boolean, lang: string) {
   return i18next
     .use(Backend)
     .init({
@@ -86,9 +86,9 @@ export function initLocalization(debug: boolean, lang: string){
       supportedLngs: lngsInLocalesDirectory.flatMap(dirLang => dirLang.includes("-") ? [dirLang.split("-")[0], dirLang] : [dirLang]),
       preload: lngsInLocalesDirectory,
       fallbackLng: originalLanguage => {
-        if(typeof originalLanguage === "string"){
+        if (typeof originalLanguage === "string") {
           return [...lngsInLocalesDirectory.filter(dirLang => dirLang.includes(originalLanguage.split("-")[0])), lang];
-        }else{
+        } else {
           return [lang];
         }
       },
@@ -107,6 +107,6 @@ export function initLocalization(debug: boolean, lang: string){
     });
 }
 
-export function availableLanguages(){
+export function availableLanguages() {
   return supportedDiscordLocales;
 }

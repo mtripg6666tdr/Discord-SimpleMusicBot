@@ -27,7 +27,7 @@ import { LogEmitter } from ".";
 export abstract class ServerManagerBase<T extends EventDictionary> extends LogEmitter<T> {
   protected server: GuildDataContainer;
 
-  constructor(tag: string, parent: GuildDataContainer){
+  constructor(tag: string, parent: GuildDataContainer) {
     super(tag, parent.getGuildId());
     this.logger.info("Set data of guild id " + parent.getGuildId());
     this.server = parent;

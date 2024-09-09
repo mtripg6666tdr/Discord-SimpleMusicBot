@@ -31,7 +31,7 @@ type nightlyYoutubeDl = "ytDlNightlyYoutubeDl";
 const nightlyYoutubeDl: nightlyYoutubeDl = "ytDlNightlyYoutubeDl";
 
 export class NightlyYoutubeDl extends baseYoutubeDlStrategy<nightlyYoutubeDl> {
-  constructor(priority: number){
+  constructor(priority: number) {
     super(priority, nightlyYoutubeDl, ytDlNightlyBinaryManager);
   }
 

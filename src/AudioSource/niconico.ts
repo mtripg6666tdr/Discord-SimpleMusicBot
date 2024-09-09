@@ -30,23 +30,23 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
   protected author = "";
   protected views = 0;
 
-  constructor(){
+  constructor() {
     super({ isSeekable: false });
   }
 
-  async init(url: string, prefetched: NiconicoJsonFormat){
+  async init(url: string, prefetched: NiconicoJsonFormat) {
     this.url = url;
 
     this.nicoTemp = new NiconicoDL(url);
 
-    if(prefetched){
+    if (prefetched) {
       this.title = prefetched.title;
       this.description = htmlToText(prefetched.description);
       this.lengthSeconds = prefetched.length;
       this.author = prefetched.author;
       this.thumbnail = prefetched.thumbnail;
       this.views = prefetched.views;
-    }else{
+    } else {
       const info = await this.nicoTemp.getInfo();
       this.title = info.data.response.video.title;
       this.description = htmlToText(info.data.response.video.description);
@@ -58,8 +58,8 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
     return this;
   }
 
-  async fetch(): Promise<StreamInfo>{
-    if(!this.nicoTemp){
+  async fetch(): Promise<StreamInfo> {
+    if (!this.nicoTemp) {
       throw new Error("The audio source is not initialized.");
     }
 
@@ -72,7 +72,7 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
     };
   }
 
-  toField(verbose: boolean){
+  toField(verbose: boolean) {
     const { t } = getCommandExecutionContext();
 
     return [
@@ -96,13 +96,13 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
     ];
   }
 
-  npAdditional(){
+  npAdditional() {
     const { t } = getCommandExecutionContext();
 
     return `${t("audioSources.videoAuthor")}: ` + this.author;
   }
 
-  exportData(): NiconicoJsonFormat{
+  exportData(): NiconicoJsonFormat {
     return {
       url: this.url,
       length: this.lengthSeconds,
@@ -114,7 +114,7 @@ export class NicoNicoS extends AudioSource<string, NiconicoJsonFormat> {
     };
   }
 
-  static validateUrl(url: string){
+  static validateUrl(url: string) {
     return NiconicoDL.isWatchUrl(url);
   }
 }
@@ -134,28 +134,28 @@ class NiconicoDL {
 
   private _info: NiconicoMeta | null = null;
 
-  constructor(url: string){
-    if(!NiconicoDL.isWatchUrl(url)){
+  constructor(url: string) {
+    if (!NiconicoDL.isWatchUrl(url)) {
       throw new Error("The requested url is invalid.");
     }
 
     this._videoId = niconicoTempWatchUrlRegex.exec(url)!.groups!["id"]!;
   }
 
-  static isWatchUrl(url: string){
+  static isWatchUrl(url: string) {
     return niconicoTempWatchUrlRegex.test(url);
   }
 
   async getInfo(): Promise<NiconicoMeta> {
     const { statusCode, body } = await candyget.string(`https://www.nicovideo.jp/watch/${this._videoId}`);
-    if(statusCode < 200 || 300 <= statusCode){
+    if (statusCode < 200 || 300 <= statusCode) {
       throw new Error("Failed to fetch audio information.");
     }
 
     const root = parse(body);
     const content = root.querySelector("meta[name=server-response]")?.getAttribute("content");
 
-    if(!content){
+    if (!content) {
       throw new Error("Failed to fetch audio information.");
     }
 
@@ -168,7 +168,7 @@ class NiconicoDL {
     const hlsInfoUrl = `https://nvapi.nicovideo.jp/v1/watch/${this._videoId}/access-rights/hls?actionTrackId=${info.data.response.client.watchTrackId}`;
     const audioDomandId = [...info.data.response.media.domand.audios].sort((a, b) => b.bitRate - a.bitRate)[0]?.id;
 
-    if(!audioDomandId){
+    if (!audioDomandId) {
       throw new Error("Failed to detect audio stream.");
     }
 
@@ -187,7 +187,7 @@ class NiconicoDL {
       },
     });
 
-    if(statusCode < 200 || 300 <= statusCode){
+    if (statusCode < 200 || 300 <= statusCode) {
       throw new Error("Failed to fetch stream information.");
     }
 

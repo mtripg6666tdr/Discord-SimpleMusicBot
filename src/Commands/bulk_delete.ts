@@ -26,7 +26,7 @@ import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oc
 import { BaseCommand } from ".";
 
 export default class BulkDelete extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["bulk_delete", "bulk-delete", "bulkdelete"],
       unlist: false,
@@ -44,27 +44,27 @@ export default class BulkDelete extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     const count = Number(context.args[0]);
-    if(isNaN(count)){
+    if (isNaN(count)) {
       message.reply(`:warning:${t("commands:bulk_delete.invalidMessageCount")}`).catch(this.logger.error);
       return;
     }
     const reply = await message.reply(`${t("commands:bulk_delete.loading")}...`).catch(this.logger.error) as ResponseMessage;
-    try{
+    try {
       // collect messages
       let before = "";
       const messages = [] as Message[];
       let i = 0;
-      do{
+      do {
         const allMsgs: Message<AnyTextableGuildChannel>[] = await message.channel.getMessages(
           before
             ? { limit: 100, before }
             : { limit: 100 }
         );
-        if(allMsgs.length === 0) break;
+        if (allMsgs.length === 0) break;
         const msgs = allMsgs.filter(_msg => _msg.author.id === context.client.user.id && _msg.id !== reply.id);
         msgs.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
         messages.push(...msgs);
@@ -76,8 +76,8 @@ export default class BulkDelete extends BaseCommand {
           }/${
             t("commands:bulk_delete.inCount", { count: i * 100 })
           })...`);
-      } while(messages.length < count && i <= 10);
-      if(messages.length > count) messages.splice(count);
+      } while (messages.length < count && i <= 10);
+      if (messages.length > count) messages.splice(count);
 
       const { collector, customIdMap } = context.bot.collectors
         .create()
@@ -122,9 +122,9 @@ export default class BulkDelete extends BaseCommand {
         }).catch(this.logger.error);
       });
     }
-    catch(er){
+    catch (er) {
       this.logger.error(er);
-      if(reply){
+      if (reply) {
         await reply.edit(t("failed")).catch(this.logger.error);
       }
     }

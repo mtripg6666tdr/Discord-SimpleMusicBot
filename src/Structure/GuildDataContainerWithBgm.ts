@@ -27,29 +27,29 @@ import { QueueManagerWithBgm } from "../Component/queueManagerWithBGM";
 
 export class GuildDataContainerWithBgm extends GuildDataContainer {
   protected override _queue: QueueManagerWithBgm;
-  override get queue(){
+  override get queue() {
     return this._queue;
   }
 
   protected override _player: PlayManagerWithBgm;
-  override get player(){
+  override get player() {
     return this._player;
   }
 
   protected _bgmConfig: GuildBGMContainerType;
-  get bgmConfig(): Readonly<GuildBGMContainerType>{
+  get bgmConfig(): Readonly<GuildBGMContainerType> {
     return this._bgmConfig;
   }
 
-  protected override initPlayManager(){
+  protected override initPlayManager() {
     this._player = new PlayManagerWithBgm(this);
   }
 
-  protected override initQueueManager(){
+  protected override initQueueManager() {
     this._queue = new QueueManagerWithBgm(this);
   }
 
-  constructor(guildid: string, boundchannelid: string, bot: MusicBotBase, bgmConfig: GuildBGMContainerType){
+  constructor(guildid: string, boundchannelid: string, bot: MusicBotBase, bgmConfig: GuildBGMContainerType) {
     super(guildid, boundchannelid, bot);
     this._bgmConfig = bgmConfig;
   }
@@ -57,10 +57,10 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
   /**
    * BGM設定が存在する場合に、BGM設定を完了します
    */
-  async initBgmTracks(){
-    if(this.bgmConfig){
+  async initBgmTracks() {
+    if (this.bgmConfig) {
       const { items } = this.bgmConfig;
-      for(let i = 0; i < items.length; i++){
+      for (let i = 0; i < items.length; i++) {
         await this.queue.addQueueOnly({
           url: items[i],
           addedBy: {
@@ -80,9 +80,9 @@ export class GuildDataContainerWithBgm extends GuildDataContainer {
     }
   }
 
-  playBgmTracks(){
-    if(!this.bgmConfig) throw new Error("no bgm configuration found!");
-    if(!this.bgmConfig.enableQueueLoop){
+  playBgmTracks() {
+    if (!this.bgmConfig) throw new Error("no bgm configuration found!");
+    if (!this.bgmConfig.enableQueueLoop) {
       this.queue.resetBgmTracks();
     }
     return this.joinVoiceChannelOnly(this.bgmConfig.voiceChannelId)

@@ -29,7 +29,7 @@ import { DefaultAudioThumbnailURL } from "../definition";
 const config = getConfig();
 
 export default class News extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["news"],
       unlist: false,
@@ -40,13 +40,13 @@ export default class News extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     context.server.joinVoiceChannel(message, {}).catch(this.logger.error);
     // change news according to locale
     let url: string = null!;
-    switch(context.locale){
+    switch (context.locale) {
       case "en-US":
         url = Buffer.from(
           "aHR0cHM6Ly93d3cueW91dHViZS5jb20vcGxheWxpc3Q/bGlzdD1QTDNaUTVDcE51bFFsZE9MM1Q4ZzhrMW1nV1d5c0pmRTl3",
@@ -83,7 +83,7 @@ export default class News extends BaseCommand {
           "base64"
         ).toString();
     }
-    if(context.server.searchPanel.has(message.member.id)){
+    if (context.server.searchPanel.has(message.member.id)) {
       const { collector, customIdMap } = context.bot.collectors
         .create()
         .setAuthorIdFilter(message.member.id)
@@ -106,10 +106,10 @@ export default class News extends BaseCommand {
         ],
       }).catch(this.logger.error);
 
-      if(responseMessage){
+      if (responseMessage) {
         const panel = context.server.searchPanel.get(message.member.id);
 
-        if(!panel) return;
+        if (!panel) return;
 
         collector.on("cancelSearch", interaction => {
           panel.destroy({ quiet: true }).catch(this.logger.error);
@@ -124,7 +124,7 @@ export default class News extends BaseCommand {
       return;
     }
     const searchPanel = context.server.searchPanel.create(message, t("commands:news.newsTopics"), true);
-    if(!searchPanel) return;
+    if (!searchPanel) return;
     await searchPanel.consumeSearchResult(
       Playlist(url, {
         gl: config.country,

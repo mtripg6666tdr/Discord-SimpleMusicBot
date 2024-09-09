@@ -76,7 +76,7 @@ export type ExportedAudioEffect = {
 };
 
 export class AudioEffectManager extends ServerManagerBase<EffectManagerEvents> {
-  constructor(parent: GuildDataContainer){
+  constructor(parent: GuildDataContainer) {
     super("EffectManager", parent);
   }
 
@@ -84,19 +84,19 @@ export class AudioEffectManager extends ServerManagerBase<EffectManagerEvents> {
     audioEffectNames.map(name => [name, false])
   ) as Record<AudioEffectNames, boolean>;
 
-  toggle(effectName: AudioEffectNames){
+  toggle(effectName: AudioEffectNames) {
     return this.data[effectName] = !this.data[effectName];
   }
 
-  getEnabled(effectName: AudioEffectNames){
+  getEnabled(effectName: AudioEffectNames) {
     return this.data[effectName];
   }
 
-  export(): ExportedAudioEffect{
+  export(): ExportedAudioEffect {
     const effectArgs: string[] = [];
     let shouldDisableVbr = false;
-    for(const effectName of audioEffectNames){
-      if(this.data[effectName]){
+    for (const effectName of audioEffectNames) {
+      if (this.data[effectName]) {
         const { arg, shouldDisableVbr: _shouldDisableVbr } = audioEffects[effectName];
         effectArgs.push(arg);
         shouldDisableVbr = shouldDisableVbr || _shouldDisableVbr;
@@ -108,7 +108,7 @@ export class AudioEffectManager extends ServerManagerBase<EffectManagerEvents> {
     return { args, shouldDisableVbr };
   }
 
-  createEmbed(avatarUrl: string){
+  createEmbed(avatarUrl: string) {
     const { t } = getCommandExecutionContext();
 
     const embed = new MessageEmbedBuilder()
@@ -117,7 +117,7 @@ export class AudioEffectManager extends ServerManagerBase<EffectManagerEvents> {
       .setColor(getColor("EFFECT"))
       .setFooter({ iconURL: avatarUrl, text: t("commands:effect.effectControllPanel.footer") });
 
-    for(const effectName of audioEffectNames){
+    for (const effectName of audioEffectNames) {
       const effect = audioEffects[effectName];
       embed.addField(effect.name, this.data[effectName] ? "⭕" : "❌", true);
     }
@@ -125,9 +125,9 @@ export class AudioEffectManager extends ServerManagerBase<EffectManagerEvents> {
     return embed.toOceanic();
   }
 
-  createMessageButtons(customIdMap: Record<AudioEffectNames, string>){
+  createMessageButtons(customIdMap: Record<AudioEffectNames, string>) {
     const buttons: MessageButtonBuilder[] = [];
-    for(const effectName of audioEffectNames){
+    for (const effectName of audioEffectNames) {
       const effect = audioEffects[effectName];
       buttons.push(
         new MessageButtonBuilder()

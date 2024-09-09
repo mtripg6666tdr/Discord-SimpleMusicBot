@@ -28,17 +28,17 @@ import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 import { discordUtil } from "../Util";
 
-export async function handleCommandInteraction(this: MusicBot, server: GuildDataContainer, interaction: discord.CommandInteraction){
+export async function handleCommandInteraction(this: MusicBot, server: GuildDataContainer, interaction: discord.CommandInteraction) {
   this.logger.info("received command interaction");
-  if(!interaction.inCachedGuildChannel()) return;
+  if (!interaction.inCachedGuildChannel()) return;
 
-  if(
+  if (
     interaction.channel.type !== discord.ChannelTypes.GUILD_TEXT
     && interaction.channel.type !== discord.ChannelTypes.PRIVATE_THREAD
     && interaction.channel.type !== discord.ChannelTypes.PUBLIC_THREAD
     && interaction.channel.type !== discord.ChannelTypes.GUILD_STAGE_VOICE
     && interaction.channel.type !== discord.ChannelTypes.GUILD_VOICE
-  ){
+  ) {
     await interaction.createMessage({
       content: i18next.t("invalidChannel", { lng: interaction.locale }),
     });
@@ -46,7 +46,7 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
   }
 
   // 送信可能か確認
-  if(!discordUtil.channels.checkSendable(interaction.channel, this._client.user.id)){
+  if (!discordUtil.channels.checkSendable(interaction.channel, this._client.user.id)) {
     await interaction.createMessage({
       content: `:warning:${i18next.t("lackPermissions", { lng: interaction.locale })}`,
     });
@@ -57,14 +57,14 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
   const commandMessage = CommandMessage.createFromInteraction(interaction);
   // コマンドを解決
   const command = CommandManager.instance.resolve(commandMessage.command);
-  if(!command){
+  if (!command) {
     await interaction.createMessage({
       content: `${i18next.t("commandNotFound", { lng: interaction.locale })}:sob:`,
     });
     return;
   }
 
-  if(shouldIgnoreInteractionByBgmConfig(server, command)){
+  if (shouldIgnoreInteractionByBgmConfig(server, command)) {
     // BGM設定上コマンドが使えない場合、無視して返却
     return;
   }
@@ -83,7 +83,7 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
   );
 }
 
-function shouldIgnoreInteractionByBgmConfig(server: GuildDataContainer, command: BaseCommand){
+function shouldIgnoreInteractionByBgmConfig(server: GuildDataContainer, command: BaseCommand) {
   // BGM構成が存在するサーバー
   return server instanceof GuildDataContainerWithBgm
     && (

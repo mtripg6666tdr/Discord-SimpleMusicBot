@@ -58,92 +58,92 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
-  async handleModalSubmitInteraction(interaction: ModalSubmitInteraction<AnyTextableGuildChannel>, server: GuildDataContainer){
+  async handleModalSubmitInteraction(interaction: ModalSubmitInteraction<AnyTextableGuildChannel>, server: GuildDataContainer) {
   }
 
   protected readonly _name: string;
-  public get name(){
+  public get name() {
     return this._name;
   }
 
   protected readonly _alias: Readonly<string[]>;
-  public get alias(){
+  public get alias() {
     return this._alias;
   }
 
   protected readonly _description: string;
-  public get description(){
+  public get description() {
     return this._description;
   }
 
   protected readonly _unlist: boolean;
-  public get unlist(){
+  public get unlist() {
     return this._unlist;
   }
 
   protected readonly _examples: LocaleMap | null;
-  public get examples(){
+  public get examples() {
     return this._examples;
   }
 
   protected readonly _usage: LocaleMap | null;
-  public get usage(){
+  public get usage() {
     return this._usage;
   }
 
   protected readonly _category: string;
-  public get category(){
+  public get category() {
     return this._category;
   }
 
   protected readonly _shouldDefer: boolean = false;
-  public get shouldDefer(){
+  public get shouldDefer() {
     return this._shouldDefer;
   }
 
   protected readonly _argument: Readonly<LocalizedSlashCommandArgument[]> | null;
-  public get argument(){
+  public get argument() {
     return this._argument;
   }
 
   protected readonly _requiredPermissionsOr: CommandPermission[];
-  public get requiredPermissionsOr(){
+  public get requiredPermissionsOr() {
     return this._requiredPermissionsOr || [];
   }
 
   protected readonly _descriptionLocalization: LocaleMap;
-  get descriptionLocalization(){
+  get descriptionLocalization() {
     return this._descriptionLocalization;
   }
 
   protected readonly _disabled: boolean = false;
-  get disabled(){
+  get disabled() {
     return this._disabled;
   }
 
   protected readonly _messageCommand: boolean = false;
-  get messageCommand(){
+  get messageCommand() {
     return this._messageCommand;
   }
 
   protected readonly _interactionOnly: boolean = false;
-  get interactionOnly(){
+  get interactionOnly() {
     return this._interactionOnly;
   }
 
   protected readonly _defaultMemberPermission: PermissionName[] | "NONE" = "NONE";
-  get defaultMemberPermission(){
+  get defaultMemberPermission() {
     return this._defaultMemberPermission;
   }
 
   /** スラッシュコマンドの名称として登録できる旧基準を満たしたコマンド名を取得します */
-  get asciiName(){
+  get asciiName() {
     return this.alias.filter(c => c.match(/^[>\w-]{2,32}$/))[0];
   }
 
   protected readonly logger: LoggerObject;
 
-  constructor(opts: ListCommandInitializeOptions | UnlistCommandOptions){
+  constructor(opts: ListCommandInitializeOptions | UnlistCommandOptions) {
     super();
     this._messageCommand = "messageCommand" in opts && opts.messageCommand || false;
     this._interactionOnly = "interactionOnly" in opts && opts.interactionOnly || false;
@@ -156,8 +156,8 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     this._unlist = opts.unlist;
     this._shouldDefer = opts.shouldDefer;
     this._disabled = opts.disabled || false;
-    if(!this._unlist){
-      if(!this.asciiName){
+    if (!this._unlist) {
+      if (!this.asciiName) {
         throw new Error("Command has not ascii name");
       }
 
@@ -173,14 +173,14 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       this._description = i18next.t(`commands:${this.asciiName}.description` as any);
       this._descriptionLocalization = {};
       availableLanguages().forEach(language => {
-        if(i18next.language === language) return;
+        if (i18next.language === language) return;
         const localized: string = i18next.t(`commands:${this.asciiName}.description` as any, { lng: language }).substring(0, 100);
-        if(localized === this._description) return;
+        if (localized === this._description) return;
         this._descriptionLocalization[language as keyof typeof this._descriptionLocalization] = localized.trim();
       });
 
       this._examples = examples ? {} : null;
-      if(this._examples){
+      if (this._examples) {
         availableLanguages().forEach(language => {
           this._examples![language as keyof typeof this._examples]
             = i18next.t(`commands:${this.asciiName}.examples` as any, { lng: language }).trim();
@@ -188,7 +188,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       }
 
       this._usage = usage ? {} : null;
-      if(this._usage){
+      if (this._usage) {
         availableLanguages().forEach(language => {
           this._usage![language as keyof typeof this._usage]
             = i18next.t(`commands:${this.asciiName}.usage` as any, { lng: language }).trim();
@@ -208,10 +208,10 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           autoCompleteEnabled: arg.autoCompleteEnabled || false,
         };
         availableLanguages().forEach(language => {
-          if(i18next.language === language) return;
+          if (i18next.language === language) return;
           const localized: string = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any, { lng: language })
             .substring(0, 100);
-          if(localized === result.description) return;
+          if (localized === result.description) return;
           result.descriptionLocalization[language as keyof typeof result.descriptionLocalization] = localized.trim();
         });
 
@@ -222,15 +222,15 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
             nameLocalizations: {} as LocaleMap,
           };
           availableLanguages().forEach(language => {
-            if(i18next.language === language) return;
+            if (i18next.language === language) return;
             const localized = i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}` as any, { lng: language });
-            if(localized === resultChoice.name) return;
+            if (localized === resultChoice.name) return;
             resultChoice.nameLocalizations[language as keyof LocaleMap] = localized.trim();
           });
           result.choices!.push(resultChoice);
         });
 
-        if(result.choices!.length === 0){
+        if (result.choices!.length === 0) {
           delete result.choices;
         }
 
@@ -245,29 +245,29 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   }
 
   /**ローカライズされた権限の説明を取得します */
-  getLocalizedPermissionDescription(locale: string){
+  getLocalizedPermissionDescription(locale: string) {
     const perms = this.requiredPermissionsOr.filter(perm => perm !== "admin");
-    if(perms.length === 0){
+    if (perms.length === 0) {
       return i18next.t("none", { lng: locale });
-    }else if(perms.length > 1){
+    } else if (perms.length > 1) {
       return i18next.t("permissions.eitherOf", {
         lng: locale,
         things: perms.map(permission => i18next.t(`permissions.${permission}`, { lng: locale })).join(", "),
       });
-    }else{
+    } else {
       return i18next.t(`permissions.${perms[0]}`, { lng: locale });
     }
   }
 
   /** ローカライズされたコマンドの説明を取得します */
-  getLocalizedDescription(locale: string){
+  getLocalizedDescription(locale: string) {
     return i18next.t(`commands:${this.asciiName}.description` as any, { lng: locale });
   }
 
   /** 権限の確認と実行を一括して行います */
-  async checkAndRun(message: CommandMessage, context: Readonly<CommandArgs>){
+  async checkAndRun(message: CommandMessage, context: Readonly<CommandArgs>) {
     const judgeIfPermissionMeeted: ((perm: CommandPermission) => boolean) = (perm: CommandPermission) => {
-      switch(perm){
+      switch (perm) {
         case "admin":
           return discordUtil.users.isPrivileged(message.member);
         case "dj":
@@ -284,7 +284,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           return discordUtil.channels.sameVC(message.member, context);
         case "onlyBotInVc": {
           const member = discordUtil.channels.getVoiceMember(context);
-          if(!member){
+          if (!member) {
             return false;
           }
           return member.filter(m => !m.bot).length === 0;
@@ -293,7 +293,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
           return false;
       }
     };
-    if(this.requiredPermissionsOr.length !== 0 && !this.requiredPermissionsOr.some(judgeIfPermissionMeeted)){
+    if (this.requiredPermissionsOr.length !== 0 && !this.requiredPermissionsOr.some(judgeIfPermissionMeeted)) {
       await message.reply({
         content: `${context.includeMention ? `<@${message.member.id}> ` : ""}${i18next.t("permissions.needed", {
           permissions: this.getLocalizedPermissionDescription(context.locale),
@@ -308,10 +308,10 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     }
 
     // 遅延処理するべき時には遅延させる
-    if(this.shouldDefer && message["_interaction"] && !message["_interaction"].acknowledged){
-      if(message["_interaction"].type === InteractionTypes.APPLICATION_COMMAND){
+    if (this.shouldDefer && message["_interaction"] && !message["_interaction"].acknowledged) {
+      if (message["_interaction"].type === InteractionTypes.APPLICATION_COMMAND) {
         await message["_interaction"].defer();
-      }else if(message["_interaction"].type === InteractionTypes.MESSAGE_COMPONENT){
+      } else if (message["_interaction"].type === InteractionTypes.MESSAGE_COMPONENT) {
         await message["_interaction"].deferUpdate();
       }
     }
@@ -323,7 +323,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
   /** アプリケーションコマンドとして登録できるオブジェクトを生成します */
   toApplicationCommandStructure(): CreateApplicationCommandOptions[] {
-    if(this.unlist){
+    if (this.unlist) {
       throw new Error("This command cannot be listed due to private command!");
     }
 
@@ -351,16 +351,16 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         autocomplete: arg.autoCompleteEnabled || false,
       } as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean;
 
-      if("choices" in discordCommandStruct){
+      if ("choices" in discordCommandStruct) {
         delete discordCommandStruct.autocomplete;
-      }else if("autocomplete" in discordCommandStruct){
+      } else if ("autocomplete" in discordCommandStruct) {
         delete discordCommandStruct.choices;
       }
 
       return discordCommandStruct;
     });
 
-    if(options && options.length > 0){
+    if (options && options.length > 0) {
       result.push({
         type: ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
@@ -372,7 +372,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         options,
         defaultMemberPermissions,
       });
-    }else{
+    } else {
       result.push({
         type: ApplicationCommandTypes.CHAT_INPUT,
         name: this.asciiName,
@@ -385,7 +385,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
       });
     }
 
-    if(this.messageCommand){
+    if (this.messageCommand) {
       const messageCommand = {
         type: ApplicationCommandTypes.MESSAGE as const,
         name: this.asciiName,
@@ -404,7 +404,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
   static updateBoundChannel = function updateBoundChannel<This extends BaseCommand, Return>(
     originalMethod: (this: This, ...args: Parameters<BaseCommand["run"]>) => Return,
     _context: ClassMethodDecoratorContext<This, (this: This, ...args: Parameters<BaseCommand["run"]>) => Return>,
-  ){
+  ) {
     return function replacementMethodUpdateBoundChannel(this: This, ...args: Parameters<BaseCommand["run"]>): Return {
       args[1].server.updateBoundChannel(args[0]);
 

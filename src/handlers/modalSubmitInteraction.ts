@@ -26,8 +26,8 @@ export async function handleModalSubmitInteraction(
   this: MusicBot,
   server: GuildDataContainer,
   interaction: discord.ModalSubmitInteraction,
-){
-  if(!interaction.inCachedGuildChannel()) return;
+) {
+  if (!interaction.inCachedGuildChannel()) return;
   this.logger.info("received modalsubmit interaction");
 
   const targetCommand = CommandManager.instance.resolve(interaction.data.customID);

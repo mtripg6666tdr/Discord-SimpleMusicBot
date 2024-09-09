@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class Mv extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["move", "mv"],
       unlist: false,
@@ -47,13 +47,13 @@ export default class Mv extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    if(context.args.length !== 2){
+    if (context.args.length !== 2) {
       message.reply(`✘${t("commands:move.invalidArgumentCount")}`).catch(this.logger.error);
       return;
-    }else if(context.args.includes("0") && context.server.player.isPlaying){
+    } else if (context.args.includes("0") && context.server.player.isPlaying) {
       message.reply(`✘${t("commands:move.invalidIndex")}`).catch(this.logger.error);
       return;
     }
@@ -62,20 +62,20 @@ export default class Mv extends BaseCommand {
     const to = Number(context.args[1]);
     const q = context.server.queue;
 
-    if(
+    if (
       from >= 0 && from <= q.length
       && to >= 0 && to <= q.length
-    ){
+    ) {
       const title = q.get(from).basicInfo.title;
-      if(from !== to){
+      if (from !== to) {
         q.move(from, to);
         message.reply(`✅${t("commands:move.moved", { title, from, to })}`)
           .catch(this.logger.error);
-      }else{
+      } else {
         message.reply(`✘${t("commands:move.originEqualsDestination")}`)
           .catch(this.logger.error);
       }
-    }else{
+    } else {
       message.reply(`✘${t("commands:move.indexOutOfRange")}`)
         .catch(this.logger.error);
     }

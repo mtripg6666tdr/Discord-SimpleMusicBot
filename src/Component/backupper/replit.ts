@@ -27,11 +27,11 @@ import { ReplitClient } from "../replitDatabaseClient";
 export class ReplitBackupper extends IntervalBackupper {
   protected readonly db: ReplitClient = null!;
 
-  static get backuppable(){
+  static get backuppable() {
     return process.env.DB_URL?.startsWith("replit+http");
   }
 
-  constructor(bot: MusicBotBase, getData: () => DataType){
+  constructor(bot: MusicBotBase, getData: () => DataType) {
     super(bot, getData, "Replit");
 
     this.db = new ReplitClient(process.env.DB_URL!.substring("replit+".length));
@@ -45,23 +45,23 @@ export class ReplitBackupper extends IntervalBackupper {
   }
 
   @measureTime
-  protected override async backupStatus(){
-    if(!this.db) return;
+  protected override async backupStatus() {
+    if (!this.db) return;
 
     // determine which data should be backed up
     const filteredGuildIds = this.getStatusModifiedGuildIds();
 
     // execute
-    for(let i = 0; i < filteredGuildIds.length; i++){
+    for (let i = 0; i < filteredGuildIds.length; i++) {
       const guildId = filteredGuildIds[i];
-      try{
+      try {
         this.logger.info(`Backing up status...(${guildId})`);
         const currentStatus = this.data.get(guildId)?.exportStatus();
-        if(!currentStatus) continue;
+        if (!currentStatus) continue;
         await this.db.set(this.getDbKey("status", guildId), currentStatus);
         this.updateStatusCache(guildId, currentStatus);
       }
-      catch(er){
+      catch (er) {
         this.logger.error(er);
         this.logger.info("Something went wrong while backing up status");
       }
@@ -69,19 +69,19 @@ export class ReplitBackupper extends IntervalBackupper {
   }
 
   @measureTime
-  protected override async backupQueue(){
-    if(!this.db) return;
+  protected override async backupQueue() {
+    if (!this.db) return;
     const modifiedGuildIds = this.getQueueModifiedGuildIds();
-    for(let i = 0; i < modifiedGuildIds.length; i++){
+    for (let i = 0; i < modifiedGuildIds.length; i++) {
       const guildId = modifiedGuildIds[i];
-      try{
+      try {
         this.logger.info(`Backing up queue...(${guildId})`);
         const queue = this.data.get(guildId)?.exportQueue();
-        if(!queue) continue;
+        if (!queue) continue;
         await this.db.set(this.getDbKey("queue", guildId), queue);
         this.unmarkQueueModifiedGuild(guildId);
       }
-      catch(er){
+      catch (er) {
         this.logger.error(er);
         this.logger.info("Something went wrong while backing up queue");
       }
@@ -91,18 +91,18 @@ export class ReplitBackupper extends IntervalBackupper {
   @measureTime
   override async getQueueDataFromBackup(guildIds: string[]) {
     const result = new Map<string, YmxFormat>();
-    try{
+    try {
       await Promise.allSettled(
         guildIds.map(async id => {
           const queue = await this.db.get<YmxFormat>(this.getDbKey("queue", id));
-          if(queue){
+          if (queue) {
             result.set(id, queue);
           }
         })
       );
       return result;
     }
-    catch(er){
+    catch (er) {
       this.logger.error(er);
       this.logger.error("Queue restoring failed!");
       return null;
@@ -112,11 +112,11 @@ export class ReplitBackupper extends IntervalBackupper {
   @measureTime
   override async getStatusFromBackup(guildIds: string[]) {
     const result = new Map<string, JSONStatuses>();
-    try{
+    try {
       await Promise.allSettled(
         guildIds.map(async id => {
           const status = await this.db.get<JSONStatuses>(this.getDbKey("status", id));
-          if(status){
+          if (status) {
             result.set(id, status);
             this.updateStatusCache(id, status);
           }
@@ -124,17 +124,17 @@ export class ReplitBackupper extends IntervalBackupper {
       );
       return result;
     }
-    catch(er){
+    catch (er) {
       this.logger.error(er);
       this.logger.error("Status restoring failed!");
       return null;
     }
   }
 
-  private getDbKey(type: "status" | "queue", guildId: string){
+  private getDbKey(type: "status" | "queue", guildId: string) {
     return `dsmb-${type === "status" ? "s" : "q"}-${guildId}`;
   }
 
-  override destroy(){
+  override destroy() {
   }
 }

@@ -25,7 +25,7 @@ import { BaseCommand } from ".";
 import { getColor } from "../Util/color";
 
 export default class EquallyPlayback extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["equalplayback", "equallyplayback", "eqpb", "equal", "equally"],
       unlist: false,
@@ -36,13 +36,13 @@ export default class EquallyPlayback extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(command: CommandMessage, context: CommandArgs){
+  async run(command: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    if(context.server.preferences.equallyPlayback){
+    if (context.server.preferences.equallyPlayback) {
       context.server.preferences.equallyPlayback = false;
       command.reply(`❌${t("commands:equalplayback.disabled")}`).catch(this.logger.error);
-    }else{
+    } else {
       context.server.preferences.equallyPlayback = true;
       const embed = new MessageEmbedBuilder()
         .setTitle(`⭕${t("commands:equalplayback.enabled")}`)

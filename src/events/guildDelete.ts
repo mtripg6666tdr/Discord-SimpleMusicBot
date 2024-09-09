@@ -19,9 +19,9 @@
 import type { MusicBot } from "../bot";
 import type { Guild, Uncached } from "oceanic.js";
 
-export async function onGuildDelete(this: MusicBot, guild: Uncached | Guild){
+export async function onGuildDelete(this: MusicBot, guild: Uncached | Guild) {
   this.logger.info("Guild deleted: ", guild.id);
-  if(this.guildData.has(guild.id)){
+  if (this.guildData.has(guild.id)) {
     this.resetData(guild.id);
   }
 }

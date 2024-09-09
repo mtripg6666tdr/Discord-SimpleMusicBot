@@ -44,10 +44,10 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
   protected upcomingTimestamp: string | null = null;
 
   protected _strategyId: number;
-  get strategyId(){
+  get strategyId() {
     return this._strategyId;
   }
-  protected set strategyId(value: number){
+  protected set strategyId(value: number) {
     this._strategyId = value;
   }
 
@@ -55,7 +55,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
   get isLiveStream(): boolean {
     return this._isLiveStream;
   }
-  protected set isLiveStream(value: boolean){
+  protected set isLiveStream(value: boolean) {
     this._isLiveStream = value;
   }
 
@@ -63,39 +63,39 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
   get relatedVideos(): readonly YouTubeJsonFormat[] | readonly string[] {
     return this._relatedVideos;
   }
-  protected set relatedVideos(value: readonly YouTubeJsonFormat[] | readonly string[]){
+  protected set relatedVideos(value: readonly YouTubeJsonFormat[] | readonly string[]) {
     this._relatedVideos = value;
   }
 
   _isFallbacked: boolean;
-  get isFallbacked(): boolean{
+  get isFallbacked(): boolean {
     return this._isFallbacked;
   }
 
-  get cacheIsStale(){
+  get cacheIsStale() {
     return !this.cache || this.cache.date + cacheTimeout < Date.now();
   }
 
-  get availableAfter(){
+  get availableAfter() {
     return this.upcomingTimestamp;
   }
 
   @measureTime
-  async init(url: string, prefetched: YouTubeJsonFormat | null, forceCache?: boolean){
+  async init(url: string, prefetched: YouTubeJsonFormat | null, forceCache?: boolean) {
     this.url = url = YouTube.normalizeUrl(url);
-    if(prefetched){
+    if (prefetched) {
       this.importData(prefetched);
-    }else{
+    } else {
       await this.refreshInfo({ forceCache });
     }
 
     return this;
   }
 
-  async refreshInfo(options: { forceCache?: boolean, onlyIfNoCache?: boolean } = {}){
+  async refreshInfo(options: { forceCache?: boolean, onlyIfNoCache?: boolean } = {}) {
     const { forceCache, onlyIfNoCache } = Object.assign({ forceCache: false, onlyIfNoCache: false }, options);
 
-    if(onlyIfNoCache && this.cache){
+    if (onlyIfNoCache && this.cache) {
       return;
     }
 
@@ -106,29 +106,29 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     this._isFallbacked = isFallbacked;
 
     // check if the video is upcoming
-    if(result.cache?.data){
-      if(
+    if (result.cache?.data) {
+      if (
         "videoDetails" in result.cache.data
         && result.cache.data.videoDetails.liveBroadcastDetails
         && result.cache.data.videoDetails.liveBroadcastDetails.startTimestamp
         && !result.cache.data.videoDetails.liveBroadcastDetails.isLiveNow
         && !result.cache.data.videoDetails.liveBroadcastDetails.endTimestamp
-      ){
+      ) {
         this.upcomingTimestamp = result.cache.data.videoDetails.liveBroadcastDetails.startTimestamp;
-      }else if(
+      } else if (
         "LiveStreamData" in result.cache.data
         && result.cache.data.LiveStreamData.isLive
         && result.cache.data.video_details.upcoming
         && typeof result.cache.data.video_details.upcoming === "object"
-      ){
+      ) {
         this.upcomingTimestamp = result.cache.data.video_details.upcoming.toISOString();
-      }else{
+      } else {
         this.upcomingTimestamp = null;
       }
     }
 
     // store data as cache if requested
-    if(forceCache){
+    if (forceCache) {
       this.cache = {
         data: result.cache,
         date: Date.now(),
@@ -140,8 +140,8 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
   }
 
   @measureTime
-  async fetch(forceUrl?: boolean): Promise<StreamInfo>{
-    if(this.cacheIsStale){
+  async fetch(forceUrl?: boolean): Promise<StreamInfo> {
+    if (this.cacheIsStale) {
       this.purgeCache();
     }
 
@@ -150,17 +150,17 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     this._isFallbacked = isFallbacked;
 
     // store related videos
-    if(result.relatedVideos){
+    if (result.relatedVideos) {
       this.relatedVideos = result.relatedVideos;
     }
 
     this.importData(result.info);
 
-    if(forceUrl){
+    if (forceUrl) {
       this.logger.info("Returning a url instead of stream");
     }
 
-    if(result.cache){
+    if (result.cache) {
       this.cache = {
         data: result.cache,
         date: Date.now(),
@@ -170,14 +170,14 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     return result.stream;
   }
 
-  async fetchVideo(){
-    if(this.cacheIsStale){
+  async fetchVideo() {
+    if (this.cacheIsStale) {
       await this.refreshInfo({ forceCache: true });
     }
 
     const distubeYtdlCore: distubeYtdlCore = "distubeYtdlCore";
 
-    if(this.cache?.data.type === ytdlCore || this.cache?.data.type === distubeYtdlCore){
+    if (this.cache?.data.type === ytdlCore || this.cache?.data.type === distubeYtdlCore) {
       const info = this.cache.data.data as ytdl.videoInfo;
       const isLive = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
       const format = ytdl.chooseFormat(info.formats, {
@@ -189,12 +189,12 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
         url,
         ua: SecondaryUserAgent,
       };
-    }else if(this.cache?.data.type === playDl){
+    } else if (this.cache?.data.type === playDl) {
       const info = this.cache.data.data as InfoData;
       const format = info.format.filter(f => f.mimeType?.startsWith("video")).sort((a, b) => b.bitrate! - a.bitrate!)[0];
       const url = format.url || info.LiveStreamData.hlsManifestUrl;
 
-      if(!url){
+      if (!url) {
         throw new Error("No url found.");
       }
 
@@ -202,16 +202,16 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
         url,
         ua: SecondaryUserAgent,
       };
-    }else{
+    } else {
       throw new Error("No available data found.");
     }
   }
 
-  getStrategyIndicator(){
+  getStrategyIndicator() {
     return "\\*".repeat(this.strategyId);
   }
 
-  toField(verbose: boolean){
+  toField(verbose: boolean) {
     const { t } = getCommandExecutionContext();
     const fields = [] as EmbedField[];
     fields.push({
@@ -228,12 +228,12 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     return fields;
   }
 
-  npAdditional(){
+  npAdditional() {
     const { t } = getCommandExecutionContext();
     return `${t("channelName")}:\`${this.channelName}\``;
   }
 
-  exportData(): YouTubeJsonFormat{
+  exportData(): YouTubeJsonFormat {
     return {
       url: this.url,
       title: this.title,
@@ -246,7 +246,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     };
   }
 
-  private importData(exportable: YouTubeJsonFormat){
+  private importData(exportable: YouTubeJsonFormat) {
     this.title = exportable.title;
     this.description = exportable.description || "";
     this.lengthSeconds = exportable.isLive ? NaN : exportable.length;
@@ -256,30 +256,30 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     this.isLiveStream = exportable.isLive;
   }
 
-  override purgeCache(){
+  override purgeCache() {
     this.cache = null;
   }
 
-  waitForLive(signal: AbortSignal, tick: () => void){
-    if(!this.availableAfter){
+  waitForLive(signal: AbortSignal, tick: () => void) {
+    if (!this.availableAfter) {
       throw new Error("This is not a live stream");
     }
 
     return new Promise<void>(resolve => {
       let timeout: NodeJS.Timeout | null = null;
       signal.addEventListener("abort", () => {
-        if(timeout){
+        if (timeout) {
           clearTimeout(timeout);
           resolve();
         }
       }, { once: true });
       const checkForLive = () => {
-        if(signal.aborted) return;
+        if (signal.aborted) return;
 
         tick();
 
         const startTime = this.availableAfter;
-        if(!startTime){
+        if (!startTime) {
           resolve();
         }
 
@@ -287,7 +287,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
         this.logger.info(`Retrying after ${waitTime}ms`);
 
         timeout = setTimeout(async () => {
-          if(signal.aborted) return;
+          if (signal.aborted) return;
           tick();
           this.purgeCache();
           await this.init(this.url, null, false);
@@ -305,10 +305,10 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
   }
 
   static getVideoID(url: string): string {
-    if(this.youtubeLiveUrlRegExp.test(url)){
+    if (this.youtubeLiveUrlRegExp.test(url)) {
       const id = this.youtubeLiveUrlRegExp.exec(url)?.groups?.id;
 
-      if(id && ytdl.validateID(id)){
+      if (id && ytdl.validateID(id)) {
         return id;
       }
     }
@@ -316,8 +316,8 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     return ytdl.getVideoID(url);
   }
 
-  static normalizeUrl(url: string){
-    if(this.validateURL(url)){
+  static normalizeUrl(url: string) {
+    if (this.validateURL(url)) {
       return `https://www.youtube.com/watch?v=${YouTube.getVideoID(url)}`;
     }
 

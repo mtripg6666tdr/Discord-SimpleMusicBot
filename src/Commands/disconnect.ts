@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class Dc extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       unlist: false,
       alias: ["終了", "disconnect", "dc", "leave", "quit"] as const,
@@ -33,11 +33,11 @@ export default class Dc extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     // そもそも再生状態じゃないよ...
-    if(!context.server.player.isConnecting){
+    if (!context.server.player.isConnecting) {
       message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }

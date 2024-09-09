@@ -24,9 +24,9 @@ import { CommandManager } from "../Component/commandManager";
 export async function handleAutoCompleteInteraction(
   this: MusicBot,
   interaction: AutocompleteInteraction,
-){
+) {
   const option = interaction.data.options.getFocused();
-  if(!option){
+  if (!option) {
     return;
   }
 
@@ -38,7 +38,7 @@ export async function handleAutoCompleteInteraction(
       .filter(opt => opt.name !== option.name && "value" in opt) as { name: string, value: string | number }[]
   ).slice(0, 25);
 
-  if(!possibleOptions){
+  if (!possibleOptions) {
     return;
   }
 

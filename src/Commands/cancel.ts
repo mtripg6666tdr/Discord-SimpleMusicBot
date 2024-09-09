@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class Cancel extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["cancel", "中止", "abort"],
       unlist: false,
@@ -33,13 +33,13 @@ export default class Cancel extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     const result = context.server.cancelAll();
-    if(result){
+    if (result) {
       message.reply(t("commands:cancel.canceling")).catch(this.logger.error);
-    }else{
+    } else {
       message.reply(t("commands:cancel.noCancelable")).catch(this.logger.error);
     }
   }

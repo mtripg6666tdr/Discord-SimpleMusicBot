@@ -25,7 +25,7 @@ import { BaseCommand } from ".";
 import { GuildDataContainerWithBgm } from "../Structure/GuildDataContainerWithBgm";
 
 export default class Reset extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["reset"],
       unlist: false,
@@ -42,7 +42,7 @@ export default class Reset extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
     // VC接続中なら切断
     await context.server.player.disconnect().catch(this.logger.error);
@@ -54,29 +54,29 @@ export default class Reset extends BaseCommand {
 
     // レートリミットの制限をすべて解除
     const bucket = context.client.rest.handler.ratelimits[Routes.CHANNEL_MESSAGES(context.server.boundTextChannel)];
-    if(bucket){
+    if (bucket) {
       // キューをすべて消すためのトリック
       let allPurged = false;
       bucket.queue(cb => {
         allPurged = true;
         cb();
       });
-      do{
+      do {
         bucket["check"](/* force */ true);
       // eslint-disable-next-line no-unmodified-loop-condition
-      } while(!allPurged);
+      } while (!allPurged);
     }
 
     // データあたらしく初期化
     const newServer = context.initData(message.guild.id, message.channel.id);
 
     // BGMキューの初期化
-    if(newServer instanceof GuildDataContainerWithBgm){
+    if (newServer instanceof GuildDataContainerWithBgm) {
       await newServer.initBgmTracks();
     }
 
     // キューの復元を試みる
-    if(queueItems){
+    if (queueItems) {
       newServer.queue.addRawQueueItems(queueItems);
     }
 

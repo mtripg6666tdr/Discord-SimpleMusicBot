@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class Bgm extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["bgm", "study"],
       unlist: false,
@@ -33,14 +33,14 @@ export default class Bgm extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     // attempt to join
-    if(!await context.server.joinVoiceChannel(message, { replyOnFail: true })) return;
+    if (!await context.server.joinVoiceChannel(message, { replyOnFail: true })) return;
 
     // check existing search panel
-    if(context.server.searchPanel.has(message.member.id)){
+    if (context.server.searchPanel.has(message.member.id)) {
       message.reply(t("search.alreadyOpen")).catch(this.logger.error);
       return;
     }
@@ -50,7 +50,7 @@ export default class Bgm extends BaseCommand {
       t("commands:bgm.listOfPresetBGM"),
       true
     );
-    if(!searchPanel){
+    if (!searchPanel) {
       return;
     }
     await searchPanel.consumeSearchResult(

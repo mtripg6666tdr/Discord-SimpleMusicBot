@@ -38,13 +38,13 @@ export class MusicBot extends MusicBotBase {
   // eslint-disable-next-line @typescript-eslint/prefer-readonly
   private _isReadyFinished = false;
 
-  get readyFinished(){
+  get readyFinished() {
     return this._isReadyFinished;
   }
 
   private readonly _telemetry: Telemetry | null = null;
 
-  get telemetry(){
+  get telemetry() {
     return this._telemetry;
   }
 
@@ -52,11 +52,11 @@ export class MusicBot extends MusicBotBase {
   // eslint-disable-next-line @typescript-eslint/prefer-readonly
   private _mentionText: `<@${string}>` = "" as `<@${string}>`;
 
-  get mentionText(){
+  get mentionText() {
     return this._mentionText;
   }
 
-  constructor(token: string, maintenance: boolean = false){
+  constructor(token: string, maintenance: boolean = false) {
     super(maintenance);
 
     this._client = new discord.Client({
@@ -91,7 +91,7 @@ export class MusicBot extends MusicBotBase {
         .on("error", this.onError.bind(this))
       ;
     });
-    if(config.debug){
+    if (config.debug) {
       this.client
         .on("debug", this.onDebug.bind(this))
         .on("warn", this.onWarn.bind(this))
@@ -99,12 +99,12 @@ export class MusicBot extends MusicBotBase {
     }
   }
 
-  private async onError(er: Error){
+  private async onError(er: Error) {
     this.logger.error(er);
-    if(er.message?.startsWith("Invalid token") || (er.cause as Error | undefined)?.message?.includes("401: Unauthorized")){
+    if (er.message?.startsWith("Invalid token") || (er.cause as Error | undefined)?.message?.includes("401: Unauthorized")) {
       throw new Error("Invalid token detected. Please ensure that you set the correct token. You can also re-generate a new token for your bot.");
-    }else{
-      if(this.client.shards.some(shard => shard.status === "disconnected")){
+    } else {
+      if (this.client.shards.some(shard => shard.status === "disconnected")) {
         this.logger.info("Attempt reconnecting after waiting for a while...");
         this._client.disconnect(true);
       }
@@ -113,26 +113,26 @@ export class MusicBot extends MusicBotBase {
     }
   }
 
-  private onDebug(message: string, id?: number){
+  private onDebug(message: string, id?: number) {
     this.logger.trace(`${message} (ID: ${id || "NaN"})`);
   }
 
-  private onWarn(message: string, id?: number){
+  private onWarn(message: string, id?: number) {
     this.logger.warn(`${message} (ID: ${id || "NaN"})`);
   }
 
   /**
    * Botを開始します。
    */
-  run(){
+  run() {
     this._client.connect().catch(this.onError.bind(this));
   }
 
-  async stop(){
+  async stop() {
     this.logger.info("Shutting down the bot...");
     this._client.removeAllListeners();
     this._client.on("error", () => {});
-    if(this._backupper){
+    if (this._backupper) {
       this.logger.info("Shutting down the db...");
       await this._backupper.destroy();
     }
@@ -145,8 +145,8 @@ export class MusicBot extends MusicBotBase {
    * @param optiont コマンドの生の引数
    * @returns コマンドを実行する際にランナーに渡す引数
    */
-  createCommandRunnerArgs(guildId: string, options: string[], optiont: string, locale: string): CommandArgs{
-    if(!this.guildData.has(guildId)){
+  createCommandRunnerArgs(guildId: string, options: string[], optiont: string, locale: string): CommandArgs {
+    if (!this.guildData.has(guildId)) {
       throw new Error("The specified guild was not found.");
     }
 

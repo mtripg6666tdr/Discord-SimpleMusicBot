@@ -28,7 +28,7 @@ import * as Util from "../Util";
 import { getColor } from "../Util/color";
 
 export default class Searchq extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["searchqueue", "searchq", "seq", "sq"],
       unlist: false,
@@ -46,10 +46,10 @@ export default class Searchq extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    if(context.server.queue.length === 0){
+    if (context.server.queue.length === 0) {
       message.reply(t("commands:searchqueue.queueEmpty")).catch(this.logger.error);
       return;
     }
@@ -63,13 +63,13 @@ export default class Searchq extends BaseCommand {
       )
     ;
 
-    if(qsresult.length === 0){
+    if (qsresult.length === 0) {
       message.reply(`:confused:${t("search.notFound")}`).catch(this.logger.error);
       return;
     }
 
     // 20件以上の検索結果をドロップ
-    if(qsresult.length > 20){
+    if (qsresult.length > 20) {
       qsresult.splice(20);
     }
 

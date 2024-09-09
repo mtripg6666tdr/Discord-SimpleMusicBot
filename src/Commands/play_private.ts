@@ -26,7 +26,7 @@ import { BaseCommand } from ".";
 import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 
 export default class PlayPrivate extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       unlist: false,
       alias: ["play_private"],
@@ -38,16 +38,16 @@ export default class PlayPrivate extends BaseCommand {
     });
   }
 
-  protected override async run(message: CommandMessage, context: Readonly<CommandArgs>){
+  protected override async run(message: CommandMessage, context: Readonly<CommandArgs>) {
     const { t } = context;
 
-    if(message["isMessage"] || !message["_interaction"]){
+    if (message["isMessage"] || !message["_interaction"]) {
       await message.reply(`:x: ${t("commands:play_private.noInteraction")}`).catch(this.logger.error);
       return;
     }
 
     const interaction = message["_interaction"];
-    if(interaction.type !== InteractionTypes.APPLICATION_COMMAND) return;
+    if (interaction.type !== InteractionTypes.APPLICATION_COMMAND) return;
     await interaction.createModal({
       title: t("commands:play_private.modalTitle"),
       customID: "play_private",
@@ -69,10 +69,10 @@ export default class PlayPrivate extends BaseCommand {
     }).catch(this.logger.error);
   }
 
-  override async handleModalSubmitInteraction(interaction: ModalSubmitInteraction<AnyTextableGuildChannel>, server: GuildDataContainer){
+  override async handleModalSubmitInteraction(interaction: ModalSubmitInteraction<AnyTextableGuildChannel>, server: GuildDataContainer) {
     const value = interaction.data.components.getTextInput("url");
 
-    if(value){
+    if (value) {
       const message = CommandMessage.createFromInteraction(interaction, "play_private", [value], value);
 
       const items = await server.playFromUrl(
@@ -81,7 +81,7 @@ export default class PlayPrivate extends BaseCommand {
         { privateSource: true },
       );
 
-      if(items.length <= 0 || !await server.joinVoiceChannel(message, {})){
+      if (items.length <= 0 || !await server.joinVoiceChannel(message, {})) {
         return;
       }
 

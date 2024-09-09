@@ -31,11 +31,11 @@ type playDl = "playDl";
 export const playDl: playDl = "playDl";
 
 export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> {
-  get cacheType(){
+  get cacheType() {
     return playDl;
   }
 
-  async getInfo(url: string){
+  async getInfo(url: string) {
     this.logStrategyUsed();
     const info = await video_info(url);
     return {
@@ -62,7 +62,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
       relatedVideos: info.related_videos,
     };
 
-    if(info.LiveStreamData.isLive){
+    if (info.LiveStreamData.isLive) {
       return {
         ...partialResult,
         stream: {
@@ -75,9 +75,9 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
           data: info,
         },
       };
-    }else if(forceUrl){
+    } else if (forceUrl) {
       const format = info.format.filter(f => f.mimeType?.startsWith("audio"));
-      if(format.length === 0){
+      if (format.length === 0) {
         throw new Error("no format found!");
       }
 
@@ -96,7 +96,7 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
           data: info,
         },
       };
-    }else{
+    } else {
       const stream = await stream_from_info(info, { quality: 999, discordPlayerCompatibility: true });
       return {
         ...partialResult,
@@ -113,8 +113,8 @@ export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> 
     }
   }
 
-  protected mapToExportable(url: string, info: InfoData): YouTubeJsonFormat{
-    if(info.video_details.upcoming) throw new Error("This video is still in upcoming");
+  protected mapToExportable(url: string, info: InfoData): YouTubeJsonFormat {
+    if (info.video_details.upcoming) throw new Error("This video is still in upcoming");
     return {
       url,
       title: info.video_details.title!,

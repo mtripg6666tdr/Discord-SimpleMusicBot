@@ -29,7 +29,7 @@ import { getConfig } from "../config";
 const config = getConfig();
 
 export default class Help extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["help", "support"],
       unlist: false,
@@ -39,7 +39,7 @@ export default class Help extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     const developerId = "593758391395155978";
@@ -60,14 +60,14 @@ export default class Help extends BaseCommand {
       .addField(t("commands:help.developer"), `[${developer || "mtripg6666tdr"}](https://github.com/mtripg6666tdr)`)
       .addField(t("commands:help.version"), `\`${context.bot.version}\``);
 
-    if(!process.env.HIDE_REPO_URL){
+    if (!process.env.HIDE_REPO_URL) {
       embed.addField(
         `${t("commands:help.repository")}/${t("commands:help.sourceCode")}`,
         "https://github.com/mtripg6666tdr/Discord-SimpleMusicBot"
       );
     }
 
-    if(!process.env.HIDE_SUPPORT_SERVER_URL){
+    if (!process.env.HIDE_SUPPORT_SERVER_URL) {
       embed.addField(t("commands:help.supportServer"), process.env.SUPPORT_SERVER_URL || "https://discord.gg/7DrAEXBMHe");
     }
 

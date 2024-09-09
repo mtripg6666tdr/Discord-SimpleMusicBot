@@ -26,7 +26,7 @@ import * as Util from "../Util";
 import { getColor } from "../Util/color";
 
 export default class NowPlaying extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["今の曲", "nowplaying", "np"],
       unlist: false,
@@ -42,11 +42,11 @@ export default class NowPlaying extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     // そもそも再生状態じゃないよ...
-    if(!context.server.player.isPlaying){
+    if (!context.server.player.isPlaying) {
       message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }
@@ -60,7 +60,7 @@ export default class NowPlaying extends BaseCommand {
     const [tmin, tsec] = Util.time.calcMinSec(totalDurationSeconds);
     const info = context.server.player.currentAudioInfo!;
     let progressBar = "";
-    if(totalDurationSeconds > 0){
+    if (totalDurationSeconds > 0) {
       const progress = Math.floor(currentTimeSeconds / totalDurationSeconds * 20);
       progressBar += "=".repeat(progress > 0 ? progress - 1 : 0);
       progressBar += "●";
@@ -84,16 +84,16 @@ export default class NowPlaying extends BaseCommand {
         }`
       );
 
-    if(!info.isPrivateSource){
+    if (!info.isPrivateSource) {
       embed
         .setFields(...info.toField(["long", "l", "verbose", "l", "true"].some(arg => context.args[0] === arg)))
         .addField(":link:URL", info.url);
     }
 
-    if(typeof info.thumbnail === "string"){
+    if (typeof info.thumbnail === "string") {
       embed.setThumbnail(info.thumbnail);
       await message.reply({ embeds: [embed.toOceanic()] }).catch(this.logger.error);
-    }else{
+    } else {
       embed.setThumbnail("attachment://thumbnail." + info.thumbnail.ext);
       await message.reply({
         embeds: [embed.toOceanic()],

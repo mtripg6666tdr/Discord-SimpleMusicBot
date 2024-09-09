@@ -21,7 +21,7 @@ import { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import { colonSplittedTimeToSeconds } from "../Util/time";
 
 export default class SleepTimer extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["sleeptimer", "sleep", "timer"],
       unlist: false,
@@ -38,16 +38,16 @@ export default class SleepTimer extends BaseCommand {
     });
   }
 
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t, server } = context;
 
     // そもそも接続中ではない場合
-    if(!server.player.isConnecting){
+    if (!server.player.isConnecting) {
       await message.reply(t("notPlaying")).catch(this.logger.error);
       return;
     }
 
-    if(context.rawArgs === ""){
+    if (context.rawArgs === "") {
       server.player.setSleepTimer(false);
       await message.reply(t("commands:sleeptimer.canceled")).catch(this.logger.error);
       return;
@@ -55,7 +55,7 @@ export default class SleepTimer extends BaseCommand {
 
     const toCurrentSong = context.rawArgs === "$";
 
-    if(toCurrentSong){
+    if (toCurrentSong) {
       server.player.setSleepTimer(true);
       await message.reply(t("commands:sleeptimer.doneCurrentSong")).catch(this.logger.error);
       return;
@@ -63,7 +63,7 @@ export default class SleepTimer extends BaseCommand {
 
     const time = colonSplittedTimeToSeconds(context.rawArgs);
 
-    if(isNaN(time)){
+    if (isNaN(time)) {
       await message.reply(t("commands:sleeptimer.invalidTime")).catch(this.logger.error);
       return;
     }

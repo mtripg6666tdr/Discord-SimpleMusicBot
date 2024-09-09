@@ -26,24 +26,24 @@ export abstract class LogEmitter<Events extends EventDictionary> extends TypedEv
   protected logger: LoggerObjectWithContext;
   private guildId: string | null = null;
 
-  constructor(tag: string, id?: string | null){
+  constructor(tag: string, id?: string | null) {
     super();
     this.logger = getLogger(tag, true);
-    if(id){
+    if (id) {
       this.setGuildId(id);
     }
   }
 
-  protected setGuildId(guildId: string){
-    if(!this.logger){
+  protected setGuildId(guildId: string) {
+    if (!this.logger) {
       throw new Error("Logger is not defined");
     }
     this.logger.addContext("id", guildId);
     this.guildId = guildId;
   }
 
-  getGuildId(){
-    if(!this.guildId){
+  getGuildId() {
+    if (!this.guildId) {
       throw new Error("Cannot read guild id before guild id initialized.");
     }
 

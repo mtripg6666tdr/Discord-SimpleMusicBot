@@ -28,10 +28,10 @@ defaultConfig.subCommandSeparator = subCommandSeparator;
 
 export class CommandMessage extends LibCommandMessage {
   // 超省略形を解釈するために、基底クラスをオーバーライドします
-  protected static override parseCommand(content: string, prefixLength: number){
+  protected static override parseCommand(content: string, prefixLength: number) {
     const resolved = super.parseCommand(content, prefixLength, normalizeText);
     // 超省略形を捕捉
-    if(resolved.command.startsWith("http")){
+    if (resolved.command.startsWith("http")) {
       resolved.options.push(resolved.command);
       resolved.rawOptions = resolved.command;
       resolved.command = "play";
@@ -43,10 +43,10 @@ export class CommandMessage extends LibCommandMessage {
   static override createFromMessage(message: Message<AnyTextableGuildChannel>, prefixLength?: number | undefined) {
     const resolved = this.parseCommand(message.content, prefixLength || 1);
 
-    if(CommandManager.instance.subCommandNames.has(resolved.command)){
+    if (CommandManager.instance.subCommandNames.has(resolved.command)) {
       const subCommand = resolved.options.shift();
 
-      if(subCommand){
+      if (subCommand) {
         resolved.command = `${resolved.command}${subCommandSeparator}${subCommand}`;
         resolved.rawOptions = resolved.options.join(" ");
       }

@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class Volume extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["volume", "vol"],
       unlist: false,
@@ -40,17 +40,17 @@ export default class Volume extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
     
-    if(context.rawArgs === ""){
+    if (context.rawArgs === "") {
       await message.reply(`:loud_sound:${t("commands:volume.currentVolume", { volume: context.server.player.volume })}`)
         .catch(this.logger.error)
       ;
       return;
     }
     const newval = Number(context.rawArgs);
-    if(isNaN(newval) || newval < 1 || newval > 200){
+    if (isNaN(newval) || newval < 1 || newval > 200) {
       message.reply(`:bangbang:${t("commands:volume.outOfRange")}`)
         .catch(this.logger.error);
       return;

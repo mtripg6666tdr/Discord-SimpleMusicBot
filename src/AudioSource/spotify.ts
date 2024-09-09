@@ -38,20 +38,20 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
   protected artist = "";
   protected referenceUrl: string | null = null;
 
-  constructor(){
+  constructor() {
     super({ isCacheable: false });
   }
 
-  override async init(url: string, prefetched: SpotifyJsonFormat): Promise<Spotify>{
-    if(!Spotify.validateTrackUrl(url)) throw new Error("Invalid url");
-    if(prefetched){
+  override async init(url: string, prefetched: SpotifyJsonFormat): Promise<Spotify> {
+    if (!Spotify.validateTrackUrl(url)) throw new Error("Invalid url");
+    if (prefetched) {
       this.url = prefetched.url;
       this.lengthSeconds = prefetched.length;
       this.title = prefetched.title;
       this.artist = prefetched.artist;
       this.referenceUrl = prefetched.referenceUrl;
       this.thumbnail = prefetched.thumbnail || this.thumbnail;
-    }else{
+    } else {
       this.url = url = Spotify.formatUrl(url);
       const track = await client.getData(url) as Track;
       this.lengthSeconds = Math.floor(track.duration / 1000);
@@ -62,8 +62,8 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
     return this;
   }
 
-  override async fetch(forceUrl?: boolean): Promise<StreamInfo>{
-    if(!this.referenceUrl){
+  override async fetch(forceUrl?: boolean): Promise<StreamInfo> {
+    if (!this.referenceUrl) {
       // construct search keyword
       // eslint-disable-next-line newline-per-chained-call
       const keyword = `${this.title} ${this.artist.split(",").map(artist => artist.trim()).join(" ")}`;
@@ -78,7 +78,7 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
         .filter(({ type }) => type === "video") as (ytsr.Video | dYtsr.Video)[];
       const target = this.extractBestItem(items);
 
-      if(!target) throw new Error("Not Found");
+      if (!target) throw new Error("Not Found");
 
       // store the result
       this.referenceUrl = target.url;
@@ -95,7 +95,7 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
     return result.stream;
   }
 
-  protected extractBestItem(items: (ytsr.Video | dYtsr.Video)[]){
+  protected extractBestItem(items: (ytsr.Video | dYtsr.Video)[]) {
     this.logger.debug("result", items);
     const normalize = (text: string) => {
       return text.toLowerCase()
@@ -131,14 +131,14 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
     };
     const validItems = items
       .map(item => {
-        if("name" in item){
+        if ("name" in item) {
           (item as dYtsr.Video & { title: string }).title = item.name;
         }
         return item as dYtsr.Video & { title: string };
       })
       .filter(validate);
     this.logger.debug("valid", validItems);
-    if(validItems.length === 0) return items[0];
+    if (validItems.length === 0) return items[0];
 
     // official channel
     let filtered = validItems.filter(item =>
@@ -148,29 +148,29 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
       || item.author?.name.endsWith("トピック")
     );
     this.logger.debug("official ch", filtered);
-    if(filtered[0]) return filtered[0];
+    if (filtered[0]) return filtered[0];
 
     // official item
     filtered = validItems.filter(item => includes(item.title, "official") || includes(item.title, "公式"));
     this.logger.debug("official item", filtered);
-    if(filtered[0]) return filtered[0];
+    if (filtered[0]) return filtered[0];
 
     // pv /mv
     filtered = validItems.filter(item => includes(item.title, "pv") || includes(item.title, "mv"));
     this.logger.debug("PV/MV", filtered);
-    if(filtered[0]) return filtered[0];
+    if (filtered[0]) return filtered[0];
 
     // no live
     filtered = validItems.filter(item => !includes(item.title, "live") && !includes(item.title, "ライブ"));
     this.logger.debug("no live", filtered);
-    if(filtered[0]) return filtered[0];
+    if (filtered[0]) return filtered[0];
 
     // other
-    if(validItems[0]) return validItems[0];
+    if (validItems[0]) return validItems[0];
     return items[0];
   }
 
-  override exportData(): SpotifyJsonFormat{
+  override exportData(): SpotifyJsonFormat {
     return {
       url: this.url,
       title: this.title,
@@ -181,11 +181,11 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
     };
   }
 
-  override npAdditional(): string{
+  override npAdditional(): string {
     return "";
   }
 
-  override toField(): EmbedField[]{
+  override toField(): EmbedField[] {
     return [];
   }
 
@@ -207,36 +207,36 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
     return url.replace(/intl-[a-z]{2}\//, "");
   }
 
-  static getTrackUrl(uri: string){
+  static getTrackUrl(uri: string) {
     return `https://open.spotify.com/track/${uri.replace(/spotify:track:/, "")}`;
   }
 
-  static getPlaylistUrl(uri: string, type: "playlist"|"album"){
+  static getPlaylistUrl(uri: string, type: "playlist"|"album") {
     return `https://open.spotify.com/${type}/${uri.replace(/spotify:(playlist|album):/, "")}`;
   }
 
-  static async expandShortenLink(url: string){
+  static async expandShortenLink(url: string) {
     const result = await candyget.empty(url);
-    if(this.validatePlaylistUrl(result.url.href)){
+    if (this.validatePlaylistUrl(result.url.href)) {
       return {
         type: "playlist" as const,
         url: result.url.href,
       };
-    }else if(this.validateTrackUrl(result.url.href)){
+    } else if (this.validateTrackUrl(result.url.href)) {
       return {
         type: "track" as const,
         url: result.url.href,
       };
-    }else{
+    } else {
       return null;
     }
   }
 
-  static get client(){
+  static get client() {
     return client;
   }
 
-  static get available(){
+  static get available() {
     return !!client;
   }
 }

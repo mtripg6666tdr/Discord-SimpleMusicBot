@@ -28,18 +28,18 @@ import { retrieveRemoteAudioInfo } from "../Util";
 export class Twitter extends AudioSource<string, TwitterJsonFormat> {
   private streamUrl = "";
 
-  async init(url: string, prefetched: TwitterJsonFormat | null){
+  async init(url: string, prefetched: TwitterJsonFormat | null) {
     const { t } = getCommandExecutionContext();
 
     this.url = url;
-    if(!Twitter.validateUrl(url)) throw new Error("Invalid Twitter url.");
-    if(prefetched){
+    if (!Twitter.validateUrl(url)) throw new Error("Invalid Twitter url.");
+    if (prefetched) {
       this.lengthSeconds = prefetched.length;
       this.title = prefetched.title;
       this.streamUrl = prefetched.streamUrl;
-    }else{
+    } else {
       const streamInfo = await twitterDl(url.split("?")[0]);
-      if(!streamInfo.videoUrl){
+      if (!streamInfo.videoUrl) {
         throw new Error("Invalid Twitter url.");
       }
 
@@ -53,7 +53,7 @@ export class Twitter extends AudioSource<string, TwitterJsonFormat> {
     return this;
   }
 
-  async fetch(): Promise<UrlStreamInfo>{
+  async fetch(): Promise<UrlStreamInfo> {
     return {
       type: "url",
       streamType: "mp4",
@@ -61,7 +61,7 @@ export class Twitter extends AudioSource<string, TwitterJsonFormat> {
     };
   }
 
-  toField(){
+  toField() {
     const { t } = getCommandExecutionContext();
 
     return [
@@ -78,11 +78,11 @@ export class Twitter extends AudioSource<string, TwitterJsonFormat> {
     ];
   }
 
-  npAdditional(){
+  npAdditional() {
     return "";
   }
 
-  exportData(): TwitterJsonFormat{
+  exportData(): TwitterJsonFormat {
     return {
       url: this.url,
       length: this.lengthSeconds,
@@ -91,7 +91,7 @@ export class Twitter extends AudioSource<string, TwitterJsonFormat> {
     };
   }
 
-  static validateUrl(url: string){
+  static validateUrl(url: string) {
     return !!url.match(/^https?:\/\/(twitter|x)\.com\/[a-zA-Z0-9_-]+\/status\/\d+(\?.+)?$/);
   }
 }
@@ -119,12 +119,12 @@ async function twitterDl(url: string): Promise<Tweet> {
     }),
   });
 
-  if(result.statusCode !== 200){
+  if (result.statusCode !== 200) {
     throw new Error("An error occurred while fetching data.");
   }
 
   const type = mediaTypeRegExp.exec(result.body)?.groups?.type;
-  if(type !== "player"){
+  if (type !== "player") {
     throw new Error("Provided URL includes no videos.");
   }
 

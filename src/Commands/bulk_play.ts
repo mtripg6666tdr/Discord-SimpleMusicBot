@@ -25,7 +25,7 @@ import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
 
 export default class BulkPlay extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["bulk_play", "bulk-play", "bulkplay"],
       unlist: false,
@@ -66,11 +66,11 @@ export default class BulkPlay extends BaseCommand {
 
   @BaseCommand.updateBoundChannel
   protected async run(message: CommandMessage, context: Readonly<CommandArgs>): Promise<void> {
-    if(!await context.server.joinVoiceChannel(message, { replyOnFail: true })) return;
+    if (!await context.server.joinVoiceChannel(message, { replyOnFail: true })) return;
 
     const { t } = context;
 
-    if(context.args.length === 0){
+    if (context.args.length === 0) {
       await message.reply(t("commands:play.noContent")).catch(this.logger.error);
       return;
     }
@@ -82,21 +82,21 @@ export default class BulkPlay extends BaseCommand {
     const keywords = (
       await Promise.allSettled(
         context.args.map(async keyword => {
-          if(keyword.startsWith("http://") || keyword.startsWith("https://")){
+          if (keyword.startsWith("http://") || keyword.startsWith("https://")) {
             return keyword;
           }
 
           let videos: ytsr.Video[] | dYtsr.Video[] = null!;
 
-          if(context.bot.cache.hasSearch(keyword)){
+          if (context.bot.cache.hasSearch(keyword)) {
             videos = await context.bot.cache.getSearch(keyword);
-          }else{
+          } else {
             const result = await searchYouTube(keyword);
             videos = (result.items as (ytsr.Item | dYtsr.Video)[]).filter(it => it.type === "video") as (ytsr.Video[] | dYtsr.Video[]);
             context.bot.cache.addSearch(context.rawArgs, videos);
           }
 
-          if(videos.length === 0){
+          if (videos.length === 0) {
             throw new Error("No result found.");
           }
 
@@ -107,13 +107,13 @@ export default class BulkPlay extends BaseCommand {
       .filter(res => res.status === "fulfilled")
       .map(res => res.value);
 
-    if(keywords.length === 0){
+    if (keywords.length === 0) {
       await Promise.allSettled([
         message.reply(t("commands:play.noContent")).catch(this.logger.error),
         msg.delete(),
       ]);
       return;
-    }else if(keywords.length !== context.args.length){
+    } else if (keywords.length !== context.args.length) {
       await msg.edit({
         content: t("commands:bulk_play.partialSuccess"),
       }).catch(this.logger.error);

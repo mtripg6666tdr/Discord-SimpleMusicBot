@@ -24,7 +24,7 @@ import ytdl from "ytdl-core";
 import { BaseCommand } from ".";
 
 export default class Radio extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["radio", "radio_start"],
       unlist: false,
@@ -42,29 +42,29 @@ export default class Radio extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    try{
-      if(context.rawArgs !== "" && context.server.queue.mixPlaylistEnabled){
+    try {
+      if (context.rawArgs !== "" && context.server.queue.mixPlaylistEnabled) {
         await message.reply(t("commands:radio.alreadyEnabled")).catch(this.logger.error);
         return;
-      }else if(context.rawArgs === "" && !context.server.queue.mixPlaylistEnabled && !context.server.player.isPlaying){
+      } else if (context.rawArgs === "" && !context.server.queue.mixPlaylistEnabled && !context.server.player.isPlaying) {
         await message.reply(t("commands:radio.noUrlSpecified")).catch(this.logger.error);
         return;
       }
 
       // if url specified, enable the feature
-      if(context.rawArgs !== "" || (!context.server.queue.mixPlaylistEnabled && context.server.player.isPlaying)){
+      if (context.rawArgs !== "" || (!context.server.queue.mixPlaylistEnabled && context.server.player.isPlaying)) {
         // first, attempt to join to the vc
         const joinResult = await context.server.joinVoiceChannel(message, { reply: false, replyOnFail: true });
-        if(!joinResult){
+        if (!joinResult) {
           return;
         }
 
         // validate provided url
         const videoId = this.getVideoId(context.rawArgs || context.server.player.currentAudioUrl);
-        if(!videoId){
+        if (!videoId) {
           await message.reply(t("commands:radio.invalidUrl")).catch(this.logger.error);
           return;
         }
@@ -72,7 +72,7 @@ export default class Radio extends BaseCommand {
         // setup and start to play
         const result = await context.server.queue.enableMixPlaylist(videoId, message.member, !context.rawArgs);
 
-        if(!result){
+        if (!result) {
           await message.reply(`:smiling_face_with_tear: ${t("search.notFound")}`);
           return;
         }
@@ -86,34 +86,34 @@ export default class Radio extends BaseCommand {
       }
 
       // if no url specified, disable the feature
-      else{
+      else {
         context.server.queue.disableMixPlaylist();
 
         await message.reply(`:white_check_mark:${t("commands:radio.stopped")}`).catch(this.logger.error);
       }
     }
-    catch(er){
+    catch (er) {
       await message.reply(t("errorOccurred"));
       this.logger.error(er);
     }
   }
 
-  protected getVideoId(url: string){
-    if(ytdl.validateURL(url)){
+  protected getVideoId(url: string) {
+    if (ytdl.validateURL(url)) {
       return ytdl.getURLVideoID(url);
-    }else{
-      try{
+    } else {
+      try {
         const urlObject = new URL(url);
-        if(
+        if (
           (urlObject.protocol === "http:" || urlObject.protocol === "https:")
           && urlObject.hostname === "www.youtube.com"
           && urlObject.pathname === "/playlist"
           && urlObject.searchParams.get("list")?.startsWith("RD")
-        ){
+        ) {
           return urlObject.searchParams.get("list")!.substring(2);
         }
       }
-      catch{
+      catch {
         /* empty */
       }
       return null;

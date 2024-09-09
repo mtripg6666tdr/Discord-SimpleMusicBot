@@ -24,7 +24,7 @@ import { getLogger } from "./logger";
 
 const logger = getLogger("Server");
 
-export function createServer(client: Client, port: number){
+export function createServer(client: Client, port: number) {
   return http.createServer((_, res) => {
     res.writeHead(200, { "Content-Type": "application/json" });
     const data = {

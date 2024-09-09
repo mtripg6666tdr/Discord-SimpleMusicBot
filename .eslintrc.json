@@ -12,7 +12,11 @@
   "rules": {
     "license-header/header": ["warn", "./util/license.js"],
     "no-process-exit": "off",
-    "@typescript-eslint/consistent-type-imports": "off"
+    "@typescript-eslint/consistent-type-imports": "off",
+    "keyword-spacing": "off",
+    "@typescript-eslint/keyword-spacing": ["warn", { "before": true, "after": true }],
+    "space-before-blocks": "off",
+    "@typescript-eslint/space-before-blocks": ["warn", { "functions": "always", "keywords": "always", "classes": "always" }]
   },
   "overrides": [
     {

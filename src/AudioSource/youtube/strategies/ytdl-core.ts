@@ -39,11 +39,11 @@ type ytdlCoreCache = Cache<ytdlCore, ytdl.videoInfo>;
 export class ytdlCoreStrategy extends Strategy<ytdlCoreCache, ytdl.videoInfo> {
   protected agent = config.proxy ? new HttpsProxyAgent(config.proxy) : undefined;
 
-  get cacheType(){
+  get cacheType() {
     return ytdlCore;
   }
 
-  async getInfo(url: string){
+  async getInfo(url: string) {
     this.logStrategyUsed();
 
     const requestOptions = this.agent ? { agent: this.agent } : undefined;
@@ -100,7 +100,7 @@ export class ytdlCoreStrategy extends Strategy<ytdlCoreCache, ytdl.videoInfo> {
       }) as YouTubeJsonFormat),
     };
 
-    if(forceUrl){
+    if (forceUrl) {
       return {
         ...partialResult,
         stream: {
@@ -116,7 +116,7 @@ export class ytdlCoreStrategy extends Strategy<ytdlCoreCache, ytdl.videoInfo> {
           data: info,
         },
       };
-    }else{
+    } else {
       const readable: Readable = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow
         ? createRefreshableYTLiveStream(info, url, { format, lang: config.defaultLanguage })
         : createChunkedYTStream(info, format, { lang: config.defaultLanguage }, 1 * 1024 * 1024);
@@ -139,7 +139,7 @@ export class ytdlCoreStrategy extends Strategy<ytdlCoreCache, ytdl.videoInfo> {
     }
   }
 
-  protected mapToExportable(url: string, info: ytdl.videoInfo){
+  protected mapToExportable(url: string, info: ytdl.videoInfo) {
     return {
       url,
       title: info.videoDetails.title,

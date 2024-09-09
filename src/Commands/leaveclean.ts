@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class LeaveClean extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["leaveclean", "lc", "leavecleanup"],
       unlist: false,
@@ -33,14 +33,14 @@ export default class LeaveClean extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    if(!context.server.player.isConnecting){
+    if (!context.server.player.isConnecting) {
       context.server.queue.removeAll();
       message.reply(`✅${t("commands:leaveclean.allRemoved")}`).catch(this.logger.error);
       return;
-    }else if(context.server.queue.length === 0){
+    } else if (context.server.queue.length === 0) {
       message.reply(t("commands:leaveclean.queueEmpty")).catch(this.logger.error);
       return;
     }

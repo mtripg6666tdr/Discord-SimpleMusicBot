@@ -30,7 +30,7 @@ import { color } from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
 
 export default class Lyrics extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["lyrics", "l", "lyric"],
       unlist: false,
@@ -50,16 +50,16 @@ export default class Lyrics extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
     const msg = await message.reply("🔍検索中...");
-    try{
+    try {
       const songInfo = await getLyrics.call(this, context.rawArgs);
       const embeds = [] as MessageEmbedBuilder[];
-      if(!songInfo.lyric) throw new Error("取得した歌詞が空でした");
+      if (!songInfo.lyric) throw new Error("取得した歌詞が空でした");
       const chunkLength = Math.ceil(songInfo.lyric.length / 4000);
-      for(let i = 0; i < chunkLength; i++){
+      for (let i = 0; i < chunkLength; i++) {
         const partial = songInfo.lyric.substring(4000 * i, 4000 * (i + 1) - 1);
         embeds.push(
           new MessageEmbedBuilder()
@@ -83,7 +83,7 @@ export default class Lyrics extends BaseCommand {
         embeds: embeds.map(embed => embed.toOceanic()),
       }).catch(this.logger.error);
     }
-    catch(e){
+    catch (e) {
       this.logger.error(e);
       await msg.edit(`:confounded:${t("commands:lyrics.failed")}`)
         .catch(this.logger.error);
@@ -91,8 +91,8 @@ export default class Lyrics extends BaseCommand {
   }
 }
 
-async function getLyrics(this: BaseCommand, keyword: string): Promise<songInfo>{
-  try{
+async function getLyrics(this: BaseCommand, keyword: string): Promise<songInfo> {
+  try {
     const client = new Genius.Client();
     const song = (await client.songs.search(keyword))[0];
     return {
@@ -103,9 +103,9 @@ async function getLyrics(this: BaseCommand, keyword: string): Promise<songInfo>{
       url: song.url,
     };
   }
-  catch(e){
+  catch (e) {
     // Fallback to utaten
-    if(!process.env.CSE_KEY) throw e;
+    if (!process.env.CSE_KEY) throw e;
     this.logger.warn(e);
 
     const { body } = await candyget.json(
@@ -115,7 +115,7 @@ async function getLyrics(this: BaseCommand, keyword: string): Promise<songInfo>{
     );
     const data = body as CSE_Result;
     const items = data.items?.filter(i => new URL(i.link).pathname.startsWith("/lyric/"));
-    if(!items || items.length === 0){
+    if (!items || items.length === 0) {
       throw new Error("No lyric was found");
     }
 

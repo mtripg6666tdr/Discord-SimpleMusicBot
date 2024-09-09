@@ -37,7 +37,7 @@ export function calcMinSec(totalSec: number, { fixedLength = 0 }: { fixedLength?
  * @param totalSec 合計時間(秒)
  * @returns [時間, ゼロ補完された分, ゼロ補完された秒]
  */
-export function calcHourMinSec(totalSec: number, { fixedLength = 0 }: { fixedLength?: number } = {}): [string, string, string]{
+export function calcHourMinSec(totalSec: number, { fixedLength = 0 }: { fixedLength?: number } = {}): [string, string, string] {
   const sec = totalSec % 60;
   const min = (totalSec - sec) / 60 % 60;
   const hr = ((totalSec - sec) / 60 - min) / 60;
@@ -53,7 +53,7 @@ export function calcHourMinSec(totalSec: number, { fixedLength = 0 }: { fixedLen
  * @param param0 
  * @returns 
  */
-export function HourMinSecToString([hour, min, sec]: string[], t: i18n["t"]){
+export function HourMinSecToString([hour, min, sec]: string[], t: i18n["t"]) {
   return hour === "NaN" ? t("unknown") : `${hour === "0" ? "" : `${hour}:`}${min}:${sec}`;
 }
 
@@ -63,7 +63,7 @@ export function HourMinSecToString([hour, min, sec]: string[], t: i18n["t"]){
  * @param date 合計時間(ミリ秒)
  * @returns [時間,分,秒,ミリ秒]
  */
-export function calcTime(date: number): number[]{
+export function calcTime(date: number): number[] {
   const millisec = date % 1000;
   let ato = (date - millisec) / 1000;
   const sec = ato % 60;
@@ -78,8 +78,8 @@ export function calcTime(date: number): number[]{
 //    1:23:45 => 1h 23m 45s
 // 1: 5:20:12 => 1d 5h 20m 12s
 const colonSplittedTimeRegex = /^(\d+:){0,3}\d+$/;
-export function colonSplittedTimeToSeconds(colonSplittedTime: string){
-  if(!colonSplittedTimeRegex.test(colonSplittedTime)){
+export function colonSplittedTimeToSeconds(colonSplittedTime: string) {
+  if (!colonSplittedTimeRegex.test(colonSplittedTime)) {
     return NaN;
   }
 

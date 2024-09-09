@@ -26,33 +26,33 @@ import * as handlers from "../handlers";
 
 const config = getConfig();
 
-export async function onInteractionCreate(this: MusicBot, interaction: discord.AnyInteractionGateway){
+export async function onInteractionCreate(this: MusicBot, interaction: discord.AnyInteractionGateway) {
   // コマンドインタラクションおよびコンポーネントインタラクション以外は処理せず終了
-  if(
+  if (
     interaction.type !== InteractionTypes.APPLICATION_COMMAND
     && interaction.type !== InteractionTypes.MESSAGE_COMPONENT
     && interaction.type !== InteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE
     && interaction.type !== InteractionTypes.MODAL_SUBMIT
-  ){
+  ) {
     this.logger.debug(`Unknown interaction received: ${(interaction as any).type}`);
     return;
   }
 
-  if(!interaction.member){
+  if (!interaction.member) {
     return;
   }
 
   // メンテナンスモードでかつボット管理者以外なら終了
-  if(this.maintenance && !config.isBotAdmin(interaction.member.id)){
+  if (this.maintenance && !config.isBotAdmin(interaction.member.id)) {
     this.logger.debug("Interaction ignored due to mentenance mode");
     return;
   }
   // ボットによるインタラクション（の可能性があるのかは知らないけど）なら終了
-  if(interaction.member?.bot){
+  if (interaction.member?.bot) {
     return;
   }
   // レートリミットしてるなら終了
-  if(this.rateLimitController.pushEvent(interaction.member.id)){
+  if (this.rateLimitController.pushEvent(interaction.member.id)) {
     return;
   }
 
@@ -61,14 +61,14 @@ export async function onInteractionCreate(this: MusicBot, interaction: discord.A
   const server = this.upsertData(channel.guild.id, channel.id);
 
   // コマンドインタラクション
-  switch(interaction.type){
+  switch (interaction.type) {
     case discord.InteractionTypes.APPLICATION_COMMAND:
       handlers.handleCommandInteraction.call(this, server, interaction).catch(this.logger.error);
       break;
 
     case discord.InteractionTypes.MESSAGE_COMPONENT:
     {
-      switch(interaction.data.componentType){
+      switch (interaction.data.componentType) {
         case discord.ComponentTypes.BUTTON:
           // ボタンインタラクション
           handlers.handleButtonInteraction.call(this, server, interaction).catch(this.logger.error);

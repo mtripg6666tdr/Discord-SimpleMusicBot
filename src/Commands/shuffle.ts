@@ -22,7 +22,7 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 import { BaseCommand } from ".";
 
 export default class Shuffle extends BaseCommand {
-  constructor(){
+  constructor() {
     super({
       alias: ["shuffle"],
       unlist: false,
@@ -33,10 +33,10 @@ export default class Shuffle extends BaseCommand {
   }
 
   @BaseCommand.updateBoundChannel
-  async run(message: CommandMessage, context: CommandArgs){
+  async run(message: CommandMessage, context: CommandArgs) {
     const { t } = context;
 
-    if(context.server.queue.length === 0){
+    if (context.server.queue.length === 0) {
       message.reply(t("commands:shuffle.queueEmpty")).catch(this.logger.error);
       return;
     }
