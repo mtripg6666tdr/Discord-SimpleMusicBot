@@ -12,7 +12,6 @@ node_modules
 
 # Build artifacts
 dist
-out
 typings
 build
 src/Commands/_index.ts

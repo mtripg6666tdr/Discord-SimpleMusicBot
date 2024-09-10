@@ -1,0 +1,162 @@
+"use strict";
+/*
+ * Copyright 2021-2024 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
+ * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
+ * If not, see <https://www.gnu.org/licenses/>.
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createChunkedYTStream = createChunkedYTStream;
+exports.createChunkedDistubeYTStream = createChunkedDistubeYTStream;
+exports.createRefreshableYTLiveStream = createRefreshableYTLiveStream;
+const tslib_1 = require("tslib");
+const distubeYtdl = tslib_1.__importStar(require("@distube/ytdl-core"));
+const ytdl = tslib_1.__importStar(require("ytdl-core"));
+const Util_1 = require("../../Util");
+const logger_1 = require("../../logger");
+const logger = (0, logger_1.getLogger)("AudioSource:YouTubeStream");
+function createChunkedYTStream(info, format, options, chunkSize = 512 * 1024) {
+    return (0, Util_1.createFragmentalDownloadStream)((start, end) => ytdl.downloadFromInfo(info, {
+        format,
+        ...options,
+        range: { start, end },
+    }), {
+        chunkSize,
+        contentLength: Number(format.contentLength),
+    });
+}
+function createChunkedDistubeYTStream(info, format, options, chunkSize = 8 * 1024 * 1024) {
+    const refreshInfo = async () => {
+        info = await distubeYtdl.getInfo(info.videoDetails.video_url);
+        const newFormat = info.formats.find(f => f.itag === format.itag);
+        if (!newFormat) {
+            stream.destroy(new Error("Failed to refresh the format"));
+            return;
+        }
+        format = newFormat;
+    };
+    const stream = (0, Util_1.createFragmentalDownloadStream)(async (start, end) => {
+        await refreshInfo();
+        return distubeYtdl.downloadFromInfo(info, { format, ...options, range: { start, end }, dlChunkSize: 0 });
+    }, {
+        chunkSize,
+        contentLength: Number(format.contentLength),
+        pulseDownload: true,
+    });
+    return stream;
+}
+function createRefreshableYTLiveStream(info, url, options, distube = false) {
+    // set timeout to any miniget stream
+    const setStreamNetworkTimeout = (_stream) => {
+        _stream.on("response", (message) => {
+            message.setTimeout(4000, () => {
+                logger.info("Segment timed out; retrying...");
+                const er = new Error("ENOTFOUND");
+                Object.defineProperty(er, "type", {
+                    value: "workaround",
+                });
+                message.destroy(er);
+            });
+        });
+    };
+    // start to download the live stream from the provided information (info object or url string)
+    const downloadLiveStream = async (targetInfo) => {
+        if (typeof targetInfo === "string") {
+            targetInfo = await ytdl.getInfo(targetInfo);
+            options.format = ytdl.chooseFormat(targetInfo.formats, { isHLS: true });
+        }
+        if (distube) {
+            (0, Util_1.assertIs)(targetInfo);
+            (0, Util_1.assertIs)(options);
+            return distubeYtdl.downloadFromInfo(targetInfo, Object.assign({
+                liveBuffer: 10000,
+            }, options));
+        }
+        else {
+            (0, Util_1.assertIs)(targetInfo);
+            (0, Util_1.assertIs)(options);
+            return ytdl.downloadFromInfo(targetInfo, Object.assign({
+                liveBuffer: 10000,
+            }, options));
+        }
+    };
+    // handle errors occurred by the current live stream
+    const onError = (er) => {
+        console.error(er);
+        if (er.message === "ENOTFOUND") {
+            refreshStream().catch(onError);
+        }
+        else {
+            destroyCurrentStream(er);
+            stream.destroy(er);
+        }
+    };
+    // destroy the current stream safely
+    const destroyCurrentStream = (er) => {
+        if (currentStream) {
+            currentStream.removeAllListeners("error");
+            currentStream.on("error", () => { });
+            currentStream.destroy(er);
+        }
+    };
+    // indicates if the stream is refreshing now or not.
+    let refreshing = false;
+    // re-create new stream to refresh instance
+    const refreshStream = async () => {
+        if (refreshing)
+            return;
+        try {
+            refreshing = true;
+            logger.debug("preparing new stream");
+            const newStream = await downloadLiveStream(url);
+            newStream.on("error", onError);
+            setStreamNetworkTimeout(newStream);
+            // wait until the stream is ready
+            await new Promise((resolve, reject) => newStream.once("readable", resolve).once("error", reject));
+            destroyCurrentStream();
+            currentStream = newStream;
+            currentStream.pipe(stream, {
+                end: false,
+            });
+            logger.debug("piped new stream");
+            refreshing = false;
+        }
+        catch (e) {
+            stream.destroy(e);
+        }
+    };
+    let currentStream = null;
+    const timeout = setInterval(refreshStream, 40 * 60 * 1000).unref();
+    const stream = (0, Util_1.createPassThrough)({
+        allowHalfOpen: true,
+        autoDestroy: false,
+    });
+    setImmediate(async () => {
+        currentStream = await downloadLiveStream(info);
+        currentStream.pipe(stream, {
+            end: false,
+        });
+        currentStream.on("error", onError);
+        setStreamNetworkTimeout(currentStream);
+    }).unref();
+    // finalize the stream to prevent memory leaks
+    stream.once("close", () => {
+        destroyCurrentStream();
+        currentStream = null;
+        clearInterval(timeout);
+        logger.debug("Live refreshing schedule cleared");
+    });
+    return stream;
+}
+//# sourceMappingURL=stream.js.map

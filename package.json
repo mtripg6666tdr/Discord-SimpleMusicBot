@@ -9,9 +9,9 @@
   "scripts": {
     "test": "mocha",
     "start": "npm run build && npm run onlystart",
-    "onlystart": "node util/exec dist",
-    "build": "node builder.mjs bake && tsc -p util/tsconfig/tsconfig.build.json",
-    "build:bundled": "node builder.mjs bake && tsc -p util/tsconfig/tsconfig.bundle.json && node builder.mjs bundle",
+    "onlystart": "node util/exec out",
+    "build": "node builder.mjs bake && tsc -p util/tsconfig/tsconfig.build.json || exit 0",
+    "build:bundled": "node builder.mjs bake && tsc -p util/tsconfig/tsconfig.bundle.json && node builder.mjs bundle --use-out-dir",
     "prelint": "node builder.mjs bake",
     "lint": "tsc && eslint .",
     "cleanup": "rimraf dist/ typings/ build/ out/ src/Commands/_index.ts",

@@ -1,0 +1,83 @@
+"use strict";
+/*
+ * Copyright 2021-2024 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
+ * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
+ * If not, see <https://www.gnu.org/licenses/>.
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GuildDataContainerWithBgm = void 0;
+const tslib_1 = require("tslib");
+const i18next_1 = tslib_1.__importDefault(require("i18next"));
+const GuildDataContainer_1 = require("./GuildDataContainer");
+const playManagerWithBgm_1 = require("../Component/playManagerWithBgm");
+const queueManagerWithBGM_1 = require("../Component/queueManagerWithBGM");
+class GuildDataContainerWithBgm extends GuildDataContainer_1.GuildDataContainer {
+    get queue() {
+        return this._queue;
+    }
+    get player() {
+        return this._player;
+    }
+    get bgmConfig() {
+        return this._bgmConfig;
+    }
+    initPlayManager() {
+        this._player = new playManagerWithBgm_1.PlayManagerWithBgm(this);
+    }
+    initQueueManager() {
+        this._queue = new queueManagerWithBGM_1.QueueManagerWithBgm(this);
+    }
+    constructor(guildid, boundchannelid, bot, bgmConfig) {
+        super(guildid, boundchannelid, bot);
+        this._bgmConfig = bgmConfig;
+    }
+    /**
+     * BGM設定が存在する場合に、BGM設定を完了します
+     */
+    async initBgmTracks() {
+        if (this.bgmConfig) {
+            const { items } = this.bgmConfig;
+            for (let i = 0; i < items.length; i++) {
+                await this.queue.addQueueOnly({
+                    url: items[i],
+                    addedBy: {
+                        displayName: i18next_1.default.t("system"),
+                        userId: "0",
+                    },
+                    gotData: {
+                        // 情報の取得を回避するためにダミーのデータを渡す
+                        title: "BGM",
+                        url: items[i],
+                        length: -1,
+                    },
+                    preventCache: true,
+                });
+            }
+            this.queue.moveCurrentTracksToBGM();
+        }
+    }
+    playBgmTracks() {
+        if (!this.bgmConfig)
+            throw new Error("no bgm configuration found!");
+        if (!this.bgmConfig.enableQueueLoop) {
+            this.queue.resetBgmTracks();
+        }
+        return this.joinVoiceChannelOnly(this.bgmConfig.voiceChannelId)
+            .then(() => this.player.play({ quiet: true, bgm: true }))
+            .catch(this.logger.error);
+    }
+}
+exports.GuildDataContainerWithBgm = GuildDataContainerWithBgm;
+//# sourceMappingURL=GuildDataContainerWithBgm.js.map
