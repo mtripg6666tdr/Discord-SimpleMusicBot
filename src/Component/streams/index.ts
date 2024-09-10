@@ -24,6 +24,7 @@ import { opus } from "prism-media";
 
 import { transformThroughFFmpeg } from "./ffmpeg";
 import { createPassThrough, downloadAsReadable } from "../../Util";
+import { destroyStream } from "../../Util/stream";
 import { getLogger } from "../../logger";
 
 type PlayableStreamInfo = {
@@ -163,20 +164,6 @@ export async function resolveStreamToPlayable(
       // @ts-expect-error undefined will be filtered by Array#filter
       streams: [streamInfo.type === "readable" ? streamInfo.stream : undefined, ffmpeg, passThrough].filter(d => d),
     };
-  }
-}
-
-export function destroyStream(stream: Readable, error?: Error) {
-  if (!stream.destroyed) {
-    // if stream._destroy was overwritten, callback might not be called so make sure to be called.
-    const originalDestroy = stream._destroy;
-    stream._destroy = function(er, callback) {
-      originalDestroy.apply(this, [er, () => {}]);
-      callback.apply(this, [er]);
-    };
-    stream.destroy(error);
-  } else if (error) {
-    stream.emit("error", error);
   }
 }
 

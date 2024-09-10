@@ -67,6 +67,7 @@ export function createChunkedDistubeYTStream(
     {
       chunkSize,
       contentLength: Number(format.contentLength),
+      pulseDownload: true,
     }
   );
 
