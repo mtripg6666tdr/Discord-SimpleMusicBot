@@ -220,6 +220,7 @@ Node.js v16以上の環境で動作することを想定していますが、で
 ---
 
 # v4.3.10
+## バグ修正
 * 一部のソースの再生が機能しなくなったのを暫定的に修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2603, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2609, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2610)
   * しかしながら、引き続き必要に応じて修正パッチをリリースしていきます。
 * 可能であれば、バイナリをスタンドアロンのものを使用する(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2605)
