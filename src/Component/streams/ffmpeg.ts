@@ -21,7 +21,7 @@ import type { ExportedAudioEffect } from "../audioEffectManager";
 
 import { FFmpeg } from "prism-media";
 
-import { destroyStream } from ".";
+import { destroyStream } from "../../Util/stream";
 import { DefaultUserAgent } from "../../definition";
 import { getLogger } from "../../logger";
 

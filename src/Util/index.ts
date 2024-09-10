@@ -28,6 +28,7 @@ import candyget from "candyget";
 import miniget from "miniget";
 import { debounce } from "throttle-debounce";
 
+import { destroyStream } from "../Util/stream";
 import { DefaultUserAgent, SecondaryUserAgent } from "../definition";
 import { getLogger } from "../logger";
 
@@ -420,9 +421,21 @@ export function createDebounceFunctionsFactroy<Key>(func: (key: Key) => void, de
   };
 }
 
+type FragmentalDownloadStreamOptions = {
+  contentLength: number,
+  chunkSize?: number,
+  userAgent?: string,
+  pulseDownload?: boolean,
+};
+
 export function createFragmentalDownloadStream(
   streamGenerator: string | ((start: number, end?: number) => Readable) | ((start: number, end?: number) => PromiseLike<Readable>),
-  { chunkSize = 512 * 1024, contentLength, userAgent = SecondaryUserAgent }: { chunkSize?: number, contentLength: number, userAgent?: string },
+  {
+    contentLength,
+    chunkSize = 512 * 1024,
+    userAgent = SecondaryUserAgent,
+    pulseDownload = false,
+  }: FragmentalDownloadStreamOptions,
 ) {
   const logger = getLogger("FragmentalDownloader", true);
   logger.addContext("id", Date.now());
@@ -441,11 +454,29 @@ export function createFragmentalDownloadStream(
         })
         : await streamGenerator(0);
 
-      originStream
-        .on("error", er => stream.destroy(er))
-        .pipe(stream);
+      if (pulseDownload) {
+        const pulseBuffer = createPassThrough({ highWaterMark: chunkSize + 20 * 1024 });
 
-      logger.info("Stream was created as a single stream");
+        originStream
+          .on("request", logger.trace)
+          .on("response", res => res.once("close", () => logger.trace("Response closed")))
+          .on("end", () => logger.trace("Origin stream ended"))
+          .on("error", er => destroyStream(pulseBuffer, er))
+          .pipe(pulseBuffer)
+          .on("error", er => destroyStream(stream, er))
+          .once("close", () => destroyStream(originStream))
+          .pipe(stream)
+          .once("close", () => destroyStream(pulseBuffer));
+      } else {
+        originStream
+          .on("request", logger.trace)
+          .on("response", res => res.once("close", () => logger.trace("Response closed")))
+          .on("end", () => logger.trace("Origin stream ended"))
+          .on("error", er => stream.destroy(er))
+          .pipe(stream);
+      }
+
+      logger.info(`Stream was created as a single stream. (buffer: ${chunkSize} / content length: ${contentLength})`);
     } else {
       const pipeNextStream = async () => {
         current++;
@@ -466,13 +497,33 @@ export function createFragmentalDownloadStream(
           : await streamGenerator(chunkSize * current, end);
         logger.info(`Stream #${current + 1} was created`);
 
-        nextStream
-          .on("request", logger.trace)
-          .on("error", er => stream.destroy(er))
-          .pipe(stream, { end: end === undefined });
+        let pulseBuffer: PassThrough | null = null;
+
+        if (pulseDownload) {
+          pulseBuffer = createPassThrough({ highWaterMark: chunkSize + 20 * 1024 });
+
+          nextStream
+            .on("request", logger.trace)
+            .on("response", res => res.once("close", () => logger.trace("Response closed")))
+            .on("end", () => logger.trace("Origin stream ended"))
+            .on("error", er => destroyStream(pulseBuffer!, er))
+            .pipe(pulseBuffer)
+            .on("error", er => destroyStream(stream, er))
+            .once("close", () => destroyStream(nextStream))
+            .pipe(stream, { end: end === undefined })
+            .once("close", () => destroyStream(pulseBuffer!));
+        } else {
+          nextStream
+            .on("request", logger.trace)
+            .on("response", res => res.once("close", () => logger.trace("Response closed")))
+            .on("end", () => logger.trace("Origin stream ended"))
+            .on("error", er => destroyStream(stream, er))
+            .pipe(stream, { end: end === undefined })
+            .once("close", () => destroyStream(nextStream));
+        }
 
         if (end !== undefined) {
-          nextStream.on("end", () => pipeNextStream());
+          (pulseBuffer || nextStream).on("end", () => pipeNextStream());
         } else {
           logger.info(`Last stream (total: ${current + 1})`);
         }

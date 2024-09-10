@@ -65,8 +65,10 @@ export class FixedAudioResource extends NullMetaAudioResource {
     });
     this.playStream
       .on("error", (er) => {
-        this.logger.info(er.message || er.toString(), "error");
+        this.logger.info(`Error: ${er.message || er.toString()}; the more info will be logged after this message.`);
         this.logger.trace(er.stack);
+        this.logger.trace("Note: the same stacktrace may be logged multiple times.");
+        this.logger.info(`Pushed total ${this.readLength} bytes`);
         this.error = true;
       })
       .on("end", () => {
@@ -78,7 +80,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
   private get isStreamReadable() {
     const res = this.playStream.readable || !(this.playStream.readableEnded || this.playStream.destroyed || this.error || this.timedout);
     if (!res) {
-      this.logger.trace(`Stream seems to finished / readable=${this.playStream.readable}, readableEnded=${this.playStream.readableEnded}, destroyed=${this.playStream.destroyed}, error=${this.error}, timedout=${this.timedout}`);
+      this.logger.trace(`Stream seems to be ended / readable=${this.playStream.readable}, readableEnded=${this.playStream.readableEnded}, destroyed=${this.playStream.destroyed}, error=${this.error}, timedout=${this.timedout}`);
     }
     return res;
   }
