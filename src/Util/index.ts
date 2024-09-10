@@ -455,7 +455,7 @@ export function createFragmentalDownloadStream(
         : await streamGenerator(0);
 
       if (pulseDownload) {
-        const pulseBuffer = createPassThrough({ highWaterMark: chunkSize + 20 * 1024 });
+        const pulseBuffer = createPassThrough({ highWaterMark: chunkSize + 1.2 });
 
         originStream
           .on("request", logger.trace)
@@ -500,7 +500,7 @@ export function createFragmentalDownloadStream(
         let pulseBuffer: PassThrough | null = null;
 
         if (pulseDownload) {
-          pulseBuffer = createPassThrough({ highWaterMark: chunkSize + 20 * 1024 });
+          pulseBuffer = createPassThrough({ highWaterMark: chunkSize + 1.2 });
 
           nextStream
             .on("request", logger.trace)
