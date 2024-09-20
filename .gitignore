@@ -24,7 +24,6 @@ compose.yml
 
 # Executables
 youtube-dl
-*.exe
 node
 !util/**/node
 
