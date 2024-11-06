@@ -41,7 +41,7 @@
     "prism-media": "^1.3.5",
     "safe-traverse": "^0.2.1",
     "soundcloud.ts": "^0.5.2",
-    "spotify-url-info": "^3.2.16",
+    "spotify-url-info": "^3.2.17",
     "throttle-debounce": "^5.0.2",
     "tslib": "^2.7.0",
     "undici": "^5.28.4",
