@@ -60,7 +60,7 @@
     "@types/throttle-debounce": "^5.0.2",
     "@types/ws": "^8.5.13",
     "esbuild": "^0.24.0",
-    "eslint": "^8.57.0",
+    "eslint": "^9.14.0",
     "eslint-plugin-license-header": "^0.6.1",
     "mocha": "^10.7.3",
     "rimraf": "^5.0.10",
