@@ -22,7 +22,7 @@
     "@distube/ytdl-core": "^4.15.1",
     "@mtripg6666tdr/async-lock": "^1.1.0",
     "@mtripg6666tdr/oceanic-command-resolver": "~1.4.2",
-    "@sinclair/typebox": "^0.34.0",
+    "@sinclair/typebox": "^0.34.6",
     "candyget": "^0.5.6",
     "comment-json": "^4.2.5",
     "dotenv": "^16.4.5",
