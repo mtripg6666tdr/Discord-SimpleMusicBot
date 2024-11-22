@@ -31,7 +31,7 @@
     "html-to-text": "^9.0.5",
     "https-proxy-agent": "^7.0.5",
     "i18next": "^23.16.5",
-    "i18next-fs-backend": "^2.3.2",
+    "i18next-fs-backend": "^2.6.0",
     "log4js": "^6.9.1",
     "miniget": "^4.2.3",
     "node-html-parser": "^6.1.13",
