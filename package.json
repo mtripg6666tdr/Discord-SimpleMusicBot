@@ -30,7 +30,7 @@
     "html-entities": "^2.5.2",
     "html-to-text": "^9.0.5",
     "https-proxy-agent": "^7.0.5",
-    "i18next": "^23.16.5",
+    "i18next": "^24.2.0",
     "i18next-fs-backend": "^2.3.2",
     "log4js": "^6.9.1",
     "miniget": "^4.2.3",
