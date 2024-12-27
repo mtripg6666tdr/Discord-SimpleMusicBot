@@ -34,7 +34,7 @@
     "i18next-fs-backend": "^2.3.2",
     "log4js": "^6.9.1",
     "miniget": "^4.2.3",
-    "node-html-parser": "^6.1.13",
+    "node-html-parser": "^7.0.1",
     "oceanic.js": "~1.11.2",
     "p-event": "^4.2.0",
     "p-queue": "^6.6.2",
