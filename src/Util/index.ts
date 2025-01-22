@@ -209,6 +209,7 @@ const httpsAgent = new HttpsAgent({ keepAlive: false });
  */
 export function downloadAsReadable(url: string, options: miniget.Options = { headers: { "User-Agent": DefaultUserAgent } }): Readable {
   const logger = getLogger("Util");
+  logger.info("Miniget is now Run Request")
   return miniget(url, {
     maxReconnects: 10,
     maxRetries: 3,
