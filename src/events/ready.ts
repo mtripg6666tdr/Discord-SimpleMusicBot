@@ -129,5 +129,5 @@ export async function onReady(this: MusicBot) {
 
   await updateActivity();
 
-  setInterval(updateActivity, 1 * 30 * 1000).unref();
+  setInterval(updateActivity, 1 * 60 * 1000).unref();
 }
