@@ -120,7 +120,7 @@ export async function onReady(this: MusicBot) {
       const guildsCount = this.client.guilds.size;
       await client.editStatus("online", [
         {
-          type: discord.ActivityTypes.COMPETING,
+          type: discord.ActivityTypes.LISTENING,
           name: `${voiceConnectionsCount}/${guildsCount} Servers`,
         },
       ]).catch(this.logger.error);
