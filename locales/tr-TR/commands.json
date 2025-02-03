@@ -60,8 +60,8 @@
   },
   "command": {
     "name": "コマンド",
-    "usage": "command [コマンド名]",
-    "examples": "command search",
+    "usage": "komut [komut adı]",
+    "examples": "komut ara",
     "description": "コマンド一覧を表示します。コマンド名を指定するとそのコマンドの詳細を表示します。",
     "args": {
       "command": {
@@ -79,7 +79,7 @@
     "commandList": "コマンド一覧",
     "toLearnMoreMessage": "`{{prefix}}コマンド 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
     "toLearnMoreInteraction": "`/command 再生`のように、コマンド名を引数につけて、そのコマンドの詳細を表示できます。",
-    "commandExplanation": "コマンド`{{command}}`の詳細",
+    "commandExplanation": "`{{command}}` Komutunun Ayrıntıları",
     "usageLabel": "使い方",
     "exampleLabel": "使用例",
     "argumentDescription": "`<>` 内の引数は必須の引数、`[]`内の引数は任意の引数です。",
@@ -149,7 +149,7 @@
     "repository": "レポジトリ",
     "sourceCode": "ソースコード",
     "supportServer": "サポートサーバー",
-    "availableSources": "現在対応している音楽ソース",
+    "availableSources": "Mevcut Ses Kaynakları",
     "keywordSearch": "キーワード検索",
     "videoUrl": "動画URL指定",
     "playlistUrl": "プレイリストURL指定",
@@ -159,14 +159,14 @@
     "tweetUrl": "ツイートURL指定",
     "spotify": "曲のURL、およびプレイリストのURL。曲を推測してYouTubeから再生します。",
     "custom": "オーディオファイルへの直URL",
-    "googleDrive": "Google ドライブ",
+    "googleDrive": "Google Drive",
     "niconico": "ニコニコ動画"
   },
   "import": {
-    "name": "インポート",
-    "messageCommandName": "インポート",
-    "description": "指定されたメッセージからキューをインポートします。`export`コマンドで出力されたファイルが添付されたURLを引数として指定してください。",
-    "examples": "import https://discord.com/channels/...",
+    "name": "içe aktar",
+    "messageCommandName": "İçe Aktar",
+    "description": "Belirtilen mesajdan kuyruğu içe aktarır. `export` komutuyla dışa aktarılan bir dosyaya sahip mesajın URL'sini belirtin.",
+    "examples": "https://discord.com/channels/... adresini içe aktar",
     "usage": "インポート <インポート元のURL>",
     "args": {
       "url": {
@@ -174,7 +174,7 @@
       }
     },
     "invalidArgumentMessage": "インポート元のキューが埋め込まれたメッセージのURLを引数として渡してください。",
-    "noDiscordLink": "Discordのメッセージへのリンクを指定してください。",
+    "noDiscordLink": "Discord mesajınıza bir bağlantı sağlayın.",
     "invalidLink": "指定されたURLは無効です。",
     "loadingMessage": "メッセージを取得しています",
     "notBotMessage": "ボットのメッセージではありません",
@@ -219,33 +219,33 @@
     "usage": "log [mem|cpu|basic|log]",
     "args": {
       "content": {
-        "description": "basic,mem,cpu,logのどれかを指定できます。",
+        "description": "basic, mem, cpu ve log seçeneklerinden birini seçebilirsiniz.",
         "choices": {
-          "basic": "基本情報",
-          "mem": "メモリ",
-          "cpu": "CPU",
+          "basic": "Temel bilgiler",
+          "mem": "Hafıza",
+          "cpu": "İşlemci",
           "log": "ログ(管理者のみ)"
         }
       }
     },
     "executing": "実行します",
-    "guildName": "サーバー名",
-    "participatingGuildCount": "参加サーバー数",
+    "guildName": "Sunucu adı",
+    "participatingGuildCount": "Katılımcı Sunucular",
     "registeredGuildCount": "データが保持されているサーバー数",
     "connectingGuildCount": "接続中サーバー数",
     "playingGuildCount": "再生中サーバー数(一時停止含む)",
     "pausedGuildCount": "一時停止サーバー数",
     "guildSearchResult": "サーバー照会結果(秘)",
-    "guildId": "サーバーID",
-    "guildIcon": "サーバーアイコン",
-    "guildChannelCountFromCache": "チャンネル数(キャッシュによる)",
-    "guildConnecting": "接続中",
-    "guildPlaying": "再生中/一時停止中",
-    "guildPaused": "一時停止中",
-    "itemsInQueue": "キュー内のアイテム数",
+    "guildId": "Sunucu Kimliği",
+    "guildIcon": "Sunucu Simgesi",
+    "guildChannelCountFromCache": "Kanal Sayısı (önbelleğe alınmış)",
+    "guildConnecting": "Bağlanılıyor",
+    "guildPlaying": "Oynatılıyor/Duraklatıldı",
+    "guildPaused": "Duraklatıldı",
+    "itemsInQueue": "Oynatma Sırasındaki Öğeler",
     "currentTransformingCost": "現在の変換コスト",
-    "liveStream": "ライブストリーム",
-    "memberCount": "メンバー数",
+    "liveStream": "Canlı Yayın",
+    "memberCount": "Üyeler",
     "version": "Sürüm",
     "managedCollectorsID": "保持されているコレクターのIDの合計",
     "managedCollectors": "保持されているコレクター数",
@@ -284,8 +284,8 @@
         "description": "楽曲を検索するキーワード"
       }
     },
-    "embedTitle": "\"{{title}}\"({{artist}})の歌詞",
-    "failed": "失敗しました。曲名を確認してもう一度試してみてください。"
+    "embedTitle": "\"{{title}}\"({{artist}}) şarkısının sözleri",
+    "failed": "Şarkı sözleri gösterilemiyor. Lütfen şarkı adını kontrol edip tekrar deneyin."
   },
   "move": {
     "name": "taşı",
@@ -558,7 +558,7 @@
     "preparing": "現在再生準備中のためスキップできません。",
     "votePanelAlreadyOpen": "すでに開かれている投票パネルがあります。",
     "success": "`{{title}}`をスキップしました",
-    "failed": "スキップに失敗しました"
+    "failed": "Atlama başarısız oldu"
   },
   "sleeptimer": {
     "name": "スリープタイマー",
@@ -570,9 +570,9 @@
         "description": "スリープタイマーの時間。分:秒の形式で指定します。この曲で終了する場合は$を指定します。"
       }
     },
-    "done": "スリープタイマーを **{{time}}** に設定しました。",
-    "doneCurrentSong": "スリープタイマーを、この曲が終わるタイミングに設定しました。",
-    "canceled": "スリープタイマーをキャンセルしました。",
+    "done": "Uyku zamanlayıcısı **{{time}}** olarak başarıyla ayarlandı.",
+    "doneCurrentSong": "Uyku zamanlayıcısı geçerli şarkının sonuna başarıyla ayarlandı.",
+    "canceled": "Uyku zamanlayıcısı iptal edildi.",
     "invalidTime": "指定された時間が正しくありません。「時間:分:秒」の形式か、この曲で終了する場合は$と指定してください。",
     "slept": "スリープタイマーの時間になったため、終了します。"
   },
@@ -595,23 +595,23 @@
     "elapsedAfterInstantiated": "インスタンス作成からの経過時間",
     "elapsedAfterConnected": "Discordに接続してからの経過時間",
     "registeredServerCount": "データが保持されているサーバー数",
-    "datetimeLabel": "{{hour}}時間{{min}}分{{sec}}秒",
-    "serverCount_one": "{{count}}サーバー",
-    "serverCount_other": "{{count}}サーバー"
+    "datetimeLabel": "{{hour}} saat {{min}} dakika {{sec}} saniye",
+    "serverCount_one": "{{count}} sunucu",
+    "serverCount_other": "{{count}} sunucu"
   },
   "volume": {
-    "name": "ボリューム",
+    "name": "ses düzeyi",
     "description": "音量を調節します。1から200の間で指定します(デフォルト100)。何も引数を付けないと現在の音量を表示します。不安定になった場合には100に戻してください。",
     "examples": "volume [音量]",
-    "usage": "volume 120",
+    "usage": "ses düzeyi 120",
     "args": {
       "volume": {
-        "description": "変更先の音量。1~200までが指定できます。"
+        "description": "Değiştireceğiniz ses düzeyini 1 ile 200 arasında ayarlayın."
       }
     },
-    "currentVolume": "現在の音量は**{{volume}}**です。(デフォルトは100)",
-    "outOfRange": "音量を変更する際は1から200の数字で指定してください。",
-    "changed": "音量を**{{volume}}**に変更しました。",
+    "currentVolume": "Mevcut ses düzeyi **{{volume}}**. (Varsayılan: 100)",
+    "outOfRange": "Lütfen 1 ile 200 arasında bir değer girin.",
+    "changed": "Ses düzeyi **{{volume}}** olarak değiştirildi.",
     "appliedFromNext": "次の曲から適用されます。現在再生中の曲に設定を適用するには、`頭出し`コマンドなどを使用してください。"
   }
 }
