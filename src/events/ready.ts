@@ -127,7 +127,7 @@ export async function onReady(this: MusicBot) {
     }
   };
 
-  await updateActivity();
+  await updateActivity().catch(this.logger.error);
 
   setInterval(updateActivity, 1 * 60 * 1000).unref();
 }
