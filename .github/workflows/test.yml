@@ -200,6 +200,10 @@ jobs:
         if: env.WORKFLOW_CONCLUSION == 'failure'
         run: exit 1
 
+      - name: Check cancellation
+        if: env.WORKFLOW_CONCLUSION == 'cancelled'
+        run: exit 1
+
       - name: Success
         run: echo "All done"
         if: ${{ success() }}
