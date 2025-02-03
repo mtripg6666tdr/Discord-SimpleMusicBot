@@ -7,7 +7,7 @@ node_modules
 test
 util/exampleDbServer
 .env.sample
-.eslint*
+eslint*
 .gitattributes
 .gitignore
 .replit

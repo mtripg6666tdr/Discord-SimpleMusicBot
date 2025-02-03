@@ -51,20 +51,30 @@
     "ytsr": "^3.8.4"
   },
   "devDependencies": {
-    "@mtripg6666tdr/eslint-config": "^3.0.19",
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.14.0",
+    "@stylistic/eslint-plugin": "^2.10.1",
     "@swc/core": "^1.8.0",
     "@tsconfig/node16": "^16.1.3",
+    "@types/eslint__js": "^8.42.3",
     "@types/html-to-text": "^9.0.4",
     "@types/mocha": "^10.0.9",
     "@types/node": "^22.9.0",
     "@types/throttle-debounce": "^5.0.2",
     "@types/ws": "^8.5.13",
     "esbuild": "^0.24.0",
-    "eslint": "^8.57.0",
+    "eslint": "^9.14.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-license-header": "^0.6.1",
+    "eslint-plugin-n": "^17.12.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "globals": "^15.12.0",
     "mocha": "^10.7.3",
     "rimraf": "^5.0.10",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.13.0"
   },
   "optionalDependencies": {
     "@discordjs/opus": "^0.9.0",
