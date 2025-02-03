@@ -31,6 +31,32 @@ if (typeof global.fetch === "undefined") {
   global.fetch = require("undici").fetch;
 }
 
+
+if (typeof global.Blob === "undefined") {
+  logger.warn("Native Blob class is not defined.");
+  logger.warn("Setting up Blob object imported from buffer standard module.");
+
+  polyfillCount++;
+
+  global.Blob = require("buffer").Blob;
+}
+
+if (typeof global.DOMException === "undefined") {
+  logger.warn("Native DOMException class is not defined.");
+  logger.warn("Installing a custom DOMException pollyfill.");
+
+  polyfillCount++;
+
+  // @ts-expect-error
+  global.DOMException = function DOMException(message: string, name: string) {
+    (this as any).message = message;
+    (this as any).name = name;
+  };
+
+  // @ts-expect-error
+  global.DOMException.prototype = Error.prototype;
+}
+
 if (typeof global.structuredClone === "undefined") {
   logger.warn("Native structuredClone function is not defined.");
   logger.warn("Installing a structuredClone polyfill.");
