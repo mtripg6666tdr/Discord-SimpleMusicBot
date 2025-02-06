@@ -26,8 +26,10 @@ function createDefaultBuilder(path){
       write: false,
       define: {
         "global.BUNDLED": "true",
+        "__dirname": "\"./dist\"",
       },
-      sourcemap: "inline",
+      inject: ["./inject.js"],
+      sourcemap: false,
       metafile: generateMetafile,
     });
 
@@ -43,9 +45,9 @@ function createDefaultBuilder(path){
 }
 
 async function bundleAssets({ leaveBuildArtifact, generateMetafile, useOutDir }){
-  const [mainCompilation, workerCompilation] = await Promise.all([
+  const [mainCompilation, ] = await Promise.all([
     createDefaultBuilder("build/index.js")({ generateMetafile }),
-    createDefaultBuilder("build/AudioSource/youtube/worker.js")({ generateMetafile }),
+    //createDefaultBuilder("build/AudioSource/youtube/worker.js")({ generateMetafile }),
   ]);
 
   const outDirBase = useOutDir ? "./out" : "./dist";
@@ -55,18 +57,38 @@ async function bundleAssets({ leaveBuildArtifact, generateMetafile, useOutDir })
     await fs.promises.mkdir(resolveRelativePath(outDirBase), { recursive: true });
   }
 
-  await Promise.all([
-    fs.promises.writeFile(resolveRelativePath(outPath("index.js")), mainCompilation.bundled),
-    fs.promises.writeFile(resolveRelativePath(outPath("index.min.js")), mainCompilation.minified),
-    mainCompilation.metafile && fs.promises.writeFile(resolveRelativePath(outPath("index.meta.json")), JSON.stringify(mainCompilation.metafile, null)),
-    fs.promises.writeFile(resolveRelativePath(outPath("worker.js")), workerCompilation.bundled),
-    fs.promises.writeFile(resolveRelativePath(outPath("worker.min.js")), workerCompilation.minified),
-    workerCompilation.metafile && fs.promises.writeFile(resolveRelativePath(outPath("worker.meta.json")), JSON.stringify(workerCompilation.metafile)),
-  ].filter(Boolean));
+  // await Promise.all([
+  //   fs.promises.writeFile(resolveRelativePath(outPath("index.js")), mainCompilation.bundled),
+  //   fs.promises.writeFile(resolveRelativePath(outPath("index.min.js")), mainCompilation.minified),
+  //   mainCompilation.metafile && fs.promises.writeFile(resolveRelativePath(outPath("index.meta.json")), JSON.stringify(mainCompilation.metafile, null)),
+  //   fs.promises.writeFile(resolveRelativePath(outPath("worker.js")), workerCompilation.bundled),
+  //   fs.promises.writeFile(resolveRelativePath(outPath("worker.min.js")), workerCompilation.minified),
+  //   workerCompilation.metafile && fs.promises.writeFile(resolveRelativePath(outPath("worker.meta.json")), JSON.stringify(workerCompilation.metafile)),
+  // ].filter(Boolean));
 
   if(!leaveBuildArtifact){
     await rimraf(resolveRelativePath("./build"));
   }
+
+  const outputPackageJson = (await import("./package.json", { with: { type: "json" } })).default;
+  outputPackageJson.scripts = {
+    start: "node --dns-result-order=ipv4first -e eval(require('./package.json').__files.index_js)",
+  };
+  outputPackageJson.engines.node = ">=18";
+  delete outputPackageJson.devDependencies;
+  delete outputPackageJson.main;
+  outputPackageJson.version += "-pkgjson.0";
+  outputPackageJson.name += "-package-json-edition";
+  outputPackageJson.description += " or any js files";
+  outputPackageJson.env = {
+    "VAL_ON_PKG_JSON": "Seeing this message means environment variables in package.json was successfully loaded!\nWelcome to the Discord-SimpleMusicBot package.json edition!",
+    "TOKEN": "",
+  };
+  outputPackageJson.config = eval(`(${await fs.promises.readFile(resolveRelativePath("./config.json"), "utf-8")})`);
+  outputPackageJson.__files = {
+    index_js: mainCompilation.minified,
+  };
+  await fs.promises.writeFile(resolveRelativePath(outPath("package.json")), JSON.stringify(outputPackageJson, null, 2));
 };
 
 function bakeDynamicImports(){

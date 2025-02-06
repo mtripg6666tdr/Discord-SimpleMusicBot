@@ -18,11 +18,10 @@
 
 import type { Locale } from "oceanic.js";
 
-import fs from "fs";
 import path from "path";
 
 import i18next from "i18next";
-import Backend from "i18next-fs-backend";
+import resourcesToBackend from "i18next-resources-to-backend";
 
 // Ref: https://stackoverflow.com/questions/60131681/make-sure-array-has-all-types-from-a-union
 const arrayOfAll = <T>() => <U extends T[]>(
@@ -65,9 +64,9 @@ export const discordLanguages: readonly string[] = arrayOfAll<Locale>()([
 ]);
 
 const localesRoot = path.join(__dirname, "../locales/");
-const lngsInLocalesDirectory = fs.readdirSync(localesRoot, { withFileTypes: true })
+const lngsInLocalesDirectory /*fs.readdirSync(localesRoot, { withFileTypes: true })
   .filter(d => d.isDirectory())
-  .flatMap(d => d.name);
+  .flatMap(d => d.name)*/ = ["en-GB", "en-US", "fr-FR", "ja", "th-TH", "tr-TR", "zh-TW"];
 const supportedDiscordLocales = discordLanguages.filter(lang => {
   if (lang.includes("-")) {
     return lngsInLocalesDirectory.includes(lang);
@@ -78,7 +77,7 @@ const supportedDiscordLocales = discordLanguages.filter(lang => {
 
 export function initLocalization(debug: boolean, lang: string) {
   return i18next
-    .use(Backend)
+    .use(resourcesToBackend((language: string, namespace: string) => Promise.resolve(require(`../locales/${language}/${namespace}.json`))))
     .init({
       debug,
       cleanCode: true,
@@ -101,9 +100,9 @@ export function initLocalization(debug: boolean, lang: string) {
         escapeValue: false,
       },
       defaultNS: "default",
-      backend: {
-        loadPath: path.join(localesRoot, "{{lng}}/{{ns}}.json"),
-      },
+      // backend: {
+      //   loadPath: path.join(localesRoot, "{{lng}}/{{ns}}.json"),
+      // },
     });
 }
 

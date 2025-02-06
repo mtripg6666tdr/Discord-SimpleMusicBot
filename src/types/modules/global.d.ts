@@ -23,7 +23,7 @@ import type { ReadableStream as WebReadableStream } from "stream/web";
 import type { Worker } from "worker_threads";
 
 declare global {
-  var workerThread: Worker;
+  var workerThread: Worker | { terminate: () => void };
   var BUNDLED: boolean | undefined;
   var ReadableStream: typeof WebReadableStream;
 
