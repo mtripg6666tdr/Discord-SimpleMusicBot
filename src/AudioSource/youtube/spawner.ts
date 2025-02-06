@@ -21,16 +21,15 @@ import type * as dYtsr from "@distube/ytsr";
 import type * as ytsr from "ytsr";
 
 import * as crypto from "crypto";
-import * as path from "path";
-import { Worker, isMainThread } from "worker_threads";
 
 import PQueue from "p-queue";
 
+import { worker } from "./tunnelPolyfill";
 import { YouTube } from "..";
 import { stringifyObject } from "../../Util";
 import { getLogger } from "../../logger";
 
-const worker = isMainThread ? new Worker(path.join(__dirname, global.BUNDLED && __filename.includes("min") ? "./worker.min.js" : "./worker.js")).on("error", console.error) : null;
+import "./worker";
 
 if (worker) {
   global.workerThread = worker;
@@ -87,14 +86,14 @@ const jobQueue = worker && new Map<string, jobQueueContent>();
 if (worker) {
   worker.unref();
   worker.on("message", (message: WithId<WorkerMessage>) => {
-    if (jobQueue!.has(message.id)) {
-      const { callback, start } = jobQueue!.get(message.id)!;
+    if (jobQueue.has(message.id)) {
+      const { callback, start } = jobQueue.get(message.id)!;
 
       logger.debug(`Job(${message.id}) Finished (${Date.now() - start}ms)`);
 
       callback(message);
 
-      jobQueue!.delete(message.id);
+      jobQueue.delete(message.id);
     } else {
       logger.warn(`Invalid message received: ${stringifyObject(message)}`);
     }
@@ -123,7 +122,7 @@ function doJob(message: SpawnerJobMessage): Promise<WorkerSuccessMessage> {
       id: uuid,
     });
     logger.debug(`Job(${uuid}) Started`);
-    jobQueue!.set(uuid, {
+    jobQueue.set(uuid, {
       start: Date.now(),
       callback: result => {
         if (result.type === "error") {

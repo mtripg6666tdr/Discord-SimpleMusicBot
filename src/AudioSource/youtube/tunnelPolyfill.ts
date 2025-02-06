@@ -16,18 +16,29 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable no-var */
-/* eslint-disable @typescript-eslint/method-signature-style */
-import type { ReadableStream as WebReadableStream } from "stream/web";
-import type { Worker } from "worker_threads";
+const parentToWorkerEventHandlers: ((message: any) => any)[] = [];
+const workerToParentEventHandlers: ((message: any) => any)[] = [];
+const noop = () => {
+  console.log("noop!");
+};
 
-declare global {
-  var workerThread: Worker | { terminate: () => void };
-  var BUNDLED: boolean | undefined;
-  var ReadableStream: typeof WebReadableStream;
+export const parentPort = {
+  unref: noop,
+  on: (_: string, callback: (message: any) => void) => {
+    parentToWorkerEventHandlers.push(callback);
+  },
+  postMessage: (obj: any) => {
+    workerToParentEventHandlers.forEach((handler) => handler(obj));
+  },
+};
 
-  interface JSON {
-    parse<T>(text: string, reviver?: (this: any, key: string, value: any) => any): T;
-  }
-}
+export const worker = {
+  terminate: noop,
+  unref: noop,
+  on: (_: string, callback: (message: any) => void) => {
+    workerToParentEventHandlers.push(callback);
+  },
+  postMessage: (obj: any) => {
+    parentToWorkerEventHandlers.forEach((handler) => handler(obj));
+  },
+};

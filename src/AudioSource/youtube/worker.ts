@@ -20,14 +20,14 @@ import type { WithId, SpawnerGetInfoMessage, SpawnerJobMessage, SpawnerSearchMes
 
 import "../../polyfill";
 
-import { parentPort } from "worker_threads";
-
 import ytsr from "ytsr";
 
 import { YouTube } from ".";
 import { updateStrategyConfiguration } from "./strategies";
+import { parentPort } from "./tunnelPolyfill";
 import { requireIfAny, stringifyObject } from "../../Util";
 import { getConfig } from "../../config";
+
 
 const dYtsr = requireIfAny("@distube/ytsr") as typeof import("@distube/ytsr");
 
@@ -46,7 +46,7 @@ parentPort.unref();
 parentPort.on("message", onMessage);
 
 function postMessage(message: WorkerMessage | WithId<WorkerMessage>) {
-  parentPort!.postMessage(message);
+  parentPort.postMessage(message);
 }
 
 function getInfo({ id, url, prefetched, forceCache }: WithId<SpawnerGetInfoMessage>) {
