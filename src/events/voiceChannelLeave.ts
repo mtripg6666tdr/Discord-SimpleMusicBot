@@ -31,7 +31,7 @@ export async function onVoiceChannelLeave(
   member: discord.Member,
   oldChannel: discord.VoiceChannel | discord.StageChannel | discord.Uncached,
 ) {
-  if (!("guild" in oldChannel)) {
+  if (!oldChannel || !("guild" in oldChannel)) {
     return;
   }
 
