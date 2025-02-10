@@ -57,7 +57,7 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
       this.lengthSeconds = Math.floor(track.duration / 1000);
       this.title = track.name;
       this.artist = track.artists.map(artist => artist.name).join(", ");
-      this.thumbnail = track.coverArt.sources[0]?.url || DefaultAudioThumbnailURL;
+      this.thumbnail = track.coverArt?.sources[0]?.url || DefaultAudioThumbnailURL;
     }
     return this;
   }
