@@ -191,7 +191,14 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
     const quiet = option?.quiet || false;
     if (this.status !== "consumed") return;
     if (!quiet) {
-      await this._responseMessage?.channel.createMessage({
+      // debugging purpose
+      if (this._responseMessage && !this._responseMessage.channel) {
+        this.logger.debug("The response message has no channel. (and this is not expected for the developer.)");
+        this.logger.debug("If possible, please report this and the follwing message to the developer and they can improve this bot.");
+        this.logger.debug(this._responseMessage["_message"]);
+      }
+
+      await this._responseMessage?.channel?.createMessage({
         content: `✅${this.t("canceling")}`,
       }).catch(this.logger.error);
     }
