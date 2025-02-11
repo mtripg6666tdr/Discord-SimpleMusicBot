@@ -113,21 +113,29 @@ export async function onReady(this: MusicBot) {
   this.emit("ready");
   this.logger.info("Bot is ready now");
 
-  // Set activity with VC and guild count
   const updateActivity = async () => {
     if (!this.maintenance) {
-      const voiceConnectionsCount = this.client.voiceConnections.size;
-      const guildsCount = this.client.guilds.size;
-      await client.editStatus("online", [
-        {
-          type: discord.ActivityTypes.LISTENING,
-          name: `${voiceConnectionsCount}/${guildsCount} Servers`,
-        },
-      ]).catch(this.logger.error);
+      if (config.showGuildCountStatus) {
+        // Set activity with VC and guild count
+        const voiceConnectionsCount = this.client.voiceConnections.size;
+        const guildsCount = this.client.guilds.size;
+        await client.editStatus("online", [
+          {
+            type: discord.ActivityTypes.LISTENING,
+            name: `${voiceConnectionsCount}/${guildsCount} Servers`,
+          },
+        ]).catch(this.logger.error);
+      } else {
+        await client.editStatus("online", [
+          {
+            type: discord.ActivityTypes.LISTENING,
+            name: i18next.t("music"),
+          },
+        ]).catch(this.logger.error);
+      }
     }
   };
 
-  await updateActivity().catch(this.logger.error);
-
-  setInterval(updateActivity, 1 * 60 * 1000).unref();
+  await updateActivity();
+  this.on("tick", updateActivity);
 }
