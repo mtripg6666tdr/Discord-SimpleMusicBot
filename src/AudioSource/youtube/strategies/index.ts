@@ -19,6 +19,7 @@
 import type { Strategy, Cache } from "./base";
 import type { NightlyYoutubeDl } from "./nightly_youtube-dl";
 import type { playDlStrategy } from "./play-dl";
+import type { ybdProjectYtdlCoreStrategy } from "./ybdproject_ytdl-core";
 import type { youtubeDlStrategy } from "./youtube-dl";
 import type { ytDlPStrategy } from "./yt-dlp";
 import type { ytdlCoreStrategy } from "./ytdl-core";
@@ -39,7 +40,8 @@ interface Strategies {
     | playDlStrategy
     | youtubeDlStrategy
     | ytDlPStrategy
-    | NightlyYoutubeDl;
+    | NightlyYoutubeDl
+    | ybdProjectYtdlCoreStrategy;
   isFallback: boolean;
 }
 
@@ -49,6 +51,7 @@ const config = getConfig();
 const strategyImporters: StrategyImporter[] = [
   { enable: false, isFallback: false, importer: () => require("./ytdl-core") },
   { enable: false, isFallback: false, importer: () => require("./play-dl") },
+  { enable: true, isFallback: false, importer: () => require("./ybdproject_ytdl-core") },
   { enable: true, isFallback: false, importer: () => require("./distube_ytdl-core") },
   { enable: true, isFallback: false, importer: () => require("./play-dl-test") },
   { enable: false, isFallback: true, importer: () => require("./youtube-dl") },
