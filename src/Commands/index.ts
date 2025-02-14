@@ -351,9 +351,9 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
         autocomplete: arg.autoCompleteEnabled || false,
       } as ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean;
 
-      if ("choices" in discordCommandStruct) {
+      if ("choices" in discordCommandStruct && discordCommandStruct.choices) {
         delete discordCommandStruct.autocomplete;
-      } else if ("autocomplete" in discordCommandStruct) {
+      } else if ("autocomplete" in discordCommandStruct && discordCommandStruct.autocomplete) {
         delete discordCommandStruct.choices;
       }
 
