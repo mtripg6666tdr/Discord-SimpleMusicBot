@@ -1,0 +1,1 @@
+{"version":3,"file":"Thumbnail.d.ts","sourceRoot":"","sources":["../../../src/entities/Thumbnail.ts"],"names":[],"mappings":"AAEA,MAAM,CAAC,OAAO,OAAO,SAAS;IAC5B,GAAG,EAAE,MAAM,GAAG,IAAI,CAAC;IACnB,KAAK,EAAE,MAAM,CAAC;IACd,MAAM,EAAE,MAAM,CAAC;gBAEH,IAAI,EAAE,GAAG;IAMrB,MAAM,CAAC,KAAK,CAAC,IAAI,EAAE,GAAG,GAAG,SAAS,EAAE;CAgBrC"}
