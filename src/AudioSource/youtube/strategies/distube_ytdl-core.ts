@@ -86,6 +86,8 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
 
       if (this.validateInfoExperiments(info)) break;
 
+      this.logger.warn("Detected broken formats; retrying...");
+
       safeTraverse(ytdl)
         .get("cache")
         .values()
@@ -190,7 +192,7 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
   validateInfoExperiments(info: ytdl.videoInfo) {
     const experiments = this.extractExperiments(info);
 
-    this.logger.trace("Experiments", experiments.join(", "));
+    // this.logger.trace("Experiments", experiments.join(", "));
 
     return !poTokenExperiments.some(expId => experiments.includes(expId));
   }
