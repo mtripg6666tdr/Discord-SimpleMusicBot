@@ -56,3 +56,30 @@ Node.js v16以上の環境で動作することを想定していますが、で
 [**マイルストーン**](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/milestone/16?closed=1)(空)
 
 ---
+
+# v4.4.1
+## バグ修正
+* メッセージの表記ゆれを修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2813)
+* ボットのステータス更新を必要以上にしないよう修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2814)
+* オートコンプリートが機能しない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2815)
+* ラジオ機能が動作しない問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2816)
+* 一定の条件下で参加サーバーの情報が意図せず出力される問題を修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2817)
+## 依存関係のアップデート
+* @sinclair/typebox 0.34.16 => 0.34.21
+### その他の特記事項
+#### 再生時のエラーについて
+現在、一部の環境において、一部のソースにおいて正常に楽曲が再生されない問題が確認されています。
+これは、大手VPS、クラウドサービス、および公開プロキシ、VPNなどの環境下で高確率で発生することが確認されています。
+今後、プロキシ機能を再実装することを視野に入れ、改善を行う予定です。  
+本リリースでも、一定程度の改善が見込まれますが、完全な修正ができていないこと、あらかじめご承知おきください。
+#### Node.jsのバージョンについて
+Node.js v16以上の環境で動作することを想定していますが、できれば最新のLTS版を推奨しています。  
+古いバージョンの場合、一部機能が制限されることがあります。詳しくは[こちら](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/support#nodejs%E3%81%AE%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E3%81%AB%E3%82%88%E3%82%8B%E6%A9%9F%E8%83%BD%E3%81%AE%E9%81%95%E3%81%84)をご覧ください。
+#### Dockerについて
+* Dockerのイメージは、リリース後10～20分程度で公開されます。
+#### 本ボットの開発状況について（再掲）
+* 現在、私(mtripg6666tdr)が非常に忙しく、本ボットの機能強化に時間を割くことができない状態です。現在、多くの機能要望等をいただいておりますが、今しばらくお待ちいただければ幸いです。今後ともよろしくお願いいたします。
+* 引き続きバグ修正は最優先事項として対処していきますので、バグを発見された際はお気軽にissueを開くか、サポートサーバーまでお知らせください。
+* 随時Pull Requestも受け付けております。開発にご協力いただける方は、ぜひともよろしくお願いします。
+
+---
