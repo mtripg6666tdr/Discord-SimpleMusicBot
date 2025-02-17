@@ -406,7 +406,6 @@ export function waitForEnteringState(predicate: () => boolean, timeout: number =
 }
 
 export function createDebounceFunctionsFactroy<Key>(func: (key: Key) => void, debounceDelay: number) {
-  // eslint-disable-next-line func-call-spacing
   const functionsStore = new Map<Key, () => void>();
   return (key: Key) => {
     if (functionsStore.has(key)) {

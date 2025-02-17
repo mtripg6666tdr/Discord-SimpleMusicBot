@@ -20,7 +20,7 @@ export function parseQuery(url: string): { [key: string]: string } {
   return Object.assign({},
     ...url.split("&")
       .map(q => q.split("="))
-      .map(qs => ({ [decodeURIComponent(qs[0])]: decodeURIComponent(qs[1]) }))
+      .map(qs => ({ [decodeURIComponent(qs[0])]: decodeURIComponent(qs[1]) })),
   );
 }
 

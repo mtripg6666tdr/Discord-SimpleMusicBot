@@ -16,7 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import TypedEventEmitter from "../Structure/TypedEmitter";
+import type TypedEventEmitter from "../Structure/TypedEmitter";
+
 import { getLogger } from "../logger";
 
 const timerLogger = getLogger("Timer");

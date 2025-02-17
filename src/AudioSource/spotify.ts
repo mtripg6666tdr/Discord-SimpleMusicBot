@@ -64,8 +64,9 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
   override async fetch(forceUrl?: boolean): Promise<StreamInfo> {
     if (!this.referenceUrl) {
       // construct search keyword
-      // eslint-disable-next-line newline-per-chained-call
-      const keyword = `${this.title} ${this.artist.split(",").map(artist => artist.trim()).join(" ")}`;
+
+      const keyword = `${this.title} ${this.artist.split(",").map(artist => artist.trim())
+        .join(" ")}`;
 
       // search youtube
       this.logger.debug(`Searching the keyword: ${`${this.title} ${this.artist.split(",").map(artist => artist.trim())}`}`);

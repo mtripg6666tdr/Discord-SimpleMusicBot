@@ -21,6 +21,7 @@ import type { TaskCancellationManager } from "./taskCancellationManager";
 import type { AudioSourceBasicJsonFormat } from "../AudioSource";
 import type { GuildDataContainer } from "../Structure";
 import type { AddedBy, QueueContent } from "../types/QueueContent";
+import type { ResponseMessage } from "./commandResolver/ResponseMessage";
 import type { AnyTextableGuildChannel, EditMessageOptions, MessageActionRow } from "oceanic.js";
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
@@ -29,7 +30,6 @@ import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } fr
 import i18next from "i18next";
 import { Member } from "oceanic.js";
 
-import { ResponseMessage } from "./commandResolver/ResponseMessage";
 import { DeferredMessage } from "./deferredMessage";
 import ytmpl from "../../lib/yt-mix-playlist/dist/cjs";
 import * as AudioSource from "../AudioSource";

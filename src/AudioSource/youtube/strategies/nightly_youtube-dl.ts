@@ -16,8 +16,10 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Cache } from "./base";
-import { YoutubeDlInfo, baseYoutubeDlStrategy } from "./baseYoutubeDlStrategy";
+import type { Cache } from "./base";
+import type { YoutubeDlInfo } from "./baseYoutubeDlStrategy";
+
+import { baseYoutubeDlStrategy } from "./baseYoutubeDlStrategy";
 import { BinaryManager } from "../../../Component/binaryManager";
 
 const ytDlNightlyBinaryManager = new BinaryManager({

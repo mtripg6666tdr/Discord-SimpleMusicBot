@@ -16,8 +16,9 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { RateLimitJudgementResult } from "../types/rateLimitController";
+
 import { getLogger } from "../logger";
-import { RateLimitJudgementResult } from "../types/rateLimitController";
 
 export class RateLimitController {
   protected readonly store = new Map<string, number[]>();

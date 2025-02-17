@@ -26,104 +26,43 @@ const eslintConfigsBase = [
   eslintJs.configs.recommended,
   {
     rules: {
-      "no-promise-executor-return": "warn",
-      "no-unused-vars": "off",
-
-      "comma-style": "error",
-      "dot-location": [
-        "warn",
-        "property",
-      ],
-      "eol-last": [
-        "error",
-        "always",
-      ],
       "eqeqeq": "error",
-      "func-call-spacing": "warn",
-      "key-spacing": "error",
       "max-nested-callbacks": [
         "warn",
         {
           "max": 4,
         },
       ],
-      "max-statements-per-line": [
-        "error",
-      ],
-      "new-cap": [
-        "warn",
-        {
+      "new-cap": ["warn", {
           "capIsNew": false,
-        },
-      ],
-      "newline-per-chained-call": "warn",
-      "no-floating-decimal": "error",
+      }],
       "no-label-var": "error",
       "no-lone-blocks": "error",
       "no-lonely-if": "warn",
-      "no-mixed-requires": "error",
-      "no-multi-spaces": "error",
-      "no-multiple-empty-lines": [
-        "warn",
-        {
-          "max": 2,
-          "maxBOF": 0,
-          "maxEOF": 1,
-        },
-      ],
       "no-new-func": "error",
-      "no-new-object": "error",
-      "no-new-require": "error",
+      "no-object-constructor": "error",
       "no-new-wrappers": "error",
       "no-octal-escape": "error",
       "no-self-compare": "warn",
       "no-sequences": "warn",
       "no-throw-literal": "warn",
-      "no-trailing-spaces": [
-        "warn",
-        {
-          "ignoreComments": true,
-          "skipBlankLines": true,
-        },
-      ],
       "no-undef-init": "warn",
-      "no-unexpected-multiline": "warn",
       "no-unmodified-loop-condition": "error",
       "no-unneeded-ternary": "error",
-      "no-unreachable": "warn",
+      "no-unused-vars": "off",
       "no-useless-call": "warn",
       "no-useless-computed-key": "warn",
       "no-useless-concat": "warn",
-      "no-useless-escape": "warn",
       "no-useless-return": "warn",
       "no-var": "error",
       "no-void": "error",
-      "no-whitespace-before-property": "warn",
-      "nonblock-statement-body-position": "warn",
       "operator-assignment": "warn",
-      "operator-linebreak": [
-        "warn",
-        "before",
-      ],
-      "padded-blocks": [
-        "warn",
-        "never",
-      ],
       "prefer-arrow-callback": "warn",
       "prefer-const": "warn",
       "prefer-numeric-literals": "warn",
       "prefer-rest-params": "warn",
       "prefer-spread": "warn",
-      "rest-spread-spacing": "warn",
-      "semi-spacing": "error",
-      "space-in-parens": "warn",
-      "space-infix-ops": "warn",
-      "space-unary-ops": "warn",
-      "template-curly-spacing": "warn",
-      "template-tag-spacing": "warn",
       "unicode-bom": "warn",
-      "wrap-iife": "error",
-      "yield-star-spacing": "error",
     },
   }
 ];
@@ -149,11 +88,13 @@ const eslintConfigsEslintComments = [
     plugins: {
       "eslint-comments": eslintPluginEslintComments,
     },
+  },
+  ...compat.extends("plugin:eslint-comments/recommended"),
+  {
     rules: {
       "eslint-comments/no-unused-disable": "error",
     },
   },
-  ...compat.extends("plugin:eslint-comments/recommended"),
 ];
 
 const eslintConfigsBaseJavaScriptFiles = [
@@ -163,12 +104,9 @@ const eslintConfigsBaseJavaScriptFiles = [
       "default-param-last": "error",
       "init-declarations": "warn",
       "no-array-constructor": "error",
-      "no-dupe-class-members": "error",
       "no-implied-eval": "error",
       "no-invalid-this": "warn",
       "no-loop-func": "warn",
-      "no-loss-of-precision": "error",
-      "no-return-await": "warn",
       "no-shadow": "error",
       "no-unused-expressions": [
         "warn",
@@ -202,7 +140,6 @@ const eslintConfigsBaseTypescriptFiles = [
       "no-implied-eval": "off",
       "no-invalid-this": "off",
       "no-loop-func": "off",
-      "no-loss-of-precision": "off",
       "no-return-await": "off",
       "no-shadow": "off",
       "no-throw-literal": "off",
@@ -215,11 +152,11 @@ const eslintConfigsBaseTypescriptFiles = [
           "default": "array",
         },
       ],
-      "@typescript-eslint/await-thenable": "warn",
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/consistent-type-imports": [
         "warn",
         {
+          "disallowTypeAnnotations": false,
           "prefer": "type-imports",
         },
       ],
@@ -230,21 +167,12 @@ const eslintConfigsBaseTypescriptFiles = [
         "error",
         "property",
       ],
-      "@typescript-eslint/no-array-constructor": "error",
       "@typescript-eslint/no-confusing-non-null-assertion": "warn",
       "@typescript-eslint/no-confusing-void-expression": "off",
       "@typescript-eslint/no-deprecated": "warn",
       "@typescript-eslint/no-dupe-class-members": "error",
       "@typescript-eslint/no-empty-function": "off",
-      "@typescript-eslint/no-empty-interface": [
-        "error",
-        {
-          "allowSingleExtends": false,
-        },
-      ],
       "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-floating-promises": "warn",
-      "@typescript-eslint/no-implied-eval": "error",
       "@typescript-eslint/no-inferrable-types": [
         "error",
         {
@@ -254,7 +182,6 @@ const eslintConfigsBaseTypescriptFiles = [
       ],
       "@typescript-eslint/no-invalid-this": "warn",
       "@typescript-eslint/no-loop-func": "warn",
-      "@typescript-eslint/no-loss-of-precision": "error",
       "@typescript-eslint/no-meaningless-void-operator": [
         "error",
         {
@@ -264,7 +191,6 @@ const eslintConfigsBaseTypescriptFiles = [
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-require-imports": "off",
       "@typescript-eslint/no-shadow": "error",
-      "@typescript-eslint/no-unnecessary-type-assertion": "warn",
       "@typescript-eslint/no-unsafe-return": "off",
       "@typescript-eslint/no-unused-expressions": [
         "warn",
@@ -275,11 +201,7 @@ const eslintConfigsBaseTypescriptFiles = [
       ],
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-useless-constructor": "warn",
-      "@typescript-eslint/no-var-requires": "off",
-      "@typescript-eslint/only-throw-error": "warn",
-      "@typescript-eslint/prefer-as-const": "warn",
       "@typescript-eslint/prefer-enum-initializers": "warn",
-      "@typescript-eslint/prefer-for-of": "off",
       "@typescript-eslint/prefer-includes": "warn",
       "@typescript-eslint/prefer-readonly": [
         "warn",
@@ -289,10 +211,6 @@ const eslintConfigsBaseTypescriptFiles = [
       ],
       "@typescript-eslint/prefer-string-starts-ends-with": "warn",
       "@typescript-eslint/require-await": "off",
-      "@typescript-eslint/return-await": [
-        "warn",
-        "in-try-catch",
-      ],
 
       "import/order": [1, {
         "groups": [
@@ -342,10 +260,12 @@ const eslintConfigsStylistic = [
       "@stylistic": eslintPluginStylistic,
     },
     rules: {
+      "@stylistic/arrow-parens": ["warn", "as-needed"],
       "@stylistic/comma-dangle": [
         "warn",
         "always-multiline",
       ],
+      "@stylistic/func-call-spacing": "warn",
       "@stylistic/indent": [
         "warn",
         2,
@@ -357,6 +277,7 @@ const eslintConfigsStylistic = [
           ],
         },
       ],
+      "@stylistic/max-statements-per-line": ["error"],
       "@stylistic/member-delimiter-style": [
         "error",
         {
@@ -378,6 +299,7 @@ const eslintConfigsStylistic = [
           },
         },
       ],
+      "@stylistic/newline-per-chained-call": "warn",
       "@stylistic/no-extra-parens": [
         "warn",
         "all",
@@ -386,7 +308,7 @@ const eslintConfigsStylistic = [
         },
       ],
       "@stylistic/no-extra-semi": "error",
-      "@stylistic/type-annotation-spacing": "warn",
+      "@stylistic/nonblock-statement-body-position": "warn",
       "@stylistic/space-before-function-paren": [
         "warn",
         {
@@ -395,7 +317,7 @@ const eslintConfigsStylistic = [
           "named": "never",
         },
       ],
-      "@stylistic/arrow-parens": ["warn", "as-needed"],
+      "@stylistic/type-annotation-spacing": "warn",
     },
   }
 ];
@@ -460,7 +382,6 @@ const config = tseslint.config(
         " */",
       ]],
       "no-process-exit": "off",
-      "@typescript-eslint/consistent-type-imports": "off",
     },
   },
   {

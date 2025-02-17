@@ -19,9 +19,8 @@
 import type { categoriesList } from "../Commands/command";
 import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
+import type { i18n } from "i18next";
 import type { Client, LocaleMap, PermissionName } from "oceanic.js";
-
-import { i18n } from "i18next";
 
 export type CommandPermission =
   | "admin"

@@ -53,7 +53,7 @@ http.createServer((req, res) => {
     req.on("end", () => {
       try {
         const body = JSON.parse(Buffer.concat(bufs).toString("utf-8")) as { token: string, type: "j" | "queue", guildid: string, data: string };
-        // eslint-disable-next-line @typescript-eslint/only-throw-error
+
         if (body.token !== process.env.TOKEN) throw "";
         if (body.type === "j") {
           setStatus(JSON.parse(body.data));

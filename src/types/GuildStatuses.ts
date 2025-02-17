@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { JSONGuildPreferences } from "./GuildPreferences";
+import type { JSONGuildPreferences } from "./GuildPreferences";
 
 export type JSONStatuses = {
   voiceChannelId: string,

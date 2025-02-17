@@ -16,9 +16,10 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { AnyTextableGuildChannel, Message } from "oceanic.js";
+
 import { CommandMessage as LibCommandMessage } from "@mtripg6666tdr/oceanic-command-resolver";
 import { defaultConfig } from "@mtripg6666tdr/oceanic-command-resolver";
-import { AnyTextableGuildChannel, Message } from "oceanic.js";
 
 import { normalizeText } from "../../Util";
 import { subCommandSeparator } from "../../definition";

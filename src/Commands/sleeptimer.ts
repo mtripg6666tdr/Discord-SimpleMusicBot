@@ -16,8 +16,10 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BaseCommand, CommandArgs } from ".";
-import { CommandMessage } from "../Component/commandResolver/CommandMessage";
+import type { CommandArgs } from ".";
+import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
+
+import { BaseCommand } from ".";
 import { colonSplittedTimeToSeconds } from "../Util/time";
 
 export default class SleepTimer extends BaseCommand {

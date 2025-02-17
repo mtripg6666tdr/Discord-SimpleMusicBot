@@ -16,6 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { YouTubeJsonFormat } from "..";
 import type { Cache, StrategyFetchResult } from "./base";
 import type { ReadableStreamInfo, StreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Readable } from "stream";
@@ -23,7 +24,6 @@ import type { Readable } from "stream";
 import * as ytdl from "@distube/ytdl-core";
 import { safeTraverse } from "safe-traverse";
 
-import { YouTubeJsonFormat } from "..";
 import { Strategy } from "./base";
 import { getConfig } from "../../../config";
 import { SecondaryUserAgent } from "../../../definition";

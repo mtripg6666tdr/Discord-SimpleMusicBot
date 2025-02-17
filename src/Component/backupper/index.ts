@@ -18,11 +18,11 @@
 
 import type { GuildDataContainer, YmxFormat } from "../../Structure";
 import type { DataType, MusicBotBase } from "../../botBase";
+import type { JSONStatuses } from "../../types/GuildStatuses";
 
 import { isDeepStrictEqual } from "util";
 
 import { LogEmitter } from "../../Structure";
-import { JSONStatuses } from "../../types/GuildStatuses";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export abstract class Backupper extends LogEmitter<{}> {

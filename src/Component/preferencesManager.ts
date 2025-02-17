@@ -16,10 +16,12 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { GuildDataContainer } from "../Structure/GuildDataContainer";
+import type { GuildDataContainer } from "../Structure/GuildDataContainer";
+import type { JSONGuildPreferences } from "../types/GuildPreferences";
+
 import { ServerManagerBase } from "../Structure/ServerManagerBase";
 import { emitEventOnMutation } from "../Util/decorators";
-import { JSONGuildPreferences, NowPlayingNotificationLevel } from "../types/GuildPreferences";
+import { NowPlayingNotificationLevel } from "../types/GuildPreferences";
 
 interface GuildPreferencesEvents {
   updateSettings: [];

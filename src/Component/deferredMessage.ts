@@ -18,8 +18,9 @@
 
 import type { ResponseMessage } from "./commandResolver/ResponseMessage";
 import type { CommandMessage as LibCommandMessage } from "@mtripg6666tdr/oceanic-command-resolver";
+import type { AnyTextableGuildChannel, CreateMessageOptions, EditMessageOptions, Message } from "oceanic.js";
 
-import { AnyTextableGuildChannel, Channel, CreateMessageOptions, EditMessageOptions, Message } from "oceanic.js";
+import { Channel } from "oceanic.js";
 
 import TypedEventEmitter from "../Structure/TypedEmitter";
 import { waitForEnteringState } from "../Util";
