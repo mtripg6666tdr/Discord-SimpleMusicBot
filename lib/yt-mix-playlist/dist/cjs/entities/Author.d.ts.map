@@ -1,0 +1,1 @@
+{"version":3,"file":"Author.d.ts","sourceRoot":"","sources":["../../../src/entities/Author.ts"],"names":[],"mappings":"AAEA,MAAM,CAAC,OAAO,OAAO,MAAM;;IACzB,IAAI,EAAE,MAAM,CAAC;IACb,SAAS,EAAE,MAAM,GAAG,IAAI,CAAC;IACzB,GAAG,EAAE,MAAM,GAAG,IAAI,CAAC;gBAEP,IAAI,EAAE,GAAG;IAQrB,MAAM,CAAC,KAAK,CAAC,IAAI,EAAE,GAAG,GAAG,MAAM,GAAG,IAAI;CAWvC"}

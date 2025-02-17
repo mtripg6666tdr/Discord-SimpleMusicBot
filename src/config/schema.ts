@@ -88,6 +88,8 @@ export const ConfigSchema = Type.Object({
   ], { default: null })),
 
   djRoleNames: Type.Optional(Type.Array(Type.String(), { default: ["DJ"] })),
+
+  showGuildCountStatus: Type.Optional(Type.Boolean({ default: false })),
 });
 
 export type GuildBGMContainerType = Static<typeof GuildBGMContainer>;

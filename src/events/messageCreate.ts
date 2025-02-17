@@ -113,7 +113,7 @@ export async function onMessageCreate(this: MusicBot, message: discord.Message) 
           messageReference: {
             messageID: message.id,
           },
-          content: i18next.t("lackPermissions", { lng: server.locale }),
+          content: `:warning: ${i18next.t("lackPermissions", { lng: server.locale })}`,
           allowedMentions: {
             repliedUser: false,
           },

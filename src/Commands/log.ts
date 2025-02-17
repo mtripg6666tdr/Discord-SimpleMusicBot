@@ -150,7 +150,7 @@ export default class SystemInfo extends BaseCommand {
       );
     }
 
-    if (config.isBotAdmin(message.member.id) && context.args.includes("servers") || context.args.length === 0) {
+    if (config.isBotAdmin(message.member.id) && (context.args.includes("servers") || context.args.length === 0)) {
       embeds.push(
         new MessageEmbedBuilder()
           .setColor(getColor("UPTIME"))

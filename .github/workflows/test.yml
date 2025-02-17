@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '22.x'
 
       - name: Get npm cache directory
         id: npm-cache
@@ -38,9 +38,9 @@ jobs:
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-20.x-${{ hashFiles('package-lock.json') }}
+          key: npm-22.x-${{ hashFiles('package-lock.json') }}
           restore-keys: |
-            npm-20.x-
+            npm-22.x-
             npm-
 
       - name: Install dependencies
@@ -61,7 +61,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '22.x'
 
       - name: Get npm cache directory
         id: npm-cache
@@ -73,9 +73,9 @@ jobs:
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-20.x-${{ hashFiles('package-lock.json') }}
+          key: npm-22.x-${{ hashFiles('package-lock.json') }}
           restore-keys: |
-            npm-20.x-
+            npm-22.x-
             npm-
 
       - name: Install dependencies
@@ -94,6 +94,7 @@ jobs:
           - '16.x'
           - '18.x'
           - '20.x'
+          - '22.x'
     steps:
       - uses: actions/checkout@v4
 
@@ -144,7 +145,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '22.x'
 
       - name: Get npm cache directory
         id: npm-cache
@@ -156,9 +157,9 @@ jobs:
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-20.x-${{ hashFiles('package-lock.json') }}
+          key: npm-22.x-${{ hashFiles('package-lock.json') }}
           restore-keys: |
-            npm-20.x-
+            npm-22.x-
             npm-
 
       - name: Install dependencies
@@ -198,6 +199,10 @@ jobs:
 
       - name: Check failure
         if: env.WORKFLOW_CONCLUSION == 'failure'
+        run: exit 1
+
+      - name: Check cancellation
+        if: env.WORKFLOW_CONCLUSION == 'cancelled'
         run: exit 1
 
       - name: Success

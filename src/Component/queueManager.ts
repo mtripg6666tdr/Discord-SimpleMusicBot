@@ -28,10 +28,10 @@ import { CommandMessage as LibCommandMessage } from "@mtripg6666tdr/oceanic-comm
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 import i18next from "i18next";
 import { Member } from "oceanic.js";
-import ytmpl from "yt-mix-playlist";
 
 import { ResponseMessage } from "./commandResolver/ResponseMessage";
 import { DeferredMessage } from "./deferredMessage";
+import ytmpl from "../../lib/yt-mix-playlist/dist/cjs";
 import * as AudioSource from "../AudioSource";
 import { getCommandExecutionContext } from "../Commands";
 import { ServerManagerBase } from "../Structure";

@@ -38,7 +38,8 @@ type DefaultProvidedConfigPropertyNames =
   | "maxLogFiles"
   | "proxy"
   | "botWhiteList"
-  | "djRoleNames";
+  | "djRoleNames"
+  | "showGuildCountStatus";
 
 type DefaultProvidedConfigProperties = {
   [key in Exclude<DefaultProvidedConfigPropertyNames, "proxy">]: Exclude<StaticConfigSchema[key], null | undefined>
@@ -110,6 +111,7 @@ class ConfigLoader {
       proxy: null,
       botWhiteList: [],
       djRoleNames: ["DJ"],
+      showGuildCountStatus: false,
     };
 
     this._config = Object.assign(

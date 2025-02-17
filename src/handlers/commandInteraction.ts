@@ -48,7 +48,7 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
   // 送信可能か確認
   if (!discordUtil.channels.checkSendable(interaction.channel, this._client.user.id)) {
     await interaction.createMessage({
-      content: `:warning:${i18next.t("lackPermissions", { lng: interaction.locale })}`,
+      content: `:warning: ${i18next.t("lackPermissions", { lng: interaction.locale })}`,
     });
     return;
   }
@@ -59,7 +59,7 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
   const command = CommandManager.instance.resolve(commandMessage.command);
   if (!command) {
     await interaction.createMessage({
-      content: `${i18next.t("commandNotFound", { lng: interaction.locale })}:sob:`,
+      content: `${i18next.t("commandNotFound", { lng: interaction.locale })} :sob:`,
     });
     return;
   }

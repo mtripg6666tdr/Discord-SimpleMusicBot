@@ -48,36 +48,49 @@ export default class BulkDelete extends BaseCommand {
     const { t } = context;
 
     const count = Number(context.args[0]);
+
     if (isNaN(count)) {
       message.reply(`:warning:${t("commands:bulk_delete.invalidMessageCount")}`).catch(this.logger.error);
       return;
     }
+
     const reply = await message.reply(`${t("commands:bulk_delete.loading")}...`).catch(this.logger.error) as ResponseMessage;
     try {
-      // collect messages
+      // collect messages recursively
       let before = "";
-      const messages = [] as Message[];
       let i = 0;
+      const messages: Message[] = [];
+      // 13 days and 23 hours and 55 minutes ago
+      const threshold = Date.now() - (14 * 24 * 60 + 5) * 60 * 1000;
       do {
-        const allMsgs: Message<AnyTextableGuildChannel>[] = await message.channel.getMessages(
+        const hitMessages: Message<AnyTextableGuildChannel>[] = (await message.channel.getMessages(
           before
             ? { limit: 100, before }
             : { limit: 100 }
-        );
-        if (allMsgs.length === 0) break;
-        const msgs = allMsgs.filter(_msg => _msg.author.id === context.client.user.id && _msg.id !== reply.id);
-        msgs.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-        messages.push(...msgs);
-        before = allMsgs.at(-1)!.id;
-        i++;
+        )).filter(_msg => _msg.createdAt.getTime() > threshold);
+
+        if (hitMessages.length === 0) {
+          break;
+        }
+
+        const removingMessages = hitMessages
+          .filter(_msg => _msg.author.id === context.client.user.id && _msg.id !== reply.id)
+          .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        messages.push(...removingMessages);
+
+        before = hitMessages.at(-1)!.id;
+
         await reply.edit(
           `:mag:${t("commands:bulk_delete.loading")}(${
             t("commands:bulk_delete.hitCount", { count: messages.length })
           }/${
             t("commands:bulk_delete.inCount", { count: i * 100 })
           })...`);
-      } while (messages.length < count && i <= 10);
-      if (messages.length > count) messages.splice(count);
+      } while (messages.length < count && ++i <= 10);
+
+      if (messages.length > count) {
+        messages.splice(count);
+      }
 
       const { collector, customIdMap } = context.bot.collectors
         .create()
