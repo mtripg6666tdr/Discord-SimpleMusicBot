@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -36,7 +36,7 @@ import { availableLanguages } from "../i18n";
 /**
  * コマンドマネージャー
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export class CommandManager extends LogEmitter<{}> {
   private static _instance: CommandManager | null = null;
 
@@ -49,7 +49,7 @@ export class CommandManager extends LogEmitter<{}> {
 
   private readonly _commands: BaseCommand[];
   /** コマンドを返します */
-  get commands(): Readonly<BaseCommand[]> {
+  get commands(): readonly BaseCommand[] {
     return this._commands;
   }
 
@@ -95,7 +95,7 @@ export class CommandManager extends LogEmitter<{}> {
     this._subCommandNames = new Set(
       this.commands
         .filter(command => command.asciiName.includes(">"))
-        .map(command => command.asciiName.split(">")[0])
+        .map(command => command.asciiName.split(">")[0]),
     );
   }
 
@@ -129,7 +129,7 @@ export class CommandManager extends LogEmitter<{}> {
       this.commands
         .filter(command => !command.unlist)
         .flatMap(command => command.toApplicationCommandStructure())
-        .map(command => this.apiToApplicationCommand(command as unknown as AnyApplicationCommand) as CreateApplicationCommandOptions)
+        .map(command => this.apiToApplicationCommand(command as unknown as AnyApplicationCommand) as CreateApplicationCommandOptions),
     );
 
     // Get registered commands
@@ -189,7 +189,7 @@ export class CommandManager extends LogEmitter<{}> {
     return apiCompatibleCommands.filter(expected => {
       if (expected.type === ApplicationCommandTypes.CHAT_INPUT) {
         const actual = registeredAppCommands.find(
-          command => command.type === ApplicationCommandTypes.CHAT_INPUT && command.name === expected.name
+          command => command.type === ApplicationCommandTypes.CHAT_INPUT && command.name === expected.name,
         ) as ChatInputApplicationCommand;
 
         if (!actual) {
@@ -199,7 +199,7 @@ export class CommandManager extends LogEmitter<{}> {
         }
       } else if (expected.type === ApplicationCommandTypes.MESSAGE) {
         const actual = registeredAppCommands.find(
-          command => command.type === ApplicationCommandTypes.MESSAGE && command.name === expected.name
+          command => command.type === ApplicationCommandTypes.MESSAGE && command.name === expected.name,
         ) as MessageApplicationCommand;
 
         if (!actual) {
@@ -220,11 +220,11 @@ export class CommandManager extends LogEmitter<{}> {
     return apiCompatibleCommands.filter(expected => {
       if (expected.type === ApplicationCommandTypes.CHAT_INPUT) {
         return !registeredAppCommands.some(
-          reg => reg.type === ApplicationCommandTypes.CHAT_INPUT && reg.name === expected.name
+          reg => reg.type === ApplicationCommandTypes.CHAT_INPUT && reg.name === expected.name,
         );
       } else if (expected.type === ApplicationCommandTypes.MESSAGE) {
         return !registeredAppCommands.some(
-          reg => reg.type === ApplicationCommandTypes.MESSAGE && reg.name === expected.name
+          reg => reg.type === ApplicationCommandTypes.MESSAGE && reg.name === expected.name,
         );
       } else {
         return false;
@@ -237,7 +237,7 @@ export class CommandManager extends LogEmitter<{}> {
     registeredAppCommands: AnyApplicationCommand[],
   ) {
     return registeredAppCommands.filter(registered => {
-      const index = apiCompatibleCommands.findIndex(command =>registered.type === command.type && registered.name === command.name);
+      const index = apiCompatibleCommands.findIndex(command => registered.type === command.type && registered.name === command.name);
       return index < 0;
     });
   }
@@ -257,7 +257,7 @@ export class CommandManager extends LogEmitter<{}> {
   isSameCommand(actual: ChatInputApplicationCommand | MessageApplicationCommand, expected: CreateApplicationCommandOptions): boolean {
     return util.isDeepStrictEqual(
       this.apiToApplicationCommand(actual),
-      expected
+      expected,
     );
   }
 
@@ -299,7 +299,7 @@ export class CommandManager extends LogEmitter<{}> {
             description: option.description,
             descriptionLocalizations: option.descriptionLocalizations,
             required: !!option.required,
-            autocomplete: "autocomplete" in option && option.autocomplete || false,
+            autocomplete: ("autocomplete" in option && option.autocomplete) || false,
           };
         }
       };
@@ -348,7 +348,7 @@ export class CommandManager extends LogEmitter<{}> {
     }
   }
 
-  /**サブコマンドをグループ化します。現時点では、ネストは一段階のみ対応しています。 */
+  /** サブコマンドをグループ化します。現時点では、ネストは一段階のみ対応しています。 */
   protected groupSubcommands(commands: CreateApplicationCommandOptions[]): CreateApplicationCommandOptions[] {
     const subcommandGroups = new Map<string, { from: CreateChatInputApplicationCommandOptions[], to: CreateChatInputApplicationCommandOptions | null }>();
 

@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -50,8 +50,8 @@ export default class Effect extends BaseCommand {
             [
               ["reload", "button"],
               ...audioEffectNames.map(name => [name, "button" as const]),
-            ]
-          ) as Record<"reload" | AudioEffectNames, "button">
+            ],
+          ) as Record<"reload" | AudioEffectNames, "button">,
         );
       const createActionRow = () => {
         const rows: MessageActionRow[] = [];
@@ -67,7 +67,7 @@ export default class Effect extends BaseCommand {
           rows.push(
             new MessageActionRowBuilder()
               .addComponents(...components.slice(i * 5, (i + 1) * 5))
-              .toOceanic()
+              .toOceanic(),
           );
         }
 
@@ -93,8 +93,7 @@ export default class Effect extends BaseCommand {
           updateEffectEmbed();
         });
       }
-    }
-    catch (e) {
+    } catch (e) {
       this.logger.error(e);
       message.reply(`:cry:${t("errorOccurred")}`).catch(this.logger.error);
     }

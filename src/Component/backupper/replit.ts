@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -60,8 +60,7 @@ export class ReplitBackupper extends IntervalBackupper {
         if (!currentStatus) continue;
         await this.db.set(this.getDbKey("status", guildId), currentStatus);
         this.updateStatusCache(guildId, currentStatus);
-      }
-      catch (er) {
+      } catch (er) {
         this.logger.error(er);
         this.logger.info("Something went wrong while backing up status");
       }
@@ -80,8 +79,7 @@ export class ReplitBackupper extends IntervalBackupper {
         if (!queue) continue;
         await this.db.set(this.getDbKey("queue", guildId), queue);
         this.unmarkQueueModifiedGuild(guildId);
-      }
-      catch (er) {
+      } catch (er) {
         this.logger.error(er);
         this.logger.info("Something went wrong while backing up queue");
       }
@@ -98,11 +96,10 @@ export class ReplitBackupper extends IntervalBackupper {
           if (queue) {
             result.set(id, queue);
           }
-        })
+        }),
       );
       return result;
-    }
-    catch (er) {
+    } catch (er) {
       this.logger.error(er);
       this.logger.error("Queue restoring failed!");
       return null;
@@ -120,11 +117,10 @@ export class ReplitBackupper extends IntervalBackupper {
             result.set(id, status);
             this.updateStatusCache(id, status);
           }
-        })
+        }),
       );
       return result;
-    }
-    catch (er) {
+    } catch (er) {
       this.logger.error(er);
       this.logger.error("Status restoring failed!");
       return null;

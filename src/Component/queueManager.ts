@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -41,12 +41,12 @@ import { bindThis, emitEventOnMutation } from "../Util/decorators";
 import { measureTime } from "../Util/decorators";
 import { getConfig } from "../config";
 
-export type KnownAudioSourceIdentifer = "youtube"|"custom"|"soundcloud"|"spotify"|"unknown";
+export type KnownAudioSourceIdentifer = "youtube" | "custom" | "soundcloud" | "spotify" | "unknown";
 
 interface QueueManagerEvents {
   change: [];
   changeWithoutCurrent: [];
-  add: [content:QueueContent];
+  add: [content: QueueContent];
   settingsChanged: [boolean, boolean];
   mixPlaylistEnabledChanged: [enabled: boolean];
 }
@@ -65,7 +65,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
   /**
    * キューの本体のゲッタープロパティ
    */
-  protected get default(): Readonly<QueueContent[]> {
+  protected get default(): readonly QueueContent[] {
     return this._default;
   }
 
@@ -124,6 +124,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
   get mixPlaylist(): Awaited<ReturnType<typeof ytmpl>> {
     return this._mixPlaylist;
   }
+
   set mixPlaylist(value: Awaited<ReturnType<typeof ytmpl>>) {
     const oldState = this.mixPlaylistEnabled;
     this._mixPlaylist = value;
@@ -231,7 +232,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         ),
         additionalInfo: {
           addedBy: {
-            userId: addedBy && this.getUserIdFromMember(addedBy) || "0",
+            userId: (addedBy && this.getUserIdFromMember(addedBy)) || "0",
             displayName: addedBy?.displayName || i18next.t("unknown", { lng: this.server.locale }),
           },
         },
@@ -260,7 +261,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
   @measureTime
   async addQueue(options: {
     url: string,
-    addedBy: Member|AddedBy|null|undefined,
+    addedBy: Member | AddedBy | null | undefined,
     sourceType?: KnownAudioSourceIdentifer,
     first?: boolean,
     gotData?: AudioSourceBasicJsonFormat,
@@ -279,7 +280,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       fromSearch?: undefined,
       message?: undefined,
       channel: AnyTextableGuildChannel,
-    })
+    }),
   ): Promise<QueueContent | null> {
     this.logger.info("AutoAddQueue Called");
 
@@ -360,7 +361,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         const index = info.index.toString();
         // ETAの計算
         const timeFragments = Util.time.calcHourMinSec(
-          this.getLengthSecondsTo(info.index) - trackLengthSeconds - Math.floor(this.server.player.currentTime / 1000)
+          this.getLengthSecondsTo(info.index) - trackLengthSeconds - Math.floor(this.server.player.currentTime / 1000),
         );
         // 埋め込みの作成
         const embed = new MessageEmbedBuilder()
@@ -374,12 +375,12 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
               : trackLengthSeconds !== 0
                 ? min + ":" + sec
                 : t("unknown"),
-            true
+            true,
           )
           .addField(
             t("components:nowplaying.requestedBy"),
             options.addedBy?.displayName || t("unknown"),
-            true
+            true,
           )
           .addField(
             t("components:queue.positionInQueue"),
@@ -390,7 +391,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
                 t("components:nowplaying.waitForPlayingItemName")
               }`
               : index,
-            true
+            true,
           )
           .addField(
             t("components:queue.etaToPlay"),
@@ -399,7 +400,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
               : timeFragments[2].includes("-")
                 ? t("unknown")
                 : Util.time.HourMinSecToString(timeFragments, t),
-            true
+            true,
           )
         ;
 
@@ -407,7 +408,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           if (info.basicInfo.isFallbacked) {
             embed.addField(
               `:warning: ${t("attention")}`,
-              t("components:queue.fallbackNotice")
+              t("components:queue.fallbackNotice"),
             );
           } else if (info.basicInfo.strategyId === 1) {
             embed.setTitle(`${embed.title}*`);
@@ -415,7 +416,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         } else if (info.basicInfo instanceof AudioSource.Spotify) {
           embed.addField(
             `:warning:${t("attention")}`,
-            t("components:queue.spotifyNotice")
+            t("components:queue.spotifyNotice"),
           );
         }
 
@@ -440,9 +441,9 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
                 new MessageButtonBuilder()
                   .setCustomId(collectorCreateResult.customIdMap.cancelLast)
                   .setLabel(t("cancel"))
-                  .setStyle("DANGER")
+                  .setStyle("DANGER"),
               )
-              .toOceanic()
+              .toOceanic(),
           );
 
           collectorCreateResult.collector.once("cancelLast", interaction => {
@@ -452,8 +453,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
               interaction.createFollowup({
                 content: `🚮${t("components:queue.cancelAdded", { title: item.basicInfo.title })}`,
               }).catch(this.logger.error);
-            }
-            catch (er) {
+            } catch (er) {
               this.logger.error(er);
               interaction.createFollowup({
                 content: t("errorOccurred"),
@@ -500,8 +500,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         }
       }
       return info;
-    }
-    catch (e) {
+    } catch (e) {
       this.logger.error("AutoAddQueue failed", e);
       if (uiMessage) {
         const errorMessage = "message" in e && typeof e.message === "string"
@@ -541,7 +540,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     playlist: T[],
     title: string,
     totalCount: number,
-    exportableConsumer: (track: T) => Promise<AudioSourceBasicJsonFormat>|AudioSourceBasicJsonFormat
+    exportableConsumer: (track: T) => Promise<AudioSourceBasicJsonFormat> | AudioSourceBasicJsonFormat,
   ): Promise<QueueContent[]> {
     let index = 0;
     const result: QueueContent[] = [];
@@ -562,8 +561,8 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       }
       if (
         index % 50 === 0
-        || totalCount <= 50 && index % 10 === 0
-        || totalCount <= 10 && index % 4 === 0
+        || (totalCount <= 50 && index % 10 === 0)
+        || (totalCount <= 10 && index % 4 === 0)
       ) {
         await msg.edit(
           `:hourglass_flowing_sand:${
@@ -783,14 +782,14 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
   move(from: number, to: number) {
     this.logger.info("Move Called");
     if (from < to) {
-      //要素追加
+      // 要素追加
       this._default.splice(to + 1, 0, this.default[from]);
-      //要素削除
+      // 要素削除
       this._default.splice(from, 1);
     } else if (from > to) {
-      //要素追加
+      // 要素追加
       this._default.splice(to, 0, this.default[from]);
-      //要素削除
+      // 要素削除
       this._default.splice(from + 1, 1);
     }
 
@@ -848,4 +847,3 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     return member instanceof Member ? member.id : member.userId;
   }
 }
-

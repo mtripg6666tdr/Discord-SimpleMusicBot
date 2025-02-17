@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -31,22 +31,21 @@ import { MessageFlags } from "oceanic.js";
 import { FixedAudioResource } from "./audioResource";
 import { DeferredMessage } from "./deferredMessage";
 import { resolveStreamToPlayable } from "./streams";
-import { DSL } from "./streams/dsl";
-import { Normalizer } from "./streams/normalizer";
 import { ServerManagerBase } from "../Structure";
 import * as Util from "../Util";
+import { DSL } from "./streams/dsl";
+import { Normalizer } from "./streams/normalizer";
 import { getColor } from "../Util/color";
 import { measureTime } from "../Util/decorators";
 import { getConfig } from "../config";
 import { NowPlayingNotificationLevel } from "../types/GuildPreferences";
 
-
 interface PlayManagerEvents {
-  volumeChanged: [volume:string];
-  playCalled: [seek:number];
-  playPreparing: [seek:number];
+  volumeChanged: [volume: string];
+  playCalled: [seek: number];
+  playPreparing: [seek: number];
   playStarted: [];
-  playStartUIPrepared: [message:MessageEmbedBuilder];
+  playStartUIPrepared: [message: MessageEmbedBuilder];
   playCompleted: [];
   playFailed: [];
   reportPlaybackDuration: [duration: number, errorCount: number];
@@ -57,12 +56,11 @@ interface PlayManagerEvents {
   resume: [];
   rewind: [];
   empty: [];
-  handledError: [error:Error];
+  handledError: [error: Error];
   all: [...any[]];
 }
 
 /** PlayManager#playに渡せるオプションを指定します */
-// eslint-disable-next-line @typescript-eslint/ban-types
 export type PlayManagerPlayOptions = Record<string & {}, string | boolean | number> & {
   /** シークする際に、シーク先の秒数を指定します */
   time?: number,
@@ -212,15 +210,15 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     if (isYT && this.currentAudioInfo.availableAfter) {
       const waitTarget = this.currentAudioInfo;
       // まだ始まっていないライブを待機する
-      message = this.getNoticeNeeded() && !quiet && await this.server.bot.client.rest.channels.createMessage(
+      message = (this.getNoticeNeeded() && !quiet && await this.server.bot.client.rest.channels.createMessage(
         this.server.boundTextChannel,
         {
           content: `:stopwatch:${i18next.t("components:play.waitingForLiveStream", {
             lng: this.server.locale,
             title: this.currentAudioInfo.title,
           })}`,
-        }
-      ) || null;
+        },
+      )) || null;
       this.preparing = false;
       const abortController = this._waitForLiveAbortController = new AbortController();
       this.once("stop", () => {
@@ -240,7 +238,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         } else {
           this.server.bot.client.rest.channels.createMessage(
             this.server.boundTextChannel,
-            { content }
+            { content },
           ).catch(this.logger.error);
         }
 
@@ -266,7 +264,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           flags: this.server.preferences.nowPlayingNotificationLevel === NowPlayingNotificationLevel.Silent
             ? MessageFlags.SUPPRESS_NOTIFICATIONS
             : 0,
-        }
+        },
       )
         .on("error", this.logger.error)
         .on("debug", this.logger.debug);
@@ -275,8 +273,8 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
 
     // try...catchブロックに入る前に、エラーレポートチャンネルを決定しておく
     this._errorReportChannel = (message?.channel as TextChannel | undefined)
-        || this.server.bot.client.getChannel<TextChannel>(this.server.boundTextChannel)
-        || await this.server.bot.client.rest.channels.get<TextChannel>(this.server.boundTextChannel);
+      || this.server.bot.client.getChannel<TextChannel>(this.server.boundTextChannel)
+      || await this.server.bot.client.rest.channels.get<TextChannel>(this.server.boundTextChannel);
 
     try {
       // シーク位置を確認
@@ -331,7 +329,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
                     : StreamType.Arbitrary,
           inlineVolume: this.volume !== 100,
         }),
-        this.currentAudioInfo!.lengthSeconds - time
+        this.currentAudioInfo!.lengthSeconds - time,
       );
       this._dsLogger?.appendReadable(normalizer);
 
@@ -411,15 +409,13 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
           await nextSong.basicInfo.refreshInfo({ forceCache: true, onlyIfNoCache: true }).catch(this.logger.error);
         }
       }
-    }
-    catch (e) {
+    } catch (e) {
       if (message instanceof DeferredMessage) {
         message.cancelSchedule();
       }
 
       this.handleError(e).catch(this.logger.error);
-    }
-    finally {
+    } finally {
       this.preparing = false;
     }
     return this;
@@ -433,16 +429,16 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     const _t = Number(this.currentAudioInfo.lengthSeconds);
     const [min, sec] = Util.time.calcMinSec(_t);
     const queueTimeFragments = Util.time.calcHourMinSec(
-      this.server.queue.lengthSecondsActual - (this.currentAudioInfo.lengthSeconds >= 0 ? this.currentAudioInfo.lengthSeconds : 0)
+      this.server.queue.lengthSecondsActual - (this.currentAudioInfo.lengthSeconds >= 0 ? this.currentAudioInfo.lengthSeconds : 0),
     );
-    /* eslint-disable @typescript-eslint/indent */
+    /* eslint-disable @stylistic/multiline-ternary */
     const embed = new MessageEmbedBuilder()
       .setTitle(
         `:cd: ${
           i18next.t("components:nowplaying.nowplayingTitle", { lng: this.server.locale })
         }${
           this.currentAudioInfo.isYouTube() ? this.currentAudioInfo.getStrategyIndicator() : ""
-        } :musical_note:`
+        } :musical_note:`,
       )
       .setDescription(
         (
@@ -455,39 +451,38 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
             ? `(${i18next.t("liveStream", { lng: this.server.locale })})`
             : _t === 0 ? `(${i18next.t("unknown", { lng: this.server.locale })})` : min + ":" + sec
         )
-        + "`"
+        + "`",
       )
       .setColor(getColor("AUTO_NP"))
       .addField(
         i18next.t("components:nowplaying.requestedBy", { lng: this.server.locale }),
         this.server.queue.get(0).additionalInfo.addedBy.displayName,
-        true
+        true,
       )
       .addField(
         i18next.t("components:nowplaying.nextSong", { lng: this.server.locale }),
         // トラックループオンなら現在の曲
         this.server.queue.loopEnabled ? this.server.queue.get(0).basicInfo.title
         // (トラックループはオフ)長さが2以上ならオフセット1の曲
-        : this.server.queue.length >= 2 ? this.server.queue.get(1).basicInfo.title
-        // (トラックループオフ,長さ1)キューループがオンなら現在の曲
-        : this.server.queue.queueLoopEnabled ? this.server.queue.get(0).basicInfo.title
-        // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
-        : i18next.t("components:nowplaying.noNextSong", { lng: this.server.locale }), true
+          : this.server.queue.length >= 2 ? this.server.queue.get(1).basicInfo.title
+          // (トラックループオフ,長さ1)キューループがオンなら現在の曲
+            : this.server.queue.queueLoopEnabled ? this.server.queue.get(0).basicInfo.title
+            // (トラックループオフ,長さ1,キューループオフ)次の曲はなし
+              : i18next.t("components:nowplaying.noNextSong", { lng: this.server.locale }), true,
       )
       .addField(
         i18next.t("components:play.songsInQueue", { lng: this.server.locale }),
         this.server.queue.loopEnabled
           ? i18next.t("components:play.willLoop", { lng: this.server.locale })
           : `${i18next.t(
-              "currentSongCount",
-              {
-                count: this.server.queue.length - 1,
-                lng: this.server.locale,
-              }
-            )}(${Util.time.HourMinSecToString(queueTimeFragments, i18next.getFixedT(this.server.locale))})`
-            + (this.server.queue.mixPlaylistEnabled ? `(${i18next.t("components:nowplaying.inRadio")})` : "")
-          ,
-        true
+            "currentSongCount",
+            {
+              count: this.server.queue.length - 1,
+              lng: this.server.locale,
+            },
+          )}(${Util.time.HourMinSecToString(queueTimeFragments, i18next.getFixedT(this.server.locale))})`
+          + (this.server.queue.mixPlaylistEnabled ? `(${i18next.t("components:nowplaying.inRadio")})` : ""),
+        true,
       );
 
     if (typeof this.currentAudioInfo.thumbnail === "string") {
@@ -496,13 +491,13 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       embed.setThumbnail("attachment://thumbnail." + this.currentAudioInfo.thumbnail.ext);
     }
 
-    /* eslint-enable @typescript-eslint/indent */
+    /* eslint-enable @stylistic/multiline-ternary */
 
     if (this.currentAudioInfo.isYouTube()) {
       if (this.currentAudioInfo.isFallbacked) {
         embed.addField(
           `:warning: ${i18next.t("attention", { lng: this.server.locale })}`,
-          i18next.t("components:queue.fallbackNotice", { lng: this.server.locale })
+          i18next.t("components:queue.fallbackNotice", { lng: this.server.locale }),
         );
       }
     }
@@ -573,12 +568,12 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       this._player.on("debug", message => this.logger.trace(`[InternalAudioPlayer] ${message}`));
     }
     this._player.on("error", this.handleError.bind(this));
-    this._player.on(AudioPlayerStatus.Idle, (oldState) => {
+    this._player.on(AudioPlayerStatus.Idle, oldState => {
       if (oldState.status === AudioPlayerStatus.Playing) {
         this.emit(
           "reportPlaybackDuration",
           oldState.playbackDuration,
-          this._errorUrl === this.currentAudioUrl ? this._errorCount : 0
+          this._errorUrl === this.currentAudioUrl ? this._errorCount : 0,
         );
       }
     });
@@ -604,7 +599,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     return !!this.server.boundTextChannel;
   }
 
-  /** 
+  /**
    * 停止します。切断するにはDisconnectを使用してください。
    * @returns this
   */
@@ -925,4 +920,3 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     return super.emit(event, ...args);
   }
 }
-

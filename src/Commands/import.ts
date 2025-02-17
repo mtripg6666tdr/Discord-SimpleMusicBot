@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -96,8 +96,7 @@ export default class Import extends BaseCommand {
           await statusMessage.edit(`❌${t("commands:import.notBotMessage")}`);
           return;
         }
-      }
-      catch (e) {
+      } catch (e) {
         this.logger.error(e);
         statusMessage?.edit(`:sob:${t("failed")}...`).catch(this.logger.error);
         return;
@@ -133,7 +132,7 @@ export default class Import extends BaseCommand {
               t("songProcessingInProgress", {
                 totalSongCount: t("totalSongCount", { count: qs.length }),
                 currentSongCount: t("currentSongCount", { count: i + 1 }),
-              })
+              }),
             );
           }
           if (cancellation.cancelled) {
@@ -149,12 +148,10 @@ export default class Import extends BaseCommand {
       } else {
         await statusMessage.edit(`❌${t("commands:import.contentNotIncludedInMessage")}`);
       }
-    }
-    catch (e) {
+    } catch (e) {
       this.logger.error(e);
       statusMessage?.edit(`:sob:${t("failed")}...`).catch(this.logger.error);
-    }
-    finally {
+    } finally {
       context.server.unbindCancellation(cancellation);
     }
   }

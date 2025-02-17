@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -22,15 +22,14 @@ import type { EmbedField } from "oceanic.js";
 import type { Track } from "spotify-url-info";
 import type ytsr from "ytsr";
 
-
 import candyget from "candyget";
 import spotifyUrlInfo from "spotify-url-info";
 
 import { AudioSource } from "./audiosource";
-import { searchYouTube } from "./youtube/spawner";
-import { attemptFetchForStrategies } from "./youtube/strategies";
 import { assertIsNotNull } from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
+import { searchYouTube } from "./youtube/spawner";
+import { attemptFetchForStrategies } from "./youtube/strategies";
 
 const client = spotifyUrlInfo((url, opts) => candyget(url, "string", opts).then(res => ({ text: () => res.body })));
 
@@ -145,7 +144,7 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
       (item.author && item.author.ownerBadges.length > 0)
       || item.author?.verified
       || item.author?.name.endsWith("Topic")
-      || item.author?.name.endsWith("トピック")
+      || item.author?.name.endsWith("トピック"),
     );
     this.logger.debug("official ch", filtered);
     if (filtered[0]) return filtered[0];
@@ -211,7 +210,7 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
     return `https://open.spotify.com/track/${uri.replace(/spotify:track:/, "")}`;
   }
 
-  static getPlaylistUrl(uri: string, type: "playlist"|"album") {
+  static getPlaylistUrl(uri: string, type: "playlist" | "album") {
     return `https://open.spotify.com/${type}/${uri.replace(/spotify:(playlist|album):/, "")}`;
   }
 

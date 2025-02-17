@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -64,7 +64,7 @@ export default class Lyrics extends BaseCommand {
         embeds.push(
           new MessageEmbedBuilder()
             .setDescription(partial)
-            .setColor(color.getColor("LYRIC"))
+            .setColor(color.getColor("LYRIC")),
         );
       }
       embeds[0]
@@ -82,8 +82,7 @@ export default class Lyrics extends BaseCommand {
         content: "",
         embeds: embeds.map(embed => embed.toOceanic()),
       }).catch(this.logger.error);
-    }
-    catch (e) {
+    } catch (e) {
       this.logger.error(e);
       await msg.edit(`:confounded:${t("commands:lyrics.failed")}`)
         .catch(this.logger.error);
@@ -102,8 +101,7 @@ async function getLyrics(this: BaseCommand, keyword: string): Promise<songInfo> 
       title: song.title,
       url: song.url,
     };
-  }
-  catch (e) {
+  } catch (e) {
     // Fallback to utaten
     if (!process.env.CSE_KEY) throw e;
     this.logger.warn(e);
@@ -111,7 +109,7 @@ async function getLyrics(this: BaseCommand, keyword: string): Promise<songInfo> 
     const { body } = await candyget.json(
       `${
         Buffer.from("aHR0cHM6Ly9jdXN0b21zZWFyY2guZ29vZ2xlYXBpcy5jb20vY3VzdG9tc2VhcmNoL3YxP2N4PTg5ZWJjY2FjZGMzMjQ2MWYy", "base64").toString()
-      }&key=${process.env.CSE_KEY}&q=${encodeURIComponent(keyword)}`
+      }&key=${process.env.CSE_KEY}&q=${encodeURIComponent(keyword)}`,
     );
     const data = body as CSE_Result;
     const items = data.items?.filter(i => new URL(i.link).pathname.startsWith("/lyric/"));
@@ -139,7 +137,6 @@ async function getLyrics(this: BaseCommand, keyword: string): Promise<songInfo> 
 
     const structuredData = JSON.parse<any>(doc.match(/<script\stype="application\/ld\+json">(\r?\n?)\s*(?<json>.+)<\/script>/)!.groups!.json);
     const artwork = doc.match(/<img src="(?<url>.+?)" alt=".+? 歌詞" \/>/)?.groups?.url;
-
 
     return {
       lyric: decode(lyric),
@@ -246,4 +243,3 @@ interface URL {
   type: string;
   template: string;
 }
-

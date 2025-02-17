@@ -26,9 +26,7 @@ const eslintConfigsBase = [
   eslintJs.configs.recommended,
   {
     rules: {
-      "lines-between-class-members": "off",
-      "no-empty-function": "off",
-      "no-promise-executor-return": "off",
+      "no-promise-executor-return": "warn",
       "no-unused-vars": "off",
 
       "comma-style": "error",
@@ -43,46 +41,6 @@ const eslintConfigsBase = [
       "eqeqeq": "error",
       "func-call-spacing": "warn",
       "key-spacing": "error",
-      "keyword-spacing": [
-        "warn",
-        {
-          "after": false,
-          "before": true,
-          "overrides": {
-            "case": {
-              "after": true,
-            },
-            "const": {
-              "after": true,
-            },
-            "do": {
-              "after": false,
-            },
-            "else": {
-              "before": false,
-            },
-            "export": {
-              "after": true,
-            },
-            "from": {
-              "after": true,
-            },
-            "import": {
-              "after": true,
-              "before": false,
-            },
-            "let": {
-              "after": true,
-            },
-            "return": {
-              "after": true,
-            },
-            "throw": {
-              "after": true,
-            },
-          },
-        },
-      ],
       "max-nested-callbacks": [
         "warn",
         {
@@ -158,22 +116,6 @@ const eslintConfigsBase = [
       "prefer-spread": "warn",
       "rest-spread-spacing": "warn",
       "semi-spacing": "error",
-      "space-before-blocks": [
-        "warn",
-        {
-          "classes": "off",
-          "functions": "off",
-          "keywords": "never",
-        },
-      ],
-      "space-before-function-paren": [
-        "warn",
-        {
-          "anonymous": "never",
-          "asyncArrow": "always",
-          "named": "never",
-        },
-      ],
       "space-in-parens": "warn",
       "space-infix-ops": "warn",
       "space-unary-ops": "warn",
@@ -380,6 +322,8 @@ const eslintConfigsBaseTypescriptFiles = [
           "varsIgnorePattern": "^_",
           "args": "after-used",
           "argsIgnorePattern": "^_",
+          "caughtErrors": "all",
+          "caughtErrorsIgnorePattern": "^_"
         },
       ],
     },
@@ -443,6 +387,15 @@ const eslintConfigsStylistic = [
       ],
       "@stylistic/no-extra-semi": "error",
       "@stylistic/type-annotation-spacing": "warn",
+      "@stylistic/space-before-function-paren": [
+        "warn",
+        {
+          "anonymous": "never",
+          "asyncArrow": "always",
+          "named": "never",
+        },
+      ],
+      "@stylistic/arrow-parens": ["warn", "as-needed"],
     },
   }
 ];
@@ -487,7 +440,25 @@ const config = tseslint.config(
     },
 
     rules: {
-      "license-header/header": ["warn", "./util/license.js"],
+      "license-header/header": ["warn", [
+        "/*",
+        ` * Copyright 2021-${new Date().getFullYear()} mtripg6666tdr`,
+        " *",
+        " * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.",
+        " * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )",
+        " *",
+        " * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it",
+        " * under the terms of the GNU General Public License as published by the Free Software Foundation,",
+        " * either version 3 of the License, or (at your option) any later version.",
+        " *",
+        " * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,",
+        " * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+        " * See the GNU General Public License for more details.",
+        " *",
+        " * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.",
+        " * If not, see <https://www.gnu.org/licenses/>.",
+        " */",
+      ]],
       "no-process-exit": "off",
       "@typescript-eslint/consistent-type-imports": "off",
     },

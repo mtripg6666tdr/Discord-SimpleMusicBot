@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -91,8 +91,7 @@ export class HttpBackupper extends IntervalBackupper {
       }, payload);
 
       statusModifiedGuildIds.forEach(id => this.updateStatusCache(id, originalStatuses[id]));
-    }
-    catch (e) {
+    } catch (e) {
       this.logger.warn(e);
     }
   }
@@ -139,8 +138,7 @@ export class HttpBackupper extends IntervalBackupper {
       } else {
         throw new Error(`Status code: ${body.status}`);
       }
-    }
-    catch (e) {
+    } catch (e) {
       this.logger.error(e);
       this.logger.info("Something went wrong while backing up queue");
     }
@@ -157,7 +155,7 @@ export class HttpBackupper extends IntervalBackupper {
               "User-Agent": this.userAgent,
             },
             validator: this.getResultValidator.bind(this),
-          }
+          },
         );
         if (result.status === 200) {
           const frozenGuildStatuses = result.data;
@@ -192,8 +190,7 @@ export class HttpBackupper extends IntervalBackupper {
         } else {
           return null;
         }
-      }
-      catch (er) {
+      } catch (er) {
         this.logger.error(er);
         this.logger.warn("Status restoring failed!");
         return null;
@@ -214,7 +211,7 @@ export class HttpBackupper extends IntervalBackupper {
               "User-Agent": this.userAgent,
             },
             validator: this.getResultValidator.bind(this),
-          }
+          },
         );
         if (result.status === 200) {
           const frozenQueues = result.data as { [guildid: string]: string };
@@ -223,15 +220,13 @@ export class HttpBackupper extends IntervalBackupper {
             try {
               const ymx = JSON.parse<YmxFormat>(decodeURIComponent(frozenQueues[key]));
               res.set(key, ymx);
-            }
-            catch { /* empty */ }
+            } catch { /* empty */ }
           });
           return res;
         } else {
           return null;
         }
-      }
-      catch (er) {
+      } catch (er) {
         this.logger.error(er);
         this.logger.warn("Queue restoring failed!");
         return null;
@@ -255,7 +250,7 @@ export class HttpBackupper extends IntervalBackupper {
 }
 
 type postResult = {
-  status: 200|404,
+  status: 200 | 404,
 };
 
 type getResult = postResult & {

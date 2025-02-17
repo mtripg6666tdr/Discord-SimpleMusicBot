@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -29,7 +29,7 @@ import { getColor } from "../Util/color";
 import { measureTime } from "../Util/decorators";
 import { getConfig } from "../config";
 
-type status = "init"|"consumed"|"destroyed";
+type status = "init" | "consumed" | "destroyed";
 
 interface SearchPanelEvents {
   destroy: [];
@@ -43,13 +43,14 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
   protected get status() {
     return this._status;
   }
+
   protected set status(val: status) {
     this._status = val;
     if (val === "destroyed") this.emit("destroy");
   }
 
   protected _options: SongInfo[] | null = null;
-  get options(): Readonly<SongInfo[]> {
+  get options(): readonly SongInfo[] {
     if (!this._options) {
       throw new Error("Search has not been done yet.");
     }
@@ -78,7 +79,7 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
   @measureTime
   async consumeSearchResult<T>(
     searchPromise: Promise<T | { result: T, transformedQuery: string }>,
-    consumer: (result: T, t: i18n["t"]) => SongInfo[]
+    consumer: (result: T, t: i18n["t"]) => SongInfo[],
   ) {
     const { t } = getCommandExecutionContext();
 
@@ -99,7 +100,7 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
         "transformedQuery" in (waitedPromiseResult as { result: T, transformedQuery: string })
           ? (waitedPromiseResult as { result: T, transformedQuery: string }).result
           : waitedPromiseResult as T,
-        t
+        t,
       ).slice(0, 20);
       if (songResult.length <= 0) {
         await reply.edit(`:pensive:${t("search.notFound")}`);
@@ -126,8 +127,7 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
               text:
                 config.noMessageContent
                   ? t("components:search.resultFooterInteraction")
-                  : t("components:search.resultFooterMessage")
-              ,
+                  : t("components:search.resultFooterMessage"),
             })
             .toOceanic(),
         ],
@@ -139,7 +139,7 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
                 .setPlaceholder(
                   config.noMessageContent
                     ? t("components:search.select")
-                    : t("components:search.typeOrSelect")
+                    : t("components:search.typeOrSelect"),
                 )
                 .setMinValues(1)
                 .setMaxValues(songResult.length - 1)
@@ -148,16 +148,15 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
                   {
                     label: t("cancel"),
                     value: "cancel",
-                  }
-                )
+                  },
+                ),
             )
             .toOceanic(),
         ],
       });
       this.emit("open", this._responseMessage);
       return true;
-    }
-    catch (e) {
+    } catch (e) {
       this.logger.error(e);
       if (reply) {
         reply.edit(`✘${t("internalErrorOccurred")}`)
