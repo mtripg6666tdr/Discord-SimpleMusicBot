@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -58,11 +58,11 @@ export interface Asset {
 export enum ContentType {
   ApplicationOctetStream = "application/octet-stream",
   ApplicationPGPSignature = "application/pgp-signature",
-  ApplicationXTar = "application/x-tar"
+  ApplicationXTar = "application/x-tar",
 }
 
 export enum State {
-  Uploaded = "uploaded"
+  Uploaded = "uploaded",
 }
 
 export interface Author {
@@ -87,18 +87,18 @@ export interface Author {
 }
 
 enum Type {
-  User = "User"
+  User = "User",
 }
 
 interface Reactions {
-  url: string;
-  total_count: number;
+  "url": string;
+  "total_count": number;
   "+1": number;
   "-1": number;
-  laugh: number;
-  hooray: number;
-  confused: number;
-  heart: number;
-  rocket: number;
-  eyes: number;
+  "laugh": number;
+  "hooray": number;
+  "confused": number;
+  "heart": number;
+  "rocket": number;
+  "eyes": number;
 }

@@ -1,25 +1,25 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { GuildDataContainer } from "../Structure";
 import type { InteractionCollector } from "./collectors/InteractionCollector";
 import type { CommandMessage } from "./commandResolver/CommandMessage";
 import type { ResponseMessage } from "./commandResolver/ResponseMessage";
-import type { GuildDataContainer } from "../Structure";
 import type { QueueContent } from "../types/QueueContent";
 import type { Member } from "oceanic.js";
 
@@ -29,9 +29,9 @@ import i18next from "i18next";
 
 import { ServerManagerBase } from "../Structure";
 
-type voteResult = "voted"|"cancelled"|"ignored";
+type voteResult = "voted" | "cancelled" | "ignored";
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export class SkipSession extends ServerManagerBase<{}> {
   protected inited = false;
   protected readonly agreeUsers = new Set<string>();
@@ -63,7 +63,7 @@ export class SkipSession extends ServerManagerBase<{}> {
     const { collector, customIdMap } = this.parent.bot.collectors.create()
       .setMaxInteraction(Infinity)
       .createCustomIds({
-        "skip_vote": "button",
+        skip_vote: "button",
       });
     collector.on("skip_vote", interaction => {
       if (interaction.member) {
@@ -128,8 +128,7 @@ export class SkipSession extends ServerManagerBase<{}> {
             .catch(this.logger.error);
 
           await this.server.player.play();
-        }
-        catch (e) {
+        } catch (e) {
           this.logger.error(e);
           this.reply.edit(`:astonished:${i18next.t("components:skip.failed", { lng: this.parent.locale })}`)
             .catch(this.logger.error);
@@ -161,7 +160,7 @@ export class SkipSession extends ServerManagerBase<{}> {
             i18next.t("components:skip.howToUseSkipVote", { title: this.currentSong.basicInfo.title, lng: this.parent.locale })
             + `${i18next.t("components:skip.skipVoteDescription", { lng: this.parent.locale })}\r\n\r\n`
             + `${i18next.t("components:skip.currentStatus", { lng: this.parent.locale })}: ${this.agreeUsers.size}/${voiceSize}\r\n`
-            + i18next.t("components:skip.skipRequirement", { lng: this.parent.locale, count: Math.ceil(voiceSize / 2) - this.agreeUsers.size })
+            + i18next.t("components:skip.skipRequirement", { lng: this.parent.locale, count: Math.ceil(voiceSize / 2) - this.agreeUsers.size }),
           )
           .setFooter({
             text: i18next.t("components:skip.skipIssuer", { issuer: this.issuer, lng: this.parent.locale }),
@@ -175,7 +174,7 @@ export class SkipSession extends ServerManagerBase<{}> {
               .setCustomId(this.skipVoteCustomId)
               .setEmoji("⏩")
               .setLabel(i18next.t("components:skip.agree", { lng: this.parent.locale }))
-              .setStyle("PRIMARY")
+              .setStyle("PRIMARY"),
           )
           .toOceanic(),
       ],

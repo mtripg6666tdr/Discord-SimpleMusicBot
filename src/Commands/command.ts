@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -58,7 +58,7 @@ export default class Commands extends BaseCommand {
     if (context.rawArgs === "") {
       // 引数がない場合は全コマンドの一覧を表示
       const embed = [] as MessageEmbedBuilder[];
-      const getCategoryText = (label: typeof categoriesList[number])=>{
+      const getCategoryText = (label: typeof categoriesList[number]) => {
         return t(`commands:command.categories.${label}`);
       };
       const rawcommands = CommandManager.instance.commands.filter(ci => !ci.unlist);
@@ -83,8 +83,8 @@ export default class Commands extends BaseCommand {
                 name: [...new Set([ci.name, ...ci.alias])].join(", "),
                 value: ci.getLocalizedDescription(context.locale),
                 inline: true,
-              } as EmbedField))
-            )
+              } as EmbedField)),
+            ),
         );
       }
       for (let i = 0; i < embed.length; i++) {
@@ -100,7 +100,7 @@ export default class Commands extends BaseCommand {
               config.noMessageContent
                 ? t("commands:command.toLearnMoreInteraction")
                 : `${t("prefixIs", { prefix: context.server.prefix })}\r\n${t("commands:command.toLearnMoreMessage", { prefix: context.server.prefix })}`
-            )
+            ),
           )
           .setColor(getColor("COMMAND"));
       }
@@ -122,7 +122,7 @@ export default class Commands extends BaseCommand {
             t("alias"),
             availableAlias.length > 0
               ? `\`${availableAlias.join("`, `")}\``
-              : `*${t("none")}*`
+              : `*${t("none")}*`,
           )
           .addField(t("permissionsToRun"), ci.getLocalizedPermissionDescription(context.locale))
         ;
@@ -130,13 +130,13 @@ export default class Commands extends BaseCommand {
           embed.addField(
             t("commands:command.usageLabel"),
             `\`${prefix}${t(`commands:${ci.asciiName}.usage` as any, { lng: context.locale })}\` \r\n`
-            + t("commands:command.argumentDescription")
+            + t("commands:command.argumentDescription"),
           );
         }
         if (ci.examples) {
           embed.addField(
             t("commands:command.exampleLabel"),
-            `\`${prefix}${t(`commands:${ci.asciiName}.examples` as any, { lng: context.locale })}\``
+            `\`${prefix}${t(`commands:${ci.asciiName}.examples` as any, { lng: context.locale })}\``,
           );
         }
         await message.reply({ embeds: [embed.toOceanic()] });
@@ -161,7 +161,7 @@ export default class Commands extends BaseCommand {
         CommandManager.instance.commands
           .filter(command => !command.unlist)
           .flatMap(command => [command.name, ...command.alias])
-          .filter(name => name.includes(input))
+          .filter(name => name.includes(input)),
       )];
     }
   }

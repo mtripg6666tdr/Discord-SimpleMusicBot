@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -161,10 +161,10 @@ export class SourceCache extends LogEmitter<CacheEvents> {
       .then(files => Promise.allSettled(
         files
           .filter(file => file.isFile())
-          .map(file => fs.promises.stat(path.join(this.cacheDirPath, file.name)))
+          .map(file => fs.promises.stat(path.join(this.cacheDirPath, file.name))),
       ))
       .then(sizes =>
-        sizes.filter(d => d.status === "fulfilled").reduce((prev, current) => prev + current.value.size, 0)
+        sizes.filter(d => d.status === "fulfilled").reduce((prev, current) => prev + current.value.size, 0),
       );
   }
 
@@ -173,7 +173,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
       .then(files => Promise.allSettled(
         files
           .filter(file => file.isFile())
-          .map(file => fs.promises.unlink(path.join(this.cacheDirPath, file.name)))
+          .map(file => fs.promises.unlink(path.join(this.cacheDirPath, file.name))),
       ));
   }
 
@@ -203,7 +203,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
             this.logger.info(`persistent cache (id: ${cacheId}) stored`);
             resolve(this.cleanupCache());
           }
-        }
+        },
       );
     }));
   }
@@ -273,7 +273,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
             lastAccess: stats.atimeMs,
             size: stats.size,
           };
-        })
+        }),
       )
         .then(ss => ss.map(d => "value" in d ? d.value : null).filter(d => d));
       files.sort((a, b) => a!.lastAccess - b!.lastAccess);

@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -41,7 +41,7 @@ type BinaryManagerOptions = {
   checkUpdateTimeout?: number,
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export class BinaryManager extends LogEmitter<{}> {
   protected readonly checkUpdateTimeout = this.options.checkUpdateTimeout || 1000 * 60 /* 1 min */ * 60 /* 1 hour */ * 3/* 3 hour */;
   protected baseUrl = path.join(__dirname, global.BUNDLED ? "../bin" : "../../bin");
@@ -61,8 +61,7 @@ export class BinaryManager extends LogEmitter<{}> {
     if (!fs.existsSync(this.baseUrl)) {
       try {
         fs.mkdirSync(this.baseUrl);
-      }
-      catch (e) {
+      } catch (e) {
         this.logger.warn(e);
         this.logger.info("Fallbacking to the root directory");
         this.baseUrl = path.join(__dirname, global.BUNDLED ? "../" : "../../");
@@ -122,7 +121,7 @@ export class BinaryManager extends LogEmitter<{}> {
     const binaryUrl = this.releaseInfo!.assets.find(
       typeof binaryName === "function"
         ? asset => binaryName(asset, filename => defaultSelector(asset, filename))
-        : asset => defaultSelector(asset, binaryName)
+        : asset => defaultSelector(asset, binaryName),
     )?.browser_download_url;
 
     if (!binaryUrl) {
@@ -175,7 +174,7 @@ export class BinaryManager extends LogEmitter<{}> {
           ended = true;
           resolve(
             Buffer.concat(bufs).toString()
-              .trim()
+              .trim(),
           );
           if (process.connected) {
             process.kill("SIGTERM");
@@ -193,8 +192,7 @@ export class BinaryManager extends LogEmitter<{}> {
           reject("Aborted");
           process.kill("SIGKILL");
         });
-      }
-      catch (e) {
+      } catch (e) {
         reject(e);
       }
     });
@@ -218,10 +216,10 @@ export class BinaryManager extends LogEmitter<{}> {
         windowsHide: true,
         env: {
           ...process.env,
-          "TOKEN": "",
-          "DB_TOKEN": "",
-          "CSE_KEY": "",
-          "PATH": ffmpegStatic
+          TOKEN: "",
+          DB_TOKEN: "",
+          CSE_KEY: "",
+          PATH: ffmpegStatic
             ? `${process.env.PATH}${process.platform === "win32" ? ";" : ":"}${path.join(ffmpegStatic, "..")}`
             : process.env.PATH,
         },

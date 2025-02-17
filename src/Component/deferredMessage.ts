@@ -1,25 +1,26 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
 import type { ResponseMessage } from "./commandResolver/ResponseMessage";
 import type { CommandMessage as LibCommandMessage } from "@mtripg6666tdr/oceanic-command-resolver";
+import type { AnyTextableGuildChannel, CreateMessageOptions, EditMessageOptions, Message } from "oceanic.js";
 
-import { AnyTextableGuildChannel, Channel, CreateMessageOptions, EditMessageOptions, Message } from "oceanic.js";
+import { Channel } from "oceanic.js";
 
 import TypedEventEmitter from "../Structure/TypedEmitter";
 import { waitForEnteringState } from "../Util";
@@ -39,7 +40,7 @@ type DeferredMessageObjectResolvable = Message<AnyTextableGuildChannel> | Respon
  * 遅延したメッセージを表します。
  * 遅延したメッセージは、メッセージの送信がリクエストされてから、指定された時間経過したのちに、
  * 送信されますが、指定された時間経過前に別のメッセージの送信がリクエストされた場合、
- * 当初のリクエストはキャンセルされ、新しいリクエストが即時に送信されます。  
+ * 当初のリクエストはキャンセルされ、新しいリクエストが即時に送信されます。
  * このクラスは、二回以上送信を遅延させることはできません。
  */
 export class DeferredMessage extends TypedEventEmitter<DeferredMessageEvents> {
@@ -79,6 +80,7 @@ export class DeferredMessage extends TypedEventEmitter<DeferredMessageEvents> {
   get canceled() {
     return this._canceled;
   }
+
   private set canceled(value: boolean) {
     this._canceled = value;
   }

@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -24,7 +24,7 @@ import { getCommandExecutionContext } from "../Commands";
 import { ServerManagerBase } from "../Structure";
 import { getColor } from "../Util/color";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface EffectManagerEvents {
 }
 
@@ -38,17 +38,17 @@ type AudioEffect = {
 };
 
 const audioEffects = {
-  bassBoost: {
+  "bassBoost": {
     name: "Bass Boost",
     arg: "firequalizer=gain_entry='entry(31,4);entry(62,2.7);entry(125,0.6)'",
     shouldDisableVbr: false,
   },
-  reverb: {
+  "reverb": {
     name: "Reverb",
     arg: "aecho=1.0:0.7:20:0.5",
     shouldDisableVbr: false,
   },
-  loudnessEq: {
+  "loudnessEq": {
     name: "Loudness Eq",
     arg: "loudnorm",
     shouldDisableVbr: true,
@@ -58,12 +58,12 @@ const audioEffects = {
     arg: "apulsator=hz=0.125:amount=0.8",
     shouldDisableVbr: false,
   },
-  karaoke: {
+  "karaoke": {
     name: "Karaoke",
     arg: "stereotools=mlev=0.1",
     shouldDisableVbr: false,
   },
-  nightcore: {
+  "nightcore": {
     name: "Nightcore",
     arg: "asetrate=48000*1.2,aresample=48000,bass=g=5",
     shouldDisableVbr: false,
@@ -81,7 +81,7 @@ export class AudioEffectManager extends ServerManagerBase<EffectManagerEvents> {
   }
 
   protected data: Record<AudioEffectNames, boolean> = Object.fromEntries(
-    audioEffectNames.map(name => [name, false])
+    audioEffectNames.map(name => [name, false]),
   ) as Record<AudioEffectNames, boolean>;
 
   toggle(effectName: AudioEffectNames) {
@@ -133,7 +133,7 @@ export class AudioEffectManager extends ServerManagerBase<EffectManagerEvents> {
         new MessageButtonBuilder()
           .setCustomId(customIdMap[effectName])
           .setStyle(this.data[effectName] ? "SUCCESS" : "SECONDARY")
-          .setLabel(effect.name)
+          .setLabel(effect.name),
       );
     }
     return buttons;

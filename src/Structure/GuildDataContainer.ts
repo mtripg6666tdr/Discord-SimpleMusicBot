@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -64,13 +64,12 @@ const config = getConfig();
  */
 export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   private readonly _cancellations = [] as TaskCancellationManager[];
-  private get cancellations(): Readonly<TaskCancellationManager[]> {
+  private get cancellations(): readonly TaskCancellationManager[] {
     return this._cancellations;
   }
 
   /** プレフィックス */
   prefix: string;
-
 
   // キューマネージャー
   protected _queue: QueueManager;
@@ -79,14 +78,12 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     return this._queue;
   }
 
-
   // プレーマネージャー
   protected _player: PlayManager;
   /** 再生マネジャ */
   get player() {
     return this._player;
   }
-
 
   // 検索パネルマネージャー
   protected _searchPanel: SearchPanelManager;
@@ -95,20 +92,17 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     return this._searchPanel;
   }
 
-
   protected _audioEffects: AudioEffectManager;
   /** オーディオエフェクトマネジャ */
   get audioEffects() {
     return this._audioEffects;
   }
 
-
   protected _skipSession: SkipSession | null = null;
   /** スキップセッション */
   get skipSession() {
     return this._skipSession;
   }
-
 
   protected _preferences: GuildPreferencesManager;
   /** 設定 */
@@ -121,6 +115,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   get boundTextChannel() {
     return this._boundTextChannel;
   }
+
   /** 紐づけテキストチャンネルを設定します */
   private set boundTextChannel(val: string) {
     this._boundTextChannel = val;
@@ -275,7 +270,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    * @param param0 読み取り元のオブジェクト
    */
   importStatus(statuses: JSONStatuses): void {
-    //VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
+    // VCのID:バインドチャンネルのID:ループ:キューループ:関連曲
     this.queue.loopEnabled = !!statuses.loopEnabled;
     this.queue.queueLoopEnabled = !!statuses.queueLoopEnabled;
     this.preferences.importPreferences(statuses);
@@ -381,7 +376,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    */
   async joinVoiceChannel(
     message: CommandMessage,
-    { reply = false, replyOnFail = false }: { reply?: boolean, replyOnFail?: boolean }
+    { reply = false, replyOnFail = false }: { reply?: boolean, replyOnFail?: boolean },
   ): Promise<boolean> {
     return lock(this.joinVoiceChannelLocker, async () => {
       const { t } = getCommandExecutionContext();
@@ -419,8 +414,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
             content: `:+1:${t("guildDataContainer.connected", { channel: `:speaker:\`${targetVC.name}\`` })}`,
           });
           return true;
-        }
-        catch (e) {
+        } catch (e) {
           this.logger.error(e);
           const failedMsg = `😑${t("guildDataContainer.failedToConnect")}: ${
             typeof e === "object" && "message" in e ? `${e.message}` : e
@@ -469,7 +463,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       first?: boolean,
       cancellable?: boolean,
       privateSource?: boolean,
-    }
+    },
   ): Promise<QueueContent[]> {
     const { t } = getCommandExecutionContext();
 
@@ -490,7 +484,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
                 addedBy: message.member,
                 channel: message.channel,
                 privateSource,
-              })
+              }),
             );
           }
         }
@@ -507,6 +501,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       }
     }
 
+    /* eslint-disable @stylistic/brace-style */
 
     // 各種特殊ソースの解釈
     if (
@@ -547,15 +542,13 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
 
         await this.player.play({ bgm: false });
         return [item];
-      }
-      catch (e) {
+      } catch (e) {
         this.logger.error(e);
         await smsg.edit(`✘${t("components:queue.failedToAdd")}`)
           .catch(this.logger.error);
         return [];
       }
     }
-
 
     // オーディオファイルへの直リンク？
     else if (!config.isDisabledSource("custom") && Util.getResourceTypeFromUrl(rawArg) !== "none") {
@@ -576,7 +569,6 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       await this.player.play({ bgm: false });
       return [item];
     }
-
 
     // youtubeのプレイリストへのリンク
     else if (
@@ -603,7 +595,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           /* result */ result.items,
           /* playlist name */ result.title,
           /* tracks count */ result.itemCount,
-          /* consumer */ (c) => ({
+          /* consumer */ c => ({
             url: c.url,
             channel: c.author,
             description: t("components:queue.noDescriptionInPlaylist"),
@@ -611,7 +603,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
             length: c.duration,
             thumbnail: c.thumbnail,
             title: c.title,
-          } as AudioSourceBasicJsonFormat)
+          } as AudioSourceBasicJsonFormat),
         );
         if (cancellation.cancelled) {
           await msg.edit(`✅${t("canceled")}`);
@@ -626,7 +618,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
                   : `[${result.title}](${result.url})`
               }\r\n${
                 t("components:queue.songsAdded", { count: items.length })
-              }`
+              }`,
             )
             .setThumbnail(result.thumbnailUrl || DefaultAudioThumbnailURL)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
@@ -635,20 +627,17 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
             embeds: [embed.toOceanic()],
           });
         }
-      }
-      catch (e) {
+      } catch (e) {
         this.logger.error(e);
         await msg.edit(
-          `✘${t("components:queue.failedToAdd")}`
+          `✘${t("components:queue.failedToAdd")}`,
         ).catch(this.logger.error);
-      }
-      finally {
+      } finally {
         this.unbindCancellation(cancellation);
       }
       await this.player.play({ bgm: false });
       return items;
     }
-
 
     // SoundCloudのプレイリスト
     else if (!config.isDisabledSource("soundcloud") && SoundCloudS.validatePlaylistUrl(rawArg)) {
@@ -666,7 +655,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           playlist.tracks,
           playlist.title,
           playlist.track_count,
-          async (track) => {
+          async track => {
             const item = await sc.tracks.getV2(track.id);
             return {
               url: item.permalink_url,
@@ -676,7 +665,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
               author: item.user.username,
               thumbnail: item.artwork_url,
             } as AudioSourceBasicJsonFormat;
-          }
+          },
         );
         if (cancellation.cancelled) {
           await msg.edit(`✅${t("canceled")}`);
@@ -685,26 +674,23 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
             .setTitle(`✅${t("components:queue.processingPlaylistCompleted")}`)
             .setDescription(
               `[${playlist.title}](${playlist.permalink_url}) \`(${playlist.user.username})\` \r\n`
-              + `${t("components:queue.songsAdded", { count: items.length })}`
+              + `${t("components:queue.songsAdded", { count: items.length })}`,
             )
             .setThumbnail(playlist.artwork_url!)
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({ content: "", embeds: [embed.toOceanic()] });
         }
-      }
-      catch (e) {
+      } catch (e) {
         this.logger.error(e);
         await msg.edit(
-          `✘${t("components:queue.failedToAdd")}`
+          `✘${t("components:queue.failedToAdd")}`,
         ).catch(this.logger.error);
-      }
-      finally {
+      } finally {
         this.unbindCancellation(cancellation);
       }
       await this.player.play({ bgm: false });
       return items;
     }
-
 
     // Spotifyのプレイリスト
     else if (!config.isDisabledSource("spotify") && Spotify.validatePlaylistUrl(rawArg) && Spotify.available) {
@@ -722,14 +708,14 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           tracks,
           playlist.name,
           tracks.length,
-          async (track) => {
+          async track => {
             return {
               url: Spotify.getTrackUrl(track.uri),
               title: track.title,
               artist: track.subtitle,
               length: Math.floor(track.duration / 1000),
             } as SpotifyJsonFormat;
-          }
+          },
         );
         if (cancellation.cancelled) {
           await msg.edit(`✅${t("canceled")}`);
@@ -739,7 +725,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
             .setDescription(
               `[${playlist.title}](${
                 Spotify.getPlaylistUrl(playlist.uri, playlist.type)
-              }) \`(${playlist.subtitle})\` \r\n${t("components:queue.songsAdded", { count: items.length })}`
+              }) \`(${playlist.subtitle})\` \r\n${t("components:queue.songsAdded", { count: items.length })}`,
             )
             .setThumbnail(playlist.coverArt.sources[0].url)
             .setFields({
@@ -749,19 +735,16 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
             .setColor(Util.color.getColor("PLAYLIST_COMPLETED"));
           await msg.edit({ content: "", embeds: [embed.toOceanic()] });
         }
-      }
-      catch (e) {
+      } catch (e) {
         this.logger.error(e);
         await msg.edit(`✘${t("components:queue.failedToAdd")}`)
           .catch(this.logger.error);
-      }
-      finally {
+      } finally {
         this.unbindCancellation(cancellation);
       }
       await this.player.play({ bgm: false });
       return items;
     }
-
 
     // その他の通常のURLを解釈
     else {
@@ -781,8 +764,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         await this.player.play({ bgm: false });
 
         return [success];
-      }
-      catch (er) {
+      } catch (er) {
         this.logger.error(er);
         // なに指定したし…
         await message.reply(`🔭${t("guildDataContainer.invalidUrl")}`)
@@ -790,6 +772,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
         return [];
       }
     }
+    /* eslint-enable @stylistic/brace-style */
   }
 
   async playFromMessage(
@@ -807,7 +790,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       return;
     } else if (
       message.content.substring(prefixLength).startsWith("http://")
-        || message.content.substring(prefixLength).startsWith("https://")
+      || message.content.substring(prefixLength).startsWith("https://")
     ) {
       // プレフィックス+URLのメッセージか？
       await context.server.playFromUrl(commandMessage, message.content.substring(prefixLength), morePrefs);
@@ -823,8 +806,8 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
 
       if (
         embed.color === Util.color.getColor("SONG_ADDED")
-          || embed.color === Util.color.getColor("AUTO_NP")
-          || embed.color === Util.color.getColor("NP")
+        || embed.color === Util.color.getColor("AUTO_NP")
+        || embed.color === Util.color.getColor("NP")
       ) {
         // 曲関連のメッセージならそれをキューに追加
         const url = embed.description?.match(/^\[.+\]\((?<url>https?.+)\)/)?.groups!.url;
@@ -843,7 +826,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   /**
    * 検索パネルのオプション番号を表すインデックス番号から再生します
    * @param nums インデックス番号の配列
-   * @param message 
+   * @param message
    */
   async playFromSearchPanelOptions(nums: string[], panel: SearchPanel) {
     const includingNums = panel.filterOnlyIncludes(nums.map(n => Number(n)).filter(n => !isNaN(n)));
@@ -887,7 +870,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    * プレフィックス更新します
    * @param message 更新元となるメッセージ
    */
-  updatePrefix(message: CommandMessage|Message<AnyTextableGuildChannel>) {
+  updatePrefix(message: CommandMessage | Message<AnyTextableGuildChannel>) {
     const oldPrefix = this.prefix;
     const member = message.guild.members.get(this.bot.client.user.id)!;
     const pmatch = (member.nick || member.username).match(/^(\[(?<prefix0>[a-zA-Z!?_-]+)\]|【(?<prefix1>[a-zA-Z!?_-]+)】)/);

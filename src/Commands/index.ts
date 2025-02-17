@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -66,7 +66,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     return this._name;
   }
 
-  protected readonly _alias: Readonly<string[]>;
+  protected readonly _alias: readonly string[];
   public get alias() {
     return this._alias;
   }
@@ -101,7 +101,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     return this._shouldDefer;
   }
 
-  protected readonly _argument: Readonly<LocalizedSlashCommandArgument[]> | null;
+  protected readonly _argument: readonly LocalizedSlashCommandArgument[] | null;
   public get argument() {
     return this._argument;
   }
@@ -145,8 +145,8 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
   constructor(opts: ListCommandInitializeOptions | UnlistCommandOptions) {
     super();
-    this._messageCommand = "messageCommand" in opts && opts.messageCommand || false;
-    this._interactionOnly = "interactionOnly" in opts && opts.interactionOnly || false;
+    this._messageCommand = ("messageCommand" in opts && opts.messageCommand) || false;
+    this._interactionOnly = ("interactionOnly" in opts && opts.interactionOnly) || false;
     this._alias = opts.alias;
     this._name = "name" in opts
       ? opts.name
@@ -197,45 +197,47 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
 
       this._category = category;
 
-      this._argument = args ? args.map(arg => {
-        const result: LocalizedSlashCommandArgument = {
-          type: arg.type,
-          name: arg.name,
-          required: arg.required || false,
-          description: i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any),
-          descriptionLocalization: {} as LocaleMap,
-          choices: [],
-          autoCompleteEnabled: arg.autoCompleteEnabled || false,
-        };
-        availableLanguages().forEach(language => {
-          if (i18next.language === language) return;
-          const localized: string = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any, { lng: language })
-            .substring(0, 100);
-          if (localized === result.description) return;
-          result.descriptionLocalization[language as keyof typeof result.descriptionLocalization] = localized.trim();
-        });
-
-        arg.choices?.forEach(choiceValue => {
-          const resultChoice = {
-            name: i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}` as any),
-            value: choiceValue,
-            nameLocalizations: {} as LocaleMap,
+      this._argument = args
+        ? args.map(arg => {
+          const result: LocalizedSlashCommandArgument = {
+            type: arg.type,
+            name: arg.name,
+            required: arg.required || false,
+            description: i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any),
+            descriptionLocalization: {} as LocaleMap,
+            choices: [],
+            autoCompleteEnabled: arg.autoCompleteEnabled || false,
           };
           availableLanguages().forEach(language => {
             if (i18next.language === language) return;
-            const localized = i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}` as any, { lng: language });
-            if (localized === resultChoice.name) return;
-            resultChoice.nameLocalizations[language as keyof LocaleMap] = localized.trim();
+            const localized: string = i18next.t(`commands:${this.asciiName}.args.${arg.name}.description` as any, { lng: language })
+              .substring(0, 100);
+            if (localized === result.description) return;
+            result.descriptionLocalization[language as keyof typeof result.descriptionLocalization] = localized.trim();
           });
-          result.choices!.push(resultChoice);
-        });
 
-        if (result.choices!.length === 0) {
-          delete result.choices;
-        }
+          arg.choices?.forEach(choiceValue => {
+            const resultChoice = {
+              name: i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}` as any),
+              value: choiceValue,
+              nameLocalizations: {} as LocaleMap,
+            };
+            availableLanguages().forEach(language => {
+              if (i18next.language === language) return;
+              const localized = i18next.t(`commands:${this.asciiName}.args.${arg.name}.choices.${choiceValue}` as any, { lng: language });
+              if (localized === resultChoice.name) return;
+              resultChoice.nameLocalizations[language as keyof LocaleMap] = localized.trim();
+            });
+            result.choices!.push(resultChoice);
+          });
 
-        return result;
-      }) : null;
+          if (result.choices!.length === 0) {
+            delete result.choices;
+          }
+
+          return result;
+        })
+        : null;
 
       this._requiredPermissionsOr = requiredPermissionsOr || [];
       this._defaultMemberPermission = defaultMemberPermission || "NONE";
@@ -244,7 +246,7 @@ export abstract class BaseCommand extends TypedEmitter<CommandEvents> {
     this.logger.debug(`${this.name} loaded`);
   }
 
-  /**ローカライズされた権限の説明を取得します */
+  /** ローカライズされた権限の説明を取得します */
   getLocalizedPermissionDescription(locale: string) {
     const perms = this.requiredPermissionsOr.filter(perm => perm !== "admin");
     if (perms.length === 0) {

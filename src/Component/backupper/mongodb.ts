@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -35,7 +35,7 @@ type Analytics = Collectionate<{
   errorCount: number,
   timestamp: number,
   type: "playlog",
-}|{
+} | {
   command: string,
   count: number,
   type: "command",
@@ -97,7 +97,7 @@ export class MongoBackupper extends Backupper {
 
       this.data.forEach(setContainerEvent);
       this.bot.on("guildDataAdded", setContainerEvent);
-      this.bot.on("onBotVoiceChannelJoin", (channel) => backupStatusFuncFactory(channel.guild.id)());
+      this.bot.on("onBotVoiceChannelJoin", channel => backupStatusFuncFactory(channel.guild.id)());
       this.bot.client.on("guildDelete", ({ id }) => this.deleteGuildData(id));
 
       // analytics
@@ -126,15 +126,14 @@ export class MongoBackupper extends Backupper {
       const status = this.data.get(guildId)?.exportStatus();
       if (!status) return;
       await this.collections.status.updateOne({ guildId }, {
-        "$set": {
+        $set: {
           guildId,
           ...status,
         },
       }, {
         upsert: true,
       });
-    }
-    catch (er) {
+    } catch (er) {
       this.logger.error(er);
       this.logger.info("Something went wrong while backing up status");
     }
@@ -148,15 +147,14 @@ export class MongoBackupper extends Backupper {
       if (!queue) return;
       this.logger.info(`Backing up queue...(${guildId})`);
       await this.collections.queue.updateOne({ guildId }, {
-        "$set": {
+        $set: {
           guildId,
           ...queue,
         },
       }, {
         upsert: true,
       });
-    }
-    catch (er) {
+    } catch (er) {
       this.logger.error(er);
       this.logger.warn("Something went wrong while backing up queue");
     }
@@ -172,8 +170,7 @@ export class MongoBackupper extends Backupper {
         errorCount,
         timestamp: Date.now(),
       });
-    }
-    catch (er) {
+    } catch (er) {
       this.logger.error(er);
     }
   }
@@ -192,8 +189,7 @@ export class MongoBackupper extends Backupper {
       }, {
         upsert: true,
       });
-    }
-    catch (er) {
+    } catch (er) {
       this.logger.error(er);
     }
   }
@@ -207,7 +203,7 @@ export class MongoBackupper extends Backupper {
     }
     try {
       const dbResult = this.collections.status.find({
-        "$or": guildIds.map(id => ({
+        $or: guildIds.map(id => ({
           guildId: id,
         })),
       });
@@ -216,8 +212,7 @@ export class MongoBackupper extends Backupper {
         result.set(doc.guildId, doc);
       }
       return result;
-    }
-    catch (er) {
+    } catch (er) {
       this.logger.error(er);
       this.logger.error("Status restoring failed!");
       return null;
@@ -233,7 +228,7 @@ export class MongoBackupper extends Backupper {
     }
     try {
       const dbResult = this.collections.queue.find({
-        "$or": guildids.map(id => ({
+        $or: guildids.map(id => ({
           guildId: id,
         })),
       });
@@ -242,8 +237,7 @@ export class MongoBackupper extends Backupper {
         result.set(doc.guildId, doc);
       }
       return result;
-    }
-    catch (er) {
+    } catch (er) {
       this.logger.error(er);
       this.logger.error("Queue restoring failed!");
       return null;

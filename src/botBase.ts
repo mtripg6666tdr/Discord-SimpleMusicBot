@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -42,13 +42,13 @@ export type DataType = Map<string, GuildDataContainer>;
 interface BotBaseEvents {
   beforeReady: [];
   ready: [];
-  onMessageCreate: [message:discord.Message];
-  onInteractionCreate: [interaction:discord.Interaction];
-  onCommandHandler: [command:BaseCommand, args:CommandArgs];
-  onBotVoiceChannelJoin: [channel:discord.VoiceChannel|discord.StageChannel];
-  guildDataAdded: [container:GuildDataContainer];
-  guildDataRemoved: [guildId:string];
-  tick: [count:number];
+  onMessageCreate: [message: discord.Message];
+  onInteractionCreate: [interaction: discord.Interaction];
+  onCommandHandler: [command: BaseCommand, args: CommandArgs];
+  onBotVoiceChannelJoin: [channel: discord.VoiceChannel | discord.StageChannel];
+  guildDataAdded: [container: GuildDataContainer];
+  guildDataRemoved: [guildId: string];
+  tick: [count: number];
 }
 
 /**
@@ -95,7 +95,7 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
   }
 
   /**
-   * バージョン情報  
+   * バージョン情報
    * (リポジトリの最終コミットのハッシュ値)
    */
   get version() {
@@ -166,8 +166,7 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
     for (let i = 0; i < versionObtainStrategies.length; i++) {
       try {
         this._versionInfo = versionObtainStrategies[i]();
-      }
-      catch { /* empty */ }
+      } catch { /* empty */ }
       if (this._versionInfo) break;
     }
     if (!this._versionInfo) {
@@ -210,16 +209,16 @@ export abstract class MusicBotBase extends LogEmitter<BotBaseEvents> {
     const guildDataArray = [...this.guildData.values()];
     const memory = Util.system.getMemoryInfo();
     this.logger.info(
-      `[Tick] (Client) Participating: ${this._client.guilds.size}, Registered: ${this.guildData.size} Connecting: ${guildDataArray.filter(d => d.player.isConnecting).length} Paused: ${guildDataArray.filter(d => d.player.isPaused).length}`
+      `[Tick] (Client) Participating: ${this._client.guilds.size}, Registered: ${this.guildData.size} Connecting: ${guildDataArray.filter(d => d.player.isConnecting).length} Paused: ${guildDataArray.filter(d => d.player.isPaused).length}`,
     );
     this.logger.info(
-      `[Tick] (System) Free:${Math.floor(memory.free)}MB; Total:${Math.floor(memory.total)}MB; Usage:${memory.usage}%`
+      `[Tick] (System) Free:${Math.floor(memory.free)}MB; Total:${Math.floor(memory.total)}MB; Usage:${memory.usage}%`,
     );
     const nMem = process.memoryUsage();
     const rss = Util.system.getMBytes(nMem.rss);
     const ext = Util.system.getMBytes(nMem.external);
     this.logger.info(
-      `[Tick] (System) Memory RSS: ${rss}MB, Heap total: ${Util.system.getMBytes(nMem.heapTotal)}MB, Total: ${Util.getPercentage(rss + ext, memory.total)}%`
+      `[Tick] (System) Memory RSS: ${rss}MB, Heap total: ${Util.system.getMBytes(nMem.heapTotal)}MB, Total: ${Util.getPercentage(rss + ext, memory.total)}%`,
     );
   }
 

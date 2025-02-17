@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -25,7 +25,6 @@ import type { ytdlCoreStrategy } from "./ytdl-core";
 
 import { getConfig } from "../../../config";
 import { getLogger } from "../../../logger";
-
 
 interface StrategyImporter {
   enable: boolean;
@@ -71,8 +70,7 @@ function initStrategies(configEnabled: boolean[] | null = null) {
         module: new Module(i),
         isFallback,
       };
-    }
-    catch (e) {
+    } catch (e) {
       logger.warn(`failed to load strategy#${i}`);
       if (config.debug) {
         logger.debug(e);
@@ -99,8 +97,7 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(.
           cache: result.cache,
           isFallbacked: strategy.isFallback,
         };
-      }
-      catch (e) {
+      } catch (e) {
         logger.warn(`fetch in strategy#${checkedStrategy} failed`, e);
       }
     }
@@ -116,8 +113,7 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(.
           cache: result.cache,
           isFallbacked: strategy.isFallback,
         };
-      }
-      catch (e) {
+      } catch (e) {
         logger.warn(`fetch in strategy#${i} failed`, e);
       }
     }
@@ -139,13 +135,12 @@ export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>
           isFallbacked: strategy.isFallback,
         };
       }
-    }
-    catch (e) {
+    } catch (e) {
       logger.warn(`getInfo in strategy#${i} failed`, e);
       logger.warn(
         i + 1 === strategies.length
           ? "All strategies failed"
-          : "Fallbacking to the next strategy"
+          : "Fallbacking to the next strategy",
       );
     }
   }

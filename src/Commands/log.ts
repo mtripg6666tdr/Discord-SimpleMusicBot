@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -61,8 +61,7 @@ export default class SystemInfo extends BaseCommand {
   getPackageVersion(mod: string): string {
     try {
       return require(`${mod}/package.json`).version;
-    }
-    catch {/* empty */}
+    } catch { /* empty */ }
 
     try {
       let packageRootPath = require.resolve(mod);
@@ -77,8 +76,7 @@ export default class SystemInfo extends BaseCommand {
       }
 
       return require(path.join(packageRootPath, "package.json")).version;
-    }
-    catch {/* empty */}
+    } catch { /* empty */ }
 
     return "unknown";
   }
@@ -110,7 +108,7 @@ export default class SystemInfo extends BaseCommand {
                 .then(size => getMBytes(size))
                 .catch(() => "unknown")
             }MB\``,
-            true
+            true,
           )
           .addField(
             t("commands:log.modules"),
@@ -125,10 +123,10 @@ export default class SystemInfo extends BaseCommand {
               "pako",
             ]
               .map(mod => `\`${mod}\`@${this.getPackageVersion(mod)}`)
-              .join("\r\n")
+              .join("\r\n"),
           )
           .setColor(getColor("UPTIME"))
-          .toOceanic()
+          .toOceanic(),
       );
     }
 
@@ -146,7 +144,7 @@ export default class SystemInfo extends BaseCommand {
           .setColor(getColor("UPTIME"))
           .setTitle("Log")
           .setDescription(`Last ${logs.length}bot logs\r\n\`\`\`\r\n${logs.join("\r\n")}\r\n\`\`\``)
-          .toOceanic()
+          .toOceanic(),
       );
     }
 
@@ -157,14 +155,14 @@ export default class SystemInfo extends BaseCommand {
           .setTitle("Server Info")
           .setDescription(
             `**${t("commands:log.guildName")}(NSFW LEVEL,ID)**\r\n`
-            + context.client.guilds.map(guild => `${guild.name.length > 17 ? guild.name.substring(0, 17) + "…" : guild.name} (${guild.nsfwLevel},${guild.id})`).join("\r\n")
+            + context.client.guilds.map(guild => `${guild.name.length > 17 ? guild.name.substring(0, 17) + "…" : guild.name} (${guild.nsfwLevel},${guild.id})`).join("\r\n"),
           )
           .addField(t("commands:log.participatingGuildCount"), context.bot.client.guilds.size.toString(), true)
           .addField(t("commands:log.registeredGuildCount"), context.bot.databaseCount.toString(), true)
           .addField(t("commands:log.connectingGuildCount"), context.bot.connectingGuildCount.toString(), true)
           .addField(t("commands:log.playingGuildCount"), context.bot.playingGuildCount.toString(), true)
           .addField(t("commands:log.pausedGuildCount"), context.bot.pausedGuildCount.toString(), true)
-          .toOceanic()
+          .toOceanic(),
       );
     }
 
@@ -188,10 +186,10 @@ export default class SystemInfo extends BaseCommand {
           .addField(
             t("commands:log.liveStream"),
             data?.player.currentAudioInfo?.isYouTube() && data?.player.currentAudioInfo.isLiveStream ? t("yes") : t("no"),
-            true
+            true,
           )
           .setThumbnail(target.iconURL()!)
-          .toOceanic()
+          .toOceanic(),
       );
     }
 
@@ -213,7 +211,7 @@ export default class SystemInfo extends BaseCommand {
             `Times(irq): \`${Math.round(cpus[i].times.irq / 1000)}s(${Util.getPercentage(cpus[i].times.irq, all)}%)\``,
             `Times(idle): \`${Math.round(cpus[i].times.idle / 1000)}s(${Util.getPercentage(cpus[i].times.idle, all)}%)\``,
           ].join("\r\n"),
-          true
+          true,
         );
       }
       embeds.push(cpuInfoEmbed.toOceanic());
@@ -234,7 +232,7 @@ export default class SystemInfo extends BaseCommand {
             + "Used: `" + memory.used + "MB`\r\n"
             + "Free: `" + memory.free + "MB`\r\n"
             + "Usage: `" + memory.usage + "%`",
-            true
+            true,
           )
           .addField("Main Process Memory",
             "RSS: `" + rss + "MB`\r\n"
@@ -243,9 +241,9 @@ export default class SystemInfo extends BaseCommand {
             + "Array buffers: `" + Util.system.getMBytes(nMem.arrayBuffers) + "MB`\r\n"
             + "External: `" + ext + "MB`\r\n"
             + "Total: `" + Util.getPercentage(rss + ext, memory.total) + "%`",
-            true
+            true,
           )
-          .toOceanic()
+          .toOceanic(),
       );
     }
 

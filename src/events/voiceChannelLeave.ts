@@ -1,18 +1,18 @@
 /*
- * Copyright 2021-2024 mtripg6666tdr
- * 
- * This file is part of mtripg6666tdr/Discord-SimpleMusicBot. 
+ * Copyright 2021-2025 mtripg6666tdr
+ *
+ * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
- * 
- * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free Software Foundation, 
+ *
+ * mtripg6666tdr/Discord-SimpleMusicBot is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * mtripg6666tdr/Discord-SimpleMusicBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot. 
+ * You should have received a copy of the GNU General Public License along with mtripg6666tdr/Discord-SimpleMusicBot.
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -52,7 +52,7 @@ export async function onVoiceChannelLeave(
       server.boundTextChannel,
       {
         content: `:postbox: ${i18next.t("disconnected", { lng: server.locale })}`,
-      }
+      },
     ).catch(this.logger.error);
   } else if (oldChannel.voiceMembers.has(this._client.user.id) && oldChannel.voiceMembers.filter(user => !user.bot).length === 0) {
     // ボイスチャンネルに参加しているユーザーがボットだけになった時
@@ -66,7 +66,7 @@ export async function onVoiceChannelLeave(
         server.boundTextChannel,
         {
           content: `:postbox: ${i18next.t("disconnected", { lng: server.locale })}`,
-        }
+        },
       ).catch(this.logger.error);
     } else if (!config.twentyFourSeven.includes(oldChannel.id) && !config.alwaysTwentyFourSeven) {
       if (
@@ -87,7 +87,7 @@ export async function onVoiceChannelLeave(
           server.boundTextChannel,
           {
             content: `:postbox: ${i18next.t("disconnected", { lng: server.locale })}`,
-          }
+          },
         ).catch(this.logger.error);
       } else {
         // それ以外の場合は、タイムアウトを設定し、一定時間内に追加操作がなかった場合切断する
@@ -100,7 +100,7 @@ export async function onVoiceChannelLeave(
               server.boundTextChannel,
               {
                 content: `:pause_button:${i18next.t("autoPaused", { lng: server.locale })}`,
-              }
+              },
             ).catch(this.logger.error);
           }
         }
@@ -113,7 +113,7 @@ export async function onVoiceChannelLeave(
             server.boundTextChannel,
             {
               content: `:postbox: ${i18next.t("autoDisconnect", { lng: server.locale })}`,
-            }
+            },
           ).catch(this.logger.error);
 
           server.player.disconnect().catch(this.logger.error);
