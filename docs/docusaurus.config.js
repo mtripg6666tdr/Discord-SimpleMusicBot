@@ -89,6 +89,10 @@ const config = {
             label: '使い方/ガイド',
           },
           {
+            label: "公開ボット/コミュニティリソース",
+            to: "/community-resources",
+          },
+          {
             type: "docsVersionDropdown",
             position: "right",
             dropdownItemsAfter: [
@@ -132,6 +136,10 @@ const config = {
               {
                 label: 'Discord',
                 href: 'https://sr.usamyon.moe/8QZw',
+              },
+              {
+                label: '公開ボット/コミュニティリソース',
+                to: '/community-resources',
               },
             ],
           },
