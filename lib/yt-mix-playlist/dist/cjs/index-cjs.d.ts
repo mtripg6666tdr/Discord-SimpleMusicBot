@@ -4,6 +4,7 @@ declare const _default: typeof main & {
     default(videoId: string, options?: {
         gl?: string | undefined;
         hl?: string | undefined;
+        preferInitialPlaylistGuessing?: boolean | undefined;
     } | undefined): Promise<ytmpl.MixPlaylist | null>;
     MixPlaylist: typeof ytmpl.MixPlaylist;
     MixPlaylistItem: typeof ytmpl.MixPlaylistItem;
