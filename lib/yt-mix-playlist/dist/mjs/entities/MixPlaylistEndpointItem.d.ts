@@ -8,5 +8,6 @@ export default class MixPlaylistEndpointItem extends MixPlaylistBasicInfo {
     thumbnails: Thumbnail[];
     constructor(data: any);
     static fetch(videoId: string, context: Context): Promise<MixPlaylistEndpointItem | null>;
+    static getGuessedEndpointItem(videoId: string): Promise<MixPlaylistEndpointItem | null>;
 }
 //# sourceMappingURL=MixPlaylistEndpointItem.d.ts.map

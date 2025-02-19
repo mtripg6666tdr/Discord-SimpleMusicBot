@@ -12,6 +12,7 @@ export default class MixPlaylist extends MixPlaylistBasicInfo {
     static fetch(videoId: string, options?: {
         gl?: string;
         hl?: string;
+        preferInitialPlaylistGuessing?: boolean;
     }): Promise<MixPlaylist | null>;
     select(videoId: string): Promise<MixPlaylist | null>;
     select(index: number): Promise<MixPlaylist | null>;

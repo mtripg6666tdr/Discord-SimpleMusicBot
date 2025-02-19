@@ -623,6 +623,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     this._mixPlaylist = await ytmpl(videoId, {
       gl: config.country,
       hl: config.defaultLanguage,
+      preferInitialPlaylistGuessing: true,
     });
 
     if (!this.mixPlaylistEnabled) {
