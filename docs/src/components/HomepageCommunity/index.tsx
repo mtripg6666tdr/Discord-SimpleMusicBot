@@ -30,7 +30,8 @@ export default function HomepageCommunity(): JSX.Element {
           </ul>
         </li>
         <li>GitHub の Issue や Pull Request を通して、開発の協力をしていただく。</li>
-        <li><a href='https://crowdin.com/project/discord-simplemusicbot'>Crowdin</a> を通して、翻訳の協力をしていただく。</li>
+        <li><a href='https://crowdin.com/project/discord-simplemusicbot' target='_blank' rel='noreferrer noopener'>Crowdin</a> を通して、翻訳の協力をしていただく。</li>
+        <li><a href="https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/network/dependencies" target='_blank' rel='noopener noreferrer'>利用している各種ライブラリ</a>の開発者に寄付をしていただく。</li>
         <li style={{ color: "rgba(0, 0, 0, 0.3)" }}>
           <a href={githubRepoUrl} target='_blank' rel='noopener noreferrer' style={{ color: 'inherit' }}>GitHub のリポジトリ</a>
           から開発者に寄付していただく。
