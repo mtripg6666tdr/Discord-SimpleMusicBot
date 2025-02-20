@@ -5,8 +5,11 @@ import clsx from "clsx";
 
 export default function HomepageStatsOverview(): JSX.Element {
   const [ version, setVersion ] = useState<string | null>(null);
+  const [ years, setYears ] = useState<number | null>(null);
 
   useEffect(() => {
+    setYears(Math.floor((Date.now() - new Date("2021-05-21T14:16:28.000Z").getTime()) / 1000 / 60 / 60 / 24 / 365));
+    
     const abortController = new AbortController();
 
     window.fetch("https://cdn.jsdelivr.net/gh/mtripg6666tdr/Discord-SimpleMusicBot@master/package.json", { signal: abortController.signal })
@@ -17,9 +20,7 @@ export default function HomepageStatsOverview(): JSX.Element {
     return () => {
       abortController.abort();
     }
-  });
-
-  const years = Math.floor((Date.now() - new Date("2021-05-21T14:16:28.000Z").getTime()) / 1000 / 60 / 60 / 24 / 365);
+  }, []);
 
   return (
     <HomepageZoneContainer title="数字で見る Discord-SimpleMusicBot">
