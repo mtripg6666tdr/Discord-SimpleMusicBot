@@ -1,0 +1,21 @@
+.community {
+  margin-bottom: 5rem;
+}
+
+.community h2 {
+  font-size: 1rem;
+  font-weight: normal;
+  margin: 3rem 0 1rem 0;
+}
+
+.community_row {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.support_list {
+  list-style: square;
+  width: min(700px, 98%);
+  margin: 0 auto;
+}

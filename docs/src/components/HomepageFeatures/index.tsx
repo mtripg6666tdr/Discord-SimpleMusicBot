@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import styles from './styles.module.css';
+import HomepageZoneContainer from '../HomepageZoneContainer';
 
 type FeatureItem = {
   title: string;
@@ -54,14 +55,16 @@ function Feature({title, Svg, description}: FeatureItem) {
 
 export default function HomepageFeatures(): JSX.Element {
   return (
-    <section className={styles.features}>
-      <div className="container">
-        <div className="row">
-          {FeatureList.map((props, idx) => (
-            <Feature key={idx} {...props} />
-          ))}
+    <HomepageZoneContainer title='特長'>
+      <div className={styles.features}>
+        <div className="container">
+          <div className="row">
+            {FeatureList.map((props, idx) => (
+              <Feature key={idx} {...props} />
+            ))}
+          </div>
         </div>
       </div>
-    </section>
+    </HomepageZoneContainer>
   );
 }

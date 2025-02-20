@@ -1,0 +1,9 @@
+.zoneContainer {
+  padding: 4rem 0;
+}
+
+.zoneContainer h2 {
+  text-align: center;
+  font-size: 2rem;
+  /* padding-bottom: 1rem; */
+}
