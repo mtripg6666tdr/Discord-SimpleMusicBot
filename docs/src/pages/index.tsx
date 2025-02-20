@@ -6,6 +6,8 @@ import Layout from '@theme/Layout';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
 
 import styles from './index.module.css';
+import HomepageStatsOverview from '../components/HomepageStatsOverview';
+import HomepageCommunity from '../components/HomepageCommunity';
 
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
@@ -53,6 +55,9 @@ export default function Home(): JSX.Element {
       <HomepageHeader />
       <main>
         <HomepageFeatures />
+        <HomepageStatsOverview />
+        <hr />
+        <HomepageCommunity />
       </main>
     </Layout>
   );

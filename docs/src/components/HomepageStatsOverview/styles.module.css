@@ -1,0 +1,8 @@
+.stats :global(.row) :global(.col) p {
+  text-align: center;
+}
+
+
+.stats :global(.row) :global(.col) p:nth-child(1) {
+  font-size: 4rem;
+}
