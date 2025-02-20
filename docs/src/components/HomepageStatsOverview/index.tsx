@@ -49,7 +49,7 @@ export default function HomepageStatsOverview(): JSX.Element {
             <p>稼働中の延べサーバー数</p>
           </div>
           <div className="col col--4">
-            <p>{years.toLocaleString()}+</p>
+            <p>{years?.toLocaleString()}+</p>
             <p>プロジェクト継続年数</p>
           </div>
         </div>
