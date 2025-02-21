@@ -66,7 +66,7 @@
     "eslint": "^9.20.1",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-license-header": "^0.7.0",
+    "eslint-plugin-license-header": "^0.8.0",
     "eslint-plugin-n": "^17.15.1",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-unused-imports": "^4.1.4",
