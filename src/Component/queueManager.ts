@@ -503,9 +503,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     } catch (e) {
       this.logger.error("AutoAddQueue failed", e);
       if (uiMessage) {
-        const errorMessage = "message" in e && typeof e.message === "string"
-          ? e.message
-          : Util.filterContent(Util.stringifyObject(e));
+        const errorMessage = Util.filterContent(Util.stringifyObject(e));
         const errorMessageContent = {
           content: `:weary: ${t("components:queue.failedToAdd")}${errorMessage ? `(${errorMessage})` : ""}`,
           embeds: [],

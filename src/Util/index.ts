@@ -50,7 +50,7 @@ export function stringifyObject(obj: any): string {
   } else if (obj instanceof Error) {
     return `${obj.name}: ${obj.message}\n${obj.stack || "no stacks"}`;
   } else if (obj["message"]) {
-    return obj.message;
+    return stringifyObject(obj.message);
   } else {
     try {
       return JSON.stringify(obj);
