@@ -416,9 +416,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
           return true;
         } catch (e) {
           this.logger.error(e);
-          const failedMsg = `😑${t("guildDataContainer.failedToConnect")}: ${
-            typeof e === "object" && "message" in e ? `${e.message}` : e
-          }`;
+          const failedMsg = `😑${t("guildDataContainer.failedToConnect")}: ${Util.stringifyObject(e)}`;
           if (!reply && replyOnFail) {
             await connectingMessage.delete()
               .catch(this.logger.error);
