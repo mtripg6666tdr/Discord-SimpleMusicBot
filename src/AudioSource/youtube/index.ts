@@ -42,6 +42,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
   protected channelName: string;
   protected channelUrl: string;
   protected upcomingTimestamp: string | null = null;
+  protected failedStrategy: string;
 
   protected _strategyId: number;
   get strategyId() {
@@ -102,7 +103,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
       return;
     }
 
-    const { result, resolved, isFallbacked } = await attemptGetInfoForStrategies(this.url);
+    const { result, resolved, isFallbacked } = await attemptGetInfoForStrategies([this.url]);
 
     // check if fallbacked
     this.strategyId = resolved;
@@ -148,7 +149,8 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
       this.purgeCache();
     }
 
-    const { result, resolved, isFallbacked } = await attemptFetchForStrategies(this.url, forceUrl, this.cache?.data);
+    const { result, resolved, isFallbacked } = await attemptFetchForStrategies([this.url, forceUrl, this.cache?.data], this.failedStrategy);
+    this.failedStrategy = "";
     this.strategyId = resolved;
     this._isFallbacked = isFallbacked;
 
@@ -259,7 +261,10 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     this.isLiveStream = exportable.isLive;
   }
 
-  override purgeCache() {
+  override purgeCache(recordFailedStrategy = false) {
+    if (recordFailedStrategy && this.cache) {
+      this.failedStrategy = this.cache?.data.type;
+    }
     this.cache = null;
   }
 

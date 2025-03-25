@@ -136,7 +136,10 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
             ? "webm/opus"
             : "unknown",
         } as UrlStreamInfo,
-        cache: null!,
+        cache: {
+          type: distubeYtdlCore,
+          data: info,
+        },
       };
     } else {
       const readable: Readable = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow
@@ -153,7 +156,10 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
               ? "webm/opus"
               : "unknown",
         } as ReadableStreamInfo,
-        cache: null!,
+        cache: {
+          type: distubeYtdlCore,
+          data: info,
+        },
       };
     }
   }

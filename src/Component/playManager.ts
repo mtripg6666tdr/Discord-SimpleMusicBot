@@ -852,7 +852,8 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     this.emit("playFailed");
     this._cost = 0;
     this.destroyStream();
-    this.currentAudioInfo!.purgeCache();
+    // @ts-expect-error youtubeの場合の引数 いつか™型の整合性は治したい
+    this.currentAudioInfo!.purgeCache(this._errorCount >= 1);
 
     if (this._errorUrl === this.currentAudioInfo!.url && !quiet) {
       this._errorCount++;
