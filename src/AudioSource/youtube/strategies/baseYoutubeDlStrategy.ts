@@ -80,7 +80,7 @@ export abstract class baseYoutubeDlStrategy<T extends string> extends Strategy<C
         },
       };
     } else {
-      const formats = info.formats.filter(f => (f.format_note === "tiny" || f.video_ext === "none") && f.abr);
+      const formats = info.formats.filter(f => (f.format_note === "tiny" || f.video_ext === "none") && f.abr && !f.language?.endsWith("-desc"));
 
       if (formats.length === 0) throw new Error("no format found!");
 
@@ -235,6 +235,7 @@ interface Format {
   http_headers: HTTPHeaders;
   vbr?: number;
   video_ext?: string;
+  language?: string;
 }
 
 enum Container {
