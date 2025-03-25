@@ -82,8 +82,9 @@ function initStrategies(configEnabled: boolean[] | null = null) {
 
 initStrategies();
 
-export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(...parameters: Parameters<Strategy<T, U>["fetch"]>) {
+export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(parameters: Parameters<Strategy<T, U>["fetch"]>, skipStrategyName?: string) {
   let checkedStrategy = -1;
+  logger.trace("Skipping strategy", skipStrategyName);
   if (parameters[2]) {
     const cacheType = parameters[2].type;
     checkedStrategy = strategies.findIndex(s => s && s.module.cacheType === cacheType);
@@ -94,7 +95,6 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(.
         return {
           result,
           resolved: checkedStrategy,
-          cache: result.cache,
           isFallbacked: strategy.isFallback,
         };
       } catch (e) {
@@ -103,14 +103,13 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(.
     }
   }
   for (let i = 0; i < strategies.length; i++) {
-    if (i !== checkedStrategy && strategies[i]) {
+    if (i !== checkedStrategy && strategies[i] && strategies[i]?.module.cacheType !== skipStrategyName) {
       try {
         const strategy = strategies[i]!;
         const result = await strategy.module.fetch(...parameters);
         return {
           result,
           resolved: i,
-          cache: result.cache,
           isFallbacked: strategy.isFallback,
         };
       } catch (e) {
@@ -123,7 +122,7 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(.
   throw new Error("All strategies failed");
 }
 
-export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>(...parameters: Parameters<Strategy<T, U>["getInfo"]>) {
+export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>(parameters: Parameters<Strategy<T, U>["getInfo"]>) {
   for (let i = 0; i < strategies.length; i++) {
     try {
       if (strategies[i]) {

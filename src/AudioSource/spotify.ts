@@ -87,7 +87,7 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
     assertIsNotNull(this.referenceUrl);
 
     // fetch the video
-    const { result } = await attemptFetchForStrategies(this.referenceUrl, forceUrl);
+    const { result } = await attemptFetchForStrategies([this.referenceUrl, forceUrl]);
 
     this.title = result.info.title;
     this.lengthSeconds = result.info.length;
