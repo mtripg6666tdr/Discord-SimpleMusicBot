@@ -170,8 +170,6 @@ Node.js v16以上の環境で動作することを想定していますが、で
 * 一部のソースの再生が失敗する問題を軽減(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2893)
   * 内部的な話では、一度失敗したストラテジーをスキップすることにより、バックアップのストラテジーによる再生成功率が増加し、軽減することが見込まれます。
 * 副音声がある音楽について、副音声の再生をしない(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2894)
-## ドキュメント
-* ドキュメントサイトのトップページに「数字で見る」を追加(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2834, https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/2835)
 ## 依存関係のアップデート
 * @sinclair/typebox 0.34.30 => 0.34.31
 ### その他の特記事項
