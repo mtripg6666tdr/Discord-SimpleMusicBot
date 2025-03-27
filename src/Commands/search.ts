@@ -143,7 +143,7 @@ export default class Search extends SearchBase<ytsr.Video[] | dYtsr.Video[]> {
     return searchYouTube(query)
       .then(result => {
         const videos = (result.items as (ytsr.Item | dYtsr.Video)[]).filter(item => item.type === "video") as ytsr.Video[] | dYtsr.Video[];
-        context.bot.cache.addSearch(query, videos);
+        context.bot.cache.search.add(query, videos);
         return videos;
       });
   }

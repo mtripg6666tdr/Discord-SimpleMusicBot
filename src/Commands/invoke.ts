@@ -90,7 +90,7 @@ export default class Invoke extends BaseCommand {
         await CommandManager.instance.removeAllGuildCommand(context.client, message.guild.id);
         break;
       case "purgememcache":
-        context.bot.cache.purgeMemoryCache();
+        context.bot.cache.audioSource.purge();
         break;
       case "purgediskcache":
         await context.bot.cache.purgePersistentCache();

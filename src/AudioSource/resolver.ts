@@ -16,8 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { CacheController } from "../Component/cacheController";
 import type { KnownAudioSourceIdentifer } from "../Component/queueManager";
-import type { SourceCache } from "../Component/sourceCache";
 
 import * as AudioSource from ".";
 import { getResourceTypeFromUrl } from "../Util";
@@ -34,7 +34,7 @@ type AudioSourceBasicInfo = {
 const { isDisabledSource } = getConfig();
 const logger = getLogger("Resolver");
 
-export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCache, preventSourceCache: boolean) {
+export async function resolve(info: AudioSourceBasicInfo, cacheManager: CacheController, preventSourceCache: boolean) {
   let basicInfo: AudioSource.AudioSource<any, any> | null = null;
 
   const type = info.type;
@@ -43,11 +43,11 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
   let gotData = info.knownData;
   let fromPersistentCache = !!gotData;
 
-  if (cacheManager.hasSource(url)) {
+  if (cacheManager.audioSource.has(url)) {
     logger.debug("cache found");
-    return cacheManager.getSource(url);
-  } else if (!gotData && cacheManager.hasExportable(url)) {
-    gotData = await cacheManager.getExportable(url);
+    return cacheManager.audioSource.get(url);
+  } else if (!gotData && cacheManager.exportableAudioSource.has(url)) {
+    gotData = await cacheManager.exportableAudioSource.get(url);
     if (gotData) {
       logger.debug("exportable cache found");
       fromPersistentCache = true;
@@ -94,7 +94,7 @@ export async function resolve(info: AudioSourceBasicInfo, cacheManager: SourceCa
   if (preventSourceCache) {
     logger.debug("Skipping source-caching due to private source");
   } else if (basicInfo && !isNaN(basicInfo.lengthSeconds) && basicInfo.isCachable) {
-    cacheManager.addSource(basicInfo, fromPersistentCache);
+    cacheManager.audioSource.add(basicInfo, fromPersistentCache);
   }
 
   return basicInfo;

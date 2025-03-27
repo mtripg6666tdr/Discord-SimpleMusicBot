@@ -283,10 +283,17 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       this._seek = time;
 
       // QueueContentからストリーム情報を取得
-      const rawStream = await this.currentAudioInfo!.fetch(time > 0);
+      const rawStream = time > 0
+        ? await this.currentAudioInfo!.fetch(true)
+        : this._errorUrl !== this._currentAudioInfo!.url && this.server.bot.cache.audioBinary.has(this.currentAudioInfo!.url)
+          ? (await this.server.bot.cache.audioBinary.get(this.currentAudioInfo!.url))!
+          : this.server.bot.cache.audioBinary.teeStream(
+            this.currentAudioInfo!.url,
+            await this.currentAudioInfo!.fetch(false),
+          );
 
       // 情報からストリームを作成
-      // 万が一ストリームのfetch中に切断された場合には、リソース開放してplayを抜ける
+      // 万一ストリームのfetch中に切断された場合には、リソース開放してplayを抜ける
       const voiceChannel = this.server.connectingVoiceChannel;
       if (!voiceChannel) {
         if (rawStream.type === "readable") {

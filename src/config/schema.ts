@@ -71,7 +71,7 @@ export const ConfigSchema = Type.Object({
   cacheLevel: Type.Union([
     Type.Literal("memory"),
     Type.Literal("persistent"),
-    // Type.Literal("full"),
+    Type.Literal("full"),
   ], { default: "memory" }),
 
   cacheLimit: Type.Optional(Type.Number({ default: 500 })),

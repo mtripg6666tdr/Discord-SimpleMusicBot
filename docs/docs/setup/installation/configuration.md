@@ -110,10 +110,11 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
   このオプションが`true`の場合、上の`twentyFourSeven`は常に無視されます。  
   詳細は、[24/7再生機能](../feature/4-247.md)を参照してください。  
 
-### `cacheLevel` ("memory" | "persistent")
-  ボットによるキャッシュレベルを設定します。`"memory"`を設定すると、メモリ内にキャッシュを保存します。
-  ディスクに余裕がある場合は、`"persistent"`を指定することで、キャッシュを永続化できます。  
-  `"persistent"`を指定した場合、キャッシュは`./cache`に保存されますが、任意のタイミングで削除することができます。
+### `cacheLevel` ("memory" | "persistent" | "full")
+  ボットによる[キャッシュ](../feature/5-cache.md)レベルを設定します。  
+  メモリキャッシュ(`"memory"`)、恒常キャッシュ(`"persistent"`)、フルキャッシュ(`"full"`)の順にキャッシュレベルが高くなり、
+  キャッシュレベルが高いほど、再生が高速化されます。  
+  [`cacheLimit`](#cachelimit-number--undefined)の設定により、キャッシュの容量制限をすることも可能です。
 
 ### `cacheLimit` (number | undefined)
   `cacheLevel`が`persistent`の場合に、`./cache`に保存されるキャッシュの最大容量をMB(メガバイト)単位で指定します。  
@@ -122,6 +123,12 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
 :::note
 
 `cacheLevel`プロパティが`"memory"`の場合にはこのオプションに効果はありません。
+
+:::
+
+:::info
+
+ボットのキャッシュ機能については、[キャッシュ](../feature/5-cache.md)をご覧ください。
 
 :::
 
