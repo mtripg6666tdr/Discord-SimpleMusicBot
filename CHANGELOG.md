@@ -25,6 +25,7 @@
   * `TSG_URL`
 * `config.json`
   * `cacheLevel`
+
 → ドキュメント: [ボットの設定について](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/installation/configuration)
 #### 再生時のエラーについて
 現在、一部の環境において、一部のソースから楽曲が正常に再生されない問題が確認されています。
