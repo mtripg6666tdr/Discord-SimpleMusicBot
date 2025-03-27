@@ -83,7 +83,7 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
   # bot や mongo の並びに、 ytsg を追加してください。
   ytsg:
     image: quay.io/invidious/youtube-trusted-session-generator:webserver
-    retart: always
+    restart: always
     ports:
       - 8080:8080
 
