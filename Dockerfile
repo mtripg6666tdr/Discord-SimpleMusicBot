@@ -50,7 +50,7 @@ RUN curl -Lo phantomjs.tar.bz2 https://static-objects.usamyon.moe/phantomjs/phan
 FROM base AS runner
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
-    apt-get install -y --no-install-recommends nscd ca-certificates && \
+    apt-get install -y --no-install-recommends nscd libfontconfig && \
     ln -s /usr/bin/python3 /usr/bin/python
 WORKDIR /app
 ENV OPENSSL_CONF=/dev/null
