@@ -25,6 +25,7 @@ import type { ytdlCoreStrategy } from "./ytdl-core";
 
 import { getConfig } from "../../../config";
 import { getLogger } from "../../../logger";
+import { isTrustedSessionAvailable } from "../session";
 
 interface StrategyImporter {
   enable: boolean;
@@ -48,6 +49,7 @@ const config = getConfig();
 const strategyImporters: StrategyImporter[] = [
   { enable: false, isFallback: false, importer: () => require("./ytdl-core") },
   { enable: false, isFallback: false, importer: () => require("./play-dl") },
+  { enable: isTrustedSessionAvailable(), isFallback: false, importer: () => require("./youtubei") },
   { enable: true, isFallback: false, importer: () => require("./distube_ytdl-core") },
   { enable: false, isFallback: false, importer: () => require("./play-dl-test") },
   { enable: false, isFallback: true, importer: () => require("./youtube-dl") },
@@ -82,10 +84,31 @@ function initStrategies(configEnabled: boolean[] | null = null) {
 
 initStrategies();
 
-export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(parameters: Parameters<Strategy<T, U>["fetch"]>, skipStrategyName?: string) {
+export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(parameters: Parameters<Strategy<T, U>["fetch"]>, attemptOffsetStrategyName?: string) {
   let checkedStrategy = -1;
-  logger.trace("Skipping strategy", skipStrategyName);
-  if (parameters[2]) {
+  let generator = function* () {
+    for (let i = 0; i < strategies.length; i++) {
+      yield i;
+    }
+  };
+
+  if (attemptOffsetStrategyName) {
+    logger.trace("Offset strategy", attemptOffsetStrategyName);
+    const originalGenerator = generator;
+    generator = function* () {
+      const pool: number[] = [];
+      let found = false;
+      for (const i of originalGenerator()) {
+        if (found || strategies[i]?.module.cacheType === attemptOffsetStrategyName) {
+          found = true;
+          yield i;
+        } else {
+          pool.push(i);
+        }
+      }
+      yield* pool;
+    };
+  } else if (parameters[2]) {
     const cacheType = parameters[2].type;
     checkedStrategy = strategies.findIndex(s => s && s.module.cacheType === cacheType);
     if (checkedStrategy >= 0) {
@@ -102,8 +125,8 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(p
       }
     }
   }
-  for (let i = 0; i < strategies.length; i++) {
-    if (i !== checkedStrategy && strategies[i] && strategies[i]?.module.cacheType !== skipStrategyName) {
+  for (const i of generator()) {
+    if (i !== checkedStrategy && strategies[i] && strategies[i]?.module.cacheType !== attemptOffsetStrategyName) {
       try {
         const strategy = strategies[i]!;
         const result = await strategy.module.fetch(...parameters);

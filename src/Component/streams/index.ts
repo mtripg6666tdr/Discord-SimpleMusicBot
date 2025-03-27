@@ -179,11 +179,18 @@ function convertStreamInfoToReadableStreamInfo(streamInfo: UrlStreamInfo | Reada
     stream: downloadAsReadable(streamInfo.url, streamInfo.userAgent
       ? {
         headers: {
-          "User-Agent": streamInfo.userAgent,
-          "cookie": streamInfo.cookie
-            ?.split("\n")
-            .map(c => c.trim().split(";")[0])
-            .join(";"),
+          ...streamInfo.userAgent
+            ? {
+              "User-Agent": streamInfo.userAgent,
+            }
+            : {},
+          ...streamInfo.cookie
+            ? {
+              cookie: streamInfo.cookie
+                ?.split("\n")
+                .map(c => c.trim().split(";")[0])
+                .join(";") }
+            : {},
         },
       }
       : {}),

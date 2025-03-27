@@ -18,7 +18,7 @@
 
 import type { CacheController } from ".";
 import type { CacheControllerSharedUtils } from "./sharedUtils";
-import type { ReadableStreamInfo, StreamInfo } from "../../AudioSource";
+import type { AudioSource, ReadableStreamInfo, StreamInfo } from "../../AudioSource";
 
 import { Readable } from "stream";
 
@@ -37,8 +37,10 @@ export class AudioBinaryCacheController extends BaseController {
     this.utils.cleanupCacheKeyEndsWith(".enc").catch(this.logger.error);
   }
 
-  teeStream(url: string, streamInfo: StreamInfo): StreamInfo {
-    if (!this.parent.enableBinaryCache) {
+  teeStream(url: string, streamInfo: StreamInfo, audioSource?: AudioSource<any, any>): StreamInfo {
+    if (!this.parent.enableBinaryCache || (
+      audioSource && (!audioSource.isCachable || audioSource.isPrivateSource || (audioSource.isYouTube() && audioSource.isLiveStream))
+    )) {
       return streamInfo;
     }
 

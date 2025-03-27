@@ -16,25 +16,36 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-declare namespace NodeJS {
-  interface ProcessEnv {
-    readonly TOKEN: string;
-    readonly CSE_KEY?: string;
-    readonly DB_URL?: string;
-    readonly DB_TOKEN?: string;
-    readonly PORT?: string;
-    readonly LOG_TRANSFER_PORT?: string;
-    readonly DISABLE_TELEMETRY?: string;
-    readonly PO_TOKEN?: string;
-    readonly VISITOR_DATA?: string;
-    readonly TSG_URL?: string;
-    /* undocumented flags */
-    readonly DSL_ENABLE?: string;
-    readonly BD_ENABLE?: string;
-    readonly CONSOLE_ENABLE?: string;
-    readonly DISABLE_SYNC_SC?: string;
-    readonly HIDE_REPO_URL?: string;
-    readonly SUPPORT_SERVER_URL?: string;
-    readonly HIDE_SUPPORT_SERVER_URL?: string;
+import candyget from "candyget";
+
+export function isTrustedSessionAvailable() {
+  return !!((process.env.PO_TOKEN && process.env.VISITOR_DATA) || process.env.TSG_URL);
+}
+
+export async function getTrustedSession(): Promise<TrustedSession> {
+  if (process.env.PO_TOKEN && process.env.VISITOR_DATA) {
+    return {
+      potoken: process.env.PO_TOKEN,
+      visitor_data: process.env.VISITOR_DATA,
+    };
+  } else if (process.env.TSG_URL) {
+    try {
+      const { body: trustedSession } = await candyget.json(process.env.TSG_URL);
+
+      return trustedSession;
+    } catch {
+      /* empty */
+    }
   }
+
+  return {
+    potoken: undefined,
+    visitor_data: undefined,
+  };
+}
+
+interface TrustedSession {
+  updated?: number;
+  potoken: string | undefined;
+  visitor_data: string | undefined;
 }
