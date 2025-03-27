@@ -103,12 +103,12 @@ export default class Play extends BaseCommand {
         try {
           let videos: ytsr.Video[] | dYtsr.Video[] = null!;
 
-          if (context.bot.cache.hasSearch(context.rawArgs)) {
-            videos = await context.bot.cache.getSearch(context.rawArgs);
+          if (context.bot.cache.search.has(context.rawArgs)) {
+            videos = await context.bot.cache.search.get(context.rawArgs);
           } else {
             const result = await searchYouTube(context.rawArgs);
             videos = (result.items as (ytsr.Item | dYtsr.Video)[]).filter(it => it.type === "video") as (ytsr.Video[] | dYtsr.Video[]);
-            context.bot.cache.addSearch(context.rawArgs, videos);
+            context.bot.cache.search.add(context.rawArgs, videos);
           }
 
           if (videos.length === 0) {

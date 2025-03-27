@@ -16,10 +16,8 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { AudioSource, AudioSourceBasicJsonFormat } from "../AudioSource";
-import type { MusicBotBase } from "../botBase";
-import type dYtsr from "@distube/ytsr";
-import type ytsr from "ytsr";
+import type { MusicBotBase } from "../../botBase";
+import type { LoggerObject } from "../../logger";
 
 import crypto from "crypto";
 import fs from "fs";
@@ -29,131 +27,41 @@ import zlib from "zlib";
 
 import { lock, LockObj } from "@mtripg6666tdr/async-lock";
 
-import { LogEmitter } from "../Structure";
-import { measureTime } from "../Util/decorators";
-import { getMBytes } from "../Util/system";
-import { getConfig } from "../config";
-
-interface CacheEvents {
-  memoryCacheHit: [];
-  memoryCacheNotFound: [];
-  persistentCacheHit: [];
-  persistentCacheNotFound: [];
-}
+import { getMBytes } from "../../Util/system";
+import { getConfig } from "../../config";
 
 const config = getConfig();
 
-export class SourceCache extends LogEmitter<CacheEvents> {
-  private readonly _sourceCache: Map<string, AudioSource<any, any>>;
-  private readonly _expireMap: Map<string, number>;
-  private readonly cacheDirPath: string;
+export class CacheControllerSharedUtils {
   private lastCleanup: number = 0;
+  private readonly cacheDirPath: string;
 
-  constructor(protected bot: MusicBotBase, protected enablePersistent: boolean) {
-    super("Cache");
-    this._sourceCache = new Map();
-    this._expireMap = new Map();
+  constructor(public readonly logger: LoggerObject, public readonly bot: MusicBotBase) {
     this.cacheDirPath = path.join(__dirname, global.BUNDLED ? "../cache/" : "../../cache/");
     if (!fs.existsSync(this.cacheDirPath)) {
       fs.mkdirSync(this.cacheDirPath);
     }
-    bot.on("tick", this.onTick.bind(this));
   }
 
-  @measureTime
-  private onTick(count: number) {
-    if (count % 5 === 0 || config.debug) {
-      const now = Date.now();
-      let purgeCount = 0;
-      const shouldPurgeCount = this._sourceCache.size - 300;
-      [...this._expireMap.entries()].sort((a, b) => a[1] - b[1]).forEach(([url, expiresAt]) => {
-        if (now > expiresAt || purgeCount < shouldPurgeCount) {
-          this._sourceCache.delete(url);
-          this._expireMap.delete(url);
-          purgeCount++;
-        }
-      });
-      this.logger.debug(`${purgeCount} cache purged`);
-
-      const cacheToPurge = new Set(this._sourceCache.keys());
-      this.bot["guildData"].forEach(guild => {
-        guild.queue.forEach(item => {
-          cacheToPurge.delete(item.basicInfo.url);
-          this._expireMap.delete(item.basicInfo.url);
-        });
-      });
-      [...this._expireMap.keys()].forEach(url => cacheToPurge.delete(url));
-      cacheToPurge.forEach(url => this._expireMap.set(url, Date.now() + 4 * 60 * 60 * 1000));
-      this.logger.debug(`${this._expireMap.size} cache scheduled to be purged (total: ${this._sourceCache.size} stored)`);
-    }
+  get config() {
+    return config;
   }
 
-  addSource(content: AudioSource<any, any>, fromPersistentCache: boolean) {
-    this._sourceCache.set(content.url, content);
-    this.logger.info(`New memory cache added (total: ${this._sourceCache.size})`);
-    if (this.enablePersistent && !fromPersistentCache) {
-      this.addPersistentCache(this.createCacheId(content.url, "exportable"), content.exportData()).catch(this.logger.error);
-    }
+  createCacheId(key: string, type: "exportable" | "search") {
+    if (key.includes("?si=")) key = key.split("?")[0];
+    const id = this.generateHash(`${type}+${key}`);
+    this.logger.debug(`type: ${type}, id: ${id}`);
+    return id;
   }
 
-  hasSource(url: string) {
-    if (url.includes("?si=")) url = url.split("?")[0];
-    const result = this._sourceCache.has(url);
-    this.logger.debug(`Requested memory cache ${result ? "" : "not "}found`);
-    this.emit(result ? "memoryCacheHit" : "memoryCacheNotFound");
-    return result;
+  generateHash(content: string) {
+    return crypto.createHash("md5")
+      .update(Buffer.from(content))
+      .digest("hex");
   }
 
-  getSource(url: string) {
-    return this._sourceCache.get(url);
-  }
-
-  hasExportable(url: string) {
-    const id = this.createCacheId(url, "exportable");
-    const result = this.existPersistentCache(id);
-    this.logger.info(`Requested persistent cache ${result ? "" : "not "}found (id: ${id})`);
-    if (!result) {
-      this.emit("persistentCacheNotFound");
-    }
-    return result;
-  }
-
-  getExportable<T extends AudioSourceBasicJsonFormat>(url: string) {
-    return this.getPersistentCache(this.createCacheId(url, "exportable"))
-      .then(data => {
-        this.emit(data ? "persistentCacheHit" : "persistentCacheNotFound");
-        return data;
-      })
-      .catch(() => null) as Promise<T>;
-  }
-
-  addSearch(keyword: string, result: ytsr.Video[] | dYtsr.Video[]) {
-    if (this.enablePersistent) {
-      this.addPersistentCache(this.createCacheId(keyword.toLowerCase(), "search"), result).catch(this.logger.error);
-    }
-  }
-
-  hasSearch(keyword: string) {
-    const id = this.createCacheId(keyword, "search");
-    const result = this.existPersistentCache(id);
-    this.logger.info(`Requested persistent cache ${result ? "" : "not "}found (id: ${id})`);
-    return result;
-  }
-
-  getSearch(keyword: string) {
-    return this.getPersistentCache(this.createCacheId(keyword, "search")) as Promise<ytsr.Video[]>;
-  }
-
-  getMemoryCacheState() {
-    return {
-      totalCount: this._sourceCache.size,
-      purgeScheduled: this._expireMap.size,
-    };
-  }
-
-  purgeMemoryCache() {
-    this._sourceCache.clear();
-    this._expireMap.clear();
+  getCachePath(cacheId: string) {
+    return `${this.cacheDirPath}${cacheId}.bin2`;
   }
 
   getPersistentCacheSize() {
@@ -175,13 +83,6 @@ export class SourceCache extends LogEmitter<CacheEvents> {
           .filter(file => file.isFile())
           .map(file => fs.promises.unlink(path.join(this.cacheDirPath, file.name))),
       ));
-  }
-
-  private createCacheId(key: string, type: "exportable" | "search") {
-    if (key.includes("?si=")) key = key.split("?")[0];
-    const id = this.generateHash(`${type}+${key}`);
-    this.logger.debug(`type: ${type}, id: ${id}`);
-    return id;
   }
 
   private readonly persistentCacheLocker = new LockObj();
@@ -244,17 +145,7 @@ export class SourceCache extends LogEmitter<CacheEvents> {
     }));
   }
 
-  private getCachePath(cacheId: string) {
-    return `${this.cacheDirPath}${cacheId}.bin2`;
-  }
-
-  private generateHash(content: string) {
-    return crypto.createHash("md5")
-      .update(Buffer.from(content))
-      .digest("hex");
-  }
-
-  private async cleanupCache() {
+  async cleanupCache() {
     if (config.cacheLimit > 0) {
       if (Date.now() - this.lastCleanup < 3 * 60 * 60 * 1000) return;
       this.logger.info("Start cleaning up cache files");

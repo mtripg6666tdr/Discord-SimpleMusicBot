@@ -87,10 +87,10 @@ export default class SystemInfo extends BaseCommand {
     context.bot.logGeneralInfo();
     await message.reply(t("commands:log.executing"));
 
-    const embeds = [] as EmbedOptions[];
+    const embeds: EmbedOptions[] = [];
 
     if (context.args.includes("basic") || context.args.length === 0) {
-      const cacheState = context.bot.cache.getMemoryCacheState();
+      const cacheState = context.bot.cache.audioSource.getStatistics();
       embeds.push(
         new MessageEmbedBuilder()
           .setTitle("Discord-SimpleMusicBot")
