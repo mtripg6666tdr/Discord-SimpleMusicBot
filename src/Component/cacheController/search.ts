@@ -22,20 +22,24 @@ import type ytsr from "ytsr";
 import { BaseController } from "./baseController";
 
 export class SearchCacheController extends BaseController {
+  override get cacheIdPrefix() {
+    return "search";
+  }
+
   add(keyword: string, result: ytsr.Video[] | dYtsr.Video[]) {
     if (this.parent.enablePersistent) {
-      this.utils.addPersistentCache(this.utils.createCacheId(keyword.toLowerCase(), "search"), result).catch(this.logger.error);
+      this.utils.addPersistentCache(this.createCacheId(keyword.toLowerCase()), result).catch(this.logger.error);
     }
   }
 
   has(keyword: string) {
-    const id = this.utils.createCacheId(keyword, "search");
+    const id = this.createCacheId(keyword);
     const result = this.utils.existPersistentCache(id);
     this.logger.info(`Requested persistent cache ${result ? "" : "not "}found (id: ${id})`);
     return result;
   }
 
   get(keyword: string) {
-    return this.utils.getPersistentCache(this.utils.createCacheId(keyword, "search")) as Promise<ytsr.Video[]>;
+    return this.utils.getPersistentCache(this.createCacheId(keyword)) as Promise<ytsr.Video[]>;
   }
 }

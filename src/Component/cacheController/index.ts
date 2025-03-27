@@ -25,10 +25,6 @@ import { CacheControllerSharedUtils } from "./sharedUtils";
 import { LogEmitter } from "../../Structure";
 
 interface CacheEvents {
-  memoryCacheHit: [];
-  memoryCacheNotFound: [];
-  persistentCacheHit: [];
-  persistentCacheNotFound: [];
   tick: [count: number];
 }
 
@@ -58,11 +54,12 @@ export class CacheController extends LogEmitter<CacheEvents> {
   constructor(private readonly bot: MusicBotBase, enablePersistent: boolean) {
     super("Cache");
     this._enablePersistent = enablePersistent;
+    bot.on("tick", this.emit.bind(this, "tick" as const));
+
     this._sharedUtils = new CacheControllerSharedUtils(this.logger, this.bot);
     this._audioSource = new AudioSourceCacheController(this, this._sharedUtils);
     this._exportableAudioSource = new ExportableAudioSourceCacheController(this, this._sharedUtils);
     this._search = new SearchCacheController(this, this._sharedUtils);
-    bot.on("tick", this.emit.bind(this, "tick" as const));
   }
 
   getPersistentCacheSize() {

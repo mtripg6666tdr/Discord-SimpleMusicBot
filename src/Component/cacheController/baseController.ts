@@ -24,5 +24,15 @@ export abstract class BaseController {
     return this.utils.logger;
   }
 
+  get cacheIdPrefix() {
+    return "default";
+  }
+
   constructor(protected readonly parent: CacheController, protected readonly utils: CacheControllerSharedUtils) {}
+
+  createCacheId(key: string) {
+    const id = this.utils.generateHash(`${this.cacheIdPrefix}+${key}`);
+    this.logger.debug(`type: ${this.cacheIdPrefix}, id: ${id}`);
+    return id;
+  }
 }

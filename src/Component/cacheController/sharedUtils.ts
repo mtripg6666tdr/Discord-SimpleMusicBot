@@ -47,13 +47,6 @@ export class CacheControllerSharedUtils {
     return config;
   }
 
-  createCacheId(key: string, type: "exportable" | "search") {
-    if (key.includes("?si=")) key = key.split("?")[0];
-    const id = this.generateHash(`${type}+${key}`);
-    this.logger.debug(`type: ${type}, id: ${id}`);
-    return id;
-  }
-
   generateHash(content: string) {
     return crypto.createHash("md5")
       .update(Buffer.from(content))

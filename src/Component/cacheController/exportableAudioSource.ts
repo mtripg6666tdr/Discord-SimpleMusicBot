@@ -21,22 +21,31 @@ import type { AudioSourceBasicJsonFormat } from "../../AudioSource";
 import { BaseController } from "./baseController";
 
 export class ExportableAudioSourceCacheController extends BaseController {
+  override get cacheIdPrefix() {
+    return "exportable";
+  }
+
   has(url: string) {
-    const id = this.utils.createCacheId(url, "exportable");
+    const id = this.createCacheId(url);
     const result = this.utils.existPersistentCache(id);
     this.logger.info(`Requested persistent cache ${result ? "" : "not "}found (id: ${id})`);
-    if (!result) {
-      this.parent.emit("persistentCacheNotFound");
-    }
     return result;
   }
 
   get<T extends AudioSourceBasicJsonFormat>(url: string) {
-    return this.utils.getPersistentCache(this.utils.createCacheId(url, "exportable"))
-      .then(data => {
-        this.parent.emit(data ? "persistentCacheHit" : "persistentCacheNotFound");
-        return data;
-      })
+    return this.utils.getPersistentCache(this.createCacheId(url))
       .catch(() => null) as Promise<T>;
+  }
+
+  async add<T extends AudioSourceBasicJsonFormat>(url: string, data: T) {
+    if (this.parent.enablePersistent) {
+      await this.utils.addPersistentCache(this.createCacheId(url), data)
+        .catch(this.logger.error);
+    }
+  }
+
+  override createCacheId(key: string): string {
+    if (key.includes("?si=")) key = key.split("?")[0];
+    return super.createCacheId(key);
   }
 }
