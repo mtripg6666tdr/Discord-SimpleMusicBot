@@ -49,7 +49,8 @@ export default class Invoke extends BaseCommand {
 
     // handle special commands
     if (context.rawArgs.startsWith("sp;") && getConfig().isBotAdmin(message.member.id)) {
-      this.evaluateSpecialCommands(context.args[0].substring(3), message, context)
+      const [specialCommand, ...args] = context.rawArgs.split(" ");
+      this.evaluateSpecialCommands(specialCommand.substring(3), args, message, context)
         .then(result => message.reply(result))
         .catch(this.logger.error)
       ;
@@ -77,7 +78,7 @@ export default class Invoke extends BaseCommand {
     }
   }
 
-  private async evaluateSpecialCommands(specialCommand: string, message: CommandMessage, context: CommandArgs) {
+  private async evaluateSpecialCommands(specialCommand: string, args: string[], message: CommandMessage, context: CommandArgs) {
     switch (specialCommand) {
       case "cleanupsc":
         await CommandManager.instance.sync(context.client, true);
@@ -105,7 +106,7 @@ export default class Invoke extends BaseCommand {
         }).catch(this.logger.error);
         break;
       case "updatestrcfg": {
-        const config = context.args[1];
+        const config = args[1];
         updateStrategyConfigInWorker(config);
         updateStrategyConfiguration(config);
       }
