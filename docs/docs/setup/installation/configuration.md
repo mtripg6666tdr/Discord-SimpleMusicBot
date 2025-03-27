@@ -22,22 +22,81 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
 
 ### `TOKEN`  
   ボットのトークンです。[Discord Developer Portal](https://discord.com/developers/applications)から取得してください。
+
+---
+任意設定の設定項目は、以下を開いてください。
+
+<details>
+<summary>任意設定の設定項目</summary>
+
 ### `CSE_KEY`  
   歌詞検索に使用する[Google Custom Search](https://developers.google.com/custom-search/v1/introduction?hl=ja)のkeyです。(任意指定)
+
 ### `DB_URL`  
   「キューやループの有効無効等のデータのバックアップ」に使用するデータベースサーバーのURLです。(任意指定)  
   サーバーの仕様等については[バックアップ](../backup/overview.md)を参照してください。
+
 ### `DB_TOKEN`
   「キューやループの有効無効等のデータのバックアップ」に使用するデータベースサーバーのトークンです。(任意指定)  
   サーバーの仕様等については[バックアップ](../backup/overview.md)を参照してください。
+
 ### `PORT`
   `config.json`で`webserver`を`true`にした場合に作成されるWebサーバーのポートを指定できます。(任意指定)  
   **複数のボットを同時稼働しており、それぞれでWebサーバーが有効になっている場合、それぞれのボットで違う値を設定する必要があります。**  
   デフォルトでは`8081`が使用されます。
+
 ### `LOG_TRANSFER_PORT`
   内部的に、ロガーで使用されるTCPポートの番号を指定します。(任意指定)  
   **複数のボットを同時稼働する際には、それぞれのボットで違う値を設定する必要があります。**  
   デフォルトでは`5003`が使用されます。
+
+### `PO_TOKEN`
+  YouTubeの再生に使われるセッション情報を設定します。
+### `VISITOR_DATA`
+  YouTubeの再生に使われるセッション情報を設定します。
+
+:::info
+
+`PO_TOKEN`と`VISITOR_DATA`の取得方法は、[こちらのガイド（英語）](https://github.com/yt-dlp/yt-dlp/wiki/PO-Token-Guide#no-account)を参照してください。  
+代わりに、後述する`TSG_URL`オプションを使用することもできます。
+
+:::
+
+### `TSG_URL`
+  YouTubeの再生に使われるセッション情報を取得できるサーバーのURLを設定します。
+
+:::info
+  [このプロジェクト](https://github.com/iv-org/youtube-trusted-session-generator)のサーバーを想定した設定です。
+
+  このURLに対してHTTP GETリクエストをした際に、以下の形式でセッション情報が返却されるようなサーバーのURLであれば、なんでも指定することが可能です。
+```ts
+{
+  visitor_data: string,
+  potoken: string,
+}
+```
+
+  Docker Compose でボットを設定されている場合、 `compose.yml`にサービスを追加することで簡単にサーバーを設定できます。
+  編集の際には、インデントに注意してください。
+
+```yml title="compose.yml"
+  # bot や mongo の並びに、 ytsg を追加してください。
+  ytsg:
+    image: quay.io/invidious/youtube-trusted-session-generator:webserver
+    retart: always
+    ports:
+      - 8080:8080
+
+  # bot の environments に、以下の行を追加してください。
+      - TSG_URL=http://ytsg:8080/token
+
+  # bot の depends_on に、以下の行を追加してください。
+      - ytsg
+```
+
+:::
+
+</details>
 
 ## `config.json`ファイル
 - [サンプルファイル](https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/blob/master/config.json.sample)
@@ -45,18 +104,21 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
 こちらにはボットの設定情報などを記述します。  
 
 :::warning
+
 任意指定の設定に関しては、**値をnullにしてください("null"ではなくnull)**  
 例：
 
 ```json title="config.json"
 {
-  "proxy": null
+  "adminId": null
 }
 ```
+
 :::
 
 `config.json.sample`がサンプルファイルとなっていますので、コピー＆リネームしてお使いください。  
 (カッコ内は設定値の、TypeScript表記の"型"です。)
+
 ### `adminId` (string | string[] | null)  
   管理人のユーザーのIDを指定します。複数の管理人がいる場合は、配列で指定してください。設定しない場合は`null`
 ### `debug` (boolean)  

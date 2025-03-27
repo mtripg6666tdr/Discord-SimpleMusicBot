@@ -8,6 +8,7 @@ services:
       - "path/to/your-environment-file"
     environment:
       - DB_URL=mongodb://dsmb:hogehoge@mongo:27017/
+      - TSG_URL=http://ytsg:8080/token
     volumes:
       - type: bind
         # config.jsonのパスを指定
@@ -25,6 +26,13 @@ services:
         target: "/app/cache"
     depends_on:
       - mongo
+      - ytsg
+
+  ytsg:
+    image: quay.io/invidious/youtube-trusted-session-generator:webserver
+    retart: always
+    ports:
+      - 8080:8080
 
   mongo:
     image: mongo:latest
