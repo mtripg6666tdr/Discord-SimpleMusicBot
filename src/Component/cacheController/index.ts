@@ -18,6 +18,7 @@
 
 import type { MusicBotBase } from "../../botBase";
 
+import { AudioBinaryCacheController } from "./audioBinary";
 import { AudioSourceCacheController } from "./audioSource";
 import { ExportableAudioSourceCacheController } from "./exportableAudioSource";
 import { SearchCacheController } from "./search";
@@ -36,6 +37,11 @@ export class CacheController extends LogEmitter<CacheEvents> {
     return this._enablePersistent;
   }
 
+  private readonly _enableBinaryCache: boolean;
+  get enableBinaryCache() {
+    return this._enableBinaryCache;
+  }
+
   private readonly _audioSource: AudioSourceCacheController;
   get audioSource() {
     return this._audioSource;
@@ -51,15 +57,22 @@ export class CacheController extends LogEmitter<CacheEvents> {
     return this._search;
   }
 
-  constructor(private readonly bot: MusicBotBase, enablePersistent: boolean) {
+  private readonly _audioBinary: AudioBinaryCacheController;
+  get audioBinary() {
+    return this._audioBinary;
+  }
+
+  constructor(private readonly bot: MusicBotBase, enablePersistent: boolean, enableBinaryCache: boolean) {
     super("Cache");
     this._enablePersistent = enablePersistent;
+    this._enableBinaryCache = enableBinaryCache;
     bot.on("tick", this.emit.bind(this, "tick" as const));
 
     this._sharedUtils = new CacheControllerSharedUtils(this.logger, this.bot);
     this._audioSource = new AudioSourceCacheController(this, this._sharedUtils);
     this._exportableAudioSource = new ExportableAudioSourceCacheController(this, this._sharedUtils);
     this._search = new SearchCacheController(this, this._sharedUtils);
+    this._audioBinary = new AudioBinaryCacheController(this, this._sharedUtils);
   }
 
   getPersistentCacheSize() {
