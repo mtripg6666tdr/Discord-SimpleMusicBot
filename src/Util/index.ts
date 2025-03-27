@@ -475,6 +475,7 @@ export function createFragmentalDownloadStream(
 
       logger.info(`Stream was created as a single stream. (buffer: ${chunkSize} / content length: ${contentLength})`);
     } else {
+      let onCloseHandler = () => {};
       const pipeNextStream = async () => {
         current++;
 
@@ -496,6 +497,10 @@ export function createFragmentalDownloadStream(
 
         let pulseBuffer: PassThrough | null = null;
 
+        if (onCloseHandler) {
+          stream.off("close", onCloseHandler);
+        }
+
         if (pulseDownload) {
           pulseBuffer = createPassThrough({ highWaterMark: Math.floor(chunkSize * 1.2) });
 
@@ -508,7 +513,7 @@ export function createFragmentalDownloadStream(
             .on("error", er => destroyStream(stream, er))
             .once("close", () => destroyStream(nextStream))
             .pipe(stream, { end: end === undefined })
-            .once("close", () => destroyStream(pulseBuffer!));
+            .once("close", onCloseHandler = () => destroyStream(pulseBuffer!));
         } else {
           nextStream
             .on("request", logger.trace)
@@ -516,7 +521,7 @@ export function createFragmentalDownloadStream(
             .on("end", () => logger.trace("Origin stream ended"))
             .on("error", er => destroyStream(stream, er))
             .pipe(stream, { end: end === undefined })
-            .once("close", () => destroyStream(nextStream));
+            .once("close", onCloseHandler = () => destroyStream(nextStream));
         }
 
         if (end !== undefined) {
