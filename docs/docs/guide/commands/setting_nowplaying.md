@@ -11,6 +11,10 @@ sidebar_label: 設定>現在再生中
 
 - setting>nowplaying
 
+## 使い方
+```
+設定>現在再生中 <normalまたはsilentまたはdisabled>
+```
 
 
 

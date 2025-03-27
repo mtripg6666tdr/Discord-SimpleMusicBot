@@ -71,6 +71,7 @@ export class HttpBackupper extends IntervalBackupper {
           status.volume,
           status.disableSkipSession,
           status.nowPlayingNotificationLevel,
+          status.updateChannelTopic ? "1" : "0",
         ].join(":");
         originalStatuses[id] = status;
       });
@@ -171,19 +172,21 @@ export class HttpBackupper extends IntervalBackupper {
               volume,
               disableSkipSession,
               nowPlayingNotificationLevel,
+              updateChannelTopic,
             ] = frozenGuildStatuses[key].split(":");
             const numVolume = Number(volume) || 100;
-            const b = (v: string) => v === "1";
+            const toBoolean = (v: string) => v === "1";
             map.set(key, {
               voiceChannelId,
               boundChannelId,
-              loopEnabled: b(loopEnabled),
-              queueLoopEnabled: b(queueLoopEnabled),
-              addRelatedSongs: b(addRelatedSongs),
-              equallyPlayback: b(equallyPlayback),
+              loopEnabled: toBoolean(loopEnabled),
+              queueLoopEnabled: toBoolean(queueLoopEnabled),
+              addRelatedSongs: toBoolean(addRelatedSongs),
+              equallyPlayback: toBoolean(equallyPlayback),
               volume: numVolume >= 1 && numVolume <= 200 ? numVolume : 100,
-              disableSkipSession: b(disableSkipSession),
+              disableSkipSession: toBoolean(disableSkipSession),
               nowPlayingNotificationLevel: Number(nowPlayingNotificationLevel) || 0,
+              updateChannelTopic: toBoolean(updateChannelTopic),
             });
           });
           return map;

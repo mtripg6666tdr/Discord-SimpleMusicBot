@@ -21,13 +21,13 @@ import type { CommandMessage } from "../Component/commandResolver/CommandMessage
 
 import { BaseCommand } from ".";
 
-export default class SettingSkipvote extends BaseCommand {
+export default class SettingUpdateTopic extends BaseCommand {
   constructor() {
     super({
-      alias: ["setting>skipvote"],
+      alias: ["setting>updatetopic"],
       unlist: false,
       category: "settings",
-      requiredPermissionsOr: ["admin", "dj", "manageGuild"],
+      requiredPermissionsOr: ["admin", "manageGuild"],
       shouldDefer: false,
       examples: false,
       usage: true,
@@ -43,16 +43,16 @@ export default class SettingSkipvote extends BaseCommand {
 
   async run(message: CommandMessage, context: CommandArgs) {
     if (context.rawArgs) {
-      const newDisabledStatus = !(context.args[0] === "enable" || context.args[0] === "true");
+      const newStatus = context.args[0] === "enable" || context.args[0] === "true";
 
-      context.server.preferences.disableSkipSession = newDisabledStatus;
+      context.server.preferences.updateChannelTopic = newStatus;
 
-      await message.reply(context.t("commands:setting>skipvote.changed", {
-        status: newDisabledStatus ? context.t("disabled") : context.t("enabled"),
+      await message.reply(context.t("commands:setting>updatetopic.changed", {
+        status: newStatus ? context.t("enabled") : context.t("disabled"),
       }));
     } else {
-      await message.reply(context.t("commands:setting>skipvote.currentState", {
-        status: context.server.preferences.disableSkipSession ? context.t("disabled") : context.t("enabled"),
+      await message.reply(context.t("commands:setting>updatetopic.currentState", {
+        status: context.server.preferences.updateChannelTopic ? context.t("enabled") : context.t("disabled"),
       }));
     }
   }

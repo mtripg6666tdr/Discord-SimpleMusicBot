@@ -44,3 +44,4 @@ addon
 
 # Cache
 cache
+*-base.js

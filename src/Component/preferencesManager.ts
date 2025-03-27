@@ -40,6 +40,7 @@ export class GuildPreferencesManager extends ServerManagerBase<GuildPreferencesE
     this.equallyPlayback = false;
     this.disableSkipSession = false;
     this.nowPlayingNotificationLevel = NowPlayingNotificationLevel.Normal;
+    this.updateChannelTopic = false;
   }
 
   exportPreferences(): JSONGuildPreferences {
@@ -48,14 +49,16 @@ export class GuildPreferencesManager extends ServerManagerBase<GuildPreferencesE
       equallyPlayback: this.equallyPlayback,
       disableSkipSession: this.disableSkipSession,
       nowPlayingNotificationLevel: this.nowPlayingNotificationLevel,
+      updateChannelTopic: this.updateChannelTopic,
     };
   }
 
   importPreferences(preferences: JSONGuildPreferences) {
-    this.addRelated = preferences.addRelatedSongs;
-    this.equallyPlayback = preferences.equallyPlayback;
-    this.disableSkipSession = preferences.disableSkipSession;
-    this.nowPlayingNotificationLevel = preferences.nowPlayingNotificationLevel;
+    this.addRelated = !!preferences.addRelatedSongs;
+    this.equallyPlayback = !!preferences.equallyPlayback;
+    this.disableSkipSession = !!preferences.disableSkipSession;
+    this.nowPlayingNotificationLevel = preferences.nowPlayingNotificationLevel || NowPlayingNotificationLevel.Normal;
+    this.updateChannelTopic = !!preferences.updateChannelTopic;
   }
 
   /** 関連動画自動追加が有効 */
@@ -73,4 +76,8 @@ export class GuildPreferencesManager extends ServerManagerBase<GuildPreferencesE
   /** 現在再生中パネルの表示レベル */
   @emitEventOnMutation("updateSettings")
   accessor nowPlayingNotificationLevel: NowPlayingNotificationLevel;
+
+  /** ボイスチャンネルのトピックを更新するかどうか */
+  @emitEventOnMutation("updateSettings")
+  accessor updateChannelTopic: boolean;
 }
