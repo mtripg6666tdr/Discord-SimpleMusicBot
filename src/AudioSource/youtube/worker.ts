@@ -56,6 +56,9 @@ function getInfo({ id, url, prefetched, forceCache }: WithId<SpawnerGetInfoMessa
       const data = Object.assign({}, youtube);
       // @ts-expect-error
       delete data["logger"];
+      if (data["cache"]?.data.type === "youtubei") {
+        data["cache"] = null;
+      }
       postMessage({
         type: "initOk",
         data,
