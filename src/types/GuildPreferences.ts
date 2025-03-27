@@ -17,10 +17,11 @@
  */
 
 export interface JSONGuildPreferences {
-  addRelatedSongs: boolean;
-  equallyPlayback: boolean;
-  disableSkipSession: boolean;
-  nowPlayingNotificationLevel: NowPlayingNotificationLevel;
+  addRelatedSongs?: boolean;
+  equallyPlayback?: boolean;
+  disableSkipSession?: boolean;
+  nowPlayingNotificationLevel?: NowPlayingNotificationLevel;
+  updateChannelTopic?: boolean;
 }
 
 export enum NowPlayingNotificationLevel {

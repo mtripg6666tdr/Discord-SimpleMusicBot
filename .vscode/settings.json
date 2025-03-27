@@ -9,5 +9,64 @@
   },
   "files.insertFinalNewline": true,
   "typescript.tsdk": "node_modules\\typescript\\lib",
-  "editor.tabSize": 2
+  "editor.tabSize": 2,
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "locales/*/commands.json"
+      ],
+      "schema": {
+        "type": "object",
+        "patternProperties": {
+          "^[a-z>_-]+$": {
+            "type": "object",
+            "required": [
+              "description",
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 100,
+              },
+              "args": {
+                "type": "object",
+                "patternProperties": {
+                  "^[a-z]+$": {
+                    "type": "object",
+                    "required": [
+                      "description",
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "description": {
+                        "type": "string",
+                        "maxLength": 100,
+                      },
+                      "choices": {
+                        "type": "object",
+                        "patternProperties": {
+                          "^[a-z]+$": {
+                            "type": "string",
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "usage": {
+                "type": "string",
+              },
+              "examples": {
+                "type": "string",
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

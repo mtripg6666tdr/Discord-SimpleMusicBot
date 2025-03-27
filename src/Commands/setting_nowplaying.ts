@@ -31,7 +31,7 @@ export default class SettingNowPlayingNotification extends BaseCommand {
       requiredPermissionsOr: ["admin", "dj", "onlyListener", "manageGuild"],
       shouldDefer: false,
       examples: false,
-      usage: false,
+      usage: true,
       args: [
         {
           type: "string",

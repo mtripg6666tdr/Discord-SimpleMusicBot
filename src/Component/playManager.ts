@@ -26,6 +26,7 @@ import { NoSubscriberBehavior } from "@discordjs/voice";
 import { AudioPlayerStatus, createAudioResource, createAudioPlayer, entersState, StreamType, VoiceConnectionStatus } from "@discordjs/voice";
 import { MessageActionRowBuilder, MessageButtonBuilder, MessageEmbedBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 import i18next from "i18next";
+import { StageChannel, VoiceChannel } from "oceanic.js";
 import { MessageFlags } from "oceanic.js";
 
 import { FixedAudioResource } from "./audioResource";
@@ -392,13 +393,22 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         }
       }
 
+      if (this.currentAudioInfo && this.server.preferences.updateChannelTopic) {
+        const nowPlayingMessage = `🎵 ${i18next.t("components:nowplaying.nowplayingItemName")}: ${this.currentAudioInfo.title}`.substring(0, 120);
+        if (this.server.connectingVoiceChannel instanceof VoiceChannel) {
+          await this.server.connectingVoiceChannel.setStatus(nowPlayingMessage).catch(this.logger.error);
+        } else if (this.server.connectingVoiceChannel instanceof StageChannel) {
+          await this.server.connectingVoiceChannel.editStageInstance({ topic: nowPlayingMessage }).catch(this.logger.error);
+        }
+      }
+
       // ラジオが有効になっている場合、次の曲を準備する
       if (
         this.server.queue.mixPlaylistEnabled
         && this.server.queue.get(0).additionalInfo.addedBy.userId === "2"
         && this.server.queue.filter(item => item.additionalInfo.addedBy.userId === "2").length <= 2
       ) {
-        await this.server.queue.prepareNextMixItem();
+        await this.server.queue.prepareNextMixItem().catch(this.logger.error);
       }
 
       // 条件に合致した場合、次の曲をプリフェッチする
@@ -643,11 +653,21 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     // attempt to destroy current stream
     this.destroyStream();
 
+    const connectedVoiceChannel = this.server.connectingVoiceChannel;
+
+    // Do not await before resetting connection and connectingVoiceChannel
     this.server.connection = null;
     this.server.connectingVoiceChannel = null;
+
     this._player = null;
     this._sleeptimerCurrentSong = false;
     this.clearSleepTimerTimeout();
+
+    if (this.server.preferences.updateChannelTopic) {
+      if (connectedVoiceChannel instanceof VoiceChannel) {
+        await connectedVoiceChannel.setStatus("").catch(this.logger.error);
+      }
+    }
 
     if (typeof global.gc === "function") {
       global.gc();
@@ -814,6 +834,10 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
         })
         .catch(this.logger.error)
       ;
+    }
+
+    if (this.server.connectingVoiceChannel && this.server.connectingVoiceChannel instanceof VoiceChannel && this.server.preferences.updateChannelTopic) {
+      this.server.connectingVoiceChannel.setStatus("").catch(this.logger.error);
     }
 
     const timer = setTimeout(() => {
