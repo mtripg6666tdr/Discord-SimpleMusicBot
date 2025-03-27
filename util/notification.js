@@ -39,10 +39,16 @@ async function main(){
   const { body: apiData } = await candyget.json(`https://api.github.com/repos/${REPO_NAME}/releases/latest`);
   const { html_url: htmlUrl, name, draft } = apiData;
 
+  const { body: html } = await candyget.string(htmlUrl);
+  const regex = /<meta property="og:image" content="(.+?)"(\s\/)?>/g;
+  const match = regex.exec(html);
+
+  if(!match) throw new Error("No OGP image detected");
+
   // Get an OGP image for the release
-  const ogpImage = await candyget.buffer(`https://opengraph.githubassets.com/1/${REPO_NAME}/releases/tag/${name}`)
+  const ogpImage = await candyget.buffer(match[1])
     .then(res => {
-      if(!res.headers["content-type"]?.startsWith("image/")) throw new Error("No image detected");
+      if(!res.headers["content-type"]?.startsWith("image/")) throw new Error("No OGP image detected");
       return res.body;
     });
 
