@@ -526,6 +526,7 @@
         "description": "If you want to enable skip-vote feature, specify true. Otherwise, false."
       }
     },
+    "usage": "setting>skipvote <true or false>",
     "currentState": "The skip-vote feature is currently **{{status}}**.",
     "changed": "The skip-vote feature is now **{{status}}**."
   },
@@ -542,9 +543,22 @@
         }
       }
     },
+    "usage": "setting>nowplaying <normal, silent or disabled>",
     "invalidLevel": "The display-mode you specified was incorrect. Please specify one of three, \"normal\", \"silent\", or \"disabled\".",
     "changed": "The display-mode was set to **{{level}}**.",
     "currentState": "The current display mode was set to **{{level}}**."
+  },
+  "setting>updatetopic": {
+    "name": "setting>updatetopic",
+    "description": "Configures if the feature updating the channel topic is enabled or not. Shows current setting with no option provided.",
+    "args": {
+      "enabled": {
+        "description": "Whether the feature updating the channel topic is enabled or not."
+      }
+    },
+    "usage": "setting>updatetopic <true or false>",
+    "currentState": "The feature updating the channel topic is **{{status}}**.",
+    "changed": "The feature updating the channel topic is now **{{status}}**."
   },
   "shuffle": {
     "name": "shuffle",

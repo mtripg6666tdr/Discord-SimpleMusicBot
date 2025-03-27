@@ -526,6 +526,7 @@
         "description": "スキップ投票を有効にするかどうか。"
       }
     },
+    "usage": "設定>スキップ投票 <trueまたはfalse>",
     "currentState": "スキップ投票は現在 **{{status}}** の設定になっています。",
     "changed": "スキップ投票を **{{status}}** にしました。"
   },
@@ -542,9 +543,22 @@
         }
       }
     },
+    "usage": "設定>現在再生中 <normalまたはsilentまたはdisabled>",
     "invalidLevel": "指定されたモードが正しくありません。normal, silent, disabledのいずれかを指定してください。",
     "changed": "現在再生中パネルの表示モードを **{{level}}** に設定しました。",
     "currentState": "現在再生中パネルの表示モードは現在 **{{level}}** に設定されています。"
+  },
+  "setting>updatetopic": {
+    "name": "設定>トピック更新",
+    "description": "ボイスチャンネルのトピック更新の有効・無効の設定をします。何も指定しないと現在の設定を確認できます。",
+    "args": {
+      "enabled": {
+        "description": "ボイスチャンネルのトピック更新を有効にするかどうか。"
+      }
+    },
+    "usage": "設定>トピック更新 <trueまたはfalse>",
+    "currentState": "ボイスチャンネルのトピック更新は現在 **{{status}}** に設定されています。",
+    "changed": "ボイスチャンネルのトピック更新を **{{status}}** にしました。"
   },
   "shuffle": {
     "name": "シャッフル",
