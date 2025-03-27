@@ -43,7 +43,9 @@ export default class SettingSkipvote extends BaseCommand {
 
   async run(message: CommandMessage, context: CommandArgs) {
     if (context.rawArgs) {
-      const newDisabledStatus = context.server.preferences.disableSkipSession = !(context.args[0] === "enable" || context.args[0] === "true");
+      const newDisabledStatus = !(context.args[0] === "enable" || context.args[0] === "true");
+
+      context.server.preferences.disableSkipSession = newDisabledStatus;
 
       await message.reply(context.t("commands:setting>skipvote.changed", {
         status: newDisabledStatus ? context.t("disabled") : context.t("enabled"),

@@ -43,10 +43,12 @@ export default class SettingUpdateTopic extends BaseCommand {
 
   async run(message: CommandMessage, context: CommandArgs) {
     if (context.rawArgs) {
-      const currentStatus = context.server.preferences.updateChannelTopic = context.args[0] === "enable" || context.args[0] === "true";
+      const newStatus = context.args[0] === "enable" || context.args[0] === "true";
+
+      context.server.preferences.updateChannelTopic = newStatus;
 
       await message.reply(context.t("commands:setting>updatetopic.changed", {
-        status: currentStatus ? context.t("enabled") : context.t("disabled"),
+        status: newStatus ? context.t("enabled") : context.t("disabled"),
       }));
     } else {
       await message.reply(context.t("commands:setting>updatetopic.currentState", {
