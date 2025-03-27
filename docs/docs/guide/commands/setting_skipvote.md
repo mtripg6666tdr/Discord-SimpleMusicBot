@@ -11,6 +11,10 @@ sidebar_label: 設定>スキップ投票
 
 - setting>skipvote
 
+## 使い方
+```
+設定>スキップ投票 <trueまたはfalse>
+```
 
 
 
