@@ -54,18 +54,8 @@ Node.js v16以上の環境で動作することを想定していますが、で
 ## その他の変更
 * `TSG_URL`を`compose.yml`で設定している場合、イメージのURLを、フォークしたプロジェクトに変更することを推奨します。
   * とはいえ、これらの設定で再生が改善しない場合があることも同時に確認されていますので、設定自体の必要性には疑問が残ります。
+  * 変更については、ドキュメントの[ボットの設定について](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/installation/configuration)をご参照ください。
 ### その他の特記事項
-#### 設定ファイルの再設定を行うことをお勧めします
-いくつかの設定が追加されました。設定ファイルの説明ページをご覧の上、設定ファイルを更新してください。
-新規で追加されたり、設定項目が変更になったりしたものは以下の通りです。
-* `.env`
-  * `VISITOR_DATA`
-  * `PO_TOKEN`
-  * `TSG_URL`
-* `config.json`
-  * `cacheLevel`
-
-→ ドキュメント: [ボットの設定について](https://web.usamyon.moe/Discord-SimpleMusicBot/docs/next/setup/installation/configuration)
 #### 再生時のエラーについて
 現在、一部の環境において、一部のソースから楽曲が正常に再生されない問題が確認されています。
 これは、大手VPS、クラウドサービス、および公開プロキシ、VPNなどの環境下で高確率で発生することが確認されています。
