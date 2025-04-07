@@ -29,7 +29,7 @@ services:
       - ytsg
 
   ytsg:
-    image: quay.io/invidious/youtube-trusted-session-generator:webserver
+    image: ghcr.io/mtripg6666tdr/youtube-trusted-session-generator:latest
     restart: always
     ports:
       - 8080:8080
