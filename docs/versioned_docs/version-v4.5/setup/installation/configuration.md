@@ -66,7 +66,9 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
   YouTubeの再生に使われるセッション情報を取得できるサーバーのURLを設定します。
 
 :::info
+
   [このプロジェクト](https://github.com/iv-org/youtube-trusted-session-generator)のサーバーを想定した設定です。
+  リフレッシュ間隔が長すぎるため、[フォークしたプロジェクト](https://github.com/mtripg6666tdr/youtube-trusted-session-generator)も公開しています。
 
   このURLに対してHTTP GETリクエストをした際に、以下の形式でセッション情報が返却されるようなサーバーのURLであれば、なんでも指定することが可能です。
 ```ts
@@ -82,7 +84,7 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
 ```yml title="compose.yml"
   # bot や mongo の並びに、 ytsg を追加してください。
   ytsg:
-    image: quay.io/invidious/youtube-trusted-session-generator:webserver
+    image: ghcr.io/mtripg6666tdr/youtube-trusted-session-generator:latest
     retart: always
     ports:
       - 8080:8080
@@ -93,6 +95,8 @@ replitなど、環境変数の設定方法が特殊な場合もあるため、re
   # bot の depends_on に、以下の行を追加してください。
       - ytsg
 ```
+
+※なお、これらの設定をしても、再生が必ず改善する保証なく、変化がない場合もあります。
 
 :::
 
