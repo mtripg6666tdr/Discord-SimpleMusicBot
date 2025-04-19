@@ -11,17 +11,17 @@
     "description": "Botun gönderdiği mesajları siler. Son 1000 mesajı arar ve bulur.",
     "invalidMessageCount": "Belirtilen mesaj sayısı geçersiz.",
     "found_one": "{{count}} mesaj bulundu.",
-    "inCount_other": "取得した{{count}}件中",
+    "inCount_other": "{{count}} mesajda",
     "inCount_one": "取得した{{count}}件中",
     "found_other": "{{count}} mesaj bulundu.",
     "confirm": "Mesajların toplu olarak silinmesini onaylamak için aşağıdaki düğmeye basın.\nAksi takdirde işlem bir süre sonra otomatik olarak iptal edilecektir.",
-    "auditLog_one": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
+    "auditLog_one": "Çünkü {{issuer}}, {{count}} mesajının silinmesini talep etti.",
     "auditLog_other": "{{issuer}}により{{count}}件のメッセージの削除が要求されたため。",
     "finish": "完了!(このメッセージは自動的に消去されます)",
     "cancel": "削除をキャンセルしました",
-    "hitCount_other": "{{count}}件ヒット",
+    "hitCount_other": "{{count}} mesaj bulundu",
     "hitCount_one": "{{count}}件ヒット",
-    "loading": "取得中",
+    "loading": "Alınıyor",
     "args": {
       "count": {
         "description": "削除するメッセージの上限数。100以下で設定してください。"
