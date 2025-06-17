@@ -74,7 +74,7 @@
     "mocha": "^11.1.0",
     "rimraf": "^5.0.10",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.29.1"
+    "typescript-eslint": "^8.34.1"
   },
   "optionalDependencies": {
     "@discordjs/opus": "^0.10.0",
