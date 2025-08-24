@@ -17,7 +17,7 @@
  */
 
 /* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable no-var */
+
 /* eslint-disable @typescript-eslint/method-signature-style */
 import type { ReadableStream as WebReadableStream } from "stream/web";
 import type { Worker } from "worker_threads";

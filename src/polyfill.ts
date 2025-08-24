@@ -93,6 +93,29 @@ if (typeof Array.prototype.findLastIndex === "undefined") {
   };
 }
 
+if (typeof File === "undefined") {
+  logger.warn("Native File class is not defined.");
+  logger.warn("Installing a File polyfill.");
+
+  polyfillCount++;
+
+  if (require("buffer").File) {
+    global.File = require("buffer").File;
+  } else {
+    global.File = class File extends Blob {
+      name: string;
+      lastModified: number;
+
+      constructor(sources: any, fileName: string, options?: any) {
+        super(sources, options);
+
+        this.name = fileName;
+        this.lastModified = options?.lastModified || Date.now();
+      }
+    };
+  }
+}
+
 if (polyfillCount > 0) {
   logger.warn(`Installed ${polyfillCount} polyfill(s), which means Node.js may be stale.`);
   logger.warn("We strongly recommend you upgrading Node.js to v18 at least or higher.");
