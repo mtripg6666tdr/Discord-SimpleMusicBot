@@ -35,7 +35,7 @@
     "log4js": "^6.9.1",
     "miniget": "^4.2.3",
     "node-html-parser": "^7.0.1",
-    "oceanic.js": "~1.11.2",
+    "oceanic.js": "~1.12.0",
     "p-event": "^4.2.0",
     "p-queue": "^6.6.2",
     "prism-media": "^1.3.5",
