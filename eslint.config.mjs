@@ -265,7 +265,7 @@ const eslintConfigsStylistic = [
         "warn",
         "always-multiline",
       ],
-      "@stylistic/func-call-spacing": "warn",
+      "@stylistic/function-call-spacing": "warn",
       "@stylistic/indent": [
         "warn",
         2,
