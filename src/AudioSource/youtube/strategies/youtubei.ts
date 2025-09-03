@@ -19,12 +19,11 @@
 import type { Cache, StrategyFetchResult } from "./base";
 import type { ReadableStreamInfo, StreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Readable } from "stream";
-import type { YT } from "youtubei.js";
+import type { YT } from "youtubei.js" with { "resolution-mode": "import" };
 
 import path from "path";
 
 import { getURLVideoID } from "@distube/ytdl-core";
-import { Innertube, UniversalCache, YTNodes } from "youtubei.js";
 
 import { type YouTubeJsonFormat } from "..";
 import { Strategy } from "./base";
@@ -35,12 +34,20 @@ import { getTrustedSession } from "../session";
 export type youtubei = "youtubei";
 export const youtubei: youtubei = "youtubei";
 
+let { Innertube, UniversalCache, YTNodes } = null as unknown as typeof import("youtubei.js", { with: { "resolution-mode": "import" } });
+
+void import("youtubei.js", { with: { "resolution-mode": "import" } }).then(mod => {
+  Innertube = mod.Innertube;
+  UniversalCache = mod.UniversalCache;
+  YTNodes = mod.YTNodes;
+});
+
 const config = getConfig();
 
 type youtubeiCache = Cache<youtubei, YT.VideoInfo>;
 
 export class youtubeiStrategy extends Strategy<youtubeiCache, YT.VideoInfo> {
-  protected _client: Innertube | null = null;
+  protected _client: InstanceType<typeof Innertube> | null = null;
 
   get cacheType() {
     return youtubei;
