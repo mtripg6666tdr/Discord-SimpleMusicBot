@@ -34,13 +34,13 @@ import { getTrustedSession } from "../session";
 export type youtubei = "youtubei";
 export const youtubei: youtubei = "youtubei";
 
-let { Innertube, UniversalCache, YTNodes } = null as unknown as typeof import("youtubei.js", { with: { "resolution-mode": "import" } });
+let { Innertube, UniversalCache, YTNodes } = {} as unknown as typeof import("youtubei.js", { with: { "resolution-mode": "import" } });
 
-void import("youtubei.js", { with: { "resolution-mode": "import" } }).then(mod => {
+import("youtubei.js").then(mod => {
   Innertube = mod.Innertube;
   UniversalCache = mod.UniversalCache;
   YTNodes = mod.YTNodes;
-});
+}).catch(() => {});
 
 const config = getConfig();
 
@@ -56,6 +56,10 @@ export class youtubeiStrategy extends Strategy<youtubeiCache, YT.VideoInfo> {
   async getClient() {
     if (this._client) {
       return this._client;
+    }
+
+    if (!Innertube || !UniversalCache || !YTNodes) {
+      throw new Error("YouTube API client not initialized. This is likely due to a failed import.");
     }
 
     const trustedSession = await getTrustedSession();
