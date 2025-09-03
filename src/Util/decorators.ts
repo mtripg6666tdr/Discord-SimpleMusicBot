@@ -73,10 +73,10 @@ export function emitEventOnMutation<EventKey extends string>(eventName: EventKey
     },
     _context: ClassAccessorDecoratorContext<This, ValueType>,
   ): {
-      get?: (this: This) => ValueType,
-      set?: (this: This, value: ValueType) => void,
-      init?: (this: This, initialValue: ValueType) => ValueType,
-    } {
+    get?: (this: This) => ValueType,
+    set?: (this: This, value: ValueType) => void,
+    init?: (this: This, initialValue: ValueType) => ValueType,
+  } {
     return {
       get: originalValue.get,
       set: function set(value: ValueType) {

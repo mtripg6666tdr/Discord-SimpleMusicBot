@@ -33,7 +33,7 @@ export abstract class Backupper extends LogEmitter<{}> {
     return this.getData();
   }
 
-  constructor(protected readonly bot: MusicBotBase, protected readonly getData:(() => DataType)) {
+  constructor(protected readonly bot: MusicBotBase, protected readonly getData: (() => DataType)) {
     super("Backup");
   }
   /**
