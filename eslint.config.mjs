@@ -304,11 +304,26 @@ const eslintConfigsStylistic = [
         "warn",
         "all",
         {
-          "nestedBinaryExpressions": false,
+          "ignoredNodes": [
+            "SpreadElement[argument.type=ConditionalExpression]",
+            "SpreadElement[argument.type=LogicalExpression]",
+            "TSTypeAnnotation[typeAnnotation.type=TSFunctionType]",
+            "LogicalExpression",
+          ]
         },
       ],
       "@stylistic/no-extra-semi": "error",
+      "@stylistic/no-mixed-operators": "off",
       "@stylistic/nonblock-statement-body-position": "warn",
+      "@stylistic/operator-linebreak": [
+        "error",
+        "before",
+        {
+          "overrides": {
+            "=": "ignore",
+          },
+        },
+      ],
       "@stylistic/space-before-function-paren": [
         "warn",
         {
