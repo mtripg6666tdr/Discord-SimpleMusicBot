@@ -105,7 +105,10 @@ export class youtubeiStrategy extends Strategy<youtubeiCache, YT.VideoInfo> {
     const format = info.basic_info.is_live
       ? info.streaming_data?.adaptive_formats.filter(f => f.has_audio)[0]
       : info.chooseFormat({
-        quality: "best",
+        // workaround for youtubei issue
+        // see https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/3069#issuecomment-3249522723
+        // quality: "best",
+        quality: "360p",
         type: "audio",
       });
 
