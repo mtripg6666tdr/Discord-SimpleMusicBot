@@ -19,12 +19,11 @@
 import type { Cache, StrategyFetchResult } from "./base";
 import type { ReadableStreamInfo, StreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Readable } from "stream";
-import type { YT } from "youtubei.js";
+import type { YT } from "youtubei.js" with { "resolution-mode": "import" };
 
 import path from "path";
 
 import { getURLVideoID } from "@distube/ytdl-core";
-import { Innertube, UniversalCache, YTNodes } from "youtubei.js";
 
 import { type YouTubeJsonFormat } from "..";
 import { Strategy } from "./base";
@@ -35,12 +34,20 @@ import { getTrustedSession } from "../session";
 export type youtubei = "youtubei";
 export const youtubei: youtubei = "youtubei";
 
+let { Innertube, UniversalCache, YTNodes } = {} as unknown as typeof import("youtubei.js", { with: { "resolution-mode": "import" } });
+
+import("youtubei.js").then(mod => {
+  Innertube = mod.Innertube;
+  UniversalCache = mod.UniversalCache;
+  YTNodes = mod.YTNodes;
+}).catch(() => {});
+
 const config = getConfig();
 
 type youtubeiCache = Cache<youtubei, YT.VideoInfo>;
 
 export class youtubeiStrategy extends Strategy<youtubeiCache, YT.VideoInfo> {
-  protected _client: Innertube | null = null;
+  protected _client: InstanceType<typeof Innertube> | null = null;
 
   get cacheType() {
     return youtubei;
@@ -49,6 +56,10 @@ export class youtubeiStrategy extends Strategy<youtubeiCache, YT.VideoInfo> {
   async getClient() {
     if (this._client) {
       return this._client;
+    }
+
+    if (!Innertube || !UniversalCache || !YTNodes) {
+      throw new Error("YouTube API client not initialized. This is likely due to a failed import.");
     }
 
     const trustedSession = await getTrustedSession();
@@ -94,7 +105,10 @@ export class youtubeiStrategy extends Strategy<youtubeiCache, YT.VideoInfo> {
     const format = info.basic_info.is_live
       ? info.streaming_data?.adaptive_formats.filter(f => f.has_audio)[0]
       : info.chooseFormat({
-        quality: "best",
+        // workaround for youtubei issue
+        // see https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/3069#issuecomment-3249522723
+        // quality: "best",
+        quality: "360p",
         type: "audio",
       });
 
