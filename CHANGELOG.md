@@ -75,7 +75,7 @@ Node.js v16以上の環境で動作することを想定していますが、で
 
 # 4.5.2
 ## バグ修正
-* ストラテジーの適用方法を前提的に修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/3069)
+* ストラテジーの適用方法を暫定的に修正(https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/3069)
 ## 依存関係のアップデート
 * @discordjs/voice 0.17.0 => 0.18.0
 * @distube/ytdl-core 4.16.8 => 4.16.12
