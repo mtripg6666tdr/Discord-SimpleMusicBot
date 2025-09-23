@@ -27,7 +27,7 @@ import { video_info } from "play-dl";
 
 import { Strategy } from "./base";
 
-type playDl = "playDl";
+export type playDl = "playDl";
 export const playDl: playDl = "playDl";
 
 export class playDlStrategy extends Strategy<Cache<playDl, InfoData>, InfoData> {
