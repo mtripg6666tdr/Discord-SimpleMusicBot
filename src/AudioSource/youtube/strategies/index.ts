@@ -25,7 +25,6 @@ import type { ytdlCoreStrategy } from "./ytdl-core";
 
 import { getConfig } from "../../../config";
 import { getLogger } from "../../../logger";
-import { isTrustedSessionAvailable } from "../session";
 
 interface StrategyImporter {
   enable: boolean;
@@ -50,12 +49,12 @@ const strategyImporters: StrategyImporter[] = [
   { enable: false, isFallback: false, importer: () => require("./ytdl-core") },
   { enable: false, isFallback: false, importer: () => require("./play-dl") },
   { enable: true, isFallback: false, importer: () => require("./distube_ytdl-core") },
-  // { enable: isTrustedSessionAvailable(), isFallback: false, importer: () => require("./youtubei") },
-  { enable: false, isFallback: false, importer: () => require("./play-dl-test") },
+  { enable: false, isFallback: false, importer: () => require("./youtubei_web") },
+  { enable: true, isFallback: false, importer: () => require("./youtubei_embed") },
+  { enable: false, isFallback: true, importer: () => require("./play-dl-test") },
   { enable: false, isFallback: true, importer: () => require("./youtube-dl") },
   { enable: true, isFallback: true, importer: () => require("./yt-dlp") },
   { enable: true, isFallback: true, importer: () => require("./nightly_youtube-dl") },
-  { enable: isTrustedSessionAvailable(), isFallback: true, importer: () => require("./youtubei") },
 ] as const;
 
 export let strategies: (Strategies | null)[] = [];

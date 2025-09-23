@@ -16,41 +16,45 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { YouTubeJsonFormat } from "..";
 import type { Cache, StrategyFetchResult } from "./base";
 import type { ReadableStreamInfo, StreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Readable } from "stream";
-import type { YT } from "youtubei.js" with { "resolution-mode": "import" };
+import type { YT, Types as YTTypes } from "youtubei.js" with { "resolution-mode": "import" };
 
 import path from "path";
 
 import { getURLVideoID } from "@distube/ytdl-core";
 
-import { type YouTubeJsonFormat } from "..";
 import { Strategy } from "./base";
 import { createFragmentalDownloadStream } from "../../../Util";
 import { getConfig } from "../../../config";
 import { DefaultAudioThumbnailURL, SecondaryUserAgent } from "../../../definition";
 import { getTrustedSession } from "../session";
-export type youtubei = "youtubei";
-export const youtubei: youtubei = "youtubei";
 
-let { Innertube, UniversalCache, YTNodes } = {} as unknown as typeof import("youtubei.js", { with: { "resolution-mode": "import" } });
+let { Innertube, UniversalCache, YTNodes, YT: { VideoInfo } } = { YT: {} } as unknown as typeof import("youtubei.js", { with: { "resolution-mode": "import" } });
 
 import("youtubei.js").then(mod => {
   Innertube = mod.Innertube;
   UniversalCache = mod.UniversalCache;
   YTNodes = mod.YTNodes;
+  VideoInfo = mod.YT.VideoInfo;
 }).catch(() => {});
 
 const config = getConfig();
 
-type youtubeiCache = Cache<youtubei, YT.VideoInfo>;
+export type youtubei = "youtubei";
+export const youtubei: youtubei = "youtubei";
 
-export class youtubeiStrategy extends Strategy<youtubeiCache, YT.VideoInfo> {
+export abstract class baseYoutubeiStrategy extends Strategy<Cache<youtubei, YT.VideoInfo>, YT.VideoInfo> {
   protected _client: InstanceType<typeof Innertube> | null = null;
 
+  constructor(priority: number, protected id: youtubei, protected client: YTTypes.InnerTubeClient) {
+    super(priority);
+  }
+
   get cacheType() {
-    return youtubei;
+    return this.id;
   }
 
   async getClient() {
@@ -79,20 +83,20 @@ export class youtubeiStrategy extends Strategy<youtubeiCache, YT.VideoInfo> {
     this.logStrategyUsed();
 
     const client = await this.getClient();
-    const info = await client.getInfo(getURLVideoID(url));
+    const info = await client.getInfo(getURLVideoID(url), { client: this.client });
 
     return {
       data: this.mapToExportable(url, info),
       cache: {
-        type: youtubei,
+        type: this.id,
         data: info,
       },
     };
   }
 
-  async fetch(url: string, forceurl: true, cache?: Cache<any, any>): Promise<StrategyFetchResult<youtubeiCache, UrlStreamInfo>>;
-  async fetch(url: string, forceurl?: boolean, cache?: Cache<any, any>): Promise<StrategyFetchResult<youtubeiCache, StreamInfo>>;
-  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>): Promise<StrategyFetchResult<youtubeiCache, StreamInfo>> {
+  async fetch(url: string, forceurl: true, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<youtubei, YT.VideoInfo>, UrlStreamInfo>>;
+  async fetch(url: string, forceurl?: boolean, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<youtubei, YT.VideoInfo>, StreamInfo>>;
+  async fetch(url: string, forceUrl: boolean = false, cache?: Cache<any, any>): Promise<StrategyFetchResult<Cache<youtubei, YT.VideoInfo>, StreamInfo>> {
     this.logStrategyUsed();
 
     const availableCache = this.cacheIsValid(cache) && cache.data;
@@ -100,15 +104,12 @@ export class youtubeiStrategy extends Strategy<youtubeiCache, YT.VideoInfo> {
     this.logger.info(availableCache ? "using cache without obtaining" : "obtaining info");
 
     const client = await this.getClient();
-    const info = availableCache || await client.getInfo(getURLVideoID(url));
+    const info = availableCache || await client.getInfo(getURLVideoID(url), { client: this.client });
 
     const format = info.basic_info.is_live
       ? info.streaming_data?.adaptive_formats.filter(f => f.has_audio)[0]
       : info.chooseFormat({
-        // workaround for youtubei issue
-        // see https://github.com/mtripg6666tdr/Discord-SimpleMusicBot/pull/3069#issuecomment-3249522723
-        // quality: "best",
-        quality: "360p",
+        quality: "best",
         type: "audio",
       });
 
@@ -134,6 +135,10 @@ export class youtubeiStrategy extends Strategy<youtubeiCache, YT.VideoInfo> {
       }) as YouTubeJsonFormat) || [],
     };
 
+    const videoFormat = info.chooseFormat({ format: "video", quality: "best" });
+    const videoUrl = videoFormat.decipher(client.session.player);
+    (info as any).videoUrl = videoUrl;
+
     if (forceUrl || info.basic_info.is_live) {
       return {
         ...partialResult,
@@ -144,7 +149,7 @@ export class youtubeiStrategy extends Strategy<youtubeiCache, YT.VideoInfo> {
           streamType: info.basic_info.is_live ? "m3u8" : isWebmOpus ? "webm/opus" : "unknown",
         } as UrlStreamInfo,
         cache: {
-          type: youtubei,
+          type: this.id,
           data: info,
         },
       };
@@ -164,7 +169,7 @@ export class youtubeiStrategy extends Strategy<youtubeiCache, YT.VideoInfo> {
             isWebmOpus ? "webm/opus" : "unknown",
         } as ReadableStreamInfo,
         cache: {
-          type: youtubei,
+          type: this.id,
           data: info,
         },
       };
@@ -189,4 +194,14 @@ export class youtubeiStrategy extends Strategy<youtubeiCache, YT.VideoInfo> {
   }
 }
 
-export default youtubeiStrategy;
+export function restoreYouTubeInfo(data: unknown): YT.VideoInfo | never {
+  if (!data || typeof data !== "object") {
+    throw new Error("Invalid data to restore YouTubeInfo");
+  }
+
+  if (Object.getPrototypeOf(data) === VideoInfo.prototype) {
+    return data as YT.VideoInfo;
+  }
+
+  return Object.assign(Object.create(VideoInfo.prototype), data);
+}

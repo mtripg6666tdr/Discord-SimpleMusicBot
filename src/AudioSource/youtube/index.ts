@@ -19,14 +19,15 @@
 import type { StreamInfo } from "..";
 import type { Cache } from "./strategies/base";
 import type { distubeYtdlCore } from "./strategies/distube_ytdl-core";
+import type { playDl } from "./strategies/play-dl";
+import type { ytdlCore } from "./strategies/ytdl-core";
 import type { EmbedField } from "oceanic.js";
 import type { InfoData } from "play-dl";
 
 import * as ytdl from "ytdl-core";
 
 import { attemptGetInfoForStrategies, attemptFetchForStrategies } from "./strategies";
-import { playDl } from "./strategies/play-dl";
-import { ytdlCore } from "./strategies/ytdl-core";
+import { type youtubei } from "./strategies/baseYoutubeiStrategy";
 import { getCommandExecutionContext } from "../../Commands";
 import { measureTime } from "../../Util/decorators";
 import { SecondaryUserAgent } from "../../definition";
@@ -180,7 +181,10 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
       await this.refreshInfo({ forceCache: true });
     }
 
+    const ytdlCore: ytdlCore = "ytdlCore";
     const distubeYtdlCore: distubeYtdlCore = "distubeYtdlCore";
+    const playDl: playDl = "playDl";
+    const youtubei: youtubei = "youtubei";
 
     if (this.cache?.data.type === ytdlCore || this.cache?.data.type === distubeYtdlCore) {
       const info = this.cache.data.data as ytdl.videoInfo;
@@ -198,6 +202,17 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
       const info = this.cache.data.data as InfoData;
       const format = info.format.filter(f => f.mimeType?.startsWith("video")).sort((a, b) => b.bitrate! - a.bitrate!)[0];
       const url = format.url || info.LiveStreamData.hlsManifestUrl;
+
+      if (!url) {
+        throw new Error("No url found.");
+      }
+
+      return {
+        url,
+        ua: SecondaryUserAgent,
+      };
+    } else if (this.cache?.data.type === youtubei) {
+      const url = this.cache.data.data.videoUrl;
 
       if (!url) {
         throw new Error("No url found.");

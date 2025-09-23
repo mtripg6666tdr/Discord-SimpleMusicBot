@@ -29,7 +29,7 @@ import { getConfig } from "../../../config";
 import { SecondaryUserAgent } from "../../../definition";
 import { createChunkedYTStream, createRefreshableYTLiveStream } from "../stream";
 
-type ytdlCore = "ytdlCore";
+export type ytdlCore = "ytdlCore";
 export const ytdlCore: ytdlCore = "ytdlCore";
 
 const config = getConfig();
