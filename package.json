@@ -73,7 +73,7 @@
     "globals": "^16.4.0",
     "mocha": "^11.7.2",
     "rimraf": "^5.0.10",
-    "typescript": "^5.9.2",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.43.0"
   },
   "optionalDependencies": {
