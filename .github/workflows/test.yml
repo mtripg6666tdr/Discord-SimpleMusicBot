@@ -81,6 +81,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: List dependencies
+        run: npm list --all
+        continue-on-error: true
+
       - name: Build
         run: npm run build
 
@@ -123,6 +127,13 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: List dependencies
+        run: npm list --all
+        continue-on-error: true
+
+      - name: Attempt to install Mongo
+        run: npm install mongodb@6.19.0
 
       - name: Build
         run: npm run build
