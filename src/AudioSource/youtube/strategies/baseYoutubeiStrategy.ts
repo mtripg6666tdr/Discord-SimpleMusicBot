@@ -136,7 +136,7 @@ export abstract class baseYoutubeiStrategy extends Strategy<Cache<youtubei, YT.V
     };
 
     const videoFormat = info.chooseFormat({ format: "video", quality: "best" });
-    const videoUrl = videoFormat.decipher(client.session.player);
+    const videoUrl = await videoFormat.decipher(client.session.player);
     (info as any).videoUrl = videoUrl;
 
     if (forceUrl || info.basic_info.is_live) {
@@ -144,7 +144,7 @@ export abstract class baseYoutubeiStrategy extends Strategy<Cache<youtubei, YT.V
         ...partialResult,
         stream: {
           type: "url",
-          url: info.basic_info.is_live ? info.streaming_data?.hls_manifest_url : format.decipher(client.session.player),
+          url: info.basic_info.is_live ? info.streaming_data?.hls_manifest_url : await format.decipher(client.session.player),
           userAgent: client.session.user_agent || SecondaryUserAgent,
           streamType: info.basic_info.is_live ? "m3u8" : isWebmOpus ? "webm/opus" : "unknown",
         } as UrlStreamInfo,
@@ -154,7 +154,7 @@ export abstract class baseYoutubeiStrategy extends Strategy<Cache<youtubei, YT.V
         },
       };
     } else {
-      const readable: Readable = createFragmentalDownloadStream(format.decipher(client.session.player), {
+      const readable: Readable = createFragmentalDownloadStream(await format.decipher(client.session.player), {
         chunkSize: 8 * 1024 * 1024,
         contentLength: Number(format.content_length),
         pulseDownload: true,
