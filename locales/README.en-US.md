@@ -33,11 +33,26 @@ The documentation of the bot (Japanese).
 - [Documentation site](https://web.usamyon.moe/Discord-SimpleMusicBot/)
 
 ## Contribution
-The bot is still in development so you may encounter bugs.  
-Any contributions are welcome!  
-If you find any bugs, please confirm there's no duplicated issues at first and feel free to open a new issue.After that, open a pull request if you can.  
-Not only opening issues, we accept inquiries (Japanese or English) in the support server below.  
-Feel free to contact us in any ways!
+常に開発中であるためバグが多々あると思います。そして、プロジェクトの性質上、時間とともに機能しなくなることもよくあります。
+
+また、開発者は最近ずっと多忙であるため、あまりメンテナンスに時間を割けていないのも実情です<!--[^1]-->。
+
+<!--
+[^1]: GitHub Sponsors を通して私に寄付いただけると、こちらに割ける時間を確保しやすくなります[^2]。寄付に関わらず、サポートの対応に影響はありません。
+[^2]: もしよろしければご検討ください。ご不便おかけし申し訳ございません。できる限り頑張ります。
+-->
+
+ですので、できる限り頑張りますが、Pull Request を通して貢献していただける方や、そのほか[ドキュメント](https://web.usamyon.moe/Discord-SimpleMusicBot/)の下部に掲載されている方法で貢献していただける方ががいらっしゃいましたら、大変嬉しいですし、非常に助かります。
+
+> [!TIP] Pull Request を通した貢献に際して、ルールや役立つ事項を[CONTRIBUTING.md](.github/CONTRIBUTING.md)にまとめております。 お手数ですが、ぜひご一読ください。
+
+なにとぞ、よろしくお願いいたします。
+
+### バグのご報告について
+バグのご報告は、Issueや下記サポートサーバーのサポートチャンネルを通して受け付けております。 ご報告あり次第、できる限り優先して対応いたします。
+
+### 機能追加のご要望について
+機能追加のご要望も、Issue や下記のサポートサーバーを通して受け付けております。 しかしながら、上の理由により実装時期が全く保証できない状況です。大変申し訳ございませんが、予めご了承ください。
 
 ## Localization
 This project has a plan to be multi-lingualized via Crowdin.We are looking for translators and proofreaders who can speak Japanese or English.  
