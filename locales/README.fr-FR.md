@@ -33,11 +33,26 @@ Vous pouvez voir comment configurer le bot, les commandes, etc. ici.
 - [ドキュメントサイト](https://web.usamyon.moe/Discord-SimpleMusicBot/)
 
 ## À propos de la cotisation
-Il y a beaucoup de bugs car il est en cours de développement.  
-Les contributions à ce référentiel sont les bienvenues !  
-Si vous trouvez un bogue, assurez-vous qu'il n'y a pas de problèmes en double et ouvrez d'abord le problème.Si possible, veuillez ouvrir une pull request en conséquence.  
-En plus des problèmes, diverses demandes sont également acceptées sur le serveur d'assistance ci-dessous.  
-N'hésitez pas à nous contacter par tous les moyens !
+常に開発中であるためバグが多々あると思います。そして、プロジェクトの性質上、時間とともに機能しなくなることもよくあります。
+
+また、開発者は最近ずっと多忙であるため、あまりメンテナンスに時間を割けていないのも実情です<!--[^1]-->。
+
+<!--
+[^1]: GitHub Sponsors を通して私に寄付いただけると、こちらに割ける時間を確保しやすくなります[^2]。寄付に関わらず、サポートの対応に影響はありません。
+[^2]: もしよろしければご検討ください。ご不便おかけし申し訳ございません。できる限り頑張ります。
+-->
+
+ですので、できる限り頑張りますが、Pull Request を通して貢献していただける方や、そのほか[ドキュメント](https://web.usamyon.moe/Discord-SimpleMusicBot/)の下部に掲載されている方法で貢献していただける方ががいらっしゃいましたら、大変嬉しいですし、非常に助かります。
+
+> [!TIP] Pull Request を通した貢献に際して、ルールや役立つ事項を[CONTRIBUTING.md](.github/CONTRIBUTING.md)にまとめております。 お手数ですが、ぜひご一読ください。
+
+なにとぞ、よろしくお願いいたします。
+
+### バグのご報告について
+バグのご報告は、Issueや下記サポートサーバーのサポートチャンネルを通して受け付けております。 ご報告あり次第、できる限り優先して対応いたします。
+
+### 機能追加のご要望について
+機能追加のご要望も、Issue や下記のサポートサーバーを通して受け付けております。 しかしながら、上の理由により実装時期が全く保証できない状況です。大変申し訳ございませんが、予めご了承ください。
 
 ## À propos de la localisation
 Le projet est multilingue avec Crowdin.ボットの翻訳に協力してくださる方と、日本語か英語を話せる校正者の方を随時募集しています。  
