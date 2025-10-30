@@ -23,6 +23,7 @@ import type { Readable } from "stream";
 import type { YT, Types as YTTypes } from "youtubei.js" with { "resolution-mode": "import" };
 
 import path from "path";
+import vm from "vm";
 
 import { getURLVideoID } from "@distube/ytdl-core";
 
@@ -39,6 +40,27 @@ import("youtubei.js").then(mod => {
   UniversalCache = mod.UniversalCache;
   YTNodes = mod.YTNodes;
   VideoInfo = mod.YT.VideoInfo;
+}).catch(() => {});
+
+import("youtubei.js/web").then(({ Platform }) => {
+  // https://ytjs.dev/guide/getting-started.html#providing-a-custom-javascript-interpreter
+  Platform.shim.eval = function(data: YTTypes.BuildScriptResult, env: Record<string, YTTypes.VMPrimative>) {
+    const properties = [];
+
+    if (env.n) {
+      properties.push(`n: exportedVars.nFunction("${env.n}")`);
+    }
+
+    if (env.sig) {
+      properties.push(`sig: exportedVars.sigFunction("${env.sig}")`);
+    }
+
+    const code = `${data.output}\nreturn { ${properties.join(", ")} }`;
+
+    const script = new vm.Script(`(function(){${code}})()`);
+
+    return script.runInNewContext();
+  };
 }).catch(() => {});
 
 const config = getConfig();
