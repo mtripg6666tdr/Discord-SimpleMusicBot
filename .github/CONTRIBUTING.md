@@ -67,12 +67,12 @@ Pull Request を通じた貢献に興味をお持ちいただき、誠にあり�
 #### ３つの主要な柱
 
 1.  **サーバーごとの状態管理 (`GuildDataContainer`)**: Discordの各サーバー（ギルド）の状態は、`GuildDataContainer`というクラスにすべて集約されます。再生中の曲、キュー、音量設定など、すべての情報はここにあります。これにより、サーバー間のデータが完全に分離され、管理が容易になります。
-  - →[`GuildDataContainer.ts`](../src/Structure/GuildDataContainer.ts)
+    - →[`GuildDataContainer.ts`](../src/Structure/GuildDataContainer.ts)
 2.  **コマンドシステム (`Commands` & `Component/commandManager`)**: ユーザーからの命令（コマンド）は、`CommandManager`によって解釈され、対応するコマンドクラスが実行されます。コマンドの追加や変更が他の部分に影響を与えないように設計されています。
-  - →[`Commands`ディレクトリ](../src/Commands/)
-  - →[`commandManager (CommandManager.ts)`](../src/Component/commandManager.ts)
+    - →[`Commands`ディレクトリ](../src/Commands/)
+    - →[`commandManager (CommandManager.ts)`](../src/Component/commandManager.ts)
 3.  **音源の抽象化 (`AudioSource`)**: YouTube、SoundCloud、Spotifyなど、さまざまな音楽ソースを同じように扱えるように、`AudioSource`という概念で抽象化されています。新しい音楽サービスに対応する場合でも、既存のコードを大幅に変更する必要はありません。
-  - →[`AudioSource`ディレクトリ](../src/AudioSource/)
+    - →[`AudioSource`ディレクトリ](../src/AudioSource/)
 
 ### 2. ディレクトリ構造の歩き方
 ボット本体のソースコードは [`src`ディレクトリ](../src/)にあり、主に以下のディレクトリに分かれています。
