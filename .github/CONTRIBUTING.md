@@ -136,7 +136,7 @@ Pull Request を通じた貢献に興味をお持ちいただき、誠にあり�
 貢献していただく上で、特に知っておくと良い設計思想を3つご紹介します。
 
 #### ① Strategyパターンによる堅牢性
-YouTubeからの音源取得は複数の「戦略（Strategy）」を使い分けることで、非常に安定しています。YouTube関連の修正を行う際は、[`src/AudioSource/youtube/strategies/`](../src/AudioSource/youtube/strategies/) ディレクトリをご確認いただけるとスムーズだと思います。
+YouTubeからの音源取得は複数の「戦略（Strategy）」を使い分けることで、できる限りの安定化を図っています。YouTube関連の修正を行う際は、[`src/AudioSource/youtube/strategies/`](../src/AudioSource/youtube/strategies/) ディレクトリをご確認いただけるとスムーズだと思います。
 
 #### ② 音源ソースの抽象化
 [`src/AudioSource/audiosource.ts`](../src/AudioSource/audiosource.ts) の `AudioSource` クラスが、すべての音源の「設計図」となっています。新しい音楽サービスに対応させたい場合、このクラスを継承して `init` (情報取得) と `fetch` (ストリーム取得) の2つのメソッドを実装することが主な作業になります。[`AudioSource`ディレクトリ](../src/AudioSource/)にある、既存の各サービスを参考にするとわかりやすいと思います。
