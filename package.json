@@ -53,7 +53,7 @@
     "ytsr": "^3.8.4"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.37.0",
     "@stylistic/eslint-plugin": "^5.5.0",
     "@swc/core": "^1.14.0",
