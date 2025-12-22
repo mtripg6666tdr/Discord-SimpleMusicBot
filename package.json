@@ -79,7 +79,7 @@
   },
   "optionalDependencies": {
     "@discordjs/opus": "^0.10.0",
-    "@distube/ytpl": "^1.2.3",
+    "@distube/ytpl": "^1.2.4",
     "@distube/ytsr": "^2.0.4",
     "erlpack": "^0.1.4",
     "ffmpeg-static": "^5.2.0",
