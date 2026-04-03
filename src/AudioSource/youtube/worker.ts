@@ -75,49 +75,23 @@ function getInfo({ id, url, prefetched, forceCache }: WithId<SpawnerGetInfoMessa
 }
 
 function search({ id, keyword }: WithId<SpawnerSearchMessage>) {
-  if (dYtsr) {
-    dYtsr(keyword, searchOptions)
-    // @ts-ignore
-      .then(result => {
-        postMessage({
-          type: "searchOk",
-          data: result,
-          id,
-        });
-      })
-      // @ts-ignore
-      .catch(err => {
-        console.error(err);
+  const sendResult = (result: ytsr.Result | import("@distube/ytsr").VideoResult) => {
+    postMessage({ type: "searchOk", data: result, id });
+  };
+  const sendError = (err: unknown) => {
+    postMessage({ type: "error", data: stringifyObject(err), id });
+  };
 
-        return ytsr(keyword, searchOptions);
-      })
-      // @ts-ignore
-      .catch(err => {
-        postMessage({
-          type: "error",
-          data: stringifyObject(err),
-          id,
-        });
-      });
+  const searchWithDYtsr = dYtsr
+    ? dYtsr(keyword, searchOptions).then(sendResult)
+    : Promise.reject(new Error("@distube/ytsr not available"));
 
-    return;
-  }
-
-  ytsr(keyword, searchOptions)
-    .then(result => {
-      postMessage({
-        type: "searchOk",
-        data: result,
-        id,
-      });
-    })
+  searchWithDYtsr
     .catch(err => {
-      postMessage({
-        type: "error",
-        data: stringifyObject(err),
-        id,
-      });
-    });
+      console.error("@distube/ytsr failed, falling back to ytsr:", err);
+      return ytsr(keyword, searchOptions).then(sendResult);
+    })
+    .catch(sendError);
 }
 
 function updateConfig({ config: newConfig }: WithId<SpawnerUpdateConfigMessage>) {
