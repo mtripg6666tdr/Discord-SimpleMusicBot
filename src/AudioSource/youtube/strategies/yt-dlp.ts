@@ -41,7 +41,8 @@ const ytDlPBinaryManager = new BinaryManager({
   },
   localBinaryName: "yt-dlp",
   binaryRepo: "yt-dlp/yt-dlp",
-  checkImmediately: false,
+  checkImmediately: true,
+  checkUpdateTimeout: 1000 * 60 * 60,
 });
 
 type ytDlP = "ytDlP";

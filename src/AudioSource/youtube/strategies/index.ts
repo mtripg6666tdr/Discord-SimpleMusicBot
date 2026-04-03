@@ -25,6 +25,7 @@ import type { ytdlCoreStrategy } from "./ytdl-core";
 
 import { getConfig } from "../../../config";
 import { getLogger } from "../../../logger";
+import { strategyHealthMonitor } from "./healthMonitor";
 
 interface StrategyImporter {
   enable: boolean;
@@ -45,16 +46,36 @@ interface Strategies {
 const logger = getLogger("Strategies");
 const config = getConfig();
 
+const STRATEGY_TIMEOUT_MS = 15_000;
+const BINARY_STRATEGY_TIMEOUT_MS = 30_000;
+const BINARY_STRATEGY_INDICES = new Set([6, 7, 8]);
+
+function getStrategyTimeout(strategyIndex: number): number {
+  return BINARY_STRATEGY_INDICES.has(strategyIndex) ? BINARY_STRATEGY_TIMEOUT_MS : STRATEGY_TIMEOUT_MS;
+}
+
+function withTimeout(promise: Promise<any>, timeoutMs: number, label: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`Strategy ${label} timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+    promise.then(
+      result => { clearTimeout(timer); resolve(result); },
+      error => { clearTimeout(timer); reject(error); },
+    );
+  });
+}
+
 const strategyImporters: StrategyImporter[] = [
   { enable: false, isFallback: false, importer: () => require("./ytdl-core") },
   { enable: false, isFallback: false, importer: () => require("./play-dl") },
   // { enable: false, isFallback: false, importer: () => require("./distube_ytdl-core") },
   { enable: false, isFallback: false, importer: () => require("./youtubei_web") },
   { enable: true, isFallback: false, importer: () => require("./youtubei_embed") },
-  { enable: true, isFallback: false, importer: () => require("./distube_ytdl-core") },
+  { enable: false, isFallback: false, importer: () => require("./distube_ytdl-core") },
   { enable: false, isFallback: true, importer: () => require("./play-dl-test") },
   { enable: false, isFallback: true, importer: () => require("./youtube-dl") },
-  { enable: true, isFallback: true, importer: () => require("./yt-dlp") },
+  { enable: true, isFallback: false, importer: () => require("./yt-dlp") },
   { enable: true, isFallback: true, importer: () => require("./nightly_youtube-dl") },
 ] as const;
 
@@ -113,35 +134,57 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(p
     const cacheType = parameters[2].type;
     checkedStrategy = strategies.findIndex(s => s && s.module.cacheType === cacheType);
     if (checkedStrategy >= 0) {
-      try {
-        const strategy = strategies[checkedStrategy]!;
-        const result = await strategy.module.fetch(...parameters);
-        return {
-          result,
-          resolved: checkedStrategy,
-          isFallbacked: strategy.isFallback,
-        };
-      } catch (e) {
-        logger.warn(`fetch in strategy#${checkedStrategy} failed`, e);
+      if (!strategyHealthMonitor.isDisabled(checkedStrategy)) {
+        const startTime = Date.now();
+        try {
+          const strategy = strategies[checkedStrategy]!;
+          const result = await withTimeout(
+            strategy.module.fetch(...parameters),
+            getStrategyTimeout(checkedStrategy),
+            `#${checkedStrategy}`,
+          );
+          strategyHealthMonitor.recordSuccess(checkedStrategy, Date.now() - startTime);
+          return {
+            result,
+            resolved: checkedStrategy,
+            isFallbacked: strategy.isFallback,
+          };
+        } catch (e) {
+          strategyHealthMonitor.recordFailure(checkedStrategy);
+          logger.warn(`fetch in strategy#${checkedStrategy} failed`, e);
+        }
+      } else {
+        logger.warn(`strategy#${checkedStrategy} is auto-disabled by health monitor, skipping`);
       }
     }
   }
   for (const i of generator()) {
-    if (i !== checkedStrategy && strategies[i] && strategies[i]?.module.cacheType !== attemptOffsetStrategyName) {
-      try {
-        const strategy = strategies[i]!;
-        const result = await strategy.module.fetch(...parameters);
-        return {
-          result,
-          resolved: i,
-          isFallbacked: strategy.isFallback,
-        };
-      } catch (e) {
-        logger.warn(`fetch in strategy#${i} failed`, e);
-      }
+    if (i === checkedStrategy || !strategies[i]) {
+      continue;
     }
-
-    logger.warn("Fallbacking to the next strategy");
+    if (strategyHealthMonitor.isDisabled(i)) {
+      logger.warn(`strategy#${i} is auto-disabled by health monitor, skipping`);
+      continue;
+    }
+    const startTime = Date.now();
+    try {
+      const strategy = strategies[i]!;
+      const result = await withTimeout(
+        strategy.module.fetch(...parameters),
+        getStrategyTimeout(i),
+        `#${i}`,
+      );
+      strategyHealthMonitor.recordSuccess(i, Date.now() - startTime);
+      return {
+        result,
+        resolved: i,
+        isFallbacked: strategy.isFallback,
+      };
+    } catch (e) {
+      strategyHealthMonitor.recordFailure(i);
+      logger.warn(`fetch in strategy#${i} failed`, e);
+      logger.warn("Fallbacking to the next strategy");
+    }
   }
   throw new Error("All strategies failed");
 }
@@ -150,8 +193,18 @@ export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>
   for (let i = 0; i < strategies.length; i++) {
     try {
       if (strategies[i]) {
+        if (strategyHealthMonitor.isDisabled(i)) {
+          logger.warn(`strategy#${i} is auto-disabled by health monitor, skipping`);
+          continue;
+        }
         const strategy = strategies[i]!;
-        const result = await strategy.module.getInfo(...parameters);
+        const startTime = Date.now();
+        const result = await withTimeout(
+          strategy.module.getInfo(...parameters),
+          getStrategyTimeout(i),
+          `#${i}`,
+        );
+        strategyHealthMonitor.recordSuccess(i, Date.now() - startTime);
         return {
           result,
           resolved: i,
@@ -159,6 +212,7 @@ export async function attemptGetInfoForStrategies<T extends Cache<string, U>, U>
         };
       }
     } catch (e) {
+      strategyHealthMonitor.recordFailure(i);
       logger.warn(`getInfo in strategy#${i} failed`, e);
       logger.warn(
         i + 1 === strategies.length
