@@ -127,21 +127,21 @@ export async function attemptFetchForStrategies<T extends Cache<string, U>, U>(p
     }
   }
   for (const i of generator()) {
-    if (i !== checkedStrategy && strategies[i] && strategies[i]?.module.cacheType !== attemptOffsetStrategyName) {
-      try {
-        const strategy = strategies[i]!;
-        const result = await strategy.module.fetch(...parameters);
-        return {
-          result,
-          resolved: i,
-          isFallbacked: strategy.isFallback,
-        };
-      } catch (e) {
-        logger.warn(`fetch in strategy#${i} failed`, e);
-      }
+    if (i === checkedStrategy || !strategies[i]) {
+      continue;
     }
-
-    logger.warn("Fallbacking to the next strategy");
+    try {
+      const strategy = strategies[i]!;
+      const result = await strategy.module.fetch(...parameters);
+      return {
+        result,
+        resolved: i,
+        isFallbacked: strategy.isFallback,
+      };
+    } catch (e) {
+      logger.warn(`fetch in strategy#${i} failed`, e);
+      logger.warn("Fallbacking to the next strategy");
+    }
   }
   throw new Error("All strategies failed");
 }
