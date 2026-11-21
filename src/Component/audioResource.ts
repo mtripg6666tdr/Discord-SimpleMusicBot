@@ -122,7 +122,7 @@ export class FixedAudioResource extends NullMetaAudioResource {
       this.logger.trace("Stream becomes unreadable");
       this.dataUnreadableAt = Date.now();
       return SILENCE_FRAME;
-    } else if (this.dataUnreadableAt - Date.now() >= TIMEOUT) {
+    } else if (Date.now() - this.dataUnreadableAt >= TIMEOUT) {
       this.logger.trace("Stream timed out");
       this.timedout = true;
     } else {

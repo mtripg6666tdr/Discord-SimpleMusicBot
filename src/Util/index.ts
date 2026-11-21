@@ -415,6 +415,24 @@ function retrieveFFmpegStderrFromUrl(url: string, ffmpegPathGenerator: () => str
   return new Promise<string>((resolve, reject) => {
     const ffmpegPath = ffmpegPathGenerator();
     let data = "";
+    let settled = false;
+    const settleResolve = (value: string) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      resolve(value);
+    };
+    const settleReject = (er: unknown) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      reject(er);
+    };
+    const timeout = setTimeout(() => {
+      settleReject(new Error("FFmpeg timed out."));
+      proc.kill("SIGKILL");
+    }, 30 * 1000);
+    timeout.unref();
     const proc = spawn(ffmpegPath, [
       "-i", url,
       "-user_agent", DefaultUserAgent,
@@ -422,14 +440,20 @@ function retrieveFFmpegStderrFromUrl(url: string, ffmpegPathGenerator: () => str
       windowsHide: true,
       stdio: ["ignore", "ignore", "pipe"],
     })
+      .on("error", er => settleReject(er))
       .on("exit", () => {
         if (data.length === 0) {
-          reject(new Error("FFmpeg emit nothing."));
+          settleReject(new Error("FFmpeg emit nothing."));
+          return;
         }
 
-        resolve(data);
+        settleResolve(data);
       });
-    proc.stderr.on("data", chunk => data += chunk);
+    proc.stderr.on("data", chunk => {
+      if (data.length < 1024 * 1024) {
+        data += chunk;
+      }
+    });
   });
 }
 

@@ -304,6 +304,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
         const startTime = this.availableAfter;
         if (!startTime) {
           resolve();
+          return;
         }
 
         const waitTime = Math.max(new Date(startTime!).getTime() - Date.now(), 20 * 1000);
