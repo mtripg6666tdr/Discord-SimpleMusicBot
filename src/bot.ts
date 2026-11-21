@@ -42,6 +42,8 @@ export class MusicBot extends MusicBotBase {
     return this._isReadyFinished;
   }
 
+  private _clientEventHandlersRegistered = false;
+
   private readonly _telemetry: Telemetry | null = null;
 
   get telemetry() {
@@ -82,6 +84,8 @@ export class MusicBot extends MusicBotBase {
 
     this.client.once("ready", eventHandlers.onReady.bind(this));
     this.once("ready", () => {
+      if (this._clientEventHandlersRegistered) return;
+      this._clientEventHandlersRegistered = true;
       this.client
         .on("ready", eventHandlers.onReady.bind(this))
         .on("messageCreate", eventHandlers.onMessageCreate.bind(this))
