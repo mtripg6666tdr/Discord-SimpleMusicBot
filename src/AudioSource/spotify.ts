@@ -26,7 +26,7 @@ import candyget from "candyget";
 import spotifyUrlInfo from "spotify-url-info";
 
 import { AudioSource } from "./audiosource";
-import { assertIsNotNull } from "../Util";
+import { assertIsNotNull, isSafeRemoteUrl } from "../Util";
 import { DefaultAudioThumbnailURL } from "../definition";
 import { searchYouTube } from "./youtube/spawner";
 import { attemptFetchForStrategies } from "./youtube/strategies";
@@ -216,7 +216,21 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
   }
 
   static async expandShortenLink(url: string) {
+    // Only expand short links hosted by Spotify itself, and never follow
+    // links pointing at local/private destinations (SSRF protection).
+    let inputUrl: URL;
+    try {
+      inputUrl = new URL(url);
+    } catch {
+      return null;
+    }
+    if (inputUrl.hostname !== "spotify.link" || !isSafeRemoteUrl(url)) {
+      return null;
+    }
     const result = await candyget.empty(url);
+    if (!isSafeRemoteUrl(result.url.href)) {
+      return null;
+    }
     if (this.validatePlaylistUrl(result.url.href)) {
       return {
         type: "playlist" as const,
