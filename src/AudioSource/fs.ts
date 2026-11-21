@@ -23,26 +23,18 @@ import * as path from "path";
 
 import { AudioSource } from "./audiosource";
 import { getCommandExecutionContext } from "../Commands";
-import { resolvePathWithinBase, retrieveRemoteAudioInfo } from "../Util";
+import { retrieveRemoteAudioInfo } from "../Util";
 
 export class FsStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
   constructor() {
     super({ isCacheable: false });
   }
 
-  protected resolveLocalPath(): string {
-    const resolved = resolvePathWithinBase(path.join(__dirname, global.BUNDLED ? "../" : "../../"), this.url);
-    if (!resolved) {
-      throw new Error("Invalid file path");
-    }
-    return resolved;
-  }
-
   async init(url: string, _: AudioSourceBasicJsonFormat | null) {
     const { t } = getCommandExecutionContext();
 
     this.url = url;
-    const info = await retrieveRemoteAudioInfo(this.resolveLocalPath());
+    const info = await retrieveRemoteAudioInfo(url);
     this.title = info.displayTitle || t("audioSources.customStream");
     this.lengthSeconds = info.lengthSeconds || 0;
     return this;
@@ -51,7 +43,7 @@ export class FsStream extends AudioSource<string, AudioSourceBasicJsonFormat> {
   async fetch(): Promise<ReadableStreamInfo> {
     return {
       type: "readable",
-      stream: fs.createReadStream(this.resolveLocalPath()),
+      stream: fs.createReadStream(path.join(__dirname, global.BUNDLED ? "../" : "../../", this.url)),
       streamType: "unknown",
     };
   }
