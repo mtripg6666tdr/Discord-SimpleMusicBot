@@ -139,7 +139,7 @@ export class BinaryManager extends LogEmitter<{}> {
         },
       });
       const fileStream = result.body.pipe(fs.createWriteStream(this.binaryPath, {
-        mode: 0o755,
+        mode: 0o777,
       }));
       await Promise.all([
         pEvent(
@@ -171,41 +171,29 @@ export class BinaryManager extends LogEmitter<{}> {
           shell: false,
           windowsHide: true,
         });
-        const bufs: Buffer[] = [];
-        let settled = false;
-        const settleResolve = (value: string) => {
-          if (settled) return;
-          settled = true;
-          clearTimeout(timeout);
-          resolve(value);
-        };
-        const settleReject = (er: unknown) => {
-          if (settled) return;
-          settled = true;
-          clearTimeout(timeout);
-          reject(er);
-        };
-        const timeout = setTimeout(() => {
-          settleReject(new Error("Execution timed out"));
-          process.kill("SIGKILL");
-        }, 60 * 1000);
-        timeout.unref();
-        process.stdout.on("data", (chunk: Buffer) => bufs.push(chunk));
-        process.on("error", err => settleReject(err));
-        process.on("exit", code => {
-          if (code !== 0 && code !== null) {
-            settleReject(new Error(`Process exited with code ${code}`));
-            return;
-          }
-          settleResolve(
+        let bufs: Buffer[] = [];
+        let ended = false;
+        const onEnd = () => {
+          if (ended) return;
+          ended = true;
+          resolve(
             Buffer.concat(bufs).toString()
               .trim(),
           );
+          if (process.connected) {
+            process.kill("SIGTERM");
+          }
+        };
+        process.stdout.on("data", (chunk: Buffer) => bufs.push(chunk));
+        process.stdout.on("end", onEnd);
+        process.on("exit", onEnd);
+        process.stdout.on("error", err => {
+          bufs = null!;
+          reject(err);
         });
-        process.stdout.on("error", err => settleReject(err));
         process.stderr.on("data", (chunk: Buffer) => this.logger.info(`[Child] ${chunk.toString()}`));
         signal?.addEventListener("abort", () => {
-          settleReject("Aborted");
+          reject("Aborted");
           process.kill("SIGKILL");
         });
       } catch (e) {

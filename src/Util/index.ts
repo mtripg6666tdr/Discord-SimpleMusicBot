@@ -22,8 +22,6 @@ import type { Readable } from "stream";
 import { spawn } from "child_process";
 import { Agent as HttpAgent } from "http";
 import { Agent as HttpsAgent } from "https";
-import { isIP } from "net";
-import * as path from "path";
 import { PassThrough } from "stream";
 
 import candyget from "candyget";
@@ -124,124 +122,6 @@ const videoExtensions = [
   ".webm",
 ];
 type ResourceType = "none" | "audio" | "video";
-
-function parseIPv4Number(part: string): number | null {
-  if (/^0x[0-9a-f]+$/i.test(part)) {
-    return parseInt(part, 16);
-  } else if (/^0[0-7]+$/.test(part)) {
-    return parseInt(part, 8);
-  } else if (/^[0-9]+$/.test(part)) {
-    return parseInt(part, 10);
-  }
-  return null;
-}
-
-// Parses an IPv4 address in inet_aton notation (1 to 4 parts, decimal/octal/hex).
-function parseIPv4(hostname: string): number[] | null {
-  const parts = hostname.split(".");
-  if (parts.length > 4) {
-    return null;
-  }
-  const nums = parts.map(parseIPv4Number);
-  if (nums.some(n => n === null)) {
-    return null;
-  }
-  const values = nums as number[];
-  const last = values[values.length - 1];
-  if (values.slice(0, -1).some(n => n > 255) || last >= 256 ** (5 - values.length)) {
-    return null;
-  }
-  const octets = values.slice(0, -1);
-  const remaining = 4 - octets.length;
-  for (let i = remaining - 1; i >= 0; i--) {
-    octets.push(Math.floor(last / 256 ** i) % 256);
-  }
-  return octets;
-}
-
-function isNonPublicIPv4(octets: number[]): boolean {
-  const [a, b] = octets;
-  return a === 0
-    || a === 10
-    || a === 127
-    || (a === 100 && b >= 64 && b <= 127)
-    || (a === 169 && b === 254)
-    || (a === 172 && b >= 16 && b <= 31)
-    || (a === 192 && b === 168)
-    || a >= 240;
-}
-
-/**
- * リモートホストがローカル/プライベートな宛先かどうかを判定します（SSRF対策）。
- * ホスト名がプライベートIPへ解決されるケースまでは検出できないため、リテラルな宛先のみを対象とします。
- * @param hostname 検査対象のホスト名
- * @returns ローカル/プライベートな宛先であればtrue
- */
-export function isBlockedRemoteHost(hostname: string): boolean {
-  let host = hostname.trim().toLowerCase();
-  if (host.startsWith("[") && host.endsWith("]")) {
-    host = host.slice(1, -1);
-  }
-  if (host.endsWith(".")) {
-    host = host.slice(0, -1);
-  }
-  if (!host) {
-    return true;
-  }
-  if (
-    host === "localhost"
-    || host.endsWith(".localhost")
-    || host === "localdomain"
-    || host.endsWith(".localdomain")
-    || host.endsWith(".local")
-    || host.endsWith(".internal")
-    || host.endsWith(".home.arpa")
-  ) {
-    return true;
-  }
-  const ipv4 = parseIPv4(host);
-  if (ipv4) {
-    return isNonPublicIPv4(ipv4);
-  }
-  if (isIP(host) === 6) {
-    const v6 = host.split("%")[0];
-    if (v6 === "::" || v6 === "::1" || /^fe[89ab]/.test(v6) || /^f[cd]/.test(v6) || v6.startsWith("ff")) {
-      return true;
-    }
-    if (v6.startsWith("::ffff:")) {
-      const mapped = parseIPv4(v6.slice("::ffff:".length));
-      return mapped ? isNonPublicIPv4(mapped) : false;
-    }
-  }
-  return false;
-}
-
-/**
- * URLがhttp(s)であり、かつローカル/プライベートな宛先を指していないかを判定します（SSRF対策）。
- * @param url 検査対象のURL
- * @returns 安全なリモートURLであればtrue
- */
-export function isSafeRemoteUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return (parsed.protocol === "http:" || parsed.protocol === "https:") && !isBlockedRemoteHost(parsed.hostname);
-  } catch {
-    return false;
-  }
-}
-
-/**
- * baseDir配下に収まるようにtargetを解決します。配下に収まらない場合はnullを返します（パストラバーサル対策）。
- * @param baseDir 基底ディレクトリ
- * @param target 解決対象のパス
- * @returns 解決後の絶対パス、またはnull
- */
-export function resolvePathWithinBase(baseDir: string, target: string): string | null {
-  const base = path.resolve(baseDir);
-  const resolved = path.resolve(base, target);
-  return resolved === base || resolved.startsWith(base + path.sep) ? resolved : null;
-}
-
 /**
  * ローオーディオファイルのURLであるかどうかをURLの末尾の拡張子から判断します。
  * @param url 検査対象のURL
@@ -268,17 +148,12 @@ export function getResourceTypeFromUrl(url: string | null, { checkResponse = fal
     return "none";
   }
 
-  let urlObject: URL = null!;
-  try {
-    urlObject = new URL(url);
-  } catch {
-    return "none";
-  }
+  const urlObject = new URL(url);
 
   // check if the url has a valid protocol and if its pathname ends with a valid extension.
   const urlIsHttp = urlObject.protocol === "http:" || urlObject.protocol === "https:";
 
-  if (!urlIsHttp || isBlockedRemoteHost(urlObject.hostname)) {
+  if (!urlIsHttp) {
     return "none";
   }
 
@@ -415,24 +290,6 @@ function retrieveFFmpegStderrFromUrl(url: string, ffmpegPathGenerator: () => str
   return new Promise<string>((resolve, reject) => {
     const ffmpegPath = ffmpegPathGenerator();
     let data = "";
-    let settled = false;
-    const settleResolve = (value: string) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timeout);
-      resolve(value);
-    };
-    const settleReject = (er: unknown) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timeout);
-      reject(er);
-    };
-    const timeout = setTimeout(() => {
-      settleReject(new Error("FFmpeg timed out."));
-      proc.kill("SIGKILL");
-    }, 30 * 1000);
-    timeout.unref();
     const proc = spawn(ffmpegPath, [
       "-user_agent", DefaultUserAgent,
       "-i", url,
@@ -440,20 +297,14 @@ function retrieveFFmpegStderrFromUrl(url: string, ffmpegPathGenerator: () => str
       windowsHide: true,
       stdio: ["ignore", "ignore", "pipe"],
     })
-      .on("error", er => settleReject(er))
       .on("exit", () => {
         if (data.length === 0) {
-          settleReject(new Error("FFmpeg emit nothing."));
-          return;
+          reject(new Error("FFmpeg emit nothing."));
         }
 
-        settleResolve(data);
+        resolve(data);
       });
-    proc.stderr.on("data", chunk => {
-      if (data.length < 1024 * 1024) {
-        data += chunk;
-      }
-    });
+    proc.stderr.on("data", chunk => data += chunk);
   });
 }
 

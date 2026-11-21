@@ -51,15 +51,14 @@ export default class Queue extends BaseCommand {
     }
     // 合計所要時間の計算
     const totalLength = queue.lengthSecondsActual;
-    // 合計ページ数割り出し
-    const totalpage = Math.ceil(queue.length / 10);
-    // ユーザーの指定は1始まり、内部表現は0始まり
-    let _page = context.rawArgs === "" ? 0 : Number(context.rawArgs) - 1;
-    if (isNaN(_page)) _page = 0;
-    if (!Number.isInteger(_page) || _page < 0 || _page >= totalpage) {
+    let _page = context.rawArgs === "" ? 0 : Number(context.rawArgs);
+    if (isNaN(_page)) _page = 1;
+    if (queue.length > 0 && _page > Math.ceil(queue.length / 10)) {
       await message.reply(`:warning:${t("commands:queue.pageOutOfRange")}`).catch(this.logger.error);
       return;
     }
+    // 合計ページ数割り出し
+    const totalpage = Math.ceil(queue.length / 10);
 
     // ページのキューを割り出す
     const getQueueEmbed = (page: number) => {
@@ -119,7 +118,7 @@ export default class Queue extends BaseCommand {
       const pagenation = await context.bot.collectors
         .createPagenation()
         .setPages(getQueueEmbed, totalpage)
-        .send(message, _page);
+        .send(message);
       context.server.queue.eitherOnce(["change", "changeWithoutCurrent"], pagenation.destroy.bind(pagenation));
     } else {
       await message.reply({ content: "", embeds: [getQueueEmbed(_page)] }).catch(this.logger.error);

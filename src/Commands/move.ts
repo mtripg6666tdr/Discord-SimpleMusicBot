@@ -53,23 +53,18 @@ export default class Mv extends BaseCommand {
     if (context.args.length !== 2) {
       message.reply(`✘${t("commands:move.invalidArgumentCount")}`).catch(this.logger.error);
       return;
+    } else if (context.args.includes("0") && context.server.player.isPlaying) {
+      message.reply(`✘${t("commands:move.invalidIndex")}`).catch(this.logger.error);
+      return;
     }
 
     const from = Number(context.args[0]);
     const to = Number(context.args[1]);
     const q = context.server.queue;
 
-    if (!Number.isInteger(from) || !Number.isInteger(to)) {
-      message.reply(`✘${t("commands:move.indexOutOfRange")}`).catch(this.logger.error);
-      return;
-    } else if ((from === 0 || to === 0) && context.server.player.isPlaying) {
-      message.reply(`✘${t("commands:move.invalidIndex")}`).catch(this.logger.error);
-      return;
-    }
-
     if (
-      from >= 0 && from < q.length
-      && to >= 0 && to < q.length
+      from >= 0 && from <= q.length
+      && to >= 0 && to <= q.length
     ) {
       const title = q.get(from).basicInfo.title;
       if (from !== to) {

@@ -95,7 +95,6 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   protected _lastMember: string | null = null;
   protected _sleeptimerCurrentSong: boolean = false;
   protected _sleeptimerTimeout: NodeJS.Timeout | null = null;
-  protected _streamFailedRunning = false;
 
   get preparing() {
     return this._preparing;
@@ -202,84 +201,83 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
 
     let messageSendingScheduledAt: number | null = null;
     let message: DeferredMessage | Message | null = null;
-    try {
-      this._currentAudioInfo = this.server.queue.get(0).basicInfo;
 
-      const [min, sec] = Util.time.calcMinSec(this.currentAudioInfo!.lengthSeconds);
-      const isYT = this.currentAudioInfo!.isYouTube();
-      const isLive = isYT && this.currentAudioInfo.isLiveStream;
+    this._currentAudioInfo = this.server.queue.get(0).basicInfo;
 
-      if (isYT && this.currentAudioInfo.availableAfter) {
-        const waitTarget = this.currentAudioInfo;
-        // まだ始まっていないライブを待機する
-        message = (this.getNoticeNeeded() && !quiet && await this.server.bot.client.rest.channels.createMessage(
-          this.server.boundTextChannel,
-          {
-            content: `:stopwatch:${i18next.t("components:play.waitingForLiveStream", {
-              lng: this.server.locale,
-              title: this.currentAudioInfo.title,
-            })}`,
-          },
-        )) || null;
-        this.preparing = false;
-        const abortController = this._waitForLiveAbortController = new AbortController();
-        const onStopWhileWaiting = () => {
+    const [min, sec] = Util.time.calcMinSec(this.currentAudioInfo!.lengthSeconds);
+    const isYT = this.currentAudioInfo!.isYouTube();
+    const isLive = isYT && this.currentAudioInfo.isLiveStream;
+
+    if (isYT && this.currentAudioInfo.availableAfter) {
+      const waitTarget = this.currentAudioInfo;
+      // まだ始まっていないライブを待機する
+      message = (this.getNoticeNeeded() && !quiet && await this.server.bot.client.rest.channels.createMessage(
+        this.server.boundTextChannel,
+        {
+          content: `:stopwatch:${i18next.t("components:play.waitingForLiveStream", {
+            lng: this.server.locale,
+            title: this.currentAudioInfo.title,
+          })}`,
+        },
+      )) || null;
+      this.preparing = false;
+      const abortController = this._waitForLiveAbortController = new AbortController();
+      this.once("stop", () => {
+        abortController.abort();
+      });
+      await waitTarget.waitForLive(abortController.signal, () => {
+        if (waitTarget !== this._currentAudioInfo) {
           abortController.abort();
-        };
-        this.once("stop", onStopWhileWaiting);
-        await waitTarget.waitForLive(abortController.signal, () => {
-          if (waitTarget !== this._currentAudioInfo) {
-            abortController.abort();
-          }
-        });
-        this.off("stop", onStopWhileWaiting);
-        if (abortController.signal.aborted) {
-          this._waitForLiveAbortController = null;
-          const content = `:white_check_mark: ${i18next.t("components:play.waitingForLiveCanceled", { lng: this.server.locale })}`;
-
-          if (message) {
-            message.edit({ content }).catch(this.logger.error);
-          } else {
-            this.server.bot.client.rest.channels.createMessage(
-              this.server.boundTextChannel,
-              { content },
-            ).catch(this.logger.error);
-          }
-
-          return this;
         }
+      });
+      if (abortController.signal.aborted) {
         this._waitForLiveAbortController = null;
-        this.preparing = true;
-      } else if (this.getNoticeNeeded() && !quiet && this.server.preferences.nowPlayingNotificationLevel !== NowPlayingNotificationLevel.Disable) {
-        // 通知メッセージを送信する（可能なら）
-        message = DeferredMessage.create(
-          this.server.bot.client.getChannel<AnyTextableGuildChannel>(this.server.boundTextChannel)
-          || await this.server.bot.client.rest.channels.get<AnyTextableGuildChannel>(this.server.boundTextChannel),
-          2.5e3,
-          {
-            content: `:hourglass_flowing_sand:${
-              i18next.t("components:play.preparing", {
-                title: `\`${this.currentAudioInfo!.title}\` \`(${
-                  isLive ? i18next.t("liveStream", { lng: this.server.locale }) : `${min}:${sec}`
-                })\``,
-                lng: this.server.locale,
-              })
-            }...`,
-            flags: this.server.preferences.nowPlayingNotificationLevel === NowPlayingNotificationLevel.Silent
-              ? MessageFlags.SUPPRESS_NOTIFICATIONS
-              : 0,
-          },
-        )
-          .on("error", this.logger.error)
-          .on("debug", this.logger.debug);
-        messageSendingScheduledAt = Date.now();
+        const content = `:white_check_mark: ${i18next.t("components:play.waitingForLiveCanceled", { lng: this.server.locale })}`;
+
+        if (message) {
+          message.edit({ content }).catch(this.logger.error);
+        } else {
+          this.server.bot.client.rest.channels.createMessage(
+            this.server.boundTextChannel,
+            { content },
+          ).catch(this.logger.error);
+        }
+
+        return this;
       }
+      this._waitForLiveAbortController = null;
+      this.preparing = true;
+    } else if (this.getNoticeNeeded() && !quiet && this.server.preferences.nowPlayingNotificationLevel !== NowPlayingNotificationLevel.Disable) {
+      // 通知メッセージを送信する（可能なら）
+      message = DeferredMessage.create(
+        this.server.bot.client.getChannel<AnyTextableGuildChannel>(this.server.boundTextChannel)
+        || await this.server.bot.client.rest.channels.get<AnyTextableGuildChannel>(this.server.boundTextChannel),
+        2.5e3,
+        {
+          content: `:hourglass_flowing_sand:${
+            i18next.t("components:play.preparing", {
+              title: `\`${this.currentAudioInfo!.title}\` \`(${
+                isLive ? i18next.t("liveStream", { lng: this.server.locale }) : `${min}:${sec}`
+              })\``,
+              lng: this.server.locale,
+            })
+          }...`,
+          flags: this.server.preferences.nowPlayingNotificationLevel === NowPlayingNotificationLevel.Silent
+            ? MessageFlags.SUPPRESS_NOTIFICATIONS
+            : 0,
+        },
+      )
+        .on("error", this.logger.error)
+        .on("debug", this.logger.debug);
+      messageSendingScheduledAt = Date.now();
+    }
 
-      // エラーレポートチャンネルを決定しておく
-      this._errorReportChannel = (message?.channel as TextChannel | undefined)
-        || this.server.bot.client.getChannel<TextChannel>(this.server.boundTextChannel)
-        || await this.server.bot.client.rest.channels.get<TextChannel>(this.server.boundTextChannel);
+    // try...catchブロックに入る前に、エラーレポートチャンネルを決定しておく
+    this._errorReportChannel = (message?.channel as TextChannel | undefined)
+      || this.server.bot.client.getChannel<TextChannel>(this.server.boundTextChannel)
+      || await this.server.bot.client.rest.channels.get<TextChannel>(this.server.boundTextChannel);
 
+    try {
       // シーク位置を確認
       if (this.currentAudioInfo!.lengthSeconds <= time) time = 0;
       this._seek = time;
@@ -586,7 +584,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     if (config.debug) {
       this._player.on("debug", message => this.logger.trace(`[InternalAudioPlayer] ${message}`));
     }
-    this._player.on("error", er => this.handleError(er).catch(this.logger.error));
+    this._player.on("error", this.handleError.bind(this));
     this._player.on(AudioPlayerStatus.Idle, oldState => {
       if (oldState.status === AudioPlayerStatus.Playing) {
         this.emit(
@@ -705,8 +703,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   pause(lastMember?: Member): PlayManager {
     this.logger.info("Pause called");
     this.emit("pause");
-    if (!this._player) return this;
-    this._player.pause();
+    this._player!.pause();
     this._lastMember = lastMember?.id || null;
     return this;
   }
@@ -718,9 +715,8 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   resume(member?: Member): PlayManager {
     this.logger.info("Resume called");
     this.emit("resume");
-    if (!this._player) return this;
     if (!member || member.id === this._lastMember) {
-      this._player.unpause();
+      this._player!.unpause();
       this._lastMember = null;
     }
     return this;
@@ -758,7 +754,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
             ? i18next.t("components:play.failedAndSkipping", { lng: this.server.locale })
             : i18next.t("components:play.failedAndRetrying", { lng: this.server.locale })
         ),
-    }).catch(this.logger.error);
+    });
     await this.onStreamFailed();
   }
 
@@ -803,7 +799,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
     // スリープタイマーの処理
     if (this._sleeptimerCurrentSong) {
       if (!this.server.queue.loopEnabled && !this.server.queue.queueLoopEnabled) {
-        await this.server.queue.next().catch(this.logger.error);
+        await this.server.queue.next();
       }
 
       await this.sendSleepMessage();
@@ -821,7 +817,7 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
       await this.play();
     } else {
       // キュー整理
-      await this.server.queue.next().catch(this.logger.error);
+      await this.server.queue.next();
 
       // キューがなくなったら接続終了
       if (this.server.queue.isEmpty) {
@@ -873,8 +869,6 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
 
     const clearFinishTimeout = () => {
       clearTimeout(timer);
-      this.off("playCalled", clearFinishTimeout);
-      this.off("disconnectAttempt", clearFinishTimeout);
       this._finishTimeout = false;
     };
 
@@ -884,43 +878,30 @@ export class PlayManager extends ServerManagerBase<PlayManagerEvents> {
   }
 
   protected async onStreamFailed(quiet: boolean = false) {
-    if (this._streamFailedRunning) {
-      this.logger.warn("onStreamFailed is already running; skipping duplicated call");
-      return;
-    }
-    this._streamFailedRunning = true;
-    try {
-      this._playing = false;
-      this.logger.info("onStreamFailed called");
-      this.emit("playFailed");
-      this._cost = 0;
-      this.destroyStream();
-      // @ts-expect-error youtubeの場合の引数 いつか™型の整合性は治したい
-      this.currentAudioInfo!.purgeCache(true);
+    this._playing = false;
+    this.logger.info("onStreamFailed called");
+    this.emit("playFailed");
+    this._cost = 0;
+    this.destroyStream();
+    // @ts-expect-error youtubeの場合の引数 いつか™型の整合性は治したい
+    this.currentAudioInfo!.purgeCache(true);
 
-      if (this._errorUrl === this.currentAudioInfo!.url) {
-        this._errorCount++;
-      } else {
-        this._errorCount = 1;
-        this._errorUrl = this.currentAudioInfo!.url;
-      }
-
-      this.logger.warn(`Playback failed (${this._errorCount}times)`);
-      this.preparing = false;
-      await this.stop({ force: true }).catch(this.logger.error);
-      if (this._errorCount >= this.retryLimit) {
-        if (this.server.queue.loopEnabled) this.server.queue.loopEnabled = false;
-        if (this.server.queue.length === 1 && this.server.queue.queueLoopEnabled) this.server.queue.queueLoopEnabled = false;
-        await this.server.queue.next().catch(this.logger.error);
-        if (this.server.queue.isEmpty) {
-          await this.onQueueEmpty();
-          return;
-        }
-      }
-      await this.play({ quiet: quiet });
-    } finally {
-      this._streamFailedRunning = false;
+    if (this._errorUrl === this.currentAudioInfo!.url && !quiet) {
+      this._errorCount++;
+    } else {
+      this._errorCount = 1;
+      this._errorUrl = this.currentAudioInfo!.url;
     }
+
+    this.logger.warn(`Playback failed (${this._errorCount}times)`);
+    this.preparing = false;
+    this.stop({ force: true }).catch(this.logger.error);
+    if (this._errorCount >= this.retryLimit) {
+      if (this.server.queue.loopEnabled) this.server.queue.loopEnabled = false;
+      if (this.server.queue.length === 1 && this.server.queue.queueLoopEnabled) this.server.queue.queueLoopEnabled = false;
+      await this.server.queue.next();
+    }
+    await this.play({ quiet: quiet });
   }
 
   setSleepTimer(currentSong: boolean): void;

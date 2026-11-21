@@ -152,10 +152,9 @@ export function createRefreshableYTLiveStream(info: ytdl.videoInfo | distubeYtdl
         end: false,
       });
       logger.debug("piped new stream");
+      refreshing = false;
     } catch (e) {
       stream.destroy(e);
-    } finally {
-      refreshing = false;
     }
   };
 
@@ -166,16 +165,12 @@ export function createRefreshableYTLiveStream(info: ytdl.videoInfo | distubeYtdl
     autoDestroy: false,
   });
   setImmediate(async () => {
-    try {
-      currentStream = await downloadLiveStream(info);
-      currentStream.pipe(stream, {
-        end: false,
-      });
-      currentStream.on("error", onError);
-      setStreamNetworkTimeout(currentStream);
-    } catch (e) {
-      stream.destroy(e);
-    }
+    currentStream = await downloadLiveStream(info);
+    currentStream.pipe(stream, {
+      end: false,
+    });
+    currentStream.on("error", onError);
+    setStreamNetworkTimeout(currentStream);
   }).unref();
 
   // finalize the stream to prevent memory leaks

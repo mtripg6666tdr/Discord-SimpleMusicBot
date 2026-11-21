@@ -31,7 +31,7 @@ export default class Effect extends BaseCommand {
       alias: ["effect", "音声エフェクト", "音声効果", "効果"],
       unlist: false,
       category: "player",
-      requiredPermissionsOr: ["admin", "sameVc"],
+      requiredPermissionsOr: [],
       shouldDefer: false,
     });
   }

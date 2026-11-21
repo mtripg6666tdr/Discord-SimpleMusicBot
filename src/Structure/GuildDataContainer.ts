@@ -130,17 +130,11 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
   connectingVoiceChannel: VoiceChannel | StageChannel | null;
 
   get locale() {
-    const guild = this.bot.client.guilds.get(this.getGuildId());
-    if (!guild) {
-      return config.defaultLanguage;
-    }
+    const guild = this.bot.client.guilds.get(this.getGuildId())!;
 
     // try to get the locale from the roles assigned to the bot, if present.
     const localeRegex = /\[locale:(?<locale>[a-z]{0,2}(-[A-Z]{0,2})?)\]$/;
-    const localeRole = guild.clientMember.roles
-      .map(roleId => guild.roles.get(roleId)?.name)
-      .filter(role => !!role)
-      .find(role => localeRegex.test(role!));
+    const localeRole = guild.clientMember.roles.map(roleId => guild.roles.get(roleId)!.name).find(role => localeRegex.test(role));
     if (localeRole && discordLanguages.includes(localeRole.match(localeRegex)!.groups!.locale)) {
       return localeRole.match(localeRegex)!.groups!.locale;
     }
@@ -335,13 +329,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
     this.connectingVoiceChannel = targetChannel;
     if (this.connection === connection) return;
 
-    try {
-      await entersState(connection, VoiceConnectionStatus.Ready, 10e3);
-    } catch (er) {
-      connection.destroy();
-      this.connectingVoiceChannel = null;
-      throw er;
-    }
+    await entersState(connection, VoiceConnectionStatus.Ready, 10e3);
 
     const connectionLogger = getLogger("Connection", true);
     connectionLogger.addContext("id", this.getGuildId());
@@ -484,7 +472,7 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       const results: (QueueContent | null)[] = [];
 
       if (firstUrl) {
-        results.push(...await this.playFromUrl(message, firstUrl, { first, cancellable: false, privateSource }));
+        results.push(...await this.playFromUrl(message, firstUrl, { first, cancellable: false }));
 
         if (restUrls) {
           for (let i = 0; i < restUrls.length; i++) {
@@ -815,11 +803,9 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
       const embed = message.embeds[0];
 
       if (
-        embed && (
-          embed.color === Util.color.getColor("SONG_ADDED")
-          || embed.color === Util.color.getColor("AUTO_NP")
-          || embed.color === Util.color.getColor("NP")
-        )
+        embed.color === Util.color.getColor("SONG_ADDED")
+        || embed.color === Util.color.getColor("AUTO_NP")
+        || embed.color === Util.color.getColor("NP")
       ) {
         // 曲関連のメッセージならそれをキューに追加
         const url = embed.description?.match(/^\[.+\]\((?<url>https?.+)\)/)?.groups!.url;
@@ -903,26 +889,13 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
    * @param message ベースとなるコマンドメッセージ
    */
   async createSkipSession(message: CommandMessage) {
-    if (this._skipSession) {
-      this._skipSession.destroy();
-      this._skipSession = null;
-    }
-    const session = this._skipSession = new SkipSession(this);
+    this._skipSession = new SkipSession(this);
+    await this._skipSession.init(message);
     const destroy = () => {
-      this.queue.off("change", destroy);
-      this.player.off("disconnect", destroy);
-      session.destroy();
-      if (this._skipSession === session) {
-        this._skipSession = null;
-      }
+      this._skipSession?.destroy();
+      this._skipSession = null;
     };
     this.queue.once("change", destroy);
     this.player.once("disconnect", destroy);
-    try {
-      await session.init(message);
-    } catch (er) {
-      destroy();
-      throw er;
-    }
   }
 }

@@ -92,16 +92,6 @@ function search({ id, keyword }: WithId<SpawnerSearchMessage>) {
         return ytsr(keyword, searchOptions);
       })
       // @ts-ignore
-      .then(result => {
-        if (result) {
-          postMessage({
-            type: "searchOk",
-            data: result,
-            id,
-          });
-        }
-      })
-      // @ts-ignore
       .catch(err => {
         postMessage({
           type: "error",
