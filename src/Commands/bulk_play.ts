@@ -93,7 +93,7 @@ export default class BulkPlay extends BaseCommand {
           } else {
             const result = await searchYouTube(keyword);
             videos = (result.items as (ytsr.Item | dYtsr.Video)[]).filter(it => it.type === "video") as (ytsr.Video[] | dYtsr.Video[]);
-            context.bot.cache.search.add(context.rawArgs, videos);
+            context.bot.cache.search.add(keyword, videos);
           }
 
           if (videos.length === 0) {

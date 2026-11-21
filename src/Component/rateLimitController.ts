@@ -40,17 +40,19 @@ export class RateLimitController {
     if (isLimited) {
       if (timeSinceLastEvent < 2 * 1000) {
         store.push(Date.now());
+        if (!this.store.has(key)) this.store.set(key, store);
       }
       this.logger.info(`Key ${key} hit the ratelimit.`);
       return true;
     } else {
       store.push(Date.now());
+      if (!this.store.has(key)) this.store.set(key, store);
       return false;
     }
   }
 
   isLimited(key: string) {
-    if (!this.store) {
+    if (!this.store || !this.store.has(key)) {
       return false;
     }
 
@@ -69,13 +71,10 @@ export class RateLimitController {
     const now = Date.now();
 
     if (!this.store.has(key)) {
-      const store = [now];
-      this.store.set(key, store);
-
       return {
         isLimited: false,
         timeSinceLastEvent: null,
-        store: store,
+        store: [] as number[],
       };
     }
 
@@ -84,7 +83,12 @@ export class RateLimitController {
       if (sub < 10 * 1000) cnt10sec++;
       return sub < 60 * 1000;
     });
-    this.store.set(key, currentStore);
+    if (currentStore.length === 0) {
+      // 掃除の結果空になったキーはストアから削除する
+      this.store.delete(key);
+    } else {
+      this.store.set(key, currentStore);
+    }
 
     return {
       isLimited: currentStore.length > 15 || cnt10sec > 5,

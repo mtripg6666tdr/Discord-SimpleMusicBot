@@ -67,6 +67,8 @@ export abstract class baseYoutubeDlStrategy<T extends string> extends Strategy<C
     if (info.is_live) {
       const format = info.formats.filter(f => f.format_id === info.format_id);
 
+      if (format.length === 0) throw new Error("no format found!");
+
       return {
         ...partialResult,
         stream: {
@@ -112,7 +114,7 @@ export abstract class baseYoutubeDlStrategy<T extends string> extends Strategy<C
         stream: {
           type: "readable",
           stream: createFragmentalDownloadStream(format.url, {
-            contentLength: format.filesize,
+            contentLength: format.filesize ?? 0,
             userAgent: format.http_headers["User-Agent"],
           }),
           streamType:

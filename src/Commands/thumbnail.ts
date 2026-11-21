@@ -72,6 +72,7 @@ export default class Thumbnail extends BaseCommand {
         await message.reply({
           embeds: [embed.toOceanic()],
         }).catch(this.logger.error);
+        return;
       } else {
         embed.setImage(`attachment://thumbnail.${info.thumbnail.ext}`);
         await message.reply({
@@ -83,6 +84,7 @@ export default class Thumbnail extends BaseCommand {
             },
           ],
         }).catch(this.logger.error);
+        return;
       }
     } else {
       message.reply(`✘${t("commands:thumbnail.noSearchPanelFound")}`).catch(this.logger.error);
