@@ -434,8 +434,8 @@ function retrieveFFmpegStderrFromUrl(url: string, ffmpegPathGenerator: () => str
     }, 30 * 1000);
     timeout.unref();
     const proc = spawn(ffmpegPath, [
-      "-i", url,
       "-user_agent", DefaultUserAgent,
+      "-i", url,
     ], {
       windowsHide: true,
       stdio: ["ignore", "ignore", "pipe"],
