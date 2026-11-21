@@ -101,7 +101,7 @@ export abstract class StreamableApi {
    * @returns 動画のID
    */
   static getVideoId(url: string): string | null {
-    const match = url.match(/^https?:\/\/streamable.com\/(?<Id>.+)$/);
+    const match = url.match(/^https?:\/\/streamable.com\/(?<Id>[a-zA-Z0-9_-]+)\/?$/);
     if (match) {
       return match.groups?.Id || null;
     } else {
@@ -110,7 +110,7 @@ export abstract class StreamableApi {
   }
 
   static async getVideoDetails(id: string): Promise<StreamableAPIResult> {
-    return candyget.json(`https://api.streamable.com/videos/${id}`).then(({ body }) => body as StreamableAPIResult);
+    return candyget.json(`https://api.streamable.com/videos/${encodeURIComponent(id)}`).then(({ body }) => body as StreamableAPIResult);
   }
 }
 

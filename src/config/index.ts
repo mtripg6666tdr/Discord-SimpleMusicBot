@@ -125,14 +125,14 @@ class ConfigLoader {
     ) as unknown as ConfigObject;
     this._config.isBotAdmin = (userId: string) => {
       if (!this._config.adminId) {
-        return userId === "593758391395155978";
+        return false;
       }
       return typeof this._config.adminId === "string" ? this._config.adminId === userId : this._config.adminId.includes(userId);
     };
     this._config.isDisabledSource = (sourceIdentifer: AudioSourceTypeIdentifer) => {
       return this._config.disabledSources.includes(sourceIdentifer);
     };
-    this._config.isWhiteListedBot = (userId: string) => this._config.botWhiteList.includes(userId);
+    this._config.isWhiteListedBot = (userId: string) => this._config.botWhiteList?.includes(userId) ?? false;
     Object.freeze(this._config);
   }
 }
