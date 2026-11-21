@@ -64,7 +64,7 @@ export function createRefreshableYTLiveStream(info: VideoInfo, url: string, form
     if (typeof targetInfo === "string") {
       targetInfo = await getInfo(targetInfo);
       const { chooseFormat } = await loadYtdlCore();
-      format = chooseFormat(targetInfo.formats, { filter: f => f.isHLS });
+      format = chooseFormat(targetInfo.formats, { filter: f => f.hasAudio && f.isHLS });
     }
 
     return download(targetInfo, {

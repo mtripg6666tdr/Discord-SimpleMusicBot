@@ -89,7 +89,10 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, Vide
     const { chooseFormat, Quality } = await loadYtdlCore();
     const format = chooseFormat(info.formats, isLiveNow
       ? {
-        filter: (f) => !f.isHLS,
+        // For live streams, always pick an HLS format that carries audio.
+        // ytdl-core v5's chooseFormat defaults to the highest total bitrate,
+        // which would otherwise select a video-only format (e.g. itag 137).
+        filter: (f) => f.hasAudio && f.isHLS,
       }
       : {
         filter: { hasAudio: true, hasVideo: false },
