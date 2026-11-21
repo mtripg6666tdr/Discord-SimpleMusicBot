@@ -17,7 +17,7 @@
  */
 
 import type { AudioSourceBasicJsonFormat, StreamInfo } from "./audiosource";
-import type dYtsr from "@distube/ytsr";
+import type { YouTubeSearchVideoItem } from "./youtube/ytdlCore";
 import type { EmbedField } from "oceanic.js";
 import type { Track } from "spotify-url-info";
 
@@ -73,8 +73,8 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
 
       // extract videos that seem to be ok
       this.logger.debug("Extracting the valid item...");
-      const items = (searchResult.items as dYtsr.Video[])
-        .filter(({ type }) => type === "video") as dYtsr.Video[];
+      const items = (searchResult.items as YouTubeSearchVideoItem[])
+        .filter(({ type }) => type === "video") as YouTubeSearchVideoItem[];
       const target = this.extractBestItem(items);
 
       if (!target) throw new Error("Not Found");
@@ -94,7 +94,7 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
     return result.stream;
   }
 
-  protected extractBestItem(items: dYtsr.Video[]) {
+  protected extractBestItem(items: YouTubeSearchVideoItem[]) {
     this.logger.debug("result", items);
     const normalize = (text: string) => {
       return text.toLowerCase()
@@ -131,9 +131,9 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
     const validItems = items
       .map(item => {
         if ("name" in item) {
-          (item as dYtsr.Video & { title: string }).title = item.name;
+          (item as YouTubeSearchVideoItem & { title: string }).title = item.name;
         }
-        return item as dYtsr.Video & { title: string };
+        return item as YouTubeSearchVideoItem & { title: string };
       })
       .filter(validate);
     this.logger.debug("valid", validItems);

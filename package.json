@@ -19,9 +19,7 @@
   },
   "dependencies": {
     "@discordjs/voice": "^0.19.0",
-    "@distube/ytdl-core": "^4.16.12",
-    "@distube/ytpl": "^1.2.4",
-    "@distube/ytsr": "^2.0.4",
+    "@distube/ytdl-core": "^5.2.1",
     "@mtripg6666tdr/async-lock": "^1.1.0",
     "@mtripg6666tdr/oceanic-command-resolver": "~1.5.3",
     "@sinclair/typebox": "^0.34.41",

@@ -19,7 +19,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 
-import * as ytdl from "@distube/ytdl-core";
+import { getVideoID, validateURL } from "../AudioSource/youtube/ytdlCore";
 
 import { BaseCommand } from ".";
 
@@ -96,8 +96,8 @@ export default class Radio extends BaseCommand {
   }
 
   protected getVideoId(url: string) {
-    if (ytdl.validateURL(url)) {
-      return ytdl.getURLVideoID(url);
+    if (validateURL(url)) {
+      return getVideoID(url);
     } else {
       try {
         const urlObject = new URL(url);

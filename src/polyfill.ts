@@ -102,7 +102,6 @@ if (typeof File === "undefined") {
   if (require("buffer").File) {
     global.File = require("buffer").File;
   } else {
-    // @ts-expect-error The fallback File implementation does not fully satisfy the buffer.File type.
     global.File = class File extends Blob {
       name: string;
       lastModified: number;
@@ -122,12 +121,4 @@ if (polyfillCount > 0) {
   logger.warn("We strongly recommend you upgrading Node.js to v18 at least or higher.");
 }
 
-logger.debug("Patching @distube/ytdl-core to handle upcoming videos correctly.");
-const dYtdlUtils = require("@distube/ytdl-core/lib/utils");
-const originalPlayError = dYtdlUtils.playError;
-dYtdlUtils.playError = function playError(...args: any[]) {
-  if (args[0]?.playabilityStatus?.status === "LIVE_STREAM_OFFLINE") {
-    args[0].playabilityStatus.status += "_REPLACED";
-  }
-  return originalPlayError.apply(this, args);
-};
+// Note: the playability patch for @distube/ytdl-core v4 was removed, since v5 handles upcoming live streams natively (it reports them with a NOT_STARTED error carrying the scheduled start time).

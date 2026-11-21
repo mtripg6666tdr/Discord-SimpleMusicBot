@@ -17,7 +17,7 @@
  */
 
 import type { YouTubeJsonFormat } from "..";
-import type * as dYtsr from "@distube/ytsr";
+import type { YouTubeSearchResult } from "./ytdlCore";
 
 import * as crypto from "crypto";
 import * as path from "path";
@@ -69,7 +69,7 @@ export type WorkerGetInfoSuccessMessage = {
 };
 export type WorkerSearchSuccessMessage = {
   type: "searchOk",
-  data: dYtsr.VideoResult,
+  data: YouTubeSearchResult,
 };
 export type WorkerErrorMessage = {
   type: "error",

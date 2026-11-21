@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type dYtsr from "@distube/ytsr";
+import type { YouTubeSearchVideoItem } from "../../AudioSource/youtube/ytdlCore";
 
 import { BaseController } from "./baseController";
 
@@ -25,7 +25,7 @@ export class SearchCacheController extends BaseController {
     return "search";
   }
 
-  add(keyword: string, result: dYtsr.Video[]) {
+  add(keyword: string, result: YouTubeSearchVideoItem[]) {
     if (this.parent.enablePersistent) {
       this.utils.addPersistentCache(this.createCacheId(keyword.toLowerCase()), result).catch(this.logger.error);
     }
@@ -39,6 +39,6 @@ export class SearchCacheController extends BaseController {
   }
 
   get(keyword: string) {
-    return this.utils.getPersistentCache(this.createCacheId(keyword.toLowerCase())) as Promise<dYtsr.Video[]>;
+    return this.utils.getPersistentCache(this.createCacheId(keyword.toLowerCase())) as Promise<YouTubeSearchVideoItem[]>;
   }
 }

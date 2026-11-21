@@ -24,7 +24,7 @@ import type { ytdlCore } from "./strategies/ytdl-core";
 import type { EmbedField } from "oceanic.js";
 import type { InfoData } from "play-dl";
 
-import * as ytdl from "@distube/ytdl-core";
+import * as distubeYtdl from "./ytdlCore";
 
 import { attemptGetInfoForStrategies, attemptFetchForStrategies } from "./strategies";
 import { type youtubei } from "./strategies/baseYoutubeiStrategy";
@@ -112,21 +112,30 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
 
     // check if the video is upcoming
     if (result.cache?.data) {
-      if (
-        "videoDetails" in result.cache.data
-        && result.cache.data.videoDetails.liveBroadcastDetails
-        && result.cache.data.videoDetails.liveBroadcastDetails.startTimestamp
-        && !result.cache.data.videoDetails.liveBroadcastDetails.isLiveNow
-        && !result.cache.data.videoDetails.liveBroadcastDetails.endTimestamp
-      ) {
-        this.upcomingTimestamp = result.cache.data.videoDetails.liveBroadcastDetails.startTimestamp;
+      const cacheData = result.cache.data as any;
+      if (cacheData.videoDetails?.isUpcoming) {
+        // @distube/ytdl-core v5 carries no structured upcoming timestamp in
+        // its video details, so read the scheduled start time from the raw
+        // player response instead.
+        const scheduledStartTime = cacheData.playerResponse
+          ?.playabilityStatus?.liveStreamability?.liveStreamabilityRenderer
+          ?.offlineSlate?.liveStreamOfflineSlateRenderer?.scheduledStartTime;
+        this.upcomingTimestamp = scheduledStartTime
+          ? new Date(Number(scheduledStartTime) * 1000).toISOString()
+          : null;
       } else if (
-        "LiveStreamData" in result.cache.data
-        && result.cache.data.LiveStreamData.isLive
-        && result.cache.data.video_details.upcoming
-        && typeof result.cache.data.video_details.upcoming === "object"
+        cacheData.videoDetails?.liveBroadcastDetails
+        && cacheData.videoDetails.liveBroadcastDetails.startTimestamp
+        && !cacheData.videoDetails.liveBroadcastDetails.isLiveNow
+        && !cacheData.videoDetails.liveBroadcastDetails.endTimestamp
       ) {
-        this.upcomingTimestamp = result.cache.data.video_details.upcoming.toISOString();
+        this.upcomingTimestamp = cacheData.videoDetails.liveBroadcastDetails.startTimestamp;
+      } else if (
+        cacheData.LiveStreamData?.isLive
+        && cacheData.video_details?.upcoming
+        && typeof cacheData.video_details.upcoming === "object"
+      ) {
+        this.upcomingTimestamp = cacheData.video_details.upcoming.toISOString();
       } else {
         this.upcomingTimestamp = null;
       }
@@ -187,13 +196,23 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     const youtubei: youtubei = "youtubei";
 
     if (this.cache?.data.type === ytdlCore || this.cache?.data.type === distubeYtdlCore) {
-      const info = this.cache.data.data as ytdl.videoInfo;
-      const isLive = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow;
-      const format = ytdl.chooseFormat(info.formats, {
-        quality: isLive ? null : "highestvideo",
-        isHLS: isLive,
-      } as ytdl.chooseFormatOptions);
-      const { url } = format;
+      const info = this.cache.data.data as distubeYtdl.VideoInfo;
+      const isLive = !!(info.videoDetails.isLive && !info.videoDetails.isUpcoming);
+      const { chooseFormat, Quality } = await distubeYtdl.loadYtdlCore();
+      const format = chooseFormat(info.formats, isLive
+        ? {
+          filter: f => f.isHLS,
+        }
+        : {
+          quality: Quality.HighestVideo,
+          filter: f => !f.isHLS,
+        });
+      const url = format.url ?? (isLive ? info.hlsManifestUrl : undefined);
+
+      if (!url) {
+        throw new Error("No url found.");
+      }
+
       return {
         url,
         ua: SecondaryUserAgent,
@@ -325,19 +344,19 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
   private static readonly youtubeLiveUrlRegExp = /^https?:\/\/(www\.)?youtube\.com\/live\/(?<id>[a-zA-Z0-9-_]{11})([?#].*)?$/;
 
   static validateURL(url: string): boolean {
-    return ytdl.validateURL(url) || this.youtubeLiveUrlRegExp.test(url);
+    return distubeYtdl.validateURL(url) || this.youtubeLiveUrlRegExp.test(url);
   }
 
   static getVideoID(url: string): string {
     if (this.youtubeLiveUrlRegExp.test(url)) {
       const id = this.youtubeLiveUrlRegExp.exec(url)?.groups?.id;
 
-      if (id && ytdl.validateID(id)) {
+      if (id && distubeYtdl.validateID(id)) {
         return id;
       }
     }
 
-    return ytdl.getVideoID(url);
+    return distubeYtdl.getVideoID(url);
   }
 
   static normalizeUrl(url: string) {

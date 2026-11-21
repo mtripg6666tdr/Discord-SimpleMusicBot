@@ -19,7 +19,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 
-import * as ytdl from "@distube/ytdl-core";
+import { getVideoID } from "../AudioSource/youtube/ytdlCore";
 import { FFmpeg } from "prism-media";
 
 import { BaseCommand } from ".";
@@ -94,7 +94,7 @@ export default class Frame extends BaseCommand {
         content: "",
         files: [
           {
-            name: `capture_${ytdl.getVideoID(vinfo.url)}-${hour}${min}${sec}.png`,
+            name: `capture_${getVideoID(vinfo.url)}-${hour}${min}${sec}.png`,
             contents: frame,
           },
         ],

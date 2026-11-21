@@ -18,7 +18,7 @@
 
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
-import type * as dYtsr from "@distube/ytsr";
+import type { YouTubeSearchVideoItem } from "../AudioSource/youtube/ytdlCore";
 
 import { BaseCommand } from ".";
 import { searchYouTube } from "../AudioSource";
@@ -85,13 +85,13 @@ export default class BulkPlay extends BaseCommand {
             return keyword;
           }
 
-          let videos: dYtsr.Video[] = null!;
+          let videos: YouTubeSearchVideoItem[] = null!;
 
           if (context.bot.cache.search.has(keyword)) {
             videos = await context.bot.cache.search.get(keyword);
           } else {
             const result = await searchYouTube(keyword);
-            videos = (result.items as dYtsr.Video[]).filter(it => it.type === "video");
+            videos = (result.items as YouTubeSearchVideoItem[]).filter(it => it.type === "video");
             context.bot.cache.search.add(keyword, videos);
           }
 

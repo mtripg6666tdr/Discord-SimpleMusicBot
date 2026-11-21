@@ -16,14 +16,18 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import ytpl from "@distube/ytpl";
+import type { PlaylistInfo } from "./ytdlCore";
 
-import { getConfig } from "../../config";
-const config = getConfig();
-const playlistSearchOptions = {
-  gl: config.country,
-  hl: config.defaultLanguage,
-} as const satisfies import("@distube/ytpl").options;
+import { formatDuration, getPlaylist, resolvePlaylistTarget } from "./ytdlCore";
+
+export type PlaylistOptions = {
+  limit?: number,
+  // Accepted for compatibility with the previous @distube/ytpl-based
+  // implementation, but no longer used: @distube/ytdl-core v5 only supports
+  // a region (set globally via the config) and returns English metadata.
+  gl?: string,
+  hl?: string,
+};
 
 type GetPlaylistResult = {
   title: string,
@@ -42,47 +46,40 @@ type GetPlaylistResult = {
   }[],
 };
 
-export function Playlist(id: string, options: import("@distube/ytpl").options & Record<string & {}, any> = {}): Promise<GetPlaylistResult> {
-  return ytpl(id, { ...playlistSearchOptions, ...options }).then(resolveDYtplToResult);
+export function Playlist(id: string, options: PlaylistOptions & Record<string & {}, any> = {}): Promise<GetPlaylistResult> {
+  return getPlaylist(id, { limit: options.limit }).then(resolveToResult);
 }
 
 Playlist.validateID = function validateID(url: string) {
-  return ytpl.validateID(url);
+  return resolvePlaylistTarget(url) !== undefined;
 };
 
 Playlist.getPlaylistID = function getPlaylistID(url: string) {
-  return ytpl.getPlaylistID(url);
-};
-
-function resolveDYtplToResult(result: import("@distube/ytpl").result): GetPlaylistResult {
-  let thumbnailUrl: string | null = null;
-
-  if ("thumbnail" in result) {
-    const thumbnail = result.thumbnail as any;
-
-    if (typeof thumbnail?.url === "string") {
-      thumbnailUrl = thumbnail.url;
-    }
+  const target = resolvePlaylistTarget(url);
+  if (target === undefined) {
+    throw new Error("Failed to extract the playlist ID.");
   }
 
+  return target;
+};
+
+function resolveToResult(result: PlaylistInfo): GetPlaylistResult {
   return {
-    title: result.title,
-    // @ts-expect-error @distube/ytpl is missing 'estimatedItemCount' typing
-    itemCount: result.total_items || result.estimatedItemCount,
-    visibility: result.visibility === "everyone" ? "public" : "unlisted",
+    title: result.title || "",
+    itemCount: result.videoCount ?? result.videos.length,
+    // @distube/ytdl-core v5 does not expose the visibility of a playlist;
+    // report it as public, as with most playlists.
+    visibility: "public",
     url: result.url,
-    thumbnailUrl,
-    items: result.items.map(item => ({
+    thumbnailUrl: result.thumbnails[0]?.url ?? null,
+    items: result.videos.map(item => ({
       url: item.url,
       title: item.title,
-      author: item.author?.name || "unknown",
-      // @ts-expect-error @distube/ytpl is missing 'isLive' typing
+      author: item.author.name || "unknown",
       isLive: item.isLive,
-      duration: item.duration
-        ?.split(":")
-        .reduce((p, c) => p * 60 + Number(c), 0) || 0,
-      durationText: item.duration || "0",
-      thumbnail: item.thumbnail,
+      duration: item.lengthSeconds ?? 0,
+      durationText: formatDuration(item.lengthSeconds),
+      thumbnail: item.thumbnails[0]?.url ?? null,
     })),
   };
 }

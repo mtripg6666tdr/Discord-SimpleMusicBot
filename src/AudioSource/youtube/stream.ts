@@ -16,24 +16,23 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { IncomingMessage } from "http";
 import type { Readable } from "stream";
 
-import * as distubeYtdl from "@distube/ytdl-core";
+import type { VideoFormat, VideoInfo } from "./ytdlCore";
 
 import { createFragmentalDownloadStream, createPassThrough } from "../../Util";
 import { getLogger } from "../../logger";
+import { download, getInfo, loadYtdlCore } from "./ytdlCore";
 
 const logger = getLogger("AudioSource:YouTubeStream");
 
 export function createChunkedDistubeYTStream(
-  info: distubeYtdl.videoInfo,
-  format: distubeYtdl.videoFormat,
-  options: distubeYtdl.downloadOptions,
+  info: VideoInfo,
+  format: VideoFormat,
   chunkSize: number = 8 * 1024 * 1024, // 8MB
 ) {
   const refreshInfo = async () => {
-    info = await distubeYtdl.getInfo(info.videoDetails.video_url);
+    info = await getInfo(info.videoDetails.url);
 
     const newFormat = info.formats.find(f => f.itag === format.itag);
     if (!newFormat) {
@@ -47,7 +46,7 @@ export function createChunkedDistubeYTStream(
   const stream = createFragmentalDownloadStream(
     async (start, end) => {
       await refreshInfo();
-      return distubeYtdl.downloadFromInfo(info, { format, ...options, range: { start, end }, dlChunkSize: 0 });
+      return download(info, { format, range: { start, end } });
     },
     {
       chunkSize,
@@ -59,31 +58,19 @@ export function createChunkedDistubeYTStream(
   return stream;
 }
 
-export function createRefreshableYTLiveStream(info: distubeYtdl.videoInfo, url: string, options: distubeYtdl.downloadOptions) {
-  // set timeout to any miniget stream
-  const setStreamNetworkTimeout = (_stream: Readable) => {
-    _stream.on("response", (message: IncomingMessage) => {
-      message.setTimeout(4000, () => {
-        logger.info("Segment timed out; retrying...");
-        const er = new Error("ENOTFOUND");
-        Object.defineProperty(er, "type", {
-          value: "workaround",
-        });
-        message.destroy(er);
-      });
-    });
-  };
-
+export function createRefreshableYTLiveStream(info: VideoInfo, url: string, format: VideoFormat) {
   // start to download the live stream from the provided information (info object or url string)
-  const downloadLiveStream = async (targetInfo: distubeYtdl.videoInfo | string) => {
+  const downloadLiveStream = async (targetInfo: VideoInfo | string) => {
     if (typeof targetInfo === "string") {
-      targetInfo = await distubeYtdl.getInfo(targetInfo);
-      options.format = distubeYtdl.chooseFormat(targetInfo.formats, { isHLS: true } as distubeYtdl.chooseFormatOptions);
+      targetInfo = await getInfo(targetInfo);
+      const { chooseFormat } = await loadYtdlCore();
+      format = chooseFormat(targetInfo.formats, { filter: f => f.isHLS });
     }
 
-    return distubeYtdl.downloadFromInfo(targetInfo, Object.assign({
+    return download(targetInfo, {
+      format,
       liveBuffer: 10000,
-    }, options));
+    });
   };
 
   // handle errors occurred by the current live stream
@@ -116,7 +103,6 @@ export function createRefreshableYTLiveStream(info: distubeYtdl.videoInfo, url: 
       logger.debug("preparing new stream");
       const newStream = await downloadLiveStream(url);
       newStream.on("error", onError);
-      setStreamNetworkTimeout(newStream);
       // wait until the stream is ready
       await new Promise((resolve, reject) => newStream.once("readable", resolve).once("error", reject));
       destroyCurrentStream();
@@ -145,7 +131,6 @@ export function createRefreshableYTLiveStream(info: distubeYtdl.videoInfo, url: 
         end: false,
       });
       currentStream.on("error", onError);
-      setStreamNetworkTimeout(currentStream);
     } catch (e) {
       stream.destroy(e);
     }
