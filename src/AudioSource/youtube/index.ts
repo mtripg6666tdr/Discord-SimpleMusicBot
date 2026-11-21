@@ -322,7 +322,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     });
   }
 
-  private static readonly youtubeLiveUrlRegExp = /^https?:\/\/(www\.)?youtube\.com\/live\/(?<id>[a-zA-Z0-9-_]{11})$/;
+  private static readonly youtubeLiveUrlRegExp = /^https?:\/\/(www\.)?youtube\.com\/live\/(?<id>[a-zA-Z0-9-_]{11})([?#].*)?$/;
 
   static validateURL(url: string): boolean {
     return ytdl.validateURL(url) || this.youtubeLiveUrlRegExp.test(url);
