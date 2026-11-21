@@ -5,8 +5,8 @@
 
 <img alt="exemple d'utilisation de bot" src="https://user-images.githubusercontent.com/56076195/218059644-2ebdf405-b9f8-4561-a3cc-2bcecf09f145.png" width="550" />
 
-Discord向けの、シンプルな音楽ボット。YouTubeなどからの再生に対応。 選曲はキーワードで可能なので、URLを控える必要はありません。  
-Avec ce bot OSS, profitons tous de la musique sur le canal vocal dès maintenant.  
+Discord向けの、シンプルな音楽ボット。 YouTubeなどからの再生に対応。 選曲はキーワードで可能なので、URLを控える必要はありません。   
+Avec ce bot OSS, profitons tous de la musique sur le canal vocal dès maintenant.   
 Vous pouvez essayer le bot à partir du serveur d'assistance répertorié ci-dessous.
 
 ## 特長
@@ -55,7 +55,7 @@ Vous pouvez voir comment configurer le bot, les commandes, etc. ici.
 機能追加のご要望も、Issue や下記のサポートサーバーを通して受け付けております。 しかしながら、上の理由により実装時期が全く保証できない状況です。大変申し訳ございませんが、予めご了承ください。
 
 ## À propos de la localisation
-Le projet est multilingue avec Crowdin.ボットの翻訳に協力してくださる方と、日本語か英語を話せる校正者の方を随時募集しています。  
+Le projet est multilingue avec Crowdin.ボットの翻訳に協力してくださる方と、日本語か英語を話せる校正者の方を随時募集しています。   
 翻訳元の言語は日本語です。翻訳先の言語は以下の通りです。
 * アメリカ英語
 * イギリス英語(READMEは除く)
