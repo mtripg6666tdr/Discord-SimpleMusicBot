@@ -33,8 +33,6 @@ export class AudioBinaryCacheController extends BaseController {
 
   constructor(parent: CacheController, utils: CacheControllerSharedUtils) {
     super(parent, utils);
-
-    this.utils.cleanupCacheKeyEndsWith(".enc").catch(this.logger.error);
   }
 
   teeStream(url: string, streamInfo: StreamInfo, audioSource?: AudioSource<any, any>): StreamInfo {
