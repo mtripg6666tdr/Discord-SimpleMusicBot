@@ -193,7 +193,7 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
     this.referenceUrl = null;
   }
 
-  protected static readonly validateTrackUrlRegExp = /^https?:\/\/open\.spotify\.com\/(intl-[a-z]{2}\/)?track\/([a-zA-Z0-9]+)(\?.*)?$/;
+  protected static readonly validateTrackUrlRegExp = /^https?:\/\/open\.spotify\.com\/(intl-[a-z]{2}(-[A-Z]{2})?\/)?track\/([a-zA-Z0-9]+)(\?.*)?$/;
   static validateTrackUrl(url: string): boolean {
     return this.validateTrackUrlRegExp.test(url);
   }
@@ -204,7 +204,7 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
   }
 
   static formatUrl(url: string): string {
-    return url.replace(/intl-[a-z]{2}\//, "");
+    return url.replace(/intl-[a-z]{2}(-[A-Z]{2})?\//, "");
   }
 
   static getTrackUrl(uri: string) {
