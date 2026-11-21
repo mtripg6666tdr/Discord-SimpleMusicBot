@@ -137,7 +137,7 @@ export class Pagenation extends InteractionCollector<PagenationEvents> {
       if (res instanceof Promise) {
         return res.then(embed => this._embeds![page] = embed);
       } else {
-        return this._embeds[page] = this._embedsResolvable(page) as EmbedOptions;
+        return this._embeds[page] = res as EmbedOptions;
       }
     }
   }
