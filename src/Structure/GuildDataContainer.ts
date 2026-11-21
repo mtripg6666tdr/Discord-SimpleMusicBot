@@ -137,7 +137,10 @@ export class GuildDataContainer extends LogEmitter<GuildDataContainerEvents> {
 
     // try to get the locale from the roles assigned to the bot, if present.
     const localeRegex = /\[locale:(?<locale>[a-z]{0,2}(-[A-Z]{0,2})?)\]$/;
-    const localeRole = guild.clientMember.roles.map(roleId => guild.roles.get(roleId)?.name).filter(role => !!role).find(role => localeRegex.test(role!));
+    const localeRole = guild.clientMember.roles
+      .map(roleId => guild.roles.get(roleId)?.name)
+      .filter(role => !!role)
+      .find(role => localeRegex.test(role!));
     if (localeRole && discordLanguages.includes(localeRole.match(localeRegex)!.groups!.locale)) {
       return localeRole.match(localeRegex)!.groups!.locale;
     }
