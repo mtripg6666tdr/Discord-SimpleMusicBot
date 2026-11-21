@@ -76,7 +76,10 @@ export class MusicBot extends MusicBotBase {
             "GUILD_VOICE_STATES",
             "MESSAGE_CONTENT",
           ],
-        compress: requireIfAny("zlib-sync") || requireIfAny("pako") ? "zlib-stream" : false,
+        // NOTE: do not fall back to pako. The pako-based decompression in
+        // oceanic 1.14 corrupts gateway payloads in some environments, so
+        // compression is enabled only when zlib-sync is available.
+        compress: requireIfAny("zlib-sync") ? "zlib-stream" : false,
       },
     });
 
