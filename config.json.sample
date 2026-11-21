@@ -13,7 +13,7 @@
   "maintenance": false,
 
   // エラーログを送信するテキストチャンネルのID、なければnull
-  "errorChannel": "",
+  "errorChannel": null,
 
   // デフォルトプレフィックス。複数文字も可。省略されたりnullなら`>`
   "prefix": ">",
@@ -35,7 +35,7 @@
   "alwaysTwentyFourSeven": false,
 
   // キャッシュレベルの設定。"memory"か"persistent"を設定します。詳細はドキュメントをご覧ください。
-  "cacheLevel": "",
+  "cacheLevel": "memory",
 
   // キャッシュの最大容量(MB単位)
   "cacheLimit": 500,
