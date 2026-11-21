@@ -21,13 +21,12 @@ import type { Cache, StrategyFetchResult } from "./base";
 import type { ReadableStreamInfo, StreamInfo, UrlStreamInfo } from "../../audiosource";
 import type { Readable } from "stream";
 
-import { HttpsProxyAgent } from "https-proxy-agent";
-import * as ytdl from "ytdl-core";
+import * as ytdl from "@distube/ytdl-core";
 
 import { Strategy } from "./base";
 import { getConfig } from "../../../config";
 import { SecondaryUserAgent } from "../../../definition";
-import { createChunkedYTStream, createRefreshableYTLiveStream } from "../stream";
+import { createChunkedDistubeYTStream, createRefreshableYTLiveStream } from "../stream";
 
 export type ytdlCore = "ytdlCore";
 export const ytdlCore: ytdlCore = "ytdlCore";
@@ -37,7 +36,7 @@ const config = getConfig();
 type ytdlCoreCache = Cache<ytdlCore, ytdl.videoInfo>;
 
 export class ytdlCoreStrategy extends Strategy<ytdlCoreCache, ytdl.videoInfo> {
-  protected agent = config.proxy ? new HttpsProxyAgent(config.proxy) : undefined;
+  protected agent = config.proxy ? ytdl.createProxyAgent({ uri: config.proxy }) : undefined;
 
   get cacheType() {
     return ytdlCore;
@@ -46,11 +45,9 @@ export class ytdlCoreStrategy extends Strategy<ytdlCoreCache, ytdl.videoInfo> {
   async getInfo(url: string) {
     this.logStrategyUsed();
 
-    const requestOptions = this.agent ? { agent: this.agent } : undefined;
-
     const info = await ytdl.getInfo(url, {
       lang: "ja",
-      requestOptions,
+      agent: this.agent,
     });
     return {
       data: this.mapToExportable(url, info),
@@ -120,7 +117,7 @@ export class ytdlCoreStrategy extends Strategy<ytdlCoreCache, ytdl.videoInfo> {
     } else {
       const readable: Readable = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow
         ? createRefreshableYTLiveStream(info, url, { format, lang: config.defaultLanguage })
-        : createChunkedYTStream(info, format, { lang: config.defaultLanguage }, 1 * 1024 * 1024);
+        : createChunkedDistubeYTStream(info, format, { lang: config.defaultLanguage }, 1 * 1024 * 1024);
 
       return {
         ...partialResult,

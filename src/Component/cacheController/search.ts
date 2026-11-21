@@ -17,7 +17,6 @@
  */
 
 import type dYtsr from "@distube/ytsr";
-import type ytsr from "ytsr";
 
 import { BaseController } from "./baseController";
 
@@ -26,7 +25,7 @@ export class SearchCacheController extends BaseController {
     return "search";
   }
 
-  add(keyword: string, result: ytsr.Video[] | dYtsr.Video[]) {
+  add(keyword: string, result: dYtsr.Video[]) {
     if (this.parent.enablePersistent) {
       this.utils.addPersistentCache(this.createCacheId(keyword.toLowerCase()), result).catch(this.logger.error);
     }
@@ -40,6 +39,6 @@ export class SearchCacheController extends BaseController {
   }
 
   get(keyword: string) {
-    return this.utils.getPersistentCache(this.createCacheId(keyword.toLowerCase())) as Promise<ytsr.Video[]>;
+    return this.utils.getPersistentCache(this.createCacheId(keyword.toLowerCase())) as Promise<dYtsr.Video[]>;
   }
 }

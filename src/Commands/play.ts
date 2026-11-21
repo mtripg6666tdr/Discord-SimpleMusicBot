@@ -19,7 +19,6 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type * as dYtsr from "@distube/ytsr";
-import type * as ytsr from "ytsr";
 
 import { ApplicationCommandTypes } from "oceanic.js";
 
@@ -101,13 +100,13 @@ export default class Play extends BaseCommand {
         });
 
         try {
-          let videos: ytsr.Video[] | dYtsr.Video[] = null!;
+          let videos: dYtsr.Video[] = null!;
 
           if (context.bot.cache.search.has(context.rawArgs)) {
             videos = await context.bot.cache.search.get(context.rawArgs);
           } else {
             const result = await searchYouTube(context.rawArgs);
-            videos = (result.items as (ytsr.Item | dYtsr.Video)[]).filter(it => it.type === "video") as (ytsr.Video[] | dYtsr.Video[]);
+            videos = (result.items as dYtsr.Video[]).filter(it => it.type === "video");
             context.bot.cache.search.add(context.rawArgs, videos);
           }
 

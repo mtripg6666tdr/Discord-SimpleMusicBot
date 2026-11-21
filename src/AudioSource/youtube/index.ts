@@ -24,7 +24,7 @@ import type { ytdlCore } from "./strategies/ytdl-core";
 import type { EmbedField } from "oceanic.js";
 import type { InfoData } from "play-dl";
 
-import * as ytdl from "ytdl-core";
+import * as ytdl from "@distube/ytdl-core";
 
 import { attemptGetInfoForStrategies, attemptFetchForStrategies } from "./strategies";
 import { type youtubei } from "./strategies/baseYoutubeiStrategy";

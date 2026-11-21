@@ -20,7 +20,6 @@ import type { AudioSourceBasicJsonFormat, StreamInfo } from "./audiosource";
 import type dYtsr from "@distube/ytsr";
 import type { EmbedField } from "oceanic.js";
 import type { Track } from "spotify-url-info";
-import type ytsr from "ytsr";
 
 import candyget from "candyget";
 import spotifyUrlInfo from "spotify-url-info";
@@ -74,8 +73,8 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
 
       // extract videos that seem to be ok
       this.logger.debug("Extracting the valid item...");
-      const items = (searchResult.items as (ytsr.Item | dYtsr.Video)[])
-        .filter(({ type }) => type === "video") as (ytsr.Video | dYtsr.Video)[];
+      const items = (searchResult.items as dYtsr.Video[])
+        .filter(({ type }) => type === "video") as dYtsr.Video[];
       const target = this.extractBestItem(items);
 
       if (!target) throw new Error("Not Found");
@@ -95,7 +94,7 @@ export class Spotify extends AudioSource<string, SpotifyJsonFormat> {
     return result.stream;
   }
 
-  protected extractBestItem(items: (ytsr.Video | dYtsr.Video)[]) {
+  protected extractBestItem(items: dYtsr.Video[]) {
     this.logger.debug("result", items);
     const normalize = (text: string) => {
       return text.toLowerCase()

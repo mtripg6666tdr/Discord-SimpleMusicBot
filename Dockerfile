@@ -35,18 +35,6 @@ RUN --mount=type=cache,target=/root/.npm \
     npm ci --omit=dev
 
 
-FROM base AS misc_deps
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && \
-    apt-get install -y --no-install-recommends curl lbzip2
-WORKDIR /app
-# Use custom mirror for PhantomJS to reduce the build time
-# Original location: https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2
-RUN curl -Lo phantomjs.tar.bz2 https://static-objects.usamyon.moe/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2 && \
-    tar -xf phantomjs.tar.bz2 && \
-    mv phantomjs-2.1.1-linux-x86_64 phantomjs
-
-
 FROM base AS runner
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
@@ -56,7 +44,6 @@ WORKDIR /app
 ENV OPENSSL_CONF=/dev/null
 RUN mkdir logs && \
     echo DOCKER_BUILD_IMAGE>DOCKER_BUILD_IMAGE
-COPY --link --from=misc_deps /app/phantomjs/bin/phantomjs /usr/local/bin/phantomjs
 COPY --link ./lib ./lib
 COPY --link ./locales ./locales
 COPY --link package.json package-lock.json ./

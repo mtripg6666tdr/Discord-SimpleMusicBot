@@ -16,17 +16,14 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import ytpl from "ytpl";
+import ytpl from "@distube/ytpl";
 
-import { requireIfAny } from "../../Util";
 import { getConfig } from "../../config";
-const dYtpl = requireIfAny("@distube/ytpl") as typeof import("@distube/ytpl");
-
 const config = getConfig();
 const playlistSearchOptions = {
   gl: config.country,
   hl: config.defaultLanguage,
-} as const satisfies ytpl.Options;
+} as const satisfies import("@distube/ytpl").options;
 
 type GetPlaylistResult = {
   title: string,
@@ -45,16 +42,8 @@ type GetPlaylistResult = {
   }[],
 };
 
-export function Playlist(id: string, options: ytpl.Options & Record<string & {}, any> = {}): Promise<GetPlaylistResult> {
-  if (dYtpl) {
-    return dYtpl(id, { ...playlistSearchOptions, ...options })
-      .then(resolveDYtplToResult)
-      .catch(() => {
-        return ytpl(id, { ...playlistSearchOptions, ...options }).then(resolveYtplToResult);
-      });
-  }
-
-  return ytpl(id, { ...playlistSearchOptions, ...options }).then(resolveYtplToResult);
+export function Playlist(id: string, options: import("@distube/ytpl").options & Record<string & {}, any> = {}): Promise<GetPlaylistResult> {
+  return ytpl(id, { ...playlistSearchOptions, ...options }).then(resolveDYtplToResult);
 }
 
 Playlist.validateID = function validateID(url: string) {
@@ -64,25 +53,6 @@ Playlist.validateID = function validateID(url: string) {
 Playlist.getPlaylistID = function getPlaylistID(url: string) {
   return ytpl.getPlaylistID(url);
 };
-
-function resolveYtplToResult(result: ytpl.Result): GetPlaylistResult {
-  return {
-    title: result.title,
-    itemCount: result.estimatedItemCount,
-    visibility: result.visibility === "everyone" ? "public" : result.visibility,
-    url: result.url,
-    thumbnailUrl: result.bestThumbnail.url,
-    items: result.items.map(item => ({
-      url: item.url,
-      title: item.title,
-      author: item.author.name,
-      isLive: item.isLive,
-      duration: item.durationSec || 0,
-      durationText: item.duration || "0",
-      thumbnail: item.thumbnails[0]?.url || null,
-    })),
-  };
-}
 
 function resolveDYtplToResult(result: import("@distube/ytpl").result): GetPlaylistResult {
   let thumbnailUrl: string | null = null;
