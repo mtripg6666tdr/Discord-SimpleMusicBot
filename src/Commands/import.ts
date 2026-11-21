@@ -120,8 +120,25 @@ export default class Import extends BaseCommand {
           return;
         }
 
+        if (!Array.isArray(raw.data)) {
+          await statusMessage.edit(`❌${t("commands:import.contentNotIncludedInMessage")}`);
+          return;
+        }
+
+        if (raw.data.length > 999) {
+          await statusMessage.edit(`❌${t("components:queue.tooManyQueueItems")}`);
+          return;
+        }
+
         const qs = raw.data;
         for (let i = 0; i < qs.length; i++) {
+          if (!qs[i] || typeof qs[i].url !== "string") {
+            continue;
+          }
+          if (context.server.queue.length > 999) {
+            await statusMessage.edit(`❌${t("components:queue.tooManyQueueItems")}`);
+            return;
+          }
           await context.server.queue.addQueueOnly({
             url: qs[i].url,
             addedBy: message.member,
