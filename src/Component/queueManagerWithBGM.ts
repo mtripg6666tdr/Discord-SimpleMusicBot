@@ -26,6 +26,7 @@ import * as path from "path";
 
 import { QueueManager } from "./queueManager";
 import * as AudioSource from "../AudioSource";
+import { resolvePathWithinBase } from "../Util";
 
 export class QueueManagerWithBgm extends QueueManager {
   protected override server: GuildDataContainerWithBgm;
@@ -84,11 +85,10 @@ export class QueueManagerWithBgm extends QueueManager {
     gotData?: T | null,
     preventCache?: boolean,
   }): Promise<QueueContent & { index: number }> {
-    if (
-      !url.startsWith("http://")
-      && !url.startsWith("https://")
-      && fs.existsSync(path.join(__dirname, global.BUNDLED ? "../" : "../../", url))
-    ) {
+    const localPath = !url.startsWith("http://") && !url.startsWith("https://")
+      ? resolvePathWithinBase(path.join(__dirname, global.BUNDLED ? "../" : "../../"), url)
+      : null;
+    if (localPath && fs.existsSync(localPath)) {
       const result: QueueContent = {
         basicInfo: await new AudioSource.FsStream().init(url, null),
         additionalInfo: {

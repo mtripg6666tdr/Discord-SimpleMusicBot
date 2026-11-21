@@ -46,9 +46,18 @@ export default class Rm extends BaseCommand {
       message.reply(t("commands:remove.noArgument")).catch(this.logger.error);
       return;
     }
-    if (context.args.includes("0") && context.server.player.isPlaying) {
-      message.reply(t("commands:remove.invalidArgument")).catch(this.logger.error);
-      return;
+    if (context.server.player.isPlaying) {
+      const touchesPlaying = context.args.some(arg => {
+        if (/^0+$/.test(arg)) {
+          return true;
+        }
+        const range = arg.match(/^([0-9]+)-([0-9]*)$/);
+        return !!range && Number(range[1]) === 0;
+      });
+      if (touchesPlaying) {
+        message.reply(t("commands:remove.invalidArgument")).catch(this.logger.error);
+        return;
+      }
     }
 
     context.server.updateBoundChannel(message);
@@ -62,7 +71,7 @@ export default class Rm extends BaseCommand {
       let match = o.match(/^(?<from>[0-9]+)-(?<to>[0-9]+)$/);
       if (match) {
         const from = Number(match.groups!.from);
-        const to = Number(match.groups!.to);
+        const to = Math.min(Number(match.groups!.to), q.length - 1);
         if (!isNaN(from) && !isNaN(to) && from <= to) {
           for (let i = from; i <= to; i++) {
             addition.push(i);
@@ -80,7 +89,7 @@ export default class Rm extends BaseCommand {
         } else {
           match = o.match(/^-(?<to>[0-9]+)$/);
           if (match) {
-            const to = Number(match.groups!.to);
+            const to = Math.min(Number(match.groups!.to), q.length - 1);
             if (!isNaN(to)) {
               for (let i = context.server.player.isPlaying ? 1 : 0; i <= to; i++) {
                 addition.push(i);
@@ -99,7 +108,7 @@ export default class Rm extends BaseCommand {
       new Set(
         indexes
           .map(str => Number(str))
-          .filter(n => !isNaN(n))
+          .filter(n => Number.isInteger(n) && n >= 0 && n < q.length && !(context.server.player.isPlaying && n === 0))
           .sort((a, b) => b - a),
       ),
     );
@@ -110,6 +119,10 @@ export default class Rm extends BaseCommand {
     let firstItemTitle = null;
     for (let i = 0; i < dels.length; i++) {
       const item = q.get(dels[i]);
+      if (!item) {
+        failed.push(dels[i]);
+        continue;
+      }
       if (
         discordUtil.users.isDJ(message.member, context)
         || item.additionalInfo.addedBy.userId === message.member.id

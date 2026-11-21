@@ -49,7 +49,7 @@ export default class BulkDelete extends BaseCommand {
 
     const count = Number(context.args[0]);
 
-    if (isNaN(count)) {
+    if (!Number.isInteger(count) || count < 1 || count > 100) {
       message.reply(`:warning:${t("commands:bulk_delete.invalidMessageCount")}`).catch(this.logger.error);
       return;
     }
