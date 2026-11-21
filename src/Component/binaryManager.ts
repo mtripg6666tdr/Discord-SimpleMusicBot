@@ -135,7 +135,7 @@ export class BinaryManager extends LogEmitter<{}> {
         },
       });
       const fileStream = result.body.pipe(fs.createWriteStream(this.binaryPath, {
-        mode: 0o777,
+        mode: 0o755,
       }));
       await Promise.all([
         pEvent(
