@@ -20,26 +20,11 @@ import type { IncomingMessage } from "http";
 import type { Readable } from "stream";
 
 import * as distubeYtdl from "@distube/ytdl-core";
-import * as ytdl from "ytdl-core";
 
-import { assertIs, createFragmentalDownloadStream, createPassThrough } from "../../Util";
+import { createFragmentalDownloadStream, createPassThrough } from "../../Util";
 import { getLogger } from "../../logger";
 
 const logger = getLogger("AudioSource:YouTubeStream");
-
-export function createChunkedYTStream(info: ytdl.videoInfo, format: ytdl.videoFormat, options: ytdl.downloadOptions, chunkSize: number = 512 * 1024) {
-  return createFragmentalDownloadStream(
-    (start, end) => ytdl.downloadFromInfo(info, {
-      format,
-      ...options,
-      range: { start, end },
-    }),
-    {
-      chunkSize,
-      contentLength: Number(format.contentLength),
-    },
-  );
-}
 
 export function createChunkedDistubeYTStream(
   info: distubeYtdl.videoInfo,
@@ -74,7 +59,7 @@ export function createChunkedDistubeYTStream(
   return stream;
 }
 
-export function createRefreshableYTLiveStream(info: ytdl.videoInfo | distubeYtdl.videoInfo, url: string, options: ytdl.downloadOptions | distubeYtdl.downloadOptions, distube: boolean = false) {
+export function createRefreshableYTLiveStream(info: distubeYtdl.videoInfo, url: string, options: distubeYtdl.downloadOptions) {
   // set timeout to any miniget stream
   const setStreamNetworkTimeout = (_stream: Readable) => {
     _stream.on("response", (message: IncomingMessage) => {
@@ -90,27 +75,15 @@ export function createRefreshableYTLiveStream(info: ytdl.videoInfo | distubeYtdl
   };
 
   // start to download the live stream from the provided information (info object or url string)
-  const downloadLiveStream = async (targetInfo: ytdl.videoInfo | distubeYtdl.videoInfo | string) => {
+  const downloadLiveStream = async (targetInfo: distubeYtdl.videoInfo | string) => {
     if (typeof targetInfo === "string") {
-      targetInfo = await ytdl.getInfo(targetInfo);
-      options.format = ytdl.chooseFormat(targetInfo.formats, { isHLS: true } as ytdl.chooseFormatOptions);
+      targetInfo = await distubeYtdl.getInfo(targetInfo);
+      options.format = distubeYtdl.chooseFormat(targetInfo.formats, { isHLS: true } as distubeYtdl.chooseFormatOptions);
     }
 
-    if (distube) {
-      assertIs<distubeYtdl.videoInfo>(targetInfo);
-      assertIs<distubeYtdl.downloadOptions>(options);
-
-      return distubeYtdl.downloadFromInfo(targetInfo, Object.assign({
-        liveBuffer: 10000,
-      }, options));
-    } else {
-      assertIs<ytdl.videoInfo>(targetInfo);
-      assertIs<ytdl.downloadOptions>(options);
-
-      return ytdl.downloadFromInfo(targetInfo, Object.assign({
-        liveBuffer: 10000,
-      }, options));
-    }
+    return distubeYtdl.downloadFromInfo(targetInfo, Object.assign({
+      liveBuffer: 10000,
+    }, options));
   };
 
   // handle errors occurred by the current live stream

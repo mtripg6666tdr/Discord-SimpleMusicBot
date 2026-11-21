@@ -102,6 +102,7 @@ if (typeof File === "undefined") {
   if (require("buffer").File) {
     global.File = require("buffer").File;
   } else {
+    // @ts-expect-error The fallback File implementation does not fully satisfy the buffer.File type.
     global.File = class File extends Blob {
       name: string;
       lastModified: number;

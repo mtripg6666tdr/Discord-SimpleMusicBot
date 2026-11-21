@@ -20,7 +20,6 @@ import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 import type { SongInfo } from "../Component/searchPanel";
 import type * as dYtsr from "@distube/ytsr";
-import type * as ytsr from "ytsr";
 
 import { MessageActionRowBuilder, MessageButtonBuilder } from "@mtripg6666tdr/oceanic-command-resolver/helper";
 
@@ -120,7 +119,7 @@ export abstract class SearchBase<T> extends BaseCommand {
 
 const config = getConfig();
 
-export default class Search extends SearchBase<ytsr.Video[] | dYtsr.Video[]> {
+export default class Search extends SearchBase<dYtsr.Video[]> {
   constructor() {
     super({
       alias: ["search", "se"],
@@ -142,20 +141,20 @@ export default class Search extends SearchBase<ytsr.Video[] | dYtsr.Video[]> {
   protected override async searchContent(query: string, context: CommandArgs) {
     return searchYouTube(query)
       .then(result => {
-        const videos = (result.items as (ytsr.Item | dYtsr.Video)[]).filter(item => item.type === "video") as ytsr.Video[] | dYtsr.Video[];
+        const videos = (result.items as dYtsr.Video[]).filter(item => item.type === "video");
         context.bot.cache.search.add(query, videos);
         return videos;
       });
   }
 
-  protected override consumer(items: ytsr.Video[] | dYtsr.Video[]) {
+  protected override consumer(items: dYtsr.Video[]) {
     const { t } = getCommandExecutionContext();
 
     return items.map(item => ({
       url: item.url,
-      title: "title" in item ? item.title : `*${item.name}`,
+      title: "title" in item ? (item as { title: string }).title : `*${item.name}`,
       duration: item.duration || "0",
-      thumbnail: ("bestThumbnail" in item ? item.bestThumbnail.url : item.thumbnail) || DefaultAudioThumbnailURL,
+      thumbnail: ("bestThumbnail" in item ? (item as { bestThumbnail: { url: string } }).bestThumbnail.url : item.thumbnail) || DefaultAudioThumbnailURL,
       author: item.author?.name || t("unknown"),
       description: `${t("length")}: ${item.duration}, ${t("channelName")}: ${item.author?.name || t("unknown")}`,
     })).filter(n => n);
