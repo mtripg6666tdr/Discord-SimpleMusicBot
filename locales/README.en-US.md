@@ -5,8 +5,8 @@
 
 <img alt="bot usage example" src="https://user-images.githubusercontent.com/56076195/218059644-2ebdf405-b9f8-4561-a3cc-2bcecf09f145.png" width="550" />
 
-A simple music bot for Discord.This bot supports playing songs from YouTube. No need to copy and paste URLs, but you can find music by keywords.  
-Enjoy your favorite songs with your friends, by using this OSS bot.  
+A simple music bot for Discord. This bot supports playing songs from YouTube. No need to copy and paste URLs, but you can find music by keywords.   
+Enjoy your favorite songs with your friends, by using this OSS bot.   
 You can try to use the bot in the support server below.
 
 ## Features
@@ -55,8 +55,8 @@ The documentation of the bot (Japanese).
 機能追加のご要望も、Issue や下記のサポートサーバーを通して受け付けております。 しかしながら、上の理由により実装時期が全く保証できない状況です。大変申し訳ございませんが、予めご了承ください。
 
 ## Localization
-This project has a plan to be multi-lingualized via Crowdin.We are looking for translators and proofreaders who can speak Japanese or English.  
-The original language in the project is Japanese.Languages we are going to support are following:
+This project has a plan to be multi-lingualized via Crowdin. We are looking for translators and proofreaders who can speak Japanese or English.   
+The original language in the project is Japanese. Languages we are going to support are following:
 * American English
 * British English(except for the README file)
 * Taiwanese
