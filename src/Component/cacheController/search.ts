@@ -33,13 +33,13 @@ export class SearchCacheController extends BaseController {
   }
 
   has(keyword: string) {
-    const id = this.createCacheId(keyword);
+    const id = this.createCacheId(keyword.toLowerCase());
     const result = this.utils.existPersistentCache(id);
     this.logger.info(`Requested persistent cache ${result ? "" : "not "}found (id: ${id})`);
     return result;
   }
 
   get(keyword: string) {
-    return this.utils.getPersistentCache(this.createCacheId(keyword)) as Promise<ytsr.Video[]>;
+    return this.utils.getPersistentCache(this.createCacheId(keyword.toLowerCase())) as Promise<ytsr.Video[]>;
   }
 }
