@@ -30,7 +30,7 @@ import { YouTube } from "..";
 import { stringifyObject } from "../../Util";
 import { getLogger } from "../../logger";
 
-const worker = isMainThread ? new Worker(path.join(__dirname, global.BUNDLED && __filename.includes("min") ? "./worker.min.js" : "./worker.js")).on("error", console.error) : null;
+const worker = isMainThread ? new Worker(path.join(__dirname, global.BUNDLED && __filename.includes("min") ? "./worker.min.js" : "./worker.js")) : null;
 
 if (worker) {
   global.workerThread = worker;
@@ -86,6 +86,17 @@ const jobQueue = worker && new Map<string, jobQueueContent>();
 
 if (worker) {
   worker.unref();
+  worker.on("error", er => {
+    logger.error(er);
+    for (const { callback } of jobQueue!.values()) {
+      callback({
+        type: "error",
+        data: stringifyObject(er),
+        id: "",
+      });
+    }
+    jobQueue!.clear();
+  });
   worker.on("message", (message: WithId<WorkerMessage>) => {
     if (jobQueue!.has(message.id)) {
       const { callback, start } = jobQueue!.get(message.id)!;
@@ -104,7 +115,8 @@ if (worker) {
 const jobTriggerQueue = new PQueue({
   concurrency: 2,
   intervalCap: 4,
-  interval: 12,
+  // interval is in milliseconds: at most intervalCap jobs per 12 seconds
+  interval: 12 * 1000,
 });
 
 function doJob(message: SpawnerGetInfoMessage): Promise<WorkerGetInfoSuccessMessage>;
@@ -118,6 +130,11 @@ function doJob(message: SpawnerJobMessage): Promise<WorkerSuccessMessage> {
   logger.debug(`Job(${uuid}) Scheduled`);
 
   return jobTriggerQueue.add(() => new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      jobQueue!.delete(uuid);
+      reject(new Error(`Job(${uuid}) timed out`));
+    }, 30 * 1000);
+    timeout.unref();
     worker.postMessage({
       ...message,
       id: uuid,
@@ -126,6 +143,7 @@ function doJob(message: SpawnerJobMessage): Promise<WorkerSuccessMessage> {
     jobQueue!.set(uuid, {
       start: Date.now(),
       callback: result => {
+        clearTimeout(timeout);
         if (result.type === "error") {
           reject(result.data);
         } else {
