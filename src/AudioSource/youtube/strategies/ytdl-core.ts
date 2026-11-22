@@ -19,26 +19,20 @@
 import type { YouTubeJsonFormat } from "..";
 import type { Cache, StrategyFetchResult } from "./base";
 import type { ReadableStreamInfo, StreamInfo, UrlStreamInfo } from "../../audiosource";
+import type { VideoInfo } from "../ytdlCore";
 import type { Readable } from "stream";
 
-import { HttpsProxyAgent } from "https-proxy-agent";
-import * as ytdl from "ytdl-core";
-
 import { Strategy } from "./base";
-import { getConfig } from "../../../config";
 import { SecondaryUserAgent } from "../../../definition";
-import { createChunkedYTStream, createRefreshableYTLiveStream } from "../stream";
+import { createChunkedDistubeYTStream, createRefreshableYTLiveStream } from "../stream";
+import { getInfo as getYtdlInfo, loadYtdlCore } from "../ytdlCore";
 
 export type ytdlCore = "ytdlCore";
 export const ytdlCore: ytdlCore = "ytdlCore";
 
-const config = getConfig();
+type ytdlCoreCache = Cache<ytdlCore, VideoInfo>;
 
-type ytdlCoreCache = Cache<ytdlCore, ytdl.videoInfo>;
-
-export class ytdlCoreStrategy extends Strategy<ytdlCoreCache, ytdl.videoInfo> {
-  protected agent = config.proxy ? new HttpsProxyAgent(config.proxy) : undefined;
-
+export class ytdlCoreStrategy extends Strategy<ytdlCoreCache, VideoInfo> {
   get cacheType() {
     return ytdlCore;
   }
@@ -46,12 +40,7 @@ export class ytdlCoreStrategy extends Strategy<ytdlCoreCache, ytdl.videoInfo> {
   async getInfo(url: string) {
     this.logStrategyUsed();
 
-    const requestOptions = this.agent ? { agent: this.agent } : undefined;
-
-    const info = await ytdl.getInfo(url, {
-      lang: "ja",
-      requestOptions,
-    });
+    const info = await getYtdlInfo(url);
     return {
       data: this.mapToExportable(url, info),
       cache: {
@@ -70,38 +59,43 @@ export class ytdlCoreStrategy extends Strategy<ytdlCoreCache, ytdl.videoInfo> {
 
     this.logger.info(availableCache ? "using cache without obtaining" : "obtaining info");
 
-    const info = availableCache || await ytdl.getInfo(url, {
-      lang: config.defaultLanguage,
-    });
+    const info = availableCache || await getYtdlInfo(url);
 
-    const format = ytdl.chooseFormat(info.formats, info.videoDetails.liveBroadcastDetails?.isLiveNow
+    const isLiveNow = !!(info.videoDetails.isLive && !info.videoDetails.isUpcoming);
+    const { chooseFormat, Quality } = await loadYtdlCore();
+    const format = chooseFormat(info.formats, isLiveNow
       ? {
-        filter: undefined,
-        quality: undefined,
-        isHLS: false,
-      } as ytdl.chooseFormatOptions
+        // For live streams, always pick an HLS format that carries audio.
+        // ytdl-core v5's chooseFormat defaults to the highest total bitrate,
+        // which would otherwise select a video-only format (e.g. itag 137).
+        filter: (f) => f.hasAudio && f.isHLS,
+      }
       : {
-        filter: "audioonly",
-        quality: "highestaudio",
+        filter: { hasAudio: true, hasVideo: false },
+        quality: Quality.HighestAudio,
       });
 
     this.logger.info(`format: ${format.itag}, bitrate: ${format.bitrate}bps, audio codec:${format.audioCodec}, container: ${format.container}`);
 
     const partialResult = {
       info: this.mapToExportable(url, info),
-      relatedVideos: info.related_videos.filter(v => !v.isLive).map(video => ({
+      relatedVideos: info.relatedVideos.filter(v => !v.isLive).map(video => ({
         url: `https://www.youtube.com/watch?v=${video.id}`,
         title: video.title,
         description: "No description due to being fetched via related-videos.",
-        length: video.length_seconds,
-        channel: (video.author as ytdl.Author)?.name,
-        channelUrl: (video.author as ytdl.Author)?.channel_url,
-        thumbnail: video.thumbnails[0].url,
+        length: video.lengthSeconds ?? 0,
+        channel: video.author.name || "",
+        channelUrl: video.author.url || "",
+        thumbnail: video.thumbnails[0]?.url || "",
         isLive: video.isLive,
       }) as YouTubeJsonFormat),
     };
 
     if (forceUrl) {
+      if (!format.url) {
+        throw new Error("No direct URL is available for the chosen format.");
+      }
+
       return {
         ...partialResult,
         stream: {
@@ -118,9 +112,9 @@ export class ytdlCoreStrategy extends Strategy<ytdlCoreCache, ytdl.videoInfo> {
         },
       };
     } else {
-      const readable: Readable = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow
-        ? createRefreshableYTLiveStream(info, url, { format, lang: config.defaultLanguage })
-        : createChunkedYTStream(info, format, { lang: config.defaultLanguage }, 1 * 1024 * 1024);
+      const readable: Readable = isLiveNow
+        ? createRefreshableYTLiveStream(info, url, format)
+        : createChunkedDistubeYTStream(info, format, 1 * 1024 * 1024);
 
       return {
         ...partialResult,
@@ -140,20 +134,20 @@ export class ytdlCoreStrategy extends Strategy<ytdlCoreCache, ytdl.videoInfo> {
     }
   }
 
-  protected mapToExportable(url: string, info: ytdl.videoInfo) {
+  protected mapToExportable(url: string, info: VideoInfo) {
     return {
       url,
       title: info.videoDetails.title,
       description: info.videoDetails.description || "",
-      length: Number(info.videoDetails.lengthSeconds),
-      channel: info.videoDetails.ownerChannelName,
-      channelUrl: info.videoDetails.author.channel_url,
-      thumbnail: info.videoDetails.thumbnails[0].url,
-      isLive: !!(info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails?.isLiveNow),
+      length: info.videoDetails.lengthSeconds,
+      channel: info.videoDetails.author.name,
+      channelUrl: info.videoDetails.author.url,
+      thumbnail: info.videoDetails.thumbnails[0]?.url || "",
+      isLive: !!(info.videoDetails.isLive && !info.videoDetails.isUpcoming),
     };
   }
 
-  protected override cacheIsValid(cache?: Cache<any, any> | undefined): cache is Cache<ytdlCore, ytdl.videoInfo> {
+  protected override cacheIsValid(cache?: Cache<any, any> | undefined): cache is Cache<ytdlCore, VideoInfo> {
     return cache?.type === ytdlCore;
   }
 }

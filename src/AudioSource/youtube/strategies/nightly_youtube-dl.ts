@@ -38,7 +38,7 @@ export class NightlyYoutubeDl extends baseYoutubeDlStrategy<nightlyYoutubeDl> {
   }
 
   protected override cacheIsValid(cache?: Cache<any, any> | undefined): cache is Cache<nightlyYoutubeDl, YoutubeDlInfo> {
-    return cache?.type === NightlyYoutubeDl;
+    return cache?.type === nightlyYoutubeDl;
   }
 }
 

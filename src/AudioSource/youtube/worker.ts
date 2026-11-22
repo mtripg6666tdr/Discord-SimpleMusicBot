@@ -22,25 +22,16 @@ import "../../polyfill";
 
 import { parentPort } from "worker_threads";
 
-import ytsr from "ytsr";
-
 import { YouTube } from ".";
 import { updateStrategyConfiguration } from "./strategies";
-import { requireIfAny, stringifyObject } from "../../Util";
-import { getConfig } from "../../config";
-
-const dYtsr = requireIfAny("@distube/ytsr") as typeof import("@distube/ytsr");
+import { searchVideos } from "./ytdlCore";
+import { stringifyObject } from "../../Util";
 
 if (!parentPort) {
   throw new Error("This file should be run in worker thread.");
 }
 
-const config = getConfig();
-const searchOptions = {
-  limit: 12,
-  gl: config.country,
-  hl: config.defaultLanguage,
-};
+const searchLimit = 12;
 
 parentPort.unref();
 parentPort.on("message", onMessage);
@@ -75,35 +66,7 @@ function getInfo({ id, url, prefetched, forceCache }: WithId<SpawnerGetInfoMessa
 }
 
 function search({ id, keyword }: WithId<SpawnerSearchMessage>) {
-  if (dYtsr) {
-    dYtsr(keyword, searchOptions)
-    // @ts-ignore
-      .then(result => {
-        postMessage({
-          type: "searchOk",
-          data: result,
-          id,
-        });
-      })
-      // @ts-ignore
-      .catch(err => {
-        console.error(err);
-
-        return ytsr(keyword, searchOptions);
-      })
-      // @ts-ignore
-      .catch(err => {
-        postMessage({
-          type: "error",
-          data: stringifyObject(err),
-          id,
-        });
-      });
-
-    return;
-  }
-
-  ytsr(keyword, searchOptions)
+  searchVideos(keyword, searchLimit)
     .then(result => {
       postMessage({
         type: "searchOk",

@@ -16,15 +16,22 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-// This type declaration is just for building on Node.js v16.x
-// @distube/ytsr has been dropped its support for v16.x or lower.
-// Building with Node.js v18+, the type definition packed in @distube/ytsr should take priority over below stub types.
-// This file should be removed when dropping the Node.js v16 support.
-declare module "@distube/ytsr" {
-  namespace _EXPORT {
-    type Video = any;
-    type VideoResult = any;
+declare module "miniget" {
+  import type { Agent } from "http";
+  import type { Readable } from "stream";
+
+  namespace miniget {
+    interface Options {
+      maxReconnects?: number;
+      maxRetries?: number;
+      maxRedirects?: number;
+      backoff?: { inc?: number, max?: number };
+      headers?: Record<string, string>;
+      agent?: Agent | false;
+    }
   }
-  declare function _EXPORT(...args: any[]): any;
-  export = _EXPORT;
+
+  function miniget(url: string, options?: miniget.Options): Readable;
+
+  export = miniget;
 }

@@ -106,7 +106,7 @@ export default class Invoke extends BaseCommand {
         }).catch(this.logger.error);
         break;
       case "updatestrcfg": {
-        const config = args[1];
+        const config = args[0];
         updateStrategyConfigInWorker(config);
         updateStrategyConfiguration(config);
       }

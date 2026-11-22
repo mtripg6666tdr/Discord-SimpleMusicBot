@@ -19,28 +19,22 @@
 import type { YouTubeJsonFormat } from "..";
 import type { Cache, StrategyFetchResult } from "./base";
 import type { ReadableStreamInfo, StreamInfo, UrlStreamInfo } from "../../audiosource";
+import type { VideoInfo } from "../ytdlCore";
 import type { Readable } from "stream";
 
-import * as ytdl from "@distube/ytdl-core";
-import { safeTraverse } from "safe-traverse";
-
 import { Strategy } from "./base";
-import { getConfig } from "../../../config";
 import { SecondaryUserAgent } from "../../../definition";
 import { createChunkedDistubeYTStream, createRefreshableYTLiveStream } from "../stream";
+import { getInfo as getYtdlInfo, loadYtdlCore } from "../ytdlCore";
 
 export type distubeYtdlCore = "distubeYtdlCore";
 export const distubeYtdlCore: distubeYtdlCore = "distubeYtdlCore";
 
-const config = getConfig();
-
-type distubeYtdlCoreCache = Cache<distubeYtdlCore, ytdl.videoInfo>;
+type distubeYtdlCoreCache = Cache<distubeYtdlCore, VideoInfo>;
 
 const poTokenExperiments = ["51217476", "51217102"];
 
-export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl.videoInfo> {
-  protected agent = config.proxy ? ytdl.createProxyAgent({ uri: config.proxy }) : undefined;
-
+export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, VideoInfo> {
   get cacheType() {
     return distubeYtdlCore;
   }
@@ -48,10 +42,7 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
   async getInfo(url: string) {
     this.logStrategyUsed();
 
-    const info = await ytdl.getInfo(url, {
-      lang: "ja",
-      agent: this.agent,
-    });
+    const info = await getYtdlInfo(url);
 
     const nop = this.validateInfoExperiments(info);
 
@@ -77,55 +68,58 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
 
     this.logger.info(availableCache ? "using cache without obtaining" : "obtaining info");
 
-    let info: ytdl.videoInfo = null!;
+    let info: VideoInfo = null!;
 
     for (let i = 0; i < 3; i++) {
-      info = availableCache || await ytdl.getInfo(url, {
-        lang: config.defaultLanguage,
-      });
+      info = availableCache || await getYtdlInfo(url);
 
       if (this.validateInfoExperiments(info)) break;
 
       this.logger.warn("Detected broken formats; retrying...");
-
-      safeTraverse(ytdl)
-        .get("cache")
-        .values()
-        .call("clear", (s: Map<string, any>) => s.clear());
+      // Note: @distube/ytdl-core v5 does not expose its internal caches,
+      // so the signature-cache reset the v4-based implementation did here
+      // can no longer be performed.
     }
 
     if (!this.validateInfoExperiments(info)) {
       throw new Error("Detected broken formats.");
     }
 
-    const format = ytdl.chooseFormat(info.formats, info.videoDetails.liveBroadcastDetails?.isLiveNow
+    const isLiveNow = !!(info.videoDetails.isLive && !info.videoDetails.isUpcoming);
+    const { chooseFormat, Quality } = await loadYtdlCore();
+    const format = chooseFormat(info.formats, isLiveNow
       ? {
-        filter: undefined,
-        quality: undefined,
-        isHLS: false,
-      } as ytdl.chooseFormatOptions
+        // For live streams, always pick an HLS format that carries audio.
+        // ytdl-core v5's chooseFormat defaults to the highest total bitrate,
+        // which would otherwise select a video-only format (e.g. itag 137).
+        filter: (f) => f.hasAudio && f.isHLS,
+      }
       : {
-        filter: "audioonly",
-        quality: "highestaudio",
+        filter: { hasAudio: true, hasVideo: false },
+        quality: Quality.HighestAudio,
       });
 
     this.logger.info(`format: ${format.itag}, bitrate: ${format.bitrate}bps, audio codec:${format.audioCodec}, container: ${format.container}`);
 
     const partialResult = {
       info: this.mapToExportable(url, info),
-      relatedVideos: info.related_videos.filter(v => !v.isLive).map(video => ({
+      relatedVideos: info.relatedVideos.filter(v => !v.isLive).map(video => ({
         url: `https://www.youtube.com/watch?v=${video.id}`,
         title: video.title,
         description: "No description due to being fetched via related-videos.",
-        length: video.length_seconds,
-        channel: (video.author as ytdl.Author)?.name,
-        channelUrl: (video.author as ytdl.Author)?.channel_url,
-        thumbnail: video.thumbnails[0].url,
+        length: video.lengthSeconds ?? 0,
+        channel: video.author.name || "",
+        channelUrl: video.author.url || "",
+        thumbnail: video.thumbnails[0]?.url || "",
         isLive: video.isLive,
       }) as YouTubeJsonFormat),
     };
 
     if (forceUrl) {
+      if (!format.url) {
+        throw new Error("No direct URL is available for the chosen format.");
+      }
+
       return {
         ...partialResult,
         stream: {
@@ -142,9 +136,9 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
         },
       };
     } else {
-      const readable: Readable = info.videoDetails.liveBroadcastDetails && info.videoDetails.liveBroadcastDetails.isLiveNow
-        ? createRefreshableYTLiveStream(info, url, { format, lang: config.defaultLanguage })
-        : createChunkedDistubeYTStream(info, format, { lang: config.defaultLanguage });
+      const readable: Readable = isLiveNow
+        ? createRefreshableYTLiveStream(info, url, format)
+        : createChunkedDistubeYTStream(info, format);
 
       return {
         ...partialResult,
@@ -164,40 +158,39 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
     }
   }
 
-  protected mapToExportable(url: string, info: ytdl.videoInfo) {
+  protected mapToExportable(url: string, info: VideoInfo) {
     return {
       url,
       title: info.videoDetails.title,
       description: info.videoDetails.description || "",
-      length: Number(info.videoDetails.lengthSeconds),
-      channel: info.videoDetails.ownerChannelName,
-      channelUrl: info.videoDetails.author.channel_url,
-      thumbnail: info.videoDetails.thumbnails[0].url,
-      isLive: !!(info.videoDetails.isLiveContent && info.videoDetails.liveBroadcastDetails?.isLiveNow),
+      length: info.videoDetails.lengthSeconds,
+      channel: info.videoDetails.author.name,
+      channelUrl: info.videoDetails.author.url,
+      thumbnail: info.videoDetails.thumbnails[0]?.url || "",
+      isLive: !!(info.videoDetails.isLive && !info.videoDetails.isUpcoming),
     };
   }
 
-  protected override cacheIsValid(cache?: Cache<any, any> | undefined): cache is Cache<distubeYtdlCore, ytdl.videoInfo> {
+  protected override cacheIsValid(cache?: Cache<any, any> | undefined): cache is Cache<distubeYtdlCore, VideoInfo> {
     return cache?.type === distubeYtdlCore;
   }
 
-  extractExperiments(info: ytdl.videoInfo): string[] {
+  extractExperiments(info: VideoInfo): string[] {
     // ref: https://github.com/yt-dlp/yt-dlp/pull/10456/files
 
-    const experiments = safeTraverse(info)
-      .expect(_ => _.response.responseContext.serviceTrackingParams)
-      .validate(_ => !!_.find)
-      .select(_ => _.find((d: any) => d.service === "GFEEDBACK"))
-      .get<any>("params")
-      .validate(_ => !!_.find)
-      .select(_ => _.find((d: any) => d.key === "e"))
-      .safeExpect(_ => _.value.split(","))
-      .get() as string[];
+    const trackingParams = (info.playerResponse as any)
+      ?.responseContext?.serviceTrackingParams;
+    const gfeedback = Array.isArray(trackingParams)
+      ? trackingParams.find((d: any) => d.service === "GFEEDBACK")
+      : undefined;
+    const experimentsParam = Array.isArray(gfeedback?.params)
+      ? gfeedback.params.find((d: any) => d.key === "e")
+      : undefined;
 
-    return experiments || [];
+    return typeof experimentsParam?.value === "string" ? experimentsParam.value.split(",") : [];
   }
 
-  validateInfoExperiments(info: ytdl.videoInfo) {
+  validateInfoExperiments(info: VideoInfo) {
     const experiments = this.extractExperiments(info);
 
     // this.logger.trace("Experiments", experiments.join(", "));
@@ -205,7 +198,7 @@ export class distubeYtdlCoreStrategy extends Strategy<distubeYtdlCoreCache, ytdl
     return !poTokenExperiments.some(expId => experiments.includes(expId));
   }
 
-  validateCacheExperiments(cache: Cache<distubeYtdlCore, ytdl.videoInfo>) {
+  validateCacheExperiments(cache: Cache<distubeYtdlCore, VideoInfo>) {
     return this.validateInfoExperiments(cache.data);
   }
 }

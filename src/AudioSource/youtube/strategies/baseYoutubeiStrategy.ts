@@ -25,7 +25,7 @@ import type { YT, Types as YTTypes } from "youtubei.js" with { "resolution-mode"
 import path from "path";
 import vm from "vm";
 
-import { getURLVideoID } from "@distube/ytdl-core";
+import { getVideoID } from "../ytdlCore";
 
 import { Strategy } from "./base";
 import { createFragmentalDownloadStream } from "../../../Util";
@@ -105,7 +105,7 @@ export abstract class baseYoutubeiStrategy extends Strategy<Cache<youtubei, YT.V
     this.logStrategyUsed();
 
     const client = await this.getClient();
-    const info = await client.getInfo(getURLVideoID(url), { client: this.client });
+    const info = await client.getInfo(getVideoID(url), { client: this.client });
 
     return {
       data: this.mapToExportable(url, info),
@@ -126,7 +126,7 @@ export abstract class baseYoutubeiStrategy extends Strategy<Cache<youtubei, YT.V
     this.logger.info(availableCache ? "using cache without obtaining" : "obtaining info");
 
     const client = await this.getClient();
-    const info = availableCache || await client.getInfo(getURLVideoID(url), { client: this.client });
+    const info = availableCache || await client.getInfo(getVideoID(url), { client: this.client });
 
     const format = info.basic_info.is_live
       ? info.streaming_data?.adaptive_formats.filter(f => f.has_audio)[0]

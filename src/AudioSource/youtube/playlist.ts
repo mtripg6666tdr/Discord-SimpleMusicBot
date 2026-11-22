@@ -16,17 +16,18 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-import ytpl from "ytpl";
+import type { PlaylistInfo } from "./ytdlCore";
 
-import { requireIfAny } from "../../Util";
-import { getConfig } from "../../config";
-const dYtpl = requireIfAny("@distube/ytpl") as typeof import("@distube/ytpl");
+import { formatDuration, getPlaylist, resolvePlaylistTarget } from "./ytdlCore";
 
-const config = getConfig();
-const playlistSearchOptions = {
-  gl: config.country,
-  hl: config.defaultLanguage,
-} as const satisfies ytpl.Options;
+export type PlaylistOptions = {
+  limit?: number,
+  // Accepted for compatibility with the previous @distube/ytpl-based
+  // implementation, but no longer used: @distube/ytdl-core v5 only supports
+  // a region (set globally via the config) and returns English metadata.
+  gl?: string,
+  hl?: string,
+};
 
 type GetPlaylistResult = {
   title: string,
@@ -45,74 +46,40 @@ type GetPlaylistResult = {
   }[],
 };
 
-export function Playlist(id: string, options: ytpl.Options & Record<string & {}, any> = {}): Promise<GetPlaylistResult> {
-  if (dYtpl) {
-    return dYtpl(id, { ...playlistSearchOptions, ...options })
-      .then(resolveDYtplToResult)
-      .catch(() => {
-        return ytpl(id, { ...playlistSearchOptions, ...options }).then(resolveYtplToResult);
-      });
-  }
-
-  return ytpl(id, { ...playlistSearchOptions, ...options }).then(resolveYtplToResult);
+export function Playlist(id: string, options: PlaylistOptions & Record<string & {}, any> = {}): Promise<GetPlaylistResult> {
+  return getPlaylist(id, { limit: options.limit }).then(resolveToResult);
 }
 
 Playlist.validateID = function validateID(url: string) {
-  return ytpl.validateID(url);
+  return resolvePlaylistTarget(url) !== undefined;
 };
 
 Playlist.getPlaylistID = function getPlaylistID(url: string) {
-  return ytpl.getPlaylistID(url);
-};
-
-function resolveYtplToResult(result: ytpl.Result): GetPlaylistResult {
-  return {
-    title: result.title,
-    itemCount: result.estimatedItemCount,
-    visibility: result.visibility === "everyone" ? "public" : result.visibility,
-    url: result.url,
-    thumbnailUrl: result.bestThumbnail.url,
-    items: result.items.map(item => ({
-      url: item.url,
-      title: item.title,
-      author: item.author.name,
-      isLive: item.isLive,
-      duration: item.durationSec || 0,
-      durationText: item.duration || "0",
-      thumbnail: item.thumbnails[0]?.url || null,
-    })),
-  };
-}
-
-function resolveDYtplToResult(result: import("@distube/ytpl").result): GetPlaylistResult {
-  let thumbnailUrl: string | null = null;
-
-  if ("thumbnail" in result) {
-    const thumbnail = result.thumbnail as any;
-
-    if (typeof thumbnail?.url === "string") {
-      thumbnailUrl = thumbnail.url;
-    }
+  const target = resolvePlaylistTarget(url);
+  if (target === undefined) {
+    throw new Error("Failed to extract the playlist ID.");
   }
 
+  return target;
+};
+
+function resolveToResult(result: PlaylistInfo): GetPlaylistResult {
   return {
-    title: result.title,
-    // @ts-expect-error @distube/ytpl is missing 'estimatedItemCount' typing
-    itemCount: result.total_items || result.estimatedItemCount,
-    visibility: result.visibility === "everyone" ? "public" : "unlisted",
+    title: result.title || "",
+    itemCount: result.videoCount ?? result.videos.length,
+    // @distube/ytdl-core v5 does not expose the visibility of a playlist;
+    // report it as public, as with most playlists.
+    visibility: "public",
     url: result.url,
-    thumbnailUrl,
-    items: result.items.map(item => ({
+    thumbnailUrl: result.thumbnails[0]?.url ?? null,
+    items: result.videos.map(item => ({
       url: item.url,
       title: item.title,
-      author: item.author?.name || "unknown",
-      // @ts-expect-error @distube/ytpl is missing 'isLive' typing
+      author: item.author.name || "unknown",
       isLive: item.isLive,
-      duration: item.duration
-        ?.split(":")
-        .reduce((p, c) => p * 60 + Number(c), 0) || 0,
-      durationText: item.duration || "0",
-      thumbnail: item.thumbnail,
+      duration: item.lengthSeconds ?? 0,
+      durationText: formatDuration(item.lengthSeconds),
+      thumbnail: item.thumbnails[0]?.url ?? null,
     })),
   };
 }

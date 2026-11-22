@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2025 mtripg6666tdr
+ * Copyright 2021-2026 mtripg6666tdr
  *
  * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
@@ -19,8 +19,8 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 
+import { getVideoID } from "../AudioSource/youtube/ytdlCore";
 import { FFmpeg } from "prism-media";
-import * as ytdl from "ytdl-core";
 
 import { BaseCommand } from ".";
 import { FFmpegDefaultNetworkArgs } from "../Component/streams/ffmpeg";
@@ -94,7 +94,7 @@ export default class Frame extends BaseCommand {
         content: "",
         files: [
           {
-            name: `capture_${ytdl.getVideoID(vinfo.url)}-${hour}${min}${sec}.png`,
+            name: `capture_${getVideoID(vinfo.url)}-${hour}${min}${sec}.png`,
             contents: frame,
           },
         ],
