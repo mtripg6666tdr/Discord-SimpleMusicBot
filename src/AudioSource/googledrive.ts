@@ -36,6 +36,10 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
   async init(url: string, prefetched: AudioSourceBasicJsonFormat | null) {
     const { t } = getCommandExecutionContext();
 
+    if (!GoogleDrive.validateUrl(url)) {
+      throw new Error(t("urlNotFound"));
+    }
+
     if (prefetched) {
       this.title = prefetched.title || t("audioSources.driveStream");
       this.url = url;
@@ -88,6 +92,9 @@ export class GoogleDrive extends AudioSource<string, AudioSourceBasicJsonFormat>
           });
       });
       const { url: actionUrl } = document.match(/action="(?<url>.+?)"/)?.groups || {};
+      if (!actionUrl) {
+        throw new Error("The requested resource is not available right now.");
+      }
       const resourceUrlObj = new URL(actionUrl);
       for (const match of document.matchAll(/<input type="hidden" name="(?<name>.+?)" value="(?<value>.+?)">/g)) {
         const { name, value } = match.groups!;

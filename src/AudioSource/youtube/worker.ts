@@ -22,14 +22,12 @@ import "../../polyfill";
 
 import { parentPort } from "worker_threads";
 
-import ytsr from "ytsr";
+import ytsr from "@distube/ytsr";
 
 import { YouTube } from ".";
 import { updateStrategyConfiguration } from "./strategies";
-import { requireIfAny, stringifyObject } from "../../Util";
+import { stringifyObject } from "../../Util";
 import { getConfig } from "../../config";
-
-const dYtsr = requireIfAny("@distube/ytsr") as typeof import("@distube/ytsr");
 
 if (!parentPort) {
   throw new Error("This file should be run in worker thread.");
@@ -75,34 +73,6 @@ function getInfo({ id, url, prefetched, forceCache }: WithId<SpawnerGetInfoMessa
 }
 
 function search({ id, keyword }: WithId<SpawnerSearchMessage>) {
-  if (dYtsr) {
-    dYtsr(keyword, searchOptions)
-    // @ts-ignore
-      .then(result => {
-        postMessage({
-          type: "searchOk",
-          data: result,
-          id,
-        });
-      })
-      // @ts-ignore
-      .catch(err => {
-        console.error(err);
-
-        return ytsr(keyword, searchOptions);
-      })
-      // @ts-ignore
-      .catch(err => {
-        postMessage({
-          type: "error",
-          data: stringifyObject(err),
-          id,
-        });
-      });
-
-    return;
-  }
-
   ytsr(keyword, searchOptions)
     .then(result => {
       postMessage({

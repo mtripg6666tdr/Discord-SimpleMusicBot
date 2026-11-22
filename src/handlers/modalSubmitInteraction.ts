@@ -20,6 +20,7 @@ import type { GuildDataContainer } from "../Structure";
 import type { MusicBot } from "../bot";
 import type * as discord from "oceanic.js";
 
+import { shouldIgnoreInteractionByBgmConfig } from "./commandInteraction";
 import { CommandManager } from "../Component/commandManager";
 
 export async function handleModalSubmitInteraction(
@@ -31,6 +32,12 @@ export async function handleModalSubmitInteraction(
   this.logger.info("received modalsubmit interaction");
 
   const targetCommand = CommandManager.instance.resolve(interaction.data.customID);
+
+  if (targetCommand && shouldIgnoreInteractionByBgmConfig(server, targetCommand)) {
+    // BGM設定上コマンドが使えない場合、無視して返却
+    this.logger.info("Modal submit interaction ignored due to the BGM configuration");
+    return;
+  }
 
   await targetCommand?.handleModalSubmitInteraction(interaction, server);
 }

@@ -19,7 +19,7 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 
-import ytdl from "ytdl-core";
+import * as ytdl from "@distube/ytdl-core";
 
 import { BaseCommand } from ".";
 

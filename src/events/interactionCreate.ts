@@ -57,7 +57,11 @@ export async function onInteractionCreate(this: MusicBot, interaction: discord.A
   }
 
   // データ初期化
-  const channel = interaction.channel as discord.TextChannel;
+  const channel = interaction.channel as discord.TextChannel | undefined;
+  if (!channel?.guild) {
+    this.logger.debug("Interaction ignored because its channel could not be resolved");
+    return;
+  }
   const server = this.upsertData(channel.guild.id, channel.id);
 
   // コマンドインタラクション

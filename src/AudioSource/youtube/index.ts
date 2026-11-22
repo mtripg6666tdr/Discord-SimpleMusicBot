@@ -24,7 +24,7 @@ import type { ytdlCore } from "./strategies/ytdl-core";
 import type { EmbedField } from "oceanic.js";
 import type { InfoData } from "play-dl";
 
-import * as ytdl from "ytdl-core";
+import * as ytdl from "@distube/ytdl-core";
 
 import { attemptGetInfoForStrategies, attemptFetchForStrategies } from "./strategies";
 import { type youtubei } from "./strategies/baseYoutubeiStrategy";
@@ -304,6 +304,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
         const startTime = this.availableAfter;
         if (!startTime) {
           resolve();
+          return;
         }
 
         const waitTime = Math.max(new Date(startTime!).getTime() - Date.now(), 20 * 1000);
@@ -321,7 +322,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
     });
   }
 
-  private static readonly youtubeLiveUrlRegExp = /^https?:\/\/(www\.)?youtube\.com\/live\/(?<id>[a-zA-Z0-9-_]{11})$/;
+  private static readonly youtubeLiveUrlRegExp = /^https?:\/\/(www\.)?youtube\.com\/live\/(?<id>[a-zA-Z0-9-_]{11})([?#].*)?$/;
 
   static validateURL(url: string): boolean {
     return ytdl.validateURL(url) || this.youtubeLiveUrlRegExp.test(url);
