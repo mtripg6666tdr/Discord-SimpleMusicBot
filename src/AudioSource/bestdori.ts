@@ -39,10 +39,14 @@ export class BestdoriS extends AudioSource<string, BestdoriJsonFormat> {
     if (!id) throw new Error("Invalid streamable url");
     this.id = id;
     const data = (await BestdoriApi.instance.getSongInfo())[this.id];
+    if (!data) {
+      throw new Error("The requested song was not found.");
+    }
     this.title = data.musicTitle[0];
     this.type = data.tag;
     this.thumbnail = BestdoriApi.instance.getThumbnailUrl(this.id, data.jacketImage[0]);
-    this.artist = (await BestdoriApi.instance.getBandInfo())[data.bandId].bandName[0];
+    const band = (await BestdoriApi.instance.getBandInfo())[data.bandId];
+    this.artist = band?.bandName[0] ?? t("unknown");
     if (prefetched) {
       this.lengthSeconds = prefetched.length;
       this.lyricist = prefetched.lyricist;
@@ -142,7 +146,17 @@ export class BestdoriApi {
   private allsonginfoCache: ApiCache<BestdoriAllSongInfo> = null!;
   private allbandinfoCache: ApiCache<BestdoriAllBandInfo> = null!;
 
-  private async setupData() {
+  private setupDataPromise: Promise<void> | null = null;
+
+  private setupData(): Promise<void> {
+    if (!this.setupDataPromise) {
+      this.setupDataPromise = this.setupDataInternal()
+        .finally(() => this.setupDataPromise = null);
+    }
+    return this.setupDataPromise;
+  }
+
+  private async setupDataInternal() {
     const lastDateTime = new Date(new Date().toLocaleString(undefined, { timeZone: "Asia/Tokyo" }));
     lastDateTime.setMinutes(0);
     lastDateTime.setSeconds(0);

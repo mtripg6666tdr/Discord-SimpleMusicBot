@@ -25,7 +25,7 @@ import { getLogger } from "./logger";
 const logger = getLogger("Server");
 
 export function createServer(client: Client, port: number) {
-  return http.createServer((_, res) => {
+  const server = http.createServer((_, res) => {
     res.writeHead(200, { "Content-Type": "application/json" });
     const data = {
       status: 200,
@@ -36,5 +36,8 @@ export function createServer(client: Client, port: number) {
     };
     logger.info("Received a http request");
     res.end(JSON.stringify(data));
-  }).listen(port);
+  });
+  server.on("error", er => logger.error(er));
+  server.listen(port);
+  return server;
 }

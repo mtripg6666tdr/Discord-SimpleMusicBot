@@ -37,10 +37,14 @@ export class Streamable extends AudioSource<string, StreamableJsonFormat> {
       this.streamUrl = prefetched.streamUrl;
     } else {
       const streamInfo = await StreamableApi.getVideoDetails(id);
-      this.lengthSeconds = Math.floor(streamInfo.files["mp4-mobile"].duration);
+      const mobileFile = streamInfo.files?.["mp4-mobile"];
+      if (!mobileFile) {
+        throw new Error("Invalid streamable url.");
+      }
+      this.lengthSeconds = Math.floor(mobileFile.duration);
       this.thumbnail = "https:" + streamInfo.thumbnail_url;
       this.title = streamInfo.title;
-      const streamUrl = streamInfo.files["mp4-mobile"].url;
+      const streamUrl = mobileFile.url;
       if (!streamUrl) {
         throw new Error("Invalid streamable url.");
       }

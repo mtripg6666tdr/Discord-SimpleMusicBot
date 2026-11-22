@@ -225,7 +225,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
             url,
             type: sourceType,
             knownData: gotData,
-            forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000),
+            forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60),
           },
           this.server.bot.cache,
           preventSourceCache,

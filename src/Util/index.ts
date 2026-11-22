@@ -291,8 +291,8 @@ function retrieveFFmpegStderrFromUrl(url: string, ffmpegPathGenerator: () => str
     const ffmpegPath = ffmpegPathGenerator();
     let data = "";
     const proc = spawn(ffmpegPath, [
-      "-i", url,
       "-user_agent", DefaultUserAgent,
+      "-i", url,
     ], {
       windowsHide: true,
       stdio: ["ignore", "ignore", "pipe"],

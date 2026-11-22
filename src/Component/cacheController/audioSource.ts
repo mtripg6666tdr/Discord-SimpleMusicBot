@@ -35,22 +35,25 @@ export class AudioSourceCacheController extends BaseController {
     }
 
     add(content: AudioSource<any, any>, fromPersistentCache: boolean) {
-      this._sourceCache.set(content.url, content);
+      this._sourceCache.set(this.normalizeUrl(content.url), content);
       this.logger.info(`New memory cache added (total: ${this._sourceCache.size})`);
       if (!fromPersistentCache) {
         this.parent.exportableAudioSource.add(content.url, content.exportData());
       }
     }
 
+    private normalizeUrl(url: string) {
+      return url.includes("?si=") ? url.split("?")[0] : url;
+    }
+
     has(url: string) {
-      if (url.includes("?si=")) url = url.split("?")[0];
-      const result = this._sourceCache.has(url);
+      const result = this._sourceCache.has(this.normalizeUrl(url));
       this.logger.debug(`Requested memory cache ${result ? "" : "not "}found`);
       return result;
     }
 
     get(url: string) {
-      return this._sourceCache.get(url);
+      return this._sourceCache.get(this.normalizeUrl(url));
     }
 
     getStatistics() {

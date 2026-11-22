@@ -57,7 +57,6 @@ export default class RmDuplicated extends BaseCommand {
 
     // 削除を実行する
     const actualDeleted = [] as number[];
-    const failed = [] as number[];
     let firstItemTitle = null;
     for (let i = 0; i < dels.length; i++) {
       const item = q.get(dels[i]);
@@ -71,29 +70,11 @@ export default class RmDuplicated extends BaseCommand {
     if (actualDeleted.length > 0) {
       const title = actualDeleted.length === 1 ? firstItemTitle : null;
       const resultStr = actualDeleted.sort((a, b) => a - b).join(",");
-      const failedStr = failed.sort((a, b) => a - b).join(",");
-      message.reply(
-        `🚮${
-          resultStr.length > 100
-            ? "重複していた"
-            : `${resultStr}番目の`
-        }曲${title ? `(\`${title}\`)` : ""}を削除しました${
-          failed.length > 0
-            ? `\r\n:warning:${failed.length > 100 ? "一部" : `${failedStr}番目`}の曲は権限がないため削除できませんでした。`
-            : ""
-        }`,
-      ).catch(this.logger.error);
       message.reply(
         `🚮${
           resultStr.length > 100
             ? t("commands:removedupes.removedMany")
             : t("commands:removedupes.removedAt", { indexes: resultStr, title: title ? `(\`${title}\`)` : "" })
-        }${
-          failed.length > 100
-            ? `\r\n${t("commands:remove.unableToRemoveMany")}`
-            : failed.length > 0
-              ? `\r\n${t("commands:remove.unableToRemoveAt", { indexes: failedStr })}`
-              : ""
         }`,
       ).catch(this.logger.error);
     } else {

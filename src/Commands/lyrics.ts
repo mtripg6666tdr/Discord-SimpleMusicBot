@@ -59,8 +59,14 @@ export default class Lyrics extends BaseCommand {
       const embeds = [] as MessageEmbedBuilder[];
       if (!songInfo.lyric) throw new Error("取得した歌詞が空でした");
       const chunkLength = Math.ceil(songInfo.lyric.length / 4000);
-      for (let i = 0; i < chunkLength; i++) {
-        const partial = songInfo.lyric.substring(4000 * i, 4000 * (i + 1) - 1);
+      const maxChunks = 10;
+      const truncated = chunkLength > maxChunks;
+      const displayChunkLength = Math.min(chunkLength, maxChunks);
+      for (let i = 0; i < displayChunkLength; i++) {
+        let partial = songInfo.lyric.substring(4000 * i, 4000 * (i + 1));
+        if (truncated && i === displayChunkLength - 1) {
+          partial += "\n\n(歌詞が長いため、以下は省略されました)";
+        }
         embeds.push(
           new MessageEmbedBuilder()
             .setDescription(partial)

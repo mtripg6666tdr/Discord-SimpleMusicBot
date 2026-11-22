@@ -129,8 +129,9 @@ async function twitterDl(url: string): Promise<Tweet> {
   }
 
   const screenName = twitterSiteRegExp.exec(result.body)?.groups?.id || null;
+  const escapedScreenName = screenName?.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const displayName = (twitterTitleRegExp.exec(result.body)?.groups?.title || "")
-    .replace(new RegExp(`\\(@${screenName}\\)$`), "")
+    .replace(new RegExp(`\\(@${escapedScreenName}\\)$`), "")
     .trimEnd() || null;
   const content = htmlEntities.decode(ogDescriptionRegExp.exec(result.body)?.groups?.content || "");
   const videoUrl = ogVideoRegExp.exec(result.body)?.groups?.url || null;

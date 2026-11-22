@@ -69,6 +69,26 @@ export class QueueManagerWithBgm extends QueueManager {
     return this.isBGM ? this._bgmDefault[index] : super.get(index);
   }
 
+  override get length(): number {
+    return this.isBGM ? this._bgmDefault.length : super.length;
+  }
+
+  override get isEmpty(): boolean {
+    return this.length === 0;
+  }
+
+  override get lengthSeconds(): number {
+    return this.isBGM
+      ? this._bgmDefault.reduce((prev, current) => prev + Number(current.basicInfo.lengthSeconds), 0)
+      : super.lengthSeconds;
+  }
+
+  override get lengthSecondsActual(): number {
+    return this.isBGM
+      ? this._bgmDefault.reduce((prev, current) => prev + Number(current.basicInfo.lengthSeconds || 0), 0)
+      : super.lengthSecondsActual;
+  }
+
   override async addQueueOnly<T extends AudioSource.AudioSourceBasicJsonFormat>({
     url,
     addedBy,
