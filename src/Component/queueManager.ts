@@ -190,7 +190,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
   getLengthSecondsTo(index: number) {
     let sec = 0;
     if (index < 0) throw new Error("Invalid argument: " + index);
-    const target = Math.min(index, this.length);
+    const target = Math.min(index, this.length - 1);
     for (let i = 0; i <= target; i++) {
       sec += this.get(i).basicInfo.lengthSeconds;
     }
@@ -225,7 +225,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
             url,
             type: sourceType,
             knownData: gotData,
-            forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60 * 1000),
+            forceCache: !preventCache && (this.length === 0 || method === "unshift" || this.lengthSeconds < 4 * 60 * 60),
           },
           this.server.bot.cache,
           preventSourceCache,
@@ -449,6 +449,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
           collectorCreateResult.collector.once("cancelLast", interaction => {
             try {
               const item = this.get(info.index);
+              if (!item) return;
               this.removeAt(info.index);
               interaction.createFollowup({
                 content: `🚮${t("components:queue.cancelAdded", { title: item.basicInfo.title })}`,
@@ -541,6 +542,7 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
     exportableConsumer: (track: T) => Promise<AudioSourceBasicJsonFormat> | AudioSourceBasicJsonFormat,
   ): Promise<QueueContent[]> {
     let index = 0;
+    let lastReportedIndex = -1;
     const result: QueueContent[] = [];
     for (let i = 0; i < totalCount; i++) {
       const item = playlist[i];
@@ -558,10 +560,14 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
         result.push(_result);
       }
       if (
-        index % 50 === 0
-        || (totalCount <= 50 && index % 10 === 0)
-        || (totalCount <= 10 && index % 4 === 0)
+        index !== lastReportedIndex
+        && (
+          index % 50 === 0
+          || (totalCount <= 50 && index % 10 === 0)
+          || (totalCount <= 10 && index % 4 === 0)
+        )
       ) {
+        lastReportedIndex = index;
         await msg.edit(
           `:hourglass_flowing_sand:${
             i18next.t("components:queue.processingPlaylist", { title, lng: this.server.locale })
@@ -595,21 +601,25 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
       const relatedVideos = this.server.player.currentAudioInfo.relatedVideos;
       if (relatedVideos.length >= 1) {
         const video = relatedVideos[0];
-        if (typeof video === "string") {
-          await this.addQueueOnly({
-            url: video,
-            addedBy: null,
-            method: "push",
-            sourceType: "youtube",
-          });
-        } else {
-          await this.addQueueOnly({
-            url: video.url,
-            addedBy: null,
-            method: "push",
-            sourceType: "youtube",
-            gotData: video,
-          });
+        try {
+          if (typeof video === "string") {
+            await this.addQueueOnly({
+              url: video,
+              addedBy: null,
+              method: "push",
+              sourceType: "youtube",
+            });
+          } else {
+            await this.addQueueOnly({
+              url: video.url,
+              addedBy: null,
+              method: "push",
+              sourceType: "youtube",
+              gotData: video,
+            });
+          }
+        } catch (er) {
+          this.logger.error(er);
         }
       }
     }
@@ -691,6 +701,10 @@ export class QueueManager extends ServerManagerBase<QueueManagerEvents> {
    * @param offset 位置
    */
   removeAt(offset: number) {
+    if (!Number.isInteger(offset) || offset < 0 || offset >= this.length) {
+      this.logger.warn(`RemoveAt called with invalid offset: ${offset}`);
+      return;
+    }
     if (this.server.player.isPlaying && offset === 0) {
       throw new Error("The first item cannot be removed because it is being played right now.");
     }

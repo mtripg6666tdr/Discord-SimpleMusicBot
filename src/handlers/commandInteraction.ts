@@ -83,7 +83,7 @@ export async function handleCommandInteraction(this: MusicBot, server: GuildData
   );
 }
 
-function shouldIgnoreInteractionByBgmConfig(server: GuildDataContainer, command: BaseCommand) {
+export function shouldIgnoreInteractionByBgmConfig(server: GuildDataContainer, command: BaseCommand) {
   // BGM構成が存在するサーバー
   return server instanceof GuildDataContainerWithBgm
     && (

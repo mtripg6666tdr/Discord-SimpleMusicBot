@@ -82,6 +82,11 @@ const onTerminated = async function(code: string) {
 
   logger.info(`${code} detected`);
 
+  setTimeout(() => {
+    console.error("Killing... (forced)");
+    process.exit(1);
+  }, 5000).unref();
+
   await bot.stop();
 
   if (server && server.listening) {
@@ -108,11 +113,6 @@ const onTerminated = async function(code: string) {
       console.error(er);
     }
   });
-
-  setTimeout(() => {
-    console.error("Killing... (forced)");
-    process.exit(1);
-  }, 5000).unref();
 };
 
 ["SIGINT", "SIGTERM", "SIGUSR2"].forEach(signal => {
@@ -121,10 +121,14 @@ const onTerminated = async function(code: string) {
 
 logger.info("Loading locales...");
 
-initLocalization(config.debug, config.defaultLanguage).then(() => {
-  // ボット開始
-  bot.run();
-});
+initLocalization(config.debug, config.defaultLanguage)
+  .then(() => {
+    // ボット開始
+    bot.run();
+  })
+  .catch(er => {
+    logger.fatal(er);
+  });
 
 async function reportError(err: any) {
   if (!config.errorChannel) return;

@@ -83,7 +83,7 @@ export class HttpBackupper extends IntervalBackupper {
         data: JSON.stringify(statuses),
       };
 
-      await candyget.post(process.env.DB_URL!, "json", {
+      const { body } = await candyget.post<postResult>(process.env.DB_URL!, "json", {
         headers: {
           "Content-Type": MIME_JSON,
           "User-Agent": this.userAgent,
@@ -91,7 +91,11 @@ export class HttpBackupper extends IntervalBackupper {
         validator: this.postResultValidator.bind(this),
       }, payload);
 
-      statusModifiedGuildIds.forEach(id => this.updateStatusCache(id, originalStatuses[id]));
+      if (body.status === 200) {
+        statusModifiedGuildIds.forEach(id => this.updateStatusCache(id, originalStatuses[id]));
+      } else {
+        throw new Error(`Status code: ${body.status}`);
+      }
     } catch (e) {
       this.logger.warn(e);
     }
@@ -129,7 +133,7 @@ export class HttpBackupper extends IntervalBackupper {
       const { body } = await candyget.post<postResult>(process.env.DB_URL!, "json", {
         headers: {
           "Content-Type": MIME_JSON,
-          "User-Aegnt": this.userAgent,
+          "User-Agent": this.userAgent,
         },
         validator: this.postResultValidator.bind(this),
       }, payload);

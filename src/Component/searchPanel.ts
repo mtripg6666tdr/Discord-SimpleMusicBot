@@ -142,7 +142,7 @@ export class SearchPanel extends LogEmitter<SearchPanelEvents> {
                     : t("components:search.typeOrSelect"),
                 )
                 .setMinValues(1)
-                .setMaxValues(songResult.length - 1)
+                .setMaxValues(Math.max(1, songResult.length - 1))
                 .addOptions(
                   ...selectOpts,
                   {

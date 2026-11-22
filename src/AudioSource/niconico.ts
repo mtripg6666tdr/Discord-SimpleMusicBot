@@ -126,7 +126,7 @@ export type NiconicoJsonFormat = AudioSourceBasicJsonFormat & {
   views: number,
 };
 
-const niconicoTempWatchUrlRegex = /https:\/\/www\.nicovideo\.jp\/watch\/(?<id>sm\d+)/;
+const niconicoTempWatchUrlRegex = /^https:\/\/www\.nicovideo\.jp\/watch\/(?<id>(?:sm|so|nm)\d+)(?:[?#].*)?$/;
 
 class NiconicoDL {
   private readonly _videoId: string;
@@ -192,7 +192,7 @@ class NiconicoDL {
 
     return {
       url: (body as NiconicoTempHlsInfo).data.contentUrl,
-      cookie: headers["set-cookie"]!.join("\n"),
+      cookie: headers["set-cookie"]?.join("\n") ?? "",
     };
   }
 }

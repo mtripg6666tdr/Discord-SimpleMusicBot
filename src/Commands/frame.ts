@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2025 mtripg6666tdr
+ * Copyright 2021-2026 mtripg6666tdr
  *
  * This file is part of mtripg6666tdr/Discord-SimpleMusicBot.
  * (npm package name: 'discord-music-bot' / repository url: <https://github.com/mtripg6666tdr/Discord-SimpleMusicBot> )
@@ -19,8 +19,8 @@
 import type { CommandArgs } from ".";
 import type { CommandMessage } from "../Component/commandResolver/CommandMessage";
 
+import * as ytdl from "@distube/ytdl-core";
 import { FFmpeg } from "prism-media";
-import * as ytdl from "ytdl-core";
 
 import { BaseCommand } from ".";
 import { FFmpegDefaultNetworkArgs } from "../Component/streams/ffmpeg";

@@ -105,6 +105,18 @@ export class PlayManagerWithBgm extends PlayManager {
     this._errorUrl = "";
     this._cost = 0;
     if (this.bgm) {
+      // 基底クラスと同様の後始末を行う
+      this._playing = false;
+      this.emit("playCompleted");
+      this.destroyStream();
+
+      // スリープタイマーの処理
+      if (this._sleeptimerCurrentSong) {
+        await this.sendSleepMessage();
+        await this.disconnect().catch(this.logger.error);
+        return;
+      }
+
       await this.server.queue.next();
       if (this.server.queue.isBgmEmpty) {
         this.logger.info("Queue empty");

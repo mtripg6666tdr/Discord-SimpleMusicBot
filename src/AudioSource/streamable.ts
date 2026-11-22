@@ -37,10 +37,14 @@ export class Streamable extends AudioSource<string, StreamableJsonFormat> {
       this.streamUrl = prefetched.streamUrl;
     } else {
       const streamInfo = await StreamableApi.getVideoDetails(id);
-      this.lengthSeconds = Math.floor(streamInfo.files["mp4-mobile"].duration);
+      const mobileFile = streamInfo.files?.["mp4-mobile"];
+      if (!mobileFile) {
+        throw new Error("Invalid streamable url.");
+      }
+      this.lengthSeconds = Math.floor(mobileFile.duration);
       this.thumbnail = "https:" + streamInfo.thumbnail_url;
       this.title = streamInfo.title;
-      const streamUrl = streamInfo.files["mp4-mobile"].url;
+      const streamUrl = mobileFile.url;
       if (!streamUrl) {
         throw new Error("Invalid streamable url.");
       }
@@ -101,7 +105,7 @@ export abstract class StreamableApi {
    * @returns 動画のID
    */
   static getVideoId(url: string): string | null {
-    const match = url.match(/^https?:\/\/streamable.com\/(?<Id>.+)$/);
+    const match = url.match(/^https?:\/\/streamable.com\/(?<Id>[a-zA-Z0-9_-]+)\/?$/);
     if (match) {
       return match.groups?.Id || null;
     } else {
@@ -110,7 +114,7 @@ export abstract class StreamableApi {
   }
 
   static async getVideoDetails(id: string): Promise<StreamableAPIResult> {
-    return candyget.json(`https://api.streamable.com/videos/${id}`).then(({ body }) => body as StreamableAPIResult);
+    return candyget.json(`https://api.streamable.com/videos/${encodeURIComponent(id)}`).then(({ body }) => body as StreamableAPIResult);
   }
 }
 

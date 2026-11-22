@@ -42,6 +42,8 @@ export class MusicBot extends MusicBotBase {
     return this._isReadyFinished;
   }
 
+  private _clientEventHandlersRegistered = false;
+
   private readonly _telemetry: Telemetry | null = null;
 
   get telemetry() {
@@ -74,7 +76,10 @@ export class MusicBot extends MusicBotBase {
             "GUILD_VOICE_STATES",
             "MESSAGE_CONTENT",
           ],
-        compress: requireIfAny("zlib-sync") || requireIfAny("pako") ? "zlib-stream" : false,
+        // NOTE: do not fall back to pako. The pako-based decompression in
+        // oceanic 1.14 corrupts gateway payloads in some environments, so
+        // compression is enabled only when zlib-sync is available.
+        compress: requireIfAny("zlib-sync") ? "zlib-stream" : false,
       },
     });
 
@@ -82,6 +87,8 @@ export class MusicBot extends MusicBotBase {
 
     this.client.once("ready", eventHandlers.onReady.bind(this));
     this.once("ready", () => {
+      if (this._clientEventHandlersRegistered) return;
+      this._clientEventHandlersRegistered = true;
       this.client
         .on("ready", eventHandlers.onReady.bind(this))
         .on("messageCreate", eventHandlers.onMessageCreate.bind(this))

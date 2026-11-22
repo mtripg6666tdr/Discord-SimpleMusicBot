@@ -24,7 +24,7 @@ import type { ytdlCore } from "./strategies/ytdl-core";
 import type { EmbedField } from "oceanic.js";
 import type { InfoData } from "play-dl";
 
-import * as ytdl from "ytdl-core";
+import * as ytdl from "@distube/ytdl-core";
 
 import { attemptGetInfoForStrategies, attemptFetchForStrategies } from "./strategies";
 import { type youtubei } from "./strategies/baseYoutubeiStrategy";
@@ -304,6 +304,7 @@ export class YouTube extends AudioSource<string, YouTubeJsonFormat> {
         const startTime = this.availableAfter;
         if (!startTime) {
           resolve();
+          return;
         }
 
         const waitTime = Math.max(new Date(startTime!).getTime() - Date.now(), 20 * 1000);

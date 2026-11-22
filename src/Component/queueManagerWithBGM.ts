@@ -26,6 +26,7 @@ import * as path from "path";
 
 import { QueueManager } from "./queueManager";
 import * as AudioSource from "../AudioSource";
+import { resolvePathWithinBase } from "../Util";
 
 export class QueueManagerWithBgm extends QueueManager {
   protected override server: GuildDataContainerWithBgm;
@@ -69,6 +70,26 @@ export class QueueManagerWithBgm extends QueueManager {
     return this.isBGM ? this._bgmDefault[index] : super.get(index);
   }
 
+  override get length(): number {
+    return this.isBGM ? this._bgmDefault.length : super.length;
+  }
+
+  override get isEmpty(): boolean {
+    return this.length === 0;
+  }
+
+  override get lengthSeconds(): number {
+    return this.isBGM
+      ? this._bgmDefault.reduce((prev, current) => prev + Number(current.basicInfo.lengthSeconds), 0)
+      : super.lengthSeconds;
+  }
+
+  override get lengthSecondsActual(): number {
+    return this.isBGM
+      ? this._bgmDefault.reduce((prev, current) => prev + Number(current.basicInfo.lengthSeconds || 0), 0)
+      : super.lengthSecondsActual;
+  }
+
   override async addQueueOnly<T extends AudioSource.AudioSourceBasicJsonFormat>({
     url,
     addedBy,
@@ -84,11 +105,10 @@ export class QueueManagerWithBgm extends QueueManager {
     gotData?: T | null,
     preventCache?: boolean,
   }): Promise<QueueContent & { index: number }> {
-    if (
-      !url.startsWith("http://")
-      && !url.startsWith("https://")
-      && fs.existsSync(path.join(__dirname, global.BUNDLED ? "../" : "../../", url))
-    ) {
+    const localPath = !url.startsWith("http://") && !url.startsWith("https://")
+      ? resolvePathWithinBase(path.join(__dirname, global.BUNDLED ? "../" : "../../"), url)
+      : null;
+    if (localPath && fs.existsSync(localPath)) {
       const result: QueueContent = {
         basicInfo: await new AudioSource.FsStream().init(url, null),
         additionalInfo: {

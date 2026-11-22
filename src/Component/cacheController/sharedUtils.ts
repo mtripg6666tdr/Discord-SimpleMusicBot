@@ -37,15 +37,51 @@ export class CacheControllerSharedUtils {
   private lastCleanup: number = 0;
   private readonly cacheDirPath: string;
   private readonly writingCacheId: Set<string> = new Set();
-  private readonly encyrptionKey = crypto.scryptSync(crypto.randomBytes(16), "salt", 16);
-    private readonly encryptionIv = crypto.randomBytes(16);
-    private readonly cacheIdSalt = crypto.randomBytes(8).toString("hex");
+  private readonly encyrptionKey: Buffer;
+    private readonly cacheIdSalt: string;
 
     constructor(public readonly logger: LoggerObject, public readonly bot: MusicBotBase) {
       this.cacheDirPath = path.join(__dirname, global.BUNDLED ? "../cache/" : "../../../cache/");
       if (!fs.existsSync(this.cacheDirPath)) {
         fs.mkdirSync(this.cacheDirPath);
       }
+      const secrets = this.loadOrCreateCacheSecrets();
+      this.encyrptionKey = crypto.scryptSync(secrets.key, "salt", 16);
+      this.cacheIdSalt = secrets.salt;
+    }
+
+    // 暗号化キーとキャッシュID用ソルトをキャッシュディレクトリ内のファイルに永続化し、
+    // 再起動後も永続キャッシュを復号・再利用できるようにします
+    private loadOrCreateCacheSecrets(): { key: string, salt: string } {
+      const secretsPath = path.join(this.cacheDirPath, ".cache-secrets");
+      try {
+        const parsed = JSON.parse(fs.readFileSync(secretsPath, "utf-8")) as { key?: unknown, salt?: unknown };
+        if (typeof parsed.key === "string" && typeof parsed.salt === "string") {
+          return { key: parsed.key, salt: parsed.salt };
+        }
+        throw new Error("Invalid cache secrets file.");
+      } catch (e) {
+        if ((e as NodeJS.ErrnoException).code !== "ENOENT") {
+          this.logger.warn(`Failed to load cache secrets: ${e}`);
+        }
+      }
+      const secrets = {
+        key: crypto.randomBytes(16).toString("hex"),
+        salt: crypto.randomBytes(8).toString("hex"),
+      };
+      try {
+        fs.writeFileSync(secretsPath, JSON.stringify(secrets), { mode: 0o600, flag: "wx" });
+      } catch {
+        // 並行して作成されていた場合などは、保存済みの内容を読み直します
+        try {
+          const parsed = JSON.parse(fs.readFileSync(secretsPath, "utf-8")) as { key?: unknown, salt?: unknown };
+          if (typeof parsed.key === "string" && typeof parsed.salt === "string") {
+            return { key: parsed.key, salt: parsed.salt };
+          }
+        } catch { /* empty */ }
+        this.logger.warn("Failed to persist cache secrets; encrypted caches will not survive a restart.");
+      }
+      return secrets;
     }
 
     get config() {
@@ -54,7 +90,7 @@ export class CacheControllerSharedUtils {
 
     generateHash(content: string) {
       return crypto.createHash("md5")
-        .update(Buffer.from(content))
+        .update(Buffer.from(`${this.cacheIdSalt}:${content}`))
         .digest("hex");
     }
 
@@ -132,10 +168,13 @@ export class CacheControllerSharedUtils {
         .catch(this.logger.error);
 
       if (cacheId.endsWith(".enc")) {
-        const cipherStream = crypto.createCipheriv("aes-128-cbc", this.encyrptionKey, this.encryptionIv, {
+        const iv = crypto.randomBytes(16);
+        const cipherStream = crypto.createCipheriv("aes-128-cbc", this.encyrptionKey, iv, {
           allowHalfOpen: false,
         });
 
+        // IVを暗号文の先頭に付けて保存し、復号時に読み取れるようにします
+        stream.write(iv);
         cipherStream
           .once("error", err => destroyStream(stream, err))
           .pipe(stream)
@@ -176,15 +215,46 @@ export class CacheControllerSharedUtils {
       this.logger.info(`persistent cache (id: ${cacheId}) restored.`);
 
       if (cacheId.endsWith(".enc")) {
-        const decipherStream = crypto.createDecipheriv("aes-128-cbc", this.encyrptionKey, this.encryptionIv);
-
-        return reader
+        const result = createPassThrough();
+        const decompressed = reader
           .once("error", err => destroyStream(brotliDecompress, err))
           .pipe(brotliDecompress)
-          .once("close", () => destroyStream(reader))
-          .once("error", err => destroyStream(decipherStream, err))
-          .pipe(decipherStream)
-          .once("close", () => destroyStream(brotliDecompress));
+          .once("close", () => destroyStream(reader));
+
+        // 暗号文の先頭に付けられたIV(16バイト)を読み取ってから復号します
+        const ivChunks: Buffer[] = [];
+        let ivLength = 0;
+        const onError = (err: Error) => destroyStream(result, err);
+        const onReadable = () => {
+          let chunk: Buffer | null;
+          while ((chunk = decompressed.read() as Buffer | null) !== null) {
+            ivChunks.push(chunk);
+            ivLength += chunk.length;
+            if (ivLength >= 16) {
+              decompressed.removeListener("readable", onReadable);
+              decompressed.removeListener("error", onError);
+              const buffered = Buffer.concat(ivChunks);
+              decompressed.unshift(buffered.subarray(16));
+              const decipherStream = crypto.createDecipheriv("aes-128-cbc", this.encyrptionKey, buffered.subarray(0, 16));
+              decipherStream.once("error", err => destroyStream(result, err));
+              decompressed
+                .once("error", err => destroyStream(decipherStream, err))
+                .pipe(decipherStream)
+                .once("close", () => destroyStream(brotliDecompress))
+                .pipe(result);
+              break;
+            }
+          }
+        };
+        decompressed.on("readable", onReadable);
+        decompressed.once("error", onError);
+        decompressed.once("end", () => {
+          if (ivLength < 16) {
+            destroyStream(result, new Error("Encrypted cache is corrupted."));
+          }
+        });
+
+        return result;
       } else {
         return reader
           .once("error", err => destroyStream(brotliDecompress, err))
